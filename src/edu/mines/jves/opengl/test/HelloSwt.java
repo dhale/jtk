@@ -7,7 +7,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jves.opengl.test;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -27,19 +26,18 @@ public class HelloSwt {
 
   private static class MyCanvas extends GlSwtCanvas {
     public MyCanvas(Composite parent, int style) {
-      super(parent, style);
+      super(parent,style);
     }
-    public void glPaint() {
-      Point size = getSize();
-      if (_width!=size.x || _height!=size.y) {
-        _width = size.x;
-        _height = size.y;
-        glClearColor(0.0f,0.0f,0.0f,0.0f);
-        glViewport(0,0,_width,_height);
+    public void glInit() {
+      glClearColor(0.0f,0.0f,0.0f,0.0f);
+    }
+    public void glResize(int widthOld, int heightOld, int width, int height) {
+        glViewport(0,0,width,height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0.0,1.0,0.0,1.0,-1.0,1.0);
-      }
+    }
+    public void glPaint() {
       glClear(GL_COLOR_BUFFER_BIT);
       glBlendColor(1.0f,1.0f,1.0f,1.0f); // OpenGL 1.2 test
       glColor3f(1.0f,1.0f,1.0f);
@@ -51,8 +49,6 @@ public class HelloSwt {
       glEnd();
       glFlush();
     }
-    private int _width = -1;
-    private int _height = -1;
   }
   public static void main(String[] args) {
     Display display = new Display();
@@ -60,8 +56,6 @@ public class HelloSwt {
     shell.setLayout(new FillLayout());
     shell.setSize(800,800);
     MyCanvas canvas = new MyCanvas(shell,SWT.NO_BACKGROUND);
-    canvas.setBackground(display.getSystemColor(SWT.COLOR_BLUE));
-    canvas.setForeground(display.getSystemColor(SWT.COLOR_RED));
     shell.layout();
     shell.open();
     while (!shell.isDisposed())

@@ -21,16 +21,16 @@ import static edu.mines.jves.opengl.Gl.*;
 public class HelloAwt {
 
   private static class MyCanvas extends GlAwtCanvas {
-    public void glPaint() {
-      if (_width!=getWidth() || _height!=getHeight()) {
-        _width = getWidth();
-        _height = getHeight();
-        glClearColor(0.0f,0.0f,0.0f,0.0f);
-        glViewport(0,0,_width,_height);
+    public void glInit() {
+      glClearColor(0.0f,0.0f,0.0f,0.0f);
+    }
+    public void glResize(int widthOld, int heightOld, int width, int height) {
+        glViewport(0,0,width,height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         glOrtho(0.0,1.0,0.0,1.0,-1.0,1.0);
-      }
+    }
+    public void glPaint() {
       glClear(GL_COLOR_BUFFER_BIT);
       glBlendColor(1.0f,1.0f,1.0f,1.0f); // OpenGL 1.2 test
       glColor3f(1.0f,1.0f,1.0f);
@@ -42,11 +42,8 @@ public class HelloAwt {
       glEnd();
       glFlush();
     }
-    private int _width = -1;
-    private int _height = -1;
   }
   public static void main(String[] args) {
-    System.setProperty("sun.awt.noerasebackground","true");
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(new Dimension(800,800));
