@@ -18,20 +18,22 @@
 #include "jawt_md.h"
 #include "../util/jniglue.h"
 
-// OpenGL context for AWT Canvas
+// OpenGL context.
 class GlContext {
 public:
+  virtual ~GlContext() {
+  }
   virtual jboolean lock(JNIEnv* env) = 0;
   virtual jboolean unlock(JNIEnv* env) = 0;
   virtual jboolean swapBuffers() = 0;
-  virtual ~GlContext() {
-  }
 };
 
-// OpenGL context for AWT Canvas
+// OpenGL context for AWT Canvas.
 class GlAwtCanvasContext : public GlContext {
 public:
   GlAwtCanvasContext(jobject canvas) : _canvas(canvas) {
+  }
+  virtual ~GlAwtCanvasContext() {
   }
   virtual jboolean lock(JNIEnv* env) {
     _awt.version = JAWT_VERSION_1_3;
@@ -66,13 +68,15 @@ protected:
   virtual void makeCurrent() = 0;
 };
 
-// Platform-dependent OpenGL context for AWT Canvas
+// Microsoft Windows OpenGL context for AWT Canvas.
 #if defined(MWIN)
 class WglAwtCanvasContext : public GlAwtCanvasContext {
 public:
   WglAwtCanvasContext(jobject canvas) : 
     GlAwtCanvasContext(canvas),_hglrc(0) 
   {
+  }
+  virtual ~WglAwtCanvasContext() {
   }
   virtual void makeCurrent() {
     _dsi_win32 = (JAWT_Win32DrawingSurfaceInfo*)_dsi->platformInfo;
@@ -107,12 +111,16 @@ private:
   HDC _hdc;
   HGLRC _hglrc;
 };
+
+// X Windows OpenGL context for AWT Canvas.
 #elif defined(XWIN)
 class GlxAwtCanvasContext : public GlAwtCanvasContext {
 public:
   GlxAwtCanvasContext(jobject canvas) : 
     GlAwtCanvasContext(canvas),_context(0) 
   {
+  }
+  virtual ~GlxAwtCanvasContext() {
   }
   virtual void makeCurrent() {
     _dsi_x11 = (JAWT_X11DrawingSurfaceInfo*)_dsi->platformInfo;
