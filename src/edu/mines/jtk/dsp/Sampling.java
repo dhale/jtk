@@ -25,8 +25,8 @@ import edu.mines.jtk.util.*;
  * <p>
  * All sample values are computed and stored in <em>double precision</em>. 
  * This double precision can be especially important in uniform samplings, 
- * because the sampling interval d and first sample value f are often used 
- * to compute sample values for thousands of samples, in loops like this one:
+ * where the sampling interval d and first sample value f may be used to
+ * compute values for thousands of samples, in loops like this one:
  * <pre><code>
  *   int n = sampling.getCount();
  *   double d = sampling.getDelta();
@@ -36,7 +36,7 @@ import edu.mines.jtk.util.*;
  *     // some calculation that uses the sample value v
  *   }
  * </code></pre>
- * In each iteration of the loop above, the sample value x is computed by 
+ * In each iteration of the loop above, the sample value v is computed by 
  * accumulating the sampling interval d. This computation is fast, but it 
  * also yields rounding error that can grow quadratically with the number 
  * of samples n. If v were computed in single (float) precision, then this 
@@ -60,8 +60,14 @@ import edu.mines.jtk.util.*;
  * specified, as a fraction of the sampling interval, when a sampling is
  * constructed. Alternatively, a default tolerance may be used. When
  * comparing two samplings, the smaller of their tolerances is used.
+ * <p>
+ * A sampling is immutable. New samplings can be constructed by applying
+ * various transformations (e.g., shifting) to an existing sampling, but
+ * an existing sampling cannot be changed. Therefore, multiple sampled
+ * functions can safely share the same sampling.
+ *
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.03.10
+ * @version 2005.03.11
  */
 public class Sampling {
 
@@ -75,17 +81,9 @@ public class Sampling {
   public static final double DEFAULT_TOLERANCE = 1.0e-6;
 
   /**
-   * Constructs an empty sampling. An empty sampling has no samples. The 
-   * sampling interval (delta) is 1.0, and the first sample value is 0.0.
-   */
-  public Sampling() {
-    this(0,1.0,0.0);
-  }
-
-  /**
    * Constructs a uniform sampling with specified count. The sampling 
    * interval (delta) is 1.0, and the first sample value is 0.0.
-   * @param n the number (count) of samples.
+   * @param n the number (count) of samples; must be positive.
    */
   public Sampling(int n) {
     this(n,1.0,0.0);
@@ -93,7 +91,7 @@ public class Sampling {
 
   /**
    * Constructs a uniform sampling with specified parameters.
-   * @param n the number (count) of samples; must be non-negative.
+   * @param n the number (count) of samples; must be positive.
    * @param d the sampling interval (delta); must be positive.
    * @param f the first sample value.
    */
@@ -103,26 +101,32 @@ public class Sampling {
 
   /**
    * Constructs a sampling with specified parameters.
-   * @param n the number (count) of samples; must be non-negative.
+   * @param n the number (count) of samples; must be positive.
    * @param d the sampling interval (delta); must be positive.
    * @param f the first sample value.
    * @param t the sampling tolerance, expressed as fraction of delta.
    */
   public Sampling(int n, double d, double f, double t) {
-    Check.argument(0<=n,"n is not less than zero");
-    Check.argument(0.0<d,"d is greater than zero");
+    Check.argument(n>0,"n>0");
+    Check.argument(d>0.0,"d>0.0");
     _n = n;
     _d = d;
     _f = f;
     _v = null;
-    _t = _d*t;
+    _t = t;
+    _td = _t*_d;
   }
 
   /**
    * Constructs a sampling from the specified array of values. The values 
-   * must be strictly increasing. The constructed sampling may or may not 
-   * be uniform, depending on the specified values.
-   * @param v the sampling values; copied, not referenced.
+   * must be strictly increasing.
+   * <p>
+   * The constructed sampling may or may not be uniform, depending on the 
+   * specified values and default sampling tolerance. If uniform (to within 
+   * the default tolerance), then the array of values is discarded, and the 
+   * sampling is represented by the count, sampling interval, and first 
+   * sample value.
+   * @param v the array of sampling values; must have non-zero length.
    */
   public Sampling(double[] v) {
     this(v,DEFAULT_TOLERANCE);
@@ -130,21 +134,27 @@ public class Sampling {
 
   /**
    * Constructs a sampling from the specified array of values and tolerance.
-   * The values must be strictly increasing. The constructed sampling may or
-   * may not be uniform, depending on the specified values.
-   * @param v the sampling values; copied, not referenced.
+   * The values must be strictly increasing. 
+   * <p>
+   * The constructed sampling may or may not be uniform, depending on the 
+   * specified values and tolerance. If uniform (to within the specified
+   * tolerance), then the array of values is discarded, and the sampling is 
+   * represented by the count, sampling interval, and first sample value.
+   * @param v the array of sampling values; must have non-zero length.
    * @param t the sampling tolerance, expressed as fraction of delta.
    */
   public Sampling(double[] v, double t) {
+    Check.argument(v.length>0,"v.length>0");
     Check.argument(Array.isIncreasing(v),"v is increasing");
     _n = v.length;
     _d = (_n<2)?1.0:(v[_n-1]-v[0])/(_n-1);
-    _f = (_n<1)?0.0:v[0];
-    _t = _d*t;
+    _f = v[0];
+    _t = t;
+    _td = _t*_d;
     boolean uniform = true;
     for (int i=0; i<_n && uniform; ++i) {
       double vi = _f+i*_d;
-      if (!almostEqual(v[i],vi,_t))
+      if (!almostEqual(v[i],vi,_td))
         uniform = false;
     }
     _v = (uniform)?null:Array.copy(v);
@@ -169,7 +179,7 @@ public class Sampling {
 
   /**
    * Gets the first sample value.
-   * @return the first sample value; 0.0, if this sampling is empty.
+   * @return the first sample value.
    */
   public double getFirst() {
     return _f;
@@ -177,10 +187,10 @@ public class Sampling {
 
   /**
    * Gets the last sample value.
-   * @return the last sample value; 0.0, if this sampling is empty.
+   * @return the last sample value.
    */
   public double getLast() {
-    return (_n==0)?0.0:(_v!=null)?_v[_n-1]:_f+(_n-1)*_d;
+    return (_v!=null)?_v[_n-1]:_f+(_n-1)*_d;
   }
 
   /**
@@ -190,11 +200,13 @@ public class Sampling {
    */
   public double getValue(int i) {
     Check.index(_n,i);
-    return (_v!=null)?_v[i]:_f+i*_d;
+    return value(i);
   }
 
   /**
-   * Gets the sample values.
+   * Gets the sample values. If this sampling was constructed with an array 
+   * of sample values, then the returned values are equivalent (equal to 
+   * within the sampling tolerance) to the values in that array.
    * @return the sample values; returned by copy, not by reference.
    */
   public double[] getValues() {
@@ -210,19 +222,10 @@ public class Sampling {
   }
 
   /**
-   * Determines whether this sampling has no samples.
-   * @return true, if no samples; false, otherwise.
-   */
-  public boolean isEmpty() {
-    return _n==0;
-  }
-
-  /**
    * Determines whether this sampling is uniform. A sampling is uniform 
    * if its values can be computed, to within the sampling tolerance, by
    * the expression v = f+i*d, for sampling indices i = 0, 1, ..., n-1.
-   * Samplings with fewer than two samples (even empty samplings) are 
-   * considered to be uniform.
+   * Samplings with only one sample are considered to be uniform.
    * <p>
    * Note that, by this definition, samplings constructed with an array 
    * of sample values may or may not be uniform.
@@ -230,6 +233,36 @@ public class Sampling {
    */
   public boolean isUniform() {
     return _v==null;
+  }
+
+  /**
+   * Determines whether this sampling is equivalent to the specified sampling.
+   * Two samplings are equivalent if each of their sample values differs by 
+   * no more than the sampling tolerance.
+   * @param s the sampling to compare to this sampling.
+   * @return true, if equivalent; false, otherwise.
+   */
+  public boolean isEquivalentTo(Sampling s) {
+    Sampling t = this;
+    if (t.isUniform()!=s.isUniform())
+      return false;
+    if (t.isUniform()) {
+      if (t.getCount()!=s.getCount())
+        return false;
+      double tiny = tinyWith(s);
+      double tf = t.getFirst();
+      double tl = t.getLast();
+      double sf = s.getFirst();
+      double sl = s.getLast();
+      return almostEqual(tf,sf,tiny) && almostEqual(tl,sl,tiny);
+    } else {
+      double tiny = tinyWith(s);
+      for (int i=0; i<_n; ++i) {
+        if (!almostEqual(_v[i],s.value(i),tiny))
+          return false;
+      }
+      return true;
+    }
   }
 
   /**
@@ -244,7 +277,7 @@ public class Sampling {
     int i = -1;
     if (isUniform()) {
       int j = (int)Math.round((x-_f)/_d);
-      if (0<=j && j<_n && almostEqual(x,_f+j*_d,_t))
+      if (0<=j && j<_n && almostEqual(x,_f+j*_d,_td))
         i = j;
     } else {
       int j = Array.binarySearch(_v,x);
@@ -252,9 +285,9 @@ public class Sampling {
         i = j;
       } else {
         j = -(j+1);
-        if (j>0 && almostEqual(x,_v[j-1],_t)) {
+        if (j>0 && almostEqual(x,_v[j-1],_td)) {
           i = j-1;
-        } else if (j<_n && almostEqual(x,_v[j],_t)) {
+        } else if (j<_n && almostEqual(x,_v[j],_td)) {
           i = j;
         }
       }
@@ -272,7 +305,7 @@ public class Sampling {
    * denote the indices of the first samples in the overlapping parts of this 
    * sampling (t) and the specified sampling (s). There exist three cases.
    * <ul><li>
-   * The ranges of sample values overlap, and the values in the overlapping 
+   * The ranges of sample values overlap, and all values in the overlapping 
    * parts are equivalent. In this case, the two samplings are compatible; 
    * and this method returns the array {n,it,is}, as described 
    * above.
@@ -283,9 +316,9 @@ public class Sampling {
    * sample values in this sampling are less than or greater than
    * those in the specified sampling, respectively.
    * </li><li>
-   * The ranges of sample values overlap, but the values in the overlapping 
-   * parts are not equivalent. In this case, the two samplings are 
-   * incompatible; and this method returns null.
+   * The ranges of sample values overlap, but not all values in the 
+   * overlapping parts are equivalent. In this case, the two samplings 
+   * are incompatible; and this method returns null.
    * </li></ul>
    * @param s the sampling to compare with this sampling.
    * @return the array {n,it,is} that describes the overlap; null, if 
@@ -327,9 +360,9 @@ public class Sampling {
       if (mt!=ms)
         return null;
       if (!t.isUniform() || !s.isUniform()) {
-        double tiny = toleranceWith(s);
+        double tiny = tinyWith(s);
         for (jt=it,js=is; jt!=mt; ++jt,++js) {
-          if (!almostEqual(t.getValue(jt),s.getValue(js),tiny))
+          if (!almostEqual(t.value(jt),s.value(js),tiny))
             return null;
         }
       }
@@ -340,9 +373,21 @@ public class Sampling {
   /**
    * Returns the union of this sampling with the specified sampling. This
    * union is possible if and only if the two samplings are compatible.
+   * <p>
+   * If the two samplings do not overlap, this method does not create
+   * samples within any gap that may exist between them. In other words,
+   * the number of samples in the sampling returned is exactly nt+ns-n, 
+   * where nt is the number of samples in this sampling, ns is the number 
+   * of samples in the specified sampling, and n is the number of samples 
+   * with equivalent values in any overlapping parts of the two samplings.
+   * If the samplings do not overlap, then n = 0. One consequence of this
+   * behavior is that the union of two uniform samplings with the same 
+   * sampling interval may be non-uniform.
+   * <p>
+   * This method returns a new sampling; it does not modify this sampling.
+   * @see #overlapWith(Sampling)
    * @param s the sampling to merge with this sampling.
    * @return the merged sampling; null, if no merge is possible.
-   * @see #overlapWith(Sampling)
    */
   public Sampling mergeWith(Sampling s) {
     Sampling t = this;
@@ -355,7 +400,7 @@ public class Sampling {
     int nt = t.getCount();
     int ns = s.getCount();
     int nm = nt+ns-n;
-    if (t.isUniform() && s.isUniform()) {
+    if (n>0 && t.isUniform() && s.isUniform()) {
       double dm = t.getDelta();
       double fm = (it==0)?s.getFirst():t.getFirst();
       return new Sampling(nm,dm,fm);
@@ -363,46 +408,131 @@ public class Sampling {
       double[] vm = new double[nm];
       int jm = 0;
       for (int jt=0; jt<it; ++jt)
-        vm[jm++] = t.getValue(jt);
+        vm[jm++] = t.value(jt);
       for (int js=0; js<is; ++js)
-        vm[jm++] = s.getValue(js);
+        vm[jm++] = s.value(js);
       for (int jt=it; jt<it+n; ++jt)
-        vm[jm++] = t.getValue(jt);
+        vm[jm++] = t.value(jt);
       for (int jt=it+n; jt<nt; ++jt)
-        vm[jm++] = t.getValue(jt);
+        vm[jm++] = t.value(jt);
       for (int js=is+n; js<ns; ++js)
-        vm[jm++] = s.getValue(js);
+        vm[jm++] = s.value(js);
       return new Sampling(vm);
     }
   }
 
   /**
-   * Determines whether this sampling is equivalent to the specified sampling.
-   * Two samplings are equivalent if each of their sample values differs by 
-   * no more than the sampling tolerance.
-   * @param s the sampling to compare to this sampling.
-   * @return true, if equivalent; false, otherwise.
+   * Shifts this sampling.
+   * <p>
+   * This method returns a new sampling; it does not modify this sampling.
+   * @param s the value (shift) to add to this sampling's values.
+   * @return the new sampling.
    */
-  public boolean isEquivalentTo(Sampling s) {
-    Sampling t = this;
-    if (t.isUniform()!=s.isUniform())
-      return false;
-    if (t.isUniform()) {
-      if (t.getCount()!=s.getCount())
-        return false;
-      double tiny = toleranceWith(s);
-      double tf = t.getFirst();
-      double tl = t.getLast();
-      double sf = s.getFirst();
-      double sl = s.getLast();
-      return almostEqual(tf,sf,tiny) && almostEqual(tl,sl,tiny);
+  public Sampling shift(double s) {
+    if (_v==null) {
+      return new Sampling(_n,_d,_f+s,_t);
     } else {
-      double tiny = toleranceWith(s);
-      for (int i=0; i<_n; ++i) {
-        if (!almostEqual(_v[i],s.getValue(i),tiny))
-          return false;
+      double[] v = new double[_n];
+      for (int i=0; i<_n; ++i)
+        v[i] = _v[i]+s;
+      return new Sampling(v,_t);
+    }
+  }
+
+  /**
+   * Prepends samples to this sampling.
+   * If this sampling is not uniform, prepended sample values are computed 
+   * to preserve the average difference between adjacent sample values.
+   * <p>
+   * This method returns a new sampling; it does not modify this sampling.
+   * @param m the number of new samples prepended to this sampling.
+   * @return the new sampling.
+   */
+  public Sampling prepend(int m) {
+    int n = _n+m;
+    double f = _f-m*_d;
+    if (_v==null) {
+      return new Sampling(n,_d,f,_t);
+    } else {
+      double[] v = new double[n];
+      for (int i=0; i<m; ++i)
+        v[i] = f+i*_d;
+      for (int i=m; i<n; ++i)
+        v[i] = _v[i-m];
+      return new Sampling(v,_t);
+    }
+  }
+
+  /**
+   * Appends samples to this sampling.
+   * If this sampling is not uniform, appended sample values are computed 
+   * to preserve the average difference between adjacent sample values.
+   * <p>
+   * This method returns a new sampling; it does not modify this sampling.
+   * @param m the number of new samples appended to this sampling.
+   * @return the new sampling.
+   */
+  public Sampling append(int m) {
+    int n = _n+m;
+    if (_v==null) {
+      return new Sampling(n,_d,_f,_t);
+    } else {
+      double[] v = new double[n];
+      for (int i=0; i<_n; ++i)
+        v[i] = _v[i];
+      for (int i=_n; i<n; ++i)
+        v[i] = _f+i*_d;
+      return new Sampling(v,_t);
+    }
+  }
+
+  /**
+   * Decimates this sampling. Beginning with the first sample, keeps only 
+   * every m'th sample, while discarding the others in this sampling. If 
+   * this sampling has n values, the new sampling will have 1+(n-1)/m values.
+   * <p>
+   * This method returns a new sampling; it does not modify this sampling.
+   * @param m the factor by which to decimate; must be positive.
+   * @return the new sampling.
+   */
+  public Sampling decimate(int m) {
+    Check.argument(m>0,"m>0");
+    int n = 1+(_n-1)/m;
+    if (_v==null) {
+      return new Sampling(n,m*_d,_f,_t);
+    } else {
+      double[] v = new double[n];
+      for (int i=0,j=0; i<n; ++i,j+=m)
+        v[i] = _v[j];
+      return new Sampling(v,_t);
+    }
+  }
+
+  /**
+   * Interpolates this sampling. Inserts m-1 evenly spaced samples between 
+   * each of the samples in this sampling. If this sampling has n values, 
+   * the new sampling will have 1+(n-1)*m values.
+   * <p>
+   * This method returns a new sampling; it does not modify this sampling.
+   * @param m the factor by which to interpolate.
+   * @return the new sampling.
+   */
+  public Sampling interpolate(int m) {
+    Check.argument(m>0,"m>0");
+    int n = _n+(_n-1)*(m-1);
+    if (_v==null) {
+      return new Sampling(n,_d/m,_f,_t);
+    } else {
+      double[] v = new double[n];
+      v[0] = _v[0];
+      for (int i=1,j=m; i<_n; ++i,j+=m) {
+        v[j] = _v[i];
+        double dk = (v[j]-v[j-m])/m;
+        double vk = v[j-m];
+        for (int k=j-m+1; k<j; ++k,vk+=dk)
+          v[k] = vk;
       }
-      return true;
+      return new Sampling(v,_t);
     }
   }
 
@@ -413,14 +543,19 @@ public class Sampling {
   private double _d; // sampling interval
   private double _f; // value of first sample
   private double[] _v; // array[n] of sample values; null, if uniform
-  private double _t; // sampling tolerance (multiplied by _d)
+  private double _t; // sampling tolerance, as a fraction of _d
+  private double _td; // sampling tolerance _t multiplied by _d
+
+  private double value(int i) {
+    return (_v!=null)?_v[i]:_f+i*_d;
+  }
 
   private boolean almostEqual(double v1, double v2, double tiny) {
     double diff = v1-v2;
     return (diff<0.0)?-diff<tiny:diff<tiny;
   }
 
-  private double toleranceWith(Sampling s) {
-    return (_t<s._t)?_t:s._t;
+  private double tinyWith(Sampling s) {
+    return (_td<s._td)?_td:s._td;
   }
 }
