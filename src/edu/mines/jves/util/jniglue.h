@@ -100,7 +100,22 @@ typedef Jarray<unsigned char> JubyteArray;
 typedef Jarray<jchar> JcharArray;
 typedef Jarray<jshort> JshortArray;
 typedef Jarray<unsigned short> JushortArray;
+#ifdef WIN32
+// On Windows, jint is declared as a long, so we must provide a
+// conversion operator to int*.
+class JintArray : public Jarray<jint> {
+public:
+  JintArray(JNIEnv* env, jarray arr) : Jarray<jint>(env,arr) {}
+  operator const int*() const {
+    return (const int*)(this->operator const jint*());
+  }
+  operator int*() const {
+    return (int*)(this->operator jint*());
+  }
+};
+#else
 typedef Jarray<jint> JintArray;
+#endif /* WIN32 */
 typedef Jarray<unsigned int> JuintArray;
 typedef Jarray<jfloat> JfloatArray;
 typedef Jarray<jdouble> JdoubleArray;
