@@ -33,15 +33,13 @@ public class AwtBench {
   }
 
   public static void testImage() {
-    int widthPanel = 600;
-    int heightPanel = 600;
-    int dpi = 288;
-    double widthInches = 3.0;
-    double heightInches = 3.0;
+    Dimension panelSize = new Dimension(600,600);
     ImagePanel panel = new ImagePanel();
-    panel.setPreferredSize(new Dimension(widthPanel,heightPanel));
-    BufferedImage bi = panel.drawToImage(dpi,widthInches,heightInches);
-    writeToPng(bi,"ImageAWT.png");
+    panel.setSize(panelSize);
+    panel.setPreferredSize(panelSize);
+    panel.setBackground(Color.WHITE);
+    BufferedImage image = panel.paintToImage(300,3);
+    writeToPng(image,"ImageAWT.png");
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.add(panel);
@@ -52,25 +50,21 @@ public class AwtBench {
     public void paintComponent(Graphics g) {
       super.paintComponent(g);
       Graphics2D g2d = (Graphics2D)g;
-      int wpixels = getWidth();
-      int hpixels = getHeight();
-      draw(g,wpixels,hpixels);
-    }
-    public void draw(Graphics g, int width, int height) {
-      Graphics2D g2d = (Graphics2D)g;
+      int width = getWidth();
+      int height = getHeight();
       g2d.setColor(Color.RED);
       for (int i=0; i<3; ++i)
         g2d.drawLine(0,0,i*(width-1)/2,height-1);
       for (int i=0; i<2; ++i)
         g2d.drawLine(0,0,width-1,i*(height-1)/2);
       g2d.setColor(Color.BLACK);
-      Font font = new Font("SansSerif",Font.PLAIN,10);
+      Font font = new Font("SansSerif",Font.PLAIN,18);
       g2d.setFont(font);
       FontMetrics fm = g2d.getFontMetrics();
       int fontAscent = fm.getAscent();
       int fontHeight = fm.getHeight();
-      int x = width/3;
-      int y = height/3;
+      int x = width/2;
+      int y = height/2;
       g2d.drawLine(x,0,x,y);
       y += fontAscent;
       int sw = fm.stringWidth("Goodbye");
@@ -78,25 +72,29 @@ public class AwtBench {
       y += fontHeight;
       sw = fm.stringWidth("Hello");
       g2d.drawString("Hello",x-sw/2,y);
+      y += fontHeight;
+      String message = "abcdefghijklmnopqrstuvwxyz0123456789";
+      sw = fm.stringWidth(message);
+      g2d.drawString(message,x-sw/2,y);
     }
-    public BufferedImage drawToImage(
-      double dpi, double widthInches, double heightInches) {
-      int wimage = (int)(dpi*widthInches+0.5);
-      int himage = (int)(dpi*heightInches+0.5);
+    public BufferedImage paintToImage(double dpi, double winches) {
+      int wpixels = getWidth();
+      int hpixels = getHeight();
+      double scale = dpi*winches/wpixels;
+      int wimage = (int)(scale*(wpixels-1)+1.5);
+      int himage = (int)(scale*(hpixels-1)+1.5);
       int type = BufferedImage.TYPE_INT_RGB;
       BufferedImage bi = new BufferedImage(wimage,himage,type);
       Graphics2D g2d = (Graphics2D)bi.getGraphics();
-      g2d.setColor(Color.WHITE);
-      g2d.fillRect(0,0,wimage,himage);
       g2d.setRenderingHint(
         RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
-      double sr = 2+Toolkit.getDefaultToolkit().getScreenResolution();
-      double scale = dpi/sr;
-      int wpixels = (int)((wimage-1)/scale+1.5);
-      int hpixels = (int)((himage-1)/scale+1.5);
+      Color fg = getForeground();
+      g2d.setColor(getBackground());
+      g2d.fillRect(0,0,wimage,himage);
+      g2d.setColor(fg);
       g2d.scale(scale,scale);
-      draw(g2d,wpixels,hpixels);
+      paintComponent(g2d);
       g2d.dispose();
       return bi;
     }
@@ -108,6 +106,43 @@ public class AwtBench {
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
+  }
+  private static class DGraphics {
+    public DGraphics(Graphics2D g2d, double dpi) {
+      _g2d = g2d;
+      _xushift = 0.5;
+      _yushift = 0.5;
+      _xuscale = dpi/72.0;
+      _yuscale = dpi/72.0;
+      _xdshift = 0.0;
+      _ydshift = 0.0;
+      _xdscale = 72.0/dpi;
+      _ydscale = 72.0/dpi;
+    }
+    public void translate(double x, double y) {
+      _g2d.translate(x,y);
+    }
+    public void scale(double s) {
+      _g2d.scale(s,s);
+    }
+    public void drawLine(double x1, double y1, double x2, double y2) {
+      _g2d.drawLine(x(x1),y(y1),x(x2),y(y2));
+    }
+    public int x(double xu) {
+      return (int)(_xushift+_xuscale*xu);
+    }
+    public int y(double yu) {
+      return (int)(_yushift+_yuscale*yu);
+    }
+    public double x(int xd) {
+      return _xdscale*(xd-_xdshift);
+    }
+    public double y(int yd) {
+      return _ydscale*(yd-_ydshift);
+    }
+    private double _xushift,_xuscale,_yushift,_yuscale;
+    private double _xdshift,_xdscale,_ydshift,_ydscale;
+    Graphics2D _g2d;
   }
 
   private static void testNativeJFrame() {
