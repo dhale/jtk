@@ -87,7 +87,8 @@ public class FftReal {
    *  maximum length is 1,441,440.
    */
   public static int nfftFast(int n) {
-    return nfftSmall(n); // TODO: implement
+    Check.argument(n<=1441440,"n does not exceed 1441440");
+    return 2*Pfacc.nfftFast((n+1)/2);
   }
 
   /**

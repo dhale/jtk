@@ -71,7 +71,8 @@ public class FftComplex {
    *  maximum length is 720,720.
    */
   public static int nfftFast(int n) {
-    return nfftSmall(n); // TODO: implement
+    Check.argument(n<=720720,"n does not exceed 720720");
+    return Pfacc.nfftFast(n);
   }
 
   /**
