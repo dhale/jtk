@@ -160,6 +160,51 @@ public class GlContext {
 
   // OpenGL 1.3
   long glActiveTexture;
+  long glClientActiveTexture;
+  long glMultiTexCoord1d;
+  long glMultiTexCoord1dv;
+  long glMultiTexCoord1f;
+  long glMultiTexCoord1fv;
+  long glMultiTexCoord1i;
+  long glMultiTexCoord1iv;
+  long glMultiTexCoord1s;
+  long glMultiTexCoord1sv;
+  long glMultiTexCoord2d;
+  long glMultiTexCoord2dv;
+  long glMultiTexCoord2f;
+  long glMultiTexCoord2fv;
+  long glMultiTexCoord2i;
+  long glMultiTexCoord2iv;
+  long glMultiTexCoord2s;
+  long glMultiTexCoord2sv;
+  long glMultiTexCoord3d;
+  long glMultiTexCoord3dv;
+  long glMultiTexCoord3f;
+  long glMultiTexCoord3fv;
+  long glMultiTexCoord3i;
+  long glMultiTexCoord3iv;
+  long glMultiTexCoord3s;
+  long glMultiTexCoord3sv;
+  long glMultiTexCoord4d;
+  long glMultiTexCoord4dv;
+  long glMultiTexCoord4f;
+  long glMultiTexCoord4fv;
+  long glMultiTexCoord4i;
+  long glMultiTexCoord4iv;
+  long glMultiTexCoord4s;
+  long glMultiTexCoord4sv;
+  long glLoadTransposeMatrixf;
+  long glLoadTransposeMatrixd;
+  long glMultTransposeMatrixf;
+  long glMultTransposeMatrixd;
+  long glSampleCoverage;
+  long glCompressedTexImage3D;
+  long glCompressedTexImage2D;
+  long glCompressedTexImage1D;
+  long glCompressedTexSubImage3D;
+  long glCompressedTexSubImage2D;
+  long glCompressedTexSubImage1D;
+  long glGetCompressedTexImage;
 
   // OpenGL 1.4
   long glBlendFuncSeparate;
@@ -168,6 +213,7 @@ public class GlContext {
   long glGenQueries;
 
   private void getProcAddresses() {
+
     // OpenGL 1.2
     glBlendColor = getProcAddress("glBlendColor");
     glBlendEquation = getProcAddress("glBlendEquation");
@@ -210,8 +256,55 @@ public class GlContext {
 
     // OpenGL 1.3
     glActiveTexture = getProcAddress("glActiveTexture");
+    glClientActiveTexture = getProcAddress("glClientActiveTexture");
+    glMultiTexCoord1d = getProcAddress("glMultiTexCoord1d");
+    glMultiTexCoord1dv = getProcAddress("glMultiTexCoord1dv");
+    glMultiTexCoord1f = getProcAddress("glMultiTexCoord1f");
+    glMultiTexCoord1fv = getProcAddress("glMultiTexCoord1fv");
+    glMultiTexCoord1i = getProcAddress("glMultiTexCoord1i");
+    glMultiTexCoord1iv = getProcAddress("glMultiTexCoord1iv");
+    glMultiTexCoord1s = getProcAddress("glMultiTexCoord1s");
+    glMultiTexCoord1sv = getProcAddress("glMultiTexCoord1sv");
+    glMultiTexCoord2d = getProcAddress("glMultiTexCoord2d");
+    glMultiTexCoord2dv = getProcAddress("glMultiTexCoord2dv");
+    glMultiTexCoord2f = getProcAddress("glMultiTexCoord2f");
+    glMultiTexCoord2fv = getProcAddress("glMultiTexCoord2fv");
+    glMultiTexCoord2i = getProcAddress("glMultiTexCoord2i");
+    glMultiTexCoord2iv = getProcAddress("glMultiTexCoord2iv");
+    glMultiTexCoord2s = getProcAddress("glMultiTexCoord2s");
+    glMultiTexCoord2sv = getProcAddress("glMultiTexCoord2sv");
+    glMultiTexCoord3d = getProcAddress("glMultiTexCoord3d");
+    glMultiTexCoord3dv = getProcAddress("glMultiTexCoord3dv");
+    glMultiTexCoord3f = getProcAddress("glMultiTexCoord3f");
+    glMultiTexCoord3fv = getProcAddress("glMultiTexCoord3fv");
+    glMultiTexCoord3i = getProcAddress("glMultiTexCoord3i");
+    glMultiTexCoord3iv = getProcAddress("glMultiTexCoord3iv");
+    glMultiTexCoord3s = getProcAddress("glMultiTexCoord3s");
+    glMultiTexCoord3sv = getProcAddress("glMultiTexCoord3sv");
+    glMultiTexCoord4d = getProcAddress("glMultiTexCoord4d");
+    glMultiTexCoord4dv = getProcAddress("glMultiTexCoord4dv");
+    glMultiTexCoord4f = getProcAddress("glMultiTexCoord4f");
+    glMultiTexCoord4fv = getProcAddress("glMultiTexCoord4fv");
+    glMultiTexCoord4i = getProcAddress("glMultiTexCoord4i");
+    glMultiTexCoord4iv = getProcAddress("glMultiTexCoord4iv");
+    glMultiTexCoord4s = getProcAddress("glMultiTexCoord4s");
+    glMultiTexCoord4sv = getProcAddress("glMultiTexCoord4sv");
+    glLoadTransposeMatrixf = getProcAddress("glLoadTransposeMatrixf");
+    glLoadTransposeMatrixd = getProcAddress("glLoadTransposeMatrixd");
+    glMultTransposeMatrixf = getProcAddress("glMultTransposeMatrixf");
+    glMultTransposeMatrixd = getProcAddress("glMultTransposeMatrixd");
+    glSampleCoverage = getProcAddress("glSampleCoverage");
+    glCompressedTexImage3D = getProcAddress("glCompressedTexImage3D");
+    glCompressedTexImage2D = getProcAddress("glCompressedTexImage2D");
+    glCompressedTexImage1D = getProcAddress("glCompressedTexImage1D");
+    glCompressedTexSubImage3D = getProcAddress("glCompressedTexSubImage3D");
+    glCompressedTexSubImage2D = getProcAddress("glCompressedTexSubImage2D");
+    glCompressedTexSubImage1D = getProcAddress("glCompressedTexSubImage1D");
+    glGetCompressedTexImage = getProcAddress("glGetCompressedTexImage");
+
     // OpenGL 1.4
     glBlendFuncSeparate = getProcAddress("glBlendFuncSeparate");
+
     // OpenGL 1.5
     glGenQueries = getProcAddress("glGenQueries");
 

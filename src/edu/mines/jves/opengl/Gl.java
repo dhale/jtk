@@ -2045,6 +2045,515 @@ public class Gl {
     int x, int y, int width, int height);
 
   ///////////////////////////////////////////////////////////////////////////
+  // OpenGL 1.3
+
+  public static void glActiveTexture(int texture)
+  {
+    nglActiveTexture(getContext().glActiveTexture,
+      texture);
+  }
+  public static void glClientActiveTexture(int texture)
+  {
+    nglClientActiveTexture(getContext().glClientActiveTexture,
+      texture);
+  }
+  public static void glMultiTexCoord1d(int target, double s)
+  {
+    nglMultiTexCoord1d(getContext().glMultiTexCoord1d,
+      target,s);
+  }
+  public static void glMultiTexCoord1dv(int target, double[] v)
+  {
+    nglMultiTexCoord1dv(getContext().glMultiTexCoord1dv,
+      target,v);
+  }
+  public static void glMultiTexCoord1f(int target, float s)
+  {
+    nglMultiTexCoord1f(getContext().glMultiTexCoord1f,
+      target,s);
+  }
+  public static void glMultiTexCoord1fv(int target, float[] v)
+  {
+    nglMultiTexCoord1fv(getContext().glMultiTexCoord1fv,
+      target,v);
+  }
+  public static void glMultiTexCoord1i(int target, int s)
+  {
+    nglMultiTexCoord1i(getContext().glMultiTexCoord1i,
+      target,s);
+  }
+  public static void glMultiTexCoord1iv(int target, int[] v)
+  {
+    nglMultiTexCoord1iv(getContext().glMultiTexCoord1iv,
+      target,v);
+  }
+  public static void glMultiTexCoord1s(int target, short s)
+  {
+    nglMultiTexCoord1s(getContext().glMultiTexCoord1s,
+      target,s);
+  }
+  public static void glMultiTexCoord1sv(int target, short[] v)
+  {
+    nglMultiTexCoord1sv(getContext().glMultiTexCoord1sv,
+      target,v);
+  }
+  public static void glMultiTexCoord2d(int target, double s, double t)
+  {
+    nglMultiTexCoord2d(getContext().glMultiTexCoord2d,
+      target,s,t);
+  }
+  public static void glMultiTexCoord2dv(int target, double[] v)
+  {
+    nglMultiTexCoord2dv(getContext().glMultiTexCoord2dv,
+      target,v);
+  }
+  public static void glMultiTexCoord2f(int target, float s, float t)
+  {
+    nglMultiTexCoord2f(getContext().glMultiTexCoord2f,
+      target,s,t);
+  }
+  public static void glMultiTexCoord2fv(int target, float[] v)
+  {
+    nglMultiTexCoord2fv(getContext().glMultiTexCoord2fv,
+      target,v);
+  }
+  public static void glMultiTexCoord2i(int target, int s, int t)
+  {
+    nglMultiTexCoord2i(getContext().glMultiTexCoord2i,
+      target,s,t);
+  }
+  public static void glMultiTexCoord2iv(int target, int[] v)
+  {
+    nglMultiTexCoord2iv(getContext().glMultiTexCoord2iv,
+      target,v);
+  }
+  public static void glMultiTexCoord2s(int target, short s, short t)
+  {
+    nglMultiTexCoord2s(getContext().glMultiTexCoord2s,
+      target,s,t);
+  }
+  public static void glMultiTexCoord2sv(int target, short[] v)
+  {
+    nglMultiTexCoord2sv(getContext().glMultiTexCoord2sv,
+      target,v);
+  }
+  public static void glMultiTexCoord3d(
+    int target, double s, double t, double r)
+  {
+    nglMultiTexCoord3d(getContext().glMultiTexCoord3d,
+      target,s,t,r);
+  }
+  public static void glMultiTexCoord3dv(int target, double[] v)
+  {
+    nglMultiTexCoord3dv(getContext().glMultiTexCoord3dv,
+      target,v);
+  }
+  public static void glMultiTexCoord3f(
+    int target, float s, float t, float r)
+  {
+    nglMultiTexCoord3f(getContext().glMultiTexCoord3f,
+      target,s,t,r);
+  }
+  public static void glMultiTexCoord3fv(int target, float[] v)
+  {
+    nglMultiTexCoord3fv(getContext().glMultiTexCoord3fv,
+      target,v);
+  }
+  public static void glMultiTexCoord3i(
+    int target, int s, int t, int r)
+  {
+    nglMultiTexCoord3i(getContext().glMultiTexCoord3i,
+      target,s,t,r);
+  }
+  public static void glMultiTexCoord3iv(int target, int[] v)
+  {
+    nglMultiTexCoord3iv(getContext().glMultiTexCoord3iv,
+      target,v);
+  }
+  public static void glMultiTexCoord3s(
+    int target, short s, short t, short r)
+  {
+    nglMultiTexCoord3s(getContext().glMultiTexCoord3s,
+      target,s,t,r);
+  }
+  public static void glMultiTexCoord3sv(int target, short[] v)
+  {
+    nglMultiTexCoord3sv(getContext().glMultiTexCoord3sv,
+      target,v);
+  }
+  public static void glMultiTexCoord4d(
+    int target, double s, double t, double r, double q)
+  {
+    nglMultiTexCoord4d(getContext().glMultiTexCoord4d,
+      target,s,t,r,q);
+  }
+  public static void glMultiTexCoord4dv(int target, double[] v)
+  {
+    nglMultiTexCoord4dv(getContext().glMultiTexCoord4dv,
+      target,v);
+  }
+  public static void glMultiTexCoord4f(
+    int target, float s, float t, float r, float q)
+  {
+    nglMultiTexCoord4f(getContext().glMultiTexCoord4f,
+      target,s,t,r,q);
+  }
+  public static void glMultiTexCoord4fv(int target, float[] v)
+  {
+    nglMultiTexCoord4fv(getContext().glMultiTexCoord4fv,
+      target,v);
+  }
+  public static void glMultiTexCoord4i(
+    int target, int s, int t, int r, int q)
+  {
+    nglMultiTexCoord4i(getContext().glMultiTexCoord4i,
+      target,s,t,r,q);
+  }
+  public static void glMultiTexCoord4iv(int target, int[] v)
+  {
+    nglMultiTexCoord4iv(getContext().glMultiTexCoord4iv,
+      target,v);
+  }
+  public static void glMultiTexCoord4s(
+    int target, short s, short t, short r, short q)
+  {
+    nglMultiTexCoord4s(getContext().glMultiTexCoord4s,
+      target,s,t,r,q);
+  }
+  public static void glMultiTexCoord4sv(int target, short[] v)
+  {
+    nglMultiTexCoord4sv(getContext().glMultiTexCoord4sv,
+      target,v);
+  }
+  public static void glLoadTransposeMatrixf(float[] m)
+  {
+    nglLoadTransposeMatrixf(getContext().glLoadTransposeMatrixf,
+      m);
+  }
+  public static void glLoadTransposeMatrixd(double[] m)
+  {
+    nglLoadTransposeMatrixd(getContext().glLoadTransposeMatrixd,
+      m);
+  }
+  public static void glMultTransposeMatrixf(float[] m)
+  {
+    nglMultTransposeMatrixf(getContext().glMultTransposeMatrixf,
+      m);
+  }
+  public static void glMultTransposeMatrixd(double[] m)
+  {
+    nglMultTransposeMatrixd(getContext().glMultTransposeMatrixd,
+      m);
+  }
+  public static void glSampleCoverage(float value, boolean invert)
+  {
+    nglSampleCoverage(getContext().glSampleCoverage,
+      value,invert);
+  }
+  public static void glCompressedTexImage3D(
+    int target, int level, int internalformat,
+    int width, int height, int depth, int border, int imageSize, byte[] data)
+  {
+    nglCompressedTexImage3D(getContext().glCompressedTexImage3D,
+      target,level,internalformat,
+      width,height,depth,border,imageSize,data);
+  }
+  public static void glCompressedTexImage3D(
+    int target, int level, int internalformat,
+    int width, int height, int depth, int border, int imageSize, int[] data)
+  {
+    nglCompressedTexImage3D(getContext().glCompressedTexImage3D,
+      target,level,internalformat,
+      width,height,depth,border,imageSize,data);
+  }
+  public static void glCompressedTexImage3D(
+    int target, int level, int internalformat,
+    int width, int height, int depth, int border, int imageSize, short[] data)
+  {
+    nglCompressedTexImage3D(getContext().glCompressedTexImage3D,
+      target,level,internalformat,
+      width,height,depth,border,imageSize,data);
+  }
+  public static void glCompressedTexImage2D(
+    int target, int level, int internalformat,
+    int width, int height, int border, int imageSize, byte[] data)
+  {
+    nglCompressedTexImage2D(getContext().glCompressedTexImage2D,
+      target,level,internalformat,
+      width,height,border,imageSize,data);
+  }
+  public static void glCompressedTexImage2D(
+    int target, int level, int internalformat,
+    int width, int height, int border, int imageSize, int[] data)
+  {
+    nglCompressedTexImage2D(getContext().glCompressedTexImage2D,
+      target,level,internalformat,
+      width,height,border,imageSize,data);
+  }
+  public static void glCompressedTexImage2D(
+    int target, int level, int internalformat,
+    int width, int height, int border, int imageSize, short[] data)
+  {
+    nglCompressedTexImage2D(getContext().glCompressedTexImage2D,
+      target,level,internalformat,
+      width,height,border,imageSize,data);
+  }
+  public static void glCompressedTexImage1D(
+    int target, int level, int internalformat,
+    int width, int border, int imageSize, byte[] data)
+  {
+    nglCompressedTexImage1D(getContext().glCompressedTexImage1D,
+      target,level,internalformat,
+      width,border,imageSize,data);
+  }
+  public static void glCompressedTexImage1D(
+    int target, int level, int internalformat,
+    int width, int border, int imageSize, int[] data)
+  {
+    nglCompressedTexImage1D(getContext().glCompressedTexImage1D,
+      target,level,internalformat,
+      width,border,imageSize,data);
+  }
+  public static void glCompressedTexImage1D(
+    int target, int level, int internalformat,
+    int width, int border, int imageSize, short[] data)
+  {
+    nglCompressedTexImage1D(getContext().glCompressedTexImage1D,
+      target,level,internalformat,
+      width,border,imageSize,data);
+  }
+  public static void glCompressedTexSubImage3D(
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int imageSize, byte[] data)
+  {
+    nglCompressedTexSubImage3D(getContext().glCompressedTexSubImage3D,
+      target,level,xoffset,yoffset,zoffset,
+      width,height,depth,format,imageSize,data);
+  }
+  public static void glCompressedTexSubImage3D(
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int imageSize, int[] data)
+  {
+    nglCompressedTexSubImage3D(getContext().glCompressedTexSubImage3D,
+      target,level,xoffset,yoffset,zoffset,
+      width,height,depth,format,imageSize,data);
+  }
+  public static void glCompressedTexSubImage3D(
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int imageSize, short[] data)
+  {
+    nglCompressedTexSubImage3D(getContext().glCompressedTexSubImage3D,
+      target,level,xoffset,yoffset,zoffset,
+      width,height,depth,format,imageSize,data);
+  }
+  public static void glCompressedTexSubImage2D(
+    int target, int level, int xoffset, int yoffset, 
+    int width, int height, int format, int imageSize, byte[] data)
+  {
+    nglCompressedTexSubImage2D(getContext().glCompressedTexSubImage2D,
+      target,level,xoffset,yoffset,
+      width,height,format,imageSize,data);
+  }
+  public static void glCompressedTexSubImage2D(
+    int target, int level, int xoffset, int yoffset, 
+    int width, int height, int format, int imageSize, int[] data)
+  {
+    nglCompressedTexSubImage2D(getContext().glCompressedTexSubImage2D,
+      target,level,xoffset,yoffset,
+      width,height,format,imageSize,data);
+  }
+  public static void glCompressedTexSubImage2D(
+    int target, int level, int xoffset, int yoffset, 
+    int width, int height, int format, int imageSize, short[] data)
+  {
+    nglCompressedTexSubImage2D(getContext().glCompressedTexSubImage2D,
+      target,level,xoffset,yoffset,
+      width,height,format,imageSize,data);
+  }
+  public static void glCompressedTexSubImage1D(
+    int target, int level, int xoffset, 
+    int width, int format, int imageSize, byte[] data)
+  {
+    nglCompressedTexSubImage1D(getContext().glCompressedTexSubImage1D,
+      target,level,xoffset,
+      width,format,imageSize,data);
+  }
+  public static void glCompressedTexSubImage1D(
+    int target, int level, int xoffset, 
+    int width, int format, int imageSize, int[] data)
+  {
+    nglCompressedTexSubImage1D(getContext().glCompressedTexSubImage1D,
+      target,level,xoffset,
+      width,format,imageSize,data);
+  }
+  public static void glCompressedTexSubImage1D(
+    int target, int level, int xoffset, 
+    int width, int format, int imageSize, short[] data)
+  {
+    nglCompressedTexSubImage1D(getContext().glCompressedTexSubImage1D,
+      target,level,xoffset,
+      width,format,imageSize,data);
+  }
+  public static void glGetCompressedTexImage(
+    int target, int level, byte[] img)
+  {
+    nglGetCompressedTexImage(getContext().glGetCompressedTexImage,
+      target,level,img);
+  }
+  public static void glGetCompressedTexImage(
+    int target, int level, int[] img)
+  {
+    nglGetCompressedTexImage(getContext().glGetCompressedTexImage,
+      target,level,img);
+  }
+  public static void glGetCompressedTexImage(
+    int target, int level, short[] img)
+  {
+    nglGetCompressedTexImage(getContext().glGetCompressedTexImage,
+      target,level,img);
+  }
+  private static native void nglActiveTexture(long pfunc,
+    int texture);
+  private static native void nglClientActiveTexture(long pfunc,
+    int texture);
+  private static native void nglMultiTexCoord1d(long pfunc,
+    int target, double s);
+  private static native void nglMultiTexCoord1dv(long pfunc,
+    int target, double[] v);
+  private static native void nglMultiTexCoord1f(long pfunc,
+    int target, float s);
+  private static native void nglMultiTexCoord1fv(long pfunc,
+    int target, float[] v);
+  private static native void nglMultiTexCoord1i(long pfunc,
+    int target, int s);
+  private static native void nglMultiTexCoord1iv(long pfunc,
+    int target, int[] v);
+  private static native void nglMultiTexCoord1s(long pfunc,
+    int target, short s);
+  private static native void nglMultiTexCoord1sv(long pfunc,
+    int target, short[] v);
+  private static native void nglMultiTexCoord2d(long pfunc,
+    int target, double s, double t);
+  private static native void nglMultiTexCoord2dv(long pfunc,
+    int target, double[] v);
+  private static native void nglMultiTexCoord2f(long pfunc,
+    int target, float s, float t);
+  private static native void nglMultiTexCoord2fv(long pfunc,
+    int target, float[] v);
+  private static native void nglMultiTexCoord2i(long pfunc,
+    int target, int s, int t);
+  private static native void nglMultiTexCoord2iv(long pfunc,
+    int target, int[] v);
+  private static native void nglMultiTexCoord2s(long pfunc,
+    int target, short s, short t);
+  private static native void nglMultiTexCoord2sv(long pfunc,
+    int target, short[] v);
+  private static native void nglMultiTexCoord3d(long pfunc,
+    int target, double s, double t, double r);
+  private static native void nglMultiTexCoord3dv(long pfunc,
+    int target, double[] v);
+  private static native void nglMultiTexCoord3f(long pfunc,
+    int target, float s, float t, float r);
+  private static native void nglMultiTexCoord3fv(long pfunc,
+    int target, float[] v);
+  private static native void nglMultiTexCoord3i(long pfunc,
+    int target, int s, int t, int r);
+  private static native void nglMultiTexCoord3iv(long pfunc,
+    int target, int[] v);
+  private static native void nglMultiTexCoord3s(long pfunc,
+    int target, short s, short t, short r);
+  private static native void nglMultiTexCoord3sv(long pfunc,
+    int target, short[] v);
+  private static native void nglMultiTexCoord4d(long pfunc,
+    int target, double s, double t, double r, double q);
+  private static native void nglMultiTexCoord4dv(long pfunc,
+    int target, double[] v);
+  private static native void nglMultiTexCoord4f(long pfunc,
+    int target, float s, float t, float r, float q);
+  private static native void nglMultiTexCoord4fv(long pfunc,
+    int target, float[] v);
+  private static native void nglMultiTexCoord4i(long pfunc,
+    int target, int s, int t, int r, int q);
+  private static native void nglMultiTexCoord4iv(long pfunc,
+    int target, int[] v);
+  private static native void nglMultiTexCoord4s(long pfunc,
+    int target, short s, short t, short r, short q);
+  private static native void nglMultiTexCoord4sv(long pfunc,
+    int target, short[] v);
+  private static native void nglLoadTransposeMatrixf(long pfunc,
+    float[] m);
+  private static native void nglLoadTransposeMatrixd(long pfunc,
+    double[] m);
+  private static native void nglMultTransposeMatrixf(long pfunc,
+    float[] m);
+  private static native void nglMultTransposeMatrixd(long pfunc,
+    double[] m);
+  private static native void nglSampleCoverage(long pfunc,
+    float value, boolean invert);
+  private static native void nglCompressedTexImage3D(long pfunc,
+    int target, int level, int internalformat,
+    int width, int height, int depth, int border, int imageSize, byte[] data);
+  private static native void nglCompressedTexImage3D(long pfunc,
+    int target, int level, int internalformat,
+    int width, int height, int depth, int border, int imageSize, int[] data);
+  private static native void nglCompressedTexImage3D(long pfunc,
+    int target, int level, int internalformat,
+    int width, int height, int depth, int border, int imageSize, short[]
+    data);
+  private static native void nglCompressedTexImage2D(long pfunc,
+    int target, int level, int internalformat,
+    int width, int height, int border, int imageSize, byte[] data);
+  private static native void nglCompressedTexImage2D(long pfunc,
+    int target, int level, int internalformat,
+    int width, int height, int border, int imageSize, int[] data);
+  private static native void nglCompressedTexImage2D(long pfunc,
+    int target, int level, int internalformat,
+    int width, int height, int border, int imageSize, short[] data);
+  private static native void nglCompressedTexImage1D(long pfunc,
+    int target, int level, int internalformat,
+    int width, int border, int imageSize, byte[] data);
+  private static native void nglCompressedTexImage1D(long pfunc,
+    int target, int level, int internalformat,
+    int width, int border, int imageSize, int[] data);
+  private static native void nglCompressedTexImage1D(long pfunc,
+    int target, int level, int internalformat,
+    int width, int border, int imageSize, short[] data);
+  private static native void nglCompressedTexSubImage3D(long pfunc,
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int imageSize, byte[] data);
+  private static native void nglCompressedTexSubImage3D(long pfunc,
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int imageSize, int[] data);
+  private static native void nglCompressedTexSubImage3D(long pfunc,
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int imageSize, short[]
+    data);
+  private static native void nglCompressedTexSubImage2D(long pfunc,
+    int target, int level, int xoffset, int yoffset, 
+    int width, int height, int format, int imageSize, byte[] data);
+  private static native void nglCompressedTexSubImage2D(long pfunc,
+    int target, int level, int xoffset, int yoffset, 
+    int width, int height, int format, int imageSize, int[] data);
+  private static native void nglCompressedTexSubImage2D(long pfunc,
+    int target, int level, int xoffset, int yoffset, 
+    int width, int height, int format, int imageSize, short[] data);
+  private static native void nglCompressedTexSubImage1D(long pfunc,
+    int target, int level, int xoffset, 
+    int width, int format, int imageSize, byte[] data);
+  private static native void nglCompressedTexSubImage1D(long pfunc,
+    int target, int level, int xoffset, 
+    int width, int format, int imageSize, int[] data);
+  private static native void nglCompressedTexSubImage1D(long pfunc,
+    int target, int level, int xoffset, 
+    int width, int format, int imageSize, short[] data);
+  private static native void nglGetCompressedTexImage(long pfunc,
+    int target, int level, byte[] img);
+  private static native void nglGetCompressedTexImage(long pfunc,
+    int target, int level, int[] img);
+  private static native void nglGetCompressedTexImage(long pfunc,
+    int target, int level, short[] img);
+
+  ///////////////////////////////////////////////////////////////////////////
   // package
 
   static GlContext getContext() {
