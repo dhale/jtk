@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+
+<project name="jves" default="all" basedir=".">
+
+  <description>
+    Java for Visualization, Engineering and Science
+  </description>
+
+  <!-- Project directories -->
+  <property name="src" value="src"/>
+  <property name="jar" value="jar"/>
+  <property name="jni" value="jni"/>
+  <property name="build" value="build"/>
+  <property name="build.cls" value="${build}/cls"/>
+  <property name="build.obj" value="${build}/obj"/>
+  <property name="build.jar" value="${build}/jar"/>
+  <property name="build.jni" value="${build}/jni"/>
+  <property name="build.doc" value="${build}/doc"/>
+  <property name="src.jves" value="${src}/edu/mines/jves"/>
+  <property name="obj.jves" value="${build.obj}/edu/mines/jves"/>
+
+  <!-- Other global settings -->
+  <path id="classpath">
+    <fileset dir="${jar}">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+  <condition property="windows">
+    <os family="windows"/>
+  </condition>
+  <condition property="unix">
+    <os family="unix"/>
+  </condition>
+
+  <!-- Initialize -->
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${build}"/>
+    <mkdir dir="${build.cls}"/>
+    <mkdir dir="${build.jar}"/>
+    <mkdir dir="${build.jni}"/>
+    <mkdir dir="${build.obj}"/>
+  </target>
+
+  <!-- Compile Java -->
+  <target name="compile-java" depends="init">
+    <javac srcdir="${src}" destdir="${build.cls}" debug="on">
+      <classpath refid="classpath"/>
+    </javac>
+  </target>
+
+  <!-- Build Java archive -->
+  <target name="jar" depends="compile-java"
+      description="build Java archive">
+    <jar jarfile="${build.jar}/edu_mines_jves.jar" basedir="${build.cls}"/>
+  </target>
+
+  <!-- Build JNI libraries -->
+  <target name="jni" depends="jni-init,jni-linux,jni-windows"
+      description="build JNI libraries (compile and link C++)">
+  </target>
+  <target name="jni-init" depends="compile-java">
+    <taskdef name="jnicpp" 
+        classname="edu.mines.jves.ant.Jnicpp"
+        classpath="${build.cls}"/>
+    <condition property="linux">
+      <os family="unix"/>
+    </condition>
+    <condition property="windows">
+      <os family="windows"/>
+    </condition>
+  </target>
+
+  <!-- Build JNI libraries for Linux -->
+  <target name="jni-linux" if="linux">
+    <jnicpp 
+        srcdir="${src.jves}/bench" 
+        objdir="${obj.jves}/bench"
+        jnidir="${build.jni}" 
+        jniname="edu_mines_jves_bench">
+      <incarg arg="-Iinclude"/>
+      <incarg arg="-Iinclude/linux"/>
+      <libarg arg="-L/usr/X11R6/lib"/>
+      <libarg arg="-lGL"/>
+      <libarg arg="-lGLU"/>
+    </jnicpp>
+  </target>
+
+  <!-- Build JNI libraries for Windows -->
+  <target name="jni-windows" if="windows">
+  </target>
+
+  <!-- Build everything (except javadocs) -->
+  <target name="all" depends="jar,jni"
+      description="build everything"/>
+
+  <!-- Clean jar -->
+  <target name="clean-jar"
+      description="delete all products of jar build">
+    <delete dir="${build.cls}"/>
+    <delete dir="${build.jar}"/>
+  </target>
+
+  <!-- Clean jni -->
+  <target name="clean-jni"
+      description="delete all products of jni build">
+    <delete dir="${build.jni}"/>
+    <delete dir="${build.obj}"/>
+  </target>
+
+  <!-- Cleanup -->
+  <target name="clean" 
+      description="delete all products of build">
+    <delete dir="${build}"/>
+  </target>
+
+</project>

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+export JVES_HOME=~dhale/box/jves
+
+export CLASSPATH=\
+$JVES_HOME/build/jar/edu_mines_jves.jar:\
+$JVES_HOME/jar/swt.jar:\
+$JVES_HOME/jar/swt-pi.jar:\
+$JVES_HOME/jar/junit.jar
+
+export LD_LIBRARY_PATH=\
+$JVES_HOME/lib/linux/x86:\
+$JVES_HOME/build/jni
+
+java -server -ea -Xmx1000m $*
