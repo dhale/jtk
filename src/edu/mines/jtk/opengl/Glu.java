@@ -39,17 +39,6 @@ public class Glu {
   ///////////////////////////////////////////////////////////////////////////
   // methods
 
-  /*
-  public static native int gluBuild1DMipmapLevels(
-    int target, int internalFormat, int width, 
-    int format, int type, int level, int base, int max, byte[] data);
-  public static native int gluBuild1DMipmapLevels(
-    int target, int internalFormat, int width, 
-    int format, int type, int level, int base, int max, short[] data);
-  public static native int gluBuild1DMipmapLevels(
-    int target, int internalFormat, int width, 
-    int format, int type, int level, int base, int max, int[] data);
-  */
   public static native int gluBuild1DMipmaps(
     int target, int internalFormat, int width, 
     int format, int type, byte[] data);
@@ -59,17 +48,6 @@ public class Glu {
   public static native int gluBuild1DMipmaps(
     int target, int internalFormat, int width, 
     int format, int type, int[] data);
-  /*
-  public static native int gluBuild2DMipmapLevels(
-    int target, int internalFormat, int width, int height, 
-    int format, int type, int level, int base, int max, byte[] data);
-  public static native int gluBuild2DMipmapLevels(
-    int target, int internalFormat, int width, int height, 
-    int format, int type, int level, int base, int max, short[] data);
-  public static native int gluBuild2DMipmapLevels(
-    int target, int internalFormat, int width, int height, 
-    int format, int type, int level, int base, int max, int[] data);
-  */
   public static native int gluBuild2DMipmaps(
     int target, int internalFormat, int width, int height, 
     int format, int type, byte[] data);
@@ -79,7 +57,56 @@ public class Glu {
   public static native int gluBuild2DMipmaps(
     int target, int internalFormat, int width, int height, 
     int format, int type, int[] data);
-  /*
+  public static native String gluGetString(int name);
+  public static native void gluLookAt(
+    double eyeX, double eyeY, double eyeZ,
+    double centerX, double centerY, double centerZ, 
+    double upX, double upY, double upZ);
+  public static native void gluOrtho2D(
+    double left, double right, double bottom, double top);
+  public static native void gluPerspective(
+    double fovy, double aspect, double zNear, double zFar);
+  public static native void gluPickMatrix(
+    double x, double y, double delX, double delY, int[] viewport);
+  public static native int gluProject(
+    double objX, double objY, double objZ, double[] model, double[] proj,
+    int[] view, double[] winX, double[] winY, double[] winZ);
+  public static native int gluScaleImage(
+    int format, 
+    int wIn, int hIn, int typeIn, byte[] dataIn, 
+    int wOut, int hOut, int typeOut, byte[] dataOut);
+  public static native int gluScaleImage(
+    int format, 
+    int wIn, int hIn, int typeIn, short[] dataIn, 
+    int wOut, int hOut, int typeOut, short[] dataOut);
+  public static native int gluScaleImage(
+    int format, 
+    int wIn, int hIn, int typeIn, int[] dataIn, 
+    int wOut, int hOut, int typeOut, int[] dataOut);
+  public static native int gluUnProject(
+    double winX, double winY, double winZ, 
+    double[] model, double[] proj, int[] view, 
+    double[] objX, double[] objY, double[] objZ);
+
+  /* GLU version 1.3
+  public static native int gluBuild1DMipmapLevels(
+    int target, int internalFormat, int width, 
+    int format, int type, int level, int base, int max, byte[] data);
+  public static native int gluBuild1DMipmapLevels(
+    int target, int internalFormat, int width, 
+    int format, int type, int level, int base, int max, short[] data);
+  public static native int gluBuild1DMipmapLevels(
+    int target, int internalFormat, int width, 
+    int format, int type, int level, int base, int max, int[] data);
+  public static native int gluBuild2DMipmapLevels(
+    int target, int internalFormat, int width, int height, 
+    int format, int type, int level, int base, int max, byte[] data);
+  public static native int gluBuild2DMipmapLevels(
+    int target, int internalFormat, int width, int height, 
+    int format, int type, int level, int base, int max, short[] data);
+  public static native int gluBuild2DMipmapLevels(
+    int target, int internalFormat, int width, int height, 
+    int format, int type, int level, int base, int max, int[] data);
   public static native int gluBuild3DMipmapLevels(
     int target, int internalFormat, int width, int height, int depth, 
     int format, int type, int level, int base, int max, byte[] data);
@@ -100,41 +127,15 @@ public class Glu {
     int format, int type, int[] data);
   public static native boolean gluCheckExtension(
     String extName, String extString);
-  */
-  public static native String gluGetString(int name);
-  public static native void gluLookAt(
-    double eyeX, double eyeY, double eyeZ,
-    double centerX, double centerY, double centerZ, 
-    double upX, double upY, double upZ);
-  public static native void gluOrtho2D(
-    double left, double right, double bottom, double top);
-  public static native void gluPerspective(
-    double fovy, double aspect, double zNear, double zFar);
-  public static native void gluPickMatrix(
-    double x, double y, double delX, double delY, int[] viewport);
-  public static native int gluProject(
-    double objX, double objY, double objZ, double[] model, double[] proj,
-    int[] view, double[] winX, double[] winY, double[] winZ);
-  /*
-  public static native int gluScaleImage(
-    int format, 
-    int wIn, int hIn, int typeIn, byte[] dataIn, 
-    int wOut, int hOut, int typeOut, byte[] dataOut);
-  public static native int gluScaleImage(
-    int format, 
-    int wIn, int hIn, int typeIn, short[] dataIn, 
-    int wOut, int hOut, int typeOut, short[] dataOut);
-  public static native int gluScaleImage(
-    int format, 
-    int wIn, int hIn, int typeIn, int[] dataIn, 
-    int wOut, int hOut, int typeOut, int[] dataOut);
-  */
-  public static native int gluUnProject(
-    double winX, double winY, double winZ, 
-    double[] model, double[] proj, int[] view, 
-    double[] objX, double[] objY, double[] objZ);
-  /*
-  public static native int gluUnProject4(
+  public static int gluUnProject4(
+    double winX, double winY, double winZ, double clipW, 
+    double[] model, double[] proj, int[] view, double near, double far, 
+    double[] objX, double[] objY, double[] objZ, double[] objW) 
+  {
+    return ngluUnProject4(getContext().gluUnProject4,
+      winX,winY,winZ,clipW,model,proj,view,near,far,objX,objY,objZ,objW);
+  }
+  private static int ngluUnProject4(long pfunc,
     double winX, double winY, double winZ, double clipW, 
     double[] model, double[] proj, int[] view, double near, double far, 
     double[] objX, double[] objY, double[] objZ, double[] objW);
