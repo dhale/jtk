@@ -6,152 +6,150 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static java.lang.Math.*;
-import edu.mines.jtk.util.Check;
-
 /**
- * Translates and scales normalized coordinates to/from device coordinates.
- * Device x coordinates range from 0 to width-1, and device y coordinates 
- * range from 0 to height-1, where width and height are integers that
- * represent the device <em>size</em>.
+ * Translates and scales (maps) user coordinates to/from device coordinates.
+ * The mapping is specified by two rectangles, one in user coordinates and 
+ * the other in device coordinates.
  * <p>
- * Normalized coordinates are floating-point coordinates in the range [0:1].
- * By default, the normalized x-coordinate range [0:1] corresponds to 
- * the device x-coordinate range [0:width-1]. Likewise, the normalized 
- * y-coordinate range [0:1] corresponds to the device y-coordinate range
- * [0:height-1]. This mapping can be changed, so that only a subset of the 
- * normalized coordinate unit rectangle is mapped to/from the device rectangle. 
- * That subset rectangle represents the normalized coordinate <em>bounds</em>.
+ * Device coordinates are ints, and the device coordinate rectangle 
+ * typically corresponds to device bounds. User coordinates are doubles.
  * <p>
- * During conversion from normalized to device coordinates, the latter are
- * clipped to lie in the range [-32768,32767], which is the range of a 16-bit
- * short integer. Although device coordinates are represented by ints, they 
- * are often limited by the underlying graphics systems to this range.
+ * In conversion from user to device coordinates, the latter are clipped 
+ * to lie in the range [-32768,32767], which is the range of a 16-bit
+ * short integer. Although device coordinates are represented by ints, 
+ * they are often limited by an underlying graphics systems to the 16-bit 
+ * range of shorts.
+ * <p>
+ * Conversion from/to user coordinates to/from device coordinates behaves 
+ * robustly in the cases where the mapping is degenerate. For example, if
+ * the device coordinate rectangle has zero width, then conversion from 
+ * any device x-coordinate to user x-coordinate yields the average of the 
+ * user x-coordinate bounds. Likewise, if the user coordinate rectangle 
+ * has zero width, then conversion from any user x-coordinate to device 
+ * x-coordinate yields the average of the device x-coordinate bounds.
  *
  * @author Dave Hale, Colorado School of Mines
- * @version 2004.12.11
+ * @version 2004.12.23
  */
 public class Transcaler {
 
   /**
-   * Constructs a transcaler with specified device size and default bounds.
-   * @param wd the device width; must not be negative.
-   * @param hd the device height; must not be negative.
+   * Constructs a transcaler with identity coordinate mapping.
+   * In this mapping, device coordinates equal user coordinates,
+   * rounded to the nearest integer.
    */
-  public Transcaler(int wd, int hd) {
-    setSize(wd,hd);
+  public Transcaler() {
+    this(0.0,1.0,0.0,1.0,0,1,0,1);
   }
 
   /**
-   * Converts the specified normalized x-coordinate to device x-coordinate.
-   * @param xn the normalized x-coordinate.
+   * Constructs a transcaler with specified coordinate mapping.
+   * @param x1u the user x-coordinate corresponding to x1d.
+   * @param y1u the user y-coordinate corresponding to y1d.
+   * @param x2u the user x-coordinate corresponding to x2d.
+   * @param y2u the user y-coordinate corresponding to y2d.
+   * @param x1d the device x-coordinate corresponding to x1u.
+   * @param y1d the device y-coordinate corresponding to y1u.
+   * @param x2d the device x-coordinate corresponding to x2u.
+   * @param y2d the device y-coordinate corresponding to y2u.
+   */
+  public Transcaler(
+    double x1u, double y1u, double x2u, double y2u,
+    int    x1d, int    y1d, int    x2d, int    y2d)
+  {
+    setMapping(x1u,y1u,x2u,y2u,x1d,y1d,x2d,y2d);
+  }
+
+  /**
+   * Sets the coordinate mapping for this transcaler.
+   * @param x1u the user x-coordinate corresponding to x1d.
+   * @param y1u the user y-coordinate corresponding to y1d.
+   * @param x2u the user x-coordinate corresponding to x2d.
+   * @param y2u the user y-coordinate corresponding to y2d.
+   * @param x1d the device x-coordinate corresponding to x1u.
+   * @param y1d the device y-coordinate corresponding to y1u.
+   * @param x2d the device x-coordinate corresponding to x2u.
+   * @param y2d the device y-coordinate corresponding to y2u.
+   */
+  public void setMapping(
+    double x1u, double y1u, double x2u, double y2u,
+    int    x1d, int    y1d, int    x2d, int    y2d)
+  {
+    _x1u = x1u;  _x2u = x2u;  _y1u = y1u;  _y2u = y2u;
+    _x1d = x1d;  _x2d = x2d;  _y1d = y1d;  _y2d = y2d;
+    computeShiftAndScale();
+  }
+
+  /**
+   * Sets the user-coordinate part of the mapping for this transcaler.
+   * @param x1u the user x-coordinate corresponding to the current x1d.
+   * @param y1u the user y-coordinate corresponding to the current y1d.
+   * @param x2u the user x-coordinate corresponding to the current x2d.
+   * @param y2u the user y-coordinate corresponding to the current y2d.
+   */
+  public void setMapping(double x1u, double y1u, double x2u, double y2u) {
+    _x1u = x1u;  _x2u = x2u;  _y1u = y1u;  _y2u = y2u;
+    computeShiftAndScale();
+  }
+
+  /**
+   * Sets the device-coordinate part of the mapping for this transcaler.
+   * @param x1d the device x-coordinate corresponding to the current x1u.
+   * @param y1d the device y-coordinate corresponding to the current y1u.
+   * @param x2d the device x-coordinate corresponding to the current x2u.
+   * @param y2d the device y-coordinate corresponding to the current y2u.
+   */
+  public void setMapping(int x1d, int y1d, int x2d, int y2d) {
+    _x1d = x1d;  _x2d = x2d;  _y1d = y1d;  _y2d = y2d;
+    computeShiftAndScale();
+  }
+
+  /**
+   * Converts the specified user x-coordinate to device x-coordinate.
+   * @param xu the user x-coordinate.
    * @return the device x-coordinate.
    */
-  public int x(double xn) {
-    if (_xclip) {
-      double xd = _xshift+_xscale*xn+0.5;
-      if (xd<DMIN) xd = DMIN;
-      if (xd>DMAX) xd = DMAX;
-      return (int)xd;
-    } else {
-      return (int)(_xshift+_xscale*xn+0.5);
+  public int x(double xu) {
+    double xd = _xushift+_xuscale*xu;
+    if (xd<DMIN) {
+      xd = DMIN;
+    } else if (xd>DMAX) {
+      xd = DMAX;
     }
+    return (int)xd;
   }
 
   /**
-   * Converts the specified normalized y-coordinate to device y-coordinate.
-   * @param yn the normalized y-coordinate.
+   * Converts the specified user y-coordinate to device y-coordinate.
+   * @param yu the user y-coordinate.
    * @return the device y-coordinate.
    */
-  public int y(double yn) {
-    if (_yclip) {
-      double yd = _yshift+_yscale*yn+0.5;
-      if (yd<DMIN) yd = DMIN;
-      if (yd>DMAX) yd = DMAX;
-      return (int)yd;
-    } else {
-      return (int)(_yshift+_yscale*yn+0.5);
+  public int y(double yu) {
+    double yd = _yushift+_yuscale*yu;
+    if (yd<DMIN) {
+      yd = DMIN;
+    } else if (yd>DMAX) {
+      yd = DMAX;
     }
+    return (int)yd;
   }
 
   /**
-   * Converts the specified device x-coordinate to normalized x-coordinate.
+   * Converts the specified device x-coordinate to user x-coordinate.
    * @param xd the device x-coordinate.
-   * @return the normalized x-coordinate.
+   * @return the user x-coordinate.
    */
   public double x(int xd) {
-    return (xd-_xshift)/_xscale;
+    return _xdshift+_xdscale*xd;
   }
 
   /**
-   * Converts the specified device y-coordinate to normalized y-coordinate.
+   * Converts the specified device y-coordinate to user y-coordinate.
    * @param yd the device y-coordinate.
-   * @return the normalized y-coordinate.
+   * @return the user y-coordinate.
    */
   public double y(int yd) {
-    return (yd-_yshift)/_yscale;
-  }
-
-  /**
-   * Sets the device coordinate size.
-   * @param wd the device coordinate width.
-   * @param hd the device coordinate height.
-   */
-  public void setSize(int wd, int hd) {
-    Check.argument(wd>=0.0,"width is non-negative");
-    Check.argument(hd>=0.0,"height is non-negative");
-    _wd = wd;
-    _hd = hd;
-    computeShiftAndScale();
-  }
-
-  /**
-   * Gets the device coordinate width.
-   * @return the device coordinate width.
-   */
-  public int getWidth() {
-    return _wd;
-  }
-
-  /**
-   * Gets the device coordinate height.
-   * @return the device coordinate height.
-   */
-  public int getHeight() {
-    return _hd;
-  }
-
-  /**
-   * Sets the normalized coordinate bounds rectangle.
-   * @param xn the normalized x-coordinate minimum.
-   * @param yn the normalized y-coordinate minimum.
-   * @param wn the normalized x-coordinate width; must not be negative.
-   * @param hn the normalized y-coordinate height; must not be negative.
-   */
-  public void setBounds(double xn, double yn, double wn, double hn) {
-    Check.argument(wn>=0.0,"width is non-negative");
-    Check.argument(hn>=0.0,"height is non-negative");
-    _xn = xn;
-    _yn = yn;
-    _wn = wn;
-    _hn = hn;
-    computeShiftAndScale();
-  }
-
-  /**
-   * Sets the normalized coordinate bounds rectangle.
-   * @param bounds the normalized coordinate bounds rectangle.
-   */
-  public void setBounds(DRectangle bounds) {
-    setBounds(bounds.x,bounds.y,bounds.width,bounds.height);
-  }
-
-  /**
-   * Gets the normalized coordinate bounds rectangle.
-   * @return the normalized coordinate bounds rectangle.
-   */
-  public DRectangle getBounds() {
-    return new DRectangle(_xn,_yn,_wn,_hn);
+    return _ydshift+_ydscale*yd;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -160,33 +158,39 @@ public class Transcaler {
   private static final double DMIN = -32768.0; // device min coordinate
   private static final double DMAX =  32767.0; // device max coordinate
 
-  private int _wd,_hd;
-  private double _xn = 0.0;
-  private double _yn = 0.0;
-  private double _wn = 1.0;
-  private double _hn = 1.0;
-  private double _xshift,_xscale;
-  private double _yshift,_yscale;
-  private boolean _xclip,_yclip;
+  private double _x1u,_y1u,_x2u,_y2u;
+  private int    _x1d,_y1d,_x2d,_y2d;
+  private double _xushift,_xuscale,_yushift,_yuscale;
+  private double _xdshift,_xdscale,_ydshift,_ydscale;
 
   private void computeShiftAndScale() {
-
-    // Shift and scale.
-    _xn = max(0.0,min(1.0,_xn));
-    _yn = max(0.0,min(1.0,_yn));
-    _wn = max(0.0,min(1.0-_xn,_wn));
-    _hn = max(0.0,min(1.0-_yn,_hn));
-    _xscale = (_wd-1)/_wn;
-    _xshift = -_xn*_xscale;
-    _yscale = (_hd-1)/_hn;
-    _yshift = -_yn*_yscale;
-
-    // Must we clip x and/or y coordinates?
-    double x0d = _xshift+_xscale*0.0+0.5;
-    double x1d = _xshift+_xscale*1.0+0.5;
-    double y0d = _yshift+_yscale*0.0+0.5;
-    double y1d = _yshift+_yscale*1.0+0.5;
-    _xclip = min(x0d,x1d)<DMIN || max(x0d,x1d)>DMAX;
-    _yclip = min(y0d,y1d)<DMIN || max(y0d,y1d)>DMAX;
+    if (_x1u!=_x2u) {
+      _xuscale = (_x2d-_x1d)/(_x2u-_x1u);
+      _xushift = _x1d-_x1u*_xuscale+0.5;
+    } else {
+      _xushift = 0.5*(_x1d+_x2d)+0.5;
+      _xuscale = 0.0;
+    }
+    if (_x1d!=_x2d) {
+      _xdscale = (_x2u-_x1u)/(_x2d-_x1d);
+      _xdshift = _x1u-_x1d*_xdscale;
+    } else {
+      _xdshift = 0.5*(_x1u+_x2u);
+      _xdscale = 0.0;
+    }
+    if (_y1u!=_y2u) {
+      _yuscale = (_y2d-_y1d)/(_y2u-_y1u);
+      _yushift = _y1d-_y1u*_yuscale+0.5;
+    } else {
+      _yushift = 0.5*(_y1d+_y2d)+0.5;
+      _yuscale = 0.0;
+    }
+    if (_y1d!=_y2d) {
+      _ydscale = (_y2u-_y1u)/(_y2d-_y1d);
+      _ydshift = _y1u-_y1d*_ydscale;
+    } else {
+      _ydshift = 0.5*(_y1u+_y2u);
+      _ydscale = 0.0;
+    }
   }
 }

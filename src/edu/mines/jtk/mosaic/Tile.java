@@ -166,7 +166,7 @@ public class Tile extends Canvas {
   private Projector _vp = new Projector(0.0,1.0,0.0,1.0);
   private Projector _bhp = null;
   private Projector _bvp = null;
-  private Transcaler _ts = new Transcaler(1,1);
+  private Transcaler _ts = new Transcaler();
 
   private void onDispose(Event e) {
   }
@@ -175,7 +175,7 @@ public class Tile extends Canvas {
     Point size = getSize();
     int w = size.x;
     int h = size.y;
-    _ts.setSize(w,h);
+    _ts.setMapping(0,w-1,0,h-1);
   }
 
   private void onPaint(Event e) {

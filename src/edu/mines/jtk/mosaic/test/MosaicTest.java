@@ -23,7 +23,7 @@ public class MosaicTest {
     Display display = new Display();
     Shell shell = new Shell(display);
     shell.setLayout(new FillLayout());
-    shell.setSize(800,800);
+    shell.setSize(600,600);
     int nrow = 2;
     int ncol = 3;
     int axesPlacement =
