@@ -2552,6 +2552,389 @@ public class Gl {
     int target, int level, short[] img);
 
   ///////////////////////////////////////////////////////////////////////////
+  // OpenGL 1.4
+
+  public static void glBlendFuncSeparate(
+    int sfactorRGB, int dfactorRGB, int sfactorAlpha, int dfactorAlpha)
+  {
+    nglBlendFuncSeparate(getContext().glBlendFuncSeparate,
+      sfactorRGB,dfactorRGB,sfactorAlpha,dfactorAlpha);
+  }
+  public static void glFogCoordf(
+    float coord)
+  {
+    nglFogCoordf(getContext().glFogCoordf,
+      coord);
+  }
+  public static void glFogCoordfv(
+    float[] coord)
+  {
+    nglFogCoordfv(getContext().glFogCoordfv,
+      coord);
+  }
+  public static void glFogCoordd(
+    double coord)
+  {
+    nglFogCoordd(getContext().glFogCoordd,
+      coord);
+  }
+  public static void glFogCoorddv(
+    double[] coord)
+  {
+    nglFogCoorddv(getContext().glFogCoorddv,
+      coord);
+  }
+  public static void glFogCoordPointer(
+    int type, int stride, Buffer pointer)
+  {
+    nglFogCoordPointer(getContext().glFogCoordPointer,
+      type,stride,pointer);
+  }
+  public static void glMultiDrawArrays(
+    int mode, int[] first, int[] count, int primcount)
+  {
+    nglMultiDrawArrays(getContext().glMultiDrawArrays,
+      mode,first,count,primcount);
+  }
+  public static void glMultiDrawElements(
+    int mode, int[] count, int type, byte[][] indices, int primcount)
+  {
+    nglMultiDrawElements(getContext().glMultiDrawElements,
+      mode,count,type,indices,primcount);
+  }
+  public static void glMultiDrawElements(
+    int mode, int[] count, int type, int[][] indices, int primcount)
+  {
+    nglMultiDrawElements(getContext().glMultiDrawElements,
+      mode,count,type,indices,primcount);
+  }
+  public static void glMultiDrawElements(
+    int mode, int[] count, int type, short[][] indices, int primcount)
+  {
+    nglMultiDrawElements(getContext().glMultiDrawElements,
+      mode,count,type,indices,primcount);
+  }
+  public static void glPointParameterf(
+    int pname, float param)
+  {
+    nglPointParameterf(getContext().glPointParameterf,
+      pname,param);
+  }
+  public static void glPointParameterfv(
+    int pname, float[] params)
+  {
+    nglPointParameterfv(getContext().glPointParameterfv,
+      pname,params);
+  }
+  public static void glPointParameteri(
+    int pname, int param)
+  {
+    nglPointParameteri(getContext().glPointParameteri,
+      pname,param);
+  }
+  public static void glPointParameteriv(
+    int pname, int[] params)
+  {
+    nglPointParameteriv(getContext().glPointParameteriv,
+      pname,params);
+  }
+  public static void glSecondaryColor3b(
+    byte red, byte green, byte blue)
+  {
+    nglSecondaryColor3b(getContext().glSecondaryColor3b,
+      red,green,blue);
+  }
+  public static void glSecondaryColor3bv(
+    byte[] v)
+  {
+    nglSecondaryColor3bv(getContext().glSecondaryColor3bv,
+      v);
+  }
+  public static void glSecondaryColor3d(
+    double red, double green, double blue)
+  {
+    nglSecondaryColor3d(getContext().glSecondaryColor3d,
+      red,green,blue);
+  }
+  public static void glSecondaryColor3dv(
+    double[] v)
+  {
+    nglSecondaryColor3dv(getContext().glSecondaryColor3dv,
+      v);
+  }
+  public static void glSecondaryColor3f(
+    float red, float green, float blue)
+  {
+    nglSecondaryColor3f(getContext().glSecondaryColor3f,
+      red,green,blue);
+  }
+  public static void glSecondaryColor3fv(
+    float[] v)
+  {
+    nglSecondaryColor3fv(getContext().glSecondaryColor3fv,
+      v);
+  }
+  public static void glSecondaryColor3i(
+    int red, int green, int blue)
+  {
+    nglSecondaryColor3i(getContext().glSecondaryColor3i,
+      red,green,blue);
+  }
+  public static void glSecondaryColor3iv(
+    int[] v)
+  {
+    nglSecondaryColor3iv(getContext().glSecondaryColor3iv,
+      v);
+  }
+  public static void glSecondaryColor3s(
+    short red, short green, short blue)
+  {
+    nglSecondaryColor3s(getContext().glSecondaryColor3s,
+      red,green,blue);
+  }
+  public static void glSecondaryColor3sv(
+    short[] v)
+  {
+    nglSecondaryColor3sv(getContext().glSecondaryColor3sv,
+      v);
+  }
+  public static void glSecondaryColor3ub(
+    byte red, byte green, byte blue)
+  {
+    nglSecondaryColor3ub(getContext().glSecondaryColor3ub,
+      red,green,blue);
+  }
+  public static void glSecondaryColor3ubv(
+    byte[] v)
+  {
+    nglSecondaryColor3ubv(getContext().glSecondaryColor3ubv,
+      v);
+  }
+  public static void glSecondaryColor3ui(
+    int red, int green, int blue)
+  {
+    nglSecondaryColor3ui(getContext().glSecondaryColor3ui,
+      red,green,blue);
+  }
+  public static void glSecondaryColor3uiv(
+    int[] v)
+  {
+    nglSecondaryColor3uiv(getContext().glSecondaryColor3uiv,
+      v);
+  }
+  public static void glSecondaryColor3us(
+    short red, short green, short blue)
+  {
+    nglSecondaryColor3us(getContext().glSecondaryColor3us,
+      red,green,blue);
+  }
+  public static void glSecondaryColor3usv(
+    short[] v)
+  {
+    nglSecondaryColor3usv(getContext().glSecondaryColor3usv,
+      v);
+  }
+  public static void glSecondaryColorPointer(
+    int size, int type, int stride, Buffer pointer)
+  {
+    nglSecondaryColorPointer(getContext().glSecondaryColorPointer,
+      size,type,stride,pointer);
+  }
+  public static void glWindowPos2d(
+    double x, double y)
+  {
+    nglWindowPos2d(getContext().glWindowPos2d,
+      x,y);
+  }
+  public static void glWindowPos2dv(
+    double[] v)
+  {
+    nglWindowPos2dv(getContext().glWindowPos2dv,
+      v);
+  }
+  public static void glWindowPos2f(
+    float x, float y)
+  {
+    nglWindowPos2f(getContext().glWindowPos2f,
+      x,y);
+  }
+  public static void glWindowPos2fv(
+    float[] v)
+  {
+    nglWindowPos2fv(getContext().glWindowPos2fv,
+      v);
+  }
+  public static void glWindowPos2i(
+    int x, int y)
+  {
+    nglWindowPos2i(getContext().glWindowPos2i,
+      x,y);
+  }
+  public static void glWindowPos2iv(
+    int[] v)
+  {
+    nglWindowPos2iv(getContext().glWindowPos2iv,
+      v);
+  }
+  public static void glWindowPos2s(
+    short x, short y)
+  {
+    nglWindowPos2s(getContext().glWindowPos2s,
+      x,y);
+  }
+  public static void glWindowPos2sv(
+    short[] v)
+  {
+    nglWindowPos2sv(getContext().glWindowPos2sv,
+      v);
+  }
+  public static void glWindowPos3d(
+    double x, double y, double z)
+  {
+    nglWindowPos3d(getContext().glWindowPos3d,
+      x,y,z);
+  }
+  public static void glWindowPos3dv(
+    double[] v)
+  {
+    nglWindowPos3dv(getContext().glWindowPos3dv,
+      v);
+  }
+  public static void glWindowPos3f(
+    float x, float y, float z)
+  {
+    nglWindowPos3f(getContext().glWindowPos3f,
+      x,y,z);
+  }
+  public static void glWindowPos3fv(
+    float[] v)
+  {
+    nglWindowPos3fv(getContext().glWindowPos3f,
+      v);
+  }
+  public static void glWindowPos3i(
+    int x, int y, int z)
+  {
+    nglWindowPos3i(getContext().glWindowPos3i,
+      x,y,z);
+  }
+  public static void glWindowPos3iv(
+    int[] v)
+  {
+    nglWindowPos3iv(getContext().glWindowPos3iv,
+      v);
+  }
+  public static void glWindowPos3s(
+    short x, short y, short z)
+  {
+    nglWindowPos3s(getContext().glWindowPos3s,
+      x,y,z);
+  }
+  public static void glWindowPos3sv(
+    short[] v)
+  {
+    nglWindowPos3sv(getContext().glWindowPos3sv,
+      v);
+  }
+  private static native void nglBlendFuncSeparate(long pfunc,
+    int sfactorRGB, int dfactorRGB, int sfactorAlpha, int dfactorAlpha);
+  private static native void nglFogCoordf(long pfunc,
+    float coord);
+  private static native void nglFogCoordfv(long pfunc,
+    float[] coord);
+  private static native void nglFogCoordd(long pfunc,
+    double coord);
+  private static native void nglFogCoorddv(long pfunc,
+    double[] coord);
+  private static native void nglFogCoordPointer(long pfunc,
+    int type, int stride, Buffer pointer);
+  private static native void nglMultiDrawArrays(long pfunc,
+    int mode, int[] first, int[] count, int primcount);
+  private static native void nglMultiDrawElements(long pfunc,
+    int mode, int[] count, int type, byte[][] indices, int primcount);
+  private static native void nglMultiDrawElements(long pfunc,
+    int mode, int[] count, int type, int[][] indices, int primcount);
+  private static native void nglMultiDrawElements(long pfunc,
+    int mode, int[] count, int type, short[][] indices, int primcount);
+  private static native void nglPointParameterf(long pfunc,
+    int pname, float param);
+  private static native void nglPointParameterfv(long pfunc,
+    int pname, float[] params);
+  private static native void nglPointParameteri(long pfunc,
+    int pname, int param);
+  private static native void nglPointParameteriv(long pfunc,
+    int pname, int[] params);
+  private static native void nglSecondaryColor3b(long pfunc,
+    byte red, byte green, byte blue);
+  private static native void nglSecondaryColor3bv(long pfunc,
+    byte[] v);
+  private static native void nglSecondaryColor3d(long pfunc,
+    double red, double green, double blue);
+  private static native void nglSecondaryColor3dv(long pfunc,
+    double[] v);
+  private static native void nglSecondaryColor3f(long pfunc,
+    float red, float green, float blue);
+  private static native void nglSecondaryColor3fv(long pfunc,
+    float[] v);
+  private static native void nglSecondaryColor3i(long pfunc,
+    int red, int green, int blue);
+  private static native void nglSecondaryColor3iv(long pfunc,
+    int[] v);
+  private static native void nglSecondaryColor3s(long pfunc,
+    short red, short green, short blue);
+  private static native void nglSecondaryColor3sv(long pfunc,
+    short[] v);
+  private static native void nglSecondaryColor3ub(long pfunc,
+    byte red, byte green, byte blue);
+  private static native void nglSecondaryColor3ubv(long pfunc,
+    byte[] v);
+  private static native void nglSecondaryColor3ui(long pfunc,
+    int red, int green, int blue);
+  private static native void nglSecondaryColor3uiv(long pfunc,
+    int[] v);
+  private static native void nglSecondaryColor3us(long pfunc,
+    short red, short green, short blue);
+  private static native void nglSecondaryColor3usv(long pfunc,
+    short[] v);
+  private static native void nglSecondaryColorPointer(long pfunc,
+    int size, int type, int stride, Buffer pointer);
+  private static native void nglWindowPos2d(long pfunc,
+    double x, double y);
+  private static native void nglWindowPos2dv(long pfunc,
+    double[] v);
+  private static native void nglWindowPos2f(long pfunc,
+    float x, float y);
+  private static native void nglWindowPos2fv(long pfunc,
+    float[] v);
+  private static native void nglWindowPos2i(long pfunc,
+    int x, int y);
+  private static native void nglWindowPos2iv(long pfunc,
+    int[] v);
+  private static native void nglWindowPos2s(long pfunc,
+    short x, short y);
+  private static native void nglWindowPos2sv(long pfunc,
+    short[] v);
+  private static native void nglWindowPos3d(long pfunc,
+    double x, double y, double z);
+  private static native void nglWindowPos3dv(long pfunc,
+    double[] v);
+  private static native void nglWindowPos3f(long pfunc,
+    float x, float y, float z);
+  private static native void nglWindowPos3fv(long pfunc,
+    float[] v);
+  private static native void nglWindowPos3i(long pfunc,
+    int x, int y, int z);
+  private static native void nglWindowPos3iv(long pfunc,
+    int[] v);
+  private static native void nglWindowPos3s(long pfunc,
+    short x, short y, short z);
+  private static native void nglWindowPos3sv(long pfunc,
+    short[] v);
+
+  ///////////////////////////////////////////////////////////////////////////
+  // OpenGL 1.5
+
+  ///////////////////////////////////////////////////////////////////////////
   // package
 
   static GlContext getContext() {

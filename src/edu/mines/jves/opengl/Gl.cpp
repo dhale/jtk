@@ -3418,8 +3418,369 @@ JNI_GL_END
 /////////////////////////////////////////////////////////////////////////////
 // OpenGL 1.4
 
+JNI_GL_DECLARE2(glBlendFuncSeparate)
+  jint sfactorRGB, jint dfactorRGB, jint sfactorAlpha, jint dfactorAlpha
+JNI_GL_BEGIN2
+  (*(PFNGLBLENDFUNCSEPARATEPROC)toPointer(pfunc))
+    (sfactorRGB,dfactorRGB,sfactorAlpha,dfactorAlpha);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glFogCoordf)
+  jfloat coord
+JNI_GL_BEGIN2
+  (*(PFNGLFOGCOORDFPROC)toPointer(pfunc))
+    (coord);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glFogCoordfv)
+  jfloatArray jcoord
+JNI_GL_BEGIN2
+  JfloatArray coord(env,jcoord);
+  (*(PFNGLFOGCOORDFVPROC)toPointer(pfunc))
+    (coord);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glFogCoordd)
+  jdouble coord
+JNI_GL_BEGIN2
+  (*(PFNGLFOGCOORDDPROC)toPointer(pfunc))
+    (coord);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glFogCoorddv)
+  jdoubleArray jcoord
+JNI_GL_BEGIN2
+  JdoubleArray coord(env,jcoord);
+  (*(PFNGLFOGCOORDDVPROC)toPointer(pfunc))
+    (coord);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glFogCoordPointer)
+  jint type, jint stride, jobject jpointer
+JNI_GL_BEGIN2
+  JvoidBuffer pointer(env,jpointer);
+  (*(PFNGLFOGCOORDPOINTERPROC)toPointer(pfunc))
+    (type,stride,pointer);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiDrawArrays)
+  jint mode, jintArray jfirst, jintArray jcount, jint primcount
+JNI_GL_BEGIN2
+  JintArray first(env,jfirst);
+  JintArray count(env,jcount);
+  (*(PFNGLMULTIDRAWARRAYSPROC)toPointer(pfunc))
+    (mode,first,count,primcount);
+JNI_GL_END
+
 /*
+JNI_GL_DECLARE2(glMultiDrawElements__JI_3II_3_3BI)
+  jint mode, jintArray jcount, jint type, jarray jindices, jint primcount
+JNI_GL_BEGIN2
+  JintArray count(env,jcount);
+  JintArray2 indices(env,jindices);
+  (*(PFNGLMULTIDRAWELEMENTSPROC)toPointer(pfunc))
+    (mode,count,type,indices,primcount);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiDrawElements__JI_3II_3_3II)
+  jint mode, jintArray jcount, jint type, jarray jindices, jint primcount
+JNI_GL_BEGIN2
+  JintArray count(env,jcount);
+  JintArray2 indices(env,jindices);
+  (*(PFNGLMULTIDRAWELEMENTSPROC)toPointer(pfunc))
+    (mode,count,type,indices,primcount);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiDrawElements__JI_3II_3_3SI)
+  jint mode, jintArray jcount, jint type, jarray jindices, jint primcount
+JNI_GL_BEGIN2
+  JintArray count(env,jcount);
+  JintArray2 indices(env,jindices);
+  (*(PFNGLMULTIDRAWELEMENTSPROC)toPointer(pfunc))
+    (mode,count,type,indices,primcount);
+JNI_GL_END
 */
+
+JNI_GL_DECLARE2(glPointParameterf)
+  jint pname, jfloat param
+JNI_GL_BEGIN2
+  (*(PFNGLPOINTPARAMETERFPROC)toPointer(pfunc))
+    (pname,param);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glPointParameterfv)
+  jint pname, jfloatArray jparams
+JNI_GL_BEGIN2
+  JfloatArray params(env,jparams);
+  (*(PFNGLPOINTPARAMETERFVPROC)toPointer(pfunc))
+    (pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glPointParameteri)
+  jint pname, jint param
+JNI_GL_BEGIN2
+  (*(PFNGLPOINTPARAMETERIPROC)toPointer(pfunc))
+    (pname,param);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glPointParameteriv)
+  jint pname, jintArray jparams
+JNI_GL_BEGIN2
+  JintArray params(env,jparams);
+  (*(PFNGLPOINTPARAMETERIVPROC)toPointer(pfunc))
+    (pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3b)
+  jbyte red, jbyte green, jbyte blue
+JNI_GL_BEGIN2
+  (*(PFNGLSECONDARYCOLOR3BPROC)toPointer(pfunc))
+    (red,green,blue);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3bv)
+  jbyteArray jv
+JNI_GL_BEGIN2
+  JbyteArray v(env,jv);
+  (*(PFNGLSECONDARYCOLOR3BVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3d)
+  jdouble red, jdouble green, jdouble blue
+JNI_GL_BEGIN2
+  (*(PFNGLSECONDARYCOLOR3DPROC)toPointer(pfunc))
+    (red,green,blue);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3dv)
+  jdoubleArray jv
+JNI_GL_BEGIN2
+  JdoubleArray v(env,jv);
+  (*(PFNGLSECONDARYCOLOR3DVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3f)
+  jfloat red, jfloat green, jfloat blue
+JNI_GL_BEGIN2
+  (*(PFNGLSECONDARYCOLOR3FPROC)toPointer(pfunc))
+    (red,green,blue);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3fv)
+  jfloatArray jv
+JNI_GL_BEGIN2
+  JfloatArray v(env,jv);
+  (*(PFNGLSECONDARYCOLOR3FVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3i)
+  jint red, jint green, jint blue
+JNI_GL_BEGIN2
+  (*(PFNGLSECONDARYCOLOR3IPROC)toPointer(pfunc))
+    (red,green,blue);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3iv)
+  jintArray jv
+JNI_GL_BEGIN2
+  JintArray v(env,jv);
+  (*(PFNGLSECONDARYCOLOR3IVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3s)
+  jshort red, jshort green, jshort blue
+JNI_GL_BEGIN2
+  (*(PFNGLSECONDARYCOLOR3SPROC)toPointer(pfunc))
+    (red,green,blue);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3sv)
+  jshortArray jv
+JNI_GL_BEGIN2
+  JshortArray v(env,jv);
+  (*(PFNGLSECONDARYCOLOR3SVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3ub)
+  jbyte red, jbyte green, jbyte blue
+JNI_GL_BEGIN2
+  (*(PFNGLSECONDARYCOLOR3UBPROC)toPointer(pfunc))
+    (red,green,blue);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3ubv)
+  jbyteArray jv
+JNI_GL_BEGIN2
+  JubyteArray v(env,jv);
+  (*(PFNGLSECONDARYCOLOR3UBVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3ui)
+  jint red, jint green, jint blue
+JNI_GL_BEGIN2
+  (*(PFNGLSECONDARYCOLOR3UIPROC)toPointer(pfunc))
+    (red,green,blue);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3uiv)
+  jintArray jv
+JNI_GL_BEGIN2
+  JuintArray v(env,jv);
+  (*(PFNGLSECONDARYCOLOR3UIVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3us)
+  jshort red, jshort green, jshort blue
+JNI_GL_BEGIN2
+  (*(PFNGLSECONDARYCOLOR3USPROC)toPointer(pfunc))
+    (red,green,blue);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColor3usv)
+  jshortArray jv
+JNI_GL_BEGIN2
+  JushortArray v(env,jv);
+  (*(PFNGLSECONDARYCOLOR3USVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSecondaryColorPointer)
+  jint size, jint type, jint stride, jobject jpointer
+JNI_GL_BEGIN2
+  JvoidBuffer pointer(env,jpointer);
+  (*(PFNGLSECONDARYCOLORPOINTERPROC)toPointer(pfunc))
+    (size,type,stride,pointer);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos2d)
+  jdouble x, jdouble y
+JNI_GL_BEGIN2
+  (*(PFNGLWINDOWPOS2DPROC)toPointer(pfunc))
+    (x,y);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos2dv)
+  jdoubleArray jv
+JNI_GL_BEGIN2
+  JdoubleArray v(env,jv);
+  (*(PFNGLWINDOWPOS2DVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos2f)
+  jfloat x, jfloat y
+JNI_GL_BEGIN2
+  (*(PFNGLWINDOWPOS2FPROC)toPointer(pfunc))
+    (x,y);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos2fv)
+  jfloatArray jv
+JNI_GL_BEGIN2
+  JfloatArray v(env,jv);
+  (*(PFNGLWINDOWPOS2FVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos2i)
+  jint x, jint y
+JNI_GL_BEGIN2
+  (*(PFNGLWINDOWPOS2IPROC)toPointer(pfunc))
+    (x,y);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos2iv)
+  jintArray jv
+JNI_GL_BEGIN2
+  JintArray v(env,jv);
+  (*(PFNGLWINDOWPOS2IVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos2s)
+  jshort x, jshort y
+JNI_GL_BEGIN2
+  (*(PFNGLWINDOWPOS2SPROC)toPointer(pfunc))
+    (x,y);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos2sv)
+  jshortArray jv
+JNI_GL_BEGIN2
+  JshortArray v(env,jv);
+  (*(PFNGLWINDOWPOS2SVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos3d)
+  jdouble x, jdouble y, jdouble z
+JNI_GL_BEGIN2
+  (*(PFNGLWINDOWPOS3DPROC)toPointer(pfunc))
+    (x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos3dv)
+  jdoubleArray jv
+JNI_GL_BEGIN2
+  JdoubleArray v(env,jv);
+  (*(PFNGLWINDOWPOS3DVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos3f)
+  jfloat x, jfloat y, jfloat z
+JNI_GL_BEGIN2
+  (*(PFNGLWINDOWPOS3FPROC)toPointer(pfunc))
+    (x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos3fv)
+  jfloatArray jv
+JNI_GL_BEGIN2
+  JfloatArray v(env,jv);
+  (*(PFNGLWINDOWPOS3FVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos3i)
+  jint x, jint y, jint z
+JNI_GL_BEGIN2
+  (*(PFNGLWINDOWPOS3IPROC)toPointer(pfunc))
+    (x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos3iv)
+  jintArray jv
+JNI_GL_BEGIN2
+  JintArray v(env,jv);
+  (*(PFNGLWINDOWPOS3IVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos3s)
+  jshort x, jshort y, jshort z
+JNI_GL_BEGIN2
+  (*(PFNGLWINDOWPOS3SPROC)toPointer(pfunc))
+    (x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glWindowPos3sv)
+  jshortArray jv
+JNI_GL_BEGIN2
+  JshortArray v(env,jv);
+  (*(PFNGLWINDOWPOS3SVPROC)toPointer(pfunc))
+    (v);
+JNI_GL_END
 
 /////////////////////////////////////////////////////////////////////////////
 // OpenGL 1.5
+
+/*
+*/

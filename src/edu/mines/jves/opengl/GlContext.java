@@ -115,6 +115,46 @@ public class GlContext {
   private static native boolean unlock(long peer);
   private static native boolean swapBuffers(long peer);
 
+  /**
+   * Stripped-down version of Doug Lea's reentrant lock.
+   * TODO: replace with JDK 5.0 standard lock.
+   */
+  private static class ReentrantLock {
+    public void acquire() {
+      Check.state(!Thread.interrupted(),"thread is not interrupted");
+      Thread caller = Thread.currentThread();
+      synchronized(this) {
+        if (_owner==caller) 
+          ++_holds;
+        else {
+          try {  
+            while (_owner != null) 
+              wait(); 
+            _owner = caller;
+            _holds = 1;
+          }
+          catch (InterruptedException ex) {
+            notify();
+            Check.state(false,"thread is not interrupted");
+          }
+        }
+      }
+    }
+    public synchronized void release() {
+      Check.state(_owner==Thread.currentThread(),"thread owns the lock");
+      if (--_holds == 0) {
+        _owner = null;
+        notify(); 
+      }
+    }
+    private Thread _owner = null;
+    private long _holds = 0;
+  }
+
+  static {
+    System.loadLibrary("edu_mines_jves_opengl");
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // pointers to OpenGL functions after version 1.1
 
@@ -208,6 +248,50 @@ public class GlContext {
 
   // OpenGL 1.4
   long glBlendFuncSeparate;
+  long glFogCoordf;
+  long glFogCoordfv;
+  long glFogCoordd;
+  long glFogCoorddv;
+  long glFogCoordPointer;
+  long glMultiDrawArrays;
+  long glMultiDrawElements;
+  long glPointParameterf;
+  long glPointParameterfv;
+  long glPointParameteri;
+  long glPointParameteriv;
+  long glSecondaryColor3b;
+  long glSecondaryColor3bv;
+  long glSecondaryColor3d;
+  long glSecondaryColor3dv;
+  long glSecondaryColor3f;
+  long glSecondaryColor3fv;
+  long glSecondaryColor3i;
+  long glSecondaryColor3iv;
+  long glSecondaryColor3s;
+  long glSecondaryColor3sv;
+  long glSecondaryColor3ub;
+  long glSecondaryColor3ubv;
+  long glSecondaryColor3ui;
+  long glSecondaryColor3uiv;
+  long glSecondaryColor3us;
+  long glSecondaryColor3usv;
+  long glSecondaryColorPointer;
+  long glWindowPos2d;
+  long glWindowPos2dv;
+  long glWindowPos2f;
+  long glWindowPos2fv;
+  long glWindowPos2i;
+  long glWindowPos2iv;
+  long glWindowPos2s;
+  long glWindowPos2sv;
+  long glWindowPos3d;
+  long glWindowPos3dv;
+  long glWindowPos3f;
+  long glWindowPos3fv;
+  long glWindowPos3i;
+  long glWindowPos3iv;
+  long glWindowPos3s;
+  long glWindowPos3sv;
 
   // OpenGL 1.5
   long glGenQueries;
@@ -304,6 +388,50 @@ public class GlContext {
 
     // OpenGL 1.4
     glBlendFuncSeparate = getProcAddress("glBlendFuncSeparate");
+    glFogCoordf = getProcAddress("glFogCoordf");
+    glFogCoordfv = getProcAddress("glFogCoordfv");
+    glFogCoordd = getProcAddress("glFogCoordd");
+    glFogCoorddv = getProcAddress("glFogCoorddv");
+    glFogCoordPointer = getProcAddress("glFogCoordPointer");
+    glMultiDrawArrays = getProcAddress("glMultiDrawArrays");
+    glMultiDrawElements = getProcAddress("glMultiDrawElements");
+    glPointParameterf = getProcAddress("glPointParameterf");
+    glPointParameterfv = getProcAddress("glPointParameterfv");
+    glPointParameteri = getProcAddress("glPointParameteri");
+    glPointParameteriv = getProcAddress("glPointParameteriv");
+    glSecondaryColor3b = getProcAddress("glSecondaryColor3b");
+    glSecondaryColor3bv = getProcAddress("glSecondaryColor3bv");
+    glSecondaryColor3d = getProcAddress("glSecondaryColor3d");
+    glSecondaryColor3dv = getProcAddress("glSecondaryColor3dv");
+    glSecondaryColor3f = getProcAddress("glSecondaryColor3f");
+    glSecondaryColor3fv = getProcAddress("glSecondaryColor3fv");
+    glSecondaryColor3i = getProcAddress("glSecondaryColor3i");
+    glSecondaryColor3iv = getProcAddress("glSecondaryColor3iv");
+    glSecondaryColor3s = getProcAddress("glSecondaryColor3s");
+    glSecondaryColor3sv = getProcAddress("glSecondaryColor3sv");
+    glSecondaryColor3ub = getProcAddress("glSecondaryColor3ub");
+    glSecondaryColor3ubv = getProcAddress("glSecondaryColor3ubv");
+    glSecondaryColor3ui = getProcAddress("glSecondaryColor3ui");
+    glSecondaryColor3uiv = getProcAddress("glSecondaryColor3uiv");
+    glSecondaryColor3us = getProcAddress("glSecondaryColor3us");
+    glSecondaryColor3usv = getProcAddress("glSecondaryColor3usv");
+    glSecondaryColorPointer = getProcAddress("glSecondaryColorPointer");
+    glWindowPos2d = getProcAddress("glWindowPos2d");
+    glWindowPos2dv = getProcAddress("glWindowPos2dv");
+    glWindowPos2f = getProcAddress("glWindowPos2f");
+    glWindowPos2fv = getProcAddress("glWindowPos2fv");
+    glWindowPos2i = getProcAddress("glWindowPos2i");
+    glWindowPos2iv = getProcAddress("glWindowPos2iv");
+    glWindowPos2s = getProcAddress("glWindowPos2s");
+    glWindowPos2sv = getProcAddress("glWindowPos2sv");
+    glWindowPos3d = getProcAddress("glWindowPos3d");
+    glWindowPos3dv = getProcAddress("glWindowPos3dv");
+    glWindowPos3f = getProcAddress("glWindowPos3f");
+    glWindowPos3fv = getProcAddress("glWindowPos3fv");
+    glWindowPos3i = getProcAddress("glWindowPos3i");
+    glWindowPos3iv = getProcAddress("glWindowPos3iv");
+    glWindowPos3s = getProcAddress("glWindowPos3s");
+    glWindowPos3sv = getProcAddress("glWindowPos3sv");
 
     // OpenGL 1.5
     glGenQueries = getProcAddress("glGenQueries");
@@ -312,44 +440,4 @@ public class GlContext {
     _gotProcAddresses = true;
   }
   private static native long getProcAddress(String functionName);
-
-  /**
-   * Stripped-down version of Doug Lea's reentrant lock.
-   * TODO: replace with JDK 5.0 standard lock.
-   */
-  private static class ReentrantLock {
-    public void acquire() {
-      Check.state(!Thread.interrupted(),"thread is not interrupted");
-      Thread caller = Thread.currentThread();
-      synchronized(this) {
-        if (_owner==caller) 
-          ++_holds;
-        else {
-          try {  
-            while (_owner != null) 
-              wait(); 
-            _owner = caller;
-            _holds = 1;
-          }
-          catch (InterruptedException ex) {
-            notify();
-            Check.state(false,"thread is not interrupted");
-          }
-        }
-      }
-    }
-    public synchronized void release() {
-      Check.state(_owner==Thread.currentThread(),"thread owns the lock");
-      if (--_holds == 0) {
-        _owner = null;
-        notify(); 
-      }
-    }
-    private Thread _owner = null;
-    private long _holds = 0;
-  }
-
-  static {
-    System.loadLibrary("edu_mines_jves_opengl");
-  }
 }
