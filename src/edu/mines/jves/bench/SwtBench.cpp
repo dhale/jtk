@@ -3,7 +3,7 @@
 #include "GL/gl.h"
 
 extern "C" JNIEXPORT void JNICALL
-Java_edu_mines_jves_bench_SwtBench_printHandle(
+Java_edu_mines_jves_bench_SwtBench_printHandleNative(
   JNIEnv* env, jclass cls,
   jint handle)
 {

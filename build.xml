@@ -25,12 +25,6 @@
       <include name="**/*.jar"/>
     </fileset>
   </path>
-  <condition property="windows">
-    <os family="windows"/>
-  </condition>
-  <condition property="unix">
-    <os family="unix"/>
-  </condition>
 
   <!-- Initialize -->
   <target name="init">

@@ -17,6 +17,7 @@ import edu.mines.jves.util.Stopwatch;
 public class SwtBench {
 
   public static void main(String[] args) {
+    //simple();
     benchPrimitives();
   }
 
@@ -95,7 +96,7 @@ public class SwtBench {
     Display display = new Display();
     Shell shell = new Shell(display);
     System.out.println("shell handle="+shell.handle);
-    printHandle(shell.handle);
+    printHandleNative(shell.handle);
     shell.open();
     while (!shell.isDisposed()) {
       if (!display.readAndDispatch())
@@ -142,7 +143,7 @@ public class SwtBench {
     display.dispose();
   }
 
-  private static native void printHandle(int handle);
+  private static native void printHandleNative(int handle);
 
   static {
     System.loadLibrary("edu_mines_jves_bench");
