@@ -140,7 +140,8 @@ public:
   {
   }
   virtual ~GlxAwtCanvasContext() {
-    glXDestroyContext(_display,_context);
+    if (_context!=0)
+      glXDestroyContext(_display,_context);
   }
   virtual void makeCurrent(JNIEnv*) {
     _dsi_x11 = (JAWT_X11DrawingSurfaceInfo*)_dsi->platformInfo;

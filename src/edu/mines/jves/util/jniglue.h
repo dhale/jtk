@@ -71,3 +71,67 @@ private:
   jstring _str;
   const char* _utf;
 };
+
+// Java array
+template<typename T> class Jarray {
+public:
+  Jarray(JNIEnv* env, jarray arr) {
+    _env = env;
+    _arr = arr;
+    _ptr = (T*)env->GetPrimitiveArrayCritical(arr,0);
+  }
+  ~Jarray() {
+    _env->ReleasePrimitiveArrayCritical(_arr,_ptr,0);
+  }
+  operator const T*() const {
+    return _ptr;
+  }
+  operator T*() const {
+    return _ptr;
+  }
+private:
+  JNIEnv* _env;
+  jarray _arr;
+  T* _ptr;
+};
+typedef Jarray<jboolean> JbooleanArray;
+typedef Jarray<jbyte> JbyteArray;
+typedef Jarray<unsigned char> JubyteArray;
+typedef Jarray<jchar> JcharArray;
+typedef Jarray<jshort> JshortArray;
+typedef Jarray<unsigned short> JushortArray;
+typedef Jarray<jint> JintArray;
+typedef Jarray<unsigned int> JuintArray;
+typedef Jarray<jfloat> JfloatArray;
+typedef Jarray<jdouble> JdoubleArray;
+typedef Jarray<void> JvoidArray;
+
+// Java NIO buffer
+template<typename T> class Jbuffer {
+public:
+  Jbuffer(JNIEnv* env, jobject buf) {
+    _ptr = (T*)env->GetDirectBufferAddress(buf);
+    // TODO: check pointer; will be zero if not a direct buffer
+    //if (_ptr==0)
+    //  throw ???
+  }
+  operator const T*() const {
+    return _ptr;
+  }
+  operator T*() const {
+    return _ptr;
+  }
+private:
+  T* _ptr;
+};
+typedef Jbuffer<jboolean> JbooleanBuffer;
+typedef Jbuffer<jbyte> JbyteBuffer;
+typedef Jbuffer<unsigned char> JubyteBuffer;
+typedef Jbuffer<jchar> JcharBuffer;
+typedef Jbuffer<jshort> JshortBuffer;
+typedef Jbuffer<unsigned short> JushortBuffer;
+typedef Jbuffer<jint> JintBuffer;
+typedef Jbuffer<unsigned int> JuintBuffer;
+typedef Jbuffer<jfloat> JfloatBuffer;
+typedef Jbuffer<jdouble> JdoubleBuffer;
+typedef Jbuffer<void> JvoidBuffer;
