@@ -14,7 +14,7 @@ import edu.mines.jtk.util.*;
  * Samplings are often used to represent independent variables for sampled 
  * functions. They describe the values at which a function is sampled. For 
  * efficiency, and to guarantee a unique mapping from sample value to 
- * function value, we restrict samplings to be monotonic-definite. That is, 
+ * function value, we restrict samplings to be monotonic. That is, 
  * sample values strictly decrease or increase as sample index increases.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.03.01
@@ -53,11 +53,11 @@ public class Sampling {
 
   /**
    * Constructs a sampling from the specified array of values. The values 
-   * must be monotonic-definite; i.e., strictly increasing or decreasing.
+   * must be monotonic; i.e., strictly increasing or decreasing.
    * @param v the sampling values; copied, not referenced.
    */
   public Sampling(float[] v) {
-    Check.argument(Array.isMonotonicDefinite(v),"v is monotonic-definite");
+    Check.argument(Array.isMonotonic(v),"v is monotonic");
     _n = v.length;
     _d = (_n<2)?0.0f:v[1]-v[0];
     _f = (_n<1)?0.0f:v[0];

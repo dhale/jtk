@@ -40,152 +40,262 @@ public class Array {
   }
 
   /**
-   * Determines whether the specified array is monotonic-definite.
-   * The array is monotonic-definite if its elements are strictly
-   * increasing or decreasing, with no equal values.
+   * Determines whether the specified array is monotonic. The array is 
+   * monotonic if its elements a[i] either increase or decrease (but 
+   * not both) with array index i, with no equal values.
    * @param a the array.
+   * @return true, if monotonic (or a.length&lt;2); false, otherwise.
    */
-  public static boolean isMonotonicDefinite(double[] a) {
-    int n = a.length;
-    if (n<2) {
-      return true;
-    } else if (a[0]<a[1]) {
-      for (int i=2; i<n; ++i) {
-        if (a[i-1]>=a[i])
-          return false;
-      }
-      return true;
-    } else if (a[1]<a[0]) {
-      for (int i=2; i<n; ++i) {
-        if (a[i-1]<=a[i])
-          return false;
-      }
-      return true;
-    } else {
-      return false;
-    }
+  public static boolean isMonotonic(double[] a) {
+    return isIncreasing(a) || isDecreasing(a);
   }
 
   /**
-   * Determines whether the specified array is monotonic-definite.
-   * The array is monotonic-definite if its elements are strictly
-   * increasing or decreasing, with no equal values.
+   * Determines whether the specified array is monotonic. The array is 
+   * monotonic if its elements a[i] either increase or decrease (but 
+   * not both) with array index i, with no equal values.
    * @param a the array.
+   * @return true, if monotonic (or a.length&lt;2); false, otherwise.
    */
-  public static boolean isMonotonicDefinite(float[] a) {
+  public static boolean isMonotonic(float[] a) {
+    return isIncreasing(a) || isDecreasing(a);
+  }
+
+  /**
+   * Determines whether the specified array is increasing. The array is 
+   * increasing if its elements a[i] increase with array index i, with 
+   * no equal values.
+   * @param a the array.
+   * @return true, if increasing (or a.length&lt;2); false, otherwise.
+   */
+  public static boolean isIncreasing(double[] a) {
     int n = a.length;
-    if (n<2) {
-      return true;
-    } else if (a[0]<a[1]) {
-      for (int i=2; i<n; ++i) {
+    if (n>1) {
+      for (int i=1; i<n; ++i) {
         if (a[i-1]>=a[i])
           return false;
       }
-      return true;
-    } else if (a[1]<a[0]) {
-      for (int i=2; i<n; ++i) {
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the specified array is increasing. The array is 
+   * increasing if its elements a[i] increase with array index i, with 
+   * no equal values.
+   * @param a the array.
+   * @return true, if increasing (or a.length&lt;2); false, otherwise.
+   */
+  public static boolean isIncreasing(float[] a) {
+    int n = a.length;
+    if (n>1) {
+      for (int i=1; i<n; ++i) {
+        if (a[i-1]>=a[i])
+          return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the specified array is decreasing. The array is 
+   * decreasing if its elements a[i] decrease with array index i, with 
+   * no equal values.
+   * @param a the array.
+   * @return true, if decreasing (or a.length&lt;2); false, otherwise.
+   */
+  public static boolean isDecreasing(double[] a) {
+    int n = a.length;
+    if (n>1) {
+      for (int i=1; i<n; ++i) {
         if (a[i-1]<=a[i])
           return false;
       }
-      return true;
-    } else {
-      return false;
     }
+    return true;
+  }
+
+  /**
+   * Determines whether the specified array is decreasing. The array is 
+   * decreasing if its elements a[i] decrease with array index i, with 
+   * no equal values.
+   * @param a the array.
+   * @return true, if decreasing (or a.length&lt;2); false, otherwise.
+   */
+  public static boolean isDecreasing(float[] a) {
+    int n = a.length;
+    if (n>1) {
+      for (int i=1; i<n; ++i) {
+        if (a[i-1]<=a[i])
+          return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Performs a binary search in a monotonic array of values. 
+   * <p>
+   * Warning: this method does not ensure that the specified array is
+   * monotonic; that check would be more costly than this search.
+   * @param a the array of values, assumed to be monotonic.
+   * @param x the value for which to search.
+   * @return the index at which the specified value is found, or, if not
+   *  found, -(i+1), where i equals the index at which the specified value 
+   *  would be located if it was inserted into the monotonic array.
+   */
+  public static int binarySearch(double[] a, double x) {
+    return binarySearch(a,x,a.length);
+  }
+
+  /**
+   * Performs a binary search in a monotonic array of values. 
+   * <p>
+   * Warning: this method does not ensure that the specified array is
+   * monotonic; that check would be more costly than this search.
+   * @param a the array of values, assumed to be monotonic.
+   * @param x the value for which to search.
+   * @return the index at which the specified value is found, or, if not
+   *  found, -(i+1), where i equals the index at which the specified value 
+   *  would be located if it was inserted into the monotonic array.
+   */
+  public static int binarySearch(float[] a, float x) {
+    return binarySearch(a,x,a.length);
+  }
+
+  /**
+   * Performs a binary search in a monotonic array of values. 
+   * This method is most efficient when called repeatedly for slightly 
+   * changing search values; in such cases, the index returned from one 
+   * call should be passed in the next.
+   * <p>
+   * Warning: this method does not ensure that the specified array is
+   * monotonic; that check would be more costly than this search.
+   * @param a the array of values, assumed to be monotonic.
+   * @param x the value for which to search.
+   * @param i the index at which to begin the search. If negative, this 
+   *  method interprets this index as if returned from a previous call.
+   * @return the index at which the specified value is found, or, if not
+   *  found, -(i+1), where i equals the index at which the specified value 
+   *  would be located if it was inserted into the monotonic array.
+   */
+  public static int binarySearch(double[] a, double x, int i) {
+    int n = a.length;
+    int nm1 = n-1;
+    int low = 0;
+    int high = nm1;
+    boolean increasing = n<2 || a[0]<a[1];
+    if (i<n) {
+      high = (0<=i)?i:-(i+1);
+      low = high-1;
+      int step = 1;
+      if (increasing) {
+        for (; 0<low && x<a[low]; low-=step,step+=step)
+          high = low;
+        for (; high<nm1 && a[high]<x; high+=step,step+=step)
+          low = high;
+      } else {
+        for (; 0<low && x>a[low]; low-=step,step+=step)
+          high = low;
+        for (; high<nm1 && a[high]>x; high+=step,step+=step)
+          low = high;
+      }
+      if (low<0) low = 0;
+      if (high>nm1) high = nm1;
+    }
+    if (increasing) {
+      while (low<=high) {
+        int mid = (low+high)>>1;
+        double amid = a[mid];
+        if (amid<x)
+          low = mid+1;
+        else if (amid>x)
+          high = mid-1;
+        else
+          return mid;
+      }
+    } else {
+      while (low<=high) {
+        int mid = (low+high)>>1;
+        double amid = a[mid];
+        if (amid>x)
+          low = mid+1;
+        else if (amid<x)
+          high = mid-1;
+        else
+          return mid;
+      }
+    }
+    return -(low+1);
+  }
+
+  /**
+   * Performs a binary search in a monotonic array of values. 
+   * This method is most efficient when called repeatedly for slightly 
+   * changing search values; in such cases, the index returned from one 
+   * call should be passed in the next.
+   * <p>
+   * Warning: this method does not ensure that the specified array is
+   * monotonic; that check would be more costly than this search.
+   * @param a the array of values, assumed to be monotonic.
+   * @param x the value for which to search.
+   * @param i the index at which to begin the search. If negative, this 
+   *  method interprets this index as if returned from a previous call.
+   * @return the index at which the specified value is found, or, if not
+   *  found, -(i+1), where i equals the index at which the specified value 
+   *  would be located if it was inserted into the monotonic array.
+   */
+  public static int binarySearch(float[] a, float x, int i) {
+    int n = a.length;
+    int nm1 = n-1;
+    int low = 0;
+    int high = nm1;
+    boolean increasing = n<2 || a[0]<a[1];
+    if (i<n) {
+      high = (0<=i)?i:-(i+1);
+      low = high-1;
+      int step = 1;
+      if (increasing) {
+        for (; 0<low && x<a[low]; low-=step,step+=step)
+          high = low;
+        for (; high<nm1 && a[high]<x; high+=step,step+=step)
+          low = high;
+      } else {
+        for (; 0<low && x>a[low]; low-=step,step+=step)
+          high = low;
+        for (; high<nm1 && a[high]>x; high+=step,step+=step)
+          low = high;
+      }
+      if (low<0) low = 0;
+      if (high>nm1) high = nm1;
+    }
+    if (increasing) {
+      while (low<=high) {
+        int mid = (low+high)>>1;
+        float amid = a[mid];
+        if (amid<x)
+          low = mid+1;
+        else if (amid>x)
+          high = mid-1;
+        else
+          return mid;
+      }
+    } else {
+      while (low<=high) {
+        int mid = (low+high)>>1;
+        float amid = a[mid];
+        if (amid>x)
+          low = mid+1;
+        else if (amid<x)
+          high = mid-1;
+        else
+          return mid;
+      }
+    }
+    return -(low+1);
   }
 
   // Static methods only.
   private Array() {
-  }
-
-  /**
-   * Performs a binary search in a monotonic-definite array of values. 
-   * This method is most efficient when called repeatedly for slightly 
-   * changing search values; in such cases, the index returned from one 
-   * call should be used in the next.
-   * <p>
-   * Warning: this method does not ensure that the specified array is indeed 
-   * monotonic-definite; that check would be more costly than this search.
-   * @param a the array of values, assumed to be monotonic-definite.
-   * @param x the search value; the value to locate.
-   * @param i the index at which to begin the search. If negative, this 
-   *  method interprets this index as if returned from a previous call.
-   * @return the index at which the specified value is found; or, if not
-   *  found, -(i+1), where i equals the index at which the specified value 
-   *  would be located if it was inserted into the monotonic-definite array.
-   */
-  public static int binarySearch(float[] a, float x, int i) {
-    int n = a.length;
-
-    // Interpret a negative index i as if returned from a previous call.
-    if (i<0)
-      i = -i-1;
-
-    // Special case for n=0.
-    if (n==0)
-      return 0;
-
-    // Lower index j, upper index k, and step m.
-    int j = max(0,min(n-1,i));
-    int k = j+1;
-    int m = 1;
-
-    // If values increasing, ...
-    if (a[0]<a[n-1]) {
-
-      // Find indices j and k such that 
-      // (1) 0 <= j < k <= n and, 
-      // (2) if possible, a[j] <= x < a[k].
-      while (0<j && x<a[j]) {
-        k = j;
-        j -= m;
-        m += m;
-      }
-      j = max(0,j);
-      while (k<n && a[k]<=x) {
-        j = k;
-        k += m;
-        m += m;
-      }
-      k = min(n,k);
-
-      // Find index via bisection.
-      for (int middle=(j+k)/2; middle!=j; middle=(j+k)/2) {
-        if (a[middle]<=x)
-          j = middle;
-        else
-          k = middle;
-      }
-    }
-
-    // Else, if not increasing, ...
-    else {
-
-      // Find indices j and k such that 
-      // (1) 0 <= j < k <= n and, 
-      // (2) if possible, a[j] >= x > a[k].
-      while (0<j && a[j]<x) {
-        k = j;
-        j -= m;
-        m += m;
-      }
-      j = max(0,j);
-      while (k<n && x<=a[k]) {
-        j = k;
-        k += m;
-        m += m;
-      }
-      k = min(n,k);
-
-      // Find index via bisection.
-      for (int middle=(j+k)/2; middle!=j; middle=(j+k)/2) {
-        if (x<=a[middle])
-          j = middle;
-        else
-          k = middle;
-      }
-    }
-
-    // Return the lower index j.
-    return (0<=j && j<n && a[j]==x)?j:(-j-1);
   }
 }
