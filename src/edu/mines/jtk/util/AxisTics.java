@@ -156,9 +156,10 @@ public class AxisTics {
   /**
    * Gets the tic multiple. The tic multiple is the number of (major 
    * and minor) tics per major tic, except near the ends of the axis.
+   * Between any pair of major tics there are multiple-1 minor tics.
    * @return the tic multiple.
    */
-  public double getMultiple() {
+  public int getMultiple() {
     return _mtic;
   }
 

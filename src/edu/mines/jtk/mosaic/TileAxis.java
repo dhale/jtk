@@ -8,6 +8,7 @@ package edu.mines.jtk.mosaic;
 
 import static java.lang.Math.*;
 import java.awt.*;
+import java.awt.font.*;
 import javax.swing.*;
 import edu.mines.jtk.util.*;
 
@@ -114,23 +115,30 @@ public class TileAxis extends JPanel {
 
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
+    Graphics2D g2d = (Graphics2D)g;
 
     // Axis size.
     int w = getWidth();
     int h = getHeight();
 
     // Font dimensions.
+    Font font = getFont();
     FontMetrics fm = g.getFontMetrics();
-    int fh = fm.getHeight();
-    int fa = fm.getAscent();
-    int fd = fm.getDescent();
+    FontRenderContext frc = g2d.getFontRenderContext();
+    LineMetrics lm = font.getLineMetrics("0.123456789",frc);
+    int fh = round(lm.getHeight());
+    int fa = round(lm.getAscent());
+    int fd = round(lm.getDescent());
+    int fl = round(lm.getLeading());
 
     // Length of major tics.
     int tl = 2*fa/3;
 
-    Graphics2D g2d = (Graphics2D)g;
+    // Projector and transcaler of adjacent tile.
     Projector p = getProjector();
     Transcaler t = getTranscaler();
+
+    // Axis placement.
     boolean isHorizontal = isHorizontal();
     boolean isTop = isTop();
     boolean isLeft = isLeft();
@@ -152,60 +160,98 @@ public class TileAxis extends JPanel {
       double v1 = max(vmin,min(vmax,p.v(t.y(h-1))));
       at = new AxisTics(v0,v1,nmax);
     }
+    int nticMajor = at.getCountMajor();
+    double dticMajor = at.getDeltaMajor();
+    double fticMajor = at.getFirstMajor();
+    int nticMinor = at.getCountMinor();
+    double dticMinor = at.getDeltaMinor();
+    double fticMinor = at.getFirstMinor();
+    int mtic = at.getMultiple();
 
-    // Minor tics.
-    int ntic = at.getCountMinor();
-    double dtic = at.getDeltaMinor();
-    double ftic = at.getFirstMinor();
-    if (isHorizontal) {
-      for (int itic=0; itic<ntic; ++itic) {
-        double vtic = ftic+itic*dtic;
+    // Minor tics. Skip major tics, which may not coincide, due to rounding.
+    int ktic = (int)round((fticMajor-fticMinor)/dticMinor);
+    for (int itic=0; itic<nticMinor; ++itic) {
+      if (itic==ktic) {
+        ktic += mtic;
+      } else {
+        double vtic = fticMinor+itic*dticMinor;
         double utic = p.u(vtic);
-        int x = t.x(utic);
-        if (isTop) {
-          g2d.drawLine(x,h-1,x,h-1-tl/2);
+        if (isHorizontal) {
+          int x = t.x(utic);
+          if (isTop) {
+            g2d.drawLine(x,h-1,x,h-1-tl/2);
+          } else {
+            g2d.drawLine(x,0,x,tl/2);
+          }
         } else {
-          g2d.drawLine(x,0,x,tl/2);
+          int y = t.y(utic);
+          if (isLeft) {
+            g2d.drawLine(w-1,y,w-1-tl/2,y);
+          } else {
+            g2d.drawLine(0,y,tl/2,y);
+          }
         }
       }
-    } else {
     }
 
-    // Major tics and axis label.
-    ntic = at.getCountMajor();
-    dtic = at.getDeltaMajor();
-    ftic = at.getFirstMajor();
-    if (isHorizontal) {
-      for (int itic=0; itic<ntic; ++itic) {
-        double vtic = ftic+itic*dtic;
-        double utic = p.u(vtic);
+    // Major tics.
+    int wsmax = 0;
+    for (int itic=0; itic<nticMajor; ++itic) {
+      double vtic = fticMajor+itic*dticMajor;
+      double utic = p.u(vtic);
+      String stic = formatTic(vtic);
+      if (isHorizontal) {
         int x = t.x(utic);
         int y;
-        String stic = formatTic(vtic);
         if (isTop) {
           y = h-1;
           g2d.drawLine(x,y,x,y-tl);
           y -= tl+fd;
         } else {
           y = 0;
-          g2d.drawLine(x,0,x,tl);
+          g2d.drawLine(x,y,x,y+tl);
           y += tl+fa;
         }
         int ws = fm.stringWidth(stic);
         int xs = max(0,min(w-ws,x-ws/2));
         int ys = y;
         g2d.drawString(stic,xs,ys);
+      } else {
+        int x;
+        int y = t.y(utic);
+        if (isLeft) {
+          x = w-1;
+          g2d.drawLine(x,y,x-tl,y);
+          x -= tl+fd;
+        } else {
+          x = 0;
+          g2d.drawLine(x,y,x+tl,y);
+          x += tl+fd;
+        }
+        int ws = fm.stringWidth(stic);
+        if (ws>wsmax)
+          wsmax = ws;
+        int xs = (isLeft)?x-ws:x;
+        int ys = max(fa,min(h-1,y+fa/2));
+        g2d.drawString(stic,xs,ys);
       }
+    }
+
+    // Axis label.
+    if (isHorizontal) {
       int wl = fm.stringWidth(_label);
       int xl = max(0,min(w-wl,(w-wl)/2));
       int yl = isTop?h-1-tl-fh-fd:tl+fh+fa;
       g2d.drawString(_label,xl,yl);
     } else {
-      g.setColor(Color.RED);
-      g.fillRect(0,0,w,h);
-      g.setColor(getForeground());
-      int ws = fm.stringWidth("Axis");
-      g.drawString("Axis",(w-ws)/2,(h+fa)/2);
+      int wl = fm.stringWidth(_label);
+      int xl = isLeft?max(fa,w-1-tl-fd-wsmax-fd-fl):min(w-1-fd,tl+fd+wsmax+fh);
+      int yl = max(wl,min(h,(h+wl)/2));
+      g2d.translate(xl,yl);
+      g2d.rotate(-PI/2.0);
+      g2d.drawString(_label,0,0);
+      g2d.rotate(PI/2.0);
+      g2d.translate(-xl,-yl);
     }
   }
 
