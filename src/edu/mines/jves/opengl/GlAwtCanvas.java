@@ -44,6 +44,10 @@ public class GlAwtCanvas extends Canvas {
     }
   }
 
+  public void update(Graphics g) {
+    paint(g);
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 

@@ -31,6 +31,10 @@ public:
   virtual jboolean swapBuffers() = 0;
 };
 
+static void trace(const char* message) {
+  fprintf(stderr,"%s\n",message);
+}
+
 // OpenGL context for AWT Canvas.
 class GlAwtCanvasContext : public GlContext {
 public:
@@ -44,23 +48,23 @@ public:
   virtual jboolean lock() {
     _awt.version = JAWT_VERSION_1_3;
     if (JAWT_GetAWT(_env,&_awt)==JNI_FALSE) {
-      printf("Could not get AWT\n");
+      trace("GlAwtCanvasContext.lock: cannot get AWT");
       return JNI_FALSE;
     }
     _ds = _awt.GetDrawingSurface(_env,_canvas);
     if (_ds==0) {
-      printf("Could not get DrawingSurface\n");
+      trace("GlAwtCanvasContext.lock: cannot get DrawingSurface");
       return JNI_FALSE;
     }
     jint lock = _ds->Lock(_ds);
     if ((lock&JAWT_LOCK_ERROR)!=0) {
-      printf("Could not lock DrawingSurface\n");
+      trace("GlAwtCanvasContext.lock: cannot lock DrawingSurface");
       _awt.FreeDrawingSurface(_ds);
       return JNI_FALSE;
     }
     _dsi = _ds->GetDrawingSurfaceInfo(_ds);
     if (_dsi==0) {
-      printf("Could not get DrawingSurfaceInfo\n");
+      trace("GlAwtCanvasContext.lock: cannot get DrawingSurfaceInfo");
       _ds->Unlock(_ds);
       _awt.FreeDrawingSurface(_ds);
       return JNI_FALSE;
