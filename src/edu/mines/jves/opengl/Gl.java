@@ -3024,11 +3024,11 @@ public class Gl {
     nglGetBufferSubData(getContext().glGetBufferSubData,
       target,offset,size,data);
   }
-  public static Buffer glMapBuffer(
-    int target, int access)
+  public static ByteBuffer glMapBuffer(
+    int target, int access, int size, ByteBuffer buffer)
   {
     return nglMapBuffer(getContext().glMapBuffer,
-      target,access);
+      target,access,size,buffer);
   }
   public static boolean glUnmapBuffer(
     int target)
@@ -3078,8 +3078,8 @@ public class Gl {
     int target, int offset, int size, Buffer data);
   private static native void nglGetBufferSubData(long pfunc,
     int target, int offset, int size, Buffer data);
-  private static native Buffer nglMapBuffer(long pfunc,
-    int target, int access);
+  private static native ByteBuffer nglMapBuffer(long pfunc,
+    int target, int access, int size, ByteBuffer buffer);
   private static native boolean nglUnmapBuffer(long pfunc,
     int target);
   private static native void nglGetBufferParameteriv(long pfunc,

@@ -3893,11 +3893,20 @@ JNI_GL_BEGIN2
 JNI_GL_END
 
 JNI_GL_DECLARE_RETURN2(jobject,glMapBuffer)
-  jint target, jint access
+  jint target, jint access, jlong size, jobject buffer
 JNI_GL_BEGIN2
   void* pointer = (*(PFNGLMAPBUFFERPROC)toPointer(pfunc))
     (target,access);
-  return (jobject)pointer; // TODO: return a Buffer
+  if (pointer!=0) {
+    if (buffer!=0) {
+      void* p = env->GetDirectBufferAddress(buffer);
+      if (p==pointer)
+        return buffer;
+    } else {
+      return env->NewDirectByteBuffer(pointer,size);
+    }
+  }
+  return 0;
 JNI_GL_END
 
 JNI_GL_DECLARE_RETURN2(jboolean,glUnmapBuffer)
@@ -3923,10 +3932,3 @@ JNI_GL_BEGIN2
     (target,pname,&params);
   // TODO: convert the void* to Buffer
 JNI_GL_END
-
-/*
-  private static native void nglGetBufferParameteriv(
-    int target, int pname, int[] params);
-  private static native void nglGetBufferPointerv(
-    int target, int pname, Buffer[] params);
-*/
