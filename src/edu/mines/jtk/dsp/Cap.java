@@ -434,9 +434,129 @@ public class Cap {
     int n1, int n2, int n3, float[][][] cx, Complex cb, float[][][] cz) {
     return _add.apply(n1,n2,n3,cx,cb,cz);
   }
+  public static float[] sub(float[] cx, float[] cy) {
+    return _sub.apply(cx,cy);
+  }
+  public static float[] sub(Complex ca, float[] cy) {
+    return _sub.apply(ca,cy);
+  }
+  public static float[] sub(float[] cx, Complex cb) {
+    return _sub.apply(cx,cb);
+  }
+  public static float[][] sub(float[][] cx, float[][] cy) {
+    return _sub.apply(cx,cy);
+  }
+  public static float[][] sub(Complex ca, float[][] cy) {
+    return _sub.apply(ca,cy);
+  }
+  public static float[][] sub(float[][] cx, Complex cb) {
+    return _sub.apply(cx,cb);
+  }
+  public static float[][][] sub(float[][][] cx, float[][][] cy) {
+    return _sub.apply(cx,cy);
+  }
+  public static float[][][] sub(Complex ca, float[][][] cy) {
+    return _sub.apply(ca,cy);
+  }
+  public static float[][][] sub(float[][][] cx, Complex cb) {
+    return _sub.apply(cx,cb);
+  }
+  public static float[] sub(float[] cx, float[] cy, float[] cz) {
+    return _sub.apply(cx,cy,cz);
+  }
+  public static float[] sub(Complex ca, float[] cy, float[] cz) {
+    return _sub.apply(ca,cy,cz);
+  }
+  public static float[] sub(float[] cx, Complex cb, float[] cz) {
+    return _sub.apply(cx,cb,cz);
+  }
+  public static float[][] sub(float[][] cx, float[][] cy, float[][] cz) {
+    return _sub.apply(cx,cy,cz);
+  }
+  public static float[][] sub(Complex ca, float[][] cy, float[][] cz) {
+    return _sub.apply(ca,cy,cz);
+  }
+  public static float[][] sub(float[][] cx, Complex cb, float[][] cz) {
+    return _sub.apply(cx,cb,cz);
+  }
+  public static float[][][] sub(
+    float[][][] cx, float[][][] cy, float[][][] cz) {
+    return _sub.apply(cx,cy,cz);
+  }
+  public static float[][][] sub(
+    Complex ca, float[][][] cy, float[][][] cz) {
+    return _sub.apply(ca,cy,cz);
+  }
+  public static float[][][] sub(
+    float[][][] cx, Complex cb, float[][][] cz) {
+    return _sub.apply(cx,cb,cz);
+  }
+  public static float[] sub(int n1, float[] cx, float[] cy) {
+    return _sub.apply(n1,cx,cy);
+  }
+  public static float[] sub(int n1, Complex ca, float[] cy) {
+    return _sub.apply(n1,ca,cy);
+  }
+  public static float[] sub(int n1, float[] cx, Complex cb) {
+    return _sub.apply(n1,cx,cb);
+  }
+  public static float[][] sub(int n1, int n2, float[][] cx, float[][] cy) {
+    return _sub.apply(n1,n2,cx,cy);
+  }
+  public static float[][] sub(int n1, int n2, Complex ca, float[][] cy) {
+    return _sub.apply(n1,n2,ca,cy);
+  }
+  public static float[][] sub(int n1, int n2, float[][] cx, Complex cb) {
+    return _sub.apply(n1,n2,cx,cb);
+  }
+  public static float[][][] sub(
+    int n1, int n2, int n3, float[][][] cx, float[][][] cy) {
+    return _sub.apply(n1,n2,n3,cx,cy);
+  }
+  public static float[][][] sub(
+    int n1, int n2, int n3, Complex ca, float[][][] cy) {
+    return _sub.apply(n1,n2,n3,ca,cy);
+  }
+  public static float[][][] sub(
+    int n1, int n2, int n3, float[][][] cx, Complex cb) {
+    return _sub.apply(n1,n2,n3,cx,cb);
+  }
+  public static float[] sub(int n1, float[] cx, float[] cy, float[] cz) {
+    return _sub.apply(n1,cx,cy,cz);
+  }
+  public static float[] sub(int n1, Complex ca, float[] cy, float[] cz) {
+    return _sub.apply(n1,ca,cy,cz);
+  }
+  public static float[] sub(int n1, float[] cx, Complex cb, float[] cz) {
+    return _sub.apply(n1,cx,cb,cz);
+  }
+  public static float[][] sub(
+    int n1, int n2, float[][] cx, float[][] cy, float[][] cz) {
+    return _sub.apply(n1,n2,cx,cy,cz);
+  }
+  public static float[][] sub(
+    int n1, int n2, Complex ca, float[][] cy, float[][] cz) {
+    return _sub.apply(n1,n2,ca,cy,cz);
+  }
+  public static float[][] sub(
+    int n1, int n2, float[][] cx, Complex cb, float[][] cz) {
+    return _sub.apply(n1,n2,cx,cb,cz);
+  }
+  public static float[][][] sub(
+    int n1, int n2, int n3, float[][][] cx, float[][][] cy, float[][][] cz) {
+    return _sub.apply(n1,n2,n3,cx,cy,cz);
+  }
+  public static float[][][] sub(
+    int n1, int n2, int n3, Complex ca, float[][][] cy, float[][][] cz) {
+    return _sub.apply(n1,n2,n3,ca,cy,cz);
+  }
+  public static float[][][] sub(
+    int n1, int n2, int n3, float[][][] cx, Complex cb, float[][][] cz) {
+    return _sub.apply(n1,n2,n3,cx,cb,cz);
+  }
 
   ///////////////////////////////////////////////////////////////////////////
-  // Binary operations; e.g., add, sub, mul, div.
+  // binary operations; e.g., add, sub, mul, div, ...
   private static abstract class Binary {
     float[] apply(float[] cx, float[] cy) {
       int n1 = cx.length/2;
@@ -636,6 +756,33 @@ public class Cap {
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         cz[ir] = cx[ir]+br;
         cz[ii] = cx[ii]+bi;
+      }
+      return cz;
+    }
+  };
+  private static Binary _sub = new Binary() {
+    float[] apply(int n1, float[] cx, float[] cy, float[] cz) {
+      for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+        cz[ir] = cx[ir]-cy[ir];
+        cz[ii] = cx[ii]-cy[ii];
+      }
+      return cz;
+    }
+    float[] apply(int n1, Complex ca, float[] cy, float[] cz) {
+      float ar = ca.r;
+      float ai = ca.i;
+      for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+        cz[ir] = ar-cy[ir];
+        cz[ii] = ai-cy[ii];
+      }
+      return cz;
+    }
+    float[] apply(int n1, float[] cx, Complex cb, float[] cz) {
+      float br = cb.r;
+      float bi = cb.i;
+      for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+        cz[ir] = cx[ir]-br;
+        cz[ii] = cx[ii]-bi;
       }
       return cz;
     }
