@@ -6,7 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jves.opengl;
 
-import java.awt.Canvas;
 import edu.mines.jves.util.Check;
 
 /**
@@ -42,6 +41,14 @@ public class GlContext {
    */
   public GlContext(java.awt.Canvas canvas) {
     _peer = makeGlAwtCanvasContext(canvas);
+  }
+
+  /**
+   * Constructs an OpenGL context for the specified SWT canvas.
+   * @param canvas the canvas.
+   */
+  public GlContext(org.eclipse.swt.widgets.Canvas canvas) {
+    _peer = makeGlSwtCanvasContext(canvas);
   }
 
   /**
@@ -111,6 +118,7 @@ public class GlContext {
 
   private static native void killGlContext(long peer);
   private static native long makeGlAwtCanvasContext(java.awt.Canvas canvas);
+  private static native long makeGlSwtCanvasContext(org.eclipse.swt.widgets.Canvas canvas);
   private static native boolean lock(long peer);
   private static native boolean unlock(long peer);
   private static native boolean swapBuffers(long peer);

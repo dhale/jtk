@@ -174,6 +174,112 @@ private:
 };
 #endif
 
+// OpenGL context for SWT Canvas.
+class GlSwtCanvasContext : public GlContext {
+public:
+  GlSwtCanvasContext(JNIEnv* env, jobject canvas) {
+    _env = env;
+    _canvas = env->NewGlobalRef(canvas);
+  }
+  virtual ~GlSwtCanvasContext() {
+    _env->DeleteGlobalRef(_canvas);
+  }
+  virtual jboolean lock(JNIEnv* env) {
+    /*
+    _awt.version = JAWT_VERSION_1_3;
+    if (JAWT_GetAWT(env,&_awt)==JNI_FALSE) {
+      trace("GlAwtCanvasContext.lock: cannot get AWT");
+      return JNI_FALSE;
+    }
+    _ds = _awt.GetDrawingSurface(env,_canvas);
+    if (_ds==0) {
+      trace("GlAwtCanvasContext.lock: cannot get DrawingSurface");
+      return JNI_FALSE;
+    }
+    jint lock = _ds->Lock(_ds);
+    if ((lock&JAWT_LOCK_ERROR)!=0) {
+      trace("GlAwtCanvasContext.lock: cannot lock DrawingSurface");
+      _awt.FreeDrawingSurface(_ds);
+      return JNI_FALSE;
+    }
+    _dsi = _ds->GetDrawingSurfaceInfo(_ds);
+    if (_dsi==0) {
+      trace("GlAwtCanvasContext.lock: cannot get DrawingSurfaceInfo");
+      _ds->Unlock(_ds);
+      _awt.FreeDrawingSurface(_ds);
+      return JNI_FALSE;
+    }
+    */
+    makeCurrent(env);
+    return JNI_TRUE;
+  }
+  virtual jboolean unlock(JNIEnv*) {
+    /*
+    _ds->FreeDrawingSurfaceInfo(_dsi);
+    _ds->Unlock(_ds);
+    _awt.FreeDrawingSurface(_ds);
+    */
+    return JNI_TRUE;
+  }
+protected:
+  JNIEnv* _env; // thread in which context was constructed
+  jobject _canvas; // global reference to canvas, useful in any thread
+  virtual void makeCurrent(JNIEnv* env) = 0;
+};
+
+// Microsoft Windows OpenGL context for SWT Canvas.
+#if defined(MWIN)
+class WglSwtCanvasContext : public GlSwtCanvasContext {
+public:
+  WglSwtCanvasContext(JNIEnv* env, jobject canvas) : 
+    GlSwtCanvasContext(env,canvas),_hglrc(0) 
+  {
+    _hdc = getCanvasHDC();
+  }
+  virtual ~WglSwtCanvasContext() {
+  }
+  virtual void makeCurrent(JNIEnv*) {
+    if (_hglrc==0) {
+      PIXELFORMATDESCRIPTOR pfd;
+      ZeroMemory(&pfd,sizeof(pfd));
+      pfd.nSize = sizeof(pfd);
+      pfd.nVersion = 1;
+      pfd.dwFlags = 
+        PFD_DRAW_TO_WINDOW |
+        PFD_SUPPORT_OPENGL |
+        PFD_DOUBLEBUFFER;
+      pfd.iPixelType = PFD_TYPE_RGBA;
+      pfd.cColorBits = 16;
+      pfd.cDepthBits = 16;
+      pfd.iLayerType = PFD_MAIN_PLANE;
+      int format = ChoosePixelFormat(_hdc,&pfd);
+      SetPixelFormat(_hdc,format,&pfd);
+      _hglrc = wglCreateContext(_hdc);
+    }
+    wglMakeCurrent(_hdc,_hglrc);
+  }
+  virtual jboolean swapBuffers(JNIEnv*) {
+    SwapBuffers(_hdc);
+    return JNI_TRUE;
+  }
+private:
+  HDC getCanvasHDC() {
+    // Equivalent to this Java code: 
+    //   return _canvas.internal_new_GC(new GCData());
+
+    jclass gcDataCls = _env->FindClass("org/eclipse/swt/graphics/GCData");
+    jmethodID gcDataCtr = _env->GetMethodID(gcDataCls, "<init>", "()V");
+    jobject gcData = _env->NewObject(gcDataCls, gcDataCtr);
+
+    jclass canvasCls = _env->GetObjectClass(_canvas);
+    jmethodID mid = _env->GetMethodID(canvasCls, "internal_new_GC",
+      "(Lorg/eclipse/swt/graphics/GCData;)I");
+    return (HDC)_env->CallIntMethod(_canvas, mid, gcData);
+  }
+  HDC _hdc;
+  HGLRC _hglrc;
+};
+#endif
 
 /////////////////////////////////////////////////////////////////////////////
 // native methods
@@ -197,6 +303,20 @@ Java_edu_mines_jves_opengl_GlContext_makeGlAwtCanvasContext(
   GlContext* context = new WglAwtCanvasContext(env,canvas);
 #elif defined(XWIN)
   GlContext* context = new GlxAwtCanvasContext(env,canvas);
+#endif
+  return fromPointer(context);
+  JNI_CATCH
+}
+
+extern "C" JNIEXPORT jlong JNICALL
+Java_edu_mines_jves_opengl_GlContext_makeGlSwtCanvasContext(
+  JNIEnv* env, jclass cls,
+  jobject canvas) {
+  JNI_TRY
+#if defined(MWIN)
+trace("before new WglSwtCanvasContext");
+  GlContext* context = new WglSwtCanvasContext(env,canvas);
+trace("after new WglSwtCanvasContext");
 #endif
   return fromPointer(context);
   JNI_CATCH
