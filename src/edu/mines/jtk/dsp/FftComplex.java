@@ -135,6 +135,76 @@ public class FftComplex {
   }
 
   /**
+   * Computes a complex-to-complex dimension-1 fast Fourier transform. 
+   * Transforms a 3-D input array cx[n3][n2][2*nfft] of n3*n2*nfft complex 
+   * numbers to a 3-D output array cy[n3][n2][2*nfft] of n3*n2*nfft complex 
+   * numbers.
+   * @param sign the sign (1 or -1) of the exponent used in the FFT.
+   * @param n2 the 2nd dimension of arrays.
+   * @param n3 the 3rd dimension of arrays.
+   * @param cx the input array.
+   * @param cy the output array.
+   */
+  public void complexToComplex1(
+    int sign, int n2, int n3, float[][][] cx, float[][][] cy)
+  {
+    checkSign(sign);
+    checkArray(2*_nfft,n2,n3,cx,"cx");
+    checkArray(2*_nfft,n2,n3,cy,"cy");
+    for (int i3=0; i3<n3; ++i3)
+        complexToComplex1(sign,n2,cx[i3],cy[i3]);
+  }
+
+  /**
+   * Computes a complex-to-complex dimension-2 fast Fourier transform. 
+   * Transforms a 3-D input array cx[n3][nfft][2*n1] of n3*nfft*n1 complex 
+   * numbers to a 3-D output array cy[n3][nfft][2*n1] of n3*nfft*n1 complex 
+   * numbers.
+   * @param sign the sign (1 or -1) of the exponent used in the FFT.
+   * @param n1 the 1st dimension of arrays.
+   * @param n3 the 3rd dimension of arrays.
+   * @param cx the input array.
+   * @param cy the output array.
+   */
+  public void complexToComplex2(
+    int sign, int n1, int n3, float[][][] cx, float[][][] cy)
+  {
+    checkSign(sign);
+    checkArray(2*n1,_nfft,n3,cx,"cx");
+    checkArray(2*n1,_nfft,n3,cy,"cy");
+    for (int i3=0; i3<n3; ++i3)
+        complexToComplex2(sign,n1,cx[i3],cy[i3]);
+  }
+
+  /**
+   * Computes a complex-to-complex dimension-3 fast Fourier transform. 
+   * Transforms a 3-D input array cx[nfft][n2][2*n1] of nfft*n2*n1 complex 
+   * numbers to a 3-D output array cy[nfft][n2][2*n1] of nfft*n2*n1 complex 
+   * numbers.
+   * @param sign the sign (1 or -1) of the exponent used in the FFT.
+   * @param n1 the 1st dimension of arrays.
+   * @param n2 the 2nd dimension of arrays.
+   * @param cx the input array.
+   * @param cy the output array.
+   */
+  public void complexToComplex3(
+    int sign, int n1, int n2, float[][][] cx, float[][][] cy)
+  {
+    checkSign(sign);
+    checkArray(2*n1,n2,_nfft,cx,"cx");
+    checkArray(2*n1,n2,_nfft,cy,"cy");
+    float[][] cxi2 = new float[_nfft][];
+    float[][] cyi2 = new float[_nfft][];
+    for (int i2=0; i2<n2; ++i2) {
+      for (int i3=0; i3<_nfft; ++i3) {
+        cxi2[i3] = cx[i3][i2];
+        cyi2[i3] = cy[i3][i2];
+      }
+      complexToComplex2(sign,n1,cxi2,cyi2);
+    }
+  }
+
+  /**
    * Scales n1 complex numbers in the specified array by 1/nfft. 
    * The inverse of a complex-to-complex FFT is a complex-to-complex 
    * FFT (with opposite sign) followed by this scaling.
@@ -161,6 +231,20 @@ public class FftComplex {
       scale(n1,cx[i2]);
   }
 
+  /**
+   * Scales n1*n2*n3 complex numbers in the specified array by 1/nfft. 
+   * The inverse of a complex-to-complex FFT is a complex-to-complex 
+   * FFT (with opposite sign) followed by this scaling.
+   * @param n1 the 1st dimension of the array cx.
+   * @param n2 the 2nd dimension of the array cx.
+   * @param n3 the 3rd dimension of the array cx.
+   * @param cx the input/output array[n3][n2][2*n1].
+   */
+  public void scale(int n1, int n2, int n3, float[][][] cx) {
+    for (int i3=0; i3<n3; ++i3)
+      scale(n1,n2,cx[i3]);
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -178,6 +262,19 @@ public class FftComplex {
     boolean ok = a.length>=n2;
     for (int i2=0; i2<n2 && ok; ++i2)
       ok = a[i2].length>=n1;
+    Check.argument(ok,"dimensions of "+name+" are valid");
+  }
+
+  private static void checkArray(
+    int n1, int n2, int n3, float[][][] a, String name) 
+  {
+    boolean ok = a.length>=n3;
+    for (int i3=0; i3<n3 && ok; ++i3) {
+      ok = a[i3].length>=n2;
+      for (int i2=0; i2<n2 && ok; ++i2) {
+        ok = a[i3][i2].length>=n1;
+      }
+    }
     Check.argument(ok,"dimensions of "+name+" are valid");
   }
 }

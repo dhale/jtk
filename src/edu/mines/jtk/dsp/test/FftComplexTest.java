@@ -110,13 +110,48 @@ public class FftComplexTest extends TestCase {
     }
   }
 
+  public void test3Random() {
+    int n1 = 11;
+    int n2 = 12;
+    int n3 = 13;
+    int n1fft = FftComplex.nfftSmall(n1);
+    int n2fft = FftComplex.nfftSmall(n2);
+    int n3fft = FftComplex.nfftSmall(n3);
+    FftComplex fft1 = new FftComplex(n1fft);
+    FftComplex fft2 = new FftComplex(n2fft);
+    FftComplex fft3 = new FftComplex(n3fft);
+    float[][][] cr = Cap.rand(n1fft,n2fft,n3fft);
+    float[][][] cx = Cap.copy(cr);
+    fft1.complexToComplex1( 1,n2fft,n3fft,cx,cx);
+    fft2.complexToComplex2( 1,n1fft,n3fft,cx,cx);
+    fft3.complexToComplex3( 1,n1fft,n2fft,cx,cx);
+    fft1.complexToComplex1(-1,n2fft,n3fft,cx,cx);
+    fft2.complexToComplex2(-1,n1fft,n3fft,cx,cx);
+    fft3.complexToComplex3(-1,n1fft,n2fft,cx,cx);
+    fft1.scale(n1fft,n2fft,n3fft,cx);
+    fft2.scale(n1fft,n2fft,n3fft,cx);
+    fft3.scale(n1fft,n2fft,n3fft,cx);
+    assertEqual(cr,cx);
+  }
+
   private void assertEqual(float[] ca, float[] cb) {
-    float tolerance = (float)(ca.length/2)*FLT_EPSILON;
+    int n1 = ca.length/2;
+    float tolerance = (float)(n1)*FLT_EPSILON;
     assertTrue(Cap.equal(tolerance,ca,cb));
   }
 
   private void assertEqual(float[][] ca, float[][] cb) {
-    float tolerance = (float)(ca.length+ca[0].length/2)*FLT_EPSILON;
+    int n1 = ca[0].length/2;
+    int n2 = ca.length;
+    float tolerance = (float)(n1+n2)*FLT_EPSILON;
+    assertTrue(Cap.equal(tolerance,ca,cb));
+  }
+
+  private void assertEqual(float[][][] ca, float[][][] cb) {
+    int n1 = ca[0][0].length/2;
+    int n2 = ca[0].length;
+    int n3 = ca.length;
+    float tolerance = (float)(n1+n2+n3)*FLT_EPSILON;
     assertTrue(Cap.equal(tolerance,ca,cb));
   }
 }
