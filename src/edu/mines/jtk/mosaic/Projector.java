@@ -19,7 +19,8 @@ public class Projector implements Cloneable {
   /**
    * Constructs a projector with specified u and v values. The
    * parameters u0 and u1 determine the margins of the projector.
-   * The world coordinate v0 corresponds to normalized coordinate u0.
+   * The world coordinate v0 corresponds to normalized coordinate u0;
+   * the world coordinate v1 corresponds to normalized coordinate u1.
    * @param u0 the u coordinate closest to normalized coordinate 0;
    *  0.0 &lt;= u0 &lt; u1 is required.
    * @param u1 the u coordinate closest to normalized coordinate 1;
@@ -65,6 +66,38 @@ public class Projector implements Cloneable {
    */
   public double v(double u) {
     return _ushift+_uscale*u;
+  }
+
+  /**
+   * Returns the u-coordinate bound closest to u=0.
+   * @return the u-coordinate bound.
+   */
+  public double u0() {
+    return _u0;
+  }
+
+  /**
+   * Returns the u-coordinate bound closest to u=1.
+   * @return the u-coordinate bound.
+   */
+  public double u1() {
+    return _u1;
+  }
+
+  /**
+   * Returns the v-coordinate bound closest to u=0.
+   * @return the v-coordinate bound.
+   */
+  public double v0() {
+    return _v0;
+  }
+
+  /**
+   * Returns the v-coordinate bound closest to u=1.
+   * @return the v-coordinate bound.
+   */
+  public double v1() {
+    return _v1;
   }
 
   /**

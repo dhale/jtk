@@ -8,7 +8,12 @@ package edu.mines.jtk.bench;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.font.*;
+import java.awt.geom.*;
+import java.awt.image.*;
+import java.io.*;
 import java.util.*;
+import javax.imageio.*;
 import javax.swing.*;
 
 import edu.mines.jtk.util.Stopwatch;
@@ -21,9 +26,88 @@ import edu.mines.jtk.util.Stopwatch;
 public class AwtBench {
 
   public static void main(String[] args) {
-    testNativeJFrame();
+    testImage();
+    //testNativeJFrame();
     //testNativeFrame();
     //benchPrimitives();
+  }
+
+  public static void testImage() {
+    int widthPanel = 600;
+    int heightPanel = 600;
+    int dpi = 288;
+    double widthInches = 3.0;
+    double heightInches = 3.0;
+    ImagePanel panel = new ImagePanel();
+    panel.setPreferredSize(new Dimension(widthPanel,heightPanel));
+    BufferedImage bi = panel.drawToImage(dpi,widthInches,heightInches);
+    writeToPng(bi,"ImageAWT.png");
+    JFrame frame = new JFrame();
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.add(panel);
+    frame.pack();
+    frame.setVisible(true);
+  }
+  private static class ImagePanel extends JPanel {
+    public void paintComponent(Graphics g) {
+      super.paintComponent(g);
+      Graphics2D g2d = (Graphics2D)g;
+      int wpixels = getWidth();
+      int hpixels = getHeight();
+      draw(g,wpixels,hpixels);
+    }
+    public void draw(Graphics g, int width, int height) {
+      Graphics2D g2d = (Graphics2D)g;
+      g2d.setColor(Color.RED);
+      for (int i=0; i<3; ++i)
+        g2d.drawLine(0,0,i*(width-1)/2,height-1);
+      for (int i=0; i<2; ++i)
+        g2d.drawLine(0,0,width-1,i*(height-1)/2);
+      g2d.setColor(Color.BLACK);
+      Font font = new Font("SansSerif",Font.PLAIN,10);
+      g2d.setFont(font);
+      FontMetrics fm = g2d.getFontMetrics();
+      int fontAscent = fm.getAscent();
+      int fontHeight = fm.getHeight();
+      int x = width/3;
+      int y = height/3;
+      g2d.drawLine(x,0,x,y);
+      y += fontAscent;
+      int sw = fm.stringWidth("Goodbye");
+      g2d.drawString("Goodbye",x-sw/2,y);
+      y += fontHeight;
+      sw = fm.stringWidth("Hello");
+      g2d.drawString("Hello",x-sw/2,y);
+    }
+    public BufferedImage drawToImage(
+      double dpi, double widthInches, double heightInches) {
+      int wimage = (int)(dpi*widthInches+0.5);
+      int himage = (int)(dpi*heightInches+0.5);
+      int type = BufferedImage.TYPE_INT_RGB;
+      BufferedImage bi = new BufferedImage(wimage,himage,type);
+      Graphics2D g2d = (Graphics2D)bi.getGraphics();
+      g2d.setColor(Color.WHITE);
+      g2d.fillRect(0,0,wimage,himage);
+      g2d.setRenderingHint(
+        RenderingHints.KEY_ANTIALIASING,
+        RenderingHints.VALUE_ANTIALIAS_ON);
+      double sr = 2+Toolkit.getDefaultToolkit().getScreenResolution();
+      double scale = dpi/sr;
+      int wpixels = (int)((wimage-1)/scale+1.5);
+      int hpixels = (int)((himage-1)/scale+1.5);
+      g2d.scale(scale,scale);
+      draw(g2d,wpixels,hpixels);
+      g2d.dispose();
+      return bi;
+    }
+  }
+  private static void writeToPng(BufferedImage image, String fileName) {
+    try {
+      File file = new File(fileName);
+      ImageIO.write(image,"png",file);
+    } catch (IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
   }
 
   private static void testNativeJFrame() {

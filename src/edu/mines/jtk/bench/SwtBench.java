@@ -36,20 +36,21 @@ public class SwtBench {
 
   public static void testImage() {
     final Display display = new Display();
-
-    Image image = createTestImage(display,600,600);
+    //final int dpi = display.getDPI().x;
+    final int dpi = 96; // Gnome wants 96
+    Image image = createTestImage(display,dpi,600,600);
     System.out.print("Converting image to buffered image ... ");
     BufferedImage bi = convertToBufferedImage(image);
     System.out.println("done.");
     try {
-      writeToPng(bi,"/tmp/junk.png");
+      writeToPng(bi,"ImageSWT.png");
     } catch (IOException ioe) {
       System.out.println(ioe.getMessage());
     }
-
     Shell shell = new Shell(display);
     shell.setLayout(new FillLayout());
     Canvas canvas = new Canvas(shell,SWT.NONE);
+    System.out.println("display dpi="+dpi);
     canvas.addPaintListener(new Painter() {
       public void paintControl(PaintEvent e) {
         GC gc = e.gc;
@@ -57,7 +58,7 @@ public class SwtBench {
         Point size = canvas.getSize();
         int width = size.x;
         int height = size.y;
-        Image image = createTestImage(display,width,height);
+        Image image = createTestImage(display,dpi,width,height);
         gc.drawImage(image,0,0);
         image.dispose();
       }
@@ -70,10 +71,22 @@ public class SwtBench {
     }
     display.dispose();
   }
-  private static Image createTestImage(Display display, int width, int height) {
+  private static Image createTestImage(
+    Display display, int dpi, int width, int height) 
+  {
     Image image = new Image(display,width,height);
     Rectangle bounds = image.getBounds();
     GC gc = new GC(image);
+    int lineWidth = 1;
+    int fontHeight = 72;
+    if (dpi>72) {
+      double scale = dpi/72.0;
+      lineWidth = (int)(lineWidth*scale);
+      fontHeight = (int)(fontHeight*scale);
+    }
+    Font font = new Font(display,"SansSerif",fontHeight,SWT.NORMAL);
+    gc.setFont(font);
+    gc.setLineWidth(lineWidth);
     gc.setBackground(display.getSystemColor(SWT.COLOR_BLUE));
     gc.fillRectangle(bounds);
     gc.setBackground(display.getSystemColor(SWT.COLOR_GREEN));
@@ -81,6 +94,12 @@ public class SwtBench {
     gc.setForeground(display.getSystemColor(SWT.COLOR_RED));
     gc.drawLine(0,0,bounds.width-1,bounds.height-1);
     gc.drawLine(bounds.width-1,0,0,bounds.height-1);
+    gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+    gc.drawString("Tyme (ms) 12345",width*2/4,height*1/4,true);
+    gc.drawString("Tyme (ms) 12345",width*3/4,height*2/4,true);
+    gc.drawString("Tyme (ms) 12345",width*2/4,height*3/4,true);
+    gc.drawString("Tyme (ms) 12345",width*1/4,height*2/4,true);
+    font.dispose();
     gc.dispose();
     return image;
   }
