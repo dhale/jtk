@@ -19,32 +19,36 @@ import edu.mines.jves.opengl.*;
  */
 public class Hello {
 
-  public static void main(String[] args) {
-    GlAwtCanvas canvas = new GlAwtCanvas(new GlPainter() {
-      public void glPaint() {
-        if (!_inited) {
-          Gl.glClearColor(0.0f,0.0f,0.0f,0.0f);
-          Gl.glMatrixMode(Gl.GL_PROJECTION);
-          Gl.glLoadIdentity();
-          Gl.glOrtho(0.0,1.0,0.0,1.0,-1.0,1.0);
-          _inited = true;
-        }
-        Gl.glClear(Gl.GL_COLOR_BUFFER_BIT);
-        Gl.glColor3f(1.0f,1.0f,1.0f);
-        Gl.glBegin(Gl.GL_POLYGON);
-          Gl.glVertex3f(0.25f,0.25f,0.00f);
-          Gl.glVertex3f(0.75f,0.25f,0.00f);
-          Gl.glVertex3f(0.75f,0.75f,0.00f);
-          Gl.glVertex3f(0.25f,0.75f,0.00f);
-        Gl.glEnd();
-        Gl.glFlush();
+  private static class MyCanvas extends GlAwtCanvas {
+    public void glPaint() {
+      if (_width!=getWidth() || _height!=getHeight()) {
+        _width = getWidth();
+        _height = getHeight();
+        Gl.glClearColor(0.0f,0.0f,0.0f,0.0f);
+        Gl.glViewport(0,0,_width,_height);
+        Gl.glMatrixMode(Gl.GL_PROJECTION);
+        Gl.glLoadIdentity();
+        Gl.glOrtho(0.0,1.0,0.0,1.0,-1.0,1.0);
       }
-      private boolean _inited;
-    });
+      Gl.glClear(Gl.GL_COLOR_BUFFER_BIT);
+      Gl.glBlendColor(1.0f,1.0f,1.0f,1.0f); // OpenGL 1.2 test
+      Gl.glColor3f(1.0f,1.0f,1.0f);
+      Gl.glBegin(Gl.GL_POLYGON);
+        Gl.glVertex3f(0.25f,0.25f,0.00f);
+        Gl.glVertex3f(0.75f,0.25f,0.00f);
+        Gl.glVertex3f(0.75f,0.75f,0.00f);
+        Gl.glVertex3f(0.25f,0.75f,0.00f);
+      Gl.glEnd();
+      Gl.glFlush();
+    }
+    private int _width = -1;
+    private int _height = -1;
+  }
+  public static void main(String[] args) {
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(new Dimension(800,800));
-    frame.getContentPane().add(canvas,BorderLayout.CENTER);
+    frame.getContentPane().add(new MyCanvas(),BorderLayout.CENTER);
     frame.setVisible(true);
   }
 }

@@ -40,7 +40,7 @@ inline static void throwJavaRuntimeException(JNIEnv* env, const char* message) {
 // throw a Java Error, which should be not be caught. But, just in
 // case it is caught, this macro rethrows the C++ exception. Also,
 // if we did not rethrow the C++ exception, then compilers will warn
-// that functions declared to return a value do not return a value.
+// that functions declared to return a value do not do so.
 #define JNI_TRY try {
 #define JNI_CATCH \
 } catch (...) { \

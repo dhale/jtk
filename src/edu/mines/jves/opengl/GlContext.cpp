@@ -19,21 +19,21 @@ GlContext JNI glue.
 #include <GL/gl.h>
 #include "jawt_md.h"
 #include "../util/jniglue.h"
-#include <stdio.h> // for debugging
+#include <stdio.h>
+
+static void trace(const char* message) {
+  fprintf(stderr,"%s\n",message);
+}
 
 // OpenGL context.
 class GlContext {
 public:
   virtual ~GlContext() {
   }
-  virtual jboolean lock() = 0;
-  virtual jboolean unlock() = 0;
-  virtual jboolean swapBuffers() = 0;
+  virtual jboolean lock(JNIEnv* env) = 0;
+  virtual jboolean unlock(JNIEnv* env) = 0;
+  virtual jboolean swapBuffers(JNIEnv* env) = 0;
 };
-
-static void trace(const char* message) {
-  fprintf(stderr,"%s\n",message);
-}
 
 // OpenGL context for AWT Canvas.
 class GlAwtCanvasContext : public GlContext {
@@ -45,13 +45,13 @@ public:
   virtual ~GlAwtCanvasContext() {
     _env->DeleteGlobalRef(_canvas);
   }
-  virtual jboolean lock() {
+  virtual jboolean lock(JNIEnv* env) {
     _awt.version = JAWT_VERSION_1_3;
-    if (JAWT_GetAWT(_env,&_awt)==JNI_FALSE) {
+    if (JAWT_GetAWT(env,&_awt)==JNI_FALSE) {
       trace("GlAwtCanvasContext.lock: cannot get AWT");
       return JNI_FALSE;
     }
-    _ds = _awt.GetDrawingSurface(_env,_canvas);
+    _ds = _awt.GetDrawingSurface(env,_canvas);
     if (_ds==0) {
       trace("GlAwtCanvasContext.lock: cannot get DrawingSurface");
       return JNI_FALSE;
@@ -69,22 +69,22 @@ public:
       _awt.FreeDrawingSurface(_ds);
       return JNI_FALSE;
     }
-    makeCurrent();
+    makeCurrent(env);
     return JNI_TRUE;
   }
-  virtual jboolean unlock() {
+  virtual jboolean unlock(JNIEnv*) {
     _ds->FreeDrawingSurfaceInfo(_dsi);
     _ds->Unlock(_ds);
     _awt.FreeDrawingSurface(_ds);
     return JNI_TRUE;
   }
 protected:
-  JNIEnv* _env;
-  jobject _canvas;
+  JNIEnv* _env; // thread in which context was constructed
+  jobject _canvas; // global reference to canvas, useful in any thread
   JAWT _awt;
   JAWT_DrawingSurface* _ds;
   JAWT_DrawingSurfaceInfo* _dsi;
-  virtual void makeCurrent() = 0;
+  virtual void makeCurrent(JNIEnv* env) = 0;
 };
 
 // Microsoft Windows OpenGL context for AWT Canvas.
@@ -97,7 +97,7 @@ public:
   }
   virtual ~WglAwtCanvasContext() {
   }
-  virtual void makeCurrent() {
+  virtual void makeCurrent(JNIEnv*) {
     _dsi_win32 = (JAWT_Win32DrawingSurfaceInfo*)_dsi->platformInfo;
     _hwnd = _dsi_win32->hwnd;
     _hdc = _dsi_win32->hdc;
@@ -120,7 +120,7 @@ public:
     }
     wglMakeCurrent(_hdc,_hglrc);
   }
-  virtual jboolean swapBuffers() {
+  virtual jboolean swapBuffers(JNIEnv*) {
     SwapBuffers(_hdc);
     return JNI_TRUE;
   }
@@ -140,8 +140,9 @@ public:
   {
   }
   virtual ~GlxAwtCanvasContext() {
+    glXDestroyContext(_display,_context);
   }
-  virtual void makeCurrent() {
+  virtual void makeCurrent(JNIEnv*) {
     _dsi_x11 = (JAWT_X11DrawingSurfaceInfo*)_dsi->platformInfo;
     _display = _dsi_x11->display;
     _drawable = _dsi_x11->drawable;
@@ -160,7 +161,7 @@ public:
     glXMakeCurrent(_display,_drawable,_context);
     XFlush(_display);
   }
-  virtual jboolean swapBuffers() {
+  virtual jboolean swapBuffers(JNIEnv*) {
     glXSwapBuffers(_display,_drawable);
     return JNI_TRUE;
   }
@@ -175,6 +176,16 @@ private:
 
 /////////////////////////////////////////////////////////////////////////////
 // native methods
+
+extern "C" JNIEXPORT void JNICALL
+Java_edu_mines_jves_opengl_GlContext_killGlContext(
+  JNIEnv* env, jclass cls,
+  jlong peer) {
+  JNI_TRY
+  GlContext* context = (GlContext*)toPointer(peer);
+  delete context;
+  JNI_CATCH
+}
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_edu_mines_jves_opengl_GlContext_makeGlAwtCanvasContext(
@@ -197,7 +208,7 @@ Java_edu_mines_jves_opengl_GlContext_lock(
 {
   JNI_TRY
   GlContext* context = (GlContext*)toPointer(peer);
-  return context->lock();
+  return context->lock(env);
   JNI_CATCH
 }
 
@@ -208,7 +219,7 @@ Java_edu_mines_jves_opengl_GlContext_unlock(
 {
   JNI_TRY
   GlContext* context = (GlContext*)toPointer(peer);
-  return context->unlock();
+  return context->unlock(env);
   JNI_CATCH
 }
 
@@ -219,7 +230,7 @@ Java_edu_mines_jves_opengl_GlContext_swapBuffers(
 {
   JNI_TRY
   GlContext* context = (GlContext*)toPointer(peer);
-  return context->swapBuffers();
+  return context->swapBuffers(env);
   JNI_CATCH
 }
 

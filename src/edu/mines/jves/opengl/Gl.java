@@ -44,6 +44,7 @@ public class Gl {
   public static void glVertex(float x, float y, float z) {
     glVertex3f(x,y,z);
   }
+  public static native void glViewport(int x, int y, int width, int height);
 
   ///////////////////////////////////////////////////////////////////////////
   // OpenGL 1.2

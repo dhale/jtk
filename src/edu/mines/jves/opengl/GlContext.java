@@ -42,6 +42,7 @@ public class GlContext {
    */
   public GlContext(java.awt.Canvas canvas) {
     _peer = makeGlAwtCanvasContext(canvas);
+    init();
   }
 
   /**
@@ -86,7 +87,7 @@ public class GlContext {
    * Dispose of this context.
    */
   public void dispose() {
-    // TODO: kill the peer of this context
+    killGlContext(_peer);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -106,6 +107,7 @@ public class GlContext {
   private long _peer; // C++ peer of this OpenGL context
   private ReentrantLock _lock = new ReentrantLock(); // mutual exclusion lock
 
+  private static native void killGlContext(long peer);
   private static native long makeGlAwtCanvasContext(java.awt.Canvas canvas);
   private static native boolean lock(long peer);
   private static native boolean unlock(long peer);

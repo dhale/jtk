@@ -93,6 +93,12 @@ JNI_GL_BEGIN1
   glVertex3f(x,y,z);
 JNI_GL_END
 
+JNI_GL_DECLARE1(glViewport)
+  jint x, jint y, jint width, jint height
+JNI_GL_BEGIN1
+  glViewport(x,y,width,height);
+JNI_GL_END
+
 /////////////////////////////////////////////////////////////////////////////
 // OpenGL 1.2
 
