@@ -48,11 +48,11 @@ public class GlContext {
    * @param canvas the canvas.
    */
   public GlContext(org.eclipse.swt.widgets.Canvas canvas) {
-    _swtHandles = new SwtHandles(canvas);
-    long xdisplay = _swtHandles.xdisplay;
-    long xdrawable = _swtHandles.xdrawable;
-    long hwnd = _swtHandles.hwnd;
-    long hdc = _swtHandles.hdc;
+    _swtHooks = new SwtHooks(canvas);
+    long xdisplay = _swtHooks.xdisplay;
+    long xdrawable = _swtHooks.xdrawable;
+    long hwnd = _swtHooks.hwnd;
+    long hdc = _swtHooks.hdc;
     _peer = makeGlSwtCanvasContext(xdisplay,xdrawable,hwnd,hdc);
   }
 
@@ -100,7 +100,7 @@ public class GlContext {
    */
   public void dispose() {
     killGlContext(_peer);
-    _swtHandles.dispose();
+    _swtHooks.dispose();
     _peer = 0;
     _gotProcAddresses = false;
   }
@@ -120,7 +120,7 @@ public class GlContext {
   // private
 
   private long _peer; // C++ peer of this OpenGL context
-  private SwtHandles _swtHandles; // SWT handles (for X11 or WIN32)
+  private SwtHooks _swtHooks; // SWT hooks (for X11 or WIN32)
   private ReentrantLock _lock = new ReentrantLock(); // mutual exclusion lock
   private boolean _gotProcAddresses;
 

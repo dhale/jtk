@@ -11,6 +11,7 @@ import java.util.*;
 import javax.swing.*;
 
 import edu.mines.jves.opengl.*;
+import static edu.mines.jves.opengl.Gl.*;
 
 /**
  * Simple OpenGL program.
@@ -24,27 +25,28 @@ public class HelloAwt {
       if (_width!=getWidth() || _height!=getHeight()) {
         _width = getWidth();
         _height = getHeight();
-        Gl.glClearColor(0.0f,0.0f,0.0f,0.0f);
-        Gl.glViewport(0,0,_width,_height);
-        Gl.glMatrixMode(Gl.GL_PROJECTION);
-        Gl.glLoadIdentity();
-        Gl.glOrtho(0.0,1.0,0.0,1.0,-1.0,1.0);
+        glClearColor(0.0f,0.0f,0.0f,0.0f);
+        glViewport(0,0,_width,_height);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0.0,1.0,0.0,1.0,-1.0,1.0);
       }
-      Gl.glClear(Gl.GL_COLOR_BUFFER_BIT);
-      Gl.glBlendColor(1.0f,1.0f,1.0f,1.0f); // OpenGL 1.2 test
-      Gl.glColor3f(1.0f,1.0f,1.0f);
-      Gl.glBegin(Gl.GL_POLYGON);
-        Gl.glVertex3f(0.25f,0.25f,0.00f);
-        Gl.glVertex3f(0.75f,0.25f,0.00f);
-        Gl.glVertex3f(0.75f,0.75f,0.00f);
-        Gl.glVertex3f(0.25f,0.75f,0.00f);
-      Gl.glEnd();
-      Gl.glFlush();
+      glClear(GL_COLOR_BUFFER_BIT);
+      glBlendColor(1.0f,1.0f,1.0f,1.0f); // OpenGL 1.2 test
+      glColor3f(1.0f,1.0f,1.0f);
+      glBegin(GL_POLYGON);
+        glVertex3f(0.25f,0.25f,0.00f);
+        glVertex3f(0.75f,0.25f,0.00f);
+        glVertex3f(0.75f,0.75f,0.00f);
+        glVertex3f(0.25f,0.75f,0.00f);
+      glEnd();
+      glFlush();
     }
     private int _width = -1;
     private int _height = -1;
   }
   public static void main(String[] args) {
+    System.setProperty("sun.awt.noerasebackground","true");
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(new Dimension(800,800));

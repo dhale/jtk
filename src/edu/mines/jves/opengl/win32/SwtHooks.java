@@ -1,3 +1,9 @@
+/****************************************************************************
+Copyright (c) 2004, Colorado School of Mines and others. All rights reserved.
+This program and accompanying materials are made available under the terms of
+the Common Public License - v1.0, which accompanies this distribution, and is 
+available at http://www.eclipse.org/legal/cpl-v10.html
+****************************************************************************/
 package edu.mines.jves.opengl;
 
 import org.eclipse.swt.SWTException;
@@ -7,12 +13,12 @@ import org.eclipse.swt.graphics.GCData;
 import org.eclipse.swt.internal.win32.OS;
 
 /**
- * SWT handles required to create, access, and destroy OpenGL contexts.
+ * SWT hooks required to create, access, and destroy OpenGL contexts.
  * For internal use only. This class is platform-dependent.
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.11.30
  */
-class SwtHandles {
+class SwtHooks {
 
   // Generic SWT.
   Drawable drawable;
@@ -27,7 +33,7 @@ class SwtHandles {
   long hwnd;
   long hdc;
 
-  SwtHandles(Canvas canvas) {
+  SwtHooks(Canvas canvas) {
     drawable = canvas;
     data = new GCData();
     handle = canvas.handle;

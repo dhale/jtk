@@ -54,18 +54,21 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 
   <!-- Compile Java -->
   <target name="compile-java" depends="init,copy-linux,copy-windows">
-    <javac srcdir="${src}" destdir="${build.cls}" debug="on">
+    <javac srcdir="${src}" destdir="${build.cls}" 
+      compiler="javac1.5"
+      debug="on" 
+      deprecation="on">
       <classpath refid="classpath"/>
       <exclude name="edu/mines/jves/opengl/linux-gtk/**"/>
       <exclude name="edu/mines/jves/opengl/win32/**"/>
     </javac>
   </target>
   <target name="copy-linux" depends="init" if="linux">
-    <copy file="${src}/edu/mines/jves/opengl/linux-gtk/SwtHandles.java"
+    <copy file="${src}/edu/mines/jves/opengl/linux-gtk/SwtHooks.java"
       todir="${src}/edu/mines/jves/opengl"/>
   </target>
   <target name="copy-windows" depends="init" if="windows">
-    <copy file="${src}/edu/mines/jves/opengl/win32/SwtHandles.java"
+    <copy file="${src}/edu/mines/jves/opengl/win32/SwtHooks.java"
       todir="${src}/edu/mines/jves/opengl"/>
   </target>
 

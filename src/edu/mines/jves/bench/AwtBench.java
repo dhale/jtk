@@ -43,7 +43,7 @@ public class AwtBench {
         System.exit(0);
       }
     });
-    frame.show();
+    frame.setVisible(true);
   }
 
   private static class NativeCanvas extends Canvas {
@@ -61,7 +61,7 @@ public class AwtBench {
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.getContentPane().add(new MyPanel());
     frame.setSize(new Dimension(800,800));
-    frame.show();
+    frame.setVisible(true);
   }
 
   private static class MyPanel extends JPanel {

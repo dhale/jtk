@@ -1,3 +1,9 @@
+/****************************************************************************
+Copyright (c) 2004, Colorado School of Mines and others. All rights reserved.
+This program and accompanying materials are made available under the terms of
+the Common Public License - v1.0, which accompanies this distribution, and is 
+available at http://www.eclipse.org/legal/cpl-v10.html
+****************************************************************************/
 package edu.mines.jves.opengl;
 
 import org.eclipse.swt.SWTException;
@@ -7,12 +13,12 @@ import org.eclipse.swt.graphics.GCData;
 import org.eclipse.swt.internal.gtk.OS;
 
 /**
- * SWT handles required to create, access, and destroy OpenGL contexts.
+ * SWT hooks required to create, access, and destroy OpenGL contexts.
  * For internal use only. This class is platform-dependent.
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.11.30
  */
-class SwtHandles {
+class SwtHooks {
 
   // Generic SWT.
   Drawable drawable;
@@ -27,7 +33,7 @@ class SwtHandles {
   long hwnd;
   long hdc;
 
-  SwtHandles(Canvas canvas) {
+  SwtHooks(Canvas canvas) {
     drawable = canvas;
     data = new GCData();
     handle = canvas.handle;
@@ -38,7 +44,13 @@ class SwtHandles {
     xdisplay = OS.gdk_x11_drawable_get_xdisplay((int)gdkWindow); // 64-bit!
     xdrawable = OS.gdk_x11_drawable_get_xid((int)gdkWindow); // 64-bit!
 
-    // Disable double-buffering, since we do that with OpenGL.
+    // Disable GTK double-buffering! By default, GTK and, hence, SWT
+    // widgets paint themselves in offscreen pixmaps, which GTK then 
+    // copies to the widget's window. With OpenGL, we perform double-
+    // buffering directly to the widget's window. Therefore, GTK's
+    // double-buffering is redundant. Furthermore, GTK's copy from 
+    // the pixmap to the widget window replaces anything we draw in
+    // that window via OpenGL. So we must disable this GTK feature.
     OS.gtk_widget_set_double_buffered((int)handle,false); // 64-bit!
   }
   void dispose() {
