@@ -3899,8 +3899,7 @@ JNI_GL_BEGIN2
     (target,access);
   if (pointer!=0) {
     if (buffer!=0) {
-      void* p = env->GetDirectBufferAddress(buffer);
-      if (p==pointer)
+      if (pointer==env->GetDirectBufferAddress(buffer))
         return buffer;
     } else {
       return env->NewDirectByteBuffer(pointer,capacity);
