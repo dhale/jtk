@@ -12,7 +12,7 @@ ThreadLocalBench JNI glue
 #include "../util/jniglue.h"
 
 extern "C" JNIEXPORT void JNICALL
-Java_edu_mines_jves_bench_ThreadLocalBench_nativeMethod(
+Java_edu_mines_jtk_bench_ThreadLocalBench_nativeMethod(
   JNIEnv* env, jclass cls,
   jint i)
 {
@@ -21,7 +21,7 @@ Java_edu_mines_jves_bench_ThreadLocalBench_nativeMethod(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_edu_mines_jves_bench_ThreadLocalBench_nativeMethodWithContext(
+Java_edu_mines_jtk_bench_ThreadLocalBench_nativeMethodWithContext(
   JNIEnv* env, jclass cls,
   jlong pointer, jint i)
 {

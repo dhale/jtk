@@ -5,10 +5,10 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 *************************************************************************-->
-<project name="jves" default="all" basedir=".">
+<project name="jtk" default="all" basedir=".">
 
   <description>
-    Java for Visualization, Engineering and Science
+    The Colorado School of Mines Java Tool Kit
   </description>
 
   <!-- Project directories -->
@@ -21,8 +21,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <property name="build.jar" value="${build}/jar"/>
   <property name="build.jni" value="${build}/jni"/>
   <property name="build.doc" value="${build}/doc"/>
-  <property name="src.jves" value="${src}/edu/mines/jves"/>
-  <property name="obj.jves" value="${build.obj}/edu/mines/jves"/>
+  <property name="src.jtk" value="${src}/edu/mines/jtk"/>
+  <property name="obj.jtk" value="${build.obj}/edu/mines/jtk"/>
 
   <!-- Other global settings -->
   <property environment="env"/>
@@ -60,23 +60,23 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       deprecation="on">
       <compilerarg value="-Xlint:unchecked"/>
       <classpath refid="classpath"/>
-      <exclude name="edu/mines/jves/opengl/linux-gtk/**"/>
-      <exclude name="edu/mines/jves/opengl/win32/**"/>
+      <exclude name="edu/mines/jtk/opengl/linux-gtk/**"/>
+      <exclude name="edu/mines/jtk/opengl/win32/**"/>
     </javac>
   </target>
   <target name="copy-linux" depends="init" if="linux">
-    <copy file="${src}/edu/mines/jves/opengl/linux-gtk/SwtHooks.java"
-      todir="${src}/edu/mines/jves/opengl"/>
+    <copy file="${src}/edu/mines/jtk/opengl/linux-gtk/SwtHooks.java"
+      todir="${src}/edu/mines/jtk/opengl"/>
   </target>
   <target name="copy-windows" depends="init" if="windows">
-    <copy file="${src}/edu/mines/jves/opengl/win32/SwtHooks.java"
-      todir="${src}/edu/mines/jves/opengl"/>
+    <copy file="${src}/edu/mines/jtk/opengl/win32/SwtHooks.java"
+      todir="${src}/edu/mines/jtk/opengl"/>
   </target>
 
   <!-- Build Java archive -->
   <target name="jar" depends="compile-java"
       description="build Java archive">
-    <jar jarfile="${build.jar}/edu_mines_jves.jar" basedir="${build.cls}"/>
+    <jar jarfile="${build.jar}/edu_mines_jtk.jar" basedir="${build.cls}"/>
   </target>
 
   <!-- Build JNI libraries -->
@@ -85,7 +85,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   </target>
   <target name="jni-init" depends="compile-java">
     <taskdef name="jnicpp" 
-        classname="edu.mines.jves.ant.Jnicpp"
+        classname="edu.mines.jtk.ant.Jnicpp"
         classpath="${build.cls}"/>
   </target>
 
@@ -96,10 +96,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <property name="jre.home" value="${jdk.home}/jre"/>
     <property name="jre.lib" value="${jre.home}/lib/i386"/>
     <jnicpp 
-        srcdir="${src.jves}/bench" 
-        objdir="${obj.jves}/bench"
+        srcdir="${src.jtk}/bench" 
+        objdir="${obj.jtk}/bench"
         jnidir="${build.jni}" 
-        jniname="edu_mines_jves_bench">
+        jniname="edu_mines_jtk_bench">
       <incarg arg="-I${jdk.include}"/>
       <incarg arg="-I${jdk.include}/linux"/>
       <libarg arg="-L/usr/X11R6/lib"/>
@@ -109,10 +109,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <libarg arg="-ljawt"/>
     </jnicpp>
     <jnicpp 
-        srcdir="${src.jves}/opengl" 
-        objdir="${obj.jves}/opengl"
+        srcdir="${src.jtk}/opengl" 
+        objdir="${obj.jtk}/opengl"
         jnidir="${build.jni}" 
-        jniname="edu_mines_jves_opengl">
+        jniname="edu_mines_jtk_opengl">
       <incarg arg="-I${jdk.include}"/>
       <incarg arg="-I${jdk.include}/linux"/>
       <libarg arg="-L/usr/X11R6/lib"/>
@@ -132,10 +132,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <property name="sdk.include" value="${sdk.home}\include"/>
     <property name="jdk.include" value="${jdk.home}\include"/>
     <jnicpp 
-        srcdir="${src.jves}/bench" 
-        objdir="${obj.jves}/bench"
+        srcdir="${src.jtk}/bench" 
+        objdir="${obj.jtk}/bench"
         jnidir="${build.jni}" 
-        jniname="edu_mines_jves_bench">
+        jniname="edu_mines_jtk_bench">
       <incarg arg="/I${jdk.include}"/>
       <incarg arg="/I${jdk.include}\win32"/>
       <incarg arg="/I${vc.include}"/>
@@ -144,10 +144,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <libarg arg="jawt.lib"/>
     </jnicpp>
     <jnicpp 
-        srcdir="${src.jves}/opengl" 
-        objdir="${obj.jves}/opengl"
+        srcdir="${src.jtk}/opengl" 
+        objdir="${obj.jtk}/opengl"
         jnidir="${build.jni}" 
-        jniname="edu_mines_jves_opengl">
+        jniname="edu_mines_jtk_opengl">
       <incarg arg="/I${jdk.include}"/>
       <incarg arg="/I${jdk.include}\win32"/>
       <incarg arg="/I${vc.include}"/>

@@ -25,22 +25,22 @@ inline static jboolean toJava(GLboolean b) {
 }
 
 #define JNI_GL_DECLARE0(name) extern "C" JNIEXPORT void JNICALL \
-Java_edu_mines_jves_opengl_Gl_##name(\
+Java_edu_mines_jtk_opengl_Gl_##name(\
   JNIEnv* env, jclass cls)
 #define JNI_GL_DECLARE1(name) extern "C" JNIEXPORT void JNICALL \
-Java_edu_mines_jves_opengl_Gl_##name(\
+Java_edu_mines_jtk_opengl_Gl_##name(\
   JNIEnv* env, jclass cls,
 #define JNI_GL_DECLARE2(name) extern "C" JNIEXPORT void JNICALL \
-Java_edu_mines_jves_opengl_Gl_n##name(\
+Java_edu_mines_jtk_opengl_Gl_n##name(\
   JNIEnv* env, jclass cls, jlong pfunc,
 #define JNI_GL_DECLARE_RETURN0(type,name) extern "C" JNIEXPORT type JNICALL \
-Java_edu_mines_jves_opengl_Gl_##name(\
+Java_edu_mines_jtk_opengl_Gl_##name(\
   JNIEnv* env, jclass cls)
 #define JNI_GL_DECLARE_RETURN1(type,name) extern "C" JNIEXPORT type JNICALL \
-Java_edu_mines_jves_opengl_Gl_##name(\
+Java_edu_mines_jtk_opengl_Gl_##name(\
   JNIEnv* env, jclass cls,
 #define JNI_GL_DECLARE_RETURN2(type,name) extern "C" JNIEXPORT type JNICALL \
-Java_edu_mines_jves_opengl_Gl_n##name(\
+Java_edu_mines_jtk_opengl_Gl_n##name(\
   JNIEnv* env, jclass cls, jlong pfunc,
 #define JNI_GL_BEGIN0 {\
   JNI_TRY

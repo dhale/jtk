@@ -17,7 +17,7 @@ SwtBench JNI glue
 #include "../util/jniglue.h"
 
 extern "C" JNIEXPORT void JNICALL
-Java_edu_mines_jves_bench_SwtBench_printHandleNative(
+Java_edu_mines_jtk_bench_SwtBench_printHandleNative(
   JNIEnv* env, jclass cls,
   jint handle)
 {

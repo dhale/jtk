@@ -4,7 +4,7 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jves.opengl;
+package edu.mines.jtk.opengl;
 
 import java.nio.*;
 
@@ -15,7 +15,7 @@ import java.nio.*;
  * simply as glVertex(float,float).
  * <p>
  * All methods in this class are static. These methods should be called
- * only while an OpenGL context ({@link edu.mines.jves.opengl.GlContext})
+ * only while an OpenGL context ({@link edu.mines.jtk.opengl.GlContext})
  * is locked for the calling thread.
  * <p>
  * Some methods, such as 
@@ -3130,6 +3130,6 @@ public class Gl {
   }
 
   static {
-    System.loadLibrary("edu_mines_jves_opengl");
+    System.loadLibrary("edu_mines_jtk_opengl");
   }
 }

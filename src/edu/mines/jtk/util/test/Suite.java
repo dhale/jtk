@@ -4,12 +4,12 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jves.util.test;
+package edu.mines.jtk.util.test;
 
 import junit.framework.*;
 
 /**
- * Tests all classes package edu.mines.jves.util.
+ * Tests all classes package edu.mines.jtk.util.
  * @author Dave Hale
  * @version 2004.11.02
  */

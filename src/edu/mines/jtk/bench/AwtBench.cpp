@@ -22,9 +22,9 @@ AwtBench JNI glue
 
 // Note: _00024 is the escape sequence for Unicode character 0024, 
 // which represents $. The fully-qualified native method name is 
-// edu.mines.jves.bench.AwtBench$NativeCanvas.paintNative
+// edu.mines.jtk.bench.AwtBench$NativeCanvas.paintNative
 extern "C" JNIEXPORT void JNICALL
-Java_edu_mines_jves_bench_AwtBench_00024NativeCanvas_paintNative(
+Java_edu_mines_jtk_bench_AwtBench_00024NativeCanvas_paintNative(
   JNIEnv* env, jclass cls, jobject canvas)
 {
   JNI_TRY

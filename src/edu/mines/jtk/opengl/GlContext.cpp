@@ -315,7 +315,7 @@ private:
 // native methods
 
 extern "C" JNIEXPORT void JNICALL
-Java_edu_mines_jves_opengl_GlContext_killGlContext(
+Java_edu_mines_jtk_opengl_GlContext_killGlContext(
   JNIEnv* env, jclass cls,
   jlong peer) 
 {
@@ -326,7 +326,7 @@ Java_edu_mines_jves_opengl_GlContext_killGlContext(
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_edu_mines_jves_opengl_GlContext_makeGlAwtCanvasContext(
+Java_edu_mines_jtk_opengl_GlContext_makeGlAwtCanvasContext(
   JNIEnv* env, jclass cls,
   jobject canvas) 
 {
@@ -341,7 +341,7 @@ Java_edu_mines_jves_opengl_GlContext_makeGlAwtCanvasContext(
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_edu_mines_jves_opengl_GlContext_makeGlSwtCanvasContext(
+Java_edu_mines_jtk_opengl_GlContext_makeGlSwtCanvasContext(
   JNIEnv* env, jclass cls, 
   jlong xdisplay, jlong xdrawable,
   jlong hwnd, jlong hdc) 
@@ -357,7 +357,7 @@ Java_edu_mines_jves_opengl_GlContext_makeGlSwtCanvasContext(
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_edu_mines_jves_opengl_GlContext_lock(
+Java_edu_mines_jtk_opengl_GlContext_lock(
   JNIEnv* env, jclass cls,
   jlong peer)
 {
@@ -368,7 +368,7 @@ Java_edu_mines_jves_opengl_GlContext_lock(
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_edu_mines_jves_opengl_GlContext_unlock(
+Java_edu_mines_jtk_opengl_GlContext_unlock(
   JNIEnv* env, jclass cls,
   jlong peer)
 {
@@ -379,7 +379,7 @@ Java_edu_mines_jves_opengl_GlContext_unlock(
 }
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_edu_mines_jves_opengl_GlContext_swapBuffers(
+Java_edu_mines_jtk_opengl_GlContext_swapBuffers(
   JNIEnv* env, jclass cls,
   jlong peer)
 {
@@ -390,7 +390,7 @@ Java_edu_mines_jves_opengl_GlContext_swapBuffers(
 }
 
 extern "C" JNIEXPORT jlong JNICALL
-Java_edu_mines_jves_opengl_GlContext_getProcAddress(
+Java_edu_mines_jtk_opengl_GlContext_getProcAddress(
   JNIEnv* env, jclass cls,
   jstring jfunctionName)
 {

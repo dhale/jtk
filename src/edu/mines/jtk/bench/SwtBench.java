@@ -4,7 +4,7 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is 
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jves.bench;
+package edu.mines.jtk.bench;
 
 import java.util.*;
 import org.eclipse.swt.*;
@@ -13,7 +13,7 @@ import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
 
-import edu.mines.jves.util.Stopwatch;
+import edu.mines.jtk.util.Stopwatch;
 
 /**
  * SWT workbench.
@@ -136,6 +136,6 @@ public class SwtBench {
   private static native void printHandleNative(int handle);
 
   static {
-    System.loadLibrary("edu_mines_jves_bench");
+    System.loadLibrary("edu_mines_jtk_bench");
   }
 }

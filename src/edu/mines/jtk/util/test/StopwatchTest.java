@@ -4,13 +4,13 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jves.util.test;
+package edu.mines.jtk.util.test;
 
 import junit.framework.*;
-import edu.mines.jves.util.Stopwatch;
+import edu.mines.jtk.util.Stopwatch;
 
 /**
- * Tests {@link edu.mines.jves.util.Stopwatch}.
+ * Tests {@link edu.mines.jtk.util.Stopwatch}.
  * @author Dave Hale and Dean Witte
  * @version 2004.11.02
  */

@@ -4,7 +4,7 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is 
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jves.ant;
+package edu.mines.jtk.ant;
 
 import java.io.*;
 import java.util.*;
@@ -16,7 +16,7 @@ import org.apache.tools.ant.util.*;
 /**
  * Custom Ant task that builds a JNI library from C++ source files.
  * This custom task is designed to build JNI libraries for packages 
- * in edu.mines.jves.*. It may not be suitable for other packages.
+ * in edu.mines.jtk.*. It may not be suitable for other packages.
  * @author Dave Hale
  * @version 2004.11.04
  */

@@ -4,9 +4,9 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is 
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jves.bench;
+package edu.mines.jtk.bench;
 
-import edu.mines.jves.util.Stopwatch;
+import edu.mines.jtk.util.Stopwatch;
 
 /**
  * Benchmark ThreadLocal with respect to static native methods.
@@ -69,6 +69,6 @@ public class ThreadLocalBench {
   private static native void nativeMethodWithContext(long pointer, int i);
 
   static {
-    System.loadLibrary("edu_mines_jves_bench");
+    System.loadLibrary("edu_mines_jtk_bench");
   }
 }

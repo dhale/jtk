@@ -4,9 +4,9 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jves.opengl;
+package edu.mines.jtk.opengl;
 
-import edu.mines.jves.util.Check;
+import edu.mines.jtk.util.Check;
 
 /**
  * An OpenGL context. All OpenGL rendering is performed using the current
@@ -170,7 +170,7 @@ public class GlContext {
   }
 
   static {
-    System.loadLibrary("edu_mines_jves_opengl");
+    System.loadLibrary("edu_mines_jtk_opengl");
   }
 
   ///////////////////////////////////////////////////////////////////////////

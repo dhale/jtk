@@ -4,11 +4,11 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is 
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jves.opengl.test;
+package edu.mines.jtk.opengl.test;
 
 import java.nio.*;
-import edu.mines.jves.opengl.*;
-import static edu.mines.jves.opengl.Gl.*;
+import edu.mines.jtk.opengl.*;
+import static edu.mines.jtk.opengl.Gl.*;
 
 /**
  * Simple OpenGL program to display a lit sphere using glDrawArrays.
