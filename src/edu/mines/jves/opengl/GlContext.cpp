@@ -1,42 +1,12 @@
-#include <jni.h>
-
-#ifdef WIN32
-#define MWIN // Microsoft Windows
-#define getProcAddress wglGetProcAddress
+#ifdef WIN32 // If Microsoft Windows, ...
+#define MWIN
 #include <windows.h>
-#else
-#define XWIN // X Windows
-#define getProcAddress glXGetProcAddressARB
-#endif
-
-#include <GL/gl.h>
-
-#ifdef XWIN
+#else // Else, assume X Windows, ...
+#define XWIN
 #include <GL/glx.h> 
 #endif
-
-class Jstring {
-public:
-  Jstring(JNIEnv* env, jstring str) {
-    _env = env;
-    _str = str;
-    jboolean isCopy;
-    _utf = env->GetStringUTFChars(str,&isCopy);
-  }
-  ~Jstring() {
-    _env->ReleaseStringUTFChars(_str,_utf);
-  }
-  operator const char*() const {
-    return _utf;
-  }
-  operator const unsigned char*() const {
-    return (const unsigned char*)_utf;
-  }
-private:
-  JNIEnv* _env;
-  jstring _str;
-  const char* _utf;
-};
+#include <GL/gl.h>
+#include "../util/jniglue.h"
 
 extern "C" JNIEXPORT void JNICALL
 Java_edu_mines_jves_opengl_Gl_nswapBuffers(
@@ -44,9 +14,9 @@ Java_edu_mines_jves_opengl_Gl_nswapBuffers(
   jlong display, jlong handle)
 {
 #if defined(MWIN)
-  SwapBuffers((HDC)handle);
+  SwapBuffers((HDC)toPointer(handle));
 #elif defined(XWIN)
-  glXSwapBuffers((Display*)display,(Drawable)handle);
+  glXSwapBuffers((Display*)toPointer(display),(Drawable)toPointer(handle));
 #endif
 }
 
@@ -56,5 +26,10 @@ Java_edu_mines_jves_opengl_Gl_getProcAddress(
   jstring jfunctionName)
 {
   Jstring functionName(env,jfunctionName);
-  return (jlong)getProcAddress(functionName);
+#if defined(MWIN)
+  void (*p)() = wglGetProcAddress(functionName);
+#elif defined(XWIN)
+  void (*p)() = glXGetProcAddressARB(functionName);
+#endif
+  return (jlong)((intptr_t)p);
 }
