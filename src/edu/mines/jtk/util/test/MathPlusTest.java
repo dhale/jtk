@@ -7,16 +7,16 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.util.test;
 
 import junit.framework.*;
-import static edu.mines.jtk.util.M.*;
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * Tests {@link edu.mines.jtk.util.M}.
+ * Tests {@link edu.mines.jtk.util.MathPlus}.
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.04
  */
-public class MTest extends TestCase {
+public class MathPlusTest extends TestCase {
   public static void main(String[] args) {
-    TestSuite suite = new TestSuite(MTest.class);
+    TestSuite suite = new TestSuite(MathPlusTest.class);
     junit.textui.TestRunner.run(suite);
   }
 

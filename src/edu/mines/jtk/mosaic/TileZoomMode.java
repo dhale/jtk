@@ -17,6 +17,7 @@ import javax.swing.*;
  * @version 2004.12.29
  */
 public class TileZoomMode extends Mode {
+  private static final long serialVersionUID = 1L;
 
   /**
    * Constructs a tile zoom mode for the specified mosaic.

@@ -22,6 +22,7 @@ import javax.swing.*;
  * @version 2004.12.30
  */
 public class ModeToggleButton extends JToggleButton {
+  private static final long serialVersionUID = 1L;
   
   /**
    * Constructs a mode toggle button for the specified mode.

@@ -25,6 +25,7 @@ import edu.mines.jtk.util.*;
  * @version 2004.12.27
  */
 public class TileAxis extends JPanel {
+  private static final long serialVersionUID = 1L;
 
   /**
    * Placement of a tile axis.

@@ -9,7 +9,7 @@ package edu.mines.jtk.util.test;
 import junit.framework.*;
 import edu.mines.jtk.util.Complex;
 import static edu.mines.jtk.util.Complex.*;
-import static edu.mines.jtk.util.M.*;
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Tests {@link edu.mines.jtk.util.Complex}.

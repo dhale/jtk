@@ -8,8 +8,6 @@ package edu.mines.jtk.bench;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.font.*;
-import java.awt.geom.*;
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
@@ -47,6 +45,7 @@ public class AwtBench {
     frame.setVisible(true);
   }
   private static class ImagePanel extends JPanel {
+    private static final long serialVersionUID = 1L;
     public void paintComponent(Graphics g) {
       super.paintComponent(g);
       Graphics2D g2d = (Graphics2D)g;

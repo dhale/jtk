@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
-import static edu.mines.jtk.util.M.*;
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Tics for annotating an axis. Given values at the endpoints of the axis,
@@ -72,8 +72,8 @@ public class AxisTics {
   public AxisTics(double x1, double x2, int ntic) {
     double xmin = _xmin = min(x1,x2);
     double xmax = _xmax = max(x1,x2);
-    xmin -= (xmax-xmin)*100*M.DBL_EPSILON;
-    xmax += (xmax-xmin)*100*M.DBL_EPSILON;
+    xmin -= (xmax-xmin)*100*DBL_EPSILON;
+    xmax += (xmax-xmin)*100*DBL_EPSILON;
     if (ntic<=0)
       ntic = 1;
     int nmult = _mult.length;
@@ -211,6 +211,6 @@ public class AxisTics {
   }
 
   private static boolean almostEqual(double x1, double x2) {
-    return abs(x1-x2)<=max(abs(x1),abs(x2))*100.0*M.DBL_EPSILON;
+    return abs(x1-x2)<=max(abs(x1),abs(x2))*100.0*DBL_EPSILON;
   }
 }

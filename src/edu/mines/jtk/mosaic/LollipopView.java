@@ -8,7 +8,7 @@ package edu.mines.jtk.mosaic;
 
 import java.awt.*;
 import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.M.*;
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * A lollipop view of a sampled function f(x) of one variable x.

@@ -22,8 +22,9 @@ import javax.swing.*;
  * @version 2004.12.30
  */
 public class ModeMenuItem extends JCheckBoxMenuItem {
-  
-  /**
+  private static final long serialVersionUID = 1L;
+
+/**
    * Constructs a mode menu item for the specified mode.
    * @param mode the mode.
    */

@@ -9,12 +9,13 @@ package edu.mines.jtk.util;
 /**
  * Basic math functions. Like the standard class {@link java.lang.Math}, but
  * with overloaded methods that return floats when passed float arguments. 
- * It also defines additional constants, such as {@link #FLT_PI}.
+ * (This eliminates ugly casts when using floats.) This class also defines
+ * useful additional constants, such as {@link #FLT_PI}.
  * @see java.lang.Math
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.04
  */
-public class M {
+public class MathPlus {
 
   /**
    * The double value that is closer than any other to <i>e</i>,
@@ -332,7 +333,7 @@ public class M {
    * @return the hyperbolic sine.
    */
   public static float sinh(float x) {
-    return (float)M.sinh((double)x);
+    return (float)Math.sinh((double)x);
   }
 
   /**
@@ -350,7 +351,7 @@ public class M {
    * @return the hyperbolic cosine.
    */
   public static float cosh(float x) {
-    return (float)M.cosh((double)x);
+    return (float)Math.cosh((double)x);
   }
 
   /**

@@ -19,7 +19,7 @@ public class Suite extends TestCase {
 
     suite.addTestSuite(AxisTicsTest.class);
     suite.addTestSuite(ComplexTest.class);
-    suite.addTestSuite(MTest.class);
+    suite.addTestSuite(MathPlusTest.class);
     suite.addTestSuite(StopwatchTest.class);
 
     junit.textui.TestRunner.run(suite);

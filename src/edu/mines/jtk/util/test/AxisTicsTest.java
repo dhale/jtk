@@ -6,9 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util.test;
 
-import static java.lang.Math.*;
 import junit.framework.*;
 import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Tests {@link edu.mines.jtk.util.AxisTics}.
@@ -70,7 +70,7 @@ public class AxisTicsTest extends TestCase {
   }
 
   private void assertEquals(double e, double a) {
-    double tiny = max(abs(e),abs(a))*100.0*M.DBL_EPSILON;
+    double tiny = max(abs(e),abs(a))*100.0*DBL_EPSILON;
     assertEquals(e,a,tiny);
   }
 }

@@ -39,6 +39,7 @@ import javax.swing.*;
  * @version 2004.12.27
  */
 public class Tile extends JPanel {
+  private static final long serialVersionUID = 1L;
 
   /**
    * Gets the mosaic that contains this tile.

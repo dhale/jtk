@@ -10,7 +10,6 @@ import java.io.*;
 import java.util.*;
 import java.awt.image.*;
 import javax.imageio.*;
-import javax.imageio.stream.*;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;

@@ -38,6 +38,7 @@ import javax.swing.border.*;
  * @version 2004.12.27
  */
 public class Mosaic extends JPanel {
+  private static final long serialVersionUID = 1L;
 
   /**
    * Placement of axes.
@@ -748,6 +749,7 @@ public class Mosaic extends JPanel {
   private static final int HORIZONTAL = Adjustable.HORIZONTAL;
   private static final int VERTICAL = Adjustable.VERTICAL;
   private class TileScrollBar extends JScrollBar {
+    private static final long serialVersionUID = 1L;
     Tile tile;
     TileScrollBar(int orientation, final Tile tile) {
       super(orientation,0,SCROLL_MAX,0,SCROLL_MAX);
@@ -801,6 +803,7 @@ public class Mosaic extends JPanel {
     private boolean _settingInternal;
   }
   private class HScrollBar extends TileScrollBar {
+    private static final long serialVersionUID = 1L;
     int icol;
     HScrollBar(int icol) {
       super(HORIZONTAL,_tiles[0][icol]);
@@ -808,6 +811,7 @@ public class Mosaic extends JPanel {
     }
   }
   private class VScrollBar extends TileScrollBar {
+    private static final long serialVersionUID = 1L;
     int irow;
     VScrollBar(int irow) {
       super(VERTICAL,_tiles[irow][0]);
