@@ -11,13 +11,14 @@ import static java.lang.Math.*;
 
 /**
  * Real array processing. A real array is an array of floats, in which
- * each float represents one real number. Methods are overloaded for 1-D
- * arrays, 2-D arrays (arrays of arrays), and 3-D arrays (arrays of arrays
- * of arrays). Multi-dimensional arrays can be regular or ragged. For
- * example, the dimensions of a regular 3-D array float[n3][n2][n1] are
- * n1, n2, and n3, where n1 is the fastest dimension, and n3 is the
- * slowest dimension. In contrast, the lengths of arrays within a ragged 
- * array of arrays (of arrays) may vary.
+ * each float represents one real number. 
+ * <p>
+ * Methods are overloaded for 1-D arrays, 2-D arrays (arrays of arrays), 
+ * and 3-D arrays (arrays of arrays of arrays). Multi-dimensional arrays 
+ * can be regular or ragged. For example, the dimensions of a regular 3-D 
+ * array float[n3][n2][n1] are n1, n2, and n3, where n1 is the fastest 
+ * dimension, and n3 is the slowest dimension. In contrast, the lengths 
+ * of arrays within a ragged array of arrays (of arrays) may vary.
  * <p>
  * Some methods that create new arrays (e.g., zero, fill, ramp, and 
  * rand) have no array arguments; these methods have arguments that 
@@ -36,7 +37,7 @@ import static java.lang.Math.*;
  * copy - copies an array, or a specified subset of that array
  * zero - fills an array with a constant value zero
  * fill - fills an array with a specified constant value
- * ramp - fills an array with a linear values a+b*index
+ * ramp - fills an array with a linear values ra + rb1*i1 (+ rb2*i2 + rb3*i3)
  * rand - fills an array with pseudo-random numbers
  * </pre><pre>
  * Binary operations:
@@ -55,7 +56,7 @@ import static java.lang.Math.*;
  * log10 - logarithm base 10
  * sqrt - square-root
  * sgn - sign (1 if positive, -1 if negative, 0 if zero)
- * pow - raises to a specified power
+ * pow - raise to a specified power
  * </pre><pre>
  * Other operations:
  * equal - compares arrays for equality (to within an optional tolerance)

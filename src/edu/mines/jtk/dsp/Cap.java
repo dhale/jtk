@@ -15,7 +15,68 @@ import static edu.mines.jtk.util.MathPlus.*;
  * in which each consecutive pair of floats represents the real and 
  * imaginary parts of one complex number. This means that a complex 
  * array cx contains cx.length/2 complex numbers, and cx.length is an 
- * even number.
+ * even number. For example, the length of a 1-D complex array cx with 
+ * dimension n1 is cx.length = 2*n1; i.e., n1 is the number of complex
+ * elements in the array.
+ * <p>
+ * Methods are overloaded for 1-D arrays, 2-D arrays (arrays of arrays), 
+ * and 3-D arrays (arrays of arrays of arrays). Multi-dimensional arrays 
+ * can be regular or ragged. For example, the dimensions of a regular 3-D 
+ * array float[n3][n2][n1] are n1, n2, and n3, where n1 is the fastest 
+ * dimension, and n3 is the slowest dimension. In contrast, the lengths 
+ * of arrays within a ragged array of arrays (of arrays) may vary.
+ * <p>
+ * Some methods that create new arrays (e.g., zero, fill, ramp, and 
+ * rand) have no array arguments; these methods have arguments that 
+ * specify regular array dimensions n1, n2, and/or n3. All other methods, 
+ * those with at least one array argument, use the dimensions of the first 
+ * array argument to determine the number of array elements to process.
+ * <p>
+ * Most methods in this class have well-known names and functions. All
+ * methods share a common naming convention for arguments. Arguments 
+ * with names like cx, cy, and cz denote complex arrays. Arguments with 
+ * names like ca and cb denote complex constants. Some methods also have
+ * real-valued array arguments, with names like rx, ry, and rz.
+ * <p>
+ * Method summary:
+ * <pre>
+ * Copy and creation operations:
+ * copy - copies an array, or a specified subset of that array
+ * zero - fills an array with a constant value zero
+ * fill - fills an array with a specified constant value
+ * ramp - fills an array with a linear values ca + cb1*i1 (+ cb2*i2 + cb3*i3)
+ * rand - fills an array with pseudo-random numbers
+ * complex - creates a complex array with specified real and imaginary parts
+ * polar - creates a complex array with magnitude and phase (in radians)
+ * </pre><pre>
+ * Binary operations:
+ * add - adds one array (or constant) to another array (or constant)
+ * sub - subtracts one array (or constant) from another array (or constant)
+ * mul - multiplies one array (or constant) by another array (or constant)
+ * div - divides one array (or constant) by another array (or constant)
+ * </pre><pre>
+ * Complex-to-real operations:
+ * real - real part
+ * imag - imaginary part
+ * norm - squared magnitude
+ * abs - absolute value (magnitude)
+ * arg - argument (phase, arc-tangent of imag/real)
+ * </pre><pre>
+ * Complex-to-complex operations:
+ * conj - conjugate
+ * neg - negation
+ * exp - exponential
+ * TODO:
+ * cos - cosine
+ * sin - sin
+ * log - natural logarithm
+ * log10 - logarithm base 10
+ * sqrt - square-root
+ * pow - raise to a specified power
+ * </pre><pre>
+ * Other operations:
+ * equal - compares arrays for equality (to within an optional tolerance)
+ * </pre>
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.03.21
  */
