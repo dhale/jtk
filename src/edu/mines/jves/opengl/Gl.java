@@ -3042,12 +3042,12 @@ public class Gl {
     nglGetBufferParameteriv(getContext().glGetBufferParameteriv,
       target,pname,params);
   }
-  public static void glGetBufferPointerv(
-    int target, int pname, Buffer[] params)
-  {
-    nglGetBufferPointerv(getContext().glGetBufferPointerv,
-      target,pname,params);
-  }
+//  public static void glGetBufferPointerv(
+//    int target, int pname, Buffer[] params)
+//  {
+//    nglGetBufferPointerv(getContext().glGetBufferPointerv,
+//      target,pname,params);
+//  }
   private static native void nglGenQueries(long pfunc,
     int n, int[] ids);
   private static native void nglDeleteQueries(long pfunc,
@@ -3084,8 +3084,8 @@ public class Gl {
     int target);
   private static native void nglGetBufferParameteriv(long pfunc,
     int target, int pname, int[] params);
-  private static native void nglGetBufferPointerv(long pfunc,
-    int target, int pname, Buffer[] params);
+//  private static native void nglGetBufferPointerv(long pfunc,
+//    int target, int pname, Buffer[] params);
 
   ///////////////////////////////////////////////////////////////////////////
   // package

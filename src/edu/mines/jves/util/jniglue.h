@@ -94,31 +94,16 @@ private:
   jarray _arr;
   T* _ptr;
 };
-typedef Jarray<jboolean> JbooleanArray;
-typedef Jarray<jbyte> JbyteArray;
+typedef Jarray<unsigned char> JbooleanArray;
+typedef Jarray<signed char> JbyteArray;
 typedef Jarray<unsigned char> JubyteArray;
-typedef Jarray<jchar> JcharArray;
-typedef Jarray<jshort> JshortArray;
+typedef Jarray<unsigned short> JcharArray;
+typedef Jarray<short> JshortArray;
 typedef Jarray<unsigned short> JushortArray;
-#ifdef WIN32
-// On Windows, jint is declared as a long, so we must provide a
-// conversion operator to int*.
-class JintArray : public Jarray<jint> {
-public:
-  JintArray(JNIEnv* env, jarray arr) : Jarray<jint>(env,arr) {}
-  operator const int*() const {
-    return (const int*)(this->operator const jint*());
-  }
-  operator int*() const {
-    return (int*)(this->operator jint*());
-  }
-};
-#else
-typedef Jarray<jint> JintArray;
-#endif /* WIN32 */
+typedef Jarray<int> JintArray;
 typedef Jarray<unsigned int> JuintArray;
-typedef Jarray<jfloat> JfloatArray;
-typedef Jarray<jdouble> JdoubleArray;
+typedef Jarray<float> JfloatArray;
+typedef Jarray<double> JdoubleArray;
 typedef Jarray<void> JvoidArray;
 
 // Java NIO buffer
@@ -139,14 +124,14 @@ public:
 private:
   T* _ptr;
 };
-typedef Jbuffer<jboolean> JbooleanBuffer;
-typedef Jbuffer<jbyte> JbyteBuffer;
+typedef Jbuffer<unsigned char> JbooleanBuffer;
+typedef Jbuffer<signed char> JbyteBuffer;
 typedef Jbuffer<unsigned char> JubyteBuffer;
-typedef Jbuffer<jchar> JcharBuffer;
-typedef Jbuffer<jshort> JshortBuffer;
+typedef Jbuffer<unsigned short> JcharBuffer;
+typedef Jbuffer<short> JshortBuffer;
 typedef Jbuffer<unsigned short> JushortBuffer;
-typedef Jbuffer<jint> JintBuffer;
+typedef Jbuffer<int> JintBuffer;
 typedef Jbuffer<unsigned int> JuintBuffer;
-typedef Jbuffer<jfloat> JfloatBuffer;
-typedef Jbuffer<jdouble> JdoubleBuffer;
+typedef Jbuffer<float> JfloatBuffer;
+typedef Jbuffer<double> JdoubleBuffer;
 typedef Jbuffer<void> JvoidBuffer;
