@@ -8,6 +8,7 @@ package edu.mines.jtk.mosaic;
 
 import static java.lang.Math.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -518,6 +519,8 @@ public class Mosaic extends JPanel {
   private TileAxis[] _axesRight; // array[nrow] of right axes; null, if none
   private ArrayList<Tile> _tileList; // simple list of all tiles
   private ArrayList<TileAxis> _axisList; // simple list of all axes
+  private HScrollBar[] _hsb; // horizontal scroll bars
+  private VScrollBar[] _vsb; // vertical scroll bars
   private int[] _wm; // array[ncol] of width minimums
   private int[] _we; // array[ncol] of width elastics
   private int[] _hm; // array[nrow] of height minimums
@@ -652,5 +655,118 @@ public class Mosaic extends JPanel {
       height += 2*widthAxesBorder();
     }
     return height;
+  }
+
+  private static final int SCROLL_MAX = 1000000000;
+  private static final double SCROLL_SCL = 1.0/SCROLL_MAX;
+  private static final int HORIZONTAL = Adjustable.HORIZONTAL;
+  private static final int VERTICAL = Adjustable.VERTICAL;
+  private class TileScrollBar extends JScrollBar {
+    Tile tile;
+    TileScrollBar(int orientation, final Tile tile) {
+      super(orientation,0,SCROLL_MAX,0,SCROLL_MAX);
+      setVisible(false);
+      this.tile = tile;
+      addAdjustmentListener(new AdjustmentListener() {
+        public void adjustmentValueChanged(AdjustmentEvent ae) {
+          double v = getV();
+          double e = getE();
+          DRectangle vr = tile.getViewRectangle();
+          if (getOrientation()==HORIZONTAL) {
+            vr.x = getV();
+            vr.width = getE();
+          } else {
+            vr.y = getV();
+            vr.height = getE();
+          }
+          tile.setViewRectangle(vr);
+        }
+      });
+    }
+    void setV(double v) {
+      setValue((int)(v*SCROLL_MAX+0.5));
+    }
+    void setE(double e) {
+      boolean isVisible = isVisible();
+      setVisibleAmount((int)(e*SCROLL_MAX+0.5));
+      updateIsVisible();
+    }
+    double getV() {
+      return SCROLL_SCL*getValue();
+    }
+    double getE() {
+      return SCROLL_SCL*getVisibleAmount();
+    }
+    void update() {
+      DRectangle vr = tile.getViewRectangle();
+      if (getOrientation()==HORIZONTAL) {
+        setV(vr.x);
+        setE(vr.width);
+      } else {
+        setV(vr.y);
+        setE(vr.height);
+      }
+    }
+    void updateIsVisible() {
+      boolean isVisible = isVisible();
+      if (getVisibleAmount()==SCROLL_MAX) {
+        if (isVisible)
+          setVisible(false);
+      } else {
+        if (!isVisible)
+          setVisible(true);
+      }
+      if (isVisible!=isVisible()) {
+        isVisible = isVisible();
+        int nVisible = countVisible();
+        if (isVisible && nVisible==0 || !isVisible && nVisible==1)
+          doLayout();
+      }
+    }
+    int countVisible() {
+      int n = 0;
+      if (getOrientation()==HORIZONTAL) {
+        for (int icol=0; icol<_ncol; ++icol) {
+          if (_hsb[icol].isVisible())
+            ++n;
+        }
+      } else {
+        for (int irow=0; irow<_nrow; ++irow) {
+          if (_vsb[irow].isVisible())
+            ++n;
+        }
+      }
+      return n;
+    }
+  }
+  private class HScrollBar extends TileScrollBar {
+    int icol;
+    HScrollBar(int icol) {
+      super(HORIZONTAL,_tiles[0][icol]);
+      this.icol = icol;
+    }
+  }
+  private class VScrollBar extends TileScrollBar {
+    int irow;
+    VScrollBar(int irow) {
+      super(VERTICAL,_tiles[irow][0]);
+      this.irow = irow;
+    }
+  }
+
+  private boolean needHScrollBar() {
+    for (int icol=0; icol<_ncol; ++icol) {
+      if (_hsb[icol].isVisible())
+        return true;
+    }
+    return false;
+  }
+
+  private boolean needVScrollBar() {
+    for (int irow=0; irow<_nrow; ++irow) {
+      if (_vsb[irow].isVisible())
+        return true;
+    }
+    return false;
   }
 }
