@@ -8,6 +8,7 @@ package edu.mines.jtk.mosaic;
 
 import static java.lang.Math.*;
 import java.awt.*;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
@@ -43,31 +44,40 @@ public class Mosaic extends JPanel {
     _tiles = new Tile[nrow][ncol];
     for (int irow=0; irow<nrow; ++irow) {
       for (int icol=0; icol<ncol; ++icol) {
-        _tiles[irow][icol] = new Tile(this,irow,icol);
+        Tile tile = _tiles[irow][icol] = new Tile(this,irow,icol);
+        _tileList.add(tile);
       }
     }
     if ((axesPlacement&AXES_TOP)!=0) {
       _axesTop = new TileAxis[ncol];
       for (int icol=0; icol<ncol; ++icol) {
-        _axesTop[icol] = new TileAxis(this,TileAxis.TOP,icol);
+        TileAxis axis = _axesTop[icol] = 
+          new TileAxis(this,TileAxis.TOP,icol);
+        _axisList.add(axis);
       }
     }
     if ((axesPlacement&AXES_LEFT)!=0) {
       _axesLeft = new TileAxis[nrow];
       for (int irow=0; irow<nrow; ++irow) {
-        _axesLeft[irow] = new TileAxis(this,TileAxis.LEFT,irow);
+        TileAxis axis = _axesLeft[irow] = 
+          new TileAxis(this,TileAxis.LEFT,irow);
+        _axisList.add(axis);
       }
     }
     if ((axesPlacement&AXES_BOTTOM)!=0) {
       _axesBottom = new TileAxis[ncol];
       for (int icol=0; icol<ncol; ++icol) {
-        _axesBottom[icol] = new TileAxis(this,TileAxis.BOTTOM,icol);
+        TileAxis axis = _axesBottom[icol] = 
+          new TileAxis(this,TileAxis.BOTTOM,icol);
+        _axisList.add(axis);
       }
     }
     if ((axesPlacement&AXES_RIGHT)!=0) {
       _axesRight = new TileAxis[nrow];
       for (int irow=0; irow<nrow; ++irow) {
-        _axesRight[irow] = new TileAxis(this,TileAxis.RIGHT,irow);
+        TileAxis axis = _axesRight[irow] = 
+          new TileAxis(this,TileAxis.RIGHT,irow);
+        _axisList.add(axis);
       }
     }
     _we = new int[ncol];
@@ -83,7 +93,7 @@ public class Mosaic extends JPanel {
       _hm[irow] = 100;
     }
     if (_borderStyle==BORDER_FLAT) {
-      _borderTile = BorderFactory.createLineBorder(Color.BLACK);
+      _borderTile = BorderFactory.createLineBorder(getForeground());
       _borderAxis = null;
     } else if (_borderStyle==BORDER_SHADOW) {
       _borderTile = BorderFactory.createLoweredBevelBorder();
@@ -201,6 +211,37 @@ public class Mosaic extends JPanel {
    */
   public void setHeightElastic(int irow, int heightElastic) {
     _he[irow] = heightElastic;
+  }
+
+  // Override base class implementation.
+  public void setFont(Font font) {
+    super.setFont(font);
+    if (_axisList!=null) {
+      for (TileAxis axis : _axisList)
+        axis.setFont(font);
+    }
+  }
+
+  // Override base class implementation.
+  public void setForeground(Color color) {
+    super.setForeground(color);
+    if (_tileList!=null) {
+      for (Tile tile : _tileList)
+        tile.setForeground(color);
+      for (TileAxis axis : _axisList)
+        axis.setForeground(color);
+    }
+  }
+
+  // Override base class implementation.
+  public void setBackground(Color color) {
+    super.setBackground(color);
+    if (_tileList!=null) {
+      for (Tile tile : _tileList)
+        tile.setBackground(color);
+      for (TileAxis axis : _axisList)
+        axis.setBackground(color);
+    }
   }
 
   // Override base class implementation.
@@ -439,6 +480,8 @@ public class Mosaic extends JPanel {
   private TileAxis[] _axesLeft; // array[nrow] of left axes; null, if none
   private TileAxis[] _axesBottom; // array[ncol] of bottom axes; null, if none
   private TileAxis[] _axesRight; // array[nrow] of right axes; null, if none
+  private ArrayList<Tile> _tileList = new ArrayList<Tile>();
+  private ArrayList<TileAxis> _axisList = new ArrayList<TileAxis>();
   private int[] _wm; // array[ncol] of width minimums
   private int[] _we; // array[ncol] of width elastics
   private int[] _hm; // array[nrow] of height minimums

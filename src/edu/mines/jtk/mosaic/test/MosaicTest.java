@@ -25,16 +25,16 @@ public class MosaicTest {
       Mosaic.AXES_LEFT |
       Mosaic.AXES_BOTTOM |
       Mosaic.AXES_RIGHT;
-    int borderStyle = Mosaic.BORDER_SHADOW;
+    int borderStyle = Mosaic.BORDER_FLAT;
     Mosaic mosaic = new Mosaic(nrow,ncol,axesPlacement,borderStyle);
+    mosaic.setBackground(Color.WHITE);
+    mosaic.setFont(new Font("SansSerif",Font.PLAIN,12));
     mosaic.setWidthMinimum(1,200);
     mosaic.setWidthElastic(1,200);
     mosaic.setHeightElastic(0,0);
     mosaic.setPreferredSize(new Dimension(600,600));
     Tile tile11 = mosaic.getTile(1,1);
     tile11.setViewRectangle(new DRectangle(0.1,0.1,0.8,0.8));
-    //TileAxis axist1 = mosaic.getTileAxisTop(1);
-    //axist1.setFont(new Font("Helvetica",Font.PLAIN,18));
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.add(mosaic);
