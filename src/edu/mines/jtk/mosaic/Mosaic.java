@@ -409,7 +409,7 @@ public class Mosaic extends JPanel {
         DRectangle dr = ti.getViewRectangle();
         dr.x = tr.x;
         dr.width = tr.width;
-        ti.setViewRectangle(dr);
+        ti.setViewRect(dr);
       }
     }
     for (int icol=0; icol<_ncol; ++icol) {
@@ -418,7 +418,7 @@ public class Mosaic extends JPanel {
         DRectangle dr = ti.getViewRectangle();
         dr.y = tr.y;
         dr.height = tr.height;
-        ti.setViewRectangle(dr);
+        ti.setViewRect(dr);
       }
     }
     repaintAxis(_axesTop,jcol);

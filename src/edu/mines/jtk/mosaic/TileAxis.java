@@ -6,8 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
+import static java.lang.Math.*;
 import java.awt.*;
 import javax.swing.*;
+import edu.mines.jtk.util.*;
 
 /**
  * A tile axis in a mosaic.
@@ -80,7 +82,7 @@ public class TileAxis extends JPanel {
     FontMetrics fm = g.getFontMetrics();
     int height = 0;
     if (isHorizontal()) {
-      height = 3*fm.getHeight();
+      height = 2*fm.getHeight();
       if (_label!=null)
         height += fm.getHeight();
     } else {
@@ -95,7 +97,7 @@ public class TileAxis extends JPanel {
   ///////////////////////////////////////////////////////////////////////////
   // protected
 
-  protected void paintComponent(Graphics g) {
+  protected void paintComponentX(Graphics g) {
     super.paintComponent(g);
     int width = getWidth();
     int height = getHeight();
@@ -110,13 +112,148 @@ public class TileAxis extends JPanel {
     g.drawString("Axis",x,y);
   }
 
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+
+    // Axis size.
+    int w = getWidth();
+    int h = getHeight();
+
+    // Font dimensions.
+    FontMetrics fm = g.getFontMetrics();
+    int fh = fm.getHeight();
+    int fa = fm.getAscent();
+    int fd = fm.getDescent();
+
+    // Length of major tics.
+    int tl = 2*fa/3;
+
+    Graphics2D g2d = (Graphics2D)g;
+    Projector p = getProjector();
+    Transcaler t = getTranscaler();
+    boolean isHorizontal = isHorizontal();
+    boolean isTop = isTop();
+    boolean isLeft = isLeft();
+
+    // Axis tics.
+    AxisTics at;
+    if (isHorizontal) {
+      int nmax = 6; // TODO: compute maximum number of tics to fit
+      double vmin = min(p.v0(),p.v1());
+      double vmax = max(p.v0(),p.v1());
+      double v0 = max(vmin,min(vmax,p.v(t.x(0))));
+      double v1 = max(vmin,min(vmax,p.v(t.x(w-1))));
+      at = new AxisTics(v0,v1,nmax);
+    } else {
+      int nmax = 4; // TODO: compute maximum number of tics to fit
+      double vmin = min(p.v0(),p.v1());
+      double vmax = max(p.v0(),p.v1());
+      double v0 = max(vmin,min(vmax,p.v(t.y(0))));
+      double v1 = max(vmin,min(vmax,p.v(t.y(h-1))));
+      at = new AxisTics(v0,v1,nmax);
+    }
+
+    // Minor tics.
+    int ntic = at.getCountMinor();
+    double dtic = at.getDeltaMinor();
+    double ftic = at.getFirstMinor();
+    if (isHorizontal) {
+      for (int itic=0; itic<ntic; ++itic) {
+        double vtic = ftic+itic*dtic;
+        double utic = p.u(vtic);
+        int x = t.x(utic);
+        if (isTop) {
+          g2d.drawLine(x,h-1,x,h-1-tl/2);
+        } else {
+          g2d.drawLine(x,0,x,tl/2);
+        }
+      }
+    } else {
+    }
+
+    // Major tics and axis label.
+    ntic = at.getCountMajor();
+    dtic = at.getDeltaMajor();
+    ftic = at.getFirstMajor();
+    if (isHorizontal) {
+      for (int itic=0; itic<ntic; ++itic) {
+        double vtic = ftic+itic*dtic;
+        double utic = p.u(vtic);
+        int x = t.x(utic);
+        int y;
+        String stic = formatTic(vtic);
+        if (isTop) {
+          y = h-1;
+          g2d.drawLine(x,y,x,y-tl);
+          y -= tl+fd;
+        } else {
+          y = 0;
+          g2d.drawLine(x,0,x,tl);
+          y += tl+fa;
+        }
+        int ws = fm.stringWidth(stic);
+        int xs = max(0,min(w-ws,x-ws/2));
+        int ys = y;
+        g2d.drawString(stic,xs,ys);
+      }
+      int wl = fm.stringWidth(_label);
+      int xl = max(0,min(w-wl,(w-wl)/2));
+      int yl = isTop?h-1-tl-fh-fd:tl+fh+fa;
+      g2d.drawString(_label,xl,yl);
+    } else {
+      g.setColor(Color.RED);
+      g.fillRect(0,0,w,h);
+      g.setColor(getForeground());
+      int ws = fm.stringWidth("Axis");
+      g.drawString("Axis",(w-ws)/2,(h+fa)/2);
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
   private Mosaic _mosaic;
   private int _placement;
   private int _index;
-  private String _label;
+  private String _format = "%1.6g";
+  private String _label = "Axis Label";
+
+  // Formats tic value, removing any trailing zeros and decimal point.
+  private String formatTic(double v) {
+    String s = String.format(_format,v);
+    int len = s.length();
+    int iend = s.indexOf('e');
+    if (iend<0)
+      iend = s.indexOf('E');
+    if (iend<0)
+      iend = len;
+    int ibeg = iend;
+    while (ibeg>0 && s.charAt(ibeg-1)=='0')
+      --ibeg;
+    if (ibeg>0 && s.charAt(ibeg-1)=='.')
+      --ibeg;
+    if (ibeg<iend) {
+      String sb = s.substring(0,ibeg);
+      s = (iend<len)?sb+s.substring(iend,len):sb;
+    }
+    return s;
+  }
+
+  private boolean isTop() {
+    return _placement==TOP;
+  }
+
+  private boolean isLeft() {
+    return _placement==LEFT;
+  }
+
+  private boolean isBottom() {
+    return _placement==BOTTOM;
+  }
+
+  private boolean isRight() {
+    return _placement==RIGHT;
+  }
 
   private boolean isHorizontal() {
     return _placement==TOP || _placement==BOTTOM;
@@ -128,5 +265,31 @@ public class TileAxis extends JPanel {
 
   private int countTicChars() {
     return 8;
+  }
+
+  private Tile getTile() {
+    if (isTop()) {
+      return _mosaic.getTile(0,_index);
+    } else if (isLeft()) {
+      return _mosaic.getTile(_index,0);
+    } else if (isBottom()) {
+      int irow = _mosaic.countRows()-1;
+      return _mosaic.getTile(irow,_index);
+    } else if (isRight()) {
+      int icol = _mosaic.countColumns()-1;
+      return _mosaic.getTile(_index,icol);
+    } else {
+      return null;
+    }
+  }
+  
+  private Projector getProjector() {
+    return (isHorizontal()) ?
+      getTile().getHorizontalProjector() :
+      getTile().getVerticalProjector();
+  }
+  
+  private Transcaler getTranscaler() {
+    return getTile().getTranscaler();
   }
 }
