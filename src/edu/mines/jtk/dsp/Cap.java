@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import java.util.Random;
 import edu.mines.jtk.util.Complex;
 import static edu.mines.jtk.util.MathPlus.*;
 
@@ -217,6 +218,60 @@ public class Cap {
   }
 
   ///////////////////////////////////////////////////////////////////////////
+  // rand
+  public static float[] rand(int n1) {
+    return rand(_random,n1);
+  }
+  public static float[][] rand(int n1, int n2) {
+    return rand(_random,n1,n2);
+  }
+  public static float[][][] rand(int n1, int n2, int n3) {
+    return rand(_random,n1,n2,n3);
+  }
+  public static void rand(float[] cx) {
+    rand(_random,cx);
+  }
+  public static void rand(float[][] cx) {
+    rand(_random,cx);
+  }
+  public static void rand(float[][][] cx) {
+    rand(_random,cx);
+  }
+  public static float[] rand(Random random, int n1) {
+    float[] cx = new float[n1];
+    rand(random,cx);
+    return cx;
+  }
+  public static float[][] rand(Random random, int n1, int n2) {
+    float[][] cx = new float[n2][n1];
+    rand(random,cx);
+    return cx;
+  }
+  public static float[][][] rand(Random random, int n1, int n2, int n3) {
+    float[][][] cx = new float[n3][n2][n1];
+    rand(random,cx);
+    return cx;
+  }
+  public static void rand(Random random, float[] cx) {
+    int n1 = cx.length/2;
+    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+      cx[ir] = random.nextFloat();
+      cx[ii] = random.nextFloat();
+    }
+  }
+  public static void rand(Random random, float[][] cx) {
+    int n2 = cx.length;
+    for (int i2=0; i2<n2; ++i2)
+      rand(random,cx[i2]);
+  }
+  public static void rand(Random random, float[][][] cx) {
+    int n3 = cx.length;
+    for (int i3=0; i3<n3; ++i3)
+      rand(random,cx[i3]);
+  }
+  private static Random _random = new Random();
+
+  ///////////////////////////////////////////////////////////////////////////
   // equal
   public static boolean equal(float[] cx, float[] cy) {
     int n1 = cx.length/2;
@@ -242,38 +297,32 @@ public class Cap {
     }
     return true;
   }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // almostEqual
-  public static boolean almostEqual(
-    float tolerance, float[] cx, float[] cy) {
+  public static boolean equal(float tolerance, float[] cx, float[] cy) {
     int n1 = cx.length/2;
     for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
-      if (!almostEqual(tolerance,cx[ir],cy[ir]) || 
-          !almostEqual(tolerance,cx[ii],cy[ii])) 
+      if (!equal(tolerance,cx[ir],cy[ir]) || 
+          !equal(tolerance,cx[ii],cy[ii])) 
         return false;
     }
     return true;
   }
-  public static boolean almostEqual(
-    float tolerance, float[][] cx, float[][] cy) {
+  public static boolean equal(float tolerance, float[][] cx, float[][] cy) {
     int n2 = cx.length;
     for (int i2=0; i2<n2; ++i2) {
-      if (!almostEqual(tolerance,cx[i2],cy[i2]))
+      if (!equal(tolerance,cx[i2],cy[i2]))
         return false;
     }
     return true;
   }
-  public static boolean almostEqual(
-    float tolerance, float[][][] cx, float[][][] cy) {
+  public static boolean equal(float tolerance, float[][][] cx, float[][][] cy) {
     int n3 = cx.length;
     for (int i3=0; i3<n3; ++i3) {
-      if (!almostEqual(tolerance,cx[i3],cy[i3]))
+      if (!equal(tolerance,cx[i3],cy[i3]))
         return false;
     }
     return true;
   }
-  private static boolean almostEqual(float tolerance, float ra, float rb) {
+  private static boolean equal(float tolerance, float ra, float rb) {
     return (ra<rb)?rb-ra<=tolerance:ra-rb<=tolerance;
   }
 

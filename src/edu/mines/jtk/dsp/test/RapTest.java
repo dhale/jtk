@@ -30,20 +30,28 @@ public class RapTest extends TestCase {
     float rb1 = 1.0f;
     float rb2 = 2.0f;
     float rb3 = 4.0f;
-    float tolerance = 10.0f*FLT_EPSILON;
     float[][][] rx,ry,rz;
 
-    assertTrue(Rap.equal(Rap.zero(n1,n2,n3),Rap.fill(r0,n1,n2,n3)));
+    assertEqual(Rap.zero(n1,n2,n3),Rap.fill(r0,n1,n2,n3));
 
     rx = Rap.ramp(ra,rb1,rb2,rb3,n1,n2,n3);
-    assertTrue(Rap.equal(rx,Rap.sub(Rap.add(rx,rx),rx)));
-    assertTrue(Rap.equal(rx,Rap.sub(Rap.add(rx,ra),ra)));
-    assertTrue(Rap.equal(Rap.fill(ra,n1,n2,n3),Rap.sub(Rap.add(ra,rx),rx)));
+    assertEqual(rx,Rap.sub(Rap.add(rx,rx),rx));
+    assertEqual(rx,Rap.sub(Rap.add(rx,ra),ra));
+    assertEqual(Rap.fill(ra,n1,n2,n3),Rap.sub(Rap.add(ra,rx),rx));
 
     rx = Rap.ramp(ra,rb1,rb2,rb3,n1,n2,n3);
-    assertTrue(Rap.equal(rx,Rap.div(Rap.mul(rx,rx),rx)));
-    assertTrue(Rap.equal(rx,Rap.div(Rap.mul(rx,ra),ra)));
-    assertTrue(Rap.equal(Rap.fill(ra,n1,n2,n3),Rap.div(Rap.mul(ra,rx),rx)));
+    assertEqual(rx,Rap.div(Rap.mul(rx,rx),rx));
+    assertEqual(rx,Rap.div(Rap.mul(rx,ra),ra));
+    assertEqual(Rap.fill(ra,n1,n2,n3),Rap.div(Rap.mul(ra,rx),rx));
+
+    rx = Rap.ramp(ra,rb1,rb2,rb3,n1,n2,n3);
+    assertEqual(rx,Rap.log(Rap.exp(rx)));
+
+    rx = Rap.ramp(ra,rb1,rb2,rb3,n1,n2,n3);
+    assertAlmostEqual(rx,Rap.mul(Rap.sqrt(rx),Rap.sqrt(rx)));
+
+    rx = Rap.ramp(ra,rb1,rb2,rb3,n1,n2,n3);
+    assertAlmostEqual(rx,Rap.pow(Rap.sqrt(rx),2.0f));
 
     rx = Rap.ramp(ra,rb1,rb2,rb3,n1,n2,n3);
     int[] imax = {-1,-1,-1};
@@ -52,12 +60,23 @@ public class RapTest extends TestCase {
     assertEquals(n1-1,imax[0]);
     assertEquals(n2-1,imax[1]);
     assertEquals(n3-1,imax[2]);
+
+    rx = Rap.ramp(ra,rb1,rb2,rb3,n1,n2,n3);
     int[] imin = {-1,-1,-1};
     float rmin = Rap.findMin(rx,imin);
     assertTrue(rmin==rx[0][0][0]);
     assertEquals(0,imin[0]);
     assertEquals(0,imin[1]);
     assertEquals(0,imin[2]);
+  }
+
+  private void assertEqual(float[][][] rx, float[][][] ry) {
+    assertTrue(Rap.equal(rx,ry));
+  }
+
+  private void assertAlmostEqual(float[][][] rx, float[][][] ry) {
+    float tolerance = 100.0f*FLT_EPSILON;
+    assertTrue(Rap.equal(tolerance,rx,ry));
   }
 
   private void printError(float[][][] rx, float[][][] ry) {

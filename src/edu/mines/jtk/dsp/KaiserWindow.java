@@ -18,7 +18,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * For definiteness, we assume that the Kaiser window is a function w(x) 
  * of argument x. Then, the window length is that range of x, centered 
  * about x = 0, for which the Kaiser window is non-zero. In other words, 
- * w(x) = 0 for x &gt; length/2. When windowing functions of time, both 
+ * w(x) = 0 for |x| &gt; length/2. When windowing functions of time, both 
  * the window length and the argument x of w(x) have dimensions of time. 
  * <p>
  * The transition width is the width of the central lobe in the Fourier 

@@ -255,8 +255,8 @@ public class FftReal {
    * numbers to an output array ry[nfft][n1] of nfft*n1 real numbers.
    * @param sign the sign (1 or -1) of the exponent used in the FFT.
    * @param n1 the 1st dimension of arrays.
-   * @param rx the input array.
-   * @param cy the output array.
+   * @param cx the input array.
+   * @param ry the output array.
    */
   public void complexToReal2(int sign, int n1, float[][] cx, float[][] ry) {
     Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
