@@ -170,6 +170,7 @@ public class Tile extends JPanel {
 
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
+    /*
     int width = getWidth();
     int height = getHeight();
     //g.setColor(Color.GREEN);
@@ -181,9 +182,11 @@ public class Tile extends JPanel {
     int y = height/2+sh/2;
     g.setColor(Color.BLACK);
     g.drawString("Tile",x,y);
+    */
     for (TiledView tv : _tvs) {
       Graphics2D g2d = (Graphics2D)g.create();
       tv.paint(g2d);
+      g2d.dispose();
     }
   }
 
@@ -287,5 +290,7 @@ public class Tile extends JPanel {
         bvp.merge(tv.getBestVerticalProjector());
       }
     }
+    _bhp = bhp;
+    _bvp = bvp;
   }
 }

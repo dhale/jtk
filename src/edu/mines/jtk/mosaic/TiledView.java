@@ -90,23 +90,25 @@ public abstract class TiledView {
       }
     }
   }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // package
   
   /**
-   * Called during alignment of this tiled view by its tile.
+   * Gets the best horizontal projector for this tiled view.
+   * @return the best horizontal projector; by reference, not by copy.
    */
-  Projector getBestHorizontalProjector() {
+  protected Projector getBestHorizontalProjector() {
     return _bhp;
   }
   
   /**
-   * Called during alignment of this tiled view by its tile.
+   * Gets the best vertical projector for this tiled view.
+   * @return the best vertical projector; by reference, not by copy.
    */
-  Projector getBestVerticalProjector() {
+  protected Projector getBestVerticalProjector() {
     return _bvp;
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // package
 
   /**
    * Called by the tile when this tiled view is added or removed.

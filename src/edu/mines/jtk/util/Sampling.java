@@ -34,6 +34,7 @@ public class Sampling {
    * @param f the first sample value.
    */
   public Sampling(int n, double d, double f) {
+    Check.argument(0<=n,"n is not less than zero");
     _n = n;
     _d = (_n<2)?0.0:d;
     _f = (_n<1)?0.0:f;
@@ -80,6 +81,14 @@ public class Sampling {
   }
 
   /**
+   * Gets the last sample value. Returns zero, if this sampling is empty.
+   * @return the last sample value.
+   */
+  public double getLast() {
+    return (_n==0)?0.0:(_v!=null)?_v[_n-1]:_f+(_n-1)*_d;
+  }
+
+  /**
    * Gets the sample value with specified index.
    * @param i the index.
    * @return the sample value.
@@ -110,7 +119,7 @@ public class Sampling {
    * @return true, if no samples; false, otherwise.
    */
   public boolean isEmpty() {
-    return _n>0;
+    return _n==0;
   }
 
   /**
