@@ -42,7 +42,6 @@ public class GlContext {
    */
   public GlContext(java.awt.Canvas canvas) {
     _peer = makeGlAwtCanvasContext(canvas);
-    init();
   }
 
   /**
@@ -58,6 +57,8 @@ public class GlContext {
     Gl.setContext(this);
     boolean locked = lock(_peer);
     Check.state(locked,"this OpenGL context has been locked");
+    if (!_gotProcAddresses)
+      getProcAddresses();
   }
 
   /**
@@ -106,6 +107,7 @@ public class GlContext {
 
   private long _peer; // C++ peer of this OpenGL context
   private ReentrantLock _lock = new ReentrantLock(); // mutual exclusion lock
+  private boolean _gotProcAddresses;
 
   private static native void killGlContext(long peer);
   private static native long makeGlAwtCanvasContext(java.awt.Canvas canvas);
@@ -165,7 +167,7 @@ public class GlContext {
   // OpenGL 1.5
   long glGenQueries;
 
-  private void init() {
+  private void getProcAddresses() {
     // OpenGL 1.2
     glBlendColor = getProcAddress("glBlendColor");
     glBlendEquation = getProcAddress("glBlendEquation");
@@ -212,6 +214,9 @@ public class GlContext {
     glBlendFuncSeparate = getProcAddress("glBlendFuncSeparate");
     // OpenGL 1.5
     glGenQueries = getProcAddress("glGenQueries");
+
+    // Do this only once.
+    _gotProcAddresses = true;
   }
   private static native long getProcAddress(String functionName);
 
