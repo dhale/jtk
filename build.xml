@@ -112,17 +112,31 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <property name="jdk.home" value="${env.JDK_HOME}"/>
     <property name="vc.include" value="${vc.home}\include"/>
     <property name="sdk.include" value="${sdk.home}\include"/>
-    <property name="jdk.include" value="${jdk.home}/include"/>
+    <property name="jdk.include" value="${jdk.home}\include"/>
     <jnicpp 
         srcdir="${src.jves}/bench" 
         objdir="${obj.jves}/bench"
         jnidir="${build.jni}" 
         jniname="edu_mines_jves_bench">
-      <incarg arg="/I${java.include}"/>
-      <incarg arg="/I${java.include}\win32"/>
+      <incarg arg="/I${jdk.include}"/>
+      <incarg arg="/I${jdk.include}\win32"/>
       <incarg arg="/I${vc.include}"/>
       <incarg arg="/I${sdk.include}"/>
       <libarg arg="openGL32.lib"/>
+      <libarg arg="jawt.lib"/>
+    </jnicpp>
+    <jnicpp 
+        srcdir="${src.jves}/opengl" 
+        objdir="${obj.jves}/opengl"
+        jnidir="${build.jni}" 
+        jniname="edu_mines_jves_opengl">
+      <incarg arg="/I${jdk.include}"/>
+      <incarg arg="/I${jdk.include}\win32"/>
+      <incarg arg="/I${vc.include}"/>
+      <incarg arg="/I${sdk.include}"/>
+      <libarg arg="openGL32.lib"/>
+      <libarg arg="gdi32.lib"/>
+      <libarg arg="jawt.lib"/>
     </jnicpp>
   </target>
 
