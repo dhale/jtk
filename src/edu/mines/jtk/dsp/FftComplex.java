@@ -9,14 +9,17 @@ package edu.mines.jtk.dsp;
 import edu.mines.jtk.util.Check;
 
 /**
- * Fast Fourier transform of complex-valued sequences.
+ * Fast Fourier transform of complex-valued sequences. Complex numbers 
+ * are packed into arrays of floats as [real0, imag0, real1, imag1, ...],
+ * where realk and imagk correspond the real and imaginary parts of the
+ * k'th complex number, respectively.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.03.18
  */
 public class FftComplex {
 
   public static void main(String[] args) {
-    int n = 13;
+    int n = 12;
     float[] ca = new float[2*n];
     ca[2] = 1.0f;
     FftComplex fft = FftComplex.small(n);
@@ -25,40 +28,101 @@ public class FftComplex {
       System.out.println("("+ca[j]+","+ca[j+1]+")");
   }
 
-  public enum Sign {PLUS,MINUS};
-
+  /**
+   * Constructs a new FFT, with specified length. The FFT length must be 
+   * valid, and valid lengths can be obtained by calling the methods 
+   * {@link #nfftSmall(int)} and {@link #nfftFast(int)}. Alternatively, 
+   * the methods {@link #small(int)} and {@link #fast(int)} return an 
+   * FFT with valid length.
+   * @param nfft the FFT length, which must be valid.
+   */
   public FftComplex(int nfft) {
-    Check.argument(true,"nfft is valid");
+    boolean valid = false;
+    for (int itable=0; itable<NTABLE && !valid; ++itable)
+      valid = _ntable[itable]==nfft;
+    Check.argument(valid,"FFT length nfft="+nfft+" is valid");
     _nfft = nfft;
   }
 
+  /**
+   * Gets the FFT length for this FFT.
+   * @return the FFT length.
+   */
   public int getNfft() {
     return _nfft;
   }
 
-  public void forward(float[] cx, float[] cy) {
+  /**
+   * Performs a fast Fourier transform. Both the input and output arrays 
+   * must have length not less than 2*nfft, where nfft is the FFT length. 
+   * The transform may be performed in-place, that is the input and output
+   * arrays may be the same array.
+   * @param sign the sign of the exponent used in the FFT.
+   * @param cx the input array.
+   * @param cy the output array.
+   */
+  public void complexToComplex(int sign, float[] cx, float[] cy) {
+    Check.argument(2*cx.length>=_nfft,"cx.length is sufficient");
+    Check.argument(2*cy.length>=_nfft,"cy.length is sufficient");
+    if (cx!=cy)
+      System.arraycopy(cx,0,cy,0,_nfft);
+    pfacc(_sign,_nfft,cy);
   }
 
-  public void inverse(float[] cx, float[] cy) {
+  /**
+   * Scales nfft complex numbers in the specified array by 1/nfft. 
+   * The inverse of an FFT is an FFT with opposite sign followed by
+   * this scaling.
+   */
+  public void scale(float[] cx) {
+    float s = 1.0f/(float)_nfft;
+    int n = 2*_nfft;
+    while (--n>=0)
+      cx[n] *= s;
   }
 
+  /**
+   * Returns a new FFT optimized for memory. The FFT length will be the 
+   * smallest valid length that is not less than the specified length n.
+   * @param n the lower bound on FFT length.
+   * @return the FFT.
+   */
   public static FftComplex small(int n) {
     return new FftComplex(n);
   }
 
+  /**
+   * Returns a new FFT optimized for speed. The FFT length will be the 
+   * fastest valid length that is not less than the specified length n.
+   * @param n the lower bound on FFT length.
+   * @return the FFT.
+   */
   public static FftComplex fast(int n) {
     return new FftComplex(n);
   }
 
-  public static int getNfftSmall(int n) {
+  /**
+   * Returns an FFT length optimized for memory. The FFT length will be the 
+   * smallest valid length that is not less than the specified length n.
+   * @param n the lower bound on FFT length.
+   * @return the FFT length.
+   */
+  public static int nfftSmall(int n) {
     return n;
   }
 
-  public static int getNfftFast(int n) {
+  /**
+   * Returns an FFT length optimized for speed. The FFT length will be the 
+   * fastest valid length that is not less than the specified length n.
+   * @param n the lower bound on FFT length.
+   * @return the FFT length.
+   */
+  public static int nfftFast(int n) {
     return n;
   }
 
   private int _nfft;
+  private int _sign;
 
   private static void pfacc(int isign, int n, float[] z) {
 
@@ -90,7 +154,7 @@ public class FftComplex {
       if (isign<0)
         mu = ifac-mu;
 
-      // Stride, limit, and indices.
+      // Array stride, bound, and indices.
       int jinc = 2*mm;
       int jmax = 2*n;
       int j0 = 0;
