@@ -41,13 +41,19 @@ public class Mosaic extends JPanel {
     _ncol = ncol;
     _axesPlacement = axesPlacement;
     _borderStyle = borderStyle;
+
+    // Tiles.
     _tiles = new Tile[nrow][ncol];
+    _tileList = new ArrayList<Tile>();
     for (int irow=0; irow<nrow; ++irow) {
       for (int icol=0; icol<ncol; ++icol) {
         Tile tile = _tiles[irow][icol] = new Tile(this,irow,icol);
         _tileList.add(tile);
       }
     }
+
+    // Tile axes.
+    _axisList = new ArrayList<TileAxis>();
     if ((axesPlacement&AXES_TOP)!=0) {
       _axesTop = new TileAxis[ncol];
       for (int icol=0; icol<ncol; ++icol) {
@@ -80,18 +86,24 @@ public class Mosaic extends JPanel {
         _axisList.add(axis);
       }
     }
+
+    // Width elastic and minimum for each column.
     _we = new int[ncol];
     _wm = new int[ncol];
     for (int icol=0; icol<ncol; ++icol) {
       _we[icol] = 100;
       _wm[icol] = 100;
     }
+
+    // Height elastic and minimum for each row.
     _he = new int[nrow];
     _hm = new int[nrow];
     for (int irow=0; irow<nrow; ++irow) {
       _he[irow] = 100;
       _hm[irow] = 100;
     }
+
+    // Borders for tiles and axes.
     if (_borderStyle==BORDER_FLAT) {
       _borderTile = BorderFactory.createLineBorder(getForeground());
       _borderAxis = null;
@@ -99,6 +111,13 @@ public class Mosaic extends JPanel {
       _borderTile = BorderFactory.createLoweredBevelBorder();
       _borderAxis = _borderTile;
     }
+
+    // Mode manager.
+    _modeManager = new ModeManager();
+    for (Tile tile : _tileList)
+      _modeManager.add(tile);
+    for (TileAxis axis : _axisList)
+      _modeManager.add(axis);
   }
 
   /**
@@ -211,6 +230,14 @@ public class Mosaic extends JPanel {
    */
   public void setHeightElastic(int irow, int heightElastic) {
     _he[irow] = heightElastic;
+  }
+
+  /**
+   * Gets the mode manager for this mosaic.
+   * @return the mode manager.
+   */
+  public ModeManager getModeManager() {
+    return _modeManager;
   }
 
   // Override base class implementation.
@@ -480,14 +507,15 @@ public class Mosaic extends JPanel {
   private TileAxis[] _axesLeft; // array[nrow] of left axes; null, if none
   private TileAxis[] _axesBottom; // array[ncol] of bottom axes; null, if none
   private TileAxis[] _axesRight; // array[nrow] of right axes; null, if none
-  private ArrayList<Tile> _tileList = new ArrayList<Tile>();
-  private ArrayList<TileAxis> _axisList = new ArrayList<TileAxis>();
+  private ArrayList<Tile> _tileList; // simple list of all tiles
+  private ArrayList<TileAxis> _axisList; // simple list of all axes
   private int[] _wm; // array[ncol] of width minimums
   private int[] _we; // array[ncol] of width elastics
   private int[] _hm; // array[nrow] of height minimums
   private int[] _he; // array[nrow] of height elastics
-  private Border _borderTile;
-  private Border _borderAxis;
+  private Border _borderTile; // border for all tiles
+  private Border _borderAxis; // border for all axes
+  private ModeManager _modeManager; // mode manager
 
   private void repaintAxis(TileAxis[] axes, int index) {
     if (axes!=null)

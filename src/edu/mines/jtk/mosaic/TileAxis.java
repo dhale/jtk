@@ -32,11 +32,11 @@ public class TileAxis extends JPanel {
   public static final int RIGHT = 4;
 
   /**
-   * Gets the placement of this axis.
-   * @return the placement.
+   * Gets the mosaic that contains this axis.
+   * @return the mosaic.
    */
-  public int getPlacement() {
-    return _placement;
+  public Mosaic getMosaic() {
+    return _mosaic;
   }
 
   /**
@@ -45,6 +45,64 @@ public class TileAxis extends JPanel {
    */
   public int getIndex() {
     return _index;
+  }
+
+  /**
+   * Gets the placement of this axis.
+   * @return the placement.
+   */
+  public int getPlacement() {
+    return _placement;
+  }
+
+  /**
+   * Determines whether this axis is placed at top of mosaic.
+   * @return true, if at top; false, otherwise.
+   */
+  public boolean isTop() {
+    return _placement==TOP;
+  }
+
+  /**
+   * Determines whether this axis is placed at left of mosaic.
+   * @return true, if at left; false, otherwise.
+   */
+  public boolean isLeft() {
+    return _placement==LEFT;
+  }
+
+  /**
+   * Determines whether this axis is placed at bottom of mosaic.
+   * @return true, if at bottom; false, otherwise.
+   */
+  public boolean isBottom() {
+    return _placement==BOTTOM;
+  }
+
+  /**
+   * Determines whether this axis is placed at right of mosaic.
+   * @return true, if at right; false, otherwise.
+   */
+  public boolean isRight() {
+    return _placement==RIGHT;
+  }
+
+  /**
+   * Determines whether this axis is placed at top or bottom of mosaic.
+   * An axis placed at the top or bottom is a horizontal axis.
+   * @return true, if horizontal (at top or bottom); false, otherwise.
+   */
+  public boolean isHorizontal() {
+    return _placement==TOP || _placement==BOTTOM;
+  }
+
+  /**
+   * Determines whether this axis is placed at left or right of mosaic.
+   * An axis placed at the left or right is a vertical axis.
+   * @return true, if vertical (at left or right); false, otherwise.
+   */
+  public boolean isVertical() {
+    return _placement==LEFT || _placement==RIGHT;
   }
 
   /**
@@ -320,30 +378,6 @@ public class TileAxis extends JPanel {
       s = (iend<len)?sb+s.substring(iend,len):sb;
     }
     return s;
-  }
-
-  private boolean isTop() {
-    return _placement==TOP;
-  }
-
-  private boolean isLeft() {
-    return _placement==LEFT;
-  }
-
-  private boolean isBottom() {
-    return _placement==BOTTOM;
-  }
-
-  private boolean isRight() {
-    return _placement==RIGHT;
-  }
-
-  private boolean isHorizontal() {
-    return _placement==TOP || _placement==BOTTOM;
-  }
-
-  private boolean isVertical() {
-    return _placement==LEFT || _placement==RIGHT;
   }
 
   private Tile getTile() {
