@@ -14,8 +14,26 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 /**
- * A mosaic of tiles and tile axes. A mosaic manages the geometry (layout)
- * and the world and normalized coordinate systems of its tiles.
+ * A mosaic of tiles and tile axes. A mosaic lays out its tiles in a matrix,
+ * with a specified number of rows and columns. It manages the world and
+ * normalized coordinate systems of those tiles, so that tiles zoom and
+ * scroll consistently. 
+ * <p>
+ * For example, when the the view rectangle (in normalized coordinates)
+ * of a tile is set, perhaps while zooming or scrolling, then that tile's 
+ * mosaic changes the view rectangles of any other tiles in the same row 
+ * or column accordingly, so that they all zoom and scroll together.
+ * <p>
+ * A mosaic can also manage axes at the top, left, bottom, and/or right
+ * sides of its matrix of tiles. These axes annotate the adjacent tiles,
+ * and mosaic ensures that they too zoom and scroll consistent with any
+ * changes to the view rectangles of those tiles.
+ * <p>
+ * A mosaic also manages a horizontal scrollbar for each column and a
+ * vertical scrollbar for each row. The mosaic shows scrollbars for only
+ * those dimensions of view rectangles that are zoomed. In other words,
+ * scrollbars are visible and consume space only when they are needed.
+ *
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.27
  */
@@ -762,6 +780,8 @@ public class Mosaic extends JPanel {
       _settingInternal = true;
       setVisibleAmount((int)(e*SCROLL_MAX+0.5));
       setVisible(getVisibleAmount()<SCROLL_MAX);
+      setUnitIncrement((int)(0.05*e*SCROLL_MAX+0.5));
+      setBlockIncrement((int)(0.50*e*SCROLL_MAX+0.5));
       _settingInternal = false;
     }
     double getV() {
