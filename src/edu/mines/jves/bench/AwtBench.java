@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jves.bench;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -20,6 +21,32 @@ import edu.mines.jves.util.Stopwatch;
 public class AwtBench {
 
   public static void main(String[] args) {
+    testNative();
+    //benchPrimitives();
+  }
+
+  private static void testNative() {
+    Frame frame = new Frame();
+    frame.setBounds(100,100,500,200);
+    frame.add(new NativeCanvas());
+    frame.addWindowListener(new WindowAdapter() {
+      public void windowClosing(WindowEvent event) {
+        System.exit(0);
+      }
+    });
+    frame.show();
+  }
+  private static class NativeCanvas extends Canvas {
+    public void paint(Graphics g) {
+      paintNative(this);
+    }
+    private static native void paintNative(Canvas canvas);
+    static {
+      System.loadLibrary("edu_mines_jves_bench");
+    }
+  }
+
+  private static void benchPrimitives() {
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.getContentPane().add(new MyPanel());
