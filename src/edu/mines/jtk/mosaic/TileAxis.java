@@ -49,9 +49,9 @@ public class TileAxis extends Canvas {
     _mosaic = mosaic;
     _placement = placement;
     _index = index;
-    addPaintListener(new PaintListener() {
-      public void paintControl(PaintEvent pe) {
-        doPaint(pe);
+    addListener(SWT.Paint, new Listener() {
+      public void handleEvent(Event e) {
+        onPaint(e);
       }
     });
   }
@@ -105,6 +105,27 @@ public class TileAxis extends Canvas {
   }
 
   ///////////////////////////////////////////////////////////////////////////
+  // package
+
+  /**
+   * Paints this axis. Typically, this method is called by our paint 
+   * listener, in response to a paint event. However, it may also be 
+   * called by our mosaic, if exporting to an image or other drawable.
+   * @param gc the GC with which to paint.
+   * @param width the width of the drawable, in pixels.
+   * @param height the height of the drawable, in pixels.
+   */
+  void paint(GC gc, int width, int height) {
+    gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_RED));
+    gc.fillRectangle(0,0,width,height);
+    Point extent = gc.stringExtent("Axis");
+    int x = width/2-extent.x/2;
+    int y = height/2-extent.y/2;
+    gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
+    gc.drawString("Axis",x,y);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
   // private
 
   private Mosaic _mosaic;
@@ -112,18 +133,10 @@ public class TileAxis extends Canvas {
   private int _index;
   private String _label;
 
-  private void doPaint(PaintEvent pe) {
-    GC gc = pe.gc;
+  private void onPaint(Event e) {
+    PaintEvent pe = new PaintEvent(e);
     Point size = getSize();
-    int w = size.x;
-    int h = size.y;
-    gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_RED));
-    gc.fillRectangle(0,0,w,h);
-    Point extent = gc.stringExtent("Axis");
-    int x = w/2-extent.x/2;
-    int y = h/2-extent.y/2;
-    gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
-    gc.drawString("Axis",x,y);
+    paint(pe.gc,size.x,size.y);
   }
 
   private boolean isHorizontal() {

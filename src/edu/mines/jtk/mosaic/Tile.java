@@ -82,17 +82,17 @@ public class Tile extends Canvas {
     _icol = icol;
     addListener(SWT.Dispose, new Listener() {
       public void handleEvent(Event e) {
-        onDispose();
+        onDispose(e);
       }
     });
     addListener(SWT.Resize, new Listener() {
       public void handleEvent(Event e) {
-        onResize();
+        onResize(e);
       }
     });
     addListener(SWT.Paint, new Listener() {
       public void handleEvent(Event e) {
-        onPaint(new PaintEvent(e));
+        onPaint(e);
       }
     });
   }
@@ -137,6 +137,24 @@ public class Tile extends Canvas {
     }
   }
 
+  /**
+   * Paints this tile. Typically, this method is called by our paint 
+   * listener, in response to a paint event. However, it may also be 
+   * called by our mosaic, if exporting to an image or other drawable.
+   * @param gc the GC with which to paint.
+   * @param width the width of the drawable, in pixels.
+   * @param height the height of the drawable, in pixels.
+   */
+  void paint(GC gc, int width, int height) {
+    gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_GREEN));
+    gc.fillRectangle(0,0,width,height);
+    Point extent = gc.stringExtent("Tile");
+    int x = width/2-extent.x/2;
+    int y = height/2-extent.y/2;
+    gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
+    gc.drawString("Tile",x,y);
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -150,28 +168,20 @@ public class Tile extends Canvas {
   private Projector _bvp = null;
   private Transcaler _ts = new Transcaler(1,1);
 
-  private void onDispose() {
+  private void onDispose(Event e) {
   }
 
-  private void onResize() {
+  private void onResize(Event e) {
     Point size = getSize();
     int w = size.x;
     int h = size.y;
     _ts.setSize(w,h);
   }
 
-  private void onPaint(PaintEvent pe) {
-    GC gc = pe.gc;
+  private void onPaint(Event e) {
+    PaintEvent pe = new PaintEvent(e);
     Point size = getSize();
-    int w = size.x;
-    int h = size.y;
-    gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_GREEN));
-    gc.fillRectangle(0,0,w,h);
-    Point extent = gc.stringExtent("Axis");
-    int x = w/2-extent.x/2;
-    int y = h/2-extent.y/2;
-    gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
-    gc.drawString("Tile",x,y);
+    paint(pe.gc,size.x,size.y);
   }
 
   private void updateBestProjectors() {

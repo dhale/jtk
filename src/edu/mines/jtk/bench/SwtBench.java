@@ -6,7 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.bench;
 
+import java.io.*;
 import java.util.*;
+import java.awt.image.*;
+import javax.imageio.*;
+import javax.imageio.stream.*;
+
 import org.eclipse.swt.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
@@ -23,7 +28,193 @@ import edu.mines.jtk.util.Stopwatch;
 public class SwtBench {
 
   public static void main(String[] args) {
-    benchPrimitives();
+    testImage();
+    //listScalableFonts();
+    //testLineWidth();
+    //benchPrimitives();
+  }
+
+  public static void testImage() {
+    final Display display = new Display();
+
+    Image image = createTestImage(display,600,600);
+    System.out.print("Converting image to buffered image ... ");
+    BufferedImage bi = convertToBufferedImage(image);
+    System.out.println("done.");
+    try {
+      writeToPng(bi,"/tmp/junk.png");
+    } catch (IOException ioe) {
+      System.out.println(ioe.getMessage());
+    }
+
+    Shell shell = new Shell(display);
+    shell.setLayout(new FillLayout());
+    Canvas canvas = new Canvas(shell,SWT.NONE);
+    canvas.addPaintListener(new Painter() {
+      public void paintControl(PaintEvent e) {
+        GC gc = e.gc;
+        Canvas canvas = (Canvas)e.widget;
+        Point size = canvas.getSize();
+        int width = size.x;
+        int height = size.y;
+        Image image = createTestImage(display,width,height);
+        gc.drawImage(image,0,0);
+        image.dispose();
+      }
+    });
+    shell.setBounds(100,100,600,600);
+    shell.open();
+    while (!shell.isDisposed()) {
+      if (!display.readAndDispatch())
+        display.sleep();
+    }
+    display.dispose();
+  }
+  private static Image createTestImage(Display display, int width, int height) {
+    Image image = new Image(display,width,height);
+    Rectangle bounds = image.getBounds();
+    GC gc = new GC(image);
+    gc.setBackground(display.getSystemColor(SWT.COLOR_BLUE));
+    gc.fillRectangle(bounds);
+    gc.setBackground(display.getSystemColor(SWT.COLOR_GREEN));
+    gc.fillOval(0,0,bounds.width,bounds.height);
+    gc.setForeground(display.getSystemColor(SWT.COLOR_RED));
+    gc.drawLine(0,0,bounds.width-1,bounds.height-1);
+    gc.drawLine(bounds.width-1,0,0,bounds.height-1);
+    gc.dispose();
+    return image;
+  }
+  private static BufferedImage convertToBufferedImage(Image image) {
+    ImageData data = image.getImageData();
+    int w = data.width;
+    int h = data.height;
+    int d = data.depth;
+    PaletteData palette = data.palette;
+    if (palette.isDirect) {
+      int redMask = palette.redMask;
+      int greenMask = palette.greenMask;
+      int blueMask = palette.blueMask;
+      ColorModel cm = new DirectColorModel(d,redMask,greenMask,blueMask);
+      WritableRaster wr = cm.createCompatibleWritableRaster(w,h);
+      BufferedImage bi = new BufferedImage(cm,wr,false,null);
+      int[] pixel = new int[3];
+      for (int y=0; y<h; ++y) {
+        for (int x=0; x<w; ++x) {
+          int p = data.getPixel(x,y);
+          RGB rgb = palette.getRGB(data.getPixel(x,y));
+          pixel[0] = rgb.red;
+          pixel[1] = rgb.green;
+          pixel[2] = rgb.blue;
+          wr.setPixels(x,y,1,1,pixel);
+        }
+      }
+      return bi;
+    } else {
+      RGB[] rgbs = palette.getRGBs();
+      int nrgb = rgbs.length;
+      byte[] red = new byte[nrgb];
+      byte[] green = new byte[nrgb];
+      byte[] blue = new byte[nrgb];
+      for (int i=0; i<nrgb; ++i) {
+        RGB rgb = rgbs[i];
+        red[i] = (byte)rgb.red;
+        green[i] = (byte)rgb.green;
+        blue[i] = (byte)rgb.blue;
+      }
+      ColorModel cm = null;
+      int tp = data.transparentPixel;
+      if (tp!=-1) {
+        cm = new IndexColorModel(d,nrgb,red,green,blue,tp);
+      } else {
+        cm = new IndexColorModel(d,nrgb,red,green,blue);
+      }
+      WritableRaster wr = cm.createCompatibleWritableRaster(w,h);
+      BufferedImage bi = new BufferedImage(cm,wr,false,null);
+      int[] pixel = new int[1];
+      for (int y=0; y<h; ++y) {
+        for (int x=0; x<w; ++x) {
+          int p = data.getPixel(x,y);
+          pixel[0] = data.getPixel(x,y);
+          wr.setPixel(x,y,pixel);
+        }
+      }
+      return bi;
+    }
+  }
+  private static void writeToPng(BufferedImage image, String fileName) 
+    throws IOException
+  {
+    File file = new File(fileName);
+    ImageIO.write(image,"png",file);
+  }
+
+  public static void listScalableFonts() {
+    System.out.println("Scalable fonts:");
+    Display display = new Display();
+    FontData[] list = display.getFontList(null,true);
+    for (FontData fd : list) {
+      String name = fd.getName();
+      int height = fd.getHeight();
+      String style = "normal";
+      if (fd.getStyle()==(SWT.NORMAL|SWT.ITALIC)) {
+        style = "italic";
+      } else if (fd.getStyle()==SWT.BOLD) {
+        style = "bold";
+      } else if (fd.getStyle()==(SWT.BOLD|SWT.ITALIC)) {
+        style = "bold italic";
+      }
+      System.out.println(name+" "+style+" "+height);
+    }
+    display.dispose();
+  }
+
+  public static void testLineWidth() {
+    final Display display = new Display();
+    Shell shell = new Shell(display);
+    Canvas canvas = new Canvas(shell,SWT.NONE);
+    canvas.addPaintListener(new Painter() {
+      public void paintControl(PaintEvent e) {
+        GC gc = e.gc;
+        Canvas canvas = (Canvas)e.widget;
+        Point size = canvas.getSize();
+        int w = size.x;
+        int h = size.y;
+        gc.setBackground(canvas.getBackground());
+        gc.setForeground(canvas.getForeground());
+        gc.fillRectangle(0,0,w,h);
+
+        int x1 = 10;
+        int y1 = 10;
+        int x2 = w-1-x1;
+        int y2 = h-1-y1;
+        gc.drawLine(x1,y1,x2,y1);
+        gc.drawLine(x2,y1,x2,y2);
+        gc.drawLine(x2,y2,x1,y2);
+        gc.drawLine(x1,y2,x1,y1);
+        gc.drawLine(x1,y1,x2,y2);
+        gc.drawLine(x2,y1,x1,y2);
+
+        int xa = x1+50;
+        int ya = y1+50;
+        int xb = x2-50;
+        int yb = y2-50;
+        gc.setLineWidth(5); // change to see how thick lines are drawn
+        gc.drawLine(xa,y1,xb,y1);
+        gc.drawLine(x2,ya,x2,yb);
+        gc.drawLine(xa,y2,xb,y2);
+        gc.drawLine(x1,ya,x1,yb);
+        gc.drawLine(xa,ya,xb,yb);
+        gc.drawLine(xb,ya,xa,yb);
+      }
+    });
+    canvas.setSize(600,600);
+    shell.setLocation(100,100);
+    shell.open();
+    while (!shell.isDisposed()) {
+      if (!display.readAndDispatch())
+        display.sleep();
+    }
+    display.dispose();
   }
 
   public static void benchPrimitives() {
@@ -35,7 +226,7 @@ public class SwtBench {
     Painter painter = new Painter();
     canvas.addControlListener(painter);
     canvas.addPaintListener(painter);
-    shell.setBounds(100,100,800,800);
+    shell.setBounds(100,100,600,600);
     shell.open();
     while (!shell.isDisposed()) {
       if (!display.readAndDispatch())

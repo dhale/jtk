@@ -22,6 +22,11 @@ import edu.mines.jtk.util.Check;
  * [0:height-1]. This mapping can be changed, so that only a subset of the 
  * normalized coordinate unit rectangle is mapped to/from the device rectangle. 
  * That subset rectangle represents the normalized coordinate <em>bounds</em>.
+ * <p>
+ * During conversion from normalized to device coordinates, the latter are
+ * clipped to lie in the range [-32768,32767], which is the range of a 16-bit
+ * short integer. Although device coordinates are represented by ints, they 
+ * are often limited by the underlying graphics systems to this range.
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.11
@@ -43,7 +48,14 @@ public class Transcaler {
    * @return the device x-coordinate.
    */
   public int x(double xn) {
-    return (int)(_xshift+_xscale*xn+0.5);
+    if (_xclip) {
+      double xd = _xshift+_xscale*xn+0.5;
+      if (xd<DMIN) xd = DMIN;
+      if (xd>DMAX) xd = DMAX;
+      return (int)xd;
+    } else {
+      return (int)(_xshift+_xscale*xn+0.5);
+    }
   }
 
   /**
@@ -52,7 +64,14 @@ public class Transcaler {
    * @return the device y-coordinate.
    */
   public int y(double yn) {
-    return (int)(_yshift+_yscale*yn+0.5);
+    if (_yclip) {
+      double yd = _yshift+_yscale*yn+0.5;
+      if (yd<DMIN) yd = DMIN;
+      if (yd>DMAX) yd = DMAX;
+      return (int)yd;
+    } else {
+      return (int)(_yshift+_yscale*yn+0.5);
+    }
   }
 
   /**
@@ -138,6 +157,9 @@ public class Transcaler {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  private static final double DMIN = -32768.0; // device min coordinate
+  private static final double DMAX =  32767.0; // device max coordinate
+
   private int _wd,_hd;
   private double _xn = 0.0;
   private double _yn = 0.0;
@@ -145,8 +167,11 @@ public class Transcaler {
   private double _hn = 1.0;
   private double _xshift,_xscale;
   private double _yshift,_yscale;
+  private boolean _xclip,_yclip;
 
   private void computeShiftAndScale() {
+
+    // Shift and scale.
     _xn = max(0.0,min(1.0,_xn));
     _yn = max(0.0,min(1.0,_yn));
     _wn = max(0.0,min(1.0-_xn,_wn));
@@ -155,5 +180,13 @@ public class Transcaler {
     _xshift = -_xn*_xscale;
     _yscale = (_hd-1)/_hn;
     _yshift = -_yn*_yscale;
+
+    // Must we clip x and/or y coordinates?
+    double x0d = _xshift+_xscale*0.0+0.5;
+    double x1d = _xshift+_xscale*1.0+0.5;
+    double y0d = _yshift+_yscale*0.0+0.5;
+    double y1d = _yshift+_yscale*1.0+0.5;
+    _xclip = min(x0d,x1d)<DMIN || max(x0d,x1d)>DMAX;
+    _yclip = min(y0d,y1d)<DMIN || max(y0d,y1d)>DMAX;
   }
 }
