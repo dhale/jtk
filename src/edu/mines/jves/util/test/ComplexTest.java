@@ -7,8 +7,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jves.util.test;
 
 import junit.framework.*;
-import edu.mines.jves.util.M;
 import edu.mines.jves.util.Complex;
+import static edu.mines.jves.util.Complex.*;
+import static edu.mines.jves.util.M.*;
 
 /**
  * Tests {@link edu.mines.jves.util.Complex}.
@@ -23,35 +24,35 @@ public class ComplexTest extends TestCase {
 
   public void test() {
 
-    Complex a = new Complex(M.FLT_PI,M.FLT_E);
-    Complex b = new Complex(M.FLT_E,M.FLT_PI);
+    Complex a = new Complex(FLT_PI,FLT_E);
+    Complex b = new Complex(FLT_E,FLT_PI);
 
-    assertEquals(a,Complex.sub(Complex.add(a,b),b));
-    assertEquals(a,Complex.div(Complex.mul(a,b),b));
+    assertEquals(a,sub(add(a,b),b));
+    assertEquals(a,div(mul(a,b),b));
 
-    assertEquals(a,Complex.conj(Complex.conj(a)));
+    assertEquals(a,conj(conj(a)));
 
-    assertEquals(a,Complex.polar(Complex.abs(a),Complex.arg(a)));
+    assertEquals(a,polar(abs(a),arg(a)));
 
-    assertEquals(a,Complex.exp(Complex.log(a)));
+    assertEquals(a,exp(log(a)));
 
-    assertEquals(a,Complex.pow(Complex.sqrt(a),2.0f));
+    assertEquals(a,pow(sqrt(a),2.0f));
 
-    assertEquals(Complex.pow(a,b),Complex.exp(b.times(Complex.log(a))));
+    assertEquals(pow(a,b),exp(b.times(log(a))));
 
-    assertEquals(Complex.pow(a,b),Complex.exp(b.times(Complex.log(a))));
+    assertEquals(pow(a,b),exp(b.times(log(a))));
 
-    assertEquals(Complex.sin(Complex.I.times(a)),
-                 Complex.I.times(Complex.sinh(a)));
+    assertEquals(sin(I.times(a)),
+                 I.times(sinh(a)));
 
-    assertEquals(Complex.cos(Complex.I.times(a)),Complex.cosh(a));
+    assertEquals(cos(I.times(a)),cosh(a));
 
-    assertEquals(Complex.tan(Complex.I.times(a)),
-                 Complex.I.times(Complex.tanh(a)));
+    assertEquals(tan(I.times(a)),
+                 I.times(tanh(a)));
   }
 
   private void assertEquals(float expected, float actual) {
-    float small = 1.0e-6f*M.max(M.abs(expected),M.abs(actual),1.0f);
+    float small = 1.0e-6f*max(abs(expected),abs(actual),1.0f);
     assertEquals(expected,actual,small);
   }
 

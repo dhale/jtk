@@ -14,7 +14,7 @@ package edu.mines.jves.util;
 public class Complex {
 
   /**
-   * The complex constant (0.0,1.0f).
+   * The complex constant (0.0f,1.0f).
    */
   public static final Complex I = new Complex(0.0f,1.0f);
 
@@ -596,6 +596,10 @@ public class Complex {
    */
   public static Complex tanh(Complex x) {
     return sinh(x).overEquals(cosh(x));
+  }
+
+  public String toString() {
+    return ""+r+" + "+i+"j";
   }
 
   ///////////////////////////////////////////////////////////////////////////
