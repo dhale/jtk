@@ -13,6 +13,30 @@ inline static jlong fromPointer(void* pvoid) {
   return (jlong)((intptr_t)pvoid);
 }
 
+// Throw a Java Exception with the specified name.
+inline static void throwException(
+  JNIEnv* env, const char* exceptionClassName, const char* message) 
+{
+  env->ThrowNew(env->FindClass(exceptionClassName),message);
+}
+
+// Throw a Java RuntimeException with the specified name.
+inline static void throwRuntimeException(JNIEnv* env, const char* message) {
+  throwException(env,"java/lang/RuntimeException",message); 
+}
+
+// Macros that try and catch C++ exceptions thrown by native code.
+#define JNI_TRY try {
+#define JNI_CATCH \
+} catch (...) { \
+  throwRuntimeException(env,"C++ exception thrown by native code"); \
+}
+#define JNI_CATCH_RETURN(retval) \
+} catch (...) { \
+  throwRuntimeException(env,"C++ exception thrown by native code"); \
+  return retval; \
+}
+
 // Java string
 class Jstring {
 public:
