@@ -14,7 +14,7 @@ import edu.mines.jtk.util.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.14
  */
-public class Projector {
+public class Projector implements Cloneable {
 
   /**
    * Constructs a projector with specified u and v values. The
@@ -42,6 +42,14 @@ public class Projector {
   }
 
   /**
+   * Returns a clone of this projector.
+   * @return the clone.
+   */
+  public Projector clone() {
+    return new Projector(_u0,_u1,_v0,_v1);
+  }
+
+  /**
    * Converts world coordinate v to normalized coordinate u.
    * @param v world coordinate v.
    * @return normalized coordinate u.
@@ -64,6 +72,10 @@ public class Projector {
    * @param p the projector.
    */
   public void merge(Projector p) {
+
+    // Ignore null projectors.
+    if (p==null)
+      return;
 
     // Parameters for this projector A.
     double u0a = _u0;
@@ -97,6 +109,29 @@ public class Projector {
 
     // Recompute shifts and scales.
     computeShiftsAndScales();
+  }
+
+  public boolean equals(Object obj) {
+    if (this==obj)
+      return true;
+    if (obj==null || this.getClass()!=obj.getClass())
+      return false;
+    Projector that = (Projector)obj;
+    return this._u0==that._u0 && 
+           this._u1==that._u1 &&
+           this._v0==that._v0 &&
+           this._v1==that._v1;
+  }
+
+  public int hashCode() {
+    long u0bits = Double.doubleToLongBits(_u0);
+    long u1bits = Double.doubleToLongBits(_u1);
+    long v0bits = Double.doubleToLongBits(_v0);
+    long v1bits = Double.doubleToLongBits(_v1);
+    return (int)(u0bits^(u0bits>>>32) ^
+                 u1bits^(u1bits>>>32) ^
+                 v0bits^(v0bits>>>32) ^
+                 v1bits^(v1bits>>>32));
   }
 
   ///////////////////////////////////////////////////////////////////////////

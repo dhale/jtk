@@ -190,6 +190,10 @@ public class Mosaic extends Composite {
   ///////////////////////////////////////////////////////////////////////////
   // package
 
+  void alignTile(Tile tile) {
+    // TODO
+  }
+
   void needsLayout() {
     doLayout();
   }
