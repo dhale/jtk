@@ -16,8 +16,6 @@ package edu.mines.jves.util;
  */
 public class M {
 
-  // TODO: add FLT_EPSILON and DBL_EPSILON.
-
   /**
    * The double value that is closer than any other to <i>e</i>,
    * the base of the natural logarithm.
@@ -53,6 +51,16 @@ public class M {
    * the ratio of the circumference of a circle to its diameter.
    */
   public static final double DBL_PI = PI;
+
+  /**
+   * The smallest float value e such that (1+e) does not equal 1.
+   */
+  public static final float FLT_EPSILON = 1.19209290e-07f;
+
+  /**
+   * The smallest double value e such that (1+e) does not equal 1.
+   */
+  public static final double DBL_EPSILON = 2.2204460492503131e-16d;
 
   /**
    * Returns the trigonometric sine of an angle.
