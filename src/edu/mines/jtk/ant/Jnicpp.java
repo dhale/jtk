@@ -16,7 +16,7 @@ import org.apache.tools.ant.util.*;
  * Custom Ant task that builds a JNI library from C++ source files.
  * This custom task is designed to build JNI libraries for packages 
  * in edu.mines.jtk.*. It may not be suitable for other packages.
- * @author Dave Hale
+ * @author Dave Hale, Colorado School of Mines
  * @version 2004.11.04
  */
 public class Jnicpp extends MatchingTask {
