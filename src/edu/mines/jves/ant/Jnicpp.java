@@ -101,7 +101,11 @@ public class Jnicpp extends MatchingTask {
     String[] files = ds.getIncludedFiles();
     GlobPatternMapper gpm = new GlobPatternMapper();
     gpm.setFrom("*.cpp");
-    gpm.setTo("*.o");
+    if (_isLinux) {
+      gpm.setTo("*.o");
+    } else if (_isWindows) {
+      gpm.setTo("*.obj");
+    }
     SourceFileScanner sfs = new SourceFileScanner(this);
     File[] cppFiles = sfs.restrictAsFiles(files,_srcdir,_objdir,gpm);
 
@@ -130,6 +134,10 @@ public class Jnicpp extends MatchingTask {
     // If necessary, link object files into the JNI library.
     if (mustLink) {
       String[] objFiles = _objdir.list();
+      if (_isWindows) {
+        for (int i=0; i<objFiles.length; ++i)
+          objFiles[i] = _objdir.getPath() + "\\" + objFiles[i];
+      }
       int narg = _libargs.size();
       String[] libArgs = new String[narg];
       for (int iarg=0; iarg<narg; ++iarg)
@@ -158,7 +166,8 @@ public class Jnicpp extends MatchingTask {
     */
     String osName = System.getProperty("os.name");
     _isLinux = osName.equals("Linux");;
-    _isWindows = osName.equals("Windows");;
+    // TODO: handle other Windows OS
+    _isWindows = osName.equals("Windows XP");;
   }
 
   private void throwBuildException(String message) throws BuildException {
@@ -212,12 +221,13 @@ public class Jnicpp extends MatchingTask {
   private void compileVc(File objFile, File cppFile, String[] incArgs) 
     throws BuildException 
   {
-    String[] cl = {
-      "cl","/nologo","/c","/W3","/O2","/MD",
+    String[] cppArgs = {
+      "/nologo","/c","/W3","/O2","/MD","/DWIN32"
     };
+    String[] cl = {"cl",cppFile.getPath()};
+    cl = addArgs(cl,cppArgs);
     cl = addArgs(cl,incArgs);
-    cl = addArgs(cl,new String[]{"/Fo",objFile.getPath(),cppFile.getPath()});
-    System.out.println("cl = " + cl);
+    cl = addArgs(cl,new String[]{"/Fo"+objFile.getPath()});
     int exitCode = execute(cl);
     if (exitCode!=0)
       throw new BuildException("VC++ compile failed!",getLocation());
@@ -231,7 +241,6 @@ public class Jnicpp extends MatchingTask {
       linkGcc(jniFile,objFiles,libArgs);
     } else if (_isWindows) {
       linkVc(jniFile,objFiles,libArgs);
-      throwBuildException("windows not yet supported");
     }
   }
   private void linkGcc(File jniFile, String[] objFiles, String[] libArgs) 
@@ -250,12 +259,14 @@ public class Jnicpp extends MatchingTask {
   private void linkVc(File jniFile, String[] objFiles, String[] libArgs)
     throws BuildException
   {
-    String[] cl = {
-      "cl","/nologo","/LD","/MD","/link","/fixed:no","/incremental:no",
-      "/Fe"+jniFile.getPath()
+    String[] lnkArgs = {
+      "/nologo","/LD","/MD","/link","/fixed:no","/incremental:no"
     };
+    String[] cl = {"cl"};
     cl = addArgs(cl,objFiles);
+    cl = addArgs(cl,lnkArgs);
     cl = addArgs(cl,libArgs);
+    cl = addArgs(cl,new String[]{"/OUT:"+jniFile.getPath()});
     int exitCode = execute(cl,_objdir);
     if (exitCode!=0)
       throw new BuildException("VC++ link failed!",getLocation());
@@ -283,6 +294,6 @@ public class Jnicpp extends MatchingTask {
     return new File(jnidir,"lib"+jniname+".so");
   }
   private File makeJniFileWindows(File jnidir, String jniname) {
-    return new File(jnidir,"lib"+jniname+".dll");
+    return new File(jnidir,jniname+".dll");
   }
 }

@@ -1,6 +1,9 @@
 #include <stdio.h>
-#include "jni.h"
-#include "GL/gl.h"
+#include <jni.h>
+#ifdef WIN32
+#include <windows.h>
+#endif
+#include <GL/gl.h>
 
 extern "C" JNIEXPORT void JNICALL
 Java_edu_mines_jves_bench_SwtBench_printHandleNative(
