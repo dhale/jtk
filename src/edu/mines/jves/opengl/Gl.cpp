@@ -3892,22 +3892,19 @@ JNI_GL_BEGIN2
     (target,offset,size,data);
 JNI_GL_END
 
-JNI_GL_DECLARE_RETURN2(jobject,glMapBuffer1)
-  jint target, jint access, jlong size
+JNI_GL_DECLARE_RETURN2(jobject,glMapBuffer)
+  jint target, jint access, jlong capacity, jobject buffer
 JNI_GL_BEGIN2
   void* pointer = (*(PFNGLMAPBUFFERPROC)toPointer(pfunc))
     (target,access);
-  return (pointer!=0)?env->NewDirectByteBuffer(pointer,size):0;
-JNI_GL_END
-
-JNI_GL_DECLARE_RETURN2(jobject,glMapBuffer2)
-  jint target, jint access, jobject buffer
-JNI_GL_BEGIN2
-  void* pointer = (*(PFNGLMAPBUFFERPROC)toPointer(pfunc))
-    (target,access);
-  if (pointer!=0 && buffer!=0) {
-    void* p = env->GetDirectBufferAddress(buffer);
-    return (p==pointer)?buffer:0;
+  if (pointer!=0) {
+    if (buffer!=0) {
+      void* p = env->GetDirectBufferAddress(buffer);
+      if (p==pointer)
+        return buffer;
+    } else {
+      return env->NewDirectByteBuffer(pointer,capacity);
+    }
   }
   return 0;
 JNI_GL_END
