@@ -1,25 +1,27 @@
 /****************************************************************************
-Copyright (c) 2004, Colorado School of Mines and others. All rights reserved.
+Copyright (c) 2005, Colorado School of Mines and others. All rights reserved.
 This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Check;
 
 /**
  * Fast Fourier transform of complex-valued sequences. Complex numbers 
  * are packed into arrays of floats as [real0, imag0, real1, imag1, ...],
- * where realk and imagk correspond the real and imaginary parts of the
- * k'th complex number, respectively.
+ * where realk and imagk correspond to the real and imaginary parts of 
+ * the k'th complex number in the array, respectively. The FFT length
+ * nfft equals the number of <em>complex</em> numbers transformed.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.03.18
  */
 public class FftComplex {
 
   public static void main(String[] args) {
-    int n = 12;
+    int n = 16;
     float[] ca = new float[2*n];
     ca[2] = 1.0f;
     FftComplex fft = FftComplex.small(n);
@@ -29,18 +31,15 @@ public class FftComplex {
   }
 
   /**
-   * Constructs a new FFT, with specified length. The FFT length must be 
-   * valid, and valid lengths can be obtained by calling the methods 
-   * {@link #nfftSmall(int)} and {@link #nfftFast(int)}. Alternatively, 
-   * the methods {@link #small(int)} and {@link #fast(int)} return an 
-   * FFT with valid length.
+   * Constructs a new FFT, with specified length. Valid FFT lengths can 
+   * be obtained by calling the methods {@link #nfftSmall(int)} and 
+   * {@link #nfftFast(int)}. Alternatively, the methods {@link #small(int)} 
+   * and {@link #fast(int)} return an FFT with valid length.
    * @param nfft the FFT length, which must be valid.
    */
   public FftComplex(int nfft) {
-    boolean valid = false;
-    for (int itable=0; itable<NTABLE && !valid; ++itable)
-      valid = _ntable[itable]==nfft;
-    Check.argument(valid,"FFT length nfft="+nfft+" is valid");
+    boolean valid = Array.binarySearch(_ntable,nfft)>=0;
+    Check.argument(valid,"nfft="+nfft+" is valid FFT length");
     _nfft = nfft;
   }
 
@@ -66,7 +65,7 @@ public class FftComplex {
     Check.argument(2*cy.length>=_nfft,"cy.length is sufficient");
     if (cx!=cy)
       System.arraycopy(cx,0,cy,0,_nfft);
-    pfacc(_sign,_nfft,cy);
+    pfacc(sign,_nfft,cy);
   }
 
   /**
@@ -121,13 +120,33 @@ public class FftComplex {
     return n;
   }
 
-  private int _nfft;
-  private int _sign;
+  ///////////////////////////////////////////////////////////////////////////
+  // private
 
-  private static void pfacc(int isign, int n, float[] z) {
+  private int _nfft; // FFT length (number of complex numbers to transform)
+
+  /**
+   * Prime-factor complex-to-complex FFT. The FFT length nfft must be composed 
+   * of mutually prime factors from the set {2,3,4,5,7,8,9,11,13,16}. This
+   * implies that n cannot exceed 720720 = 5*7*9*11*13*16.
+   * <p>
+   * References: 
+   * <ul><li>
+   * Temperton, C., 1985, Implementation of a self-sorting in-place prime 
+   * factor fft algorithm:  Journal of Computational Physics, v. 58, 
+   * p. 283-299.
+   * </li><li>
+   * Temperton, C., 1988, A new set of minimum-add rotated rotated dft 
+   * modules: Journal of Computational Physics, v. 75, p. 190-198.
+   * </li></ul>
+   * @param sign the sign of the exponent in the Fourier transform.
+   * @param nfft the number of complex numbers to transform.
+   * @param z array[2*nfft] of nfft packed complex numbers.
+   */
+  private static void pfacc(int sign, int nfft, float[] z) {
 
     // What is left of n after dividing by factors.
-    int nleft = n;
+    int nleft = nfft;
 
     // Loop over all possible factors, from largest to smallest.
     for (int jfac=0; jfac<NFAC; ++jfac) {
@@ -140,7 +159,7 @@ public class FftComplex {
 
       // What is left of n (nleft), and n divided by the current factor (m).
       nleft = ndiv;
-      int m = n/ifac;
+      int m = nfft/ifac;
  
       // Rotation factor mu and stride mm.
       int mu = 0;
@@ -149,14 +168,12 @@ public class FftComplex {
         mu = kfac;
         mm = kfac*m;
       }
- 
-      // Rotation factor, adjusted for sign of transform.
-      if (isign<0)
+      if (sign<0)
         mu = ifac-mu;
 
       // Array stride, bound, and indices.
       int jinc = 2*mm;
-      int jmax = 2*n;
+      int jmax = 2*nfft;
       int j0 = 0;
       int j1 = j0+jinc;
 
@@ -224,9 +241,17 @@ public class FftComplex {
         pfa13(z,mu,m,j0,j1,j2,j3,j4,j5,j6,j7,j8,j9,j10,j11,j12);
         continue;
       }
+      int j13 = (j12+jinc)%jmax;
+      int j14 = (j13+jinc)%jmax;
+      int j15 = (j14+jinc)%jmax;
+
+      // Factor 16.
+      if (ifac==16) {
+        pfa16(z,mu,m,j0,j1,j2,j3,j4,j5,j6,j7,j8,j9,j10,j11,j12,j13,j14,j15);
+        continue;
+      }
     }
   }
-
   private static void pfa2(float[] z, int mu, int m,
     int j0, int j1)
   {
@@ -242,7 +267,6 @@ public class FftComplex {
       j0 = jt;
     }
   }
-
   private static void pfa3(float[] z, int mu, int m,
     int j0, int j1, int j2)
   {
@@ -271,7 +295,6 @@ public class FftComplex {
       j0 = jt;
     }
   }
-
   private static void pfa4(float[] z, int mu, int m,
     int j0, int j1, int j2, int j3)
   {
@@ -305,7 +328,6 @@ public class FftComplex {
       j0 = jt;
     }
   }
-
   private static void pfa5(float[] z, int mu, int m,
     int j0, int j1, int j2, int j3, int j4)
   {
@@ -368,7 +390,6 @@ public class FftComplex {
       j0 = jt;
     }
   }
-
   private static void pfa7(float[] z, int mu, int m,
     int j0, int j1, int j2, int j3, int j4, int j5, int j6)
   {
@@ -471,7 +492,6 @@ public class FftComplex {
       j0 = jt;
     }
   }
-
   private static void pfa8(float[] z, int mu, int m,
     int j0, int j1, int j2, int j3, int j4, int j5, int j6, int j7)
   {
@@ -554,7 +574,6 @@ public class FftComplex {
       j0 = jt;
     }
   }
-
   private static void pfa9(float[] z, int mu, int m,
     int j0, int j1, int j2, int j3, int j4, int j5, int j6, int j7, int j8)
   {
@@ -693,7 +712,6 @@ public class FftComplex {
       j0 = jt;
     }
   }
-
   private static void pfa11(float[] z, int mu, int m,
     int j0, int j1, int j2, int j3, int j4, int j5, 
     int j6, int j7, int j8, int j9, int j10)
@@ -897,7 +915,6 @@ public class FftComplex {
       j0 = jt;
     }
   }
-
   private static void pfa13(float[] z, int mu, int m,
     int j0, int j1, int j2, int j3, int j4, int j5, int j6, 
     int j7, int j8, int j9, int j10, int j11, int j12)
@@ -1163,7 +1180,221 @@ public class FftComplex {
       j0 = jt;
     }
   }
+  private static void pfa16(float[] z, int mu, int m,
+    int j0, int j1, int j2, int j3, int j4, int j5, int j6, int j7, int j8, 
+    int j9, int j10, int j11, int j12, int j13, int j14, int j15)
+  {
+    float c1,c2,c3,c4,c5,c6,c7;
+    if (mu==1) {
+      c1 =  PONE;
+      c2 =  P923;
+      c3 =  P382;
+      c4 =  P707;
+    } else if (mu==3) {
+      c1 = -PONE;
+      c2 =  P382;
+      c3 =  P923;
+      c4 = -P707;
+    } else if (mu==5) {
+      c1 =  PONE;
+      c2 = -P382;
+      c3 =  P923;
+      c4 = -P707;
+    } else if (mu==7) {
+      c1 = -PONE;
+      c2 = -P923;
+      c3 =  P382;
+      c4 =  P707;
+    } else if (mu==9) {
+      c1 =  PONE;
+      c2 = -P923;
+      c3 = -P382;
+      c4 =  P707;
+    } else if (mu==11) {
+      c1 = -PONE;
+      c2 = -P382;
+      c3 = -P923;
+      c4 = -P707;
+    } else if (mu==13) {
+      c1 =  PONE;
+      c2 =  P382;
+      c3 = -P923;
+      c4 = -P707;
+    } else {
+      c1 = -PONE;
+      c2 =  P923;
+      c3 = -P382;
+      c4 =  P707;
+    }
+    c5 = c1*c4;
+    c6 = c1*c3;
+    c7 = c1*c2;
+    for (int i=0; i<m; ++i) {
+      float t1r  = z[j0  ]+z[j8  ];
+      float t1i  = z[j0+1]+z[j8+1];
+      float t2r  = z[j4  ]+z[j12  ];
+      float t2i  = z[j4+1]+z[j12+1];
+      float t3r  = z[j0  ]-z[j8  ];
+      float t3i  = z[j0+1]-z[j8+1];
+      float t4r  = c1*(z[j4  ]-z[j12  ]);
+      float t4i  = c1*(z[j4+1]-z[j12+1]);
+      float t5r  = t1r+t2r;
+      float t5i  = t1i+t2i;
+      float t6r  = t1r-t2r;
+      float t6i  = t1i-t2i;
+      float t7r  = z[j1  ]+z[j9  ];
+      float t7i  = z[j1+1]+z[j9+1];
+      float t8r  = z[j5  ]+z[j13  ];
+      float t8i  = z[j5+1]+z[j13+1];
+      float t9r  = z[j1  ]-z[j9  ];
+      float t9i  = z[j1+1]-z[j9+1];
+      float t10r = z[j5  ]-z[j13  ];
+      float t10i = z[j5+1]-z[j13+1];
+      float t11r = t7r+t8r;
+      float t11i = t7i+t8i;
+      float t12r = t7r-t8r;
+      float t12i = t7i-t8i;
+      float t13r = z[j2  ]+z[j10  ];
+      float t13i = z[j2+1]+z[j10+1];
+      float t14r = z[j6  ]+z[j14  ];
+      float t14i = z[j6+1]+z[j14+1];
+      float t15r = z[j2  ]-z[j10  ];
+      float t15i = z[j2+1]-z[j10+1];
+      float t16r = z[j6  ]-z[j14  ];
+      float t16i = z[j6+1]-z[j14+1];
+      float t17r = t13r+t14r;
+      float t17i = t13i+t14i;
+      float t18r = c4*(t15r-t16r);
+      float t18i = c4*(t15i-t16i);
+      float t19r = c5*(t15r+t16r);
+      float t19i = c5*(t15i+t16i);
+      float t20r = c1*(t13r-t14r);
+      float t20i = c1*(t13i-t14i);
+      float t21r = z[j3  ]+z[j11  ];
+      float t21i = z[j3+1]+z[j11+1];
+      float t22r = z[j7  ]+z[j15  ];
+      float t22i = z[j7+1]+z[j15+1];
+      float t23r = z[j3  ]-z[j11  ];
+      float t23i = z[j3+1]-z[j11+1];
+      float t24r = z[j7  ]-z[j15  ];
+      float t24i = z[j7+1]-z[j15+1];
+      float t25r = t21r+t22r;
+      float t25i = t21i+t22i;
+      float t26r = t21r-t22r;
+      float t26i = t21i-t22i;
+      float t27r = t9r+t24r;
+      float t27i = t9i+t24i;
+      float t28r = t10r+t23r;
+      float t28i = t10i+t23i;
+      float t29r = t9r-t24r;
+      float t29i = t9i-t24i;
+      float t30r = t10r-t23r;
+      float t30i = t10i-t23i;
+      float t31r = t5r+t17r;
+      float t31i = t5i+t17i;
+      float t32r = t11r+t25r;
+      float t32i = t11i+t25i;
+      float t33r = t3r+t18r;
+      float t33i = t3i+t18i;
+      float t34r = c2*t29r-c6*t30r;
+      float t34i = c2*t29i-c6*t30i;
+      float t35r = t3r-t18r;
+      float t35i = t3i-t18i;
+      float t36r = c7*t27r-c3*t28r;
+      float t36i = c7*t27i-c3*t28i;
+      float t37r = t4r+t19r;
+      float t37i = t4i+t19i;
+      float t38r = c3*t27r+c7*t28r;
+      float t38i = c3*t27i+c7*t28i;
+      float t39r = t4r-t19r;
+      float t39i = t4i-t19i;
+      float t40r = c6*t29r+c2*t30r;
+      float t40i = c6*t29i+c2*t30i;
+      float t41r = c4*(t12r-t26r);
+      float t41i = c4*(t12i-t26i);
+      float t42r = c5*(t12r+t26r);
+      float t42i = c5*(t12i+t26i);
+      float y1r  = t33r+t34r;
+      float y1i  = t33i+t34i;
+      float y2r  = t6r+t41r;
+      float y2i  = t6i+t41i;
+      float y3r  = t35r+t40r;
+      float y3i  = t35i+t40i;
+      float y4r  = t5r-t17r;
+      float y4i  = t5i-t17i;
+      float y5r  = t35r-t40r;
+      float y5i  = t35i-t40i;
+      float y6r  = t6r-t41r;
+      float y6i  = t6i-t41i;
+      float y7r  = t33r-t34r;
+      float y7i  = t33i-t34i;
+      float y9r  = t38r-t37r;
+      float y9i  = t38i-t37i;
+      float y10r = t42r-t20r;
+      float y10i = t42i-t20i;
+      float y11r = t36r+t39r;
+      float y11i = t36i+t39i;
+      float y12r = c1*(t11r-t25r);
+      float y12i = c1*(t11i-t25i);
+      float y13r = t36r-t39r;
+      float y13i = t36i-t39i;
+      float y14r = t42r+t20r;
+      float y14i = t42i+t20i;
+      float y15r = t38r+t37r;
+      float y15i = t38i+t37i;
+      z[j0  ]  = t31r+t32r;
+      z[j0+1]  = t31i+t32i;
+      z[j1  ]  = y1r-y15i;
+      z[j1+1]  = y1i+y15r;
+      z[j2  ]  = y2r-y14i;
+      z[j2+1]  = y2i+y14r;
+      z[j3  ]  = y3r-y13i;
+      z[j3+1]  = y3i+y13r;
+      z[j4  ]  = y4r-y12i;
+      z[j4+1]  = y4i+y12r;
+      z[j5  ]  = y5r-y11i;
+      z[j5+1]  = y5i+y11r;
+      z[j6  ]  = y6r-y10i;
+      z[j6+1]  = y6i+y10r;
+      z[j7  ]  = y7r-y9i;
+      z[j7+1]  = y7i+y9r;
+      z[j8  ]  = t31r-t32r;
+      z[j8+1]  = t31i-t32i;
+      z[j9  ]  = y7r+y9i;
+      z[j9+1]  = y7i-y9r;
+      z[j10  ] = y6r+y10i;
+      z[j10+1] = y6i-y10r;
+      z[j11  ] = y5r+y11i;
+      z[j11+1] = y5i-y11r;
+      z[j12  ] = y4r+y12i;
+      z[j12+1] = y4i-y12r;
+      z[j13  ] = y3r+y13i;
+      z[j13+1] = y3i-y13r;
+      z[j14  ] = y2r+y14i;
+      z[j14+1] = y2i-y14r;
+      z[j15  ] = y1r+y15i;
+      z[j15+1] = y1i-y15r;
+      int jt = j15+2;
+      j15 = j14+2;
+      j14 = j13+2;
+      j13 = j12+2;
+      j12 = j11+2;
+      j11 = j10+2;
+      j10 = j9+2;
+      j9 = j8+2;
+      j8 = j7+2;
+      j7 = j6+2;
+      j6 = j5+2;
+      j5 = j4+2;
+      j4 = j3+2;
+      j3 = j2+2;
+      j2 = j1+2;
+      j1 = j0+2;
+      j0 = jt;
+    }
+  }
 
+  // Constants used in prime-factor FFT.
   private static final float P120 = 0.120536680f;
   private static final float P142 = 0.142314838f;
   private static final float P173 = 0.173648178f;
@@ -1207,11 +1438,18 @@ public class FftComplex {
   private static final float P992 = 0.992708874f;
   private static final float PONE = 1.000000000f;
 
+  // Factors supported in this implementation of the prime-factor FFT.
+  // Methods above require that these factors be in descending order.
   private static final int NFAC = 10;
   private static final int _kfac[] = {
     16, 13, 11, 9, 8, 7, 5, 4, 3, 2
   };
 
+  // FFT lengths supported in this implementation of the prime-factor FFT.
+  // These lengths are the products of mutually prime factors from the
+  // set above. For example, note that 17 and 32 are not in this table;
+  // 17 is not in the set above, and 32 = 16*2 is not valid, because
+  // the factors 16 and 2 share the prime factor 2.
   private static final int NTABLE = 240;
   private static final int _ntable[] = {
          1, 2, 3, 4, 5, 6, 7, 8, 9, 
