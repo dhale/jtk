@@ -39,7 +39,7 @@ public class MosaicTest {
     Tile tile11 = mosaic.getTile(1,1);
     tile11.setViewRectangle(new DRectangle(0.1,0.1,0.8,0.8));
 
-    TileZoomMode zoomMode = new TileZoomMode(mosaic);
+    TileZoomMode zoomMode = new TileZoomMode(mosaic.getModeManager());
 
     JMenuBar menuBar = new JMenuBar();
     JMenu modeMenu = new JMenu("Mode");

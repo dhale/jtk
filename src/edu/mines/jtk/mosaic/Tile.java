@@ -66,6 +66,32 @@ public class Tile extends JPanel {
   }
 
   /**
+   * Sets the best horizontal projector for this tile. If null, this
+   * tile will compute its best horizontal projector by merging those
+   * of its tiled views. If not null, the specified projector is best.
+   * In either case, this tile's horizontal projector may be adjusted by 
+   * it's mosaic during alignment with other tiles in the same column.
+   * @param bhp the best horizontal projector.
+   */
+  public void setBestHorizontalProjector(Projector bhp) {
+    _shp = bhp;
+    alignProjectors();
+  }
+
+  /**
+   * Sets the best vertical projector for this tile. If null, this
+   * tile will compute its best vertical projector by merging those
+   * of its tiled views. If not null, the specified projector is best.
+   * In either case, this tile's vertical projector may be adjusted by 
+   * it's mosaic during alignment with other tiles in the same row.
+   * @param bvp the best vertical projector.
+   */
+  public void setBestVerticalProjector(Projector bvp) {
+    _svp = bvp;
+    alignProjectors();
+  }
+
+  /**
    * Gets the horizontal projector for this tile.
    * @return the horizontal projector.
    */
@@ -305,8 +331,10 @@ public class Tile extends JPanel {
   private ArrayList<TiledView> _tvs = new ArrayList<TiledView>();
   private Projector _hp = new Projector(0.0,1.0,0.0,1.0);
   private Projector _vp = new Projector(0.0,1.0,0.0,1.0);
-  private Projector _bhp;
-  private Projector _bvp;
+  private Projector _bhp; // best horizontal projector; computed or specified
+  private Projector _bvp; // best vertical projector; computed or specified
+  private Projector _shp; // specified best horizontal projector; or null
+  private Projector _svp; // specified best vertical projector; or null
   private Transcaler _ts = new Transcaler();
   private DRectangle _vr = new DRectangle(0.0,0.0,1.0,1.0);
   private boolean _zeroLinePaintX;
@@ -317,18 +345,24 @@ public class Tile extends JPanel {
   private void updateBestProjectors() {
     Projector bhp = null;
     Projector bvp = null;
-    int ntv = _tvs.size();
-    if (ntv>0) {
-      TiledView tv = _tvs.get(ntv-1);
-      bhp = tv.getBestHorizontalProjector();
-      bvp = tv.getBestVerticalProjector();
-      for (int itv=ntv-2; itv>=0; --itv) {
-        tv = _tvs.get(itv);
-        bhp.merge(tv.getBestHorizontalProjector());
-        bvp.merge(tv.getBestVerticalProjector());
+    if (_shp==null || _svp==null) {
+      int ntv = _tvs.size();
+      if (ntv>0) {
+        TiledView tv = _tvs.get(ntv-1);
+        if (_shp==null)
+          bhp = tv.getBestHorizontalProjector();
+        if (_svp==null)
+          bvp = tv.getBestVerticalProjector();
+        for (int itv=ntv-2; itv>=0; --itv) {
+          tv = _tvs.get(itv);
+          if (_shp==null)
+            bhp.merge(tv.getBestHorizontalProjector());
+          if (_svp==null)
+            bvp.merge(tv.getBestVerticalProjector());
+        }
       }
     }
-    _bhp = bhp;
-    _bvp = bvp;
+    _bhp = (_shp!=null)?_shp:bhp;
+    _bvp = (_svp!=null)?_svp:bvp;
   }
 }

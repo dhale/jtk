@@ -12,6 +12,7 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
+import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
 import edu.mines.jtk.mosaic.*;
 
@@ -51,7 +52,8 @@ public class LollipopViewTest {
     tileA.addTiledView(makeView(n,d,f,x));
     tileB.addTiledView(makeView(n,d,f,y));
 
-    TileZoomMode zoomMode = new TileZoomMode(mosaic);
+    ModeManager modeManager = mosaic.getModeManager();
+    TileZoomMode zoomMode = new TileZoomMode(modeManager);
 
     JMenuBar menuBar = new JMenuBar();
     JMenu modeMenu = new JMenu("Mode");

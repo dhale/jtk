@@ -55,6 +55,18 @@ import edu.mines.jtk.util.*;
 public class Projector implements Cloneable {
 
   /**
+   * Constructs a projector with specified v values, u0=0, and u1=1.
+   * The projector will have zero margins.
+   * @param v0 the v coordinate that corresponds to u coordinate 0;
+   *  v0 != v1 is required.
+   * @param v1 the v coordinate that corresponds to u coordinate 1;
+   *  v0 != v1 is required.
+   */
+  public Projector(double v0, double v1) {
+    this(v0,v1,0.0,1.0);
+  }
+
+  /**
    * Constructs a projector with specified v and u values. The
    * parameters u0 and u1 determine the margins of the projector.
    * The world coordinate v0 corresponds to normalized coordinate u0;

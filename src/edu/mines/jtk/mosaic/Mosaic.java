@@ -167,6 +167,29 @@ public class Mosaic extends JPanel {
   }
 
   /**
+   * Sets the mode manager for this mosaic. By default, a mosaic
+   * constructs a unique mode manager when it is constructed. This 
+   * default may be overridden, for example, when two or more mosaics 
+   * must share modes.
+   * @param modeManager the mode manager.
+   */
+  public void setModeManager(ModeManager modeManager) {
+    if (_modeManager!=null) {
+      for (Tile tile : _tileList)
+        _modeManager.remove(tile);
+      for (TileAxis axis : _axisList)
+        _modeManager.remove(axis);
+    }
+    _modeManager = modeManager;
+    if (_modeManager!=null) {
+      for (Tile tile : _tileList)
+        _modeManager.add(tile);
+      for (TileAxis axis : _axisList)
+        _modeManager.add(axis);
+    }
+  }
+
+  /**
    * Returns the number of rows of tiles in this mosaic.
    * @return the number of rows.
    */
@@ -335,10 +358,10 @@ public class Mosaic extends JPanel {
     // Extra width and height to fill; zero, if no extra space.
     int w = getWidth();
     int h = getHeight();
-    int wm = widthMinimum();
-    int hm = heightMinimum();
-    int wfill = max(0,w-wm);
-    int hfill = max(0,h-hm);
+    int wf = widthFixed();
+    int hf = heightFixed();
+    int wfill = max(0,w-wf);
+    int hfill = max(0,h-hf);
 
     // Sums of width elastics and height elastics.
     int wesum = 0;
@@ -355,17 +378,17 @@ public class Mosaic extends JPanel {
     // Widths of columns, not including borders.
     int[] wcol = new int[_ncol];
     for (int icol=0,wleft=wfill; icol<_ncol; ++icol) {
-      int wpad = (icol<_ncol-1)?wfill*_we[icol]/wesum:wleft;
-      wcol[icol] = _wm[icol]+wpad;
-      wleft -= wpad;
+      int we = (icol<_ncol-1)?wfill*_we[icol]/wesum:wleft;
+      wcol[icol] = max(_wm[icol],we);
+      wleft -= wcol[icol];
     }
 
     // Heights of rows, not including borders.
     int[] hrow = new int[_nrow];
     for (int irow=0,hleft=hfill; irow<_nrow; ++irow) {
-      int hpad = (irow<_nrow-1)?hfill*_he[irow]/hesum:hleft;
-      hrow[irow] = _hm[irow]+hpad;
-      hleft -= hpad;
+      int he = (irow<_nrow-1)?hfill*_he[irow]/hesum:hleft;
+      hrow[irow] = max(_hm[irow],he);
+      hleft -= hrow[irow];
     }
 
     // Width of borders around axes and tiles.
@@ -634,6 +657,15 @@ public class Mosaic extends JPanel {
     return 2;
   }
 
+  private int widthFixed() {
+    int width = widthMinimumAxesLeft();
+    width += (_ncol-1)*widthTileSpacing();
+    width += (_ncol+1)*widthTileBorder();
+    width += widthMinimumAxesRight();
+    width += widthVScrollBars();
+    return width;
+  }
+
   private int widthMinimum() {
     int width = widthMinimumAxesLeft();
     for (int icol=0; icol<_ncol; ++icol)
@@ -679,6 +711,15 @@ public class Mosaic extends JPanel {
       width += 2*widthAxesBorder();
     }
     return width;
+  }
+
+  private int heightFixed() {
+    int height = heightMinimumAxesTop();
+    height += (_nrow-1)*widthTileSpacing();
+    height += (_nrow+1)*widthTileBorder();
+    height += heightMinimumAxesBottom();
+    height += heightHScrollBars();
+    return height;
   }
 
   private int heightMinimum() {

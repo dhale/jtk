@@ -8,6 +8,7 @@ package edu.mines.jtk.mosaic;
 
 import java.awt.*;
 import java.util.*;
+import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
@@ -25,7 +26,6 @@ public class MarkLineView extends TiledView {
    * @param y array of sampled function values y(x).
    */
   public MarkLineView(Sampling sx, float[] y) {
-    Check.argument(!sx.isEmpty(),"sampling is not empty");
     Check.argument(sx.getCount()==y.length,"sx count equals length of y");
     int nxy = sx.getCount();
     float[] xt = new float[nxy];
@@ -142,12 +142,12 @@ public class MarkLineView extends TiledView {
       }
     }
 
-    // TODO: mark size
-    // TODO: rotated x down, y right
+    // TODO: handle mark size
+    // TODO: handle x vertical, y horizontal
 
     // Best projectors.
     Projector bhp = new Projector(xmin,xmax,0.0,1.0);
-    Projector bvp = new Projector(ymin,ymax,0.0,1.0);
+    Projector bvp = new Projector(ymax,ymin,0.0,1.0);
     setBestProjectors(bhp,bvp);
   }
 

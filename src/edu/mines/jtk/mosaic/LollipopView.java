@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic;
 
 import java.awt.*;
+import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
@@ -47,7 +48,6 @@ public class LollipopView extends TiledView {
    * @param f the sampled function f(x); by reference, not copied.
    */
   public LollipopView(Sampling sx, float[] f) {
-    Check.argument(!sx.isEmpty(),"sampling is not empty");
     Check.argument(sx.getCount()==f.length,"sx count equals length of f");
     set(sx,f);
   }
@@ -218,7 +218,7 @@ public class LollipopView extends TiledView {
 
   private double ballRadiusX() {
     double nx = _sx.getCount();
-    return 0.99/(2.0*nx);
+    return 0.90/(2.0*nx);
   }
 
   private double ballRadiusY() {

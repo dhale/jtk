@@ -20,11 +20,11 @@ public class TileZoomMode extends Mode {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Constructs a tile zoom mode for the specified mosaic.
-   * @param mosaic the mosaic.
+   * Constructs a tile zoom mode with specified manager.
+   * @param modeManager the mode manager for this mode.
    */
-  public TileZoomMode(Mosaic mosaic) {
-    super(mosaic.getModeManager());
+  public TileZoomMode(ModeManager modeManager) {
+    super(modeManager);
     setName("Zoom");
     setIcon(loadIcon(TileZoomMode.class,"resources/Zoom24.gif"));
     setMnemonicKey(KeyEvent.VK_Z);

@@ -12,6 +12,7 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
+import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
 import edu.mines.jtk.mosaic.*;
 
@@ -53,7 +54,8 @@ public class MarkLineViewTest {
     tileB.addTiledView(makeMarkLineView(n,d,f,y));
     tileB.addTiledView(makeLollipopView(n,d,f,y));
 
-    TileZoomMode zoomMode = new TileZoomMode(mosaic);
+    ModeManager modeManager = mosaic.getModeManager();
+    TileZoomMode zoomMode = new TileZoomMode(modeManager);
 
     JMenuBar menuBar = new JMenuBar();
     JMenu modeMenu = new JMenu("Mode");
@@ -79,10 +81,10 @@ public class MarkLineViewTest {
     int nx, double dx, double fx, float[] f) 
   {
     Sampling sx = new Sampling(nx,dx,fx);
-    MarkLineView lv = new MarkLineView(sx,f);
-    lv.setLineColor(Color.BLACK);
-    lv.setLineWidth(2.0f);
-    return lv;
+    MarkLineView mlv = new MarkLineView(sx,f);
+    mlv.setLineColor(Color.BLACK);
+    mlv.setLineWidth(2.0f);
+    return mlv;
   }
 
   private static LollipopView makeLollipopView(
