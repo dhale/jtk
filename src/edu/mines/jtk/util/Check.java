@@ -115,4 +115,8 @@ public class Check {
   private static long _l;
   private static float _f;
   private static double _d;
+
+  // Static methods only.
+  private Check() {
+  }
 }

@@ -48,6 +48,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <tstamp/>
     <mkdir dir="${build}"/>
     <mkdir dir="${build.cls}"/>
+    <mkdir dir="${build.doc}"/>
     <mkdir dir="${build.jar}"/>
     <mkdir dir="${build.jni}"/>
     <mkdir dir="${build.obj}"/>
@@ -69,14 +70,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       deprecation="on">
       <compilerarg value="-Xlint:unchecked"/>
       <classpath refid="classpath"/>
-      <exclude name="edu/mines/jtk/opengl/linux-gtk/**"/>
+      <exclude name="edu/mines/jtk/opengl/linuxgtk/**"/>
       <exclude name="edu/mines/jtk/opengl/win32/**"/>
       <exclude name="**/old/*"/>
       <exclude name="**/new/*"/>
     </javac>
   </target>
   <target name="copy-linux" depends="init" if="linux">
-    <copy file="${src}/edu/mines/jtk/opengl/linux-gtk/SwtHooks.java"
+    <copy file="${src}/edu/mines/jtk/opengl/linuxgtk/SwtHooks.java"
       todir="${build.src}/edu/mines/jtk/opengl"/>
   </target>
   <target name="copy-windows" depends="init" if="windows">
@@ -175,6 +176,24 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <libarg arg="gdi32.lib"/>
       <libarg arg="jawt.lib"/>
     </jnicpp>
+  </target>
+
+  <!--Build javadocs -->
+  <target name="doc" depends="init" description="build javadocs">
+    <javadoc 
+      classpathref="classpath"
+      destdir="${build.doc}/api" 
+      author="true"
+      version="true"
+      use="true"
+      windowtitle="CSM JTK">
+      <packageset dir="src" defaultexcludes="yes">
+        <include name="edu/mines/jtk/**"/>
+        <exclude name="edu/mines/jtk/**/new"/>
+        <exclude name="edu/mines/jtk/**/old"/>
+        <exclude name="edu/mines/jtk/**/test"/>
+      </packageset>
+    </javadoc>
   </target>
 
   <!-- Build everything (except javadocs) -->

@@ -784,4 +784,8 @@ public class MathPlus {
   public static double min(double a, double b, double c, double d) {
     return min(a,min(b,min(c,d)));
   }
+
+  // Static methods only.
+  private MathPlus() {
+  }
 }

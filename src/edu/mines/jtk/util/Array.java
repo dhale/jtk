@@ -50,4 +50,8 @@ public class Array {
       return false;
     }
   }
+
+  // Static methods only.
+  private Array() {
+  }
 }
