@@ -8,7 +8,6 @@ package edu.mines.jtk.dsp;
 
 import java.util.Random;
 import edu.mines.jtk.util.Complex;
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Complex array processing. A complex array is an array of floats, 
@@ -41,13 +40,13 @@ import static edu.mines.jtk.util.MathPlus.*;
  * Method summary:
  * <pre>
  * Copy and creation operations:
- * copy - copies an array, or a specified subset of that array
+ * copy - copies an array, or a specified subset of an array
  * zero - fills an array with a constant value zero
  * fill - fills an array with a specified constant value
  * ramp - fills an array with a linear values ca + cb1*i1 (+ cb2*i2 + cb3*i3)
  * rand - fills an array with pseudo-random numbers
- * complex - creates a complex array with specified real and imaginary parts
- * polar - creates a complex array with magnitude and phase (in radians)
+ * complex - creates a complex array from real and imaginary parts
+ * polar - creates a complex array from magnitude and phase (in radians)
  * </pre><pre>
  * Binary operations:
  * add - adds one array (or constant) to another array (or constant)
@@ -65,14 +64,13 @@ import static edu.mines.jtk.util.MathPlus.*;
  * Complex-to-complex operations:
  * conj - conjugate
  * neg - negation
- * exp - exponential
- * TODO:
  * cos - cosine
  * sin - sin
+ * sqrt - square-root
+ * exp - exponential
  * log - natural logarithm
  * log10 - logarithm base 10
- * sqrt - square-root
- * pow - raise to a specified power
+ * pow - raise to a specified (real or complex) power
  * </pre><pre>
  * Other operations:
  * equal - compares arrays for equality (to within an optional tolerance)
@@ -101,21 +99,6 @@ public class Cap {
       cy[i3] = copy(cx[i3]);
     return cy;
   }
-  public static float[] copy(int n1, float[] cx) {
-    float[] cy = new float[2*n1];
-    copy(n1,cx,cy);
-    return cy;
-  }
-  public static float[][] copy(int n1, int n2, float[][] cx) {
-    float[][] cy = new float[n2][2*n1];
-    copy(n1,n2,cx,cy);
-    return cy;
-  }
-  public static float[][][] copy(int n1, int n2, int n3, float[][][] cx) {
-    float[][][] cy = new float[n3][n2][2*n1];
-    copy(n1,n2,n3,cx,cy);
-    return cy;
-  }
   public static void copy(float[] cx, float[] cy) {
     int n1 = cx.length/2;
     copy(n1,cx,cy);
@@ -130,20 +113,56 @@ public class Cap {
     for (int i3=0; i3<n3; ++i3)
       copy(cx[i3],cy[i3]);
   }
+  /**
+   * Returns cx[0:n1-1].
+   */
+  public static float[] copy(int n1, float[] cx) {
+    float[] cy = new float[2*n1];
+    copy(n1,cx,cy);
+    return cy;
+  }
+  /**
+   * Returns cx[0:n2-1][0:n1-1].
+   */
+  public static float[][] copy(int n1, int n2, float[][] cx) {
+    float[][] cy = new float[n2][2*n1];
+    copy(n1,n2,cx,cy);
+    return cy;
+  }
+  /**
+   * Returns cx[0:n3-1][0:n2-1][0:n1-1].
+   */
+  public static float[][][] copy(int n1, int n2, int n3, float[][][] cx) {
+    float[][][] cy = new float[n3][n2][2*n1];
+    copy(n1,n2,n3,cx,cy);
+    return cy;
+  }
+  /**
+   * Copies from cx[0:n1-1] to cy[0:n1-1].
+   */
   public static void copy(int n1, float[] cx, float[] cy) {
     int n = 2*n1;
     while (--n>=0)
       cy[n] = cx[n];
   }
+  /**
+   * Copies from cx[0:n2-1][0:n1-1] to cy[0:n2-1][0:n1-1].
+   */
   public static void copy(int n1, int n2, float[][] cx, float[][] cy) {
     for (int i2=0; i2<n2; ++i2)
       copy(n1,cx[i2],cy[i2]);
   }
+  /**
+   * Copies from cx[0:n3-1][0:n2-1][0:n1-1] to cy[0:n3-1][0:n2-1][0:n1-1].
+   */
   public static void copy(
     int n1, int n2, int n3, float[][][] cx, float[][][] cy) {
     for (int i3=0; i3<n3; ++i3)
       copy(n1,n2,cx[i3],cy[i3]);
   }
+  /**
+   * Copies from cx[j1x:j1x+n1-1] to cy[j1y:j1y+n1-1].
+   */
   public static void copy(
     int n1, 
     int j1x, float[] cx, 
@@ -153,6 +172,10 @@ public class Cap {
       cy[iy++] = cx[ix++];
     }
   }
+  /**
+   * Copies from cx[j2x:j2x+n2-1][j1x:j1x+n1-1] 
+   * to cy[j2y:j2y+n2-1][j1y:j1y+n1-1].
+   */
   public static void copy(
     int n1, int n2, 
     int j1x, int j2x, float[][] cx, 
@@ -160,6 +183,10 @@ public class Cap {
     for (int i2=0; i2<n2; ++i2)
       copy(n1,j1x,cx[i2],j1y,cy[i2]);
   }
+  /**
+   * Copies from cx[j3x:j3x+n3-1][j2x:j2x+n2-1][j1x:j1x+n1-1]
+   * to cy[j3y:j3y+n3-1][j2y:j2y+n2-1][j1y:j1y+n1-1].
+   */
   public static void copy(
     int n1, int n2, int n3,
     int j1x, int j2x, int j3x, float[][][] cx, 
@@ -258,24 +285,22 @@ public class Cap {
     float ai = ca.i;
     float br = cb.r;
     float bi = cb.i;
-    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2,ar+=br,ai+=bi) {
-      cx[ir] = ar;
-      cx[ii] = ai;
+    for (int i1=0,ir=0,ii=1; i1<n1; ++i1,ir+=2,ii+=2) {
+      cx[ir] = ar+br*(float)i1;
+      cx[ii] = ai+bi*(float)i1;
     }
   }
   public static void ramp(
     Complex ca, Complex cb1, Complex cb2, float[][] cx) {
     int n2 = cx.length;
-    Complex ca2 = new Complex(ca);
-    for (int i2=0; i2<n2; ++i2,ca2.plusEquals(cb2))
-      ramp(ca2,cb1,cx[i2]);
+    for (int i2=0; i2<n2; ++i2)
+      ramp(ca.plus(cb2.times((float)i2)),cb1,cx[i2]);
   }
   public static void ramp(
     Complex ca, Complex cb1, Complex cb2, Complex cb3, float[][][] cx) {
     int n3 = cx.length;
-    Complex ca3 = new Complex(ca);
-    for (int i3=0; i3<n3; ++i3,ca3.plusEquals(cb3))
-      ramp(ca3,cb1,cb2,cx[i3]);
+    for (int i3=0; i3<n3; ++i3)
+      ramp(ca.plus(cb3.times((float)i3)),cb1,cb2,cx[i3]);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -299,17 +324,17 @@ public class Cap {
     rand(_random,cx);
   }
   public static float[] rand(Random random, int n1) {
-    float[] cx = new float[n1];
+    float[] cx = new float[2*n1];
     rand(random,cx);
     return cx;
   }
   public static float[][] rand(Random random, int n1, int n2) {
-    float[][] cx = new float[n2][n1];
+    float[][] cx = new float[n2][2*n1];
     rand(random,cx);
     return cx;
   }
   public static float[][][] rand(Random random, int n1, int n2, int n3) {
-    float[][][] cx = new float[n3][n2][n1];
+    float[][][] cx = new float[n3][n2][2*n1];
     rand(random,cx);
     return cx;
   }
@@ -425,6 +450,42 @@ public class Cap {
   public static void conj(float[][][] cx, float[][][] cy) {
     _conj.apply(cx,cy);
   }
+  public static float[] cos(float[] cx) {
+    return _cos.apply(cx);
+  }
+  public static float[][] cos(float[][] cx) {
+    return _cos.apply(cx);
+  }
+  public static float[][][] cos(float[][][] cx) {
+    return _cos.apply(cx);
+  }
+  public static void cos(float[] cx, float[] cy) {
+    _cos.apply(cx,cy);
+  }
+  public static void cos(float[][] cx, float[][] cy) {
+    _cos.apply(cx,cy);
+  }
+  public static void cos(float[][][] cx, float[][][] cy) {
+    _cos.apply(cx,cy);
+  }
+  public static float[] sin(float[] cx) {
+    return _sin.apply(cx);
+  }
+  public static float[][] sin(float[][] cx) {
+    return _sin.apply(cx);
+  }
+  public static float[][][] sin(float[][][] cx) {
+    return _sin.apply(cx);
+  }
+  public static void sin(float[] cx, float[] cy) {
+    _sin.apply(cx,cy);
+  }
+  public static void sin(float[][] cx, float[][] cy) {
+    _sin.apply(cx,cy);
+  }
+  public static void sin(float[][][] cx, float[][][] cy) {
+    _sin.apply(cx,cy);
+  }
   public static float[] exp(float[] cx) {
     return _exp.apply(cx);
   }
@@ -442,6 +503,42 @@ public class Cap {
   }
   public static void exp(float[][][] cx, float[][][] cy) {
     _exp.apply(cx,cy);
+  }
+  public static float[] log(float[] cx) {
+    return _log.apply(cx);
+  }
+  public static float[][] log(float[][] cx) {
+    return _log.apply(cx);
+  }
+  public static float[][][] log(float[][][] cx) {
+    return _log.apply(cx);
+  }
+  public static void log(float[] cx, float[] cy) {
+    _log.apply(cx,cy);
+  }
+  public static void log(float[][] cx, float[][] cy) {
+    _log.apply(cx,cy);
+  }
+  public static void log(float[][][] cx, float[][][] cy) {
+    _log.apply(cx,cy);
+  }
+  public static float[] log10(float[] cx) {
+    return _log10.apply(cx);
+  }
+  public static float[][] log10(float[][] cx) {
+    return _log10.apply(cx);
+  }
+  public static float[][][] log10(float[][][] cx) {
+    return _log10.apply(cx);
+  }
+  public static void log10(float[] cx, float[] cy) {
+    _log10.apply(cx,cy);
+  }
+  public static void log10(float[][] cx, float[][] cy) {
+    _log10.apply(cx,cy);
+  }
+  public static void log10(float[][][] cx, float[][][] cy) {
+    _log10.apply(cx,cy);
   }
   private static abstract class ComplexToComplex {
     float[] apply(float[] cx) {
@@ -492,11 +589,50 @@ public class Cap {
       }
     }
   };
+  private static ComplexToComplex _cos = new ComplexToComplex() {
+    void apply(float[] cx, float[] cy) {
+      Complex ct = new Complex();
+      int n1 = cx.length/2;
+      for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+        ct.r = cx[ir];
+        ct.i = cx[ii];
+        Complex ce = Complex.cos(ct);
+        cy[ir] = ce.r;
+        cy[ii] = ce.i;
+      }
+    }
+  };
+  private static ComplexToComplex _sin = new ComplexToComplex() {
+    void apply(float[] cx, float[] cy) {
+      Complex ct = new Complex();
+      int n1 = cx.length/2;
+      for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+        ct.r = cx[ir];
+        ct.i = cx[ii];
+        Complex ce = Complex.sin(ct);
+        cy[ir] = ce.r;
+        cy[ii] = ce.i;
+      }
+    }
+  };
+  private static ComplexToComplex _sqrt = new ComplexToComplex() {
+    void apply(float[] cx, float[] cy) {
+      Complex ct = new Complex();
+      int n1 = cx.length/2;
+      for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+        ct.r = cx[ir];
+        ct.i = cx[ii];
+        Complex ce = Complex.sqrt(ct);
+        cy[ir] = ce.r;
+        cy[ii] = ce.i;
+      }
+    }
+  };
   private static ComplexToComplex _exp = new ComplexToComplex() {
     void apply(float[] cx, float[] cy) {
       Complex ct = new Complex();
       int n1 = cx.length/2;
-      for (int i1=0,ir=0,ii=1; i1<n1; ++i1,ir+=2,ii+=2) {
+      for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         ct.r = cx[ir];
         ct.i = cx[ii];
         Complex ce = Complex.exp(ct);
@@ -505,6 +641,117 @@ public class Cap {
       }
     }
   };
+  private static ComplexToComplex _log = new ComplexToComplex() {
+    void apply(float[] cx, float[] cy) {
+      Complex ct = new Complex();
+      int n1 = cx.length/2;
+      for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+        ct.r = cx[ir];
+        ct.i = cx[ii];
+        Complex ce = Complex.log(ct);
+        cy[ir] = ce.r;
+        cy[ii] = ce.i;
+      }
+    }
+  };
+  private static ComplexToComplex _log10 = new ComplexToComplex() {
+    void apply(float[] cx, float[] cy) {
+      Complex ct = new Complex();
+      int n1 = cx.length/2;
+      for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+        ct.r = cx[ir];
+        ct.i = cx[ii];
+        Complex ce = Complex.log10(ct);
+        cy[ir] = ce.r;
+        cy[ii] = ce.i;
+      }
+    }
+  };
+
+  ///////////////////////////////////////////////////////////////////////////
+  // pow
+  public static float[] pow(float[] cx, float ra) {
+    int n1 = cx.length/2;
+    float[] cy = new float[2*n1];
+    pow(cx,ra,cy);
+    return cy;
+  }
+  public static float[][] pow(float[][] cx, float ra) {
+    int n2 = cx.length;
+    float[][] cy = new float[n2][];
+    for (int i2=0; i2<n2; ++i2)
+      cy[i2] = pow(cx[i2],ra);
+    return cy;
+  }
+  public static float[][][] pow(float[][][] cx, float ra) {
+    int n3 = cx.length;
+    float[][][] cy = new float[n3][][];
+    for (int i3=0; i3<n3; ++i3)
+      cy[i3] = pow(cx[i3],ra);
+    return cy;
+  }
+  public static void pow(float[] cx, float ra, float[] cy) {
+    Complex ct = new Complex();
+    int n1 = cx.length/2;
+    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+      ct.r = cx[ir];
+      ct.i = cx[ii];
+      Complex ce = Complex.pow(ct,ra);
+      cy[ir] = ce.r;
+      cy[ii] = ce.i;
+    }
+  }
+  public static void pow(float[][] cx, float ra, float[][] cy) {
+    int n2 = cx.length;
+    for (int i2=0; i2<n2; ++i2)
+      pow(cx[i2],ra,cy[i2]);
+  }
+  public static void pow(float[][][] cx, float ra, float[][][] cy) {
+    int n3 = cx.length;
+    for (int i3=0; i3<n3; ++i3)
+      pow(cx[i3],ra,cy[i3]);
+  }
+  public static float[] pow(float[] cx, Complex ca) {
+    int n1 = cx.length/2;
+    float[] cy = new float[2*n1];
+    pow(cx,ca,cy);
+    return cy;
+  }
+  public static float[][] pow(float[][] cx, Complex ca) {
+    int n2 = cx.length;
+    float[][] cy = new float[n2][];
+    for (int i2=0; i2<n2; ++i2)
+      cy[i2] = pow(cx[i2],ca);
+    return cy;
+  }
+  public static float[][][] pow(float[][][] cx, Complex ca) {
+    int n3 = cx.length;
+    float[][][] cy = new float[n3][][];
+    for (int i3=0; i3<n3; ++i3)
+      cy[i3] = pow(cx[i3],ca);
+    return cy;
+  }
+  public static void pow(float[] cx, Complex ca, float[] cy) {
+    Complex ct = new Complex();
+    int n1 = cx.length/2;
+    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+      ct.r = cx[ir];
+      ct.i = cx[ii];
+      Complex ce = Complex.pow(ct,ca);
+      cy[ir] = ce.r;
+      cy[ii] = ce.i;
+    }
+  }
+  public static void pow(float[][] cx, Complex ca, float[][] cy) {
+    int n2 = cx.length;
+    for (int i2=0; i2<n2; ++i2)
+      pow(cx[i2],ca,cy[i2]);
+  }
+  public static void pow(float[][][] cx, Complex ca, float[][][] cy) {
+    int n3 = cx.length;
+    for (int i3=0; i3<n3; ++i3)
+      pow(cx[i3],ca,cy[i3]);
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   // complex-to-real
@@ -764,8 +1011,8 @@ public class Cap {
       for (int i1=0,ir=0,ii=1; i1<n1; ++i1,ir+=2,ii+=2) {
         float r = rx[i1];
         float a = ry[i1];
-        cz[ir] = r*cos(a);
-        cz[ii] = r*sin(a);
+        cz[ir] = r*(float)Math.cos(a);
+        cz[ii] = r*(float)Math.sin(a);
       }
     }
   };

@@ -7,7 +7,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp;
 
 import java.util.Random;
-import static java.lang.Math.*;
 
 /**
  * Real array processing. A real array is an array of floats, in which
@@ -34,7 +33,7 @@ import static java.lang.Math.*;
  * Method summary:
  * <pre>
  * Copy and creation operations:
- * copy - copies an array, or a specified subset of that array
+ * copy - copies an array, or a specified subset of an array
  * zero - fills an array with a constant value zero
  * fill - fills an array with a specified constant value
  * ramp - fills an array with a linear values ra + rb1*i1 (+ rb2*i2 + rb3*i3)
@@ -51,12 +50,12 @@ import static java.lang.Math.*;
  * neg - negation
  * cos - cosine
  * sin - sin
+ * sqrt - square-root
  * exp - exponential
  * log - natural logarithm
  * log10 - logarithm base 10
- * sqrt - square-root
- * sgn - sign (1 if positive, -1 if negative, 0 if zero)
  * pow - raise to a specified power
+ * sgn - sign (1 if positive, -1 if negative, 0 if zero)
  * </pre><pre>
  * Other operations:
  * equal - compares arrays for equality (to within an optional tolerance)
@@ -87,21 +86,6 @@ public class Rap {
       ry[i3] = copy(rx[i3]);
     return ry;
   }
-  public static float[] copy(int n1, float[] rx) {
-    float[] ry = new float[n1];
-    copy(n1,rx,ry);
-    return ry;
-  }
-  public static float[][] copy(int n1, int n2, float[][] rx) {
-    float[][] ry = new float[n2][n1];
-    copy(n1,n2,rx,ry);
-    return ry;
-  }
-  public static float[][][] copy(int n1, int n2, int n3, float[][][] rx) {
-    float[][][] ry = new float[n3][n2][n1];
-    copy(n1,n2,n3,rx,ry);
-    return ry;
-  }
   public static void copy(float[] rx, float[] ry) {
     copy(rx.length,rx,ry);
   }
@@ -115,19 +99,56 @@ public class Rap {
     for (int i3=0; i3<n3; ++i3)
       copy(rx[i3],ry[i3]);
   }
+  /**
+   * Returns rx[0:n1-1].
+   */
+  public static float[] copy(int n1, float[] rx) {
+    float[] ry = new float[n1];
+    copy(n1,rx,ry);
+    return ry;
+  }
+  /**
+   * Returns rx[0:n2-1][0:n1-1].
+   */
+  public static float[][] copy(int n1, int n2, float[][] rx) {
+    float[][] ry = new float[n2][n1];
+    copy(n1,n2,rx,ry);
+    return ry;
+  }
+  /**
+   * Returns rx[0:n3-1][0:n2-1][0:n1-1].
+   */
+  public static float[][][] copy(int n1, int n2, int n3, float[][][] rx) {
+    float[][][] ry = new float[n3][n2][n1];
+    copy(n1,n2,n3,rx,ry);
+    return ry;
+  }
+  /**
+   * Copies from rx[0:n1-1] to ry[0:n1-1].
+   */
   public static void copy(int n1, float[] rx, float[] ry) {
     for (int i1=0; i1<n1; ++i1)
       ry[i1] = rx[i1];
   }
+  /**
+   * Copies from rx[0:n2-1][0:n1-1] to ry[0:n2-1][0:n1-1].
+   */
   public static void copy(int n1, int n2, float[][] rx, float[][] ry) {
     for (int i2=0; i2<n2; ++i2)
       copy(n1,rx[i2],ry[i2]);
   }
+  /**
+   * Copies from rx[0:n3-1][0:n2-1][0:n1-1] to ry[0:n3-1][0:n2-1][0:n1-1].
+   */
   public static void copy(
     int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
     for (int i3=0; i3<n3; ++i3)
       copy(n1,n2,rx[i3],ry[i3]);
   }
+  /**
+   * Copies from rx[j1x:j1x+n1-1]
+   * to ry[j1y:j1y+n1-1].
+   */
   public static void copy(
     int n1, 
     int j1x, float[] rx, 
@@ -135,6 +156,10 @@ public class Rap {
     for (int i1=0,ix=j1x,iy=j1y; i1<n1; ++i1)
       ry[iy++] = rx[ix++];
   }
+  /**
+   * Copies from rx[j2x:j2x+n2-1][j1x:j1x+n1-1]
+   * to ry[j2y:j2y+n2-1][j1y:j1y+n1-1].
+   */
   public static void copy(
     int n1, int n2, 
     int j1x, int j2x, float[][] rx, 
@@ -142,6 +167,10 @@ public class Rap {
     for (int i2=0; i2<n2; ++i2)
       copy(n1,j1x,rx[j2x+i2],j1y,ry[j2y+i2]);
   }
+  /**
+   * Copies from rx[j3x:j3x+n3-1][j2x:j2x+n2-1][j1x:j1x+n1-1]
+   * to ry[j3y:j3y+n3-1][j2y:j2y+n2-1][j1y:j1y+n1-1].
+   */
   public static void copy(
     int n1, int n2, int n3,
     int j1x, int j2x, int j3x, float[][][] rx, 
@@ -231,21 +260,19 @@ public class Rap {
   }
   public static void ramp(float ra, float rb, float[] rx) {
     int n1 = rx.length;
-    for (int i1=0; i1<n1; ++i1,ra+=rb)
-      rx[i1] = ra;
+    for (int i1=0; i1<n1; ++i1)
+      rx[i1] = ra+rb*(float)i1;
   }
   public static void ramp(float ra, float rb1, float rb2, float[][] rx) {
     int n2 = rx.length;
-    float ra2 = ra;
-    for (int i2=0; i2<n2; ++i2,ra2+=rb2)
-      ramp(ra2,rb1,rx[i2]);
+    for (int i2=0; i2<n2; ++i2)
+      ramp(ra+rb2*(float)i2,rb1,rx[i2]);
   }
   public static void ramp(
     float ra, float rb1, float rb2, float rb3, float[][][] rx) {
     int n3 = rx.length;
-    float ra3 = ra;
-    for (int i3=0; i3<n3; ++i3,ra3+=rb3)
-      ramp(ra3,rb1,rb2,rx[i3]);
+    for (int i3=0; i3<n3; ++i3)
+      ramp(ra+rb3*(float)i3,rb1,rb2,rx[i3]);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -1039,6 +1066,15 @@ public class Rap {
 
   ///////////////////////////////////////////////////////////////////////////
   // findMax, findMin
+  public static float findMax(float[] rx) {
+    return findMax(rx,null);
+  }
+  public static float findMax(float[][] rx) {
+    return findMax(rx,null);
+  }
+  public static float findMax(float[][][] rx) {
+    return findMax(rx,null);
+  }
   public static float findMax(float[] rx, int[] index) {
     int i1max = 0;
     float rmax = rx[0];
@@ -1103,6 +1139,15 @@ public class Rap {
       index[2] = i3max;
     }
     return rmax;
+  }
+  public static float findMin(float[] rx) {
+    return findMin(rx,null);
+  }
+  public static float findMin(float[][] rx) {
+    return findMin(rx,null);
+  }
+  public static float findMin(float[][][] rx) {
+    return findMin(rx,null);
   }
   public static float findMin(float[] rx, int[] index) {
     int i1min = 0;

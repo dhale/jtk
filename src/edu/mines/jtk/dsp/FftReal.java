@@ -11,15 +11,16 @@ import edu.mines.jtk.util.Check;
 import static java.lang.Math.*;
 
 /**
- * Fast Fourier transform of real-valued arrays. The FFT length nfft equals
- * the number of <em>real</em> numbers transformed. The transform of nfft
- * real numbers yields nfft/2+1 complex numbers. (The imaginary parts of 
- * the first and last complex numbers are always zero.) For real-to-complex 
- * and complex-to-real transforms, nfft is always an even number.
+ * Fast Fourier transform of real-valued arrays. The FFT length nfft 
+ * equals the number of <em>real</em> numbers transformed. The transform 
+ * of nfft real numbers yields nfft/2+1 complex numbers. (The imaginary 
+ * parts of the first and last complex numbers are always zero.) For 
+ * real-to-complex and complex-to-real transforms, nfft is always an even 
+ * number.
  * <p>
- * Complex numbers are packed into arrays of floats as 
- * [real_0, imag_0, real_1, imag_1, ...]. Here, real_k and imag_k correspond 
- * to the real and imaginary parts of the complex number with index k. 
+ * Complex numbers are packed into arrays of floats as [real_0, imag_0, 
+ * real_1, imag_1, ...]. Here, real_k and imag_k correspond to the real 
+ * and imaginary parts of the complex number with index k. 
  * <p>
  * When input and output arrays are the same array, transforms are performed 
  * in-place. For example, an input array rx[nfft] of nfft real numbers may be 
@@ -28,23 +29,31 @@ import static java.lang.Math.*;
  * cy.length equal nfft+2. When we write rx[nfft] (here and below), we imply 
  * that only the first nfft floats in the input array rx are accessed.
  * <p>
- * Transforms may be performed for each dimension of a multi-dimensional 
+ * Transforms may be performed for any dimension of a multi-dimensional 
  * array. For example, we may transform the 1st dimension of an input array 
  * rx[n2][nfft] of n2*nfft real numbers to an output array cy[n2][nfft+2] of 
  * n2*(nfft/2+1) complex numbers. Or, we may transform the 2nd dimension of 
- * an input array rx[nfft][n1] of nfft*n1 real numbers to a complex array 
- * cy[nfft/2+1][2*n1] of (nfft/2+1)*n1 complex numbers. In either case, the
- * input array rx and the output array cy may be the same array.
+ * an input array rx[nfft][n1] of nfft*n1 real numbers to an output array 
+ * cy[nfft/2+1][2*n1] of (nfft/2+1)*n1 complex numbers. In either case, the 
+ * input array rx and the output array cy may be the same array, such that 
+ * the transform may be performed in-place. 
+ * <p>
+ * In-place transforms are typically used to reduce memory consumption. 
+ * Note, however, that memory consumption is reduced for only dimension-1 
+ * in-place transforms. Dimension-2 (and higher) in-place transforms save 
+ * no memory, because of the contiguous packing of real and imaginary parts 
+ * of complex numbers in multi-dimensional arrays of floats. (See above.)
+ * Therefore, dimension-1 transforms are best when performing real-to-complex 
+ * or complex-to-real transforms of multi-dimensional arrays.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.03.21
  */
 public class FftReal {
 
   /**
-   * Constructs a new FFT, with specified length. Valid FFT lengths can 
-   * be obtained by calling the methods {@link #nfftSmall(int)} and 
-   * {@link #nfftFast(int)}. Alternatively, the methods {@link #small(int)} 
-   * and {@link #fast(int)} return an FFT with valid length.
+   * Constructs a new FFT, with specified length. Valid FFT lengths 
+   * can be obtained by calling the methods {@link #nfftSmall(int)} 
+   * and {@link #nfftFast(int)}.
    * @param nfft the FFT length, which must be valid.
    */
   public FftReal(int nfft) {
@@ -52,6 +61,33 @@ public class FftReal {
       nfft%2==0 && Pfacc.nfftValid(nfft/2),
       "nfft="+nfft+" is valid FFT length");
     _nfft = nfft;
+  }
+
+  /**
+   * Returns an FFT length optimized for memory. The FFT length will be the 
+   * smallest valid length that is not less than the specified length n.
+   * @param n the lower bound on FFT length.
+   * @return the FFT length.
+   * @exception IllegalArgumentException if the specified length n exceeds
+   *  the maximum length supported by this implementation. Currently, the 
+   *  maximum length is 1,441,440.
+   */
+  public static int nfftSmall(int n) {
+    Check.argument(n<=1441440,"n does not exceed 1441440");
+    return 2*Pfacc.nfftSmall((n+1)/2);
+  }
+
+  /**
+   * Returns an FFT length optimized for speed. The FFT length will be the 
+   * fastest valid length that is not less than the specified length n.
+   * @param n the lower bound on FFT length.
+   * @return the FFT length.
+   * @exception IllegalArgumentException if the specified length n exceeds
+   *  the maximum length supported by this implementation. Currently, the 
+   *  maximum length is 1,441,440.
+   */
+  public static int nfftFast(int n) {
+    return nfftSmall(n); // TODO: implement
   }
 
   /**
@@ -64,16 +100,16 @@ public class FftReal {
 
   /**
    * Computes a real-to-complex fast Fourier transform.
-   * Transforms an input array rx[nfft] of nfft real numbers to an 
-   * output array cy[nfft+2] of nfft/2+1 complex numbers.
+   * Transforms a 1-D input array rx[nfft] of nfft real numbers to 
+   * a 1-D output array cy[nfft+2] of nfft/2+1 complex numbers.
    * @param sign the sign (1 or -1) of the exponent used in the FFT.
    * @param rx the input array.
    * @param cy the output array.
    */
   public void realToComplex(int sign, float[] rx, float[] cy) {
-    Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
-    Check.argument(rx.length>=_nfft,"rx.length is valid");
-    Check.argument(cy.length>=_nfft+2,"cy.length is valid");
+    checkSign(sign);
+    checkArray(_nfft,rx,"rx");
+    checkArray(_nfft+2,cy,"cy");
     int n = _nfft;
     while (--n>=0)
       cy[n] = 0.5f*rx[n];
@@ -107,16 +143,16 @@ public class FftReal {
 
   /**
    * Computes a complex-to-real fast Fourier transform. 
-   * Transforms an input array cx[nfft+2] of nfft/2+1 complex numbers 
-   * to an output array ry[nfft] of nfft real numbers.
+   * Transforms a 1-D input array cx[nfft+2] of nfft/2+1 complex numbers 
+   * to a 1-D output array ry[nfft] of nfft real numbers.
    * @param sign the sign (1 or -1) of the exponent used in the FFT.
    * @param cx the input array.
    * @param ry the output array.
    */
   public void complexToReal(int sign, float[] cx, float[] ry) {
-    Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
-    Check.argument(cx.length>=_nfft+2,"cy.length is valid");
-    Check.argument(ry.length>=_nfft,"rx.length is valid");
+    checkSign(sign);
+    checkArray(_nfft+2,cx,"cx");
+    checkArray(_nfft,ry,"ry");
     if (cx!=ry) {
       int n = _nfft;
       while (--n>=2)
@@ -150,77 +186,72 @@ public class FftReal {
 
   /**
    * Computes a real-to-complex dimension-1 fast Fourier transform. 
-   * Transforms an input array rx[n2][nfft] of n2*nfft real numbers to 
-   * an output array cy[n2][nfft+2] of n2*(nfft/2+1) complex numbers.
+   * Transforms a 2-D input array rx[n2][nfft] of n2*nfft real numbers to 
+   * a 2-D output array cy[n2][nfft+2] of n2*(nfft/2+1) complex numbers.
    * @param sign the sign (1 or -1) of the exponent used in the FFT.
    * @param n2 the 2nd dimension of arrays.
    * @param rx the input array.
    * @param cy the output array.
    */
   public void realToComplex1(int sign, int n2, float[][] rx, float[][] cy) {
-    Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
-    Check.argument(rx.length>=n2,"rx.length is valid");
-    Check.argument(cy.length>=n2,"cy.length is valid");
-    for (int i2=0; i2<n2; ++i2) {
-      Check.argument(rx[i2].length>=_nfft,"rx[i2].length is valid");
-      Check.argument(cy[i2].length>=_nfft+2,"cy[i2].length is valid");
+    checkSign(sign);
+    checkArray(_nfft,n2,rx,"rx");
+    checkArray(_nfft+2,n2,cy,"cy");
+    for (int i2=0; i2<n2; ++i2)
       realToComplex(sign,rx[i2],cy[i2]);
-    }
   }
 
   /**
    * Computes a complex-to-real dimension-1 fast Fourier transform. 
-   * Transforms an input array cx[n2][nfft+2] of n2*(nfft/2+1) complex 
-   * numbers to an output array ry[n2][nfft] of n2*nfft real numbers.
+   * Transforms a 2-D input array cx[n2][nfft+2] of n2*(nfft/2+1) complex 
+   * numbers to a 2-D output array ry[n2][nfft] of n2*nfft real numbers.
    * @param sign the sign (1 or -1) of the exponent used in the FFT.
    * @param n2 the 2nd dimension of arrays.
    * @param cx the input array.
    * @param ry the output array.
    */
   public void complexToReal1(int sign, int n2, float[][] cx, float[][] ry) {
-    Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
-    Check.argument(cx.length>=n2,"cx.length is valid");
-    Check.argument(ry.length>=n2,"ry.length is valid");
-    for (int i2=0; i2<n2; ++i2) {
-      Check.argument(cx[i2].length>=_nfft+2,"cx[i2].length is valid");
-      Check.argument(ry[i2].length>=_nfft,"ry[i2].length is valid");
+    checkSign(sign);
+    checkArray(_nfft+2,n2,cx,"cx");
+    checkArray(_nfft,n2,ry,"ry");
+    for (int i2=0; i2<n2; ++i2)
       complexToReal(sign,cx[i2],ry[i2]);
-    }
   }
 
   /**
    * Computes a real-to-complex dimension-2 fast Fourier transform. 
-   * Transforms an input array rx[nfft][n1] of nfft*n1 real numbers to an 
-   * output array cy[nfft/2+1][2*n1] of (nfft/2+1)*n1 complex numbers.
+   * Transforms a 2-D input array rx[nfft][n1] of nfft*n1 real numbers to a
+   * 2-D output array cy[nfft/2+1][2*n1] of (nfft/2+1)*n1 complex numbers.
    * @param sign the sign (1 or -1) of the exponent used in the FFT.
    * @param n1 the 1st dimension of arrays.
    * @param rx the input array.
    * @param cy the output array.
    */
   public void realToComplex2(int sign, int n1, float[][] rx, float[][] cy) {
-    Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
-    Check.argument(rx.length>=_nfft,"rx.length is valid");
-    Check.argument(cy.length>=_nfft/2+1,"cy.length is valid");
-    for (int i2=0,j2=0; j2<_nfft; ++i2,j2+=2) {
-      Check.argument(rx[j2  ].length>=n1,"rx[i2].length is valid");
-      Check.argument(rx[j2+1].length>=n1,"rx[i2].length is valid");
-      Check.argument(cy[i2].length>=2*n1,"cy[i2].length is valid");
-      float[] rxj2r= rx[j2  ];
-      float[] rxj2i= rx[j2+1];
-      float[] cyi2 = cy[i2];
-      for (int i1=0,j1=0; i1<n1; ++i1,j1+=2) {
-        cyi2[j1  ] = 0.5f*rxj2r[i1];
-        cyi2[j1+1] = 0.5f*rxj2i[i1];
+    checkSign(sign);
+    checkArray(n1,_nfft,rx,"rx");
+    checkArray(2*n1,_nfft/2+1,cy,"cy");
+
+    // Pack real input rx into complex output cy. This is complicated 
+    // so that it works when input and output arrays are the same.
+    for (int i1=n1-1,j1=i1*2; i1>=0; --i1,j1-=2) {
+      for (int i2=_nfft-2,j2=i2/2; i2>=0; i2-=2,--j2) {
+        cy[j2][j1  ] = 0.5f*rx[i2  ][i1];
+        cy[j2][j1+1] = 0.5f*rx[i2+1][i1];
       }
     }
+
+    // Dimension-2 complex-to-complex transform.
     Pfacc.transform2a(sign,n1,_nfft/2,cy);
-    float[] cyj2 = cy[0];
-    float[] cyk2 = cy[_nfft/2];
-    for (int i1=0; i1<n1; ++i1) {
-      cyk2[i1  ] = 2.0f*(cyj2[i1]-cyj2[i1+1]);
-      cyj2[i1  ] = 2.0f*(cyj2[i1]+cyj2[i1+1]);
-      cyk2[i1+1] = 0.0f;
-      cyj2[i1+1] = 0.0f;
+
+    // Finish transform.
+    float[] cy0 = cy[0];
+    float[] cyn = cy[_nfft/2];
+    for (int i1=2*n1-2; i1>=0; i1-=2) {
+      cyn[i1  ] = 2.0f*(cy0[i1]-cy0[i1+1]);
+      cy0[i1  ] = 2.0f*(cy0[i1]+cy0[i1+1]);
+      cyn[i1+1] = 0.0f;
+      cy0[i1+1] = 0.0f;
     }
     double theta = sign*2.0*PI/_nfft;
     double wt = sin(0.5*theta);
@@ -229,8 +260,8 @@ public class FftReal {
     double wr = 1.0+wpr;
     double wi = wpi;
     for (int j2=1,k2=_nfft/2-1; j2<=k2; ++j2,--k2) {
-      cyj2 = cy[j2];
-      cyk2 = cy[k2];
+      float[] cyj2 = cy[j2];
+      float[] cyk2 = cy[k2];
       for (int i1=0,j1=0; i1<n1; ++i1,j1+=2) {
         float sumr = cyj2[j1  ]+cyk2[j1  ];
         float sumi = cyj2[j1+1]+cyk2[j1+1];
@@ -251,41 +282,32 @@ public class FftReal {
 
   /**
    * Computes a complex-to-real dimension-2 fast Fourier transform. 
-   * Transforms an input array cx[nfft/2+1][2*n1] of (nfft/2+1)*n1 complex
-   * numbers to an output array ry[nfft][n1] of nfft*n1 real numbers.
+   * Transforms a 2-D input array cx[nfft/2+1][2*n1] of (nfft/2+1)*n1 complex
+   * numbers to a 2-D output array ry[nfft][n1] of nfft*n1 real numbers.
    * @param sign the sign (1 or -1) of the exponent used in the FFT.
    * @param n1 the 1st dimension of arrays.
    * @param cx the input array.
    * @param ry the output array.
    */
   public void complexToReal2(int sign, int n1, float[][] cx, float[][] ry) {
-    Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
-    Check.argument(cx.length>=_nfft/2+1,"cx.length is valid");
-    Check.argument(ry.length>=_nfft,"ry.length is valid");
-    for (int i2=_nfft/2-1,j2=_nfft-2; j2>0; --i2,j2-=2) {
-      Check.argument(cx[i2].length>=2*n1,"cx[i2].length is valid");
-      Check.argument(ry[j2  ].length>=n1,"ry[i2].length is valid");
-      Check.argument(ry[j2+1].length>=n1,"ry[i2].length is valid");
-      float[] cxi2 = cx[i2];
-      float[] ryj2r = ry[j2  ];
-      float[] ryj2i = ry[j2+1];
-      for (int i1=0,j1=0; i1<n1; ++i1,j1+=2) {
-        ryj2r[i1] = cxi2[j1  ];
-        ryj2i[i1] = cxi2[j1+1];
+    checkSign(sign);
+    checkArray(2*n1,_nfft/2+1,cx,"cx");
+    checkArray(n1,_nfft,ry,"ry");
+
+    // Unpack complex input cx into real output ry. This is complicated 
+    // so that it works when input and output arrays are the same.
+    for (int i1=0,j1=0; j1<n1; i1+=2,++j1) {
+      float cx0 = cx[0      ][i1];
+      float cxn = cx[_nfft/2][i1];
+      for (int i2=_nfft/2-1,j2=2*i2; i2>0; --i2,j2-=2) {
+        ry[j2  ][j1] = cx[i2][i1  ];
+        ry[j2+1][j1] = cx[i2][i1+1];
       }
+      ry[1][j1] = cx0-cxn;
+      ry[0][j1] = cx0+cxn;
     }
-    float[] cxzero = cx[0];
-    float[] cxlast = cx[_nfft/2];
-    float[] ry0 = ry[0];
-    float[] ry1 = ry[1];
-    Check.argument(cxzero.length>=2*n1,"cx[i2].length is valid");
-    Check.argument(cxlast.length>=2*n1,"cx[i2].length is valid");
-    Check.argument(ry0.length>=n1,"ry[0].length is valid");
-    Check.argument(ry1.length>=n1,"ry[1].length is valid");
-    for (int i1=0,j1=0; i1<n1; ++i1,j1+=2) {
-      ry1[i1] = cxzero[j1]-cxlast[j1];
-      ry0[i1] = cxzero[j1]+cxlast[j1];
-    }
+
+    // Begin transform.
     double theta = -sign*2.0*PI/_nfft;
     double wt = sin(0.5*theta);
     double wpr = -2.0*wt*wt; // = cos(theta)-1, with less rounding error
@@ -313,13 +335,15 @@ public class FftReal {
       wr += wr*wpr-wi*wpi;
       wi += wi*wpr+wt*wpi;
     }
+
+    // Dimension-2 complex-to-complex transform.
     Pfacc.transform2b(sign,n1,_nfft/2,ry);
   }
 
   /**
-   * Scales n1 real numbers in the specified array by 1/nfft. The 
-   * inverse of a real-to-complex FFT is a complex-to-real FFT (with 
-   * opposite sign) followed by this scaling.
+   * Scales n1 real numbers in the specified array by 1/nfft. 
+   * The inverse of a real-to-complex FFT is a complex-to-real FFT 
+   * (with opposite sign) followed by this scaling.
    * @param n1 1st (only) dimension of the array rx.
    * @param rx the input/output array[n1].
    */
@@ -330,54 +354,35 @@ public class FftReal {
   }
 
   /**
-   * Returns a new FFT optimized for memory. The FFT length will be the 
-   * smallest valid length that is not less than the specified length n.
-   * @param n the lower bound on FFT length.
-   * @return the FFT.
+   * Scales n1*n2 real numbers in the specified array by 1/nfft. 
+   * The inverse of a real-to-complex FFT is a complex-to-real FFT 
+   * (with opposite sign) followed by this scaling.
+   * @param n1 the 1st dimension of the array rx.
+   * @param n2 the 2nd dimension of the array rx.
+   * @param rx the input/output array[n2][n1].
    */
-  public static FftReal small(int n) {
-    return new FftReal(nfftSmall(n));
-  }
-
-  /**
-   * Returns a new FFT optimized for speed. The FFT length will be the 
-   * fastest valid length that is not less than the specified length n.
-   * @param n the lower bound on FFT length.
-   * @return the FFT.
-   */
-  public static FftReal fast(int n) {
-    return new FftReal(nfftFast(n));
-  }
-
-  /**
-   * Returns an FFT length optimized for memory. The FFT length will be the 
-   * smallest valid length that is not less than the specified length n.
-   * @param n the lower bound on FFT length.
-   * @return the FFT length.
-   * @exception IllegalArgumentException if the specified length n exceeds
-   *  the maximum length supported by this implementation. Currently, the 
-   *  maximum length is 1,441,440.
-   */
-  public static int nfftSmall(int n) {
-    Check.argument(n<=1441440,"n does not exceed 1441440");
-    return 2*Pfacc.nfftSmall((n+1)/2);
-  }
-
-  /**
-   * Returns an FFT length optimized for speed. The FFT length will be the 
-   * fastest valid length that is not less than the specified length n.
-   * @param n the lower bound on FFT length.
-   * @return the FFT length.
-   * @exception IllegalArgumentException if the specified length n exceeds
-   *  the maximum length supported by this implementation. Currently, the 
-   *  maximum length is 1,441,440.
-   */
-  public static int nfftFast(int n) {
-    return nfftSmall(n); // TODO: implement
+  public void scale(int n1, int n2, float[][] rx) {
+    for (int i2=0; i2<n2; ++i2)
+      scale(n1,rx[i2]);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
   private int _nfft; // FFT length (number of real numbers to transform)
+
+  private static void checkSign(int sign) {
+    Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
+  }
+
+  private static void checkArray(int n, float[] a, String name) {
+    Check.argument(a.length>=n,"dimensions of "+name+" are valid");
+  }
+
+  private static void checkArray(int n1, int n2, float[][] a, String name) {
+    boolean ok = a.length>=n2;
+    for (int i2=0; i2<n2 && ok; ++i2)
+      ok = a[i2].length>=n1;
+    Check.argument(ok,"dimensions of "+name+" are valid");
+  }
 }
