@@ -13,7 +13,14 @@ import javax.swing.*;
 import edu.mines.jtk.util.*;
 
 /**
- * A tile axis in a mosaic.
+ * A tile axis in a mosaic. Tile axes may be placed along the top, left,
+ * bottom, and right sides of the mosaic of tiles. Each horizontal (top or
+ * bottom) axis annotates the tiles in its column, and each vertical (left
+ * or right) axis annotates the tiles in its row.
+ * <p>
+ * Axis tics, tic annotations, and the (optional) axis label are painted 
+ * using the tile axis font and foreground colors.
+ *
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.27
  */
@@ -24,98 +31,72 @@ public class TileAxis extends JPanel {
   public static final int BOTTOM = 3;
   public static final int RIGHT = 4;
 
+  /**
+   * Gets the placement of this axis.
+   * @return the placement.
+   */
   public int getPlacement() {
     return _placement;
   }
 
+  /**
+   * Gets the row or column index for this axis.
+   * @return the row or column index.
+   */
   public int getIndex() {
     return _index;
   }
 
+  /**
+   * Sets the label for this axis.
+   * @param label the label.
+   */
+  public void setLabel(String label) {
+    _label = label;
+    _mosaic.validate();
+    repaint();
+  }
+
+  /**
+   * Sets the format for major tic annotation for this axis.
+   * The default format is "%1.4G", which yields a minimum of 1 digit,
+   * with up to 4 digits of precision. Any trailing zeros and decimal
+   * point are removed from tic annotation.
+   * @param format the format.
+   */
+  public void setFormat(String format) {
+    _format = format;
+    _mosaic.validate();
+    repaint();
+  }
+
+  // Override base class, so we can validate the mosaic layout. Must check 
+  // for a null mosaic, because this method is called by the base class 
+  // constructor, before our constructor sets the (non-null) mosaic.
   public void setFont(Font font) {
     super.setFont(font);
     if (_mosaic!=null)
       _mosaic.validate();
   }
 
-  public void setLabel(String label) {
-    _label = label;
-    _mosaic.validate();
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // package
-
-  TileAxis(Mosaic mosaic, int placement, int index) {
-    _mosaic = mosaic;
-    _placement = placement;
-    _index = index;
-    mosaic.add(this);
-  }
-
-  /**
-   * Gets the width minimum for this axis. This width does not include 
-   * any border that will be drawn by the mosaic.
-   */
-  int getWidthMinimum() {
-    Graphics g = getGraphics();
-    FontMetrics fm = g.getFontMetrics();
-    int width = 0;
-    if (isVertical()) {
-      width = countTicChars()*fm.charWidth('3')+fm.getHeight();
-      if (_label!=null)
-        width += fm.getHeight();
-    } else {
-      width = 20;
-      if (_label!=null)
-        width = Math.max(width,fm.stringWidth(_label));
-    }
-    g.dispose();
-    return width;
-  }
-
-  /**
-   * Gets the height minimum for this axis. This height does not include 
-   * any border that will be drawn by the mosaic.
-   */
-  int getHeightMinimum() {
-    Graphics g = getGraphics();
-    FontMetrics fm = g.getFontMetrics();
-    int height = 0;
-    if (isHorizontal()) {
-      height = 2*fm.getHeight();
-      if (_label!=null)
-        height += fm.getHeight();
-    } else {
-      height = 20;
-      if (_label!=null)
-        height = Math.max(height,fm.stringWidth(_label));
-    }
-    g.dispose();
-    return height;
-  }
-
   ///////////////////////////////////////////////////////////////////////////
   // protected
-
-  protected void paintComponentX(Graphics g) {
-    super.paintComponent(g);
-    int width = getWidth();
-    int height = getHeight();
-    g.setColor(Color.RED);
-    g.fillRect(0,0,width,height);
-    FontMetrics fm = g.getFontMetrics();
-    int sw = fm.stringWidth("Axis");
-    int sh = fm.getAscent();
-    int x = width/2-sw/2;
-    int y = height/2+sh/2;
-    g.setColor(Color.BLACK);
-    g.drawString("Axis",x,y);
-  }
 
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
     Graphics2D g2d = (Graphics2D)g;
+    g2d.setRenderingHint(
+      RenderingHints.KEY_ANTIALIASING,
+      RenderingHints.VALUE_ANTIALIAS_ON);
+
+    // Adjacent tile; if none, do nothing.
+    Tile tile = getTile();
+    if (tile==null)
+      return;
+
+    // Projector and transcaler of adjacent tile.
+    Projector p = getProjector();
+    Transcaler t = getTranscaler();
 
     // Axis size.
     int w = getWidth();
@@ -134,10 +115,6 @@ public class TileAxis extends JPanel {
     // Length of major tics.
     int tl = 2*fa/3;
 
-    // Projector and transcaler of adjacent tile.
-    Projector p = getProjector();
-    Transcaler t = getTranscaler();
-
     // Axis placement.
     boolean isHorizontal = isHorizontal();
     boolean isTop = isTop();
@@ -145,17 +122,15 @@ public class TileAxis extends JPanel {
 
     // Axis tics.
     AxisTics at;
+    double vmin = min(p.v0(),p.v1());
+    double vmax = max(p.v0(),p.v1());
     if (isHorizontal) {
-      int nmax = 6; // TODO: compute maximum number of tics to fit
-      double vmin = min(p.v0(),p.v1());
-      double vmax = max(p.v0(),p.v1());
+      int nmax = 2+w/maxTicStringWidth(fm);
       double v0 = max(vmin,min(vmax,p.v(t.x(0))));
       double v1 = max(vmin,min(vmax,p.v(t.x(w-1))));
       at = new AxisTics(v0,v1,nmax);
     } else {
-      int nmax = 4; // TODO: compute maximum number of tics to fit
-      double vmin = min(p.v0(),p.v1());
-      double vmax = max(p.v0(),p.v1());
+      int nmax = max(2,h/(2*fh));
       double v0 = max(vmin,min(vmax,p.v(t.y(0))));
       double v1 = max(vmin,min(vmax,p.v(t.y(h-1))));
       at = new AxisTics(v0,v1,nmax);
@@ -238,21 +213,77 @@ public class TileAxis extends JPanel {
     }
 
     // Axis label.
-    if (isHorizontal) {
-      int wl = fm.stringWidth(_label);
-      int xl = max(0,min(w-wl,(w-wl)/2));
-      int yl = isTop?h-1-tl-fh-fd:tl+fh+fa;
-      g2d.drawString(_label,xl,yl);
-    } else {
-      int wl = fm.stringWidth(_label);
-      int xl = isLeft?max(fa,w-1-tl-fd-wsmax-fd-fl):min(w-1-fd,tl+fd+wsmax+fh);
-      int yl = max(wl,min(h,(h+wl)/2));
-      g2d.translate(xl,yl);
-      g2d.rotate(-PI/2.0);
-      g2d.drawString(_label,0,0);
-      g2d.rotate(PI/2.0);
-      g2d.translate(-xl,-yl);
+    if (_label!=null) {
+      if (isHorizontal) {
+        int wl = fm.stringWidth(_label);
+        int xl = max(0,min(w-wl,(w-wl)/2));
+        int yl = isTop?h-1-tl-fh-fd:tl+fh+fa;
+        g2d.drawString(_label,xl,yl);
+      } else {
+        int wl = fm.stringWidth(_label);
+        int xl = isLeft ?
+          max(fa,w-1-tl-fd-wsmax-fd-fl) :
+          min(w-1-fd,tl+fd+wsmax+fh);
+        int yl = max(wl,min(h,(h+wl)/2));
+        g2d.translate(xl,yl);
+        g2d.rotate(-PI/2.0);
+        g2d.drawString(_label,0,0);
+        g2d.rotate(PI/2.0);
+        g2d.translate(-xl,-yl);
+      }
     }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // package
+
+  TileAxis(Mosaic mosaic, int placement, int index) {
+    _mosaic = mosaic;
+    _placement = placement;
+    _index = index;
+    mosaic.add(this);
+  }
+
+  /**
+   * Gets the width minimum for this axis. This width does not include 
+   * any border that will be drawn by the mosaic.
+   */
+  int getWidthMinimum() {
+    Graphics g = getGraphics();
+    FontMetrics fm = g.getFontMetrics();
+    int width = 0;
+    if (isVertical()) {
+      width = maxTicStringWidth(fm)+fm.getHeight();
+      if (_label!=null)
+        width += fm.getHeight();
+    } else {
+      width = 20;
+      if (_label!=null)
+        width = max(width,fm.stringWidth(_label));
+    }
+    g.dispose();
+    return width;
+  }
+
+  /**
+   * Gets the height minimum for this axis. This height does not include 
+   * any border that will be drawn by the mosaic.
+   */
+  int getHeightMinimum() {
+    Graphics g = getGraphics();
+    FontMetrics fm = g.getFontMetrics();
+    int height = 0;
+    if (isHorizontal()) {
+      height = 2*fm.getHeight();
+      if (_label!=null)
+        height += fm.getHeight();
+    } else {
+      height = 20;
+      if (_label!=null)
+        height = max(height,fm.stringWidth(_label));
+    }
+    g.dispose();
+    return height;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -261,8 +292,14 @@ public class TileAxis extends JPanel {
   private Mosaic _mosaic;
   private int _placement;
   private int _index;
-  private String _format = "%1.6g";
-  private String _label = "Axis Label";
+  private String _label;
+  private String _format = "%1.4G";
+
+  // Returns the maximum width of a formatted tic string.
+  private int maxTicStringWidth(FontMetrics fm) {
+    double vtic = -0.123456789E-10;
+    return fm.stringWidth(formatTic(vtic));
+  }
 
   // Formats tic value, removing any trailing zeros and decimal point.
   private String formatTic(double v) {
@@ -307,10 +344,6 @@ public class TileAxis extends JPanel {
 
   private boolean isVertical() {
     return _placement==LEFT || _placement==RIGHT;
-  }
-
-  private int countTicChars() {
-    return 8;
   }
 
   private Tile getTile() {
