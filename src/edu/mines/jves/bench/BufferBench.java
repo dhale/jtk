@@ -14,8 +14,8 @@ public class BufferBench {
   }
 
   public static void testOutOfMemory() {
-    int capacity = 1000000000;
-    int nbuf = 10;
+    int capacity = 100000000;
+    int nbuf = 100;
     byte data = 31;
     for (int ibuf=0; ibuf<nbuf; ++ibuf) {
       ByteBuffer bb = newByteBuffer(capacity);
