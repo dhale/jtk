@@ -64,7 +64,7 @@ public class ThreadLocalBench {
     long pointer;
   }
 
-  private static ThreadLocal contexts = new ThreadLocal();
+  private static ThreadLocal<Context> contexts = new ThreadLocal<Context>();
   private static native void nativeMethod(int i);
   private static native void nativeMethodWithContext(long pointer, int i);
 

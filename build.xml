@@ -58,6 +58,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       compiler="javac1.5"
       debug="on" 
       deprecation="on">
+      <compilerarg value="-Xlint:unchecked"/>
       <classpath refid="classpath"/>
       <exclude name="edu/mines/jves/opengl/linux-gtk/**"/>
       <exclude name="edu/mines/jves/opengl/win32/**"/>

@@ -3113,7 +3113,7 @@ public class Gl {
   // package
 
   static GlContext getContext() {
-    return (GlContext)_context.get();
+    return _context.get();
   }
 
   static void setContext(GlContext context) {
@@ -3123,7 +3123,9 @@ public class Gl {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private static ThreadLocal _context = new ThreadLocal();
+  private static ThreadLocal<GlContext> _context = 
+    new ThreadLocal<GlContext>();
+
   private Gl() {
   }
 

@@ -127,7 +127,7 @@ public class Jnicpp extends MatchingTask {
       int narg = _incargs.size();
       String[] incArgs = new String[narg];
       for (int iarg=0; iarg<narg; ++iarg)
-        incArgs[iarg] = ((Incarg)_incargs.get(iarg)).getArg();
+        incArgs[iarg] = _incargs.get(iarg).getArg();
       for (int i=0; i<cppFiles.length; ++i) {
         File cppFile = cppFiles[i];
         String objName = gpm.mapFileName(cppFile.getName())[0];
@@ -147,7 +147,7 @@ public class Jnicpp extends MatchingTask {
       int narg = _libargs.size();
       String[] libArgs = new String[narg];
       for (int iarg=0; iarg<narg; ++iarg)
-        libArgs[iarg] = ((Libarg)_libargs.get(iarg)).getArg();
+        libArgs[iarg] = _libargs.get(iarg).getArg();
       log("  linking "+jniFile.getName());
       link(jniFile,objFiles,libArgs);
     }
@@ -160,8 +160,8 @@ public class Jnicpp extends MatchingTask {
   private File _objdir = null;
   private File _jnidir = null;
   private String _jniname = null;
-  private List _incargs = new ArrayList();
-  private List _libargs = new ArrayList();
+  private List<Incarg> _incargs = new ArrayList<Incarg>();
+  private List<Libarg> _libargs = new ArrayList<Libarg>();
   private static boolean _isLinux;
   private static boolean _isWindows;
   static {
