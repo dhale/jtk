@@ -97,14 +97,55 @@ public class TileZoomMode extends Mode {
   }
 
   private void endZoom(MouseEvent e) {
+
+    // Tile for which to set the view rectangle, and flags for x and y zoom.
+    Tile tile = null;
+    boolean zx = false;
+    boolean zy = false;
+
+    // If zoom began in a tile, ...
     if (_tile!=null) {
-      drawZoom(_tile,_xdraw,_ydraw,true,true);
+      tile = _tile;
+      zx = true;
+      zy = true;
+      drawZoom(_tile,_xdraw,_ydraw,zx,zy);
       _tile.removeMouseMotionListener(_mml);
       _tile = null;
-    } else if (_axis!=null) {
-      drawZoom(_axis,_xdraw,_ydraw,_axis.isHorizontal(),_axis.isVertical());
+    } 
+
+    // Else, if zoom began in an axis, ...
+    else if (_axis!=null) {
+      tile = _axis.getTile();
+      zx = _axis.isHorizontal();
+      zy = _axis.isVertical();
+      drawZoom(_axis,_xdraw,_ydraw,zx,zy);
       _axis.removeMouseMotionListener(_mml);
       _axis = null;
+    }
+
+    // If we have a tile for which we must set the view rectangle, ...
+    if (tile!=null && (zx || zy)) {
+      int xmin = min(_xbegin,_xdraw);
+      int xmax = max(_xbegin,_xdraw);
+      int ymin = min(_ybegin,_ydraw);
+      int ymax = max(_ybegin,_ydraw);
+      Transcaler ts = tile.getTranscaler();
+      DRectangle vr = tile.getViewRectangle();
+
+      // If zooming or unzooming x, ...
+      if (zx) {
+        vr.x = (xmin<xmax)?ts.x(xmin):0.0;
+        vr.width = (xmin<xmax)?ts.x(xmax)-vr.x:1.0;
+      }
+
+      // If zooming or unzooming y, ...
+      if (zy) {
+        vr.y = (ymin<ymax)?ts.y(ymin):0.0;
+        vr.height = (ymin<ymax)?ts.y(ymax)-vr.y:1.0;
+      }
+
+      // Set view rectangle of one tile, and mosaic will set the others.
+      tile.setViewRectangle(vr);
     }
   }
 

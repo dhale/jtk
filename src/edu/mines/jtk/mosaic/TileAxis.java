@@ -58,6 +58,26 @@ public class TileAxis extends JPanel {
   }
 
   /**
+   * Gets the tile adjacent to this axis.
+   * @return the tile.
+   */
+  public Tile getTile() {
+    if (isTop()) {
+      return _mosaic.getTile(0,_index);
+    } else if (isLeft()) {
+      return _mosaic.getTile(_index,0);
+    } else if (isBottom()) {
+      int irow = _mosaic.countRows()-1;
+      return _mosaic.getTile(irow,_index);
+    } else if (isRight()) {
+      int icol = _mosaic.countColumns()-1;
+      return _mosaic.getTile(_index,icol);
+    } else {
+      return null;
+    }
+  }
+
+  /**
    * Determines whether this axis is placed at top of mosaic.
    * @return true, if at top; false, otherwise.
    */
@@ -380,22 +400,6 @@ public class TileAxis extends JPanel {
       s = (iend<len)?sb+s.substring(iend,len):sb;
     }
     return s;
-  }
-
-  private Tile getTile() {
-    if (isTop()) {
-      return _mosaic.getTile(0,_index);
-    } else if (isLeft()) {
-      return _mosaic.getTile(_index,0);
-    } else if (isBottom()) {
-      int irow = _mosaic.countRows()-1;
-      return _mosaic.getTile(irow,_index);
-    } else if (isRight()) {
-      int icol = _mosaic.countColumns()-1;
-      return _mosaic.getTile(_index,icol);
-    } else {
-      return null;
-    }
   }
   
   private Projector getProjector() {
