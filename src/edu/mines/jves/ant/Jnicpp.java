@@ -193,10 +193,14 @@ public class Jnicpp extends MatchingTask {
     try {
       exitCode = execute.execute();
     } catch (IOException ioe) {
-      throwBuildException("cannot execute command \""+cl+"\"");
-    } finally {
-      return exitCode;
+      StringBuffer command = new StringBuffer();
+      for (int i=0; i<cl.length; ++i) {
+        command.append(cl[i]);
+        command.append(" ");
+      }
+      throwBuildException("cannot execute command \""+command+"\"");
     }
+    return exitCode;
   }
 
   ///////////////////////////////////////////////////////////////////////////

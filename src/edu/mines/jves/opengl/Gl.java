@@ -2934,6 +2934,159 @@ public class Gl {
   ///////////////////////////////////////////////////////////////////////////
   // OpenGL 1.5
 
+  public static void glGenQueries(
+    int n, int[] ids)
+  {
+    nglGenQueries(getContext().glGenQueries,
+      n,ids);
+  }
+  public static void glDeleteQueries(
+    int n, int[] ids)
+  {
+    nglDeleteQueries(getContext().glDeleteQueries,
+      n,ids);
+  }
+  public static boolean glIsQuery(
+    int id)
+  {
+    return nglIsQuery(getContext().glIsQuery,
+      id);
+  }
+  public static void glBeginQuery(
+    int target, int id)
+  {
+    nglBeginQuery(getContext().glBeginQuery,
+      target,id);
+  }
+  public static void glEndQuery(
+    int target)
+  {
+    nglEndQuery(getContext().glEndQuery,
+      target);
+  }
+  public static void glGetQueryiv(
+    int target, int pname, int[] params)
+  {
+    nglGetQueryiv(getContext().glGetQueryiv,
+      target,pname,params);
+  }
+  public static void glGetQueryObjectiv(
+    int id, int pname, int[] params)
+  {
+    nglGetQueryObjectiv(getContext().glGetQueryObjectiv,
+      id,pname,params);
+  }
+  public static void glGetQueryObjectuiv(
+    int id, int pname, int[] params)
+  {
+    nglGetQueryObjectuiv(getContext().glGetQueryObjectuiv,
+      id,pname,params);
+  }
+  public static void glBindBuffer(
+    int target, int buffer)
+  {
+    nglBindBuffer(getContext().glBindBuffer,
+      target,buffer);
+  }
+  public static void glDeleteBuffers(
+    int n, int[] buffers)
+  {
+    nglDeleteBuffers(getContext().glDeleteBuffers,
+      n,buffers);
+  }
+  public static void glGenBuffers(
+    int n, int[] buffers)
+  {
+    nglGenBuffers(getContext().glGenBuffers,
+      n,buffers);
+  }
+  public static boolean glIsBuffer(
+    int buffer)
+  {
+    return nglIsBuffer(getContext().glIsBuffer,
+      buffer);
+  }
+  public static void glBufferData(
+    int target, int size, Buffer data, int usage)
+  {
+    nglBufferData(getContext().glBufferData,
+      target,size,data,usage);
+  }
+  public static void glBufferSubData(
+    int target, int offset, int size, Buffer data)
+  {
+    nglBufferSubData(getContext().glBufferSubData,
+      target,offset,size,data);
+  }
+  public static void glGetBufferSubData(
+    int target, int offset, int size, Buffer data)
+  {
+    nglGetBufferSubData(getContext().glGetBufferSubData,
+      target,offset,size,data);
+  }
+  public static Buffer glMapBuffer(
+    int target, int access)
+  {
+    return nglMapBuffer(getContext().glMapBuffer,
+      target,access);
+  }
+  public static boolean glUnmapBuffer(
+    int target)
+  {
+    return nglUnmapBuffer(getContext().glUnmapBuffer,
+      target);
+  }
+  public static void glGetBufferParameteriv(
+    int target, int pname, int[] params)
+  {
+    nglGetBufferParameteriv(getContext().glGetBufferParameteriv,
+      target,pname,params);
+  }
+  public static void glGetBufferPointerv(
+    int target, int pname, Buffer[] params)
+  {
+    nglGetBufferPointerv(getContext().glGetBufferPointerv,
+      target,pname,params);
+  }
+  private static native void nglGenQueries(long pfunc,
+    int n, int[] ids);
+  private static native void nglDeleteQueries(long pfunc,
+    int n, int[] ids);
+  private static native boolean nglIsQuery(long pfunc,
+    int id);
+  private static native void nglBeginQuery(long pfunc,
+    int target, int id);
+  private static native void nglEndQuery(long pfunc,
+    int target);
+  private static native void nglGetQueryiv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglGetQueryObjectiv(long pfunc,
+    int id, int pname, int[] params);
+  private static native void nglGetQueryObjectuiv(long pfunc,
+    int id, int pname, int[] params);
+  private static native void nglBindBuffer(long pfunc,
+    int target, int buffer);
+  private static native void nglDeleteBuffers(long pfunc,
+    int n, int[] buffers);
+  private static native void nglGenBuffers(long pfunc,
+    int n, int[] buffers);
+  private static native boolean nglIsBuffer(long pfunc,
+    int buffer);
+  private static native void nglBufferData(long pfunc,
+    int target, int size, Buffer data, int usage);
+  private static native void nglBufferSubData(long pfunc,
+    int target, int offset, int size, Buffer data);
+  private static native void nglGetBufferSubData(long pfunc,
+    int target, int offset, int size, Buffer data);
+  private static native Buffer nglMapBuffer(long pfunc,
+    int target, int access);
+  private static native boolean nglUnmapBuffer(long pfunc,
+    int target);
+  private static native void nglGetBufferParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglGetBufferPointerv(long pfunc,
+    int target, int pname, Buffer[] params);
+
   ///////////////////////////////////////////////////////////////////////////
   // package
 

@@ -295,6 +295,24 @@ public class GlContext {
 
   // OpenGL 1.5
   long glGenQueries;
+  long glDeleteQueries;
+  long glIsQuery;
+  long glBeginQuery;
+  long glEndQuery;
+  long glGetQueryiv;
+  long glGetQueryObjectiv;
+  long glGetQueryObjectuiv;
+  long glBindBuffer;
+  long glDeleteBuffers;
+  long glGenBuffers;
+  long glIsBuffer;
+  long glBufferData;
+  long glBufferSubData;
+  long glGetBufferSubData;
+  long glMapBuffer;
+  long glUnmapBuffer;
+  long glGetBufferParameteriv;
+  long glGetBufferPointerv;
 
   private void getProcAddresses() {
 
@@ -435,6 +453,24 @@ public class GlContext {
 
     // OpenGL 1.5
     glGenQueries = getProcAddress("glGenQueries");
+    glDeleteQueries = getProcAddress("glDeleteQueries");
+    glIsQuery = getProcAddress("glIsQuery");
+    glBeginQuery = getProcAddress("glBeginQuery");
+    glEndQuery = getProcAddress("glEndQuery");
+    glGetQueryiv = getProcAddress("glGetQueryiv");
+    glGetQueryObjectiv = getProcAddress("glGetQueryObjectiv");
+    glGetQueryObjectuiv = getProcAddress("glGetQueryObjectuiv");
+    glBindBuffer = getProcAddress("glBindBuffer");
+    glDeleteBuffers = getProcAddress("glDeleteBuffers");
+    glGenBuffers = getProcAddress("glGenBuffers");
+    glIsBuffer = getProcAddress("glIsBuffer");
+    glBufferData = getProcAddress("glBufferData");
+    glBufferSubData = getProcAddress("glBufferSubData");
+    glGetBufferSubData = getProcAddress("glGetBufferSubData");
+    glMapBuffer = getProcAddress("glMapBuffer");
+    glUnmapBuffer = getProcAddress("glUnmapBuffer");
+    glGetBufferParameteriv = getProcAddress("glGetBufferParameteriv");
+    glGetBufferPointerv = getProcAddress("glGetBufferPointerv");
 
     // Do this only once.
     _gotProcAddresses = true;

@@ -3782,5 +3782,51 @@ JNI_GL_END
 /////////////////////////////////////////////////////////////////////////////
 // OpenGL 1.5
 
+JNI_GL_DECLARE2(glGenQueries)
+  jint n, jintArray jids
+JNI_GL_BEGIN2
+  JuintArray ids(env,jids);
+  (*(PFNGLGENQUERIESPROC)toPointer(pfunc))
+    (n,ids);
+JNI_GL_END
+
 /*
+  private static native void nglGenQueries(
+    int n, int[] ids);
+  private static native void nglDeleteQueries(
+    int n, int[] ids);
+  private static native boolean nglIsQuery(
+    int id);
+  private static native void nglBeginQuery(
+    int target, int id);
+  private static native void nglEndQuery(
+    int target);
+  private static native void nglGetQueryiv(
+    int target, int pname, int[] params);
+  private static native void nglGetQueryObjectiv(
+    int id, int pname, int[] params);
+  private static native void nglGetQueryObjectuiv(
+    int id, int pname, int[] params);
+  private static native void nglBindBuffer(
+    int target, int buffer);
+  private static native void nglDeleteBuffers(
+    int n, int[] buffers);
+  private static native void nglGenBuffers(
+    int n, int[] buffers);
+  private static native boolean nglIsBuffer(
+    int buffer);
+  private static native void nglBufferData(
+    int target, int size, Buffer data, int usage);
+  private static native void nglBufferSubData(
+    int target, int offset, int size, Buffer data);
+  private static native void nglGetBufferSubData(
+    int target, int offset, int size, Buffer data);
+  private static native Buffer nglMapBuffer(
+    int target, int access);
+  private static native boolean nglUnmapBuffer(
+    int target);
+  private static native void nglGetBufferParameteriv(
+    int target, int pname, int[] params);
+  private static native void nglGetBufferPointerv(
+    int target, int pname, Buffer[] params);
 */
