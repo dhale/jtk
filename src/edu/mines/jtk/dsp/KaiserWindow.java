@@ -15,11 +15,11 @@ import static edu.mines.jtk.util.MathPlus.*;
  * The Kaiser window may be defined by any two of three parameters: 
  * window length, transition width, and maximum absolute error. 
  * <p> 
- * For definiteness, let's assume that the Kaiser window is a function w(x) 
- * of argument x. Then, the window length is the range of x, centered about 
- * x = 0, for which the Kaiser window is non-zero. In other words, w(x) = 
- * 0 for x &gt; length/2. When windowing functions of time, both the window
- * length and the argument x of w(x) have dimensions of time. 
+ * For definiteness, we assume that the Kaiser window is a function w(x) 
+ * of argument x. Then, the window length is that range of x, centered 
+ * about x = 0, for which the Kaiser window is non-zero. In other words, 
+ * w(x) = 0 for x &gt; length/2. When windowing functions of time, both 
+ * the window length and the argument x of w(x) have dimensions of time. 
  * <p>
  * The transition width is the width of the central lobe in the Fourier 
  * transform of the window. For band-pass filters, this is the width of 
@@ -86,11 +86,11 @@ public class KaiserWindow {
   }
 
   /**
-   * Gets the value of this Kaiser window function for specified x.
-   * @param x the value at which to evaluate the Kaiser window function.
-   * @return the Kaiser window function value.
+   * Returns the value of this Kaiser window function w(x) for specified x.
+   * @param x the argument for which to evaluate w(x).
+   * @return the value w(x).
    */
-  public double getValue(double x) {
+  public double evaluate(double x) {
     double xx = x*x;
     return (xx<=_xxmax)?_scale*ino(_alpha*sqrt(1.0-xx/_xxmax)):0.0;
   }
