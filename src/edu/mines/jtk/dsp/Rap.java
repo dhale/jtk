@@ -533,6 +533,246 @@ public class Rap {
     int n1, int n2, int n3, float[][][] rx, float rb, float[][][] rz) {
     return _sub.apply(n1,n2,n3,rx,rb,rz);
   }
+  public static float[] mul(float[] rx, float[] ry) {
+    return _mul.apply(rx,ry);
+  }
+  public static float[] mul(float ra, float[] ry) {
+    return _mul.apply(ra,ry);
+  }
+  public static float[] mul(float[] rx, float rb) {
+    return _mul.apply(rx,rb);
+  }
+  public static float[][] mul(float[][] rx, float[][] ry) {
+    return _mul.apply(rx,ry);
+  }
+  public static float[][] mul(float ra, float[][] ry) {
+    return _mul.apply(ra,ry);
+  }
+  public static float[][] mul(float[][] rx, float rb) {
+    return _mul.apply(rx,rb);
+  }
+  public static float[][][] mul(float[][][] rx, float[][][] ry) {
+    return _mul.apply(rx,ry);
+  }
+  public static float[][][] mul(float ra, float[][][] ry) {
+    return _mul.apply(ra,ry);
+  }
+  public static float[][][] mul(float[][][] rx, float rb) {
+    return _mul.apply(rx,rb);
+  }
+  public static float[] mul(float[] rx, float[] ry, float[] rz) {
+    return _mul.apply(rx,ry,rz);
+  }
+  public static float[] mul(float ra, float[] ry, float[] rz) {
+    return _mul.apply(ra,ry,rz);
+  }
+  public static float[] mul(float[] rx, float rb, float[] rz) {
+    return _mul.apply(rx,rb,rz);
+  }
+  public static float[][] mul(float[][] rx, float[][] ry, float[][] rz) {
+    return _mul.apply(rx,ry,rz);
+  }
+  public static float[][] mul(float ra, float[][] ry, float[][] rz) {
+    return _mul.apply(ra,ry,rz);
+  }
+  public static float[][] mul(float[][] rx, float rb, float[][] rz) {
+    return _mul.apply(rx,rb,rz);
+  }
+  public static float[][][] mul(
+    float[][][] rx, float[][][] ry, float[][][] rz) {
+    return _mul.apply(rx,ry,rz);
+  }
+  public static float[][][] mul(
+    float ra, float[][][] ry, float[][][] rz) {
+    return _mul.apply(ra,ry,rz);
+  }
+  public static float[][][] mul(
+    float[][][] rx, float rb, float[][][] rz) {
+    return _mul.apply(rx,rb,rz);
+  }
+  public static float[] mul(int n1, float[] rx, float[] ry) {
+    return _mul.apply(n1,rx,ry);
+  }
+  public static float[] mul(int n1, float ra, float[] ry) {
+    return _mul.apply(n1,ra,ry);
+  }
+  public static float[] mul(int n1, float[] rx, float rb) {
+    return _mul.apply(n1,rx,rb);
+  }
+  public static float[][] mul(int n1, int n2, float[][] rx, float[][] ry) {
+    return _mul.apply(n1,n2,rx,ry);
+  }
+  public static float[][] mul(int n1, int n2, float ra, float[][] ry) {
+    return _mul.apply(n1,n2,ra,ry);
+  }
+  public static float[][] mul(int n1, int n2, float[][] rx, float rb) {
+    return _mul.apply(n1,n2,rx,rb);
+  }
+  public static float[][][] mul(
+    int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
+    return _mul.apply(n1,n2,n3,rx,ry);
+  }
+  public static float[][][] mul(
+    int n1, int n2, int n3, float ra, float[][][] ry) {
+    return _mul.apply(n1,n2,n3,ra,ry);
+  }
+  public static float[][][] mul(
+    int n1, int n2, int n3, float[][][] rx, float rb) {
+    return _mul.apply(n1,n2,n3,rx,rb);
+  }
+  public static float[] mul(int n1, float[] rx, float[] ry, float[] rz) {
+    return _mul.apply(n1,rx,ry,rz);
+  }
+  public static float[] mul(int n1, float ra, float[] ry, float[] rz) {
+    return _mul.apply(n1,ra,ry,rz);
+  }
+  public static float[] mul(int n1, float[] rx, float rb, float[] rz) {
+    return _mul.apply(n1,rx,rb,rz);
+  }
+  public static float[][] mul(
+    int n1, int n2, float[][] rx, float[][] ry, float[][] rz) {
+    return _mul.apply(n1,n2,rx,ry,rz);
+  }
+  public static float[][] mul(
+    int n1, int n2, float ra, float[][] ry, float[][] rz) {
+    return _mul.apply(n1,n2,ra,ry,rz);
+  }
+  public static float[][] mul(
+    int n1, int n2, float[][] rx, float rb, float[][] rz) {
+    return _mul.apply(n1,n2,rx,rb,rz);
+  }
+  public static float[][][] mul(
+    int n1, int n2, int n3, float[][][] rx, float[][][] ry, float[][][] rz) {
+    return _mul.apply(n1,n2,n3,rx,ry,rz);
+  }
+  public static float[][][] mul(
+    int n1, int n2, int n3, float ra, float[][][] ry, float[][][] rz) {
+    return _mul.apply(n1,n2,n3,ra,ry,rz);
+  }
+  public static float[][][] mul(
+    int n1, int n2, int n3, float[][][] rx, float rb, float[][][] rz) {
+    return _mul.apply(n1,n2,n3,rx,rb,rz);
+  }
+  public static float[] div(float[] rx, float[] ry) {
+    return _div.apply(rx,ry);
+  }
+  public static float[] div(float ra, float[] ry) {
+    return _div.apply(ra,ry);
+  }
+  public static float[] div(float[] rx, float rb) {
+    return _div.apply(rx,rb);
+  }
+  public static float[][] div(float[][] rx, float[][] ry) {
+    return _div.apply(rx,ry);
+  }
+  public static float[][] div(float ra, float[][] ry) {
+    return _div.apply(ra,ry);
+  }
+  public static float[][] div(float[][] rx, float rb) {
+    return _div.apply(rx,rb);
+  }
+  public static float[][][] div(float[][][] rx, float[][][] ry) {
+    return _div.apply(rx,ry);
+  }
+  public static float[][][] div(float ra, float[][][] ry) {
+    return _div.apply(ra,ry);
+  }
+  public static float[][][] div(float[][][] rx, float rb) {
+    return _div.apply(rx,rb);
+  }
+  public static float[] div(float[] rx, float[] ry, float[] rz) {
+    return _div.apply(rx,ry,rz);
+  }
+  public static float[] div(float ra, float[] ry, float[] rz) {
+    return _div.apply(ra,ry,rz);
+  }
+  public static float[] div(float[] rx, float rb, float[] rz) {
+    return _div.apply(rx,rb,rz);
+  }
+  public static float[][] div(float[][] rx, float[][] ry, float[][] rz) {
+    return _div.apply(rx,ry,rz);
+  }
+  public static float[][] div(float ra, float[][] ry, float[][] rz) {
+    return _div.apply(ra,ry,rz);
+  }
+  public static float[][] div(float[][] rx, float rb, float[][] rz) {
+    return _div.apply(rx,rb,rz);
+  }
+  public static float[][][] div(
+    float[][][] rx, float[][][] ry, float[][][] rz) {
+    return _div.apply(rx,ry,rz);
+  }
+  public static float[][][] div(
+    float ra, float[][][] ry, float[][][] rz) {
+    return _div.apply(ra,ry,rz);
+  }
+  public static float[][][] div(
+    float[][][] rx, float rb, float[][][] rz) {
+    return _div.apply(rx,rb,rz);
+  }
+  public static float[] div(int n1, float[] rx, float[] ry) {
+    return _div.apply(n1,rx,ry);
+  }
+  public static float[] div(int n1, float ra, float[] ry) {
+    return _div.apply(n1,ra,ry);
+  }
+  public static float[] div(int n1, float[] rx, float rb) {
+    return _div.apply(n1,rx,rb);
+  }
+  public static float[][] div(int n1, int n2, float[][] rx, float[][] ry) {
+    return _div.apply(n1,n2,rx,ry);
+  }
+  public static float[][] div(int n1, int n2, float ra, float[][] ry) {
+    return _div.apply(n1,n2,ra,ry);
+  }
+  public static float[][] div(int n1, int n2, float[][] rx, float rb) {
+    return _div.apply(n1,n2,rx,rb);
+  }
+  public static float[][][] div(
+    int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
+    return _div.apply(n1,n2,n3,rx,ry);
+  }
+  public static float[][][] div(
+    int n1, int n2, int n3, float ra, float[][][] ry) {
+    return _div.apply(n1,n2,n3,ra,ry);
+  }
+  public static float[][][] div(
+    int n1, int n2, int n3, float[][][] rx, float rb) {
+    return _div.apply(n1,n2,n3,rx,rb);
+  }
+  public static float[] div(int n1, float[] rx, float[] ry, float[] rz) {
+    return _div.apply(n1,rx,ry,rz);
+  }
+  public static float[] div(int n1, float ra, float[] ry, float[] rz) {
+    return _div.apply(n1,ra,ry,rz);
+  }
+  public static float[] div(int n1, float[] rx, float rb, float[] rz) {
+    return _div.apply(n1,rx,rb,rz);
+  }
+  public static float[][] div(
+    int n1, int n2, float[][] rx, float[][] ry, float[][] rz) {
+    return _div.apply(n1,n2,rx,ry,rz);
+  }
+  public static float[][] div(
+    int n1, int n2, float ra, float[][] ry, float[][] rz) {
+    return _div.apply(n1,n2,ra,ry,rz);
+  }
+  public static float[][] div(
+    int n1, int n2, float[][] rx, float rb, float[][] rz) {
+    return _div.apply(n1,n2,rx,rb,rz);
+  }
+  public static float[][][] div(
+    int n1, int n2, int n3, float[][][] rx, float[][][] ry, float[][][] rz) {
+    return _div.apply(n1,n2,n3,rx,ry,rz);
+  }
+  public static float[][][] div(
+    int n1, int n2, int n3, float ra, float[][][] ry, float[][][] rz) {
+    return _div.apply(n1,n2,n3,ra,ry,rz);
+  }
+  public static float[][][] div(
+    int n1, int n2, int n3, float[][][] rx, float rb, float[][][] rz) {
+    return _div.apply(n1,n2,n3,rx,rb,rz);
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   // binary operations; e.g., add, sub, mul, div, ...
@@ -743,6 +983,40 @@ public class Rap {
     float[] apply(int n1, float[] rx, float rb, float[] rz) {
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = rx[i1]-rb;
+      return rz;
+    }
+  };
+  private static Binary _mul = new Binary() {
+    float[] apply(int n1, float[] rx, float[] ry, float[] rz) {
+      for (int i1=0; i1<n1; ++i1)
+        rz[i1] = rx[i1]*ry[i1];
+      return rz;
+    }
+    float[] apply(int n1, float ra, float[] ry, float[] rz) {
+      for (int i1=0; i1<n1; ++i1)
+        rz[i1] = ra*ry[i1];
+      return rz;
+    }
+    float[] apply(int n1, float[] rx, float rb, float[] rz) {
+      for (int i1=0; i1<n1; ++i1)
+        rz[i1] = rx[i1]*rb;
+      return rz;
+    }
+  };
+  private static Binary _div = new Binary() {
+    float[] apply(int n1, float[] rx, float[] ry, float[] rz) {
+      for (int i1=0; i1<n1; ++i1)
+        rz[i1] = rx[i1]/ry[i1];
+      return rz;
+    }
+    float[] apply(int n1, float ra, float[] ry, float[] rz) {
+      for (int i1=0; i1<n1; ++i1)
+        rz[i1] = ra/ry[i1];
+      return rz;
+    }
+    float[] apply(int n1, float[] rx, float rb, float[] rz) {
+      for (int i1=0; i1<n1; ++i1)
+        rz[i1] = rx[i1]/rb;
       return rz;
     }
   };
