@@ -44,7 +44,9 @@ public class LollipopViewTest {
     float[] x = new float[n];
     float[] y = new float[n];
     x[0] = x[n-1] = x[n/2] = 1.0f;
-    filter(0.8f,x,y);
+    //filter1(0.8f,x,y);
+    filter2(0.8f,x,y);
+    //filter3(0.8f,x,y);
 
     tileA.addTiledView(makeView(n,d,f,x));
     tileB.addTiledView(makeView(n,d,f,y));
@@ -80,7 +82,7 @@ public class LollipopViewTest {
     lv.setShowZero(LollipopView.ShowZero.MIDDLE);
     return lv;
   }
-  private static void filter(float a, float[] x, float[] y) {
+  private static void filter1(float a, float[] x, float[] y) {
     int n = x.length;
     float yim1 = 0.0f;
     for (int i=0; i<n; ++i) {
@@ -93,6 +95,37 @@ public class LollipopViewTest {
       y[i] += yi;
       yip1 = yi;
     }
+  }
+  private static void filter2(float a, float[] x, float[] y) {
+    int n = x.length;
+    float yim1 = 0.0f;
+    for (int i=0; i<n; ++i) {
+      y[i] = a*yim1+(1.0f-a)*x[i];
+      yim1 = y[i];
+    }
+    float yip1 = 0.0f;
+    for (int i=n-1; i>=0; --i) {
+      y[i] = a*yip1+(1.0f+a)*y[i];
+      yip1 = y[i];
+    }
+  }
+  private static void filter3(float a, float[] x, float[] y) {
+    int n = x.length;
+    int n2 = n*2;
+    float[] t = new float[n2];
+    float yim1 = 0.0f;
+    for (int i=0; i<n2; ++i) {
+      float xi = (i<n)?x[i]:0.0f;
+      t[i] = a*yim1+(1.0f-a)*xi;
+      yim1 = t[i];
+    }
+    float yip1 = 0.0f;
+    for (int i=n2-1; i>=0; --i) {
+      t[i] = a*yip1+(1.0f+a)*t[i];
+      yip1 = t[i];
+    }
+    for (int i=0; i<n; ++i)
+      y[i] = t[i];
   }
   private static void cosine(float a, int nx, double dx, double fx, float[] f) {
     for (int ix=0; ix<nx; ++ix) {
