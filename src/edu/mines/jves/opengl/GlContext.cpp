@@ -103,7 +103,7 @@ public:
     _hdc = _dsi_win32->hdc;
     if (_hglrc==0) {
       PIXELFORMATDESCRIPTOR pfd;
-      ZeroMemory(&pfd,sizeof(pdf));
+      ZeroMemory(&pfd,sizeof(pfd));
       pfd.nSize = sizeof(pfd);
       pfd.nVersion = 1;
       pfd.dwFlags = 
@@ -243,7 +243,8 @@ Java_edu_mines_jves_opengl_GlContext_getProcAddress(
   JNI_TRY
   Jstring functionName(env,jfunctionName);
 #if defined(MWIN)
-  void (*p)() = wglGetProcAddress(functionName);
+  typedef void (*PFV)();
+  PFV p = (PFV)wglGetProcAddress(functionName);
 #elif defined(XWIN)
   void (*p)() = glXGetProcAddressARB(functionName);
 #endif
