@@ -16,11 +16,11 @@ import edu.mines.jtk.util.*;
 import edu.mines.jtk.mosaic.*;
 
 /**
- * Test {@link edu.mines.jtk.LollypopViewTest} and associates.
+ * Test {@link edu.mines.jtk.LollipopViewTest} and associates.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.01.01
  */
-public class LollypopViewTest {
+public class LollipopViewTest {
 
   public static void main(String[] args) {
     int nrow = 2;
@@ -33,10 +33,17 @@ public class LollypopViewTest {
     Mosaic mosaic = new Mosaic(nrow,ncol,axesPlacement,borderStyle);
     mosaic.setBackground(Color.WHITE);
     mosaic.setFont(new Font("SansSerif",Font.PLAIN,12));
-    mosaic.setPreferredSize(new Dimension(900,600));
+    mosaic.setPreferredSize(new Dimension(950,400));
 
-    mosaic.getTile(0,0).addTiledView(makeView(101, 1.0,-50.0,1.0));
-    mosaic.getTile(1,0).addTiledView(makeView( 17,-1.0,  5.0,2.0));
+    Tile tileA = mosaic.getTile(0,0);
+    Tile tileB = mosaic.getTile(1,0);
+    tileA.setZeroLinePaint(true,true);
+    tileB.setZeroLinePaint(true,true);
+    tileA.setZeroLineColor(Color.RED,Color.RED);
+    tileB.setZeroLineColor(Color.RED,Color.RED);
+
+    tileA.addTiledView(makeView(101, 1.0,-50.0,1.0));
+    tileB.addTiledView(makeView( 13,-1.0,  5.0,2.0));
 
     TileZoomMode zoomMode = new TileZoomMode(mosaic);
 
@@ -60,7 +67,7 @@ public class LollypopViewTest {
     frame.setVisible(true);
   }
 
-  private static LollypopView makeView(
+  private static LollipopView makeView(
     int nx, double dx, double fx, double a) 
   {
     Sampling sx = new Sampling(nx,dx,fx);
@@ -69,6 +76,9 @@ public class LollypopViewTest {
       double xi = fx+ix*dx;
       f[ix] = (float)(a*cos(2.0*PI*xi/20));
     }
-    return new LollypopView(sx,f);
+    LollipopView lv = new LollipopView(sx,f);
+    lv.setLollipopColor(Color.BLUE);
+    lv.setShowZero(LollipopView.ShowZero.MIDDLE);
+    return lv;
   }
 }

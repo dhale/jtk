@@ -107,6 +107,14 @@ public abstract class TiledView {
     return _bvp;
   }
 
+  /**
+   * Requests a repaint of the tile that contains this tiled view.
+   */
+  protected void repaint() {
+    if (_tile!=null)
+      _tile.repaint();
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // package
 

@@ -157,6 +157,37 @@ public class Tile extends JPanel {
     _mosaic.setViewRect(this,vr);
   }
 
+  /**
+   * Sets the option to paint lines at world coordinates x=0 and y=0.
+   * When painting zero lines, the tile paints lines before painting its 
+   * tiled views. The defaults are false.
+   * @param px true, to paint vertical zero line at x=0; false, otherwise.
+   * @param py true, to paint horizontal zero line at y=0; false, otherwise.
+   */
+  public void setZeroLinePaint(boolean px, boolean py) {
+    if (_zeroLinePaintX!=px || _zeroLinePaintY!=py) {
+      _zeroLinePaintX = px;
+      _zeroLinePaintY = py;
+      repaint();
+    }
+  }
+
+  /**
+   * Sets colors of lines painted at world coordinates x=0 and y=0.
+   * When painting zero lines, the tile paints lines with the specified 
+   * colors before painting its tiled views. If null (the default),
+   * the tile foreground is used.
+   * @param cx the color of the vertical line drawn at x=0.
+   * @param cy the color of the horizontal line drawn at y=0.
+   */
+  public void setZeroLineColor(Color cx, Color cy) {
+    if (_zeroLineColorX!=cx || _zeroLineColorY!=cy) {
+      _zeroLineColorX = cx;
+      _zeroLineColorY = cy;
+      repaint();
+    }
+  }
+
   // We override this method so that we can update our transcaler. We assume 
   // that this is the *only* way that our size changes. Also, we assume that 
   // a repaint is already pending, so we need not request one here.
@@ -170,19 +201,21 @@ public class Tile extends JPanel {
 
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
-    /*
-    int width = getWidth();
-    int height = getHeight();
-    //g.setColor(Color.GREEN);
-    //g.fillRect(0,0,width,height);
-    FontMetrics fm = g.getFontMetrics();
-    int sw = fm.stringWidth("Tile");
-    int sh = fm.getAscent();
-    int x = width/2-sw/2;
-    int y = height/2+sh/2;
-    g.setColor(Color.BLACK);
-    g.drawString("Tile",x,y);
-    */
+    if (_zeroLinePaintX) {
+      int x = _ts.x(_hp.u(0.0));
+      int y = getHeight()-1;
+      if (_zeroLineColorX!=null)
+        g.setColor(_zeroLineColorX);
+      g.drawLine(x,0,x,y);
+    }
+    if (_zeroLinePaintY) {
+      int x = getWidth()-1;
+      int y = _ts.y(_vp.u(0.0));
+      if (_zeroLineColorY!=null)
+        g.setColor(_zeroLineColorY);
+      g.drawLine(0,y,x,y);
+    }
+    g.setColor(getForeground());
     for (TiledView tv : _tvs) {
       Graphics2D g2d = (Graphics2D)g.create();
       tv.paint(g2d);
@@ -271,10 +304,14 @@ public class Tile extends JPanel {
   private ArrayList<TiledView> _tvs = new ArrayList<TiledView>();
   private Projector _hp = new Projector(0.0,1.0,0.0,1.0);
   private Projector _vp = new Projector(0.0,1.0,0.0,1.0);
-  private Projector _bhp = null;
-  private Projector _bvp = null;
+  private Projector _bhp;
+  private Projector _bvp;
   private Transcaler _ts = new Transcaler();
   private DRectangle _vr = new DRectangle(0.0,0.0,1.0,1.0);
+  private boolean _zeroLinePaintX;
+  private boolean _zeroLinePaintY;
+  private Color _zeroLineColorX;
+  private Color _zeroLineColorY;
 
   private void updateBestProjectors() {
     Projector bhp = null;
