@@ -10,7 +10,6 @@ import java.io.*;
 import java.util.*;
 import org.apache.tools.ant.*;
 import org.apache.tools.ant.taskdefs.*;
-import org.apache.tools.ant.types.*;
 import org.apache.tools.ant.util.*;
 
 /**

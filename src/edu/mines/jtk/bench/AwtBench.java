@@ -47,6 +47,7 @@ public class AwtBench {
   }
 
   private static class NativeCanvas extends Canvas {
+    private static final long serialVersionUID = 1L;
     public void paint(Graphics g) {
       paintNative(this);
     }
@@ -65,6 +66,7 @@ public class AwtBench {
   }
 
   private static class MyPanel extends JPanel {
+    private static final long serialVersionUID = 1L;
     private MyPanel() {
       _n = 1000;
       _x = new int[_n];

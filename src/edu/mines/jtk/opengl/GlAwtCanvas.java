@@ -20,8 +20,9 @@ import java.awt.Graphics;
  * @version 2004.11.24
  */
 public class GlAwtCanvas extends Canvas {
-
-  /**
+  private static final long serialVersionUID = 1L;
+    
+ /**
    * Constructs a canvas with no OpenGL painter.
    */
   public GlAwtCanvas() {

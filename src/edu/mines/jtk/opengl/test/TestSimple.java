@@ -10,10 +10,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.events.*;
-
 import java.awt.*;
-import java.util.*;
 import javax.swing.*;
 
 import edu.mines.jtk.opengl.*;
