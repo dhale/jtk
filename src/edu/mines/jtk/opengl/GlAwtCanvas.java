@@ -47,6 +47,17 @@ public class GlAwtCanvas extends Canvas {
   }
 
   /**
+   * Enables or disables automatic repainting. If enabled, then,
+   * immediately after this canvas paints itself, it automatically
+   * requests that it be painted again. By default, automatic
+   * repainting is disabled.
+   * @param autoRepaint true, for automatic repainting; false, otherwise.
+   */
+  public void setAutoRepaint(boolean autoRepaint) {
+    _autoRepaint = autoRepaint;
+  }
+
+  /**
    * Dispose this context.
    */
   public void dispose() {
@@ -126,6 +137,8 @@ public class GlAwtCanvas extends Canvas {
       }
       glPaint();
       _context.swapBuffers();
+      if (_autoRepaint)
+        repaint();
     } finally {
       _context.unlock();
     }
@@ -158,4 +171,5 @@ public class GlAwtCanvas extends Canvas {
   private GlContext _context;
   private boolean _inited;
   private int _width,_height;
+  private boolean _autoRepaint;
 }

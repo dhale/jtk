@@ -63,6 +63,17 @@ public class GlSwtCanvas extends Canvas {
   }
 
   /**
+   * Enables or disables automatic repainting. If enabled, then,
+   * immediately after this canvas paints itself, it automatically
+   * requests that it be painted again. By default, automatic
+   * repainting is disabled.
+   * @param autoRepaint true, for automatic repainting; false, otherwise.
+   */
+  public void setAutoRepaint(boolean autoRepaint) {
+    _autoRepaint = autoRepaint;
+  }
+
+  /**
    * Initializes OpenGL state when this canvas is first painted.
    * This method is called before the methods 
    * {@link #glResize(int,int,int,int)} and {@link #glPaint()} when (1)
@@ -139,6 +150,8 @@ public class GlSwtCanvas extends Canvas {
       }
       glPaint();
       _context.swapBuffers();
+      if (_autoRepaint)
+        redraw();
     } finally {
       _context.unlock();
     }
@@ -151,5 +164,6 @@ public class GlSwtCanvas extends Canvas {
   private GlContext _context;
   private boolean _inited;
   private int _width,_height;
+  private boolean _autoRepaint;
 }
 

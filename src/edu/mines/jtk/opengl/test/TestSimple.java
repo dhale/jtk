@@ -23,37 +23,44 @@ import edu.mines.jtk.opengl.*;
  */
 public class TestSimple {
   public static void run(String[] args, GlPainter painter) {
+    run(args,painter,false);
+  }
+  public static void run(
+    String[] args, GlPainter painter, boolean autoRepaint) 
+  {
     String platform = (args.length>0)?args[0]:"swt";
     if (platform.equals("awt")) {
-      runAwt(painter);
+      runAwt(painter,autoRepaint);
     } else if (platform.equals("swt")) {
-      runSwt(painter);
+      runSwt(painter,autoRepaint);
     } else {
       System.err.println("cannot recognize platform = "+platform);
     }
   }
-  public static void runAwt(GlPainter painter) {
+  public static void runAwt(GlPainter painter, boolean autoRepaint) {
     GlAwtCanvas canvas = new GlAwtCanvas(painter);
+    canvas.setAutoRepaint(autoRepaint);
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(new Dimension(800,800));
+    frame.setSize(new Dimension(SIZE,SIZE));
     frame.getContentPane().add(canvas,BorderLayout.CENTER);
     frame.setVisible(true);
   }
-  public static void runSwt(GlPainter painter) {
+  public static void runSwt(GlPainter painter, boolean autoRepaint) {
     Display display = new Display();
     Shell shell = new Shell(display);
     shell.setLayout(new FillLayout());
-    shell.setSize(800,800);
+    shell.setSize(SIZE,SIZE);
     GlSwtCanvas canvas = new GlSwtCanvas(shell,SWT.NO_BACKGROUND,painter);
+    canvas.setAutoRepaint(autoRepaint);
     shell.layout();
     shell.open();
-    while (!shell.isDisposed())
-    {
+    while (!shell.isDisposed()) {
       if (!display.readAndDispatch())
         display.sleep();
     }
     display.dispose();
     System.exit(0);
   }
+  private static final int SIZE = 600;
 }
