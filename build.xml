@@ -75,6 +75,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <target name="jni-linux" if="linux">
     <property name="jdk.home" value="${env.JDK_HOME}"/>
     <property name="jdk.include" value="${jdk.home}/include"/>
+    <property name="jre.home" value="${jdk.home}/jre"/>
+    <property name="jre.lib" value="${jre.home}/lib/i386"/>
     <jnicpp 
         srcdir="${src.jves}/bench" 
         objdir="${obj.jves}/bench"
@@ -96,6 +98,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <libarg arg="-L/usr/X11R6/lib"/>
       <libarg arg="-lGL"/>
       <libarg arg="-lGLU"/>
+      <libarg arg="-L${jre.lib}"/>
+      <libarg arg="-ljawt"/>
     </jnicpp>
   </target>
 

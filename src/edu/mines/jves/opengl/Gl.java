@@ -20,7 +20,30 @@ package edu.mines.jves.opengl;
  */
 public class Gl {
 
+  public static final int GL_COLOR_BUFFER_BIT                    =0x00004000;
+  public static final int GL_POLYGON                             =0x0009;
+  public static final int GL_PROJECTION                          =0x1701;
+
+  public static native void glBegin(int mode);
+  public static native void glClear(int mask);
+  public static native void glClearColor(
+    float red, float green, float blue, float alpha);
+  public static native void glColor3f(float red, float green, float blue);
+  public static void glColor(float red, float green, float blue) {
+    glColor3f(red,green,blue);
+  }
+  public static native void glEnd();
   public static native void glFlush();
+  public static native void glLoadIdentity();
+  public static native void glMatrixMode(int mode);
+  public static native void glOrtho(
+    double left, double right, 
+    double bottom, double top, 
+    double zNear, double zFar);
+  public static native void glVertex3f(float x, float y, float z);
+  public static void glVertex(float x, float y, float z) {
+    glVertex3f(x,y,z);
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   // OpenGL 1.2
@@ -51,5 +74,9 @@ public class Gl {
 
   private static ThreadLocal _context = new ThreadLocal();
   private Gl() {
+  }
+
+  static {
+    System.loadLibrary("edu_mines_jves_opengl");
   }
 }

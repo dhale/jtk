@@ -55,7 +55,8 @@ public class GlContext {
     Check.state(Gl.getContext()==null,
       "the current thread has no OpenGL context locked");
     Gl.setContext(this);
-    lock(_peer);
+    boolean locked = lock(_peer);
+    Check.state(locked,"this OpenGL context has been locked");
   }
 
   /**
@@ -67,7 +68,8 @@ public class GlContext {
     Check.state(Gl.getContext()==this,
       "the current thread has this OpenGL context locked");
     Gl.setContext(null);
-    unlock(_peer);
+    boolean unlocked = unlock(_peer);
+    Check.state(unlocked,"this OpenGL context has been unlocked");
     _lock.release();
   }
 
@@ -75,20 +77,39 @@ public class GlContext {
    * Swaps the front and back buffers for this context.
    */
   public void swapBuffers() {
-    // TODO: ensure context is locked
+    Check.state(Gl.getContext()==this,
+      "the current thread has this OpenGL context locked");
     swapBuffers(_peer);
+  }
+
+  /**
+   * Dispose of this context.
+   */
+  public void dispose() {
+    // TODO: kill the peer of this context
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // protected
+
+  protected void finalize() throws Throwable {
+    try {
+      dispose();
+    } finally {
+      super.finalize();
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
   private long _peer; // C++ peer of this OpenGL context
-  private ReentrantLock _lock; // mutual exclusion lock
+  private ReentrantLock _lock = new ReentrantLock(); // mutual exclusion lock
 
   private static native long makeGlAwtCanvasContext(java.awt.Canvas canvas);
-  private static native void lock(long peer);
-  private static native void unlock(long peer);
-  private static native void swapBuffers(long peer);
+  private static native boolean lock(long peer);
+  private static native boolean unlock(long peer);
+  private static native boolean swapBuffers(long peer);
 
   ///////////////////////////////////////////////////////////////////////////
   // pointers to OpenGL functions after version 1.1
@@ -151,5 +172,9 @@ public class GlContext {
     }
     private Thread _owner = null;
     private long _holds = 0;
+  }
+
+  static {
+    System.loadLibrary("edu_mines_jves_opengl");
   }
 }

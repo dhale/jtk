@@ -45,6 +45,12 @@ public class GlAwtCanvas extends Canvas {
     }
   }
 
+  public void addNotify() {
+    super.addNotify();
+    System.out.println("GlAwtCanvas.addNotify: this="+this);
+    System.out.println("GlAwtCanvas.addNotify: hash="+this.hashCode());
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
