@@ -2,7 +2,7 @@
 setlocal
 
 set JVES_HOME=c:\dev\jves
-set JAVA_HOME=c:\tools\Java\j2sdk1.4.2_06
+set JAVA_HOME=c:\tools\Java\j2sdk1.4.2_06\jre
 
 
 rem Set the Windows platform.
