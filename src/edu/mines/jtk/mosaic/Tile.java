@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
+import static java.lang.Math.*;
 import java.awt.*;
 import java.util.*;
 import javax.swing.*;
@@ -65,10 +66,43 @@ public class Tile extends JPanel {
     return _ts;
   }
 
+  /**
+   * Returns the number of tiled views in this this.
+   * @return the number of tiled views.
+   */
   public int countTiledViews() {
     return _tvs.size();
   }
 
+  /**
+   * Gets the view rectangle for this tile.
+   * @return the view rectangle.
+   */
+  public DRectangle getViewRectangle() {
+    return _vr.clone();
+  }
+
+  /**
+   * Sets the view rectangle for this tile. The view rectangle represents
+   * the subset of normalized coordinate space that is displayed in this 
+   * tile. Setting the view rectangle may cause the tile to zoom or scroll.
+   * <p>
+   * If this tile is in a mosaic, calling this method will cause the mosaic 
+   * to set the view rectangles of any other tiles in the same row or column 
+   * accordingly.
+   * @param vr the view rectangle.
+   */
+  public void setViewRectangle(DRectangle vr) {
+    if (_mosaic!=null) {
+      _mosaic.setViewRectangleInternal(this,vr);
+    } else {
+      setViewRectangleInternal(vr);
+    }
+  }
+
+  // We override this method so that we can update our transcaler.
+  // We assume that this is the *only* way that our size changes.
+  // Also, we assume that a repaint is already pending.
   public void setBounds(int x, int y, int width, int height) {
     super.setBounds(x,y,width,height);
     _ts.setMapping(0,width-1,0,height-1);
@@ -142,6 +176,19 @@ public class Tile extends JPanel {
     }
   }
 
+  /**
+   * Called by this tile's mosaic.
+   */
+  void setViewRectangleInternal(DRectangle vr) {
+    _vr = vr.clone();
+    _vr.x = max(0.0,min(1.0,_vr.x));
+    _vr.y = max(0.0,min(1.0,_vr.y));
+    _vr.width = max(0.0,min(1.0-_vr.x,_vr.width));
+    _vr.height = max(0.0,min(1.0-_vr.y,_vr.height));
+    _ts.setMapping(_vr.x,_vr.y,_vr.x+_vr.width,_vr.y+_vr.height);
+    repaint();
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -154,6 +201,7 @@ public class Tile extends JPanel {
   private Projector _bhp = null;
   private Projector _bvp = null;
   private Transcaler _ts = new Transcaler();
+  private DRectangle _vr = new DRectangle(0.0,0.0,1.0,1.0);
 
   private void updateBestProjectors() {
     Projector bhp = null;

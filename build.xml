@@ -71,6 +71,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <classpath refid="classpath"/>
       <exclude name="edu/mines/jtk/opengl/linux-gtk/**"/>
       <exclude name="edu/mines/jtk/opengl/win32/**"/>
+      <exclude name="**/old/*"/>
+      <exclude name="**/new/*"/>
     </javac>
   </target>
   <target name="copy-linux" depends="init" if="linux">

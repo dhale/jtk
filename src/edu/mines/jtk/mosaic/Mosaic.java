@@ -305,6 +305,39 @@ public class Mosaic extends JPanel {
     validate();
   }
 
+  void setViewRectangleInternal(Tile tile, DRectangle vr) {
+    double x = max(0.0,min(1.0,vr.x));
+    double y = max(0.0,min(1.0,vr.y));
+    double w = max(0.0,min(1.0-vr.x,vr.width));
+    double h = max(0.0,min(1.0-vr.y,vr.height));
+    DRectangle tr = new DRectangle(x,y,w,h);
+    tile.setViewRectangleInternal(tr);
+    int jrow = tile.getRowIndex();
+    int jcol = tile.getColumnIndex();
+    for (int irow=0; irow<_nrow; ++irow) {
+      if (irow!=jrow) {
+        Tile ti = _tiles[irow][jcol];
+        DRectangle dr = ti.getViewRectangle();
+        dr.x = tr.x;
+        dr.width = tr.width;
+        ti.setViewRectangle(dr);
+      }
+    }
+    for (int icol=0; icol<_ncol; ++icol) {
+      if (icol!=jcol) {
+        Tile ti = _tiles[jrow][icol];
+        DRectangle dr = ti.getViewRectangle();
+        dr.y = tr.y;
+        dr.height = tr.height;
+        ti.setViewRectangle(dr);
+      }
+    }
+    repaintAxis(_axesTop,jcol);
+    repaintAxis(_axesBottom,jcol);
+    repaintAxis(_axesLeft,jrow);
+    repaintAxis(_axesRight,jrow);
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -323,6 +356,11 @@ public class Mosaic extends JPanel {
   private int[] _he; // array[nrow] of height elastics
   private Border _borderTile;
   private Border _borderAxis;
+
+  private void repaintAxis(TileAxis[] axes, int index) {
+    if (axes!=null)
+      axes[index].repaint();
+  }
 
   private void doPaint(Graphics g) {
 
@@ -406,12 +444,6 @@ public class Mosaic extends JPanel {
     int width = widthTileBorder();
     width += _wm[icol];
     width += widthTileBorder();
-    /*
-    if (_borderStyle==BORDER_SHADOW || icol>0)
-      width += widthTileBorder();
-    if (_borderStyle==BORDER_SHADOW || icol<_ncol-1)
-      width += widthTileBorder();
-    */
     return width;
   }
 
@@ -455,11 +487,9 @@ public class Mosaic extends JPanel {
   }
 
   private int heightMinimumTiles(int irow) {
-    int height = _hm[irow];
-    if (_borderStyle==BORDER_SHADOW || irow>0)
-      height += widthTileBorder();
-    if (_borderStyle==BORDER_SHADOW || irow<_nrow-1)
-      height += widthTileBorder();
+    int height = widthTileBorder();
+    height += _hm[irow];
+    height += widthTileBorder();
     return height;
   }
 
