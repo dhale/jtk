@@ -18,6 +18,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <property name="build" value="build"/>
   <property name="build.cls" value="${build}/cls"/>
   <property name="build.obj" value="${build}/obj"/>
+  <property name="build.src" value="${build}/src"/>
   <property name="build.jar" value="${build}/jar"/>
   <property name="build.jni" value="${build}/jni"/>
   <property name="build.doc" value="${build}/doc"/>
@@ -50,10 +51,18 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <mkdir dir="${build.jar}"/>
     <mkdir dir="${build.jni}"/>
     <mkdir dir="${build.obj}"/>
+    <mkdir dir="${build.src}"/>
   </target>
 
   <!-- Compile Java -->
   <target name="compile-java" depends="init,copy-linux,copy-windows">
+    <javac srcdir="${build.src}" destdir="${build.cls}"
+      compiler="javac1.5"
+      debug="on" 
+      deprecation="on">
+      <compilerarg value="-Xlint:unchecked"/>
+      <classpath refid="classpath"/>
+    </javac>
     <javac srcdir="${src}" destdir="${build.cls}" 
       compiler="javac1.5"
       debug="on" 
@@ -66,11 +75,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   </target>
   <target name="copy-linux" depends="init" if="linux">
     <copy file="${src}/edu/mines/jtk/opengl/linux-gtk/SwtHooks.java"
-      todir="${src}/edu/mines/jtk/opengl"/>
+      todir="${build.src}/edu/mines/jtk/opengl"/>
   </target>
   <target name="copy-windows" depends="init" if="windows">
     <copy file="${src}/edu/mines/jtk/opengl/win32/SwtHooks.java"
-      todir="${src}/edu/mines/jtk/opengl"/>
+      todir="${build.src}/edu/mines/jtk/opengl"/>
   </target>
 
   <!-- Build Java archive -->
