@@ -210,7 +210,7 @@ public class TileAxis extends JPanel {
       double v1 = max(vmin,min(vmax,p.v(t.x(w-1))));
       at = new AxisTics(v0,v1,nmax);
     } else {
-      int nmax = 2+h/(2*fh);
+      int nmax = 2+h/(4*fh);
       double v0 = max(vmin,min(vmax,p.v(t.y(0))));
       double v1 = max(vmin,min(vmax,p.v(t.y(h-1))));
       at = new AxisTics(v0,v1,nmax);

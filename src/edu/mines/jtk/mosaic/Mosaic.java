@@ -59,6 +59,7 @@ public class Mosaic extends JPanel {
       for (int icol=0; icol<ncol; ++icol) {
         Tile tile = _tiles[irow][icol] = new Tile(this,irow,icol);
         _tileList.add(tile);
+        add(tile);
       }
     }
 
@@ -70,6 +71,7 @@ public class Mosaic extends JPanel {
         TileAxis axis = _axesTop[icol] = 
           new TileAxis(this,TileAxis.Placement.TOP,icol);
         _axisList.add(axis);
+        add(axis);
       }
     }
     if (axesPlacement.contains(AxesPlacement.LEFT)) {
@@ -78,6 +80,7 @@ public class Mosaic extends JPanel {
         TileAxis axis = _axesLeft[irow] = 
           new TileAxis(this,TileAxis.Placement.LEFT,irow);
         _axisList.add(axis);
+        add(axis);
       }
     }
     if (axesPlacement.contains(AxesPlacement.BOTTOM)) {
@@ -86,6 +89,7 @@ public class Mosaic extends JPanel {
         TileAxis axis = _axesBottom[icol] = 
           new TileAxis(this,TileAxis.Placement.BOTTOM,icol);
         _axisList.add(axis);
+        add(axis);
       }
     }
     if (axesPlacement.contains(AxesPlacement.RIGHT)) {
@@ -94,7 +98,20 @@ public class Mosaic extends JPanel {
         TileAxis axis = _axesRight[irow] = 
           new TileAxis(this,TileAxis.Placement.RIGHT,irow);
         _axisList.add(axis);
+        add(axis);
       }
+    }
+
+    // Scroll bars, initially not visible.
+    _vsb = new VScrollBar[_nrow];
+    _hsb = new HScrollBar[_ncol];
+    for (int irow=0; irow<_nrow; ++irow) {
+      VScrollBar vsb = _vsb[irow] = new VScrollBar(irow);
+      add(vsb);
+    }
+    for (int icol=0; icol<_ncol; ++icol) {
+      HScrollBar hsb = _hsb[icol] = new HScrollBar(icol);
+      add(hsb);
     }
 
     // Width elastic and minimum for each column.
@@ -293,6 +310,9 @@ public class Mosaic extends JPanel {
   // Override base class implementation; ignore any layout manager.
   public void doLayout() {
 
+    // Ensure scroll bars are visible or invisible, as necessary.
+    updateScrollBars();
+
     // Extra width and height to fill; zero, if no extra space.
     int w = getWidth();
     int h = getHeight();
@@ -407,6 +427,34 @@ public class Mosaic extends JPanel {
         yaxis += haxis+wtb+wts+wtb;
       }
     }
+
+    // Horizontal scroll bars.
+    int hhsb = heightHScrollBars();
+    if (hhsb>0) {
+      int xhsb = widthMinimumAxesLeft()+wtb;
+      int yhsb = ytile;
+      if (_axesBottom!=null)
+        yhsb += heightMinimumAxesBottom()-wab;
+      for (int icol=0; icol<_ncol; ++icol) {
+        int whsb = wcol[icol];
+        _hsb[icol].setBounds(xhsb,yhsb,whsb,hhsb);
+        xhsb += whsb+wtb+wts+wtb;
+      }
+    }
+
+    // Vertical scroll bars.
+    int wvsb = widthVScrollBars();
+    if (wvsb>0) {
+      int xvsb = xtile;
+      if (_axesRight!=null)
+        xvsb += widthMinimumAxesRight()-wab;
+      int yvsb = heightMinimumAxesTop()+wtb;
+      for (int irow=0; irow<_nrow; ++irow) {
+        int hvsb = hrow[irow];
+        _vsb[irow].setBounds(xvsb,yvsb,wvsb,hvsb);
+        yvsb += hvsb+wtb+wts+wtb;
+      }
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -468,11 +516,9 @@ public class Mosaic extends JPanel {
     }
   }
 
-  void needsLayout() {
-    validate();
-  }
-
   void setViewRect(Tile tile, DRectangle vr) {
+    int wvsb = widthVScrollBars();
+    int hhsb = heightHScrollBars();
     double x = max(0.0,min(1.0,vr.x));
     double y = max(0.0,min(1.0,vr.y));
     double w = max(0.0,min(1.0-vr.x,vr.width));
@@ -503,6 +549,10 @@ public class Mosaic extends JPanel {
     repaintAxis(_axesBottom,jcol);
     repaintAxis(_axesLeft,jrow);
     repaintAxis(_axesRight,jrow);
+    _hsb[jcol].update();
+    _vsb[jrow].update();
+    if (wvsb!=widthVScrollBars() || hhsb!=heightHScrollBars())
+      validate();
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -571,6 +621,7 @@ public class Mosaic extends JPanel {
       width += widthMinimumColumn(icol);
     width += widthMinimumAxesRight();
     width += (_ncol-1)*widthTileSpacing();
+    width += widthVScrollBars();
     return width;
   }
 
@@ -617,6 +668,7 @@ public class Mosaic extends JPanel {
       height += heightMinimumRow(irow);
     height += heightMinimumAxesBottom();
     height += (_nrow-1)*widthTileSpacing();
+    height += heightHScrollBars();
     return height;
   }
 
@@ -657,6 +709,22 @@ public class Mosaic extends JPanel {
     return height;
   }
 
+  private int heightHScrollBars() {
+    for (int icol=0; icol<_ncol; ++icol) {
+      if (_hsb[icol].isVisible())
+        return _hsb[icol].getMinimumSize().height;
+    }
+    return 0;
+  }
+
+  private int widthVScrollBars() {
+    for (int irow=0; irow<_nrow; ++irow) {
+      if (_vsb[irow].isVisible())
+        return _vsb[irow].getMinimumSize().width;
+    }
+    return 0;
+  }
+
   private static final int SCROLL_MAX = 1000000000;
   private static final double SCROLL_SCL = 1.0/SCROLL_MAX;
   private static final int HORIZONTAL = Adjustable.HORIZONTAL;
@@ -669,6 +737,8 @@ public class Mosaic extends JPanel {
       this.tile = tile;
       addAdjustmentListener(new AdjustmentListener() {
         public void adjustmentValueChanged(AdjustmentEvent ae) {
+          if (_settingInternal)
+            return;
           double v = getV();
           double e = getE();
           DRectangle vr = tile.getViewRectangle();
@@ -684,12 +754,15 @@ public class Mosaic extends JPanel {
       });
     }
     void setV(double v) {
+      _settingInternal = true;
       setValue((int)(v*SCROLL_MAX+0.5));
+      _settingInternal = false;
     }
     void setE(double e) {
-      boolean isVisible = isVisible();
+      _settingInternal = true;
       setVisibleAmount((int)(e*SCROLL_MAX+0.5));
-      updateIsVisible();
+      setVisible(getVisibleAmount()<SCROLL_MAX);
+      _settingInternal = false;
     }
     double getV() {
       return SCROLL_SCL*getValue();
@@ -707,37 +780,7 @@ public class Mosaic extends JPanel {
         setE(vr.height);
       }
     }
-    void updateIsVisible() {
-      boolean isVisible = isVisible();
-      if (getVisibleAmount()==SCROLL_MAX) {
-        if (isVisible)
-          setVisible(false);
-      } else {
-        if (!isVisible)
-          setVisible(true);
-      }
-      if (isVisible!=isVisible()) {
-        isVisible = isVisible();
-        int nVisible = countVisible();
-        if (isVisible && nVisible==0 || !isVisible && nVisible==1)
-          doLayout();
-      }
-    }
-    int countVisible() {
-      int n = 0;
-      if (getOrientation()==HORIZONTAL) {
-        for (int icol=0; icol<_ncol; ++icol) {
-          if (_hsb[icol].isVisible())
-            ++n;
-        }
-      } else {
-        for (int irow=0; irow<_nrow; ++irow) {
-          if (_vsb[irow].isVisible())
-            ++n;
-        }
-      }
-      return n;
-    }
+    private boolean _settingInternal;
   }
   private class HScrollBar extends TileScrollBar {
     int icol;
@@ -754,19 +797,10 @@ public class Mosaic extends JPanel {
     }
   }
 
-  private boolean needHScrollBar() {
-    for (int icol=0; icol<_ncol; ++icol) {
-      if (_hsb[icol].isVisible())
-        return true;
-    }
-    return false;
-  }
-
-  private boolean needVScrollBar() {
-    for (int irow=0; irow<_nrow; ++irow) {
-      if (_vsb[irow].isVisible())
-        return true;
-    }
-    return false;
+  private void updateScrollBars() {
+    for (int icol=0; icol<_ncol; ++icol)
+      _hsb[icol].update();
+    for (int irow=0; irow<_nrow; ++irow)
+      _vsb[irow].update();
   }
 }

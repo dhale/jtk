@@ -156,6 +156,10 @@ public class TileZoomMode extends Mode {
     // If this is tile in which zoom began, ...
     if (tile==_tile) {
 
+      // Clip zoom to tile bounds.
+      x = max(0,min(tile.getWidth()-1,x));
+      y = max(0,min(tile.getHeight()-1,y));
+
       // Draw zoom in this tile.
       drawRect(tile,x,y,bx,by);
 
@@ -193,6 +197,10 @@ public class TileZoomMode extends Mode {
 
     // If this is the axis in which zoom began, ...
     if (axis==_axis) {
+
+      // Clip zoom to axis bounds.
+      x = max(0,min(axis.getWidth()-1,x));
+      y = max(0,min(axis.getHeight()-1,y));
 
       // Draw zoom in this axis.
       drawRect(axis,x,y,bx,by);
