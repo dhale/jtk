@@ -10,23 +10,25 @@ import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Check;
 
 /**
- * Fast Fourier transform of complex-valued sequences. Complex numbers 
- * are packed into arrays of floats as [real0, imag0, real1, imag1, ...],
- * where realk and imagk correspond to the real and imaginary parts of 
- * the k'th complex number in the array, respectively. The FFT length
- * nfft equals the number of <em>complex</em> numbers transformed.
+ * Fast Fourier transform of complex-valued arrays. The FFT length nfft equals 
+ * the number of <em>complex</em> numbers transformed. The transform of nfft 
+ * complex numbers yields nfft complex numbers. Those complex numbers are 
+ * packed into arrays of floats as [real_0, imag_0, real_1, imag_1, ...].
+ * Here, real_k and imag_k correspond to the real and imaginary parts, 
+ * respectively, of the complex number with array index k.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.03.18
  */
 public class FftComplex {
 
   public static void main(String[] args) {
-    int n = 16;
-    float[] ca = new float[2*n];
-    ca[2] = 1.0f;
+    int n = 18;
     FftComplex fft = FftComplex.small(n);
-    pfacc(1,n,ca);
-    for (int i=0,j=0; i<n; ++i,j+=2)
+    int nfft = fft.getNfft();
+    float[] ca = new float[2*nfft];
+    ca[2] = 1.0f;
+    pfacc(1,nfft,ca);
+    for (int i=0,j=0; i<nfft; ++i,j+=2)
       System.out.println("("+ca[j]+","+ca[j+1]+")");
   }
 
@@ -52,26 +54,27 @@ public class FftComplex {
   }
 
   /**
-   * Performs a fast Fourier transform. Both the input and output arrays 
-   * must have length not less than 2*nfft, where nfft is the FFT length. 
-   * The transform may be performed in-place, that is the input and output
-   * arrays may be the same array.
-   * @param sign the sign of the exponent used in the FFT.
-   * @param cx the input array.
-   * @param cy the output array.
+   * Computes a complex-to-complex fast Fourier transform. Transforms nfft
+   * complex numbers to nfft complex numbers. If the input and output arrays
+   * are the same array, the transform will be performed in-place.
+   * @param sign the sign (1 or -1) of the exponent used in the FFT.
+   * @param cx the input array; cx.length must not be less than 2*nfft.
+   * @param cy the output array; cy.length must not be less than 2*nfft.
    */
   public void complexToComplex(int sign, float[] cx, float[] cy) {
-    Check.argument(2*cx.length>=_nfft,"cx.length is sufficient");
-    Check.argument(2*cy.length>=_nfft,"cy.length is sufficient");
+    Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
+    Check.argument(cx.length>=2*_nfft,"cx.length is sufficient");
+    Check.argument(cy.length>=2*_nfft,"cy.length is sufficient");
     if (cx!=cy)
       System.arraycopy(cx,0,cy,0,_nfft);
     pfacc(sign,_nfft,cy);
   }
 
   /**
-   * Scales nfft complex numbers in the specified array by 1/nfft. 
-   * The inverse of an FFT is an FFT with opposite sign followed by
-   * this scaling.
+   * Scales nfft complex numbers in the specified array by 1/nfft. The 
+   * inverse of complex-to-complex FFT is a complex-to-complex FFT (with 
+   * opposite sign) followed by this scaling.
+   * @param cx the input/output array; cx.length must not be less than 2*nfft.
    */
   public void scale(float[] cx) {
     float s = 1.0f/(float)_nfft;
@@ -87,7 +90,7 @@ public class FftComplex {
    * @return the FFT.
    */
   public static FftComplex small(int n) {
-    return new FftComplex(n);
+    return new FftComplex(nfftSmall(n));
   }
 
   /**
@@ -97,7 +100,7 @@ public class FftComplex {
    * @return the FFT.
    */
   public static FftComplex fast(int n) {
-    return new FftComplex(n);
+    return new FftComplex(nfftFast(n));
   }
 
   /**
@@ -105,9 +108,15 @@ public class FftComplex {
    * smallest valid length that is not less than the specified length n.
    * @param n the lower bound on FFT length.
    * @return the FFT length.
+   * @exception IllegalArgumentException if the specified length n exceeds
+   *  the maximum length supported by this implementation. Currently, the 
+   *  maximum length is 720,720.
    */
   public static int nfftSmall(int n) {
-    return n;
+    Check.argument(n<=720720,"n does not exceed 720720");
+    int itable = Array.binarySearch(_ntable,n);
+    if (itable<0) itable = -(itable+1);
+    return _ntable[itable];
   }
 
   /**
@@ -115,9 +124,12 @@ public class FftComplex {
    * fastest valid length that is not less than the specified length n.
    * @param n the lower bound on FFT length.
    * @return the FFT length.
+   * @exception IllegalArgumentException if the specified length n exceeds
+   *  the maximum length supported by this implementation. Currently, the 
+   *  maximum length is 720,720.
    */
   public static int nfftFast(int n) {
-    return n;
+    return nfftSmall(n);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -1394,7 +1406,7 @@ public class FftComplex {
     }
   }
 
-  // Constants used in prime-factor FFT.
+  // Constants used in this implementation of the prime-factor FFT.
   private static final float P120 = 0.120536680f;
   private static final float P142 = 0.142314838f;
   private static final float P173 = 0.173648178f;
@@ -1446,10 +1458,10 @@ public class FftComplex {
   };
 
   // FFT lengths supported in this implementation of the prime-factor FFT.
-  // These lengths are the products of mutually prime factors from the
-  // set above. For example, note that 17 and 32 are not in this table;
-  // 17 is not in the set above, and 32 = 16*2 is not valid, because
-  // the factors 16 and 2 share the prime factor 2.
+  // These lengths are the products of mutually prime factors chosen from 
+  // the set above. For example, note that 17 and 32 are not in this table;
+  // 17 is not in the set above, and 32 = 2*16 is not valid, because the 
+  // factors 2 and 16 share the prime factor 2.
   private static final int NTABLE = 240;
   private static final int _ntable[] = {
          1, 2, 3, 4, 5, 6, 7, 8, 9, 
