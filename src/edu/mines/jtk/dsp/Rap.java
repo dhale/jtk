@@ -240,6 +240,50 @@ public class Rap {
   }
 
   ///////////////////////////////////////////////////////////////////////////
+  // equal
+  public static boolean equal(float[] rx, float[] ry) {
+    return equal(rx.length,rx,ry);
+  }
+  public static boolean equal(float[][] rx, float[][] ry) {
+    int n2 = rx.length;
+    for (int i2=0; i2<n2; ++i2) {
+      if (!equal(rx[i2],ry[i2]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean equal(float[][][] rx, float[][][] ry) {
+    int n3 = rx.length;
+    for (int i3=0; i3<n3; ++i3) {
+      if (!equal(rx[i3],ry[i3]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean equal(int n1, float[] rx, float[] ry) {
+    for (int i1=0; i1<n1; ++i1) {
+      if (rx[i1]!=ry[i1])
+        return false;
+    }
+    return true;
+  }
+  public static boolean equal(int n1, int n2, float[][] rx, float[][] ry) {
+    for (int i2=0; i2<n2; ++i2) {
+      if (!equal(n1,rx[i2],ry[i2]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean equal(
+    int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
+    for (int i3=0; i3<n3; ++i3) {
+      if (!equal(n1,n2,rx[i3],ry[i3]))
+        return false;
+    }
+    return true;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
   // almostEqual
   public static boolean almostEqual(
     float tolerance, float[] rx, float[] ry) {
@@ -292,7 +336,152 @@ public class Rap {
   }
 
   ///////////////////////////////////////////////////////////////////////////
-  // add, sub, mul, div
+  // findMax, findMin
+  public static float findMax(float[] rx, int[] index) {
+    int i1max = 0;
+    float rmax = rx[0];
+    int n1 = rx.length;
+    for (int i1=1; i1<n1; ++i1) {
+      if (rx[i1]>rmax) {
+        rmax = rx[i1];
+        i1max = i1;
+      }
+    }
+    if (index!=null)
+      index[0] = i1max;
+    return rmax;
+  }
+  public static float findMax(float[][] rx, int[] index) {
+    int i1max = 0;
+    int i2max = 0;
+    float rmax = rx[0][0];
+    int n2 = rx.length;
+    for (int i2=0; i2<n2; ++i2) {
+      float[] rxi2 = rx[i2];
+      int n1 = rxi2.length;
+      for (int i1=0; i1<n1; ++i1) {
+        if (rxi2[i1]>rmax) {
+          rmax = rxi2[i1];
+          i2max = i2;
+          i1max = i1;
+        }
+      }
+    }
+    if (index!=null) {
+      index[0] = i1max;
+      index[1] = i2max;
+    }
+    return rmax;
+  }
+  public static float findMax(float[][][] rx, int[] index) {
+    int i1max = 0;
+    int i2max = 0;
+    int i3max = 0;
+    float rmax = rx[0][0][0];
+    int n3 = rx.length;
+    for (int i3=0; i3<n3; ++i3) {
+      float[][] rxi3 = rx[i3];
+      int n2 = rxi3.length;
+      for (int i2=0; i2<n2; ++i2) {
+        float[] rxi3i2 = rxi3[i2];
+        int n1 = rxi3i2.length;
+        for (int i1=0; i1<n1; ++i1) {
+          if (rxi3i2[i1]>rmax) {
+            rmax = rxi3i2[i1];
+            i1max = i1;
+            i2max = i2;
+            i3max = i3;
+          }
+        }
+      }
+    }
+    if (index!=null) {
+      index[0] = i1max;
+      index[1] = i2max;
+      index[2] = i3max;
+    }
+    return rmax;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // abs, neg, ...
+  public static float[] abs(float[] rx) {
+    return _abs.apply(rx);
+  }
+  public static float[][] abs(float[][] rx) {
+    return _abs.apply(rx);
+  }
+  public static float[][][] abs(float[][][] rx) {
+    return _abs.apply(rx);
+  }
+  public static float[] abs(float[] rx, float[] ry) {
+    return _abs.apply(rx,ry);
+  }
+  public static float[][] abs(float[][] rx, float[][] ry) {
+    return _abs.apply(rx,ry);
+  }
+  public static float[][][] abs(float[][][] rx, float[][][] ry) {
+    return _abs.apply(rx,ry);
+  }
+  public static float[] abs(int n1, float[] rx) {
+    return _abs.apply(n1,rx);
+  }
+  public static float[][] abs(int n1, int n2, float[][] rx) {
+    return _abs.apply(n1,n2,rx);
+  }
+  public static float[][][] abs(int n1, int n2, int n3, float[][][] rx) {
+    return _abs.apply(n1,n2,n3,rx);
+  }
+  public static float[] abs(int n1, float[] rx, float[] ry) {
+    return _abs.apply(n1,rx,ry);
+  }
+  public static float[][] abs(int n1, int n2, float[][] rx, float[][] ry) {
+    return _abs.apply(n1,n2,rx,ry);
+  }
+  public static float[][][] abs(
+    int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
+    return _abs.apply(n1,n2,n3,rx,ry);
+  }
+  public static float[] neg(float[] rx) {
+    return _neg.apply(rx);
+  }
+  public static float[][] neg(float[][] rx) {
+    return _neg.apply(rx);
+  }
+  public static float[][][] neg(float[][][] rx) {
+    return _neg.apply(rx);
+  }
+  public static float[] neg(float[] rx, float[] ry) {
+    return _neg.apply(rx,ry);
+  }
+  public static float[][] neg(float[][] rx, float[][] ry) {
+    return _neg.apply(rx,ry);
+  }
+  public static float[][][] neg(float[][][] rx, float[][][] ry) {
+    return _neg.apply(rx,ry);
+  }
+  public static float[] neg(int n1, float[] rx) {
+    return _neg.apply(n1,rx);
+  }
+  public static float[][] neg(int n1, int n2, float[][] rx) {
+    return _neg.apply(n1,n2,rx);
+  }
+  public static float[][][] neg(int n1, int n2, int n3, float[][][] rx) {
+    return _neg.apply(n1,n2,n3,rx);
+  }
+  public static float[] neg(int n1, float[] rx, float[] ry) {
+    return _neg.apply(n1,rx,ry);
+  }
+  public static float[][] neg(int n1, int n2, float[][] rx, float[][] ry) {
+    return _neg.apply(n1,n2,rx,ry);
+  }
+  public static float[][][] neg(
+    int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
+    return _neg.apply(n1,n2,n3,rx,ry);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // add, sub, mul, div, ...
   public static float[] add(float[] rx, float[] ry) {
     return _add.apply(rx,ry);
   }
@@ -773,6 +962,81 @@ public class Rap {
     int n1, int n2, int n3, float[][][] rx, float rb, float[][][] rz) {
     return _div.apply(n1,n2,n3,rx,rb,rz);
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // unary operations; e.g., abs, neg, ...
+  private static abstract class Unary {
+    float[] apply(float[] rx) {
+      int n1 = rx.length;
+      float[] ry = new float[n1];
+      return apply(n1,rx,ry);
+    }
+    float[][] apply(float[][] rx) {
+      int n2 = rx.length;
+      float[][] ry = new float[n2][];
+      for (int i2=0; i2<n2; ++i2)
+        ry[i2] = apply(rx[i2]);
+      return ry;
+    }
+    float[][][] apply(float[][][] rx) {
+      int n3 = rx.length;
+      float[][][] ry = new float[n3][][];
+      for (int i3=0; i3<n3; ++i3)
+        ry[i3] = apply(rx[i3]);
+      return ry;
+    }
+    float[] apply(float[] rx, float[] ry) {
+      return apply(rx.length,rx,ry);
+    }
+    float[][] apply(float[][] rx, float[][] ry) {
+      int n2 = rx.length;
+      for (int i2=0; i2<n2; ++i2)
+        apply(rx[i2],ry[i2]);
+      return ry;
+    }
+    float[][][] apply(float[][][] rx, float[][][] ry) {
+      int n3 = rx.length;
+      for (int i3=0; i3<n3; ++i3)
+        apply(rx[i3],ry[i3]);
+      return ry;
+    }
+    float[] apply(int n1, float[] rx) {
+      return apply(n1,rx,new float[n1]);
+    }
+    float[][] apply(int n1, int n2, float[][] rx) {
+      return apply(n1,n2,rx,new float[n2][n1]);
+    }
+    float[][][] apply(int n1, int n2, int n3, float[][][] rx) {
+      return apply(n1,n2,n3,rx,new float[n3][n2][n1]);
+    }
+    abstract float[] apply(int n1, float[] rx, float[] ry);
+    float[][] apply(int n1, int n2, float[][] rx, float[][] ry) {
+      for (int i2=0; i2<n2; ++i2)
+        apply(n1,rx[i2],ry[i2]);
+      return ry;
+    }
+    float[][][] apply(int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
+      for (int i3=0; i3<n3; ++i3)
+        apply(n1,n2,rx[i3],ry[i3]);
+      return ry;
+    }
+  }
+  private static Unary _abs = new Unary() {
+    float[] apply(int n1, float[] rx, float[] ry) {
+      for (int i1=0; i1<n1; ++i1) {
+        float rxi = rx[i1];
+        ry[i1] = (rxi>=0.0f)?rxi:-rxi;
+      }
+      return ry;
+    }
+  };
+  private static Unary _neg = new Unary() {
+    float[] apply(int n1, float[] rx, float[] ry) {
+      for (int i1=0; i1<n1; ++i1)
+        ry[i1] = -rx[i1];
+      return ry;
+    }
+  };
 
   ///////////////////////////////////////////////////////////////////////////
   // binary operations; e.g., add, sub, mul, div, ...

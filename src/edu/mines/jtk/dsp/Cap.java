@@ -260,6 +260,50 @@ public class Cap {
   }
 
   ///////////////////////////////////////////////////////////////////////////
+  // equal
+  public static boolean equal(float[] cx, float[] cy) {
+    return equal(cx.length/2,cx,cy);
+  }
+  public static boolean equal(float[][] cx, float[][] cy) {
+    int n2 = cx.length;
+    for (int i2=0; i2<n2; ++i2) {
+      if (!equal(cx[i2],cy[i2]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean equal(float[][][] cx, float[][][] cy) {
+    int n3 = cx.length;
+    for (int i3=0; i3<n3; ++i3) {
+      if (!equal(cx[i3],cy[i3]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean equal(int n1, float[] cx, float[] cy) {
+    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+      if (cx[ir]!=cy[ir] || cx[ii]!=cy[ii]) 
+        return false;
+    }
+    return true;
+  }
+  public static boolean equal(int n1, int n2, float[][] cx, float[][] cy) {
+    for (int i2=0; i2<n2; ++i2) {
+      if (!equal(n1,cx[i2],cy[i2]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean equal(
+    int n1, int n2, int n3, float[][][] cx, float[][][] cy) {
+    for (int i3=0; i3<n3; ++i3) {
+      if (!equal(n1,n2,cx[i3],cy[i3]))
+        return false;
+    }
+    return true;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
   // almostEqual
   public static boolean almostEqual(
     float tolerance, float[] cx, float[] cy) {
