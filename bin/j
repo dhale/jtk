@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export JVES_HOME=~dhale/box/jves
+export JVES_HOME=~dhale/box/jves/trunk
 
 export CLASSPATH=\
 $JVES_HOME/build/jar/edu_mines_jves.jar:\
