@@ -6,10 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jves.opengl;
 
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.widgets.*;
 
 /**
  * An SWT canvas that paints via OpenGL. To paint an SWT canvas using 
@@ -31,6 +30,7 @@ public abstract class GlSwtCanvas extends Canvas {
     _context = new GlContext(this);
     addPaintListener(new PaintListener() {
       public void paintControl(PaintEvent e) {
+        e.gc.drawText("Hello world",50,50);
         paint(e);
       }
     });

@@ -33,6 +33,8 @@ public:
   virtual jboolean lock(JNIEnv* env) = 0;
   virtual jboolean unlock(JNIEnv* env) = 0;
   virtual jboolean swapBuffers(JNIEnv* env) = 0;
+protected:
+  virtual void makeCurrent(JNIEnv* env, bool flag) = 0;
 };
 
 // OpenGL context for AWT Canvas.
@@ -69,10 +71,11 @@ public:
       _awt.FreeDrawingSurface(_ds);
       return JNI_FALSE;
     }
-    makeCurrent(env);
+    makeCurrent(env,true);
     return JNI_TRUE;
   }
-  virtual jboolean unlock(JNIEnv*) {
+  virtual jboolean unlock(JNIEnv* env) {
+    makeCurrent(env,false);
     _ds->FreeDrawingSurfaceInfo(_dsi);
     _ds->Unlock(_ds);
     _awt.FreeDrawingSurface(_ds);
@@ -84,7 +87,6 @@ protected:
   JAWT _awt;
   JAWT_DrawingSurface* _ds;
   JAWT_DrawingSurfaceInfo* _dsi;
-  virtual void makeCurrent(JNIEnv* env) = 0;
 };
 
 // Microsoft Windows OpenGL context for AWT Canvas.
@@ -100,7 +102,7 @@ public:
       wglDeleteContext(_hglrc);
     }
   }
-  virtual void makeCurrent(JNIEnv*) {
+  virtual void makeCurrent(JNIEnv*, bool flag) {
     _dsi_win32 = (JAWT_Win32DrawingSurfaceInfo*)_dsi->platformInfo;
     _hwnd = _dsi_win32->hwnd;
     _hdc = _dsi_win32->hdc;
@@ -121,7 +123,11 @@ public:
       SetPixelFormat(_hdc,format,&pfd);
       _hglrc = wglCreateContext(_hdc);
     }
-    wglMakeCurrent(_hdc,_hglrc);
+    if (flag) {
+      wglMakeCurrent(_hdc,_hglrc);
+    } else {
+      wglMakeCurrent(_hdc,0);
+    }
   }
   virtual jboolean swapBuffers(JNIEnv*) {
     SwapBuffers(_hdc);
@@ -146,7 +152,7 @@ public:
     if (_context!=0)
       glXDestroyContext(_display,_context);
   }
-  virtual void makeCurrent(JNIEnv*) {
+  virtual void makeCurrent(JNIEnv*, bool flag) {
     _dsi_x11 = (JAWT_X11DrawingSurfaceInfo*)_dsi->platformInfo;
     _display = _dsi_x11->display;
     _drawable = _dsi_x11->drawable;
@@ -162,7 +168,18 @@ public:
         _display,DefaultScreen(_display),config);
       _context = glXCreateContext(_display,visualInfo,0,GL_TRUE);
     }
-    glXMakeCurrent(_display,_drawable,_context);
+    if (flag) {
+      glXMakeCurrent(_display,_drawable,_context);
+    } else {
+      glXMakeCurrent(_display,_drawable,None);
+    }
+    if (flag) {
+      glXMakeCurrent(_display,_drawable,_context);
+      glXWaitX();
+    } else {
+      glXWaitGL();
+      glXMakeCurrent(_display,None,0);
+    }
     XFlush(_display);
   }
   virtual jboolean swapBuffers(JNIEnv*) {
@@ -186,15 +203,15 @@ public:
   virtual ~GlSwtCanvasContext() {
   }
   virtual jboolean lock(JNIEnv* env) {
-    makeCurrent(env);
+    makeCurrent(env,true);
     return JNI_TRUE;
   }
-  virtual jboolean unlock(JNIEnv*) {
+  virtual jboolean unlock(JNIEnv* env) {
+    makeCurrent(env,false);
     return JNI_TRUE;
   }
 protected:
   JNIEnv* _env; // thread in which context was constructed
-  virtual void makeCurrent(JNIEnv* env) = 0;
 };
 
 // Microsoft Windows OpenGL context for SWT Canvas.
@@ -212,7 +229,7 @@ public:
       wglDeleteContext(_hglrc);
     }
   }
-  virtual void makeCurrent(JNIEnv*) {
+  virtual void makeCurrent(JNIEnv*, bool flag) {
     if (_hglrc==0) {
       PIXELFORMATDESCRIPTOR pfd;
       ZeroMemory(&pfd,sizeof(pfd));
@@ -230,7 +247,11 @@ public:
       SetPixelFormat(_hdc,format,&pfd);
       _hglrc = wglCreateContext(_hdc);
     }
-    wglMakeCurrent(_hdc,_hglrc);
+    if (flag) {
+      wglMakeCurrent(_hdc,_hglrc);
+    } else {
+      wglMakeCurrent(_hdc,0);
+    }
   }
   virtual jboolean swapBuffers(JNIEnv*) {
     SwapBuffers(_hdc);
@@ -247,22 +268,22 @@ private:
 class GlxSwtCanvasContext : public GlSwtCanvasContext {
 public:
   GlxSwtCanvasContext(JNIEnv* env, 
-    jlong xdisplay, jlong xdrawable, jlong xgc) :
+    jlong xdisplay, jlong xdrawable) :
     GlSwtCanvasContext(env),_context(0) 
   {
     _xdisplay = (Display*)toPointer(xdisplay);
     _xdrawable = (Drawable)xdrawable;
-    _xgc = (GC)toPointer(xgc);
   }
   virtual ~GlxSwtCanvasContext() {
     if (_context!=0) {
       glXDestroyContext(_xdisplay,_context);
     }
   }
-  virtual void makeCurrent(JNIEnv*) {
+  virtual void makeCurrent(JNIEnv*, bool flag) {
     if (_context==0) {
       int config[] = {
-        GLX_DOUBLEBUFFER,GLX_RGBA,
+        GLX_DOUBLEBUFFER,
+        GLX_RGBA,
         GLX_DEPTH_SIZE,16,
         GLX_RED_SIZE,1,
         GLX_GREEN_SIZE,1,
@@ -272,8 +293,13 @@ public:
         _xdisplay,DefaultScreen(_xdisplay),config);
       _context = glXCreateContext(_xdisplay,visualInfo,0,GL_TRUE);
     }
-    glXMakeCurrent(_xdisplay,_xdrawable,_context);
-    XFlush(_xdisplay);
+    if (flag) {
+      glXMakeCurrent(_xdisplay,_xdrawable,_context);
+      glXWaitX();
+    } else {
+      glXWaitGL();
+      glXMakeCurrent(_xdisplay,None,0);
+    }
   }
   virtual jboolean swapBuffers(JNIEnv*) {
     glXSwapBuffers(_xdisplay,_xdrawable);
@@ -282,7 +308,6 @@ public:
 private:
   Display* _xdisplay;
   Drawable _xdrawable;
-  GC _xgc;
   GLXContext _context;
 };
 #endif
@@ -319,14 +344,14 @@ Java_edu_mines_jves_opengl_GlContext_makeGlAwtCanvasContext(
 extern "C" JNIEXPORT jlong JNICALL
 Java_edu_mines_jves_opengl_GlContext_makeGlSwtCanvasContext(
   JNIEnv* env, jclass cls, 
-  jlong xdisplay, jlong xdrawable, jlong xgc,
+  jlong xdisplay, jlong xdrawable,
   jlong hwnd, jlong hdc) 
 {
   JNI_TRY
 #if defined(MWIN)
   GlContext* context = new WglSwtCanvasContext(env,hwnd,hdc);
 #elif defined(XWIN)
-  GlContext* context = new GlxSwtCanvasContext(env,xdisplay,xdrawable,xgc);
+  GlContext* context = new GlxSwtCanvasContext(env,xdisplay,xdrawable);
 #endif
   return fromPointer(context);
   JNI_CATCH

@@ -17,12 +17,11 @@ class SwtHandles {
   // Generic SWT.
   Drawable drawable;
   GCData data;
-  long handle;
+  long handle; // the HWND, same as below
 
   // For X Windows.
   long xdisplay;
   long xdrawable;
-  long xgc;
 
   // For Microsoft Windows.
   long hwnd;

@@ -51,10 +51,9 @@ public class GlContext {
     _swtHandles = new SwtHandles(canvas);
     long xdisplay = _swtHandles.xdisplay;
     long xdrawable = _swtHandles.xdrawable;
-    long xgc = _swtHandles.xgc;
     long hwnd = _swtHandles.hwnd;
     long hdc = _swtHandles.hdc;
-    _peer = makeGlSwtCanvasContext(xdisplay,xdrawable,xgc,hwnd,hdc);
+    _peer = makeGlSwtCanvasContext(xdisplay,xdrawable,hwnd,hdc);
   }
 
   /**
@@ -128,7 +127,7 @@ public class GlContext {
   private static native void killGlContext(long peer);
   private static native long makeGlAwtCanvasContext(java.awt.Canvas canvas);
   private static native long makeGlSwtCanvasContext(
-    long xdisplay, long xdrawable, long xgc, 
+    long xdisplay, long xdrawable,
     long hwnd, long hdc);
   private static native boolean lock(long peer);
   private static native boolean unlock(long peer);
