@@ -7,11 +7,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jves.opengl;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.widgets.*;
 
 /**
  * An SWT canvas that paints via OpenGL. To paint an SWT canvas using 
@@ -33,12 +31,6 @@ public class GlSwtCanvas extends Canvas {
    */
   public GlSwtCanvas(Composite parent, int style) {
     this(parent,style,null);
-    _context = new GlContext(this);
-    addPaintListener(new PaintListener() {
-      public void paintControl(PaintEvent pe) {
-        paint(pe);
-      }
-    });
   }
 
   /**
@@ -54,6 +46,11 @@ public class GlSwtCanvas extends Canvas {
     addPaintListener(new PaintListener() {
       public void paintControl(PaintEvent pe) {
         paint(pe);
+      }
+    });
+    addDisposeListener(new DisposeListener() {
+      public void widgetDisposed(DisposeEvent de) {
+        _context.dispose();
       }
     });
   }

@@ -46,6 +46,13 @@ public class GlAwtCanvas extends Canvas {
   }
 
   /**
+   * Dispose this context.
+   */
+  public void dispose() {
+    _context.dispose();
+  }
+
+  /**
    * Initializes OpenGL state when this canvas is first painted.
    * This method is called before the methods 
    * {@link #glResize(int,int,int,int)} and {@link #glPaint()} when (1)
@@ -128,6 +135,17 @@ public class GlAwtCanvas extends Canvas {
    */
   public void update(Graphics g) {
     paint(g);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // protected
+
+  protected void finalize() throws Throwable {
+    try {
+      dispose();
+    } finally {
+      super.finalize();
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
