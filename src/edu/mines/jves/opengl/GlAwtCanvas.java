@@ -11,7 +11,8 @@ import java.awt.Graphics;
 
 /**
  * An AWT canvas that paints via OpenGL. To paint an AWT canvas using 
- * OpenGL, extend this class and implement the method {@link #glPaint()}.
+ * OpenGL, construct an instance of this class with an OpenGL painter,
+ * or extend this class and implement the method {@link #glPaint()}.
  * <p>
  * Classes that extend this class may also implement the methods
  * {@link #glInit()} and {@link #glResize(int,int,int,int)}.
@@ -21,9 +22,18 @@ import java.awt.Graphics;
 public class GlAwtCanvas extends Canvas {
 
   /**
-   * Constructs a canvas.
+   * Constructs a canvas with no OpenGL painter.
    */
   public GlAwtCanvas() {
+    this(null);
+  }
+
+  /**
+   * Constructs a canvas with the specified OpenGL painter.
+   * @param painter the OpenGL painter.
+   */
+  public GlAwtCanvas(GlPainter painter) {
+    _painter = painter;
     _context = new GlContext(this);
   }
 
@@ -38,15 +48,16 @@ public class GlAwtCanvas extends Canvas {
   /**
    * Initializes OpenGL state when this canvas is first painted.
    * This method is called before the methods 
-   * {@link #glResize(int,int,int,int)} and {@link #glPaint()} when 
-   * (1) this this canvas must be painted and (2) it has never been 
-   * painted before.
+   * {@link #glResize(int,int,int,int)} and {@link #glPaint()} when (1)
+   * this canvas must be painted and (2) it has never been painted before.
    * <p>
    * In classes that extend this class, implementations of this method 
    * use the OpenGL context that has been locked for the current thread. 
-   * This implementation does nothing.
+   * This implementation simply delegates to the painter, if not null.
    */
   public void glInit() {
+    if (_painter!=null)
+      _painter.glInit();
   }
 
   /**
@@ -57,26 +68,30 @@ public class GlAwtCanvas extends Canvas {
    * <p>
    * In classes that extend this class, implementations of this method 
    * use the OpenGL context that has been locked for the current thread. 
-   * This implementation does nothing.
-   * @param widthOld the width before resizing.
-   * @param heightOld the height before resizing.
-   * @param widthNew the width after resizing.
-   * @param heightNew the height after resizing.
+   * This implementation simply delegates to the painter, if not null.
+   * @param width the current width.
+   * @param height the current height.
+   * @param widthBefore the width before resizing.
+   * @param heightBefore the height before resizing.
    */
   public void glResize(
-    int widthOld, int heightOld, 
-    int widthNew, int heightNew) 
+    int width, int height, 
+    int widthBefore, int heightBefore)
   {
+    if (_painter!=null)
+      _painter.glResize(width,height,widthBefore,heightBefore);
   }
 
   /**
    * Paints this canvas via OpenGL.
    * <p>
-   * In classes that extend this abstract class, implementations of this 
-   * method use the OpenGL context that has been locked for the current 
-   * thread. This implementation does nothing.
+   * In classes that extend this class, implementations of this method 
+   * use the OpenGL context that has been locked for the current thread. 
+   * This implementation simply delegates to the painter, if not null.
    */
   public void glPaint() {
+    if (_painter!=null)
+      _painter.glPaint();
   }
 
   /**
@@ -96,7 +111,7 @@ public class GlAwtCanvas extends Canvas {
       int width = getWidth();
       int height = getHeight();
       if (_width!=width || _height!=height) {
-        glResize(_width,_height,width,height);
+        glResize(width,height,_width,_height);
         _width = width;
         _height = height;
       }
@@ -118,6 +133,7 @@ public class GlAwtCanvas extends Canvas {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  private GlPainter _painter;
   private GlContext _context;
   private boolean _inited;
   private int _width,_height;

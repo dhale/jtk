@@ -6,25 +6,20 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jves.opengl.test;
 
-import java.awt.*;
-import java.util.*;
-import javax.swing.*;
-
 import edu.mines.jves.opengl.*;
 import static edu.mines.jves.opengl.Gl.*;
 
 /**
  * Simple OpenGL program.
  * @author Dave Hale, Colorado School of Mines
- * @version 2004.11.24
+ * @version 2004.12.02
  */
-public class HelloAwt {
-
-  private static class MyCanvas extends GlAwtCanvas {
+public class Hello {
+  private static GlPainter painter = new GlPainter() {
     public void glInit() {
       glClearColor(0.0f,0.0f,0.0f,0.0f);
     }
-    public void glResize(int widthOld, int heightOld, int width, int height) {
+    public void glResize(int width, int height, int widthOld, int heightOld) {
         glViewport(0,0,width,height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -32,7 +27,7 @@ public class HelloAwt {
     }
     public void glPaint() {
       glClear(GL_COLOR_BUFFER_BIT);
-      glBlendColor(1.0f,1.0f,1.0f,1.0f); // OpenGL 1.2 test
+      glBlendColor(1.0f,1.0f,1.0f,1.0f); // something from OpenGL 1.2
       glColor3f(1.0f,1.0f,1.0f);
       glBegin(GL_POLYGON);
         glVertex3f(0.25f,0.25f,0.00f);
@@ -42,12 +37,8 @@ public class HelloAwt {
       glEnd();
       glFlush();
     }
-  }
+  };
   public static void main(String[] args) {
-    JFrame frame = new JFrame();
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(new Dimension(800,800));
-    frame.getContentPane().add(new MyCanvas(),BorderLayout.CENTER);
-    frame.setVisible(true);
+    TestSimple.run(args,painter);
   }
 }
