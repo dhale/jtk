@@ -39,6 +39,9 @@ Java_edu_mines_jves_opengl_Gl_##name(\
 #define JNI_GL_DECLARE_RETURN1(type,name) extern "C" JNIEXPORT type JNICALL \
 Java_edu_mines_jves_opengl_Gl_##name(\
   JNIEnv* env, jclass cls,
+#define JNI_GL_DECLARE_RETURN2(type,name) extern "C" JNIEXPORT type JNICALL \
+Java_edu_mines_jves_opengl_Gl_n##name(\
+  JNIEnv* env, jclass cls, jlong pfunc,
 #define JNI_GL_BEGIN0 {\
   JNI_TRY
 #define JNI_GL_BEGIN1 ) {\
@@ -3790,41 +3793,138 @@ JNI_GL_BEGIN2
     (n,ids);
 JNI_GL_END
 
+JNI_GL_DECLARE2(glDeleteQueries)
+  jint n, jintArray jids
+JNI_GL_BEGIN2
+  JuintArray ids(env,jids);
+  (*(PFNGLDELETEQUERIESPROC)toPointer(pfunc))
+    (n,ids);
+JNI_GL_END
+
+JNI_GL_DECLARE_RETURN2(jboolean,glIsQuery)
+  jint id
+JNI_GL_BEGIN2
+  return toJava((*(PFNGLISQUERYPROC)toPointer(pfunc))
+    (id));
+JNI_GL_END
+
+JNI_GL_DECLARE2(glBeginQuery)
+  jint target, jint id
+JNI_GL_BEGIN2
+  (*(PFNGLBEGINQUERYPROC)toPointer(pfunc))
+    (target,id);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glEndQuery)
+  jint target
+JNI_GL_BEGIN2
+  (*(PFNGLENDQUERYPROC)toPointer(pfunc))
+    (target);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glGetQueryiv)
+  jint target, jint pname, jintArray jparams
+JNI_GL_BEGIN2
+  JintArray params(env,jparams);
+  (*(PFNGLGETQUERYIVPROC)toPointer(pfunc))
+    (target,pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glGetQueryObjectiv)
+  jint id, jint pname, jintArray jparams
+JNI_GL_BEGIN2
+  JintArray params(env,jparams);
+  (*(PFNGLGETQUERYOBJECTIVPROC)toPointer(pfunc))
+    (id,pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glGetQueryObjectuiv)
+  jint id, jint pname, jintArray jparams
+JNI_GL_BEGIN2
+  JuintArray params(env,jparams);
+  (*(PFNGLGETQUERYOBJECTUIVPROC)toPointer(pfunc))
+    (id,pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glBindBuffer)
+  jint target, jint buffer
+JNI_GL_BEGIN2
+  (*(PFNGLBINDBUFFERPROC)toPointer(pfunc))
+    (target,buffer);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glDeleteBuffers)
+  jint n, jintArray jbuffers
+JNI_GL_BEGIN2
+  JuintArray buffers(env,jbuffers);
+  (*(PFNGLDELETEBUFFERSPROC)toPointer(pfunc))
+    (n,buffers);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glGenBuffers)
+  jint n, jintArray jbuffers
+JNI_GL_BEGIN2
+  JuintArray buffers(env,jbuffers);
+  (*(PFNGLGENBUFFERSPROC)toPointer(pfunc))
+    (n,buffers);
+JNI_GL_END
+
+JNI_GL_DECLARE_RETURN2(jboolean,glIsBuffer)
+  jint buffer
+JNI_GL_BEGIN2
+  return toJava((*(PFNGLISBUFFERPROC)toPointer(pfunc))
+    (buffer));
+JNI_GL_END
+
+JNI_GL_DECLARE2(glBufferData)
+  jint target, jint size, jobject jdata, jint usage
+JNI_GL_BEGIN2
+  JvoidBuffer data(env,jdata);
+  (*(PFNGLBUFFERDATAPROC)toPointer(pfunc))
+    (target,size,data,usage);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glBufferSubData)
+  jint target, jint offset, jint size, jobject jdata
+JNI_GL_BEGIN2
+  JvoidBuffer data(env,jdata);
+  (*(PFNGLBUFFERSUBDATAPROC)toPointer(pfunc))
+    (target,offset,size,data);
+JNI_GL_END
+
+JNI_GL_DECLARE_RETURN2(jobject,glMapBuffer)
+  jint target, jint access
+JNI_GL_BEGIN2
+  void* pointer = (*(PFNGLMAPBUFFERPROC)toPointer(pfunc))
+    (target,access);
+  return (jobject)pointer; // TODO: return a Buffer
+JNI_GL_END
+
+JNI_GL_DECLARE_RETURN2(jboolean,glUnmapBuffer)
+  jint target
+JNI_GL_BEGIN2
+  return toJava((*(PFNGLUNMAPBUFFERPROC)toPointer(pfunc))
+    (target));
+JNI_GL_END
+
+JNI_GL_DECLARE2(glGetBufferParameteriv)
+  jint target, jint pname, jintArray jparams
+JNI_GL_BEGIN2
+  JintArray params(env,jparams);
+  (*(PFNGLGETBUFFERPARAMETERIVPROC)toPointer(pfunc))
+    (target,pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glGetBufferPointerv)
+  jint target, jint pname, jarray jparams
+JNI_GL_BEGIN2
+  void* params;
+  (*(PFNGLGETBUFFERPOINTERVPROC)toPointer(pfunc))
+    (target,pname,&params);
+  // TODO: convert the void* to Buffer
+JNI_GL_END
+
 /*
-  private static native void nglGenQueries(
-    int n, int[] ids);
-  private static native void nglDeleteQueries(
-    int n, int[] ids);
-  private static native boolean nglIsQuery(
-    int id);
-  private static native void nglBeginQuery(
-    int target, int id);
-  private static native void nglEndQuery(
-    int target);
-  private static native void nglGetQueryiv(
-    int target, int pname, int[] params);
-  private static native void nglGetQueryObjectiv(
-    int id, int pname, int[] params);
-  private static native void nglGetQueryObjectuiv(
-    int id, int pname, int[] params);
-  private static native void nglBindBuffer(
-    int target, int buffer);
-  private static native void nglDeleteBuffers(
-    int n, int[] buffers);
-  private static native void nglGenBuffers(
-    int n, int[] buffers);
-  private static native boolean nglIsBuffer(
-    int buffer);
-  private static native void nglBufferData(
-    int target, int size, Buffer data, int usage);
-  private static native void nglBufferSubData(
-    int target, int offset, int size, Buffer data);
-  private static native void nglGetBufferSubData(
-    int target, int offset, int size, Buffer data);
-  private static native Buffer nglMapBuffer(
-    int target, int access);
-  private static native boolean nglUnmapBuffer(
-    int target);
   private static native void nglGetBufferParameteriv(
     int target, int pname, int[] params);
   private static native void nglGetBufferPointerv(
