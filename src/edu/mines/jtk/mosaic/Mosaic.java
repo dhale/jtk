@@ -221,20 +221,57 @@ public class Mosaic extends Composite {
 
   private void onPaint(PaintEvent pe) {
     GC gc = pe.gc;
-    int wb = widthBorder();
-    gc.setLineWidth(widthBorder());
+    //gc.setBackground(getSystemColor(SWT.COLOR_WHITE));
+    //gc.fillRectangle(getBounds());
+    //int wb = widthBorder();
+    //gc.setLineWidth(widthBorder());
 
     // Tiles.
     for (int irow=0; irow<_nrow; ++irow) {
       for (int icol=0; icol<_ncol; ++icol) {
         Rectangle bounds = _tiles[irow][icol].getBounds();
-        bounds.x -= (wb+1)/2;
-        bounds.y -= (wb+1)/2;
-        bounds.width += wb;
-        bounds.height += wb;
-        gc.drawRectangle(bounds);
+        paintBorderShadowIn(gc,bounds);
       }
     }
+
+    // Axes.
+    if (_axesTop!=null) {
+      for (int icol=0; icol<_ncol; ++icol)
+        paintBorderShadowIn(gc,_axesTop[icol].getBounds());
+    }
+    if (_axesLeft!=null) {
+      for (int irow=0; irow<_nrow; ++irow)
+        paintBorderShadowIn(gc,_axesLeft[irow].getBounds());
+    }
+    if (_axesBottom!=null) {
+      for (int icol=0; icol<_ncol; ++icol)
+        paintBorderShadowIn(gc,_axesBottom[icol].getBounds());
+    }
+    if (_axesRight!=null) {
+      for (int irow=0; irow<_nrow; ++irow)
+        paintBorderShadowIn(gc,_axesRight[irow].getBounds());
+    }
+  }
+
+  private void paintBorderShadowIn(GC gc, Rectangle r) {
+    int x = r.x;
+    int y = r.y;
+    int w = r.width;
+    int h = r.height;
+    gc.setForeground(getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
+    gc.drawLine(x-2,y-2,x+w+1,y-2);
+    gc.drawLine(x-2,y-2,x-2,y+h+1);
+    gc.drawLine(x-1,y-1,x+w,y-1);
+    gc.drawLine(x-1,y-1,x-1,y+h);
+    gc.setForeground(getSystemColor(SWT.COLOR_WIDGET_HIGHLIGHT_SHADOW));
+    gc.drawLine(x,y+h,x+w,y+h);
+    gc.drawLine(x+w,y,x+w,y+h);
+    gc.drawLine(x-1,y+h+1,x+w+1,y+h+1);
+    gc.drawLine(x+w+1,y-1,x+w+1,y+h+1);
+  }
+
+  private Color getSystemColor(int id) {
+    return getDisplay().getSystemColor(id);
   }
 
   private void doLayout() {
@@ -303,11 +340,31 @@ public class Mosaic extends Composite {
       }
     }
 
+    // Tiles.
+    int xtile0 = wb;
+    int ytile0 = wb;
+    if (_axesLeft!=null)
+      xtile0 += widthMinimumAxesLeft();
+    if (_axesTop!=null)
+      ytile0 += heightMinimumAxesTop();
+    int xtile = xtile0;
+    int ytile = ytile0;
+    for (int irow=0; irow<_nrow; ++irow) {
+      int htile = hrow[irow];
+      xtile = xtile0;
+      for (int icol=0; icol<_ncol; ++icol) {
+        int wtile = wcol[icol];
+        _tiles[irow][icol].setBounds(xtile,ytile,wtile,htile);
+        xtile += wtile+wb+wb;
+      }
+      ytile += htile+wb+wb;
+    }
+
     // Axes bottom.
     if (_axesBottom!=null) {
       int haxis = heightMinimumAxesBottom()-wb-wb;
       int xaxis = widthMinimumAxesLeft()+wb;
-      int yaxis = h-wb-haxis;
+      int yaxis = ytile;
       for (int icol=0; icol<_ncol; ++icol) {
         int waxis = wcol[icol];
         _axesBottom[icol].setBounds(xaxis,yaxis,waxis,haxis);
@@ -318,30 +375,13 @@ public class Mosaic extends Composite {
     // Axes right.
     if (_axesRight!=null) {
       int waxis = widthMinimumAxesRight()-wb-wb;
-      int xaxis = w-wb-waxis;
+      int xaxis = xtile;
       int yaxis = heightMinimumAxesTop()+wb;
       for (int irow=0; irow<_nrow; ++irow) {
         int haxis = hrow[irow];
         _axesRight[irow].setBounds(xaxis,yaxis,waxis,haxis);
         yaxis += haxis+wb+wb;
       }
-    }
-
-    // Tiles.
-    int xtile0 = wb;
-    int ytile0 = wb;
-    if (_axesLeft!=null)
-      xtile0 += widthMinimumAxesLeft();
-    if (_axesTop!=null)
-      ytile0 += heightMinimumAxesTop();
-    for (int irow=0,ytile=ytile0; irow<_nrow; ++irow) {
-      int htile = hrow[irow];
-      for (int icol=0,xtile=xtile0; icol<_ncol; ++icol) {
-        int wtile = wcol[icol];
-        _tiles[irow][icol].setBounds(xtile,ytile,wtile,htile);
-        xtile += wtile+wb+wb;
-      }
-      ytile += htile+wb+wb;
     }
   }
 
