@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
+import static java.lang.Math.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -50,6 +51,9 @@ public class TileZoomMode extends Mode {
   private TileAxis _axis; // non-null while zooming an axis
   private int _xbegin; // x coordinate where zoom began
   private int _ybegin; // y coordinate where zoom began
+  private int _xlast; // x coordinate where mouse was last
+  private int _ylast; // y coordinate where mouse was last
+  private Graphics _graphics; // graphics used to draw zoom rectangle
 
   private MouseListener _ml = new MouseAdapter() {;
     public void mousePressed(MouseEvent e) {
@@ -79,41 +83,41 @@ public class TileZoomMode extends Mode {
   };
 
   private void beginZoom(Tile tile, MouseEvent e) {
-    System.out.println("TileZoomMode.beginZoom: tile="+tile);
-    tile.addMouseMotionListener(_mml);
     _tile = tile;
     _axis = null;
     _xbegin = e.getX();
     _ybegin = e.getY();
+    drawZoom(tile,_xbegin,_ybegin);
+    tile.addMouseMotionListener(_mml);
   }
 
   private void duringZoom(Tile tile, MouseEvent e) {
+    drawZoom(tile,_xlast,_ylast);
+    drawZoom(tile,e.getX(),e.getY());
   }
 
   private void endZoom(Tile tile, MouseEvent e) {
-    System.out.println("TileZoomMode.endZoom: tile="+tile);
+    drawZoom(tile,_xlast,_ylast);
+    tile.removeMouseMotionListener(_mml);
     _tile = null;
     _axis = null;
-    tile.removeMouseMotionListener(_mml);
   }
 
   private void beginZoom(TileAxis axis, MouseEvent e) {
-    System.out.println("TileZoomMode.beginZoom: axis="+axis);
-    axis.addMouseMotionListener(_mml);
     _axis = axis;
     _tile = null;
     _xbegin = e.getX();
     _ybegin = e.getY();
+    axis.addMouseMotionListener(_mml);
   }
 
   private void duringZoom(TileAxis axis, MouseEvent e) {
   }
 
   private void endZoom(TileAxis axis, MouseEvent e) {
-    System.out.println("TileZoomMode.endZoom: axis="+axis);
+    axis.removeMouseMotionListener(_mml);
     _axis = null;
     _tile = null;
-    axis.removeMouseMotionListener(_mml);
   }
 
   private void drawZoom(Tile tile, int x, int y) {
@@ -124,8 +128,7 @@ public class TileZoomMode extends Mode {
     if (tile==_tile) {
 
       // Draw zoom rectangle in this tile.
-      // TODO: implement draw zoom rectangle
-      System.out.println("draw zoom rect in tile="+tile);
+      drawRect(tile,x,y);
 
       // Draw zoom lines in other tiles and axes in this tile's row and column.
       Mosaic mosaic = tile.getMosaic();
@@ -152,8 +155,25 @@ public class TileZoomMode extends Mode {
 
       // Draw zoom lines in other tile.
       // TODO: implement draw zoom lines
-      System.out.println("draw zoom lines in other tile="+tile);
     }
+  }
+
+  private void drawRect(JComponent c, int x, int y) {
+    int x1 = _xbegin;
+    int y1 = _ybegin;
+    int x2 = x;
+    int y2 = y;
+    int xmin = min(x1,x2);
+    int xmax = max(x1,x2);
+    int ymin = min(y1,y2);
+    int ymax = max(y1,y2);
+    Graphics g = c.getGraphics();
+    g.setXORMode(c.getBackground());
+    g.setColor(Color.RED);
+    g.drawRect(xmin,ymin,xmax-xmin,ymax-ymin);
+    g.dispose();
+    _xlast = x;
+    _ylast = y;
   }
 
   private void drawZoom(TileAxis axis, int x, int y) {
@@ -165,7 +185,6 @@ public class TileZoomMode extends Mode {
 
       // Draw zoom lines in this axis.
       // TODO: implement draw zoom lines
-      System.out.println("draw zoom lines in axis="+axis);
 
       // Draw zoom lines in other tiles and axes in this axis's row or column.
       Mosaic mosaic = axis.getMosaic();
@@ -198,7 +217,6 @@ public class TileZoomMode extends Mode {
 
       // Draw zoom lines in other axis.
       // TODO: implement draw zoom lines
-      System.out.println("draw zoom lines in other axis="+axis);
     }
   }
 }

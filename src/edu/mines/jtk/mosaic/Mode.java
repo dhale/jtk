@@ -86,7 +86,7 @@ public abstract class Mode extends AbstractAction {
    * Sets the name (text) for this mode.
    * Used for mode menu items.
    * <p>
-   * Typically, this method is called by classes that 
+   * Typically, this method is called by constructors in classes that 
    * extend this abstract base class.
    * @param name the name.
    */
@@ -98,7 +98,7 @@ public abstract class Mode extends AbstractAction {
    * Sets the icon for this mode.
    * Used for mode toggle buttons.
    * <p>
-   * Typically, this method is called by classes that 
+   * Typically, this method is called by constructors in classes that 
    * extend this abstract base class.
    * @param icon the icon.
    */
@@ -110,7 +110,7 @@ public abstract class Mode extends AbstractAction {
    * Sets the mnemonic key for this mode.
    * Used for mode menu items.
    * <p>
-   * Typically, this method is called by classes that 
+   * Typically, this method is called by constructors in classes that 
    * extend this abstract base class.
    * @param mk the mnemonic key; e.g., KeyEvent.VK_K.
    */
@@ -121,7 +121,7 @@ public abstract class Mode extends AbstractAction {
   /**
    * Sets the accelerator key stroke for this mode.
    * <p>
-   * Typically, this method is called by classes that 
+   * Typically, this method is called by constructors in classes that 
    * extend this abstract base class.
    * @param ak the accelerator key stroke.
    */
@@ -133,7 +133,7 @@ public abstract class Mode extends AbstractAction {
    * Sets the short description for this mode.
    * Used in tool tips for mode menu items and toggle buttons.
    * <p>
-   * Typically, this method is called by classes that 
+   * Typically, this method is called by constructors in classes that 
    * extend this abstract base class.
    * @param sd the short description.
    */
@@ -144,7 +144,7 @@ public abstract class Mode extends AbstractAction {
   /**
    * Sets the long description for this mode.
    * <p>
-   * Typically, this method is called by classes that 
+   * Typically, this method is called by constructors in classes that 
    * extend this abstract base class.
    * @param ld the long description.
    */

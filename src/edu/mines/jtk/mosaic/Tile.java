@@ -172,8 +172,8 @@ public class Tile extends JPanel {
     super.paintComponent(g);
     int width = getWidth();
     int height = getHeight();
-    g.setColor(Color.GREEN);
-    g.fillRect(0,0,width,height);
+    //g.setColor(Color.GREEN);
+    //g.fillRect(0,0,width,height);
     FontMetrics fm = g.getFontMetrics();
     int sw = fm.stringWidth("Tile");
     int sh = fm.getAscent();
