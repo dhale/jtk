@@ -37,7 +37,6 @@ class SwtHandles {
     long gdkWindow = data.drawable;
     xdisplay = OS.gdk_x11_drawable_get_xdisplay((int)gdkWindow); // 64-bit!
     xdrawable = OS.gdk_x11_drawable_get_xid((int)gdkWindow); // 64-bit!
-    //xgc = OS.gdk_x11_gc_get_xgc((int)gdkGC); // method not in OS! 
 
     // Disable double-buffering, since we do that with OpenGL.
     OS.gtk_widget_set_double_buffered((int)handle,false); // 64-bit!
