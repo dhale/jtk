@@ -228,7 +228,7 @@ public class Jnicpp extends MatchingTask {
     throws BuildException 
   {
     String[] cppArgs = {
-      "/nologo","/c","/W3","/O2","/MD","/DWIN32"
+      "/nologo","/EHs","/c","/W3","/O2","/MD","/DWIN32"
     };
     String[] cl = {"cl",cppFile.getPath()};
     cl = addArgs(cl,cppArgs);
