@@ -6,7 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.Check;
 import edu.mines.jtk.util.Complex;
 import static edu.mines.jtk.util.MathPlus.*;
 
@@ -41,47 +40,49 @@ public class Cap {
     return cy;
   }
   public static float[] copy(int n1, float[] cx) {
-    return copy(n1,cx,new float[2*n1]);
+    float[] cy = new float[2*n1];
+    copy(n1,cx,cy);
+    return cy;
   }
   public static float[][] copy(int n1, int n2, float[][] cx) {
-    return copy(n1,n2,cx,new float[n2][2*n1]);
+    float[][] cy = new float[n2][2*n1];
+    copy(n1,n2,cx,cy);
+    return cy;
   }
   public static float[][][] copy(int n1, int n2, int n3, float[][][] cx) {
-    return copy(n1,n2,n3,cx,new float[n3][n2][2*n1]);
+    float[][][] cy = new float[n3][n2][2*n1];
+    copy(n1,n2,n3,cx,cy);
+    return cy;
   }
-  public static float[] copy(float[] cx, float[] cy) {
-    return copy(cx.length/2,cx,cy);
+  public static void copy(float[] cx, float[] cy) {
+    int n1 = cx.length/2;
+    copy(n1,cx,cy);
   }
-  public static float[][] copy(float[][] cx, float[][] cy) {
+  public static void copy(float[][] cx, float[][] cy) {
     int n2 = cx.length;
     for (int i2=0; i2<n2; ++i2)
       copy(cx[i2],cy[i2]);
-    return cy;
   }
-  public static float[][][] copy(float[][][] cx, float[][][] cy) {
+  public static void copy(float[][][] cx, float[][][] cy) {
     int n3 = cx.length;
     for (int i3=0; i3<n3; ++i3)
       copy(cx[i3],cy[i3]);
-    return cy;
   }
-  public static float[] copy(int n1, float[] cx, float[] cy) {
+  public static void copy(int n1, float[] cx, float[] cy) {
     int n = 2*n1;
     while (--n>=0)
       cy[n] = cx[n];
-    return cy;
   }
-  public static float[][] copy(int n1, int n2, float[][] cx, float[][] cy) {
+  public static void copy(int n1, int n2, float[][] cx, float[][] cy) {
     for (int i2=0; i2<n2; ++i2)
       copy(n1,cx[i2],cy[i2]);
-    return cy;
   }
-  public static float[][][] copy(
+  public static void copy(
     int n1, int n2, int n3, float[][][] cx, float[][][] cy) {
     for (int i3=0; i3<n3; ++i3)
       copy(n1,n2,cx[i3],cy[i3]);
-    return cy;
   }
-  public static float[] copy(
+  public static void copy(
     int n1, 
     int j1x, float[] cx, 
     int j1y, float[] cy) {
@@ -89,23 +90,20 @@ public class Cap {
       cy[iy++] = cx[ix++];
       cy[iy++] = cx[ix++];
     }
-    return cy;
   }
-  public static float[][] copy(
+  public static void copy(
     int n1, int n2, 
     int j1x, int j2x, float[][] cx, 
     int j1y, int j2y, float[][] cy) {
     for (int i2=0; i2<n2; ++i2)
       copy(n1,j1x,cx[i2],j1y,cy[i2]);
-    return cy;
   }
-  public static float[][][] copy(
+  public static void copy(
     int n1, int n2, int n3,
     int j1x, int j2x, int j3x, float[][][] cx, 
     int j1y, int j2y, int j3y, float[][][] cy) {
     for (int i3=0; i3<n3; ++i3)
       copy(n1,n2,j1x,j2x,cx[i3],j1y,j2y,cy[i3]);
-    return cy;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -119,120 +117,81 @@ public class Cap {
   public static float[][][] zero(int n1, int n2, int n3) {
     return new float[n3][n2][2*n1];
   }
-  public static float[] zero(float[] cx) {
-    return zero(cx.length/2,cx);
+  public static void zero(float[] cx) {
+    int n = cx.length;
+    while (--n>=0)
+      cx[n] = 0.0f;
   }
-  public static float[][] zero(float[][] cx) {
+  public static void zero(float[][] cx) {
     int n2 = cx.length;
     for (int i2=0; i2<n2; ++i2)
       zero(cx[i2]);
-    return cx;
   }
-  public static float[][][] zero(float[][][] cx) {
+  public static void zero(float[][][] cx) {
     int n3 = cx.length;
     for (int i3=0; i3<n3; ++i3)
       zero(cx[i3]);
-    return cx;
-  }
-  public static float[] zero(int n1, float[] cx) {
-    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
-      cx[ir] = 0.0f;
-      cx[ii] = 0.0f;
-    }
-    return cx;
-  }
-  public static float[][] zero(int n1, int n2, float[][] cx) {
-    for (int i2=0; i2<n2; ++i2)
-      zero(n1,cx[i2]);
-    return cx;
-  }
-  public static float[][][] zero(int n1, int n2, int n3, float[][][] cx) {
-    for (int i3=0; i3<n3; ++i3)
-      zero(n1,n2,cx[i3]);
-    return cx;
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // fill
   public static float[] fill(Complex ca, int n1) {
-    return fill(ca,n1,new float[2*n1]);
+    float[] cx = new float[2*n1];
+    fill(ca,cx);
+    return cx;
   }
   public static float[][] fill(Complex ca, int n1, int n2) {
-    return fill(ca,n1,n2,new float[n2][2*n1]);
+    float[][] cx = new float[n2][2*n1];
+    fill(ca,cx);
+    return cx;
   }
   public static float[][][] fill(Complex ca, int n1, int n2, int n3) {
-    return fill(ca,n1,n2,n3,new float[n3][n2][2*n1]);
-  }
-  public static float[] fill(Complex ca, float[] cx) {
-    return fill(ca,cx.length/2,cx);
-  }
-  public static float[][] fill(Complex ca, float[][] cx) {
-    int n2 = cx.length;
-    for (int i2=0; i2<n2; ++i2)
-      fill(ca,cx[i2]);
+    float[][][] cx = new float[n3][n2][2*n1];
+    fill(ca,cx);
     return cx;
   }
-  public static float[][][] fill(Complex ca, float[][][] cx) {
-    int n3 = cx.length;
-    for (int i3=0; i3<n3; ++i3)
-      fill(ca,cx[i3]);
-    return cx;
-  }
-  public static float[] fill(Complex ca, int n1, float[] cx) {
+  public static void fill(Complex ca, float[] cx) {
+    int n1 = cx.length/2;
     float ar = ca.r;
     float ai = ca.i;
     for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
       cx[ir] = ar;
       cx[ii] = ai;
     }
-    return cx;
   }
-  public static float[][] fill(Complex ca, int n1, int n2, float[][] cx) {
+  public static void fill(Complex ca, float[][] cx) {
+    int n2 = cx.length;
     for (int i2=0; i2<n2; ++i2)
-      fill(ca,n1,cx[i2]);
-    return cx;
+      fill(ca,cx[i2]);
   }
-  public static float[][][] fill(
-    Complex ca, int n1, int n2, int n3, float[][][] cx) {
+  public static void fill(Complex ca, float[][][] cx) {
+    int n3 = cx.length;
     for (int i3=0; i3<n3; ++i3)
-      fill(ca,n1,n2,cx[i3]);
-    return cx;
+      fill(ca,cx[i3]);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // ramp
   public static float[] ramp(Complex ca, Complex cb, int n1) {
-    return ramp(ca,cb,n1,new float[2*n1]);
+    float[] cx = new float[2*n1];
+    ramp(ca,cb,cx);
+    return cx;
   }
   public static float[][] ramp(
     Complex ca, Complex cb1, Complex cb2, int n1, int n2) {
-    return ramp(ca,cb1,cb2,n1,n2,new float[n2][2*n1]);
+    float[][] cx = new float[n2][2*n1];
+    ramp(ca,cb1,cb2,cx);
+    return cx;
   }
   public static float[][][] ramp(
     Complex ca, Complex cb1, Complex cb2, Complex cb3, 
     int n1, int n2, int n3) {
-    return ramp(ca,cb1,cb2,cb3,n1,n2,n3,new float[n3][n2][2*n1]);
-  }
-  public static float[] ramp(Complex ca, Complex cb, float[] cx) {
-    return ramp(ca,cb,cx.length/2,cx);
-  }
-  public static float[][] ramp(
-    Complex ca, Complex cb1, Complex cb2, float[][] cx) {
-    int n2 = cx.length;
-    Complex ca2 = new Complex(ca);
-    for (int i2=0; i2<n2; ++i2,ca2.plusEquals(cb2))
-      ramp(ca2,cb1,cx[i2]);
+    float[][][] cx = new float[n3][n2][2*n1];
+    ramp(ca,cb1,cb2,cb3,cx);
     return cx;
   }
-  public static float[][][] ramp(
-    Complex ca, Complex cb1, Complex cb2, Complex cb3, float[][][] cx) {
-    int n3 = cx.length;
-    Complex ca3 = new Complex(ca);
-    for (int i3=0; i3<n3; ++i3,ca3.plusEquals(cb3))
-      ramp(ca3,cb1,cb2,cx[i3]);
-    return cx;
-  }
-  public static float[] ramp(Complex ca, Complex cb, int n1, float[] cx) {
+  public static void ramp(Complex ca, Complex cb, float[] cx) {
+    int n1 = cx.length/2;
     float ar = ca.r;
     float ai = ca.i;
     float br = cb.r;
@@ -241,28 +200,31 @@ public class Cap {
       cx[ir] = ar;
       cx[ii] = ai;
     }
-    return cx;
   }
-  public static float[][] ramp(
-    Complex ca, Complex cb1, Complex cb2, int n1, int n2, float[][] cx) {
+  public static void ramp(
+    Complex ca, Complex cb1, Complex cb2, float[][] cx) {
+    int n2 = cx.length;
     Complex ca2 = new Complex(ca);
     for (int i2=0; i2<n2; ++i2,ca2.plusEquals(cb2))
-      ramp(ca2,cb1,n1,cx[i2]);
-    return cx;
+      ramp(ca2,cb1,cx[i2]);
   }
-  public static float[][][] ramp(
-    Complex ca, Complex cb1, Complex cb2, Complex cb3, 
-    int n1, int n2, int n3, float[][][] cx) {
+  public static void ramp(
+    Complex ca, Complex cb1, Complex cb2, Complex cb3, float[][][] cx) {
+    int n3 = cx.length;
     Complex ca3 = new Complex(ca);
     for (int i3=0; i3<n3; ++i3,ca3.plusEquals(cb3))
-      ramp(ca3,cb1,cb2,n1,n2,cx[i3]);
-    return cx;
+      ramp(ca3,cb1,cb2,cx[i3]);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // equal
   public static boolean equal(float[] cx, float[] cy) {
-    return equal(cx.length/2,cx,cy);
+    int n1 = cx.length/2;
+    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+      if (cx[ir]!=cy[ir] || cx[ii]!=cy[ii]) 
+        return false;
+    }
+    return true;
   }
   public static boolean equal(float[][] cx, float[][] cy) {
     int n2 = cx.length;
@@ -280,34 +242,18 @@ public class Cap {
     }
     return true;
   }
-  public static boolean equal(int n1, float[] cx, float[] cy) {
-    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
-      if (cx[ir]!=cy[ir] || cx[ii]!=cy[ii]) 
-        return false;
-    }
-    return true;
-  }
-  public static boolean equal(int n1, int n2, float[][] cx, float[][] cy) {
-    for (int i2=0; i2<n2; ++i2) {
-      if (!equal(n1,cx[i2],cy[i2]))
-        return false;
-    }
-    return true;
-  }
-  public static boolean equal(
-    int n1, int n2, int n3, float[][][] cx, float[][][] cy) {
-    for (int i3=0; i3<n3; ++i3) {
-      if (!equal(n1,n2,cx[i3],cy[i3]))
-        return false;
-    }
-    return true;
-  }
 
   ///////////////////////////////////////////////////////////////////////////
   // almostEqual
   public static boolean almostEqual(
     float tolerance, float[] cx, float[] cy) {
-    return almostEqual(tolerance,cx.length/2,cx,cy);
+    int n1 = cx.length/2;
+    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+      if (!almostEqual(tolerance,cx[ir],cy[ir]) || 
+          !almostEqual(tolerance,cx[ii],cy[ii])) 
+        return false;
+    }
+    return true;
   }
   public static boolean almostEqual(
     float tolerance, float[][] cx, float[][] cy) {
@@ -327,34 +273,361 @@ public class Cap {
     }
     return true;
   }
-  public static boolean almostEqual(
-    float tolerance, int n1, float[] cx, float[] cy) {
-    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
-      if (!almostEqual(tolerance,cx[ir],cy[ir]) || 
-          !almostEqual(tolerance,cx[ii],cy[ii])) 
-        return false;
-    }
-    return true;
-  }
-  public static boolean almostEqual(
-    float tolerance, int n1, int n2, float[][] cx, float[][] cy) {
-    for (int i2=0; i2<n2; ++i2) {
-      if (!almostEqual(tolerance,n1,cx[i2],cy[i2]))
-        return false;
-    }
-    return true;
-  }
-  public static boolean almostEqual(
-    float tolerance, int n1, int n2, int n3, float[][][] cx, float[][][] cy) {
-    for (int i3=0; i3<n3; ++i3) {
-      if (!almostEqual(tolerance,n1,n2,cx[i3],cy[i3]))
-        return false;
-    }
-    return true;
-  }
   private static boolean almostEqual(float tolerance, float ra, float rb) {
     return (ra<rb)?rb-ra<=tolerance:ra-rb<=tolerance;
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // complex-to-complex
+  public static float[] neg(float[] cx) {
+    return _neg.apply(cx);
+  }
+  public static float[][] neg(float[][] cx) {
+    return _neg.apply(cx);
+  }
+  public static float[][][] neg(float[][][] cx) {
+    return _neg.apply(cx);
+  }
+  public static void neg(float[] cx, float[] cy) {
+    _neg.apply(cx,cy);
+  }
+  public static void neg(float[][] cx, float[][] cy) {
+    _neg.apply(cx,cy);
+  }
+  public static void neg(float[][][] cx, float[][][] cy) {
+    _neg.apply(cx,cy);
+  }
+  public static float[] conj(float[] cx) {
+    return _conj.apply(cx);
+  }
+  public static float[][] conj(float[][] cx) {
+    return _conj.apply(cx);
+  }
+  public static float[][][] conj(float[][][] cx) {
+    return _conj.apply(cx);
+  }
+  public static void conj(float[] cx, float[] cy) {
+    _conj.apply(cx,cy);
+  }
+  public static void conj(float[][] cx, float[][] cy) {
+    _conj.apply(cx,cy);
+  }
+  public static void conj(float[][][] cx, float[][][] cy) {
+    _conj.apply(cx,cy);
+  }
+  private static abstract class ComplexToComplex {
+    float[] apply(float[] cx) {
+      int n1 = cx.length/2;
+      float[] cy = new float[2*n1];
+      apply(cx,cy);
+      return cy;
+    }
+    float[][] apply(float[][] cx) {
+      int n2 = cx.length;
+      float[][] cy = new float[n2][];
+      for (int i2=0; i2<n2; ++i2)
+        cy[i2] = apply(cx[i2]);
+      return cy;
+    }
+    float[][][] apply(float[][][] cx) {
+      int n3 = cx.length;
+      float[][][] cy = new float[n3][][];
+      for (int i3=0; i3<n3; ++i3)
+        cy[i3] = apply(cx[i3]);
+      return cy;
+    }
+    abstract void apply(float[] cx, float[] cy);
+    void apply(float[][] cx, float[][] cy) {
+      int n2 = cx.length;
+      for (int i2=0; i2<n2; ++i2)
+        apply(cx[i2],cy[i2]);
+    }
+    void apply(float[][][] cx, float[][][] cy) {
+      int n3 = cx.length;
+      for (int i3=0; i3<n3; ++i3)
+        apply(cx[i3],cy[i3]);
+    }
+  }
+  private static ComplexToComplex _neg = new ComplexToComplex() {
+    void apply(float[] cx, float[] cy) {
+      int n1 = cx.length;
+      for (int i1=0; i1<n1; ++i1)
+        cy[i1] = -cx[i1];
+    }
+  };
+  private static ComplexToComplex _conj = new ComplexToComplex() {
+    void apply(float[] cx, float[] cy) {
+      int n1 = cx.length/2;
+      for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+        cy[ir] =  cx[ir];
+        cy[ii] = -cx[ii];
+      }
+    }
+  };
+
+  ///////////////////////////////////////////////////////////////////////////
+  // complex-to-real
+  public static float[] real(float[] cx) {
+    return _real.apply(cx);
+  }
+  public static float[][] real(float[][] cx) {
+    return _real.apply(cx);
+  }
+  public static float[][][] real(float[][][] cx) {
+    return _real.apply(cx);
+  }
+  public static void real(float[] cx, float[] cy) {
+    _real.apply(cx,cy);
+  }
+  public static void real(float[][] cx, float[][] cy) {
+    _real.apply(cx,cy);
+  }
+  public static void real(float[][][] cx, float[][][] cy) {
+    _real.apply(cx,cy);
+  }
+  public static float[] imag(float[] cx) {
+    return _imag.apply(cx);
+  }
+  public static float[][] imag(float[][] cx) {
+    return _imag.apply(cx);
+  }
+  public static float[][][] imag(float[][][] cx) {
+    return _imag.apply(cx);
+  }
+  public static void imag(float[] cx, float[] cy) {
+    _imag.apply(cx,cy);
+  }
+  public static void imag(float[][] cx, float[][] cy) {
+    _imag.apply(cx,cy);
+  }
+  public static void imag(float[][][] cx, float[][][] cy) {
+    _imag.apply(cx,cy);
+  }
+  public static float[] abs(float[] cx) {
+    return _abs.apply(cx);
+  }
+  public static float[][] abs(float[][] cx) {
+    return _abs.apply(cx);
+  }
+  public static float[][][] abs(float[][][] cx) {
+    return _abs.apply(cx);
+  }
+  public static void abs(float[] cx, float[] cy) {
+    _abs.apply(cx,cy);
+  }
+  public static void abs(float[][] cx, float[][] cy) {
+    _abs.apply(cx,cy);
+  }
+  public static void abs(float[][][] cx, float[][][] cy) {
+    _abs.apply(cx,cy);
+  }
+  public static float[] arg(float[] cx) {
+    return _arg.apply(cx);
+  }
+  public static float[][] arg(float[][] cx) {
+    return _arg.apply(cx);
+  }
+  public static float[][][] arg(float[][][] cx) {
+    return _arg.apply(cx);
+  }
+  public static void arg(float[] cx, float[] cy) {
+    _arg.apply(cx,cy);
+  }
+  public static void arg(float[][] cx, float[][] cy) {
+    _arg.apply(cx,cy);
+  }
+  public static void arg(float[][][] cx, float[][][] cy) {
+    _arg.apply(cx,cy);
+  }
+  public static float[] norm(float[] cx) {
+    return _norm.apply(cx);
+  }
+  public static float[][] norm(float[][] cx) {
+    return _norm.apply(cx);
+  }
+  public static float[][][] norm(float[][][] cx) {
+    return _norm.apply(cx);
+  }
+  public static void norm(float[] cx, float[] cy) {
+    _norm.apply(cx,cy);
+  }
+  public static void norm(float[][] cx, float[][] cy) {
+    _norm.apply(cx,cy);
+  }
+  public static void norm(float[][][] cx, float[][][] cy) {
+    _norm.apply(cx,cy);
+  }
+  private static abstract class ComplexToReal {
+    float[] apply(float[] cx) {
+      int n1 = cx.length/2;
+      float[] cy = new float[n1];
+      apply(cx,cy);
+      return cy;
+    }
+    float[][] apply(float[][] cx) {
+      int n2 = cx.length;
+      float[][] cy = new float[n2][];
+      for (int i2=0; i2<n2; ++i2)
+        cy[i2] = apply(cx[i2]);
+      return cy;
+    }
+    float[][][] apply(float[][][] cx) {
+      int n3 = cx.length;
+      float[][][] cy = new float[n3][][];
+      for (int i3=0; i3<n3; ++i3)
+        cy[i3] = apply(cx[i3]);
+      return cy;
+    }
+    abstract void apply(float[] cx, float[] ry);
+    void apply(float[][] cx, float[][] ry) {
+      int n2 = cx.length;
+      for (int i2=0; i2<n2; ++i2)
+        apply(cx[i2],ry[i2]);
+    }
+    void apply(float[][][] cx, float[][][] ry) {
+      int n3 = cx.length;
+      for (int i3=0; i3<n3; ++i3)
+        apply(cx[i3],ry[i3]);
+    }
+  }
+  private static ComplexToReal _real = new ComplexToReal() {
+    void apply(float[] cx, float[] ry) {
+      int n1 = cx.length/2;
+      for (int i1=0,ir=0; i1<n1; ++i1,ir+=2)
+        ry[i1] = cx[ir];
+    }
+  };
+  private static ComplexToReal _imag = new ComplexToReal() {
+    void apply(float[] cx, float[] ry) {
+      int n1 = cx.length/2;
+      for (int i1=0,ii=1; i1<n1; ++i1,ii+=2)
+        ry[i1] = cx[ii];
+    }
+  };
+  private static ComplexToReal _abs = new ComplexToReal() {
+    void apply(float[] cx, float[] ry) {
+      Complex ct = new Complex();
+      int n1 = cx.length/2;
+      for (int i1=0,ir=0,ii=1; i1<n1; ++i1,ir+=2,ii+=2) {
+        ct.r = cx[ir];
+        ct.i = cx[ii];
+        ry[i1] = Complex.abs(ct);
+      }
+    }
+  };
+  private static ComplexToReal _arg = new ComplexToReal() {
+    void apply(float[] cx, float[] ry) {
+      Complex ct = new Complex();
+      int n1 = cx.length/2;
+      for (int i1=0,ir=0,ii=1; i1<n1; ++i1,ir+=2,ii+=2) {
+        ct.r = cx[ir];
+        ct.i = cx[ii];
+        ry[i1] = Complex.arg(ct);
+      }
+    }
+  };
+  private static ComplexToReal _norm = new ComplexToReal() {
+    void apply(float[] cx, float[] ry) {
+      int n1 = cx.length/2;
+      for (int i1=0,ir=0,ii=1; i1<n1; ++i1,ir+=2,ii+=2) {
+        float cr = cx[ir];
+        float ci = cx[ii];
+        ry[i1] = cr*cr+ci*ci;
+      }
+    }
+  };
+
+  ///////////////////////////////////////////////////////////////////////////
+  // real-to-complex
+  public static float[] complex(float[] rx, float[] ry) {
+    return _complex.apply(rx,ry);
+  }
+  public static float[][] complex(float[][] rx, float[][] ry) {
+    return _complex.apply(rx,ry);
+  }
+  public static float[][][] complex(float[][][] rx, float[][][] ry) {
+    return _complex.apply(rx,ry);
+  }
+  public static void complex(float[] rx, float[] ry, float[] cz) {
+    _complex.apply(rx,ry,cz);
+  }
+  public static void complex(float[][] rx, float[][] ry, float[][] cz) {
+    _complex.apply(rx,ry,cz);
+  }
+  public static void complex(float[][][] rx, float[][][] ry, float[][][] cz) {
+    _complex.apply(rx,ry,cz);
+  }
+  public static float[] polar(float[] rx, float[] ry) {
+    return _polar.apply(rx,ry);
+  }
+  public static float[][] polar(float[][] rx, float[][] ry) {
+    return _polar.apply(rx,ry);
+  }
+  public static float[][][] polar(float[][][] rx, float[][][] ry) {
+    return _polar.apply(rx,ry);
+  }
+  public static void polar(float[] rx, float[] ry, float[] cz) {
+    _polar.apply(rx,ry,cz);
+  }
+  public static void polar(float[][] rx, float[][] ry, float[][] cz) {
+    _polar.apply(rx,ry,cz);
+  }
+  public static void polar(float[][][] rx, float[][][] ry, float[][][] cz) {
+    _complex.apply(rx,ry,cz);
+  }
+  private static abstract class RealToComplex {
+    float[] apply(float[] rx, float[] ry) {
+      int n1 = rx.length;
+      float[] cz = new float[2*n1];
+      apply(rx,ry,cz);
+      return cz;
+    }
+    float[][] apply(float[][] rx, float[][] ry) {
+      int n2 = rx.length;
+      float[][] cz = new float[n2][];
+      for (int i2=0; i2<n2; ++i2)
+        cz[i2] = apply(rx[i2],ry[i2]);
+      return cz;
+    }
+    float[][][] apply(float[][][] rx, float[][][] ry) {
+      int n3 = rx.length;
+      float[][][] cz = new float[n3][][];
+      for (int i3=0; i3<n3; ++i3)
+        cz[i3] = apply(rx[i3],ry[i3]);
+      return cz;
+    }
+    abstract void apply(float[] rx, float[] ry, float[] cz);
+    void apply(float[][] rx, float[][] ry, float[][] cz) {
+      int n2 = rx.length;
+      for (int i2=0; i2<n2; ++i2)
+        apply(rx[i2],ry[i2],cz[i2]);
+    }
+    void apply(float[][][] rx, float[][][] ry, float[][][] cz) {
+      int n3 = cz.length;
+      for (int i3=0; i3<n3; ++i3)
+        apply(rx[i3],ry[i3],cz[i3]);
+    }
+  }
+  private static RealToComplex _complex = new RealToComplex() {
+    void apply(float[] rx, float[] ry, float[] cz) {
+      int n1 = rx.length;
+      for (int i1=0,ir=0,ii=1; i1<n1; ++i1,ir+=2,ii+=2) {
+        cz[ir] = rx[i1];
+        cz[ii] = ry[i1];
+      }
+    }
+  };
+  private static RealToComplex _polar = new RealToComplex() {
+    void apply(float[] rx, float[] ry, float[] cz) {
+      int n1 = rx.length;
+      for (int i1=0,ir=0,ii=1; i1<n1; ++i1,ir+=2,ii+=2) {
+        float r = rx[i1];
+        float a = ry[i1];
+        cz[ir] = r*cos(a);
+        cz[ii] = r*sin(a);
+      }
+    }
+  };
 
   ///////////////////////////////////////////////////////////////////////////
   // add, sub, mul, div
@@ -385,98 +658,32 @@ public class Cap {
   public static float[][][] add(float[][][] cx, Complex cb) {
     return _add.apply(cx,cb);
   }
-  public static float[] add(float[] cx, float[] cy, float[] cz) {
-    return _add.apply(cx,cy,cz);
+  public static void add(float[] cx, float[] cy, float[] cz) {
+    _add.apply(cx,cy,cz);
   }
-  public static float[] add(Complex ca, float[] cy, float[] cz) {
-    return _add.apply(ca,cy,cz);
+  public static void add(Complex ca, float[] cy, float[] cz) {
+    _add.apply(ca,cy,cz);
   }
-  public static float[] add(float[] cx, Complex cb, float[] cz) {
-    return _add.apply(cx,cb,cz);
+  public static void add(float[] cx, Complex cb, float[] cz) {
+    _add.apply(cx,cb,cz);
   }
-  public static float[][] add(float[][] cx, float[][] cy, float[][] cz) {
-    return _add.apply(cx,cy,cz);
+  public static void add(float[][] cx, float[][] cy, float[][] cz) {
+    _add.apply(cx,cy,cz);
   }
-  public static float[][] add(Complex ca, float[][] cy, float[][] cz) {
-    return _add.apply(ca,cy,cz);
+  public static void add(Complex ca, float[][] cy, float[][] cz) {
+    _add.apply(ca,cy,cz);
   }
-  public static float[][] add(float[][] cx, Complex cb, float[][] cz) {
-    return _add.apply(cx,cb,cz);
+  public static void add(float[][] cx, Complex cb, float[][] cz) {
+    _add.apply(cx,cb,cz);
   }
-  public static float[][][] add(
-    float[][][] cx, float[][][] cy, float[][][] cz) {
-    return _add.apply(cx,cy,cz);
+  public static void add(float[][][] cx, float[][][] cy, float[][][] cz) {
+    _add.apply(cx,cy,cz);
   }
-  public static float[][][] add(
-    Complex ca, float[][][] cy, float[][][] cz) {
-    return _add.apply(ca,cy,cz);
+  public static void add(Complex ca, float[][][] cy, float[][][] cz) {
+    _add.apply(ca,cy,cz);
   }
-  public static float[][][] add(
-    float[][][] cx, Complex cb, float[][][] cz) {
-    return _add.apply(cx,cb,cz);
-  }
-  public static float[] add(int n1, float[] cx, float[] cy) {
-    return _add.apply(n1,cx,cy);
-  }
-  public static float[] add(int n1, Complex ca, float[] cy) {
-    return _add.apply(n1,ca,cy);
-  }
-  public static float[] add(int n1, float[] cx, Complex cb) {
-    return _add.apply(n1,cx,cb);
-  }
-  public static float[][] add(int n1, int n2, float[][] cx, float[][] cy) {
-    return _add.apply(n1,n2,cx,cy);
-  }
-  public static float[][] add(int n1, int n2, Complex ca, float[][] cy) {
-    return _add.apply(n1,n2,ca,cy);
-  }
-  public static float[][] add(int n1, int n2, float[][] cx, Complex cb) {
-    return _add.apply(n1,n2,cx,cb);
-  }
-  public static float[][][] add(
-    int n1, int n2, int n3, float[][][] cx, float[][][] cy) {
-    return _add.apply(n1,n2,n3,cx,cy);
-  }
-  public static float[][][] add(
-    int n1, int n2, int n3, Complex ca, float[][][] cy) {
-    return _add.apply(n1,n2,n3,ca,cy);
-  }
-  public static float[][][] add(
-    int n1, int n2, int n3, float[][][] cx, Complex cb) {
-    return _add.apply(n1,n2,n3,cx,cb);
-  }
-  public static float[] add(int n1, float[] cx, float[] cy, float[] cz) {
-    return _add.apply(n1,cx,cy,cz);
-  }
-  public static float[] add(int n1, Complex ca, float[] cy, float[] cz) {
-    return _add.apply(n1,ca,cy,cz);
-  }
-  public static float[] add(int n1, float[] cx, Complex cb, float[] cz) {
-    return _add.apply(n1,cx,cb,cz);
-  }
-  public static float[][] add(
-    int n1, int n2, float[][] cx, float[][] cy, float[][] cz) {
-    return _add.apply(n1,n2,cx,cy,cz);
-  }
-  public static float[][] add(
-    int n1, int n2, Complex ca, float[][] cy, float[][] cz) {
-    return _add.apply(n1,n2,ca,cy,cz);
-  }
-  public static float[][] add(
-    int n1, int n2, float[][] cx, Complex cb, float[][] cz) {
-    return _add.apply(n1,n2,cx,cb,cz);
-  }
-  public static float[][][] add(
-    int n1, int n2, int n3, float[][][] cx, float[][][] cy, float[][][] cz) {
-    return _add.apply(n1,n2,n3,cx,cy,cz);
-  }
-  public static float[][][] add(
-    int n1, int n2, int n3, Complex ca, float[][][] cy, float[][][] cz) {
-    return _add.apply(n1,n2,n3,ca,cy,cz);
-  }
-  public static float[][][] add(
-    int n1, int n2, int n3, float[][][] cx, Complex cb, float[][][] cz) {
-    return _add.apply(n1,n2,n3,cx,cb,cz);
+  public static void add(float[][][] cx, Complex cb, float[][][] cz) {
+    _add.apply(cx,cb,cz);
   }
   public static float[] sub(float[] cx, float[] cy) {
     return _sub.apply(cx,cy);
@@ -505,98 +712,32 @@ public class Cap {
   public static float[][][] sub(float[][][] cx, Complex cb) {
     return _sub.apply(cx,cb);
   }
-  public static float[] sub(float[] cx, float[] cy, float[] cz) {
-    return _sub.apply(cx,cy,cz);
+  public static void sub(float[] cx, float[] cy, float[] cz) {
+    _sub.apply(cx,cy,cz);
   }
-  public static float[] sub(Complex ca, float[] cy, float[] cz) {
-    return _sub.apply(ca,cy,cz);
+  public static void sub(Complex ca, float[] cy, float[] cz) {
+    _sub.apply(ca,cy,cz);
   }
-  public static float[] sub(float[] cx, Complex cb, float[] cz) {
-    return _sub.apply(cx,cb,cz);
+  public static void sub(float[] cx, Complex cb, float[] cz) {
+    _sub.apply(cx,cb,cz);
   }
-  public static float[][] sub(float[][] cx, float[][] cy, float[][] cz) {
-    return _sub.apply(cx,cy,cz);
+  public static void sub(float[][] cx, float[][] cy, float[][] cz) {
+    _sub.apply(cx,cy,cz);
   }
-  public static float[][] sub(Complex ca, float[][] cy, float[][] cz) {
-    return _sub.apply(ca,cy,cz);
+  public static void sub(Complex ca, float[][] cy, float[][] cz) {
+    _sub.apply(ca,cy,cz);
   }
-  public static float[][] sub(float[][] cx, Complex cb, float[][] cz) {
-    return _sub.apply(cx,cb,cz);
+  public static void sub(float[][] cx, Complex cb, float[][] cz) {
+    _sub.apply(cx,cb,cz);
   }
-  public static float[][][] sub(
-    float[][][] cx, float[][][] cy, float[][][] cz) {
-    return _sub.apply(cx,cy,cz);
+  public static void sub(float[][][] cx, float[][][] cy, float[][][] cz) {
+    _sub.apply(cx,cy,cz);
   }
-  public static float[][][] sub(
-    Complex ca, float[][][] cy, float[][][] cz) {
-    return _sub.apply(ca,cy,cz);
+  public static void sub(Complex ca, float[][][] cy, float[][][] cz) {
+    _sub.apply(ca,cy,cz);
   }
-  public static float[][][] sub(
-    float[][][] cx, Complex cb, float[][][] cz) {
-    return _sub.apply(cx,cb,cz);
-  }
-  public static float[] sub(int n1, float[] cx, float[] cy) {
-    return _sub.apply(n1,cx,cy);
-  }
-  public static float[] sub(int n1, Complex ca, float[] cy) {
-    return _sub.apply(n1,ca,cy);
-  }
-  public static float[] sub(int n1, float[] cx, Complex cb) {
-    return _sub.apply(n1,cx,cb);
-  }
-  public static float[][] sub(int n1, int n2, float[][] cx, float[][] cy) {
-    return _sub.apply(n1,n2,cx,cy);
-  }
-  public static float[][] sub(int n1, int n2, Complex ca, float[][] cy) {
-    return _sub.apply(n1,n2,ca,cy);
-  }
-  public static float[][] sub(int n1, int n2, float[][] cx, Complex cb) {
-    return _sub.apply(n1,n2,cx,cb);
-  }
-  public static float[][][] sub(
-    int n1, int n2, int n3, float[][][] cx, float[][][] cy) {
-    return _sub.apply(n1,n2,n3,cx,cy);
-  }
-  public static float[][][] sub(
-    int n1, int n2, int n3, Complex ca, float[][][] cy) {
-    return _sub.apply(n1,n2,n3,ca,cy);
-  }
-  public static float[][][] sub(
-    int n1, int n2, int n3, float[][][] cx, Complex cb) {
-    return _sub.apply(n1,n2,n3,cx,cb);
-  }
-  public static float[] sub(int n1, float[] cx, float[] cy, float[] cz) {
-    return _sub.apply(n1,cx,cy,cz);
-  }
-  public static float[] sub(int n1, Complex ca, float[] cy, float[] cz) {
-    return _sub.apply(n1,ca,cy,cz);
-  }
-  public static float[] sub(int n1, float[] cx, Complex cb, float[] cz) {
-    return _sub.apply(n1,cx,cb,cz);
-  }
-  public static float[][] sub(
-    int n1, int n2, float[][] cx, float[][] cy, float[][] cz) {
-    return _sub.apply(n1,n2,cx,cy,cz);
-  }
-  public static float[][] sub(
-    int n1, int n2, Complex ca, float[][] cy, float[][] cz) {
-    return _sub.apply(n1,n2,ca,cy,cz);
-  }
-  public static float[][] sub(
-    int n1, int n2, float[][] cx, Complex cb, float[][] cz) {
-    return _sub.apply(n1,n2,cx,cb,cz);
-  }
-  public static float[][][] sub(
-    int n1, int n2, int n3, float[][][] cx, float[][][] cy, float[][][] cz) {
-    return _sub.apply(n1,n2,n3,cx,cy,cz);
-  }
-  public static float[][][] sub(
-    int n1, int n2, int n3, Complex ca, float[][][] cy, float[][][] cz) {
-    return _sub.apply(n1,n2,n3,ca,cy,cz);
-  }
-  public static float[][][] sub(
-    int n1, int n2, int n3, float[][][] cx, Complex cb, float[][][] cz) {
-    return _sub.apply(n1,n2,n3,cx,cb,cz);
+  public static void sub(float[][][] cx, Complex cb, float[][][] cz) {
+    _sub.apply(cx,cb,cz);
   }
   public static float[] mul(float[] cx, float[] cy) {
     return _mul.apply(cx,cy);
@@ -625,98 +766,32 @@ public class Cap {
   public static float[][][] mul(float[][][] cx, Complex cb) {
     return _mul.apply(cx,cb);
   }
-  public static float[] mul(float[] cx, float[] cy, float[] cz) {
-    return _mul.apply(cx,cy,cz);
+  public static void mul(float[] cx, float[] cy, float[] cz) {
+    _mul.apply(cx,cy,cz);
   }
-  public static float[] mul(Complex ca, float[] cy, float[] cz) {
-    return _mul.apply(ca,cy,cz);
+  public static void mul(Complex ca, float[] cy, float[] cz) {
+    _mul.apply(ca,cy,cz);
   }
-  public static float[] mul(float[] cx, Complex cb, float[] cz) {
-    return _mul.apply(cx,cb,cz);
+  public static void mul(float[] cx, Complex cb, float[] cz) {
+    _mul.apply(cx,cb,cz);
   }
-  public static float[][] mul(float[][] cx, float[][] cy, float[][] cz) {
-    return _mul.apply(cx,cy,cz);
+  public static void mul(float[][] cx, float[][] cy, float[][] cz) {
+    _mul.apply(cx,cy,cz);
   }
-  public static float[][] mul(Complex ca, float[][] cy, float[][] cz) {
-    return _mul.apply(ca,cy,cz);
+  public static void mul(Complex ca, float[][] cy, float[][] cz) {
+    _mul.apply(ca,cy,cz);
   }
-  public static float[][] mul(float[][] cx, Complex cb, float[][] cz) {
-    return _mul.apply(cx,cb,cz);
+  public static void mul(float[][] cx, Complex cb, float[][] cz) {
+    _mul.apply(cx,cb,cz);
   }
-  public static float[][][] mul(
-    float[][][] cx, float[][][] cy, float[][][] cz) {
-    return _mul.apply(cx,cy,cz);
+  public static void mul(float[][][] cx, float[][][] cy, float[][][] cz) {
+    _mul.apply(cx,cy,cz);
   }
-  public static float[][][] mul(
-    Complex ca, float[][][] cy, float[][][] cz) {
-    return _mul.apply(ca,cy,cz);
+  public static void mul(Complex ca, float[][][] cy, float[][][] cz) {
+    _mul.apply(ca,cy,cz);
   }
-  public static float[][][] mul(
-    float[][][] cx, Complex cb, float[][][] cz) {
-    return _mul.apply(cx,cb,cz);
-  }
-  public static float[] mul(int n1, float[] cx, float[] cy) {
-    return _mul.apply(n1,cx,cy);
-  }
-  public static float[] mul(int n1, Complex ca, float[] cy) {
-    return _mul.apply(n1,ca,cy);
-  }
-  public static float[] mul(int n1, float[] cx, Complex cb) {
-    return _mul.apply(n1,cx,cb);
-  }
-  public static float[][] mul(int n1, int n2, float[][] cx, float[][] cy) {
-    return _mul.apply(n1,n2,cx,cy);
-  }
-  public static float[][] mul(int n1, int n2, Complex ca, float[][] cy) {
-    return _mul.apply(n1,n2,ca,cy);
-  }
-  public static float[][] mul(int n1, int n2, float[][] cx, Complex cb) {
-    return _mul.apply(n1,n2,cx,cb);
-  }
-  public static float[][][] mul(
-    int n1, int n2, int n3, float[][][] cx, float[][][] cy) {
-    return _mul.apply(n1,n2,n3,cx,cy);
-  }
-  public static float[][][] mul(
-    int n1, int n2, int n3, Complex ca, float[][][] cy) {
-    return _mul.apply(n1,n2,n3,ca,cy);
-  }
-  public static float[][][] mul(
-    int n1, int n2, int n3, float[][][] cx, Complex cb) {
-    return _mul.apply(n1,n2,n3,cx,cb);
-  }
-  public static float[] mul(int n1, float[] cx, float[] cy, float[] cz) {
-    return _mul.apply(n1,cx,cy,cz);
-  }
-  public static float[] mul(int n1, Complex ca, float[] cy, float[] cz) {
-    return _mul.apply(n1,ca,cy,cz);
-  }
-  public static float[] mul(int n1, float[] cx, Complex cb, float[] cz) {
-    return _mul.apply(n1,cx,cb,cz);
-  }
-  public static float[][] mul(
-    int n1, int n2, float[][] cx, float[][] cy, float[][] cz) {
-    return _mul.apply(n1,n2,cx,cy,cz);
-  }
-  public static float[][] mul(
-    int n1, int n2, Complex ca, float[][] cy, float[][] cz) {
-    return _mul.apply(n1,n2,ca,cy,cz);
-  }
-  public static float[][] mul(
-    int n1, int n2, float[][] cx, Complex cb, float[][] cz) {
-    return _mul.apply(n1,n2,cx,cb,cz);
-  }
-  public static float[][][] mul(
-    int n1, int n2, int n3, float[][][] cx, float[][][] cy, float[][][] cz) {
-    return _mul.apply(n1,n2,n3,cx,cy,cz);
-  }
-  public static float[][][] mul(
-    int n1, int n2, int n3, Complex ca, float[][][] cy, float[][][] cz) {
-    return _mul.apply(n1,n2,n3,ca,cy,cz);
-  }
-  public static float[][][] mul(
-    int n1, int n2, int n3, float[][][] cx, Complex cb, float[][][] cz) {
-    return _mul.apply(n1,n2,n3,cx,cb,cz);
+  public static void mul(float[][][] cx, Complex cb, float[][][] cz) {
+    _mul.apply(cx,cb,cz);
   }
   public static float[] div(float[] cx, float[] cy) {
     return _div.apply(cx,cy);
@@ -745,117 +820,51 @@ public class Cap {
   public static float[][][] div(float[][][] cx, Complex cb) {
     return _div.apply(cx,cb);
   }
-  public static float[] div(float[] cx, float[] cy, float[] cz) {
-    return _div.apply(cx,cy,cz);
+  public static void div(float[] cx, float[] cy, float[] cz) {
+    _div.apply(cx,cy,cz);
   }
-  public static float[] div(Complex ca, float[] cy, float[] cz) {
-    return _div.apply(ca,cy,cz);
+  public static void div(Complex ca, float[] cy, float[] cz) {
+    _div.apply(ca,cy,cz);
   }
-  public static float[] div(float[] cx, Complex cb, float[] cz) {
-    return _div.apply(cx,cb,cz);
+  public static void div(float[] cx, Complex cb, float[] cz) {
+    _div.apply(cx,cb,cz);
   }
-  public static float[][] div(float[][] cx, float[][] cy, float[][] cz) {
-    return _div.apply(cx,cy,cz);
+  public static void div(float[][] cx, float[][] cy, float[][] cz) {
+    _div.apply(cx,cy,cz);
   }
-  public static float[][] div(Complex ca, float[][] cy, float[][] cz) {
-    return _div.apply(ca,cy,cz);
+  public static void div(Complex ca, float[][] cy, float[][] cz) {
+    _div.apply(ca,cy,cz);
   }
-  public static float[][] div(float[][] cx, Complex cb, float[][] cz) {
-    return _div.apply(cx,cb,cz);
+  public static void div(float[][] cx, Complex cb, float[][] cz) {
+    _div.apply(cx,cb,cz);
   }
-  public static float[][][] div(
-    float[][][] cx, float[][][] cy, float[][][] cz) {
-    return _div.apply(cx,cy,cz);
+  public static void div(float[][][] cx, float[][][] cy, float[][][] cz) {
+    _div.apply(cx,cy,cz);
   }
-  public static float[][][] div(
-    Complex ca, float[][][] cy, float[][][] cz) {
-    return _div.apply(ca,cy,cz);
+  public static void div(Complex ca, float[][][] cy, float[][][] cz) {
+    _div.apply(ca,cy,cz);
   }
-  public static float[][][] div(
-    float[][][] cx, Complex cb, float[][][] cz) {
-    return _div.apply(cx,cb,cz);
+  public static void div(float[][][] cx, Complex cb, float[][][] cz) {
+    _div.apply(cx,cb,cz);
   }
-  public static float[] div(int n1, float[] cx, float[] cy) {
-    return _div.apply(n1,cx,cy);
-  }
-  public static float[] div(int n1, Complex ca, float[] cy) {
-    return _div.apply(n1,ca,cy);
-  }
-  public static float[] div(int n1, float[] cx, Complex cb) {
-    return _div.apply(n1,cx,cb);
-  }
-  public static float[][] div(int n1, int n2, float[][] cx, float[][] cy) {
-    return _div.apply(n1,n2,cx,cy);
-  }
-  public static float[][] div(int n1, int n2, Complex ca, float[][] cy) {
-    return _div.apply(n1,n2,ca,cy);
-  }
-  public static float[][] div(int n1, int n2, float[][] cx, Complex cb) {
-    return _div.apply(n1,n2,cx,cb);
-  }
-  public static float[][][] div(
-    int n1, int n2, int n3, float[][][] cx, float[][][] cy) {
-    return _div.apply(n1,n2,n3,cx,cy);
-  }
-  public static float[][][] div(
-    int n1, int n2, int n3, Complex ca, float[][][] cy) {
-    return _div.apply(n1,n2,n3,ca,cy);
-  }
-  public static float[][][] div(
-    int n1, int n2, int n3, float[][][] cx, Complex cb) {
-    return _div.apply(n1,n2,n3,cx,cb);
-  }
-  public static float[] div(int n1, float[] cx, float[] cy, float[] cz) {
-    return _div.apply(n1,cx,cy,cz);
-  }
-  public static float[] div(int n1, Complex ca, float[] cy, float[] cz) {
-    return _div.apply(n1,ca,cy,cz);
-  }
-  public static float[] div(int n1, float[] cx, Complex cb, float[] cz) {
-    return _div.apply(n1,cx,cb,cz);
-  }
-  public static float[][] div(
-    int n1, int n2, float[][] cx, float[][] cy, float[][] cz) {
-    return _div.apply(n1,n2,cx,cy,cz);
-  }
-  public static float[][] div(
-    int n1, int n2, Complex ca, float[][] cy, float[][] cz) {
-    return _div.apply(n1,n2,ca,cy,cz);
-  }
-  public static float[][] div(
-    int n1, int n2, float[][] cx, Complex cb, float[][] cz) {
-    return _div.apply(n1,n2,cx,cb,cz);
-  }
-  public static float[][][] div(
-    int n1, int n2, int n3, float[][][] cx, float[][][] cy, float[][][] cz) {
-    return _div.apply(n1,n2,n3,cx,cy,cz);
-  }
-  public static float[][][] div(
-    int n1, int n2, int n3, Complex ca, float[][][] cy, float[][][] cz) {
-    return _div.apply(n1,n2,n3,ca,cy,cz);
-  }
-  public static float[][][] div(
-    int n1, int n2, int n3, float[][][] cx, Complex cb, float[][][] cz) {
-    return _div.apply(n1,n2,n3,cx,cb,cz);
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // binary operations; e.g., add, sub, mul, div, ...
   private static abstract class Binary {
     float[] apply(float[] cx, float[] cy) {
       int n1 = cx.length/2;
       float[] cz = new float[2*n1];
-      return apply(n1,cx,cy,cz);
+      apply(cx,cy,cz);
+      return cz;
     }
     float[] apply(Complex ca, float[] cy) {
       int n1 = cy.length/2;
       float[] cz = new float[2*n1];
-      return apply(n1,ca,cy,cz);
+      apply(ca,cy,cz);
+      return cz;
     }
     float[] apply(float[] cx, Complex cb) {
       int n1 = cx.length/2;
       float[] cz = new float[2*n1];
-      return apply(n1,cx,cb,cz);
+      apply(cx,cb,cz);
+      return cz;
     }
     float[][] apply(float[][] cx, float[][] cy) {
       int n2 = cx.length;
@@ -899,180 +908,97 @@ public class Cap {
         cz[i3] = apply(cx[i3],cb);
       return cz;
     }
-    float[] apply(float[] cx, float[] cy, float[] cz) {
-      return apply(cx.length/2,cx,cy,cz);
-    }
-    float[] apply(Complex ca, float[] cy, float[] cz) {
-      return apply(cy.length/2,ca,cy,cz);
-    }
-    float[] apply(float[] cx, Complex cb, float[] cz) {
-      return apply(cx.length/2,cx,cb,cz);
-    }
-    float[][] apply(float[][] cx, float[][] cy, float[][] cz) {
+    abstract void apply(float[] cx, float[] cy, float[] cz);
+    abstract void apply(Complex ca, float[] cy, float[] cz);
+    abstract void apply(float[] cx, Complex cb, float[] cz);
+    void apply(float[][] cx, float[][] cy, float[][] cz) {
       int n2 = cx.length;
       for (int i2=0; i2<n2; ++i2)
         apply(cx[i2],cy[i2],cz[i2]);
-      return cz;
     }
-    float[][] apply(Complex ca, float[][] cy, float[][] cz) {
+    void apply(Complex ca, float[][] cy, float[][] cz) {
       int n2 = cy.length;
       for (int i2=0; i2<n2; ++i2)
         apply(ca,cy[i2],cz[i2]);
-      return cz;
     }
-    float[][] apply(float[][] cx, Complex cb, float[][] cz) {
+    void apply(float[][] cx, Complex cb, float[][] cz) {
       int n2 = cx.length;
       for (int i2=0; i2<n2; ++i2)
         apply(cx[i2],cb,cz[i2]);
-      return cz;
     }
-    float[][][] apply(float[][][] cx, float[][][] cy, float[][][] cz) {
+    void apply(float[][][] cx, float[][][] cy, float[][][] cz) {
       int n3 = cx.length;
       for (int i3=0; i3<n3; ++i3)
         apply(cx[i3],cy[i3],cz[i3]);
-      return cz;
     }
-    float[][][] apply(Complex ca, float[][][] cy, float[][][] cz) {
+    void apply(Complex ca, float[][][] cy, float[][][] cz) {
       int n3 = cy.length;
       for (int i3=0; i3<n3; ++i3)
         apply(ca,cy[i3],cz[i3]);
-      return cz;
     }
-    float[][][] apply(float[][][] cx, Complex cb, float[][][] cz) {
+    void apply(float[][][] cx, Complex cb, float[][][] cz) {
       int n3 = cx.length;
       for (int i3=0; i3<n3; ++i3)
         apply(cx[i3],cb,cz[i3]);
-      return cz;
-    }
-    float[] apply(int n1, float[] cx, float[] cy) {
-      return apply(n1,cx,cy,new float[2*n1]);
-    }
-    float[] apply(int n1, Complex ca, float[] cy) {
-      return apply(n1,ca,cy,new float[2*n1]);
-    }
-    float[] apply(int n1, float[] cx, Complex cb) {
-      return apply(n1,cx,cb,new float[2*n1]);
-    }
-    float[][] apply(
-      int n1, int n2, float[][] cx, float[][] cy) {
-      return apply(n1,n2,cx,cy,new float[n2][2*n1]);
-    }
-    float[][] apply(
-      int n1, int n2, Complex ca, float[][] cy) {
-      return apply(n1,n2,ca,cy,new float[n2][2*n1]);
-    }
-    float[][] apply(
-      int n1, int n2, float[][] cx, Complex cb) {
-      return apply(n1,n2,cx,cb,new float[n2][2*n1]);
-    }
-    float[][][] apply(
-      int n1, int n2, int n3, float[][][] cx, float[][][] cy) {
-      return apply(n1,n2,n3,cx,cy,new float[n3][n2][2*n1]);
-    }
-    float[][][] apply(
-      int n1, int n2, int n3, Complex ca, float[][][] cy) {
-      return apply(n1,n2,n3,ca,cy,new float[n3][n2][2*n1]);
-    }
-    float[][][] apply(
-      int n1, int n2, int n3, float[][][] cx, Complex cb) {
-      return apply(n1,n2,n3,cx,cb,new float[n3][n2][2*n1]);
-    }
-    abstract float[] apply(int n1, float[] cx, float[] cy, float[] cz);
-    abstract float[] apply(int n1, Complex ca, float[] cy, float[] cz);
-    abstract float[] apply(int n1, float[] cx, Complex cb, float[] cz);
-    float[][] apply(
-      int n1, int n2, float[][] cx, float[][] cy, float[][] cz) {
-      for (int i2=0; i2<n2; ++i2)
-        apply(n1,cx[i2],cy[i2],cz[i2]);
-      return cz;
-    }
-    float[][] apply(
-      int n1, int n2, Complex ca, float[][] cy, float[][] cz) {
-      for (int i2=0; i2<n2; ++i2)
-        apply(n1,ca,cy[i2],cz[i2]);
-      return cz;
-    }
-    float[][] apply(
-      int n1, int n2, float[][] cx, Complex cb, float[][] cz) {
-      for (int i2=0; i2<n2; ++i2)
-        apply(n1,cx[i2],cb,cz[i2]);
-      return cz;
-    }
-    float[][][] apply(
-      int n1, int n2, int n3, float[][][] cx, float[][][] cy, float[][][] cz) {
-      for (int i3=0; i3<n3; ++i3)
-        apply(n1,n2,cx[i3],cy[i3],cz[i3]);
-      return cz;
-    }
-    float[][][] apply(
-      int n1, int n2, int n3, Complex ca, float[][][] cy, float[][][] cz) {
-      for (int i3=0; i3<n3; ++i3)
-        apply(n1,n2,ca,cy[i3],cz[i3]);
-      return cz;
-    }
-    float[][][] apply(
-      int n1, int n2, int n3, float[][][] cx, Complex cb, float[][][] cz) {
-      for (int i3=0; i3<n3; ++i3)
-        apply(n1,n2,cx[i3],cb,cz[i3]);
-      return cz;
     }
   }
   private static Binary _add = new Binary() {
-    float[] apply(int n1, float[] cx, float[] cy, float[] cz) {
+    void apply(float[] cx, float[] cy, float[] cz) {
+      int n1 = cx.length/2;
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         cz[ir] = cx[ir]+cy[ir];
         cz[ii] = cx[ii]+cy[ii];
       }
-      return cz;
     }
-    float[] apply(int n1, Complex ca, float[] cy, float[] cz) {
+    void apply(Complex ca, float[] cy, float[] cz) {
+      int n1 = cy.length/2;
       float ar = ca.r;
       float ai = ca.i;
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         cz[ir] = ar+cy[ir];
         cz[ii] = ai+cy[ii];
       }
-      return cz;
     }
-    float[] apply(int n1, float[] cx, Complex cb, float[] cz) {
+    void apply(float[] cx, Complex cb, float[] cz) {
+      int n1 = cx.length/2;
       float br = cb.r;
       float bi = cb.i;
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         cz[ir] = cx[ir]+br;
         cz[ii] = cx[ii]+bi;
       }
-      return cz;
     }
   };
   private static Binary _sub = new Binary() {
-    float[] apply(int n1, float[] cx, float[] cy, float[] cz) {
+    void apply(float[] cx, float[] cy, float[] cz) {
+      int n1 = cx.length/2;
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         cz[ir] = cx[ir]-cy[ir];
         cz[ii] = cx[ii]-cy[ii];
       }
-      return cz;
     }
-    float[] apply(int n1, Complex ca, float[] cy, float[] cz) {
+    void apply(Complex ca, float[] cy, float[] cz) {
       float ar = ca.r;
       float ai = ca.i;
+      int n1 = cy.length/2;
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         cz[ir] = ar-cy[ir];
         cz[ii] = ai-cy[ii];
       }
-      return cz;
     }
-    float[] apply(int n1, float[] cx, Complex cb, float[] cz) {
+    void apply(float[] cx, Complex cb, float[] cz) {
       float br = cb.r;
       float bi = cb.i;
+      int n1 = cx.length/2;
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         cz[ir] = cx[ir]-br;
         cz[ii] = cx[ii]-bi;
       }
-      return cz;
     }
   };
   private static Binary _mul = new Binary() {
-    float[] apply(int n1, float[] cx, float[] cy, float[] cz) {
+    void apply(float[] cx, float[] cy, float[] cz) {
+      int n1 = cx.length/2;
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         float xr = cx[ir];
         float xi = cx[ii];
@@ -1081,33 +1007,33 @@ public class Cap {
         cz[ir] = xr*yr-xi*yi;
         cz[ii] = xr*yi+xi*yr;
       }
-      return cz;
     }
-    float[] apply(int n1, Complex ca, float[] cy, float[] cz) {
+    void apply(Complex ca, float[] cy, float[] cz) {
       float ar = ca.r;
       float ai = ca.i;
+      int n1 = cy.length/2;
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         float yr = cy[ir];
         float yi = cy[ii];
         cz[ir] = ar*yr-ai*yi;
         cz[ii] = ar*yi+ai*yr;
       }
-      return cz;
     }
-    float[] apply(int n1, float[] cx, Complex cb, float[] cz) {
+    void apply(float[] cx, Complex cb, float[] cz) {
       float br = cb.r;
       float bi = cb.i;
+      int n1 = cx.length/2;
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         float xr = cx[ir];
         float xi = cx[ii];
         cz[ir] = xr*br-xi*bi;
         cz[ii] = xr*bi+xi*br;
       }
-      return cz;
     }
   };
   private static Binary _div = new Binary() {
-    float[] apply(int n1, float[] cx, float[] cy, float[] cz) {
+    void apply(float[] cx, float[] cy, float[] cz) {
+      int n1 = cx.length/2;
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         float xr = cx[ir];
         float xi = cx[ii];
@@ -1117,11 +1043,11 @@ public class Cap {
         cz[ir] = (xr*yr+xi*yi)/yd;
         cz[ii] = (xi*yr-xr*yi)/yd;
       }
-      return cz;
     }
-    float[] apply(int n1, Complex ca, float[] cy, float[] cz) {
+    void apply(Complex ca, float[] cy, float[] cz) {
       float ar = ca.r;
       float ai = ca.i;
+      int n1 = cy.length/2;
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         float yr = cy[ir];
         float yi = cy[ii];
@@ -1129,19 +1055,18 @@ public class Cap {
         cz[ir] = (ar*yr+ai*yi)/yd;
         cz[ii] = (ai*yr-ar*yi)/yd;
       }
-      return cz;
     }
-    float[] apply(int n1, float[] cx, Complex cb, float[] cz) {
+    void apply(float[] cx, Complex cb, float[] cz) {
       float br = cb.r;
       float bi = cb.i;
       float bd = br*br+bi*bi;
+      int n1 = cx.length/2;
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         float xr = cx[ir];
         float xi = cx[ii];
         cz[ir] = (xr*br+xi*bi)/bd;
         cz[ii] = (xi*br-xr*bi)/bd;
       }
-      return cz;
     }
   };
 }

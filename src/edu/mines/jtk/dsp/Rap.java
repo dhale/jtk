@@ -6,8 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import static edu.mines.jtk.util.MathPlus.*;
-
 /**
  * Real array processing. A real array is an array of floats, in which
  * each float represents one real number.
@@ -36,68 +34,66 @@ public class Rap {
     return ry;
   }
   public static float[] copy(int n1, float[] rx) {
-    return copy(n1,rx,new float[n1]);
+    float[] ry = new float[n1];
+    copy(n1,rx,ry);
+    return ry;
   }
   public static float[][] copy(int n1, int n2, float[][] rx) {
-    return copy(n1,n2,rx,new float[n2][n1]);
+    float[][] ry = new float[n2][n1];
+    copy(n1,n2,rx,ry);
+    return ry;
   }
   public static float[][][] copy(int n1, int n2, int n3, float[][][] rx) {
-    return copy(n1,n2,n3,rx,new float[n3][n2][n1]);
+    float[][][] ry = new float[n3][n2][n1];
+    copy(n1,n2,n3,rx,ry);
+    return ry;
   }
-  public static float[] copy(float[] rx, float[] ry) {
-    return copy(rx.length,rx,ry);
+  public static void copy(float[] rx, float[] ry) {
+    copy(rx.length,rx,ry);
   }
-  public static float[][] copy(float[][] rx, float[][] ry) {
+  public static void copy(float[][] rx, float[][] ry) {
     int n2 = rx.length;
     for (int i2=0; i2<n2; ++i2)
       copy(rx[i2],ry[i2]);
-    return ry;
   }
-  public static float[][][] copy(float[][][] rx, float[][][] ry) {
+  public static void copy(float[][][] rx, float[][][] ry) {
     int n3 = rx.length;
     for (int i3=0; i3<n3; ++i3)
       copy(rx[i3],ry[i3]);
-    return ry;
   }
-  public static float[] copy(int n1, float[] rx, float[] ry) {
+  public static void copy(int n1, float[] rx, float[] ry) {
     for (int i1=0; i1<n1; ++i1)
       ry[i1] = rx[i1];
-    return ry;
   }
-  public static float[][] copy(int n1, int n2, float[][] rx, float[][] ry) {
+  public static void copy(int n1, int n2, float[][] rx, float[][] ry) {
     for (int i2=0; i2<n2; ++i2)
       copy(n1,rx[i2],ry[i2]);
-    return ry;
   }
-  public static float[][][] copy(
+  public static void copy(
     int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
     for (int i3=0; i3<n3; ++i3)
       copy(n1,n2,rx[i3],ry[i3]);
-    return ry;
   }
-  public static float[] copy(
+  public static void copy(
     int n1, 
     int j1x, float[] rx, 
     int j1y, float[] ry) {
     for (int i1=0,ix=j1x,iy=j1y; i1<n1; ++i1)
       ry[iy++] = rx[ix++];
-    return ry;
   }
-  public static float[][] copy(
+  public static void copy(
     int n1, int n2, 
     int j1x, int j2x, float[][] rx, 
     int j1y, int j2y, float[][] ry) {
     for (int i2=0; i2<n2; ++i2)
       copy(n1,j1x,rx[j2x+i2],j1y,ry[j2y+i2]);
-    return ry;
   }
-  public static float[][][] copy(
+  public static void copy(
     int n1, int n2, int n3,
     int j1x, int j2x, int j3x, float[][][] rx, 
     int j1y, int j2y, int j3y, float[][][] ry) {
     for (int i3=0; i3<n3; ++i3)
       copy(n1,n2,j1x,j2x,rx[j3x+i3],j1y,j2y,ry[j3y+i3]);
-    return ry;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -111,138 +107,102 @@ public class Rap {
   public static float[][][] zero(int n1, int n2, int n3) {
     return new float[n3][n2][n1];
   }
-  public static float[] zero(float[] rx) {
-    return zero(rx.length,rx);
+  public static void zero(float[] rx) {
+    int n1 = rx.length;
+    for (int i1=0; i1<n1; ++i1)
+      rx[i1] = 0.0f;
   }
-  public static float[][] zero(float[][] rx) {
+  public static void zero(float[][] rx) {
     int n2 = rx.length;
     for (int i2=0; i2<n2; ++i2)
       zero(rx[i2]);
-    return rx;
   }
-  public static float[][][] zero(float[][][] rx) {
+  public static void zero(float[][][] rx) {
     int n3 = rx.length;
     for (int i3=0; i3<n3; ++i3)
       zero(rx[i3]);
-    return rx;
-  }
-  public static float[] zero(int n1, float[] rx) {
-    for (int i1=0; i1<n1; ++i1)
-      rx[i1] = 0.0f;
-    return rx;
-  }
-  public static float[][] zero(int n1, int n2, float[][] rx) {
-    for (int i2=0; i2<n2; ++i2)
-      zero(n1,rx[i2]);
-    return rx;
-  }
-  public static float[][][] zero(int n1, int n2, int n3, float[][][] rx) {
-    for (int i3=0; i3<n3; ++i3)
-      zero(n1,n2,rx[i3]);
-    return rx;
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // fill
   public static float[] fill(float ra, int n1) {
-    return fill(ra,n1,new float[n1]);
+    float[] rx = new float[n1];
+    fill(ra,rx);
+    return rx;
   }
   public static float[][] fill(float ra, int n1, int n2) {
-    return fill(ra,n1,n2,new float[n2][n1]);
+    float[][] rx = new float[n2][n1];
+    fill(ra,rx);
+    return rx;
   }
   public static float[][][] fill(float ra, int n1, int n2, int n3) {
-    return fill(ra,n1,n2,n3,new float[n3][n2][n1]);
+    float[][][] rx = new float[n3][n2][n1];
+    fill(ra,rx);
+    return rx;
   }
-  public static float[] fill(float ra, float[] rx) {
-    return fill(ra,rx.length,rx);
+  public static void fill(float ra, float[] rx) {
+    int n1 = rx.length;
+    for (int i1=0; i1<n1; ++i1)
+      rx[i1] = ra;
   }
-  public static float[][] fill(float ra, float[][] rx) {
+  public static void fill(float ra, float[][] rx) {
     int n2 = rx.length;
     for (int i2=0; i2<n2; ++i2)
       fill(ra,rx[i2]);
-    return rx;
   }
-  public static float[][][] fill(float ra, float[][][] rx) {
+  public static void fill(float ra, float[][][] rx) {
     int n3 = rx.length;
     for (int i3=0; i3<n3; ++i3)
       fill(ra,rx[i3]);
-    return rx;
-  }
-  public static float[] fill(float ra, int n1, float[] rx) {
-    for (int i1=0; i1<n1; ++i1)
-      rx[i1] = ra;
-    return rx;
-  }
-  public static float[][] fill(float ra, int n1, int n2, float[][] rx) {
-    for (int i2=0; i2<n2; ++i2)
-      fill(ra,n1,rx[i2]);
-    return rx;
-  }
-  public static float[][][] fill(
-    float ra, int n1, int n2, int n3, float[][][] rx) {
-    for (int i3=0; i3<n3; ++i3)
-      fill(ra,n1,n2,rx[i3]);
-    return rx;
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // ramp
   public static float[] ramp(float ra, float rb, int n1) {
-    return ramp(ra,rb,n1,new float[n1]);
+    float[] rx = new float[n1];
+    ramp(ra,rb,rx);
+    return rx;
   }
   public static float[][] ramp(
     float ra, float rb1, float rb2, int n1, int n2) {
-    return ramp(ra,rb1,rb2,n1,n2,new float[n2][n1]);
+    float[][] rx = new float[n2][n1];
+    ramp(ra,rb1,rb2,rx);
+    return rx;
   }
   public static float[][][] ramp(
-    float ra, float rb1, float rb2, float rb3, 
-    int n1, int n2, int n3) {
-    return ramp(ra,rb1,rb2,rb3,n1,n2,n3,new float[n3][n2][n1]);
+    float ra, float rb1, float rb2, float rb3, int n1, int n2, int n3) {
+    float[][][] rx = new float[n3][n2][n1];
+    ramp(ra,rb1,rb2,rb3,rx);
+    return rx;
   }
-
-  public static float[] ramp(float ra, float rb, float[] rx) {
-    return ramp(ra,rb,rx.length,rx);
+  public static void ramp(float ra, float rb, float[] rx) {
+    int n1 = rx.length;
+    for (int i1=0; i1<n1; ++i1,ra+=rb)
+      rx[i1] = ra;
   }
-  public static float[][] ramp(float ra, float rb1, float rb2, float[][] rx) {
+  public static void ramp(float ra, float rb1, float rb2, float[][] rx) {
     int n2 = rx.length;
     float ra2 = ra;
     for (int i2=0; i2<n2; ++i2,ra2+=rb2)
       ramp(ra2,rb1,rx[i2]);
-    return rx;
   }
-  public static float[][][] ramp(
+  public static void ramp(
     float ra, float rb1, float rb2, float rb3, float[][][] rx) {
     int n3 = rx.length;
     float ra3 = ra;
     for (int i3=0; i3<n3; ++i3,ra3+=rb3)
       ramp(ra3,rb1,rb2,rx[i3]);
-    return rx;
-  }
-  public static float[] ramp(float ra, float rb, int n1, float[] rx) {
-    for (int i1=0; i1<n1; ++i1,ra+=rb)
-      rx[i1] = ra;
-    return rx;
-  }
-  public static float[][] ramp(
-    float ra, float rb1, float rb2, int n1, int n2, float[][] rx) {
-    float ra2 = ra;
-    for (int i2=0; i2<n2; ++i2,ra2+=rb2)
-      ramp(ra2,rb1,n1,rx[i2]);
-    return rx;
-  }
-  public static float[][][] ramp(
-    float ra, float rb1, float rb2, float rb3, 
-    int n1, int n2, int n3, float[][][] rx) {
-    float ra3 = ra;
-    for (int i3=0; i3<n3; ++i3,ra3+=rb3)
-      ramp(ra3,rb1,rb2,n1,n2,rx[i3]);
-    return rx;
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // equal
   public static boolean equal(float[] rx, float[] ry) {
-    return equal(rx.length,rx,ry);
+    int n1 = rx.length;
+    for (int i1=0; i1<n1; ++i1) {
+      if (rx[i1]!=ry[i1])
+        return false;
+    }
+    return true;
   }
   public static boolean equal(float[][] rx, float[][] ry) {
     int n2 = rx.length;
@@ -260,34 +220,17 @@ public class Rap {
     }
     return true;
   }
-  public static boolean equal(int n1, float[] rx, float[] ry) {
-    for (int i1=0; i1<n1; ++i1) {
-      if (rx[i1]!=ry[i1])
-        return false;
-    }
-    return true;
-  }
-  public static boolean equal(int n1, int n2, float[][] rx, float[][] ry) {
-    for (int i2=0; i2<n2; ++i2) {
-      if (!equal(n1,rx[i2],ry[i2]))
-        return false;
-    }
-    return true;
-  }
-  public static boolean equal(
-    int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
-    for (int i3=0; i3<n3; ++i3) {
-      if (!equal(n1,n2,rx[i3],ry[i3]))
-        return false;
-    }
-    return true;
-  }
 
   ///////////////////////////////////////////////////////////////////////////
   // almostEqual
   public static boolean almostEqual(
     float tolerance, float[] rx, float[] ry) {
-    return almostEqual(tolerance,rx.length,rx,ry);
+    int n1 = rx.length;
+    for (int i1=0; i1<n1; ++i1) {
+      if (!almostEqual(tolerance,rx[i1],ry[i1]))
+        return false;
+    }
+    return true;
   }
   public static boolean almostEqual(
     float tolerance, float[][] rx, float[][] ry) {
@@ -303,30 +246,6 @@ public class Rap {
     int n3 = rx.length;
     for (int i3=0; i3<n3; ++i3) {
       if (!almostEqual(tolerance,rx[i3],ry[i3]))
-        return false;
-    }
-    return true;
-  }
-  public static boolean almostEqual(
-    float tolerance, int n1, float[] rx, float[] ry) {
-    for (int i1=0; i1<n1; ++i1) {
-      if (!almostEqual(tolerance,rx[i1],ry[i1]))
-        return false;
-    }
-    return true;
-  }
-  public static boolean almostEqual(
-    float tolerance, int n1, int n2, float[][] rx, float[][] ry) {
-    for (int i2=0; i2<n2; ++i2) {
-      if (!almostEqual(tolerance,n1,rx[i2],ry[i2]))
-        return false;
-    }
-    return true;
-  }
-  public static boolean almostEqual(
-    float tolerance, int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
-    for (int i3=0; i3<n3; ++i3) {
-      if (!almostEqual(tolerance,n1,n2,rx[i3],ry[i3]))
         return false;
     }
     return true;
@@ -402,6 +321,71 @@ public class Rap {
     }
     return rmax;
   }
+  public static float findMin(float[] rx, int[] index) {
+    int i1min = 0;
+    float rmin = rx[0];
+    int n1 = rx.length;
+    for (int i1=1; i1<n1; ++i1) {
+      if (rx[i1]<rmin) {
+        rmin = rx[i1];
+        i1min = i1;
+      }
+    }
+    if (index!=null)
+      index[0] = i1min;
+    return rmin;
+  }
+  public static float findMin(float[][] rx, int[] index) {
+    int i1min = 0;
+    int i2min = 0;
+    float rmin = rx[0][0];
+    int n2 = rx.length;
+    for (int i2=0; i2<n2; ++i2) {
+      float[] rxi2 = rx[i2];
+      int n1 = rxi2.length;
+      for (int i1=0; i1<n1; ++i1) {
+        if (rxi2[i1]<rmin) {
+          rmin = rxi2[i1];
+          i2min = i2;
+          i1min = i1;
+        }
+      }
+    }
+    if (index!=null) {
+      index[0] = i1min;
+      index[1] = i2min;
+    }
+    return rmin;
+  }
+  public static float findMin(float[][][] rx, int[] index) {
+    int i1min = 0;
+    int i2min = 0;
+    int i3min = 0;
+    float rmin = rx[0][0][0];
+    int n3 = rx.length;
+    for (int i3=0; i3<n3; ++i3) {
+      float[][] rxi3 = rx[i3];
+      int n2 = rxi3.length;
+      for (int i2=0; i2<n2; ++i2) {
+        float[] rxi3i2 = rxi3[i2];
+        int n1 = rxi3i2.length;
+        for (int i1=0; i1<n1; ++i1) {
+          if (rxi3i2[i1]<rmin) {
+            rmin = rxi3i2[i1];
+            i1min = i1;
+            i2min = i2;
+            i3min = i3;
+          }
+        }
+      }
+    }
+    if (index!=null) {
+      index[0] = i1min;
+      index[1] = i2min;
+      index[2] = i3min;
+    }
+    return rmin;
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   // abs, neg, ...
@@ -414,33 +398,14 @@ public class Rap {
   public static float[][][] abs(float[][][] rx) {
     return _abs.apply(rx);
   }
-  public static float[] abs(float[] rx, float[] ry) {
-    return _abs.apply(rx,ry);
+  public static void abs(float[] rx, float[] ry) {
+    _abs.apply(rx,ry);
   }
-  public static float[][] abs(float[][] rx, float[][] ry) {
-    return _abs.apply(rx,ry);
+  public static void abs(float[][] rx, float[][] ry) {
+    _abs.apply(rx,ry);
   }
-  public static float[][][] abs(float[][][] rx, float[][][] ry) {
-    return _abs.apply(rx,ry);
-  }
-  public static float[] abs(int n1, float[] rx) {
-    return _abs.apply(n1,rx);
-  }
-  public static float[][] abs(int n1, int n2, float[][] rx) {
-    return _abs.apply(n1,n2,rx);
-  }
-  public static float[][][] abs(int n1, int n2, int n3, float[][][] rx) {
-    return _abs.apply(n1,n2,n3,rx);
-  }
-  public static float[] abs(int n1, float[] rx, float[] ry) {
-    return _abs.apply(n1,rx,ry);
-  }
-  public static float[][] abs(int n1, int n2, float[][] rx, float[][] ry) {
-    return _abs.apply(n1,n2,rx,ry);
-  }
-  public static float[][][] abs(
-    int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
-    return _abs.apply(n1,n2,n3,rx,ry);
+  public static void abs(float[][][] rx, float[][][] ry) {
+    _abs.apply(rx,ry);
   }
   public static float[] neg(float[] rx) {
     return _neg.apply(rx);
@@ -451,34 +416,64 @@ public class Rap {
   public static float[][][] neg(float[][][] rx) {
     return _neg.apply(rx);
   }
-  public static float[] neg(float[] rx, float[] ry) {
-    return _neg.apply(rx,ry);
+  public static void neg(float[] rx, float[] ry) {
+    _neg.apply(rx,ry);
   }
-  public static float[][] neg(float[][] rx, float[][] ry) {
-    return _neg.apply(rx,ry);
+  public static void neg(float[][] rx, float[][] ry) {
+    _neg.apply(rx,ry);
   }
-  public static float[][][] neg(float[][][] rx, float[][][] ry) {
-    return _neg.apply(rx,ry);
+  public static void neg(float[][][] rx, float[][][] ry) {
+    _neg.apply(rx,ry);
   }
-  public static float[] neg(int n1, float[] rx) {
-    return _neg.apply(n1,rx);
+  private static abstract class Unary {
+    float[] apply(float[] rx) {
+      int n1 = rx.length;
+      float[] ry = new float[n1];
+      apply(rx,ry);
+      return ry;
+    }
+    float[][] apply(float[][] rx) {
+      int n2 = rx.length;
+      float[][] ry = new float[n2][];
+      for (int i2=0; i2<n2; ++i2)
+        ry[i2] = apply(rx[i2]);
+      return ry;
+    }
+    float[][][] apply(float[][][] rx) {
+      int n3 = rx.length;
+      float[][][] ry = new float[n3][][];
+      for (int i3=0; i3<n3; ++i3)
+        ry[i3] = apply(rx[i3]);
+      return ry;
+    }
+    abstract void apply(float[] rx, float[] ry);
+    void apply(float[][] rx, float[][] ry) {
+      int n2 = rx.length;
+      for (int i2=0; i2<n2; ++i2)
+        apply(rx[i2],ry[i2]);
+    }
+    void apply(float[][][] rx, float[][][] ry) {
+      int n3 = rx.length;
+      for (int i3=0; i3<n3; ++i3)
+        apply(rx[i3],ry[i3]);
+    }
   }
-  public static float[][] neg(int n1, int n2, float[][] rx) {
-    return _neg.apply(n1,n2,rx);
-  }
-  public static float[][][] neg(int n1, int n2, int n3, float[][][] rx) {
-    return _neg.apply(n1,n2,n3,rx);
-  }
-  public static float[] neg(int n1, float[] rx, float[] ry) {
-    return _neg.apply(n1,rx,ry);
-  }
-  public static float[][] neg(int n1, int n2, float[][] rx, float[][] ry) {
-    return _neg.apply(n1,n2,rx,ry);
-  }
-  public static float[][][] neg(
-    int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
-    return _neg.apply(n1,n2,n3,rx,ry);
-  }
+  private static Unary _abs = new Unary() {
+    void apply(float[] rx, float[] ry) {
+      int n1 = rx.length;
+      for (int i1=0; i1<n1; ++i1) {
+        float rxi = rx[i1];
+        ry[i1] = (rxi>=0.0f)?rxi:-rxi;
+      }
+    }
+  };
+  private static Unary _neg = new Unary() {
+    void apply(float[] rx, float[] ry) {
+      int n1 = rx.length;
+      for (int i1=0; i1<n1; ++i1)
+        ry[i1] = -rx[i1];
+    }
+  };
 
   ///////////////////////////////////////////////////////////////////////////
   // add, sub, mul, div, ...
@@ -509,98 +504,32 @@ public class Rap {
   public static float[][][] add(float[][][] rx, float rb) {
     return _add.apply(rx,rb);
   }
-  public static float[] add(float[] rx, float[] ry, float[] rz) {
-    return _add.apply(rx,ry,rz);
+  public static void add(float[] rx, float[] ry, float[] rz) {
+    _add.apply(rx,ry,rz);
   }
-  public static float[] add(float ra, float[] ry, float[] rz) {
-    return _add.apply(ra,ry,rz);
+  public static void add(float ra, float[] ry, float[] rz) {
+    _add.apply(ra,ry,rz);
   }
-  public static float[] add(float[] rx, float rb, float[] rz) {
-    return _add.apply(rx,rb,rz);
+  public static void add(float[] rx, float rb, float[] rz) {
+    _add.apply(rx,rb,rz);
   }
-  public static float[][] add(float[][] rx, float[][] ry, float[][] rz) {
-    return _add.apply(rx,ry,rz);
+  public static void add(float[][] rx, float[][] ry, float[][] rz) {
+    _add.apply(rx,ry,rz);
   }
-  public static float[][] add(float ra, float[][] ry, float[][] rz) {
-    return _add.apply(ra,ry,rz);
+  public static void add(float ra, float[][] ry, float[][] rz) {
+    _add.apply(ra,ry,rz);
   }
-  public static float[][] add(float[][] rx, float rb, float[][] rz) {
-    return _add.apply(rx,rb,rz);
+  public static void add(float[][] rx, float rb, float[][] rz) {
+    _add.apply(rx,rb,rz);
   }
-  public static float[][][] add(
-    float[][][] rx, float[][][] ry, float[][][] rz) {
-    return _add.apply(rx,ry,rz);
+  public static void add(float[][][] rx, float[][][] ry, float[][][] rz) {
+    _add.apply(rx,ry,rz);
   }
-  public static float[][][] add(
-    float ra, float[][][] ry, float[][][] rz) {
-    return _add.apply(ra,ry,rz);
+  public static void add(float ra, float[][][] ry, float[][][] rz) {
+    _add.apply(ra,ry,rz);
   }
-  public static float[][][] add(
-    float[][][] rx, float rb, float[][][] rz) {
-    return _add.apply(rx,rb,rz);
-  }
-  public static float[] add(int n1, float[] rx, float[] ry) {
-    return _add.apply(n1,rx,ry);
-  }
-  public static float[] add(int n1, float ra, float[] ry) {
-    return _add.apply(n1,ra,ry);
-  }
-  public static float[] add(int n1, float[] rx, float rb) {
-    return _add.apply(n1,rx,rb);
-  }
-  public static float[][] add(int n1, int n2, float[][] rx, float[][] ry) {
-    return _add.apply(n1,n2,rx,ry);
-  }
-  public static float[][] add(int n1, int n2, float ra, float[][] ry) {
-    return _add.apply(n1,n2,ra,ry);
-  }
-  public static float[][] add(int n1, int n2, float[][] rx, float rb) {
-    return _add.apply(n1,n2,rx,rb);
-  }
-  public static float[][][] add(
-    int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
-    return _add.apply(n1,n2,n3,rx,ry);
-  }
-  public static float[][][] add(
-    int n1, int n2, int n3, float ra, float[][][] ry) {
-    return _add.apply(n1,n2,n3,ra,ry);
-  }
-  public static float[][][] add(
-    int n1, int n2, int n3, float[][][] rx, float rb) {
-    return _add.apply(n1,n2,n3,rx,rb);
-  }
-  public static float[] add(int n1, float[] rx, float[] ry, float[] rz) {
-    return _add.apply(n1,rx,ry,rz);
-  }
-  public static float[] add(int n1, float ra, float[] ry, float[] rz) {
-    return _add.apply(n1,ra,ry,rz);
-  }
-  public static float[] add(int n1, float[] rx, float rb, float[] rz) {
-    return _add.apply(n1,rx,rb,rz);
-  }
-  public static float[][] add(
-    int n1, int n2, float[][] rx, float[][] ry, float[][] rz) {
-    return _add.apply(n1,n2,rx,ry,rz);
-  }
-  public static float[][] add(
-    int n1, int n2, float ra, float[][] ry, float[][] rz) {
-    return _add.apply(n1,n2,ra,ry,rz);
-  }
-  public static float[][] add(
-    int n1, int n2, float[][] rx, float rb, float[][] rz) {
-    return _add.apply(n1,n2,rx,rb,rz);
-  }
-  public static float[][][] add(
-    int n1, int n2, int n3, float[][][] rx, float[][][] ry, float[][][] rz) {
-    return _add.apply(n1,n2,n3,rx,ry,rz);
-  }
-  public static float[][][] add(
-    int n1, int n2, int n3, float ra, float[][][] ry, float[][][] rz) {
-    return _add.apply(n1,n2,n3,ra,ry,rz);
-  }
-  public static float[][][] add(
-    int n1, int n2, int n3, float[][][] rx, float rb, float[][][] rz) {
-    return _add.apply(n1,n2,n3,rx,rb,rz);
+  public static void add(float[][][] rx, float rb, float[][][] rz) {
+    _add.apply(rx,rb,rz);
   }
   public static float[] sub(float[] rx, float[] ry) {
     return _sub.apply(rx,ry);
@@ -629,98 +558,32 @@ public class Rap {
   public static float[][][] sub(float[][][] rx, float rb) {
     return _sub.apply(rx,rb);
   }
-  public static float[] sub(float[] rx, float[] ry, float[] rz) {
-    return _sub.apply(rx,ry,rz);
+  public static void sub(float[] rx, float[] ry, float[] rz) {
+    _sub.apply(rx,ry,rz);
   }
-  public static float[] sub(float ra, float[] ry, float[] rz) {
-    return _sub.apply(ra,ry,rz);
+  public static void sub(float ra, float[] ry, float[] rz) {
+    _sub.apply(ra,ry,rz);
   }
-  public static float[] sub(float[] rx, float rb, float[] rz) {
-    return _sub.apply(rx,rb,rz);
+  public static void sub(float[] rx, float rb, float[] rz) {
+    _sub.apply(rx,rb,rz);
   }
-  public static float[][] sub(float[][] rx, float[][] ry, float[][] rz) {
-    return _sub.apply(rx,ry,rz);
+  public static void sub(float[][] rx, float[][] ry, float[][] rz) {
+    _sub.apply(rx,ry,rz);
   }
-  public static float[][] sub(float ra, float[][] ry, float[][] rz) {
-    return _sub.apply(ra,ry,rz);
+  public static void sub(float ra, float[][] ry, float[][] rz) {
+    _sub.apply(ra,ry,rz);
   }
-  public static float[][] sub(float[][] rx, float rb, float[][] rz) {
-    return _sub.apply(rx,rb,rz);
+  public static void sub(float[][] rx, float rb, float[][] rz) {
+    _sub.apply(rx,rb,rz);
   }
-  public static float[][][] sub(
-    float[][][] rx, float[][][] ry, float[][][] rz) {
-    return _sub.apply(rx,ry,rz);
+  public static void sub(float[][][] rx, float[][][] ry, float[][][] rz) {
+    _sub.apply(rx,ry,rz);
   }
-  public static float[][][] sub(
-    float ra, float[][][] ry, float[][][] rz) {
-    return _sub.apply(ra,ry,rz);
+  public static void sub(float ra, float[][][] ry, float[][][] rz) {
+    _sub.apply(ra,ry,rz);
   }
-  public static float[][][] sub(
-    float[][][] rx, float rb, float[][][] rz) {
-    return _sub.apply(rx,rb,rz);
-  }
-  public static float[] sub(int n1, float[] rx, float[] ry) {
-    return _sub.apply(n1,rx,ry);
-  }
-  public static float[] sub(int n1, float ra, float[] ry) {
-    return _sub.apply(n1,ra,ry);
-  }
-  public static float[] sub(int n1, float[] rx, float rb) {
-    return _sub.apply(n1,rx,rb);
-  }
-  public static float[][] sub(int n1, int n2, float[][] rx, float[][] ry) {
-    return _sub.apply(n1,n2,rx,ry);
-  }
-  public static float[][] sub(int n1, int n2, float ra, float[][] ry) {
-    return _sub.apply(n1,n2,ra,ry);
-  }
-  public static float[][] sub(int n1, int n2, float[][] rx, float rb) {
-    return _sub.apply(n1,n2,rx,rb);
-  }
-  public static float[][][] sub(
-    int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
-    return _sub.apply(n1,n2,n3,rx,ry);
-  }
-  public static float[][][] sub(
-    int n1, int n2, int n3, float ra, float[][][] ry) {
-    return _sub.apply(n1,n2,n3,ra,ry);
-  }
-  public static float[][][] sub(
-    int n1, int n2, int n3, float[][][] rx, float rb) {
-    return _sub.apply(n1,n2,n3,rx,rb);
-  }
-  public static float[] sub(int n1, float[] rx, float[] ry, float[] rz) {
-    return _sub.apply(n1,rx,ry,rz);
-  }
-  public static float[] sub(int n1, float ra, float[] ry, float[] rz) {
-    return _sub.apply(n1,ra,ry,rz);
-  }
-  public static float[] sub(int n1, float[] rx, float rb, float[] rz) {
-    return _sub.apply(n1,rx,rb,rz);
-  }
-  public static float[][] sub(
-    int n1, int n2, float[][] rx, float[][] ry, float[][] rz) {
-    return _sub.apply(n1,n2,rx,ry,rz);
-  }
-  public static float[][] sub(
-    int n1, int n2, float ra, float[][] ry, float[][] rz) {
-    return _sub.apply(n1,n2,ra,ry,rz);
-  }
-  public static float[][] sub(
-    int n1, int n2, float[][] rx, float rb, float[][] rz) {
-    return _sub.apply(n1,n2,rx,rb,rz);
-  }
-  public static float[][][] sub(
-    int n1, int n2, int n3, float[][][] rx, float[][][] ry, float[][][] rz) {
-    return _sub.apply(n1,n2,n3,rx,ry,rz);
-  }
-  public static float[][][] sub(
-    int n1, int n2, int n3, float ra, float[][][] ry, float[][][] rz) {
-    return _sub.apply(n1,n2,n3,ra,ry,rz);
-  }
-  public static float[][][] sub(
-    int n1, int n2, int n3, float[][][] rx, float rb, float[][][] rz) {
-    return _sub.apply(n1,n2,n3,rx,rb,rz);
+  public static void sub(float[][][] rx, float rb, float[][][] rz) {
+    _sub.apply(rx,rb,rz);
   }
   public static float[] mul(float[] rx, float[] ry) {
     return _mul.apply(rx,ry);
@@ -749,98 +612,32 @@ public class Rap {
   public static float[][][] mul(float[][][] rx, float rb) {
     return _mul.apply(rx,rb);
   }
-  public static float[] mul(float[] rx, float[] ry, float[] rz) {
-    return _mul.apply(rx,ry,rz);
+  public static void mul(float[] rx, float[] ry, float[] rz) {
+    _mul.apply(rx,ry,rz);
   }
-  public static float[] mul(float ra, float[] ry, float[] rz) {
-    return _mul.apply(ra,ry,rz);
+  public static void mul(float ra, float[] ry, float[] rz) {
+    _mul.apply(ra,ry,rz);
   }
-  public static float[] mul(float[] rx, float rb, float[] rz) {
-    return _mul.apply(rx,rb,rz);
+  public static void mul(float[] rx, float rb, float[] rz) {
+    _mul.apply(rx,rb,rz);
   }
-  public static float[][] mul(float[][] rx, float[][] ry, float[][] rz) {
-    return _mul.apply(rx,ry,rz);
+  public static void mul(float[][] rx, float[][] ry, float[][] rz) {
+    _mul.apply(rx,ry,rz);
   }
-  public static float[][] mul(float ra, float[][] ry, float[][] rz) {
-    return _mul.apply(ra,ry,rz);
+  public static void mul(float ra, float[][] ry, float[][] rz) {
+    _mul.apply(ra,ry,rz);
   }
-  public static float[][] mul(float[][] rx, float rb, float[][] rz) {
-    return _mul.apply(rx,rb,rz);
+  public static void mul(float[][] rx, float rb, float[][] rz) {
+    _mul.apply(rx,rb,rz);
   }
-  public static float[][][] mul(
-    float[][][] rx, float[][][] ry, float[][][] rz) {
-    return _mul.apply(rx,ry,rz);
+  public static void mul(float[][][] rx, float[][][] ry, float[][][] rz) {
+    _mul.apply(rx,ry,rz);
   }
-  public static float[][][] mul(
-    float ra, float[][][] ry, float[][][] rz) {
-    return _mul.apply(ra,ry,rz);
+  public static void mul(float ra, float[][][] ry, float[][][] rz) {
+    _mul.apply(ra,ry,rz);
   }
-  public static float[][][] mul(
-    float[][][] rx, float rb, float[][][] rz) {
-    return _mul.apply(rx,rb,rz);
-  }
-  public static float[] mul(int n1, float[] rx, float[] ry) {
-    return _mul.apply(n1,rx,ry);
-  }
-  public static float[] mul(int n1, float ra, float[] ry) {
-    return _mul.apply(n1,ra,ry);
-  }
-  public static float[] mul(int n1, float[] rx, float rb) {
-    return _mul.apply(n1,rx,rb);
-  }
-  public static float[][] mul(int n1, int n2, float[][] rx, float[][] ry) {
-    return _mul.apply(n1,n2,rx,ry);
-  }
-  public static float[][] mul(int n1, int n2, float ra, float[][] ry) {
-    return _mul.apply(n1,n2,ra,ry);
-  }
-  public static float[][] mul(int n1, int n2, float[][] rx, float rb) {
-    return _mul.apply(n1,n2,rx,rb);
-  }
-  public static float[][][] mul(
-    int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
-    return _mul.apply(n1,n2,n3,rx,ry);
-  }
-  public static float[][][] mul(
-    int n1, int n2, int n3, float ra, float[][][] ry) {
-    return _mul.apply(n1,n2,n3,ra,ry);
-  }
-  public static float[][][] mul(
-    int n1, int n2, int n3, float[][][] rx, float rb) {
-    return _mul.apply(n1,n2,n3,rx,rb);
-  }
-  public static float[] mul(int n1, float[] rx, float[] ry, float[] rz) {
-    return _mul.apply(n1,rx,ry,rz);
-  }
-  public static float[] mul(int n1, float ra, float[] ry, float[] rz) {
-    return _mul.apply(n1,ra,ry,rz);
-  }
-  public static float[] mul(int n1, float[] rx, float rb, float[] rz) {
-    return _mul.apply(n1,rx,rb,rz);
-  }
-  public static float[][] mul(
-    int n1, int n2, float[][] rx, float[][] ry, float[][] rz) {
-    return _mul.apply(n1,n2,rx,ry,rz);
-  }
-  public static float[][] mul(
-    int n1, int n2, float ra, float[][] ry, float[][] rz) {
-    return _mul.apply(n1,n2,ra,ry,rz);
-  }
-  public static float[][] mul(
-    int n1, int n2, float[][] rx, float rb, float[][] rz) {
-    return _mul.apply(n1,n2,rx,rb,rz);
-  }
-  public static float[][][] mul(
-    int n1, int n2, int n3, float[][][] rx, float[][][] ry, float[][][] rz) {
-    return _mul.apply(n1,n2,n3,rx,ry,rz);
-  }
-  public static float[][][] mul(
-    int n1, int n2, int n3, float ra, float[][][] ry, float[][][] rz) {
-    return _mul.apply(n1,n2,n3,ra,ry,rz);
-  }
-  public static float[][][] mul(
-    int n1, int n2, int n3, float[][][] rx, float rb, float[][][] rz) {
-    return _mul.apply(n1,n2,n3,rx,rb,rz);
+  public static void mul(float[][][] rx, float rb, float[][][] rz) {
+    _mul.apply(rx,rb,rz);
   }
   public static float[] div(float[] rx, float[] ry) {
     return _div.apply(rx,ry);
@@ -869,192 +666,51 @@ public class Rap {
   public static float[][][] div(float[][][] rx, float rb) {
     return _div.apply(rx,rb);
   }
-  public static float[] div(float[] rx, float[] ry, float[] rz) {
-    return _div.apply(rx,ry,rz);
+  public static void div(float[] rx, float[] ry, float[] rz) {
+    _div.apply(rx,ry,rz);
   }
-  public static float[] div(float ra, float[] ry, float[] rz) {
-    return _div.apply(ra,ry,rz);
+  public static void div(float ra, float[] ry, float[] rz) {
+    _div.apply(ra,ry,rz);
   }
-  public static float[] div(float[] rx, float rb, float[] rz) {
-    return _div.apply(rx,rb,rz);
+  public static void div(float[] rx, float rb, float[] rz) {
+    _div.apply(rx,rb,rz);
   }
-  public static float[][] div(float[][] rx, float[][] ry, float[][] rz) {
-    return _div.apply(rx,ry,rz);
+  public static void div(float[][] rx, float[][] ry, float[][] rz) {
+    _div.apply(rx,ry,rz);
   }
-  public static float[][] div(float ra, float[][] ry, float[][] rz) {
-    return _div.apply(ra,ry,rz);
+  public static void div(float ra, float[][] ry, float[][] rz) {
+    _div.apply(ra,ry,rz);
   }
-  public static float[][] div(float[][] rx, float rb, float[][] rz) {
-    return _div.apply(rx,rb,rz);
+  public static void div(float[][] rx, float rb, float[][] rz) {
+    _div.apply(rx,rb,rz);
   }
-  public static float[][][] div(
-    float[][][] rx, float[][][] ry, float[][][] rz) {
-    return _div.apply(rx,ry,rz);
+  public static void div(float[][][] rx, float[][][] ry, float[][][] rz) {
+    _div.apply(rx,ry,rz);
   }
-  public static float[][][] div(
-    float ra, float[][][] ry, float[][][] rz) {
-    return _div.apply(ra,ry,rz);
+  public static void div(float ra, float[][][] ry, float[][][] rz) {
+    _div.apply(ra,ry,rz);
   }
-  public static float[][][] div(
-    float[][][] rx, float rb, float[][][] rz) {
-    return _div.apply(rx,rb,rz);
+  public static void div(float[][][] rx, float rb, float[][][] rz) {
+    _div.apply(rx,rb,rz);
   }
-  public static float[] div(int n1, float[] rx, float[] ry) {
-    return _div.apply(n1,rx,ry);
-  }
-  public static float[] div(int n1, float ra, float[] ry) {
-    return _div.apply(n1,ra,ry);
-  }
-  public static float[] div(int n1, float[] rx, float rb) {
-    return _div.apply(n1,rx,rb);
-  }
-  public static float[][] div(int n1, int n2, float[][] rx, float[][] ry) {
-    return _div.apply(n1,n2,rx,ry);
-  }
-  public static float[][] div(int n1, int n2, float ra, float[][] ry) {
-    return _div.apply(n1,n2,ra,ry);
-  }
-  public static float[][] div(int n1, int n2, float[][] rx, float rb) {
-    return _div.apply(n1,n2,rx,rb);
-  }
-  public static float[][][] div(
-    int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
-    return _div.apply(n1,n2,n3,rx,ry);
-  }
-  public static float[][][] div(
-    int n1, int n2, int n3, float ra, float[][][] ry) {
-    return _div.apply(n1,n2,n3,ra,ry);
-  }
-  public static float[][][] div(
-    int n1, int n2, int n3, float[][][] rx, float rb) {
-    return _div.apply(n1,n2,n3,rx,rb);
-  }
-  public static float[] div(int n1, float[] rx, float[] ry, float[] rz) {
-    return _div.apply(n1,rx,ry,rz);
-  }
-  public static float[] div(int n1, float ra, float[] ry, float[] rz) {
-    return _div.apply(n1,ra,ry,rz);
-  }
-  public static float[] div(int n1, float[] rx, float rb, float[] rz) {
-    return _div.apply(n1,rx,rb,rz);
-  }
-  public static float[][] div(
-    int n1, int n2, float[][] rx, float[][] ry, float[][] rz) {
-    return _div.apply(n1,n2,rx,ry,rz);
-  }
-  public static float[][] div(
-    int n1, int n2, float ra, float[][] ry, float[][] rz) {
-    return _div.apply(n1,n2,ra,ry,rz);
-  }
-  public static float[][] div(
-    int n1, int n2, float[][] rx, float rb, float[][] rz) {
-    return _div.apply(n1,n2,rx,rb,rz);
-  }
-  public static float[][][] div(
-    int n1, int n2, int n3, float[][][] rx, float[][][] ry, float[][][] rz) {
-    return _div.apply(n1,n2,n3,rx,ry,rz);
-  }
-  public static float[][][] div(
-    int n1, int n2, int n3, float ra, float[][][] ry, float[][][] rz) {
-    return _div.apply(n1,n2,n3,ra,ry,rz);
-  }
-  public static float[][][] div(
-    int n1, int n2, int n3, float[][][] rx, float rb, float[][][] rz) {
-    return _div.apply(n1,n2,n3,rx,rb,rz);
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // unary operations; e.g., abs, neg, ...
-  private static abstract class Unary {
-    float[] apply(float[] rx) {
-      int n1 = rx.length;
-      float[] ry = new float[n1];
-      return apply(n1,rx,ry);
-    }
-    float[][] apply(float[][] rx) {
-      int n2 = rx.length;
-      float[][] ry = new float[n2][];
-      for (int i2=0; i2<n2; ++i2)
-        ry[i2] = apply(rx[i2]);
-      return ry;
-    }
-    float[][][] apply(float[][][] rx) {
-      int n3 = rx.length;
-      float[][][] ry = new float[n3][][];
-      for (int i3=0; i3<n3; ++i3)
-        ry[i3] = apply(rx[i3]);
-      return ry;
-    }
-    float[] apply(float[] rx, float[] ry) {
-      return apply(rx.length,rx,ry);
-    }
-    float[][] apply(float[][] rx, float[][] ry) {
-      int n2 = rx.length;
-      for (int i2=0; i2<n2; ++i2)
-        apply(rx[i2],ry[i2]);
-      return ry;
-    }
-    float[][][] apply(float[][][] rx, float[][][] ry) {
-      int n3 = rx.length;
-      for (int i3=0; i3<n3; ++i3)
-        apply(rx[i3],ry[i3]);
-      return ry;
-    }
-    float[] apply(int n1, float[] rx) {
-      return apply(n1,rx,new float[n1]);
-    }
-    float[][] apply(int n1, int n2, float[][] rx) {
-      return apply(n1,n2,rx,new float[n2][n1]);
-    }
-    float[][][] apply(int n1, int n2, int n3, float[][][] rx) {
-      return apply(n1,n2,n3,rx,new float[n3][n2][n1]);
-    }
-    abstract float[] apply(int n1, float[] rx, float[] ry);
-    float[][] apply(int n1, int n2, float[][] rx, float[][] ry) {
-      for (int i2=0; i2<n2; ++i2)
-        apply(n1,rx[i2],ry[i2]);
-      return ry;
-    }
-    float[][][] apply(int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
-      for (int i3=0; i3<n3; ++i3)
-        apply(n1,n2,rx[i3],ry[i3]);
-      return ry;
-    }
-  }
-  private static Unary _abs = new Unary() {
-    float[] apply(int n1, float[] rx, float[] ry) {
-      for (int i1=0; i1<n1; ++i1) {
-        float rxi = rx[i1];
-        ry[i1] = (rxi>=0.0f)?rxi:-rxi;
-      }
-      return ry;
-    }
-  };
-  private static Unary _neg = new Unary() {
-    float[] apply(int n1, float[] rx, float[] ry) {
-      for (int i1=0; i1<n1; ++i1)
-        ry[i1] = -rx[i1];
-      return ry;
-    }
-  };
-
-  ///////////////////////////////////////////////////////////////////////////
-  // binary operations; e.g., add, sub, mul, div, ...
   private static abstract class Binary {
     float[] apply(float[] rx, float[] ry) {
       int n1 = rx.length;
       float[] rz = new float[n1];
-      return apply(n1,rx,ry,rz);
+      apply(rx,ry,rz);
+      return rz;
     }
     float[] apply(float ra, float[] ry) {
       int n1 = ry.length;
       float[] rz = new float[n1];
-      return apply(n1,ra,ry,rz);
+      apply(ra,ry,rz);
+      return rz;
     }
     float[] apply(float[] rx, float rb) {
       int n1 = rx.length;
       float[] rz = new float[n1];
-      return apply(n1,rx,rb,rz);
+      apply(rx,rb,rz);
+      return rz;
     }
     float[][] apply(float[][] rx, float[][] ry) {
       int n2 = rx.length;
@@ -1098,190 +754,106 @@ public class Rap {
         rz[i3] = apply(rx[i3],rb);
       return rz;
     }
-    float[] apply(float[] rx, float[] ry, float[] rz) {
-      return apply(rx.length,rx,ry,rz);
-    }
-    float[] apply(float ra, float[] ry, float[] rz) {
-      return apply(ry.length,ra,ry,rz);
-    }
-    float[] apply(float[] rx, float rb, float[] rz) {
-      return apply(rx.length,rx,rb,rz);
-    }
-    float[][] apply(float[][] rx, float[][] ry, float[][] rz) {
+    abstract void apply(float[] rx, float[] ry, float[] rz);
+    abstract void apply(float   ra, float[] ry, float[] rz);
+    abstract void apply(float[] rx, float   rb, float[] rz);
+    void apply(float[][] rx, float[][] ry, float[][] rz) {
       int n2 = rx.length;
       for (int i2=0; i2<n2; ++i2)
         apply(rx[i2],ry[i2],rz[i2]);
-      return rz;
     }
-    float[][] apply(float ra, float[][] ry, float[][] rz) {
+    void apply(float ra, float[][] ry, float[][] rz) {
       int n2 = ry.length;
       for (int i2=0; i2<n2; ++i2)
         apply(ra,ry[i2],rz[i2]);
-      return rz;
     }
-    float[][] apply(float[][] rx, float rb, float[][] rz) {
+    void apply(float[][] rx, float rb, float[][] rz) {
       int n2 = rx.length;
       for (int i2=0; i2<n2; ++i2)
         apply(rx[i2],rb,rz[i2]);
-      return rz;
     }
-    float[][][] apply(float[][][] rx, float[][][] ry, float[][][] rz) {
+    void apply(float[][][] rx, float[][][] ry, float[][][] rz) {
       int n3 = rx.length;
       for (int i3=0; i3<n3; ++i3)
         apply(rx[i3],ry[i3],rz[i3]);
-      return rz;
     }
-    float[][][] apply(float ra, float[][][] ry, float[][][] rz) {
+    void apply(float ra, float[][][] ry, float[][][] rz) {
       int n3 = ry.length;
       for (int i3=0; i3<n3; ++i3)
         apply(ra,ry[i3],rz[i3]);
-      return rz;
     }
-    float[][][] apply(float[][][] rx, float rb, float[][][] rz) {
+    void apply(float[][][] rx, float rb, float[][][] rz) {
       int n3 = rx.length;
       for (int i3=0; i3<n3; ++i3)
         apply(rx[i3],rb,rz[i3]);
-      return rz;
-    }
-    float[] apply(int n1, float[] rx, float[] ry) {
-      return apply(n1,rx,ry,new float[n1]);
-    }
-    float[] apply(int n1, float ra, float[] ry) {
-      return apply(n1,ra,ry,new float[n1]);
-    }
-    float[] apply(int n1, float[] rx, float rb) {
-      return apply(n1,rx,rb,new float[n1]);
-    }
-    float[][] apply(
-      int n1, int n2, float[][] rx, float[][] ry) {
-      return apply(n1,n2,rx,ry,new float[n2][n1]);
-    }
-    float[][] apply(
-      int n1, int n2, float ra, float[][] ry) {
-      return apply(n1,n2,ra,ry,new float[n2][n1]);
-    }
-    float[][] apply(
-      int n1, int n2, float[][] rx, float rb) {
-      return apply(n1,n2,rx,rb,new float[n2][n1]);
-    }
-    float[][][] apply(
-      int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
-      return apply(n1,n2,n3,rx,ry,new float[n3][n2][n1]);
-    }
-    float[][][] apply(
-      int n1, int n2, int n3, float ra, float[][][] ry) {
-      return apply(n1,n2,n3,ra,ry,new float[n3][n2][n1]);
-    }
-    float[][][] apply(
-      int n1, int n2, int n3, float[][][] rx, float rb) {
-      return apply(n1,n2,n3,rx,rb,new float[n3][n2][n1]);
-    }
-    abstract float[] apply(int n1, float[] rx, float[] ry, float[] rz);
-    abstract float[] apply(int n1, float   ra, float[] ry, float[] rz);
-    abstract float[] apply(int n1, float[] rx, float   rb, float[] rz);
-    float[][] apply(
-      int n1, int n2, float[][] rx, float[][] ry, float[][] rz) {
-      for (int i2=0; i2<n2; ++i2)
-        apply(n1,rx[i2],ry[i2],rz[i2]);
-      return rz;
-    }
-    float[][] apply(
-      int n1, int n2, float ra, float[][] ry, float[][] rz) {
-      for (int i2=0; i2<n2; ++i2)
-        apply(n1,ra,ry[i2],rz[i2]);
-      return rz;
-    }
-    float[][] apply(
-      int n1, int n2, float[][] rx, float rb, float[][] rz) {
-      for (int i2=0; i2<n2; ++i2)
-        apply(n1,rx[i2],rb,rz[i2]);
-      return rz;
-    }
-    float[][][] apply(
-      int n1, int n2, int n3, float[][][] rx, float[][][] ry, float[][][] rz) {
-      for (int i3=0; i3<n3; ++i3)
-        apply(n1,n2,rx[i3],ry[i3],rz[i3]);
-      return rz;
-    }
-    float[][][] apply(
-      int n1, int n2, int n3, float ra, float[][][] ry, float[][][] rz) {
-      for (int i3=0; i3<n3; ++i3)
-        apply(n1,n2,ra,ry[i3],rz[i3]);
-      return rz;
-    }
-    float[][][] apply(
-      int n1, int n2, int n3, float[][][] rx, float rb, float[][][] rz) {
-      for (int i3=0; i3<n3; ++i3)
-        apply(n1,n2,rx[i3],rb,rz[i3]);
-      return rz;
     }
   }
   private static Binary _add = new Binary() {
-    float[] apply(int n1, float[] rx, float[] ry, float[] rz) {
+    void apply(float[] rx, float[] ry, float[] rz) {
+      int n1 = rx.length;
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = rx[i1]+ry[i1];
-      return rz;
     }
-    float[] apply(int n1, float ra, float[] ry, float[] rz) {
+    void apply(float ra, float[] ry, float[] rz) {
+      int n1 = ry.length;
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = ra+ry[i1];
-      return rz;
     }
-    float[] apply(int n1, float[] rx, float rb, float[] rz) {
+    void apply(float[] rx, float rb, float[] rz) {
+      int n1 = rx.length;
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = rx[i1]+rb;
-      return rz;
     }
   };
   private static Binary _sub = new Binary() {
-    float[] apply(int n1, float[] rx, float[] ry, float[] rz) {
+    void apply(float[] rx, float[] ry, float[] rz) {
+      int n1 = rx.length;
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = rx[i1]-ry[i1];
-      return rz;
     }
-    float[] apply(int n1, float ra, float[] ry, float[] rz) {
+    void apply(float ra, float[] ry, float[] rz) {
+      int n1 = ry.length;
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = ra-ry[i1];
-      return rz;
     }
-    float[] apply(int n1, float[] rx, float rb, float[] rz) {
+    void apply(float[] rx, float rb, float[] rz) {
+      int n1 = rx.length;
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = rx[i1]-rb;
-      return rz;
     }
   };
   private static Binary _mul = new Binary() {
-    float[] apply(int n1, float[] rx, float[] ry, float[] rz) {
+    void apply(float[] rx, float[] ry, float[] rz) {
+      int n1 = rx.length;
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = rx[i1]*ry[i1];
-      return rz;
     }
-    float[] apply(int n1, float ra, float[] ry, float[] rz) {
+    void apply(float ra, float[] ry, float[] rz) {
+      int n1 = ry.length;
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = ra*ry[i1];
-      return rz;
     }
-    float[] apply(int n1, float[] rx, float rb, float[] rz) {
+    void apply(float[] rx, float rb, float[] rz) {
+      int n1 = rx.length;
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = rx[i1]*rb;
-      return rz;
     }
   };
   private static Binary _div = new Binary() {
-    float[] apply(int n1, float[] rx, float[] ry, float[] rz) {
+    void apply(float[] rx, float[] ry, float[] rz) {
+      int n1 = rx.length;
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = rx[i1]/ry[i1];
-      return rz;
     }
-    float[] apply(int n1, float ra, float[] ry, float[] rz) {
+    void apply(float ra, float[] ry, float[] rz) {
+      int n1 = ry.length;
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = ra/ry[i1];
-      return rz;
     }
-    float[] apply(int n1, float[] rx, float rb, float[] rz) {
+    void apply(float[] rx, float rb, float[] rz) {
+      int n1 = rx.length;
       for (int i1=0; i1<n1; ++i1)
         rz[i1] = rx[i1]/rb;
-      return rz;
     }
   };
 }
