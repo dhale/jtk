@@ -14,10 +14,53 @@ import edu.mines.jtk.util.*;
  * Samplings are often used to represent independent variables for sampled 
  * functions. They describe the values at which a function is sampled. For 
  * efficiency, and to guarantee a unique mapping from sample value to 
- * function value, we restrict samplings to be monotonic. That is, 
- * sample values strictly decrease or increase as sample index increases.
+ * function value, we restrict samplings to be strictly increasing. That 
+ * is, sample values strictly increase with increasing sample index.
+ * <p>
+ * Samplings are either uniform or non-uniform. Non-uniform samplings are
+ * represented by an array of sample values, stored in <em>float</em>
+ * precision. 
+ * <p>
+ * Uniform samplings are represented by three numbers: a sample count n, 
+ * a sampling interval d, and a first sample value f. The number d and f 
+ * are represented in <em>double</em> precision, so that they can safely 
+ * be used to compute sample values for thousands of samples, in loops 
+ * like this:
+ * <pre><code>
+ *   assert sampling.isUniform();
+ *   int n = sampling.getCount();
+ *   double d = sampling.getDelta();
+ *   double f = sampling.getFirst();
+ *   double x = f;
+ *   for (int i=0; i&lt;n; ++i,x+=d) {
+ *     // some calculation that uses the sample value x
+ *   }
+ * </code></pre>
+ * In each iteration of the loop above, the sample value x is computed
+ * by accumulating the sampling interval d. This is fast, but it also
+ * yields rounding error that can grow with the <em>square</em> of the 
+ * number of samples n. If x and d were computed and stored in float
+ * precision, then for, say, 10,000 samples, this rounding error could
+ * exceed the sampling interval d!
+ * <p>
+ * A more accurate and more costly alternative way to compute sample 
+ * values is as follows:
+ * <pre><code>
+ *   // ...
+ *   double x = f;
+ *   for (int i=0; i&lt;n; ++i,x=f+i*d) {
+ *     // some calculation that uses the sample value x
+ *   }
+ * </code></pre>
+ * With this computation of sample values, rounding errors can grow 
+ * only linearly with the number of samples n.
+ * <p>
+ * Two samplings are considered equal if their sample values are equal 
+ * to within <em>float</em> precision. If the samplings are uniform,
+ * their sample values are assumed to be computed as in the second
+ * (more accurate) loop above.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.03.01
+ * @version 2005.03.08
  */
 public class Sampling {
 
@@ -34,33 +77,34 @@ public class Sampling {
    * @param n the number (count) of samples.
    */
   public Sampling(int n) {
-    this(n,1.0f,0.0f);
+    this(n,1.0,0.0);
   }
 
   /**
    * Constructs a sampling with specified count, delta, and first value.
-   * @param n the number (count) of samples.
-   * @param d the sampling interval (delta).
+   * @param n the number (count) of samples; must be non-negative.
+   * @param d the sampling interval (delta); must be positive.
    * @param f the first sample value.
    */
-  public Sampling(int n, float d, float f) {
+  public Sampling(int n, double d, double f) {
     Check.argument(0<=n,"n is not less than zero");
+    Check.argument(0.0<d,"d is greater than zero");
     _n = n;
-    _d = (_n<2)?0.0f:d;
-    _f = (_n<1)?0.0f:f;
+    _d = (_n<2)?0.0:d;
+    _f = (_n<1)?0.0:f;
     _v = null;
   }
 
   /**
-   * Constructs a sampling from the specified array of values. The values 
-   * must be monotonic; i.e., strictly increasing or decreasing.
+   * Constructs a sampling from the specified array of values. 
+   * The values must be strictly increasing.
    * @param v the sampling values; copied, not referenced.
    */
   public Sampling(float[] v) {
-    Check.argument(Array.isMonotonic(v),"v is monotonic");
+    Check.argument(Array.isIncreasing(v),"v is increasing");
     _n = v.length;
-    _d = (_n<2)?0.0f:v[1]-v[0];
-    _f = (_n<1)?0.0f:v[0];
+    _d = (_n<2)?0.0:(v[1]-v[0])/(_n-1);
+    _f = (_n<1)?0.0:v[0];
     _v = (_n<2)?null:Array.copy(v);
   }
 
@@ -78,7 +122,7 @@ public class Sampling {
    * this sampling has fewer than two samples.
    * @return the sampling interval.
    */
-  public float getDelta() {
+  public double getDelta() {
     return _d;
   }
 
@@ -86,7 +130,7 @@ public class Sampling {
    * Gets the first sample value. Returns zero, if this sampling is empty.
    * @return the first sample value.
    */
-  public float getFirst() {
+  public double getFirst() {
     return _f;
   }
 
@@ -94,8 +138,8 @@ public class Sampling {
    * Gets the last sample value. Returns zero, if this sampling is empty.
    * @return the last sample value.
    */
-  public float getLast() {
-    return (_n==0)?0.0f:(_v!=null)?_v[_n-1]:_f+(_n-1)*_d;
+  public double getLast() {
+    return (_n==0)?0.0:(_v!=null)?_v[_n-1]:_f+(_n-1)*_d;
   }
 
   /**
@@ -103,13 +147,14 @@ public class Sampling {
    * @param i the index.
    * @return the sample value.
    */
-  public float getValue(int i) {
+  public double getValue(int i) {
     Check.index(_n,i);
     return (_v!=null)?_v[i]:_f+i*_d;
   }
 
   /**
-   * Gets the sample values.
+   * Gets the sample values. Note that these values are returned
+   * with float precision, whether or not the sampling is uniform.
    * @return the sample values; returned by copy, not by reference.
    */
   public float[] getValues() {
@@ -153,13 +198,69 @@ public class Sampling {
     double f = _v[0];
     double vi = f;
     for (int i=0; i<_n; ++i,vi+=d) {
-      if (_v[i]!=(float)vi)
+      if ((float)_v[i]!=(float)vi)
         return false;
     }
-    _d = (float)d;
-    _f = (float)f;
+    _d = d;
+    _f = f;
     _v = null;
     return true;
+  }
+
+  /**
+   * Returns the index of the sample with specified value.
+   * If this sampling has a sample value that (to within float precision) 
+   * equals the specified value, then this method returns the index of 
+   * that sample. Otherwise, this method returns -1.
+   * @param x the value.
+   * @return the index of the matching sample; -1, if none.
+   */
+  public int indexOf(double x) {
+    int i = -1;
+    if (isUniform()) {
+      int j = (int)Math.round((x-_f)/_d);
+      if (0<=j && j<_n && (float)x==(float)(_f+j*_d))
+        i = j;
+    } else {
+      int j = Array.binarySearch(_v,(float)x);
+      if (0<=j)
+        i = j;
+    }
+    return -1;
+  }
+
+  public int[] overlapWith(Sampling s) {
+    int[] i = null;
+    return i;
+  }
+
+  /**
+   * Returns the union of this sampling with the specified sampling. If 
+   * sample values overlap, merging is possible only if the overlapping 
+   * values match to within float precision. 
+   * <p> 
+   * If the samplings contain no overlapping sample values, then they can 
+   * always be merged; in this case, the merged sampling may be non-uniform, 
+   * even if this sampling and the specified sampling are both uniform.
+   * @param s the sampling to merge with this sampling.
+   * @return the merged sampling; null, if no merge is possible.
+   */
+  Sampling mergeWith(Sampling s) {
+    Sampling both = null;
+    /*
+    Sampling that = s;
+    double dThis = this.getDelta();
+    double dThat = that.getDelta();
+    float xfThis = (float)this.getFirst();
+    float xfThat = (float)that.getFirst();
+    float xlThis = (float)this.getLast();
+    float xlThat = (float)that.getLast();
+    if (xfThis<xfThat) {
+      int ilo = this.indexOf(xfThat);
+    int n = 0;
+    double d
+    */
+    return both;
   }
 
   public boolean equals(Object obj) {
@@ -168,16 +269,19 @@ public class Sampling {
     if (obj==null || this.getClass()!=obj.getClass())
       return false;
     Sampling that = (Sampling)obj;
-    if (isUniform()!=that.isUniform())
+    if (this.isUniform()!=that.isUniform())
       return false;
     if (isUniform()) {
-      return getCount()==that.getCount() &&
-             getDelta()==that.getDelta() &&
-             getFirst()==that.getFirst();
+      if (this.getCount()!=that.getCount())
+        return false;
+      float xfThis = (float)this.getFirst();
+      float xlThis = (float)this.getLast();
+      float xfThat = (float)that.getFirst();
+      float xlThat = (float)that.getLast();
+      return xfThis==xfThat && xlThis==xlThat;
     } else {
-      float[] tv = that._v;
       for (int i=0; i<_n; ++i) {
-        if (_v[i]!=tv[i])
+        if (_v[i]!=that.getValue(i))
           return false;
       }
       return true;
@@ -186,7 +290,9 @@ public class Sampling {
 
   public int hashCode() {
     if (isUniform()) {
-      return _n^Float.floatToIntBits(_d)^Float.floatToIntBits(_f);
+      long dl = Double.doubleToLongBits(_d);
+      long fl = Double.doubleToLongBits(_f);
+      return _n ^ (int)(dl^(dl>>>32)) ^ (int)(fl^(fl>>>32));
     } else {
       int hash = 0;
       for (int i=0; i<_n; ++i)
@@ -199,7 +305,7 @@ public class Sampling {
   // private
 
   int _n; // number of samples
-  float _d; // sampling interval
-  float _f; // value of first sample
+  double _d; // sampling interval
+  double _f; // value of first sample
   float[] _v; // array[n] of sample values; null, if uniform
 }
