@@ -31,5 +31,5 @@ Java_edu_mines_jves_opengl_Gl_getProcAddress(
 #elif defined(XWIN)
   void (*p)() = glXGetProcAddressARB(functionName);
 #endif
-  return (jlong)((intptr_t)p);
+  return (jlong)(intptr_t)p;
 }
