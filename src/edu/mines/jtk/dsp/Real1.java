@@ -64,6 +64,14 @@ public class Real1 {
    * Gets the sampling of x1 for this function.
    * @return the sampling x1.
    */
+  public Sampling getSampling() {
+    return _x1;
+  }
+
+  /**
+   * Gets the sampling of x1 for this function.
+   * @return the sampling x1.
+   */
   public Sampling getSampling1() {
     return _x1;
   }
@@ -197,25 +205,26 @@ public class Real1 {
   /**
    * Returns a sampled function with constant value.
    * @param n1 the number of samples.
-   * @param sa the constant value.
+   * @param ar the constant.
    * @return the sampled function.
    */
-  public static Real1 fill(int n1, float sa) {
-    return fill(new Sampling(n1),sa);
+  public static Real1 fill(int n1, double ar) {
+    return fill(new Sampling(n1),ar);
   }
 
   /**
    * Returns a sampled function with constant value.
    * @param x1 the sampling.
-   * @param sa the constant value.
+   * @param ar the constant.
    * @return the sampled function.
    */
-  public static Real1 fill(Sampling x1, float sa) {
+  public static Real1 fill(Sampling x1, double ar) {
     int n1 = x1.getCount();
     Real1 ra = new Real1(x1);
     float[] fa = ra.getF();
-    for (int i1=0; i1<n1; ++i1)
-      fa[i1] = sa;
+    float far = (float)ar;
+    while (--n1>=0)
+      fa[n1] = far;
     return ra;
   }
 
@@ -230,8 +239,8 @@ public class Real1 {
   public static Real1 ramp(int n1, double d1a, double f1a) {
     Real1 ra = new Real1(n1,1.0,0.0);
     float[] fa = ra.getF();
-    for (int i1=0; i1<n1; ++i1)
-      fa[i1] = (float)(f1a+i1*d1a);
+    while (--n1>=0)
+      fa[n1] = (float)(f1a+n1*d1a);
     return ra;
   }
 
