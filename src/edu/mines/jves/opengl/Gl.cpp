@@ -2909,3 +2909,517 @@ JNI_GL_BEGIN2
     (target,level,xoffset,yoffset,zoffset,x,y,width,height);
 JNI_GL_END
 
+/////////////////////////////////////////////////////////////////////////////
+// OpenGL 1.3
+
+JNI_GL_DECLARE2(glActiveTexture)
+  jint texture
+JNI_GL_BEGIN2
+  (*(PFNGLACTIVETEXTUREPROC)toPointer(pfunc))
+    (texture);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glClientActiveTexture)
+  jint texture
+JNI_GL_BEGIN2
+  (*(PFNGLCLIENTACTIVETEXTUREPROC)toPointer(pfunc))
+    (texture);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord1d)
+  jint target, jdouble s
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD1DPROC)toPointer(pfunc))
+    (target,s);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord1dv)
+  jint target, jdoubleArray jv
+JNI_GL_BEGIN2
+  JdoubleArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD1DVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord1f)
+  jint target, jfloat s
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD1FPROC)toPointer(pfunc))
+    (target,s);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord1fv)
+  jint target, jfloatArray jv
+JNI_GL_BEGIN2
+  JfloatArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD1FVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord1i)
+  jint target, jint s
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD1IPROC)toPointer(pfunc))
+    (target,s);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord1iv)
+  jint target, jintArray jv
+JNI_GL_BEGIN2
+  JintArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD1IVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord1s)
+  jint target, jshort s
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD1SPROC)toPointer(pfunc))
+    (target,s);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord1sv)
+  jint target, jshortArray jv
+JNI_GL_BEGIN2
+  JshortArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD1SVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord2d)
+  jint target, jdouble s, jdouble t
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD2DPROC)toPointer(pfunc))
+    (target,s,t);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord2dv)
+  jint target, jdoubleArray jv
+JNI_GL_BEGIN2
+  JdoubleArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD2DVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord2f)
+  jint target, jfloat s, jfloat t
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD2FPROC)toPointer(pfunc))
+    (target,s,t);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord2fv)
+  jint target, jfloatArray jv
+JNI_GL_BEGIN2
+  JfloatArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD2FVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord2i)
+  jint target, jint s, jint t
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD2IPROC)toPointer(pfunc))
+    (target,s,t);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord2iv)
+  jint target, jintArray jv
+JNI_GL_BEGIN2
+  JintArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD2IVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord2s)
+  jint target, jshort s, jshort t
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD2SPROC)toPointer(pfunc))
+    (target,s,t);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord2sv)
+  jint target, jshortArray jv
+JNI_GL_BEGIN2
+  JshortArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD2SVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord3d)
+  jint target, jdouble s, jdouble t, jdouble r
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD3DPROC)toPointer(pfunc))
+    (target,s,t,r);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord3dv)
+  jint target, jdoubleArray jv
+JNI_GL_BEGIN2
+  JdoubleArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD3DVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord3f)
+  jint target, jfloat s, jfloat t, jfloat r
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD3FPROC)toPointer(pfunc))
+    (target,s,t,r);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord3fv)
+  jint target, jfloatArray jv
+JNI_GL_BEGIN2
+  JfloatArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD3FVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord3i)
+  jint target, jint s, jint t, jint r
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD3IPROC)toPointer(pfunc))
+    (target,s,t,r);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord3iv)
+  jint target, jintArray jv
+JNI_GL_BEGIN2
+  JintArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD3IVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord3s)
+  jint target, jshort s, jshort t, jshort r
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD3SPROC)toPointer(pfunc))
+    (target,s,t,r);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord3sv)
+  jint target, jshortArray jv
+JNI_GL_BEGIN2
+  JshortArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD3SVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord4d)
+  jint target, jdouble s, jdouble t, jdouble r, jdouble q
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD4DPROC)toPointer(pfunc))
+    (target,s,t,r,q);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord4dv)
+  jint target, jdoubleArray jv
+JNI_GL_BEGIN2
+  JdoubleArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD4DVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord4f)
+  jint target, jfloat s, jfloat t, jfloat r, jfloat q
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD4FPROC)toPointer(pfunc))
+    (target,s,t,r,q);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord4fv)
+  jint target, jfloatArray jv
+JNI_GL_BEGIN2
+  JfloatArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD4FVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord4i)
+  jint target, jint s, jint t, jint r, jint q
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD4IPROC)toPointer(pfunc))
+    (target,s,t,r,q);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord4iv)
+  jint target, jintArray jv
+JNI_GL_BEGIN2
+  JintArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD4IVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord4s)
+  jint target, jshort s, jshort t, jshort r, jshort q
+JNI_GL_BEGIN2
+  (*(PFNGLMULTITEXCOORD4SPROC)toPointer(pfunc))
+    (target,s,t,r,q);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultiTexCoord4sv)
+  jint target, jshortArray jv
+JNI_GL_BEGIN2
+  JshortArray v(env,jv);
+  (*(PFNGLMULTITEXCOORD4SVPROC)toPointer(pfunc))
+    (target,v);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glLoadTransposeMatrixf)
+  jfloatArray jm
+JNI_GL_BEGIN2
+  JfloatArray m(env,jm);
+  (*(PFNGLLOADTRANSPOSEMATRIXFPROC)toPointer(pfunc))
+    (m);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glLoadTransposeMatrixd)
+  jdoubleArray jm
+JNI_GL_BEGIN2
+  JdoubleArray m(env,jm);
+  (*(PFNGLLOADTRANSPOSEMATRIXDPROC)toPointer(pfunc))
+    (m);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultTransposeMatrixf)
+  jfloatArray jm
+JNI_GL_BEGIN2
+  JfloatArray m(env,jm);
+  (*(PFNGLMULTTRANSPOSEMATRIXFPROC)toPointer(pfunc))
+    (m);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glMultTransposeMatrixd)
+  jdoubleArray jm
+JNI_GL_BEGIN2
+  JdoubleArray m(env,jm);
+  (*(PFNGLMULTTRANSPOSEMATRIXDPROC)toPointer(pfunc))
+    (m);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glSampleCoverage)
+  jfloat value, jboolean invert
+JNI_GL_BEGIN2
+  (*(PFNGLSAMPLECOVERAGEPROC)toPointer(pfunc))
+    (value,fromJava(invert));
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexImage3D__JIIIIIIII_3B)
+  jint target, jint level, jint internalformat,
+  jint width, jint height, jint depth, 
+  jint border, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXIMAGE3DPROC)toPointer(pfunc))
+    (target,level,internalformat,
+     width,height,depth,border,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexImage3D__JIIIIIIII_3I)
+  jint target, jint level, jint internalformat,
+  jint width, jint height, jint depth, 
+  jint border, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXIMAGE3DPROC)toPointer(pfunc))
+    (target,level,internalformat,
+     width,height,depth,border,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexImage3D__JIIIIIIII_3S)
+  jint target, jint level, jint internalformat,
+  jint width, jint height, jint depth, 
+  jint border, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXIMAGE3DPROC)toPointer(pfunc))
+    (target,level,internalformat,
+     width,height,depth,border,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexImage2D__JIIIIIII_3B)
+  jint target, jint level, jint internalformat,
+  jint width, jint height,
+  jint border, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXIMAGE2DPROC)toPointer(pfunc))
+    (target,level,internalformat,
+     width,height,border,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexImage2D__JIIIIIII_3I)
+  jint target, jint level, jint internalformat,
+  jint width, jint height,
+  jint border, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXIMAGE2DPROC)toPointer(pfunc))
+    (target,level,internalformat,
+     width,height,border,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexImage2D__JIIIIIII_3S)
+  jint target, jint level, jint internalformat,
+  jint width, jint height,
+  jint border, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXIMAGE2DPROC)toPointer(pfunc))
+    (target,level,internalformat,
+     width,height,border,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexImage1D__JIIIIII_3B)
+  jint target, jint level, jint internalformat,
+  jint width, jint border, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXIMAGE1DPROC)toPointer(pfunc))
+    (target,level,internalformat,
+     width,border,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexImage1D__JIIIIII_3I)
+  jint target, jint level, jint internalformat,
+  jint width, jint border, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXIMAGE1DPROC)toPointer(pfunc))
+    (target,level,internalformat,
+     width,border,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexImage1D__JIIIIII_3S)
+  jint target, jint level, jint internalformat,
+  jint width, jint border, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXIMAGE1DPROC)toPointer(pfunc))
+    (target,level,internalformat,
+     width,border,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexSubImage3D__JIIIIIIIIII_3B)
+  jint target, jint level, jint xoffset, jint yoffset, jint zoffset,
+  jint width, jint height, jint depth, jint format, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC)toPointer(pfunc))
+    (target,level,xoffset,yoffset,zoffset,
+     width,height,depth,format,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexSubImage3D__JIIIIIIIIII_3I)
+  jint target, jint level, jint xoffset, jint yoffset, jint zoffset,
+  jint width, jint height, jint depth, jint format, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC)toPointer(pfunc))
+    (target,level,xoffset,yoffset,zoffset,
+     width,height,depth,format,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexSubImage3D__JIIIIIIIIII_3S)
+  jint target, jint level, jint xoffset, jint yoffset, jint zoffset,
+  jint width, jint height, jint depth, jint format, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC)toPointer(pfunc))
+    (target,level,xoffset,yoffset,zoffset,
+     width,height,depth,format,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexSubImage2D__JIIIIIIII_3B)
+  jint target, jint level, jint xoffset, jint yoffset,
+  jint width, jint height, jint format, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC)toPointer(pfunc))
+    (target,level,xoffset,yoffset,
+     width,height,format,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexSubImage2D__JIIIIIIII_3I)
+  jint target, jint level, jint xoffset, jint yoffset,
+  jint width, jint height, jint format, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC)toPointer(pfunc))
+    (target,level,xoffset,yoffset,
+     width,height,format,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexSubImage2D__JIIIIIIII_3S)
+  jint target, jint level, jint xoffset, jint yoffset,
+  jint width, jint height, jint format, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXSUBIMAGE2DPROC)toPointer(pfunc))
+    (target,level,xoffset,yoffset,
+     width,height,format,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexSubImage1D__JIIIIII_3B)
+  jint target, jint level, jint xoffset,
+  jint width, jint format, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXSUBIMAGE1DPROC)toPointer(pfunc))
+    (target,level,xoffset,
+     width,format,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexSubImage1D__JIIIIII_3I)
+  jint target, jint level, jint xoffset,
+  jint width, jint format, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXSUBIMAGE1DPROC)toPointer(pfunc))
+    (target,level,xoffset,
+     width,format,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glCompressedTexSubImage1D__JIIIIII_3S)
+  jint target, jint level, jint xoffset,
+  jint width, jint format, jint imageSize, jarray jdata
+JNI_GL_BEGIN2
+  JvoidArray data(env,jdata);
+  (*(PFNGLCOMPRESSEDTEXSUBIMAGE1DPROC)toPointer(pfunc))
+    (target,level,xoffset,
+     width,format,imageSize,data);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glGetCompressedTexImage__JII_3B)
+  jint target, jint level, jarray jimg
+JNI_GL_BEGIN2
+  JvoidArray img(env,jimg);
+  (*(PFNGLGETCOMPRESSEDTEXIMAGEPROC)toPointer(pfunc))
+    (target,level,img);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glGetCompressedTexImage__JII_3I)
+  jint target, jint level, jarray jimg
+JNI_GL_BEGIN2
+  JvoidArray img(env,jimg);
+  (*(PFNGLGETCOMPRESSEDTEXIMAGEPROC)toPointer(pfunc))
+    (target,level,img);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glGetCompressedTexImage__JII_3S)
+  jint target, jint level, jarray jimg
+JNI_GL_BEGIN2
+  JvoidArray img(env,jimg);
+  (*(PFNGLGETCOMPRESSEDTEXIMAGEPROC)toPointer(pfunc))
+    (target,level,img);
+JNI_GL_END
+
+/////////////////////////////////////////////////////////////////////////////
+// OpenGL 1.4
+
+/*
+*/
+
+/////////////////////////////////////////////////////////////////////////////
+// OpenGL 1.5

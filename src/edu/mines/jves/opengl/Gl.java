@@ -2498,8 +2498,7 @@ public class Gl {
     int width, int height, int depth, int border, int imageSize, int[] data);
   private static native void nglCompressedTexImage3D(long pfunc,
     int target, int level, int internalformat,
-    int width, int height, int depth, int border, int imageSize, short[]
-    data);
+    int width, int height, int depth, int border, int imageSize, short[] data);
   private static native void nglCompressedTexImage2D(long pfunc,
     int target, int level, int internalformat,
     int width, int height, int border, int imageSize, byte[] data);
@@ -2526,8 +2525,7 @@ public class Gl {
     int width, int height, int depth, int format, int imageSize, int[] data);
   private static native void nglCompressedTexSubImage3D(long pfunc,
     int target, int level, int xoffset, int yoffset, int zoffset, 
-    int width, int height, int depth, int format, int imageSize, short[]
-    data);
+    int width, int height, int depth, int format, int imageSize, short[] data);
   private static native void nglCompressedTexSubImage2D(long pfunc,
     int target, int level, int xoffset, int yoffset, 
     int width, int height, int format, int imageSize, byte[] data);
