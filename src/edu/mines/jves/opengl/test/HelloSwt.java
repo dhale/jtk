@@ -58,7 +58,7 @@ public class HelloSwt {
     Shell shell = new Shell(display);
     shell.setLayout(new FillLayout());
     shell.setSize(800,800);
-    MyCanvas canvas = new MyCanvas(shell,SWT.NONE);
+    MyCanvas canvas = new MyCanvas(shell,SWT.NO_BACKGROUND);
     canvas.setBackground(display.getSystemColor(SWT.COLOR_BLUE));
     canvas.setForeground(display.getSystemColor(SWT.COLOR_RED));
     shell.layout();

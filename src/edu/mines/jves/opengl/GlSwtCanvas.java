@@ -30,7 +30,6 @@ public abstract class GlSwtCanvas extends Canvas {
     _context = new GlContext(this);
     addPaintListener(new PaintListener() {
       public void paintControl(PaintEvent e) {
-        e.gc.drawText("Hello world",50,50);
         paint(e);
       }
     });

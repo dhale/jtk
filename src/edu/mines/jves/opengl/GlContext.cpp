@@ -180,7 +180,6 @@ public:
       glXWaitGL();
       glXMakeCurrent(_display,None,0);
     }
-    XFlush(_display);
   }
   virtual jboolean swapBuffers(JNIEnv*) {
     glXSwapBuffers(_display,_drawable);
