@@ -74,8 +74,8 @@ public class AxisTics {
     double xmax = _xmax = max(x1,x2);
     xmin -= (xmax-xmin)*100*DBL_EPSILON;
     xmax += (xmax-xmin)*100*DBL_EPSILON;
-    if (ntic<=0)
-      ntic = 1;
+    int nmax = (ntic>=2)?ntic:2;
+    double dmax = (xmax-xmin)/(nmax-1);
     int nmult = _mult.length;
     int nbest = 0;
     int mbest = 0;
@@ -83,12 +83,15 @@ public class AxisTics {
     double fbest = 0.0;
     for (int imult=0; imult<nmult; ++imult) {
       int m = _mult[imult];
-      int l = (int)(log10((xmax-xmin)/(m*ntic)));
+      int l = (int)floor(log10(dmax/m));
       double d = m*pow(10.0,l);
-      double f = ((int)(xmin/d)-1)*d;
-      while (f<xmin)
-        f += d;
-      int n = 1+(int)((xmax-f)/d);
+      double f = ceil(xmin/d)*d;
+      int n = 1+(int)((xmax-xmin)/d);
+      if (n>nmax) {
+        d *= 10;
+        f = ceil(xmin/d)*d;
+        n = 1+(int)((xmax-xmin)/d);
+      }
       if (nbest<n && n<=ntic) {
         nbest = n;
         mbest = m;
@@ -96,9 +99,8 @@ public class AxisTics {
         fbest = f;
       }
     }
-    if (mbest==1)
-      mbest = 10;
-    if (nbest<=1) {
+    nbest = 1+(int)((xmax-fbest)/dbest);
+    if (nbest<2) {
       _ntic = 2;
       _dtic = _xmax-_xmin;
       _ftic = _xmin;
@@ -183,7 +185,7 @@ public class AxisTics {
   private double _dticMinor;
   private double _fticMinor;
 
-  private static final int[] _mult = {1,2,5,10};
+  private static final int[] _mult = {2,5,10};
 
   private void computeMultiple() {
     _mtic = 1;
