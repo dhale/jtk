@@ -44,6 +44,20 @@ public class RapTest extends TestCase {
     assertTrue(Rap.equal(rx,Rap.div(Rap.mul(rx,rx),rx)));
     assertTrue(Rap.equal(rx,Rap.div(Rap.mul(rx,ra),ra)));
     assertTrue(Rap.equal(Rap.fill(ra,n1,n2,n3),Rap.div(Rap.mul(ra,rx),rx)));
+
+    rx = Rap.ramp(ra,rb1,rb2,rb3,n1,n2,n3);
+    int[] imax = {-1,-1,-1};
+    float rmax = Rap.findMax(rx,imax);
+    assertTrue(rmax==rx[n3-1][n2-1][n1-1]);
+    assertEquals(n1-1,imax[0]);
+    assertEquals(n2-1,imax[1]);
+    assertEquals(n3-1,imax[2]);
+    int[] imin = {-1,-1,-1};
+    float rmin = Rap.findMin(rx,imin);
+    assertTrue(rmin==rx[0][0][0]);
+    assertEquals(0,imin[0]);
+    assertEquals(0,imin[1]);
+    assertEquals(0,imin[2]);
   }
 
   private void printError(float[][][] rx, float[][][] ry) {
