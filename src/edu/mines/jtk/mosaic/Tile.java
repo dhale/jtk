@@ -12,7 +12,29 @@ import java.util.*;
 import javax.swing.*;
 
 /**
- * A tile in a mosaic.
+ * A tile in a mosaic contains a list of tiled views. A tile coordinates
+ * changes to its tiled views and its view rectangle with other tiles
+ * in its mosaic.
+ * <p>
+ * Each tile has a horizontal projector and a vertical projector. These 
+ * map world coordinates to and from normalized coordinates. The mosaic 
+ * aligns its tiles such that all tiles in the same column share the same 
+ * horizontal projector, and all tiles in the same row share the same 
+ * vertical projector.
+ * <p>
+ * A tile's view rectangle represents a subset of a unit square; i.e., the
+ * view rectangle is in normalized coordinates. Setting the view rectangle 
+ * of a tile causes the view rectangle to be set accordingly in all tiles 
+ * in the same column and row of the mosaic. To zoom or scroll a tile, 
+ * change its view rectangle.
+ * <p>
+ * A tile's transcaler maps normalized coordinates to and from device 
+ * coordinates. When unzoomed (by default), the tile's transcaler maps
+ * normalized coordinates (0.0,0.0) to device coordinates (0,0) and 
+ * normalized coordinates (1.0,1.0) to device coordinates (width-1,height-1),
+ * where width and height represent the size of the tile. The transcaler
+ * changes when either its size or its view rectangle is changed.
+ * 
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.27
  */
@@ -128,27 +150,19 @@ public class Tile extends JPanel {
   /**
    * Sets the view rectangle for this tile. The view rectangle represents
    * the subset of normalized coordinate space that is displayed in this 
-   * tile. Setting the view rectangle may cause the tile to zoom or scroll.
-   * <p>
-   * If this tile is in a mosaic, calling this method will cause the mosaic 
-   * to set the view rectangles of any other tiles in the same row or column 
-   * to be consistent with this tile.
+   * tile. Setting the view rectangle may zoom or scroll this tile.
    * @param vr the view rectangle.
    */
   public void setViewRectangle(DRectangle vr) {
-    if (_mosaic!=null) {
-      _mosaic.setViewRectangleInternal(this,vr);
-    } else {
-      setViewRectangleInternal(vr);
-    }
+    _mosaic.setViewRect(this,vr);
   }
 
-  // We override this method so that we can update our transcaler.
-  // We assume that this is the *only* way that our size changes.
-  // Also, we assume that a repaint is already pending.
+  // We override this method so that we can update our transcaler. We assume 
+  // that this is the *only* way that our size changes. Also, we assume that 
+  // a repaint is already pending, so we need not request one here.
   public void setBounds(int x, int y, int width, int height) {
     super.setBounds(x,y,width,height);
-    _ts.setMapping(0,width-1,0,height-1);
+    _ts.setMapping(width,height);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -167,6 +181,10 @@ public class Tile extends JPanel {
     int y = height/2+sh/2;
     g.setColor(Color.BLACK);
     g.drawString("Tile",x,y);
+    for (TiledView tv : _tvs) {
+      Graphics2D g2d = (Graphics2D)g.create();
+      tv.paint(g2d);
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -225,17 +243,13 @@ public class Tile extends JPanel {
    */
   void alignProjectors() {
     updateBestProjectors();
-    if (_mosaic!=null) {
-      _mosaic.alignProjectors(this);
-    } else {
-      setProjectors(_bhp,_bvp);
-    }
+    _mosaic.alignProjectors(this);
   }
 
   /**
-   * Called by this tile's mosaic or, if no mosaic, by this tile.
+   * Called by this tile's mosaic.
    */
-  void setViewRectangleInternal(DRectangle vr) {
+  void setViewRect(DRectangle vr) {
     _vr = vr.clone();
     _vr.x = max(0.0,min(1.0,_vr.x));
     _vr.y = max(0.0,min(1.0,_vr.y));

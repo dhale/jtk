@@ -12,7 +12,8 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 /**
- * A mosaic of tiles.
+ * A mosaic of tiles and tile axes. A mosaic manages the geometry (layout)
+ * and the world and normalized coordinate systems of its tiles.
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.27
  */
@@ -90,22 +91,64 @@ public class Mosaic extends JPanel {
     }
   }
 
+  /**
+   * Returns the number of rows of tiles in this mosaic.
+   * @return the number of rows.
+   */
+  public int countRows() {
+    return _nrow;
+  }
+
+  /**
+   * Returns the number of columns of tiles in this mosaic.
+   * @return the number of columns.
+   */
+  public int countColumns() {
+    return _ncol;
+  }
+
+  /**
+   * Gets the tile with specified row and column indices.
+   * @param irow the row index.
+   * @param icol the column index.
+   * @return the tile.
+   */
   public Tile getTile(int irow, int icol) {
     return _tiles[irow][icol];
   }
 
+  /**
+   * Gets the top tile axis with specified column index.
+   * @param icol the column index.
+   * @return the axis; null, if none.
+   */
   public TileAxis getTileAxisTop(int icol) {
     return (_axesTop!=null)?_axesTop[icol]:null;
   }
 
+  /**
+   * Gets the left tile axis with specified row index.
+   * @param irow the row index.
+   * @return the axis; null, if none.
+   */
   public TileAxis getTileAxisLeft(int irow) {
     return (_axesLeft!=null)?_axesLeft[irow]:null;
   }
 
+  /**
+   * Gets the bottom tile axis with specified column index.
+   * @param icol the column index.
+   * @return the axis; null, if none.
+   */
   public TileAxis getTileAxisBottom(int icol) {
     return (_axesBottom!=null)?_axesBottom[icol]:null;
   }
 
+  /**
+   * Gets the right tile axis with specified row index.
+   * @param irow the row index.
+   * @return the axis; null, if none.
+   */
   public TileAxis getTileAxisRight(int irow) {
     return (_axesRight!=null)?_axesRight[irow]:null;
   }
@@ -160,6 +203,7 @@ public class Mosaic extends JPanel {
     _he[irow] = heightElastic;
   }
 
+  // Override base class implementation.
   public Dimension getMinimumSize() {
     if (isMinimumSizeSet()) {
       return super.getMinimumSize();
@@ -168,6 +212,7 @@ public class Mosaic extends JPanel {
     }
   }
 
+  // Override base class implementation; ignore any layout manager.
   public void doLayout() {
 
     // Extra width and height to fill; zero, if no extra space.
@@ -291,7 +336,31 @@ public class Mosaic extends JPanel {
 
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
-    doPaint(g);
+
+    // Tiles.
+    for (int irow=0; irow<_nrow; ++irow) {
+      for (int icol=0; icol<_ncol; ++icol) {
+        paintBorder(g,_tiles[irow][icol]);
+      }
+    }
+
+    // Axes.
+    if (_axesTop!=null) {
+      for (int icol=0; icol<_ncol; ++icol)
+        paintBorder(g,_axesTop[icol]);
+    }
+    if (_axesLeft!=null) {
+      for (int irow=0; irow<_nrow; ++irow)
+        paintBorder(g,_axesLeft[irow]);
+    }
+    if (_axesBottom!=null) {
+      for (int icol=0; icol<_ncol; ++icol)
+        paintBorder(g,_axesBottom[icol]);
+    }
+    if (_axesRight!=null) {
+      for (int irow=0; irow<_nrow; ++irow)
+        paintBorder(g,_axesRight[irow]);
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -325,13 +394,13 @@ public class Mosaic extends JPanel {
     validate();
   }
 
-  void setViewRectangleInternal(Tile tile, DRectangle vr) {
+  void setViewRect(Tile tile, DRectangle vr) {
     double x = max(0.0,min(1.0,vr.x));
     double y = max(0.0,min(1.0,vr.y));
     double w = max(0.0,min(1.0-vr.x,vr.width));
     double h = max(0.0,min(1.0-vr.y,vr.height));
     DRectangle tr = new DRectangle(x,y,w,h);
-    tile.setViewRectangleInternal(tr);
+    tile.setViewRect(tr);
     int jrow = tile.getRowIndex();
     int jcol = tile.getColumnIndex();
     for (int irow=0; irow<_nrow; ++irow) {
@@ -380,34 +449,6 @@ public class Mosaic extends JPanel {
   private void repaintAxis(TileAxis[] axes, int index) {
     if (axes!=null)
       axes[index].repaint();
-  }
-
-  private void doPaint(Graphics g) {
-
-    // Tiles.
-    for (int irow=0; irow<_nrow; ++irow) {
-      for (int icol=0; icol<_ncol; ++icol) {
-        paintBorder(g,_tiles[irow][icol]);
-      }
-    }
-
-    // Axes.
-    if (_axesTop!=null) {
-      for (int icol=0; icol<_ncol; ++icol)
-        paintBorder(g,_axesTop[icol]);
-    }
-    if (_axesLeft!=null) {
-      for (int irow=0; irow<_nrow; ++irow)
-        paintBorder(g,_axesLeft[irow]);
-    }
-    if (_axesBottom!=null) {
-      for (int icol=0; icol<_ncol; ++icol)
-        paintBorder(g,_axesBottom[icol]);
-    }
-    if (_axesRight!=null) {
-      for (int irow=0; irow<_nrow; ++irow)
-        paintBorder(g,_axesRight[irow]);
-    }
   }
 
   private void paintBorder(Graphics g, Tile tile) {

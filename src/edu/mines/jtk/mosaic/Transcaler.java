@@ -39,7 +39,18 @@ public class Transcaler {
    * rounded to the nearest integer.
    */
   public Transcaler() {
-    this(0.0,1.0,0.0,1.0,0,1,0,1);
+    this(0.0,0.0,1.0,1.0,0,0,1,1);
+  }
+
+  /**
+   * Constructs a transcaler with specified device width and height.
+   * Maps user coordinates (0.0,0.0) to device coordinates (0,0) and
+   * user coordinates (1.0,1.0) to device coordinates (width-1,height-1).
+   * @param width the width, in device coordinates.
+   * @param height the height, in device coordinates.
+   */
+  public Transcaler(int width, int height) {
+    this(0.0,0.0,1.0,1.0,0,0,width-1,height-1);
   }
 
   /**
@@ -102,6 +113,15 @@ public class Transcaler {
   public void setMapping(int x1d, int y1d, int x2d, int y2d) {
     _x1d = x1d;  _x2d = x2d;  _y1d = y1d;  _y2d = y2d;
     computeShiftAndScale();
+  }
+
+  /**
+   * Sets the device-coordinate width and height. Maps the current user
+   * coordinates (x1u,y1u) to device coordinates (0,0) and user coordinates
+   * (x2u,y2u) to device coordinates (width-1,height-1).
+   */
+  public void setMapping(int width, int height) {
+    setMapping(0,0,width-1,height-1);
   }
 
   /**

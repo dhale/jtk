@@ -9,17 +9,27 @@ package edu.mines.jtk.mosaic;
 import java.awt.*;
 
 /**
- * A tiled view in a tile.
+ * A tiled view in a tile. To paint something in a tile, classes extend 
+ * and use the methods of this abstract base class.
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.28
  */
 public abstract class TiledView {
 
   /**
-   * Paints this tiled view.
-   * @param g the graphics.
+   * Paints this tiled view. This method is implemented by classes that 
+   * extend this abstract base class. Implementations may modify the
+   * specified graphics context freely. Such modifications will not affect
+   * the paintings of other tiled views in the same tile or mosaic. 
+   * <p>
+   * Tiled views should <em>not</em> replace (set) entirely the transform 
+   * in the specified graphics context. This transform may already have
+   * been set by the tile or its mosaic. Therefore, tiled views should 
+   * modify this transform only by specifying <em>additional</em> scaling,
+   * translation, etc.
+   * @param g2d the graphics context in which to paint.
    */
-  public abstract void paint(Graphics g);
+  public abstract void paint(Graphics2D g2d);
 
   /**
    * Gets the tile that contains this tiled view.
@@ -37,7 +47,7 @@ public abstract class TiledView {
    * @return the horizontal projector; null, if none.
    */
   public Projector getHorizontalProjector() {
-    return _tile.getHorizontalProjector();
+    return (_tile!=null)?_tile.getHorizontalProjector():null;
   }
 
   /**
@@ -48,7 +58,7 @@ public abstract class TiledView {
    * @return the vertical projector; null, if none.
    */
   public Projector getVerticalProjector() {
-    return _tile.getVerticalProjector();
+    return (_tile!=null)?_tile.getVerticalProjector():null;
   }
 
   /**
@@ -59,7 +69,7 @@ public abstract class TiledView {
    * @return the transcaler; null, if none.
    */
   public Transcaler getTranscaler() {
-    return _tile.getTranscaler();
+    return (_tile!=null)?_tile.getTranscaler():null;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -99,7 +109,7 @@ public abstract class TiledView {
   }
 
   /**
-   * Called by the tile when this tiled view is added/removed to/from it.
+   * Called by the tile when this tiled view is added or removed.
    */
   void setTile(Tile tile) {
     _tile = tile;
