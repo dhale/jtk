@@ -87,6 +87,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <libarg arg="-L/usr/X11R6/lib"/>
       <libarg arg="-lGL"/>
       <libarg arg="-lGLU"/>
+      <libarg arg="-L${jre.lib}"/>
+      <libarg arg="-ljawt"/>
     </jnicpp>
     <jnicpp 
         srcdir="${src.jves}/opengl" 
