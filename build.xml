@@ -81,6 +81,17 @@
       <libarg arg="-lGL"/>
       <libarg arg="-lGLU"/>
     </jnicpp>
+    <jnicpp 
+        srcdir="${src.jves}/opengl" 
+        objdir="${obj.jves}/opengl"
+        jnidir="${build.jni}" 
+        jniname="edu_mines_jves_opengl">
+      <incarg arg="-I${jdk.include}"/>
+      <incarg arg="-I${jdk.include}/linux"/>
+      <libarg arg="-L/usr/X11R6/lib"/>
+      <libarg arg="-lGL"/>
+      <libarg arg="-lGLU"/>
+    </jnicpp>
   </target>
 
   <!-- Build JNI libraries for Windows -->
