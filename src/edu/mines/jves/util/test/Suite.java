@@ -16,7 +16,11 @@ import junit.framework.*;
 public class Suite extends TestCase {
   public static void main(String[] args) {
     TestSuite suite = new TestSuite();
+
+    suite.addTestSuite(ComplexTest.class);
+    suite.addTestSuite(MTest.class);
     suite.addTestSuite(StopwatchTest.class);
+
     junit.textui.TestRunner.run(suite);
   }
 }
