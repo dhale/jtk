@@ -214,7 +214,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <mkdir dir="${dist}/lib"/>
     <mkdir dir="${dist}/src"/>
     <copy todir="${dist}" file="license.txt"/>
-    <copy todir="${dist}" file="README.txt"/>
+    <copy todir="${dist}" file="readme.txt"/>
     <copy todir="${dist}/doc">
       <fileset dir="${build.doc}"/>
     </copy>
@@ -233,10 +233,22 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     </copy>
   </target>
   <target name="dist-linux" depends="all,doc" if="linux">
+    <copy todir="${dist}/bin">
+      <fileset dir="${bin}" includes="javarun.sh"/>
+    </copy>
+    <copy todir="${dist}/lib">
+      <fileset dir="${lib}/linux/x86"/>
+    </copy>
+    <copy todir="${dist}/jar">
+      <fileset dir="${jar}/linux/x86"/>
+    </copy>
+    <tar destfile="${dist}/${title}_${DSTAMP}_${TSTAMP}.tar.gz"
+         compression="gzip">
+      <tarfileset dir="${dist}" prefix="${title}"/>
+    </tar>
   </target>
   <target name="dist-windows" depends="all,doc" if="windows">
     <copy todir="${dist}/bin">
-      <fileset dir="${bin}" includes="antrun.bat"/>
       <fileset dir="${bin}" includes="javarun.bat"/>
     </copy>
     <copy todir="${dist}/lib">
