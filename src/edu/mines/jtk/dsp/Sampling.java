@@ -43,8 +43,8 @@ import edu.mines.jtk.util.*;
  * precision, then for, say, 10,000 samples, this rounding error could
  * exceed the sampling interval d!
  * <p>
- * A more accurate and more costly alternative way to compute sample 
- * values is as follows:
+ * A more accurate and more costly way to compute sample values is as 
+ * follows:
  * <pre><code>
  *   // ...
  *   double x = f;
@@ -230,33 +230,34 @@ public class Sampling {
   }
 
   /**
-   * Determines any overlap between this and the specified sampling.
-   * Both this sampling and the specified sampling have a first-to-last 
-   * range of sample values. This method determines whether those ranges 
-   * overlap, and, if they do, whether the sample values in the overlapping 
-   * region are identical.
-   * <p>
-   * The overlap is a contiguous set of samples that have the same sample 
-   * values. This set is represented by an array of three ints: {n,it,is},
-   * where n is the number of overlapping samples, and it and is are the
-   * indices of the first samples in the overlapping region for this 
-   * sampling (t) and the specified sampling (s). 
-   * <p>
-   * There exist three cases:
-   * <ol><li>
-   * the ranges of sample values overlap, and the sample values in
-   * the overlapping region are consistent. In this case, this method
-   * returns the array {n,it,is}, as described above.
+   * Determines the overlap between this sampling and the specified sampling.
+   * Both the specified sampling and this sampling represent a first-to-last
+   * range of sample values. The overlap is a contiguous set of samples that 
+   * have the same values. This set is represented by an array of three ints,
+   * {n,it,is}, where n is the number of overlapping samples, and it and is 
+   * are the indices of the first samples in the overlapping parts of this 
+   * sampling (t) and the specified sampling (s). There exist three cases.
+   * <ul><li>
+   * The ranges of sample values overlap, and the sample values in the 
+   * overlapping parts are consistent. In this case, the two samplings are
+   * compatible; and this method returns the array {n,it,is}, as described 
+   * above.
    * </li><li>
-   * the ranges of sample values in the two samplings do not overlap.
-   * In this case, this method returns either {0,nt,-1} or {0,-1,ns}.
+   * The ranges of sample values in the two samplings do not overlap.
+   * In this case, the two samplings are compatible; and this method 
+   * returns either {0,nt,0} or {0,0,ns}, depending on whether all
+   * sample values in this sampling are less than or greater than
+   * those in the specified sampling, respectively.
    * </li><li>
-   * the ranges of sample values overlap, but the sample values in the 
-   * overlapping region are inconsistent. In this case, this method
-   * returns null.
-   * </li></ol>
+   * The ranges of sample values overlap, but the sample values in the 
+   * overlapping parts are inconsistent. In this case, the two samplings
+   * are incompatible; and this method returns null.
+   * </li></ul>
+   * @param s the sampling to compare with this sampling.
+   * @return the array {n,it,is} that describes the overlap; null, if 
+   *  the specified sampling is incompatible with this sampling.
    */
-  private int[] overlapWith(Sampling s) {
+  public int[] overlapWith(Sampling s) {
     Sampling t = this;
     int nt = t.getCount();
     int ns = s.getCount();
@@ -266,50 +267,51 @@ public class Sampling {
     float sl = (float)s.getLast();
     int it = 0;
     int is = 0;
-    if (tf<sf) {
-      it = t.indexOf(sf);
-    } else {
-      is = s.indexOf(tf);
-    }
-    if (it<0 || is<0)
-      return new int[]{0,0,0};
     int jt = nt-1;
     int js = ns-1;
-    if (tl<sl) {
-      js = s.indexOf(tl);
+    if (tl<sf) {
+      return new int[]{0,nt,0};
+    } else if (sl<tf) {
+      return new int[]{0,0,ns};
     } else {
-      jt = t.indexOf(sl);
-    }
-    if (jt<0 || js<0)
-      return new int[]{0,0,0};
-    int mt = 1+jt-it;
-    int ms = 1+js-is;
-    if (mt!=ms)
-      return null;
-    if (!t.isUniform() || !s.isUniform()) {
-      for (jt=it,js=is; jt!=mt; ++jt,++js) {
-        float xt = (float)t.getValue(jt);
-        float xs = (float)s.getValue(js);
-        if (xt!=xs)
-          return null;
+      if (tf<sf) {
+        it = t.indexOf(sf);
+      } else {
+        is = s.indexOf(tf);
       }
+      if (it<0 || is<0)
+        return null;
+      if (tl<sl) {
+        js = s.indexOf(tl);
+      } else {
+        jt = t.indexOf(sl);
+      }
+      if (jt<0 || js<0)
+        return null;
+      int mt = 1+jt-it;
+      int ms = 1+js-is;
+      if (mt!=ms)
+        return null;
+      if (!t.isUniform() || !s.isUniform()) {
+        for (jt=it,js=is; jt!=mt; ++jt,++js) {
+          float xt = (float)t.getValue(jt);
+          float xs = (float)s.getValue(js);
+          if (xt!=xs)
+            return null;
+        }
+      }
+      return new int[]{mt,it,is};
     }
-    return new int[]{mt,it,is};
   }
 
   /**
-   * Returns the union of this sampling with the specified sampling. If 
-   * the first-to-last ranges of sample values in the two samplings overlap, 
-   * then merging is possible only if all sample values in the overlapping
-   * range match to within float precision.
-   * <p> 
-   * If the first-to-last ranges of sample values do not overlap, then the 
-   * samplings can always be merged; in this case, the returned sampling
-   * may be non-uniform, even if the two samplings are both uniform.
+   * Returns the union of this sampling with the specified sampling. This
+   * union is possible if and only if the two samplings are compatible.
    * @param s the sampling to merge with this sampling.
    * @return the merged sampling; null, if no merge is possible.
+   * @see #overlapWith(Sampling)
    */
-  Sampling mergeWith(Sampling s) {
+  public Sampling mergeWith(Sampling s) {
     Sampling t = this;
     int[] overlap = t.overlapWith(s);
     if (overlap==null)
@@ -320,41 +322,24 @@ public class Sampling {
     int nt = t.getCount();
     int ns = s.getCount();
     int nm = nt+ns-n;
-    if (n==0) {
+    if (t.isUniform() && s.isUniform()) {
+      double dm = t.getDelta();
+      double fm = (it==0)?s.getFirst():t.getFirst();
+      return new Sampling(nm,dm,fm);
+    } else {
       float[] vm = new float[nm];
       int jm = 0;
-      if (s.getFirst()<t.getFirst()) {
-        for (int js=0; js<ns; ++js)
-          vm[jm++] = (float)s.getValue(js);
-        for (int jt=0; jt<nt; ++jt)
-          vm[jm++] = (float)t.getValue(jt);
-      } else {
-        for (int jt=0; jt<nt; ++jt)
-          vm[jm++] = (float)t.getValue(jt);
-        for (int js=0; js<ns; ++js)
-          vm[jm++] = (float)s.getValue(js);
-      }
+      for (int jt=0; jt<it; ++jt)
+        vm[jm++] = (float)t.getValue(jt);
+      for (int js=0; js<is; ++js)
+        vm[jm++] = (float)s.getValue(js);
+      for (int jt=it; jt<it+n; ++jt)
+        vm[jm++] = (float)t.getValue(jt);
+      for (int jt=it+n; jt<nt; ++jt)
+        vm[jm++] = (float)t.getValue(jt);
+      for (int js=is+n; js<ns; ++js)
+        vm[jm++] = (float)s.getValue(js);
       return new Sampling(vm);
-    } else {
-      if (t.isUniform() && s.isUniform()) {
-        double dm = t.getDelta();
-        double fm = (it==0)?s.getFirst():t.getFirst();
-        return new Sampling(nm,dm,fm);
-      } else {
-        float[] vm = new float[nm];
-        int jm = 0;
-        for (int jt=0; jt<it; ++jt)
-          vm[jm++] = (float)t.getValue(jt);
-        for (int js=0; js<is; ++js)
-          vm[jm++] = (float)s.getValue(js);
-        for (int jt=it; jt<it+n; ++jt)
-          vm[jm++] = (float)t.getValue(jt);
-        for (int jt=it+n; jt<nt; ++jt)
-          vm[jm++] = (float)t.getValue(jt);
-        for (int js=is+n; js<ns; ++js)
-          vm[jm++] = (float)s.getValue(js);
-        return new Sampling(vm);
-      }
     }
   }
 
