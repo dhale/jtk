@@ -16,7 +16,7 @@ import edu.mines.jtk.util.*;
 import edu.mines.jtk.mosaic.*;
 
 /**
- * Test {@link edu.mines.jtk.LollipopViewTest} and associates.
+ * Test {@link edu.mines.jtk.mosaic.LollipopView} and associates.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.01.01
  */

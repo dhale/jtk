@@ -158,8 +158,6 @@ public abstract class Mode extends AbstractAction {
   /**
    * Constructs a mode with specified manager, name, and icon.
    * @param manager the manager.
-   * @param name the name.
-   * @param icon the icon.
    */
   protected Mode(ModeManager manager) {
     manager.add(this);
@@ -187,7 +185,7 @@ public abstract class Mode extends AbstractAction {
    * this method for all of its components. Implementations of this method
    * should do nothing for components for which the mode is inapplicable.
    * @param component the component for which to enable the mode.
-   * @param enabled true, to enable; false, to disable.
+   * @param active true, to activate; false, to deactivate.
    */
   protected abstract void setActive(Component component, boolean active);
 

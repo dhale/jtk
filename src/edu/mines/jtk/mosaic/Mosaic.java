@@ -757,8 +757,6 @@ public class Mosaic extends JPanel {
         public void adjustmentValueChanged(AdjustmentEvent ae) {
           if (_settingInternal)
             return;
-          double v = getV();
-          double e = getE();
           DRectangle vr = tile.getViewRectangle();
           if (getOrientation()==HORIZONTAL) {
             vr.x = getV();

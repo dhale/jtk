@@ -220,7 +220,6 @@ public class TileZoomMode extends Mode {
 
       // Draw zoom in other tiles and axes in this axis's row or column.
       Mosaic mosaic = axis.getMosaic();
-      int index = axis.getIndex();
       if (axis.isHorizontal()) {
         int jcol = axis.getIndex();
         int nrow = mosaic.countRows();
