@@ -21,11 +21,20 @@ import edu.mines.jves.util.Stopwatch;
 public class AwtBench {
 
   public static void main(String[] args) {
-    testNative();
+    testNativeJFrame();
+    //testNativeFrame();
     //benchPrimitives();
   }
 
-  private static void testNative() {
+  private static void testNativeJFrame() {
+    JFrame frame = new JFrame();
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setSize(new Dimension(500,200));
+    frame.getContentPane().add(new NativeCanvas());
+    frame.setVisible(true);
+  }
+
+  private static void testNativeFrame() {
     Frame frame = new Frame();
     frame.setBounds(100,100,500,200);
     frame.add(new NativeCanvas());
@@ -36,6 +45,7 @@ public class AwtBench {
     });
     frame.show();
   }
+
   private static class NativeCanvas extends Canvas {
     public void paint(Graphics g) {
       paintNative(this);

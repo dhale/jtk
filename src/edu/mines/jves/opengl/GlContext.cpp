@@ -26,55 +26,56 @@ class GlContext {
 public:
   virtual ~GlContext() {
   }
-  virtual jboolean lock(JNIEnv* env) = 0;
-  virtual jboolean unlock(JNIEnv* env) = 0;
+  virtual jboolean lock() = 0;
+  virtual jboolean unlock() = 0;
   virtual jboolean swapBuffers() = 0;
 };
 
 // OpenGL context for AWT Canvas.
 class GlAwtCanvasContext : public GlContext {
 public:
-  GlAwtCanvasContext(jobject canvas) : _canvas(canvas) {
+  GlAwtCanvasContext(JNIEnv* env, jobject canvas) {
+    _env = env;
+    _canvas = env->NewGlobalRef(canvas);
   }
   virtual ~GlAwtCanvasContext() {
+    _env->DeleteGlobalRef(_canvas);
   }
-  virtual jboolean lock(JNIEnv* env) {
+  virtual jboolean lock() {
     _awt.version = JAWT_VERSION_1_3;
-    if (JAWT_GetAWT(env,&_awt)==JNI_FALSE) {
-      printf("Could not get AWT");
+    if (JAWT_GetAWT(_env,&_awt)==JNI_FALSE) {
+      printf("Could not get AWT\n");
       return JNI_FALSE;
     }
-    printf("lock: _canvas=%i\n",_canvas);
-    _ds = _awt.GetDrawingSurface(env,_canvas);
+    _ds = _awt.GetDrawingSurface(_env,_canvas);
     if (_ds==0) {
-      printf("Could not get DrawingSurface");
+      printf("Could not get DrawingSurface\n");
       return JNI_FALSE;
     }
     jint lock = _ds->Lock(_ds);
     if ((lock&JAWT_LOCK_ERROR)!=0) {
-      printf("Could not lock DrawingSurface");
+      printf("Could not lock DrawingSurface\n");
       _awt.FreeDrawingSurface(_ds);
       return JNI_FALSE;
     }
     _dsi = _ds->GetDrawingSurfaceInfo(_ds);
     if (_dsi==0) {
-      printf("Could not get DrawingSurfaceInfo");
+      printf("Could not get DrawingSurfaceInfo\n");
       _ds->Unlock(_ds);
       _awt.FreeDrawingSurface(_ds);
       return JNI_FALSE;
     }
-    printf("lock: before makeCurrent");
     makeCurrent();
-    printf("lock: returning true");
     return JNI_TRUE;
   }
-  virtual jboolean unlock(JNIEnv* env) {
+  virtual jboolean unlock() {
     _ds->FreeDrawingSurfaceInfo(_dsi);
     _ds->Unlock(_ds);
     _awt.FreeDrawingSurface(_ds);
-    return JNI_FALSE;
+    return JNI_TRUE;
   }
 protected:
+  JNIEnv* _env;
   jobject _canvas;
   JAWT _awt;
   JAWT_DrawingSurface* _ds;
@@ -86,8 +87,8 @@ protected:
 #if defined(MWIN)
 class WglAwtCanvasContext : public GlAwtCanvasContext {
 public:
-  WglAwtCanvasContext(jobject canvas) : 
-    GlAwtCanvasContext(canvas),_hglrc(0) 
+  WglAwtCanvasContext(JNIEnv* env, jobject canvas) : 
+    GlAwtCanvasContext(env,canvas),_hglrc(0) 
   {
   }
   virtual ~WglAwtCanvasContext() {
@@ -130,15 +131,13 @@ private:
 #elif defined(XWIN)
 class GlxAwtCanvasContext : public GlAwtCanvasContext {
 public:
-  GlxAwtCanvasContext(jobject canvas) : 
-    GlAwtCanvasContext(canvas),_context(0) 
+  GlxAwtCanvasContext(JNIEnv* env, jobject canvas) : 
+    GlAwtCanvasContext(env,canvas),_context(0) 
   {
-    printf("GlxAwtCanvasContext: _canvas=%i\n",_canvas);
   }
   virtual ~GlxAwtCanvasContext() {
   }
   virtual void makeCurrent() {
-    printf("makeCurrent: GlxAwtCanvasContext=%i\n",this);
     _dsi_x11 = (JAWT_X11DrawingSurfaceInfo*)_dsi->platformInfo;
     _display = _dsi_x11->display;
     _drawable = _dsi_x11->drawable;
@@ -152,15 +151,12 @@ public:
         None};
       XVisualInfo* visualInfo = glXChooseVisual(
         _display,DefaultScreen(_display),config);
-      printf("makeCurrent: visualInfo=%i\n",visualInfo);
       _context = glXCreateContext(_display,visualInfo,0,GL_TRUE);
-      printf("makeCurrent: _context=%i\n",_context);
     }
     glXMakeCurrent(_display,_drawable,_context);
     XFlush(_display);
   }
   virtual jboolean swapBuffers() {
-    printf("swapBuffers: GlxAwtCanvasContext=%i\n",this);
     glXSwapBuffers(_display,_drawable);
     return JNI_TRUE;
   }
@@ -181,11 +177,10 @@ Java_edu_mines_jves_opengl_GlContext_makeGlAwtCanvasContext(
   JNIEnv* env, jclass cls,
   jobject canvas) {
   JNI_TRY
-  printf("makeGlAwtCanvasContext: canvas=%i\n",canvas);
 #if defined(MWIN)
-  GlContext* context = new WglAwtCanvasContext(canvas);
+  GlContext* context = new WglAwtCanvasContext(env,canvas);
 #elif defined(XWIN)
-  GlContext* context = new GlxAwtCanvasContext(canvas);
+  GlContext* context = new GlxAwtCanvasContext(env,canvas);
 #endif
   return fromPointer(context);
   JNI_CATCH
@@ -198,7 +193,7 @@ Java_edu_mines_jves_opengl_GlContext_lock(
 {
   JNI_TRY
   GlContext* context = (GlContext*)toPointer(peer);
-  return context->lock(env);
+  return context->lock();
   JNI_CATCH
 }
 
@@ -209,7 +204,7 @@ Java_edu_mines_jves_opengl_GlContext_unlock(
 {
   JNI_TRY
   GlContext* context = (GlContext*)toPointer(peer);
-  return context->unlock(env);
+  return context->unlock();
   JNI_CATCH
 }
 
@@ -220,7 +215,6 @@ Java_edu_mines_jves_opengl_GlContext_swapBuffers(
 {
   JNI_TRY
   GlContext* context = (GlContext*)toPointer(peer);
-  printf("context=%i\n",context);
   return context->swapBuffers();
   JNI_CATCH
 }

@@ -41,7 +41,6 @@ public class Hello {
       }
       private boolean _inited;
     });
-    System.out.println("Hello.main: canvas="+canvas);
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(new Dimension(800,800));

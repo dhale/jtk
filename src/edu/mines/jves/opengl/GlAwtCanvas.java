@@ -26,14 +26,13 @@ public class GlAwtCanvas extends Canvas {
 
   /**
    * Gets the OpenGL context for this canvas.
-   * @return the context.
+   * @return the context; null, if canvas has never been painted.
    */
   public GlContext getContext() {
     return _context;
   }
 
   public void paint(Graphics g) {
-    super.paint(g);
     if (_context==null)
       _context = new GlContext(this);
     _context.lock();
@@ -43,12 +42,6 @@ public class GlAwtCanvas extends Canvas {
     } finally {
       _context.unlock();
     }
-  }
-
-  public void addNotify() {
-    super.addNotify();
-    System.out.println("GlAwtCanvas.addNotify: this="+this);
-    System.out.println("GlAwtCanvas.addNotify: hash="+this.hashCode());
   }
 
   ///////////////////////////////////////////////////////////////////////////
