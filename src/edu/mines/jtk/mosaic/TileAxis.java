@@ -26,10 +26,12 @@ import edu.mines.jtk.util.*;
  */
 public class TileAxis extends JPanel {
 
-  public static final int TOP = 1;
-  public static final int LEFT = 2;
-  public static final int BOTTOM = 3;
-  public static final int RIGHT = 4;
+  /**
+   * Placement of a tile axis.
+   */
+  public enum Placement {
+    TOP, LEFT, BOTTOM, RIGHT
+  }
 
   /**
    * Gets the mosaic that contains this axis.
@@ -51,7 +53,7 @@ public class TileAxis extends JPanel {
    * Gets the placement of this axis.
    * @return the placement.
    */
-  public int getPlacement() {
+  public Placement getPlacement() {
     return _placement;
   }
 
@@ -60,7 +62,7 @@ public class TileAxis extends JPanel {
    * @return true, if at top; false, otherwise.
    */
   public boolean isTop() {
-    return _placement==TOP;
+    return _placement==Placement.TOP;
   }
 
   /**
@@ -68,7 +70,7 @@ public class TileAxis extends JPanel {
    * @return true, if at left; false, otherwise.
    */
   public boolean isLeft() {
-    return _placement==LEFT;
+    return _placement==Placement.LEFT;
   }
 
   /**
@@ -76,7 +78,7 @@ public class TileAxis extends JPanel {
    * @return true, if at bottom; false, otherwise.
    */
   public boolean isBottom() {
-    return _placement==BOTTOM;
+    return _placement==Placement.BOTTOM;
   }
 
   /**
@@ -84,7 +86,7 @@ public class TileAxis extends JPanel {
    * @return true, if at right; false, otherwise.
    */
   public boolean isRight() {
-    return _placement==RIGHT;
+    return _placement==Placement.RIGHT;
   }
 
   /**
@@ -93,7 +95,7 @@ public class TileAxis extends JPanel {
    * @return true, if horizontal (at top or bottom); false, otherwise.
    */
   public boolean isHorizontal() {
-    return _placement==TOP || _placement==BOTTOM;
+    return _placement==Placement.TOP || _placement==Placement.BOTTOM;
   }
 
   /**
@@ -102,7 +104,7 @@ public class TileAxis extends JPanel {
    * @return true, if vertical (at left or right); false, otherwise.
    */
   public boolean isVertical() {
-    return _placement==LEFT || _placement==RIGHT;
+    return _placement==Placement.LEFT || _placement==Placement.RIGHT;
   }
 
   /**
@@ -295,7 +297,7 @@ public class TileAxis extends JPanel {
   ///////////////////////////////////////////////////////////////////////////
   // package
 
-  TileAxis(Mosaic mosaic, int placement, int index) {
+  TileAxis(Mosaic mosaic, Placement placement, int index) {
     _mosaic = mosaic;
     _placement = placement;
     _index = index;
@@ -348,7 +350,7 @@ public class TileAxis extends JPanel {
   // private
 
   private Mosaic _mosaic;
-  private int _placement;
+  private Placement _placement;
   private int _index;
   private String _label;
   private String _format = "%1.4G";

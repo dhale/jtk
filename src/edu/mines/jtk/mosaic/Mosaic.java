@@ -20,23 +20,32 @@ import javax.swing.border.*;
  */
 public class Mosaic extends JPanel {
 
-  public static final int AXES_NONE = 0;
-  public static final int AXES_TOP = 1;
-  public static final int AXES_LEFT = 2;
-  public static final int AXES_BOTTOM = 4;
-  public static final int AXES_RIGHT = 8;
+  /**
+   * Placement of axes.
+   */
+  public enum AxesPlacement {
+    TOP, LEFT, BOTTOM, RIGHT
+  }
 
-  public static final int BORDER_FLAT = 0;
-  public static final int BORDER_SHADOW = 1;
+  /**
+   * Style of borders around tiles and axes.
+   */
+  public enum BorderStyle {
+    FLAT, SHADOW
+  }
 
   /**
    * Constructs a mosaic with the specified number of rows and columns.
-   * @param axesPlacement the locations of axes.
+   * @param axesPlacement the placement of axes.
    * @param borderStyle the style of borders around tiles and axes.
    * @param nrow the number of rows.
    * @param ncol the number of columns.
    */
-  public Mosaic(int nrow, int ncol, int axesPlacement, int borderStyle) {
+  public Mosaic(
+    int nrow, int ncol, 
+    Set<AxesPlacement> axesPlacement, 
+    BorderStyle borderStyle) 
+  {
     _nrow = nrow;
     _ncol = ncol;
     _axesPlacement = axesPlacement;
@@ -54,35 +63,35 @@ public class Mosaic extends JPanel {
 
     // Tile axes.
     _axisList = new ArrayList<TileAxis>();
-    if ((axesPlacement&AXES_TOP)!=0) {
+    if (axesPlacement.contains(AxesPlacement.TOP)) {
       _axesTop = new TileAxis[ncol];
       for (int icol=0; icol<ncol; ++icol) {
         TileAxis axis = _axesTop[icol] = 
-          new TileAxis(this,TileAxis.TOP,icol);
+          new TileAxis(this,TileAxis.Placement.TOP,icol);
         _axisList.add(axis);
       }
     }
-    if ((axesPlacement&AXES_LEFT)!=0) {
+    if (axesPlacement.contains(AxesPlacement.LEFT)) {
       _axesLeft = new TileAxis[nrow];
       for (int irow=0; irow<nrow; ++irow) {
         TileAxis axis = _axesLeft[irow] = 
-          new TileAxis(this,TileAxis.LEFT,irow);
+          new TileAxis(this,TileAxis.Placement.LEFT,irow);
         _axisList.add(axis);
       }
     }
-    if ((axesPlacement&AXES_BOTTOM)!=0) {
+    if (axesPlacement.contains(AxesPlacement.BOTTOM)) {
       _axesBottom = new TileAxis[ncol];
       for (int icol=0; icol<ncol; ++icol) {
         TileAxis axis = _axesBottom[icol] = 
-          new TileAxis(this,TileAxis.BOTTOM,icol);
+          new TileAxis(this,TileAxis.Placement.BOTTOM,icol);
         _axisList.add(axis);
       }
     }
-    if ((axesPlacement&AXES_RIGHT)!=0) {
+    if (axesPlacement.contains(AxesPlacement.RIGHT)) {
       _axesRight = new TileAxis[nrow];
       for (int irow=0; irow<nrow; ++irow) {
         TileAxis axis = _axesRight[irow] = 
-          new TileAxis(this,TileAxis.RIGHT,irow);
+          new TileAxis(this,TileAxis.Placement.RIGHT,irow);
         _axisList.add(axis);
       }
     }
@@ -104,10 +113,10 @@ public class Mosaic extends JPanel {
     }
 
     // Borders for tiles and axes.
-    if (_borderStyle==BORDER_FLAT) {
+    if (_borderStyle==BorderStyle.FLAT) {
       _borderTile = BorderFactory.createLineBorder(getForeground());
       _borderAxis = null;
-    } else if (_borderStyle==BORDER_SHADOW) {
+    } else if (_borderStyle==BorderStyle.SHADOW) {
       _borderTile = BorderFactory.createLoweredBevelBorder();
       _borderAxis = _borderTile;
     }
@@ -500,8 +509,8 @@ public class Mosaic extends JPanel {
 
   private int _nrow; // number of rows
   private int _ncol; // number of columns
-  private int _axesPlacement; // bits for top, left, bottom, right axes
-  private int _borderStyle; // border style
+  private Set<AxesPlacement> _axesPlacement; // axes placement
+  private BorderStyle _borderStyle; // border style
   private Tile[][] _tiles; // array[nrow][ncol] of tiles
   private TileAxis[] _axesTop; // array[ncol] of top axes; null, if none
   private TileAxis[] _axesLeft; // array[nrow] of left axes; null, if none

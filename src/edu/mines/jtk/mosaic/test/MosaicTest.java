@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic.test;
 
 import java.awt.*;
+import java.util.*;
 import javax.swing.*;
 import edu.mines.jtk.mosaic.*;
 
@@ -20,12 +21,13 @@ public class MosaicTest {
   public static void main(String[] args) {
     int nrow = 2;
     int ncol = 3;
-    int axesPlacement =
-      Mosaic.AXES_TOP |
-      Mosaic.AXES_LEFT |
-      Mosaic.AXES_BOTTOM |
-      Mosaic.AXES_RIGHT;
-    int borderStyle = Mosaic.BORDER_FLAT;
+    Set<Mosaic.AxesPlacement> axesPlacement = EnumSet.of(
+      Mosaic.AxesPlacement.TOP,
+      Mosaic.AxesPlacement.LEFT,
+      Mosaic.AxesPlacement.BOTTOM,
+      Mosaic.AxesPlacement.RIGHT
+    );
+    Mosaic.BorderStyle borderStyle = Mosaic.BorderStyle.FLAT;
     Mosaic mosaic = new Mosaic(nrow,ncol,axesPlacement,borderStyle);
     mosaic.setBackground(Color.WHITE);
     mosaic.setFont(new Font("SansSerif",Font.PLAIN,12));
