@@ -1,0 +1,74 @@
+package edu.mines.jves.bench;
+
+import java.awt.*;
+import java.util.*;
+import javax.swing.*;
+
+import edu.mines.jves.util.Stopwatch;
+
+/**
+ * AWT/Swing workbench.
+ * @author Dave Hale
+ * @version 2004.11.14
+ */
+public class AwtBench {
+
+  public static void main(String[] args) {
+    JFrame frame = new JFrame();
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.getContentPane().add(new MyPanel());
+    frame.setSize(new Dimension(800,800));
+    frame.show();
+  }
+
+  private static class MyPanel extends JPanel {
+    private MyPanel() {
+      _n = 1000;
+      _x = new int[_n];
+      _y = new int[_n];
+    }
+    public void setBounds(int x, int y, int width, int height) {
+      super.setBounds(x,y,width,height);
+      System.out.println("setBounds: width="+width+" height="+height);
+      Random random = new Random();
+      for (int i=0; i<_n; ++i) {
+        _x[i] = (int)(width*random.nextDouble());
+        _y[i] = (int)(height*random.nextDouble());
+      }
+    }
+    public void paint(Graphics g) {
+      super.paint(g);
+      Stopwatch sw = new Stopwatch();
+      int ndraw,rate;
+      double maxtime = 1.0;
+
+      // Lines.
+      System.out.print("Drawing lines: ");
+      sw.restart();
+      for (ndraw=0; sw.time()<maxtime; ++ndraw) {
+        for (int i=0,j=0; j<_n; ++i) {
+          int x1 = _x[j];
+          int y1 = _y[j++];
+          int x2 = _x[j];
+          int y2 = _y[j++];
+          g.drawLine(x1,y1,x2,y2);
+        }
+      }
+      sw.stop();
+      rate = (int)((double)ndraw*(_n/2)/sw.time());
+      System.out.println("lines/sec = "+rate);
+
+      // Polylines.
+      System.out.print("Drawing polylines: ");
+      sw.restart();
+      for (ndraw=0; sw.time()<maxtime; ++ndraw) {
+        g.drawPolyline(_x,_y,_n);
+      }
+      sw.stop();
+      rate = (int)((double)ndraw*(_n-1)/sw.time());
+      System.out.println("lines/sec = "+rate);
+    }
+    private int _n;
+    private int[] _x,_y;
+  }
+}

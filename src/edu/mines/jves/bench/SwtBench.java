@@ -17,7 +17,6 @@ import edu.mines.jves.util.Stopwatch;
 public class SwtBench {
 
   public static void main(String[] args) {
-    //simple();
     benchPrimitives();
   }
 
@@ -30,6 +29,7 @@ public class SwtBench {
     Painter painter = new Painter();
     canvas.addControlListener(painter);
     canvas.addPaintListener(painter);
+    shell.setBounds(100,100,800,800);
     shell.open();
     while (!shell.isDisposed()) {
       if (!display.readAndDispatch())
@@ -46,9 +46,9 @@ public class SwtBench {
     }
     public void controlResized(ControlEvent e) {
       Random random = new Random();
-      Point size = ((Control)e.widget).getSize();
-      double width = (double)size.x;
-      double height = (double)size.y;
+      Rectangle bounds = ((Control)e.widget).getBounds();
+      double width = (double)bounds.width;
+      double height = (double)bounds.height;
       for (int i=0,j=0; i<_n; ++i,j+=2) {
         _p[j+X] = (int)(width*random.nextDouble());
         _p[j+Y] = (int)(height*random.nextDouble());
@@ -60,6 +60,7 @@ public class SwtBench {
       int ndraw,rate;
       double maxtime = 1.0;
 
+      // Lines.
       System.out.print("Drawing lines: ");
       sw.restart();
       for (ndraw=0; sw.time()<maxtime; ++ndraw) {
@@ -75,7 +76,7 @@ public class SwtBench {
       rate = (int)((double)ndraw*(_n/2)/sw.time());
       System.out.println("lines/sec = "+rate);
 
-      /*
+      // Polylines.
       System.out.print("Drawing polylines: ");
       sw.restart();
       for (ndraw=0; sw.time()<maxtime; ++ndraw) {
@@ -84,7 +85,6 @@ public class SwtBench {
       sw.stop();
       rate = (int)((double)ndraw*(_n-1)/sw.time());
       System.out.println("lines/sec = "+rate);
-      */
     }
     private int _n;
     private int[] _p;
@@ -92,28 +92,12 @@ public class SwtBench {
     private static int Y = 1;
   }
 
-  public static void simple() {
+  public static void testNative() {
     Display display = new Display();
     Shell shell = new Shell(display);
     System.out.println("shell handle="+shell.handle);
     printHandleNative(shell.handle);
     shell.open();
-    while (!shell.isDisposed()) {
-      if (!display.readAndDispatch())
-        display.sleep();
-    }
-    display.dispose();
-  }
-
-  public static void drawRectangle() {
-    Display display = new Display();
-    Shell shell = new Shell(display);
-    shell.setText("Draw rectangle");
-    shell.open();
-    GC gc = new GC(shell);
-    gc.setLineWidth(4);
-    gc.drawRectangle(20,20,100,100);
-    gc.dispose();
     while (!shell.isDisposed()) {
       if (!display.readAndDispatch())
         display.sleep();
