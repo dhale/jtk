@@ -158,7 +158,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <incarg arg="/I${jdk.include}\win32"/>
       <incarg arg="/I${vc.include}"/>
       <incarg arg="/I${sdk.include}"/>
-      <libarg arg="openGL32.lib"/>
+      <libarg arg="opengl32.lib"/>
       <libarg arg="jawt.lib"/>
     </jnicpp>
     <jnicpp 
@@ -170,7 +170,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <incarg arg="/I${jdk.include}\win32"/>
       <incarg arg="/I${vc.include}"/>
       <incarg arg="/I${sdk.include}"/>
-      <libarg arg="openGL32.lib"/>
+      <libarg arg="opengl32.lib"/>
+      <libarg arg="glu32.lib"/>
       <libarg arg="gdi32.lib"/>
       <libarg arg="jawt.lib"/>
     </jnicpp>

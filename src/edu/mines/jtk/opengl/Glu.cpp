@@ -42,6 +42,7 @@ Java_edu_mines_jtk_opengl_Glu_##name(\
 #define JNI_GLU_END JNI_CATCH \
 }
 
+/*
 JNI_GLU_DECLARE_RETURN1(jint,gluBuild1DMipmapLevels__IIIIIIII_3B)
   jint target, jint internalFormat, jint width, 
   jint format, jint type, jint level, jint base, jint max, jarray jdata
@@ -71,6 +72,7 @@ JNI_GLU_BEGIN1
     target,internalFormat,width,
     format,type,level,base,max,data);
 JNI_GLU_END
+*/
 
 JNI_GLU_DECLARE_RETURN1(jint,gluBuild1DMipmaps__IIIII_3B)
   jint target, jint internalFormat, jint width, 
@@ -102,6 +104,7 @@ JNI_GLU_BEGIN1
     format,type,data);
 JNI_GLU_END
 
+/*
 JNI_GLU_DECLARE_RETURN1(jint,gluBuild2DMipmapLevels__IIIIIIIII_3B)
   jint target, jint internalFormat, jint width, jint height,
   jint format, jint type, jint level, jint base, jint max, jarray jdata
@@ -131,6 +134,7 @@ JNI_GLU_BEGIN1
     target,internalFormat,width,height,
     format,type,level,base,max,data);
 JNI_GLU_END
+*/
 
 JNI_GLU_DECLARE_RETURN1(jint,gluBuild2DMipmaps__IIIIII_3B)
   jint target, jint internalFormat, jint width, jint height, 
@@ -162,6 +166,7 @@ JNI_GLU_BEGIN1
     format,type,data);
 JNI_GLU_END
 
+/*
 JNI_GLU_DECLARE_RETURN1(jint,gluBuild3DMipmapLevels__IIIIIIIIII_3B)
   jint target, jint internalFormat, jint width, jint height, jint depth,
   jint format, jint type, jint level, jint base, jint max, jarray jdata
@@ -229,6 +234,7 @@ JNI_GLU_BEGIN1
   Jstring extString(env,jextString);
   return toJava(gluCheckExtension(extName,extString));
 JNI_GLU_END
+*/
 
 JNI_GLU_DECLARE_RETURN1(jstring,gluGetString)
   jint name
@@ -277,6 +283,7 @@ JNI_GLU_BEGIN1
   return gluProject(objX,objY,objZ,model,proj,view,winX,winY,winZ);
 JNI_GLU_END
 
+/*
 JNI_GLU_DECLARE_RETURN1(jint,gluScaleImage__IIII_3BIII_3B)
   jint format, 
   jint wIn, jint hIn, jint typeIn, jarray jdataIn, 
@@ -315,6 +322,7 @@ JNI_GLU_BEGIN1
     wIn,hIn,typeIn,dataIn,
     wOut,hOut,typeOut,dataOut);
 JNI_GLU_END
+*/
 
 JNI_GLU_DECLARE_RETURN1(jint,gluUnProject)
   jdouble winX, jdouble winY, jdouble winZ, 
@@ -330,10 +338,11 @@ JNI_GLU_BEGIN1
   return gluUnProject(winX,winY,winZ,model,proj,view,objX,objY,objZ);
 JNI_GLU_END
 
+/*
 JNI_GLU_DECLARE_RETURN1(jint,gluUnProject4)
   jdouble winX, jdouble winY, jdouble winZ, jdouble clipW,
   jdoubleArray jmodel, jdoubleArray jproj, jintArray jview, 
-  jdouble near, jdouble far,
+  jdouble nearVal, jdouble farVal,
   jdoubleArray jobjX, jdoubleArray jobjY, 
   jdoubleArray jobjZ, jdoubleArray jobjW
 JNI_GLU_BEGIN1
@@ -346,6 +355,8 @@ JNI_GLU_BEGIN1
   JdoubleArray objW(env,jobjW);
   return gluUnProject4(
     winX,winY,winZ,clipW,
-    model,proj,view,near,far,
+    model,proj,view,
+    nearVal,farVal,
     objX,objY,objZ,objW);
 JNI_GLU_END
+*/
