@@ -25,6 +25,8 @@ public class DPoint {
 
   /**
    * Constructs a point.
+   * @param x the x-coordinate.
+   * @param y the y-coordinate.
    */
   public DPoint(double x, double y) {
     this.x = x;

@@ -108,6 +108,7 @@ public class GlAwtCanvas extends Canvas {
    * the OpenGL context constructed for this canvas. Calls the method
    * {@link #glPaint()} and, as necessary, the methods {@link #glInit()}
    * and {@link #glResize(int,int,int,int)}.
+   * @param g the graphics.
    */
   public void paint(Graphics g) {
     _context.lock();
@@ -133,6 +134,7 @@ public class GlAwtCanvas extends Canvas {
   /**
    * Updates this canvas. Overrides the base-class implementation.
    * This implementation simply calls {@link #paint(Graphics)}.
+   * @param g the graphics.
    */
   public void update(Graphics g) {
     paint(g);

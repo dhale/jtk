@@ -64,7 +64,7 @@ public class M {
 
   /**
    * Returns the trigonometric sine of an angle.
-   * @param a the angle, in radians.
+   * @param x the angle, in radians.
    * @return the sine of the argument.
    */
   public static float sin(float x) {
@@ -200,7 +200,7 @@ public class M {
 
   /**
    * Converts an angle measured in degrees to radians.
-   * @param xngdeg an angle, in degrees.
+   * @param angdeg an angle, in degrees.
    * @return the angle in radians.
    */
   public static float toRadians(float angdeg) {
@@ -209,7 +209,7 @@ public class M {
 
   /**
    * Converts an angle measured in degrees to radians.
-   * @param xngdeg an angle, in degrees.
+   * @param angdeg an angle, in degrees.
    * @return the angle in radians.
    */
   public static double toRadians(double angdeg) {
@@ -218,7 +218,7 @@ public class M {
 
   /**
    * Converts an angle measured in radians to degrees.
-   * @param xngrad an angle, in radians.
+   * @param angrad an angle, in radians.
    * @return the angle in degrees.
    */
   public static float toDegrees(float angrad) {
@@ -227,7 +227,7 @@ public class M {
 
   /**
    * Converts an angle measured in radians to degrees.
-   * @param xngrad an angle, in radians.
+   * @param angrad an angle, in radians.
    * @return the angle in degrees.
    */
   public static double toDegrees(double angrad) {

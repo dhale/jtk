@@ -39,8 +39,7 @@ public class MosaicTest {
     mosaic.setHeightElastic(0,0);
     shell.layout();
     shell.open();
-    while (!shell.isDisposed())
-    {
+    while (!shell.isDisposed()) {
       if (!display.readAndDispatch())
         display.sleep();
     }
