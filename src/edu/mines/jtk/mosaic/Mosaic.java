@@ -99,6 +99,11 @@ public class Mosaic extends Composite {
         onResize();
       }
     });
+    addListener(SWT.Paint, new Listener() {
+      public void handleEvent(Event e) {
+        onPaint(new PaintEvent(e));
+      }
+    });
   }
 
   public Tile getTile(int irow, int icol) {
@@ -121,32 +126,66 @@ public class Mosaic extends Composite {
     return (_axesRight!=null)?_axesRight[irow]:null;
   }
 
-  public void setWidthElastic(int icol, int width) {
-    _we[icol] = width;
+  /**
+   * Sets the width minimum for the specified column. All tiles in the 
+   * specified column will have width not less than the specified minimum. 
+   * Width minimums are used to compute the preferred width of this mosaic.
+   * The default width minimum is 100.
+   * @param icol the column index.
+   * @param widthMinimum the width minimum.
+   */
+  public void setWidthMinimum(int icol, int widthMinimum) {
+    _wm[icol] = widthMinimum;
   }
 
-  public void setWidthMinimum(int icol, int width) {
-    _wm[icol] = width;
+  /**
+   * Sets the width elastic for the specified column. If extra width is 
+   * available in this mosaic, it is allocated to the specified column 
+   * of tiles in proportion to the specified width elastic. 
+   * For fixed-width columns, the width elastic should be zero.
+   * The default width elastic is 100.
+   * @param icol the column index.
+   * @param widthElastic the width elastic.
+   */
+  public void setWidthElastic(int icol, int widthElastic) {
+    _we[icol] = widthElastic;
   }
 
-  public void setHeightElastic(int irow, int height) {
-    _he[irow] = height;
+  /**
+   * Sets the height minimum for the specified row. All tiles in the 
+   * specified row will have height not less than the specified minimum. 
+   * Height minimums are used to compute the preferred height of this mosaic.
+   * The default height minimum is 100.
+   * @param irow the row index.
+   * @param heightMinimum the height minimum.
+   */
+  public void setHeightMinimum(int irow, int heightMinimum) {
+    _hm[irow] = heightMinimum;
   }
 
-  public void setHeightMinimum(int irow, int height) {
-    _hm[irow] = height;
+  /**
+   * Sets the height elastic for the specified row. If extra height is 
+   * available in this mosaic, it is allocated to the specified row 
+   * of tiles in proportion to the specified height elastic. 
+   * For fixed-height rows, the height elastic should be zero.
+   * The default height elastic is 100.
+   * @param irow the row index.
+   * @param heightElastic the height elastic.
+   */
+  public void setHeightElastic(int irow, int heightElastic) {
+    _he[irow] = heightElastic;
   }
 
   public Point computeSize(int wHint, int hHint, boolean changed) {
-    return new Point(400,400); // TODO: implement computeSize
+    return new Point(widthMinimum(),heightMinimum());
   }
 
   public void setLayout(Layout layout) {
-    // Do nothing! We
+    // Do nothing!
   }
 
   public void layout(boolean changed) {
-    // TODO: implement layout
+    doLayout();
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -159,66 +198,186 @@ public class Mosaic extends Composite {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private int _nrow;
-  private int _ncol;
-  private int _axesPlacement;
-  private int _borderStyle;
-  private Tile[][] _tiles;
-  private TileAxis[] _axesTop;
-  private TileAxis[] _axesLeft;
-  private TileAxis[] _axesBottom;
-  private TileAxis[] _axesRight;
-  private int[] _we; // ncol width elastic
-  private int[] _wm; // ncol width minimum
-  private int[] _he; // nrow height elastic
-  private int[] _hm; // nrow height minimum
+  private int _nrow; // number of rows
+  private int _ncol; // number of columns
+  private int _axesPlacement; // bits for top, left, bottom, right axes
+  private int _borderStyle; // border style
+  private Tile[][] _tiles; // array[nrow][ncol] of tiles
+  private TileAxis[] _axesTop; // array[ncol] of top axes; null, if none
+  private TileAxis[] _axesLeft; // array[nrow] of left axes; null, if none
+  private TileAxis[] _axesBottom; // array[ncol] of bottom axes; null, if none
+  private TileAxis[] _axesRight; // array[nrow] of right axes; null, if none
+  private int[] _wm; // array[ncol] of width minimums
+  private int[] _we; // array[ncol] of width elastics
+  private int[] _hm; // array[nrow] of height minimums
+  private int[] _he; // array[nrow] of height elastics
 
   private void onDispose() {
   }
+
   private void onResize() {
     doLayout();
   }
 
+  private void onPaint(PaintEvent pe) {
+    GC gc = pe.gc;
+    int wb = widthBorder();
+    gc.setLineWidth(widthBorder());
+
+    // Tiles.
+    for (int irow=0; irow<_nrow; ++irow) {
+      for (int icol=0; icol<_ncol; ++icol) {
+        Rectangle bounds = _tiles[irow][icol].getBounds();
+        bounds.x -= (wb+1)/2;
+        bounds.y -= (wb+1)/2;
+        bounds.width += wb;
+        bounds.height += wb;
+        gc.drawRectangle(bounds);
+      }
+    }
+  }
+
   private void doLayout() {
     Point size = getSize();
+
+    // Extra width and height to fill; zero, if no extra space.
     int w = size.x;
     int h = size.y;
+    int wm = widthMinimum();
+    int hm = heightMinimum();
+    int wfill = max(0,w-wm);
+    int hfill = max(0,h-hm);
+
+    // Sums of width elastics and height elastics.
+    int wesum = 0;
+    for (int icol=0; icol<_ncol; ++icol)
+      wesum += _we[icol];
+    int hesum = 0;
+    for (int irow=0; irow<_nrow; ++irow)
+      hesum += _he[irow];
+
+    // Avoid divide by zero.
+    wesum = max(1,wesum);
+    hesum = max(1,hesum);
+
+    // Widths of columns, not including borders.
+    int[] wcol = new int[_ncol];
+    for (int icol=0,wleft=wfill; icol<_ncol; ++icol) {
+      int wpad = (icol<_ncol-1)?wfill*_we[icol]/wesum:wleft;
+      wcol[icol] = _wm[icol]+wpad;
+      wleft -= wpad;
+    }
+
+    // Heights of rows, not including borders.
+    int[] hrow = new int[_nrow];
+    for (int irow=0,hleft=hfill; irow<_nrow; ++irow) {
+      int hpad = (irow<_nrow-1)?hfill*_he[irow]/hesum:hleft;
+      hrow[irow] = _hm[irow]+hpad;
+      hleft -= hpad;
+    }
+
+    // Width of borders around tiles and axes.
+    int wb = widthBorder();
+
+    // Axes top.
+    if (_axesTop!=null) {
+      int haxis = heightMinimumAxesTop()-wb-wb;
+      int xaxis = widthMinimumAxesLeft()+wb;
+      int yaxis = wb;
+      for (int icol=0; icol<_ncol; ++icol) {
+        int waxis = wcol[icol];
+        _axesTop[icol].setBounds(xaxis,yaxis,waxis,haxis);
+        xaxis += waxis+wb+wb;
+      }
+    }
+
+    // Axes left.
+    if (_axesLeft!=null) {
+      int waxis = widthMinimumAxesLeft()-wb-wb;
+      int xaxis = wb;
+      int yaxis = heightMinimumAxesTop()+wb;
+      for (int irow=0; irow<_nrow; ++irow) {
+        int haxis = hrow[irow];
+        _axesLeft[irow].setBounds(xaxis,yaxis,waxis,haxis);
+        yaxis += haxis+wb+wb;
+      }
+    }
+
+    // Axes bottom.
+    if (_axesBottom!=null) {
+      int haxis = heightMinimumAxesBottom()-wb-wb;
+      int xaxis = widthMinimumAxesLeft()+wb;
+      int yaxis = h-wb-haxis;
+      for (int icol=0; icol<_ncol; ++icol) {
+        int waxis = wcol[icol];
+        _axesBottom[icol].setBounds(xaxis,yaxis,waxis,haxis);
+        xaxis += waxis+wb+wb;
+      }
+    }
+
+    // Axes right.
+    if (_axesRight!=null) {
+      int waxis = widthMinimumAxesRight()-wb-wb;
+      int xaxis = w-wb-waxis;
+      int yaxis = heightMinimumAxesTop()+wb;
+      for (int irow=0; irow<_nrow; ++irow) {
+        int haxis = hrow[irow];
+        _axesRight[irow].setBounds(xaxis,yaxis,waxis,haxis);
+        yaxis += haxis+wb+wb;
+      }
+    }
+
+    // Tiles.
+    int xtile0 = wb;
+    int ytile0 = wb;
+    if (_axesLeft!=null)
+      xtile0 += widthMinimumAxesLeft();
+    if (_axesTop!=null)
+      ytile0 += heightMinimumAxesTop();
+    for (int irow=0,ytile=ytile0; irow<_nrow; ++irow) {
+      int htile = hrow[irow];
+      for (int icol=0,xtile=xtile0; icol<_ncol; ++icol) {
+        int wtile = wcol[icol];
+        _tiles[irow][icol].setBounds(xtile,ytile,wtile,htile);
+        xtile += wtile+wb+wb;
+      }
+      ytile += htile+wb+wb;
+    }
   }
 
   private int widthBorder() {
     if (_borderStyle==BORDER_FLAT) {
       return 1;
     } else if (_borderStyle==BORDER_SHADOW_IN) {
-      return 2;
+      return 6;
     } else {
       return 0;
     }
   }
 
   private int widthMinimum() {
-    int width = 0;
-    width = max(width,widthAxesLeftMinimum());
+    int width = widthMinimumAxesLeft();
     for (int icol=0; icol<_ncol; ++icol)
-      width = max(width,widthColumnMinimum(icol));
-    width = max(width,widthAxesRightMinimum());
+      width += widthMinimumColumn(icol);
+    width += widthMinimumAxesRight();
     return width;
   }
 
-  private int widthColumnMinimum(int icol) {
+  private int widthMinimumColumn(int icol) {
     int width = 0;
     if (_axesTop!=null)
       width = max(width,_axesTop[icol].getWidthMinimum());
-    width = max(width,widthTilesMinimum(icol));
+    width = max(width,widthMinimumTiles(icol));
     if (_axesBottom!=null)
       width = max(width,_axesBottom[icol].getWidthMinimum());
     return width;
   }
 
-  private int widthTilesMinimum(int icol) {
+  private int widthMinimumTiles(int icol) {
     return _wm[icol]+2*widthBorder();
   }
 
-  private int widthAxesLeftMinimum() {
+  private int widthMinimumAxesLeft() {
     int width = 0;
     if (_axesLeft!=null) {
       for (int irow=0; irow<_nrow; ++irow)
@@ -228,7 +387,7 @@ public class Mosaic extends Composite {
     return width;
   }
 
-  private int widthAxesRightMinimum() {
+  private int widthMinimumAxesRight() {
     int width = 0;
     if (_axesRight!=null) {
       for (int irow=0; irow<_nrow; ++irow)
@@ -236,5 +395,47 @@ public class Mosaic extends Composite {
       width += 2*widthBorder();
     }
     return width;
+  }
+
+  private int heightMinimum() {
+    int height = heightMinimumAxesTop();
+    for (int irow=0; irow<_nrow; ++irow)
+      height += heightMinimumRow(irow);
+    height += heightMinimumAxesBottom();
+    return height;
+  }
+
+  private int heightMinimumRow(int irow) {
+    int height = 0;
+    if (_axesLeft!=null)
+      height = max(height,_axesLeft[irow].getHeightMinimum());
+    height = max(height,heightMinimumTiles(irow));
+    if (_axesRight!=null)
+      height = max(height,_axesRight[irow].getHeightMinimum());
+    return height;
+  }
+
+  private int heightMinimumTiles(int irow) {
+    return _hm[irow]+2*widthBorder();
+  }
+
+  private int heightMinimumAxesTop() {
+    int height = 0;
+    if (_axesTop!=null) {
+      for (int icol=0; icol<_ncol; ++icol)
+        height = max(height,_axesTop[icol].getHeightMinimum());
+      height += 2*widthBorder();
+    }
+    return height;
+  }
+
+  private int heightMinimumAxesBottom() {
+    int height = 0;
+    if (_axesBottom!=null) {
+      for (int icol=0; icol<_ncol; ++icol)
+        height = max(height,_axesBottom[icol].getHeightMinimum());
+      height += 2*widthBorder();
+    }
+    return height;
   }
 }

@@ -6,8 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.*;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.widgets.*;
 
 /**
  * A tile in a mosaic.
@@ -20,7 +22,7 @@ public class Tile extends Canvas {
     return _irow;
   }
 
-  public int getColumn() {
+  public int getColumnIndex() {
     return _icol;
   }
 
@@ -32,6 +34,11 @@ public class Tile extends Canvas {
     _mosaic = mosaic;
     _irow = irow;
     _icol = icol;
+    addPaintListener(new PaintListener() {
+      public void paintControl(PaintEvent pe) {
+        doPaint(pe);
+      }
+    });
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -39,4 +46,18 @@ public class Tile extends Canvas {
 
   private Mosaic _mosaic;
   private int _irow,_icol;
+
+  private void doPaint(PaintEvent pe) {
+    GC gc = pe.gc;
+    Point size = getSize();
+    int w = size.x;
+    int h = size.y;
+    gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_GREEN));
+    gc.fillRectangle(0,0,w,h);
+    Point extent = gc.stringExtent("Axis");
+    int x = w/2-extent.x/2;
+    int y = h/2-extent.y/2;
+    gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
+    gc.drawString("Tile",x,y);
+  }
 }

@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic;
 
 import org.eclipse.swt.*;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.*;
 
@@ -48,8 +49,17 @@ public class TileAxis extends Canvas {
     _mosaic = mosaic;
     _placement = placement;
     _index = index;
+    addPaintListener(new PaintListener() {
+      public void paintControl(PaintEvent pe) {
+        doPaint(pe);
+      }
+    });
   }
 
+  /**
+   * Gets the width minimum for this axis. This width does not include 
+   * any border that will be drawn by the mosaic.
+   */
   int getWidthMinimum() {
     GC gc = new GC(this);
     try {
@@ -70,6 +80,10 @@ public class TileAxis extends Canvas {
     }
   }
 
+  /**
+   * Gets the height minimum for this axis. This height does not include 
+   * any border that will be drawn by the mosaic.
+   */
   int getHeightMinimum() {
     GC gc = new GC(this);
     try {
@@ -97,6 +111,20 @@ public class TileAxis extends Canvas {
   private int _placement;
   private int _index;
   private String _label;
+
+  private void doPaint(PaintEvent pe) {
+    GC gc = pe.gc;
+    Point size = getSize();
+    int w = size.x;
+    int h = size.y;
+    gc.setBackground(getDisplay().getSystemColor(SWT.COLOR_RED));
+    gc.fillRectangle(0,0,w,h);
+    Point extent = gc.stringExtent("Axis");
+    int x = w/2-extent.x/2;
+    int y = h/2-extent.y/2;
+    gc.setForeground(getDisplay().getSystemColor(SWT.COLOR_BLACK));
+    gc.drawString("Axis",x,y);
+  }
 
   private boolean isHorizontal() {
     return _placement==TOP || _placement==BOTTOM;
