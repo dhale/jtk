@@ -41,6 +41,7 @@ public class GlContext {
    */
   public GlContext(java.awt.Canvas canvas) {
     _peer = makeGlAwtCanvasContext(canvas);
+    Check.state(_peer!=0,"successfully created OpenGL context peer");
   }
 
   /**
@@ -54,6 +55,7 @@ public class GlContext {
     long hwnd = _swtHooks.hwnd;
     long hdc = _swtHooks.hdc;
     _peer = makeGlSwtCanvasContext(xdisplay,xdrawable,hwnd,hdc);
+    Check.state(_peer!=0,"successfully created OpenGL context peer");
   }
 
   /**
@@ -63,12 +65,18 @@ public class GlContext {
    *  has this or any other OpenGL context locked.
    */
   public void lock() {
+    Check.state(_peer!=0,"this OpenGL context has not been disposed");
     _lock.acquire();
-    Check.state(Gl.getContext()==null,
-      "the current thread has no OpenGL context locked");
+    if (Gl.getContext()!=null) {
+      _lock.release();
+      Check.state(false,"the current thread has no OpenGL context locked");
+    }
+    if (!lock(_peer)) {
+      _lock.release();
+      Check.state(false,"successfully locked OpenGL context peer");
+    }
+    _locked = true;
     Gl.setContext(this);
-    boolean locked = lock(_peer);
-    Check.state(locked,"this OpenGL context has been locked");
     getProcAddresses();
   }
 
@@ -78,11 +86,13 @@ public class GlContext {
    *  already have this OpenGL context locked.
    */
   public void unlock() {
+    Check.state(_peer!=0,"this OpenGL context has not been disposed");
     Check.state(Gl.getContext()==this,
-      "the current thread has this OpenGL context locked");
+      "this OpenGL context is locked in current thread");
+    if (!unlock(_peer))
+      Check.state(false,"successfully unlocked OpenGL context peer");
     Gl.setContext(null);
-    boolean unlocked = unlock(_peer);
-    Check.state(unlocked,"this OpenGL context has been unlocked");
+    _locked = false;
     _lock.release();
   }
 
@@ -90,8 +100,9 @@ public class GlContext {
    * Swaps the front and back buffers for this context.
    */
   public void swapBuffers() {
+    Check.state(_peer!=0,"this OpenGL context has not been disposed");
     Check.state(Gl.getContext()==this,
-      "the current thread has this OpenGL context locked");
+      "this OpenGL context is locked in current thread");
     swapBuffers(_peer);
   }
 
@@ -99,6 +110,8 @@ public class GlContext {
    * Dispose this context.
    */
   public void dispose() {
+    Check.state(_peer!=0,"this OpenGL context has not been disposed");
+    Check.state(!_locked,"this OpenGL context is not locked in any thread");
     killGlContext(_peer);
     _swtHooks.dispose();
     _peer = 0;
@@ -122,7 +135,8 @@ public class GlContext {
   private long _peer; // C++ peer of this OpenGL context
   private SwtHooks _swtHooks; // SWT hooks (for X11 or WIN32)
   private ReentrantLock _lock = new ReentrantLock(); // mutual exclusion lock
-  private boolean _gotProcAddresses;
+  private boolean _gotProcAddresses; // true if got addresses for 1.[2-5]
+  private boolean _locked; // true, if this context locked in any thread
 
   private static native void killGlContext(long peer);
   private static native long makeGlAwtCanvasContext(java.awt.Canvas canvas);
