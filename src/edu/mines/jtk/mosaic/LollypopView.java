@@ -52,6 +52,7 @@ public class LollypopView extends TiledView {
     int rx = ts.x(rbx*hsf)-ts.x(0.0);
     int ry = ts.y(rby*vsf)-ts.y(0.0);
     int rp = min(rx,ry);
+    //System.out.println("rbx="+rbx+" hsf="+hsf+" rx="+rx+" rp="+rp);
 
     // Horizontal line for function value 0.0.
     int x0 = ts.x(hp.u0());
@@ -109,7 +110,7 @@ public class LollypopView extends TiledView {
 
   private double ballRadiusX() {
     double nx = _sx.getCount();
-    return 1.0/(2.0+2.2*(nx-1));
+    return 1.0/max(4.4,2.2*(nx-1));
   }
 
   private double ballRadiusY() {
