@@ -251,9 +251,12 @@ public class TileAxis extends JPanel {
 
     // Major tics.
     int wsmax = 0;
+    double tiny = 1.0e-6*abs(dticMajor);
     for (int itic=0; itic<nticMajor; ++itic) {
       double vtic = fticMajor+itic*dticMajor;
       double utic = p.u(vtic);
+      if (abs(vtic)<tiny)
+        vtic = 0.0;
       String stic = formatTic(vtic);
       if (isHorizontal) {
         int x = t.x(utic);

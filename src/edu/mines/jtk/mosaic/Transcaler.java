@@ -155,6 +155,36 @@ public class Transcaler {
   }
 
   /**
+   * Converts the specified user-coordinate width to device-coordinate width.
+   * @param wu the user-coordinate width.
+   * @return the device-coordinate width.
+   */
+  public int width(double wu) {
+    double wd = _xuscale*wu;
+    if (wd<DMIN) {
+      wd = DMIN;
+    } else if (wd>DMAX) {
+      wd = DMAX;
+    }
+    return (int)wd;
+  }
+
+  /**
+   * Converts the specified user-coordinate height to device-coordinate height.
+   * @param hu the user-coordinate height.
+   * @return the device-coordinate height.
+   */
+  public int height(double hu) {
+    double hd = _yuscale*hu;
+    if (hd<DMIN) {
+      hd = DMIN;
+    } else if (hd>DMAX) {
+      hd = DMAX;
+    }
+    return (int)hd;
+  }
+
+  /**
    * Converts the specified device x-coordinate to user x-coordinate.
    * @param xd the device x-coordinate.
    * @return the user x-coordinate.
@@ -170,6 +200,24 @@ public class Transcaler {
    */
   public double y(int yd) {
     return _ydshift+_ydscale*yd;
+  }
+
+  /**
+   * Converts the specified device-coordinate width to user-coordinate width.
+   * @param wd the device-coordinate width.
+   * @return the user-coordinate width.
+   */
+  public double width(int wd) {
+    return _xdscale*wd;
+  }
+
+  /**
+   * Converts the specified device-coordinate height to user-coordinate height.
+   * @param hd the device-coordinate height.
+   * @return the user-coordinate height.
+   */
+  public double height(int hd) {
+    return _ydscale*hd;
   }
 
   ///////////////////////////////////////////////////////////////////////////

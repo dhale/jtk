@@ -40,29 +40,41 @@ public class LollypopView extends TiledView {
   }
 
   public void paint(Graphics2D g2d) {
+
+    // Lollypop sampling.
+    int nx = _sx.getCount();
+    double dx = _sx.getDelta();
+    double fx = _sx.getFirst();
+    double lx = _sx.getLast();
+
+    // Our preferred projectors.
+    Projector bhp = getBestHorizontalProjector();
+    Projector bvp = getBestVerticalProjector();
+
+    // The projectors (and transcaler) we must use.
     Projector hp = getHorizontalProjector();
     Projector vp = getVerticalProjector();
     Transcaler ts = getTranscaler();
 
-    // Radius in pixels of balls.
-    double rbx = ballRadiusX();
-    double rby = ballRadiusY();
-    double hsr = hp.getScaleRatio(getBestHorizontalProjector());
-    double vsr = vp.getScaleRatio(getBestVerticalProjector());
-    int rx = ts.x(rbx*hsr)-ts.x(0.0);
-    int ry = ts.y(rby*vsr)-ts.y(0.0);
+    // Radius of lollypop balls, in normalized coordinates. 
+    // Must compensate for projector merging.
+    double rbx = ballRadiusX()*hp.getScaleRatio(bhp);
+    double rby = ballRadiusY()*vp.getScaleRatio(bvp);
+
+    // Radius of lollypop balls, in pixels.
+    int rx = ts.width(rbx);
+    int ry = ts.height(rby);
     int rb = min(rx,ry);
 
     // Horizontal line for function value 0.0.
-    int x0 = ts.x(hp.u0());
-    int x1 = ts.x(hp.u1());
+    int xf = ts.x(hp.u(fx));
+    int xl = ts.x(hp.u(lx));
+    int x1 = min(xf,xl)-rb;
+    int x2 = max(xf,xl)+rb;
     int y0 = ts.y(vp.u(0.0));
-    g2d.drawLine(x0,y0,x1,y0);
+    g2d.drawLine(x1,y0,x2,y0);
 
-    // Lollypop for each sample.
-    int nx = _sx.getCount();
-    double dx = _sx.getDelta();
-    double fx = _sx.getFirst();
+    // One lollypop for each sample.
     for (int ix=0; ix<nx; ++ix) {
       double xi = fx+ix*dx;
       double fi = _f[ix];

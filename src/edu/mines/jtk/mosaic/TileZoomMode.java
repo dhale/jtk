@@ -144,6 +144,19 @@ public class TileZoomMode extends Mode {
         vr.height = (ymin<ymax)?ts.y(ymax)-vr.y:1.0;
       }
 
+      // Arbitrarily limit zoom to a factor of 10000.
+      double tiny = 0.0001;
+      if (vr.width<tiny) {
+        vr.x -= (tiny-vr.width)/2;
+        vr.width = tiny;
+      }
+      if (vr.height<tiny) {
+        vr.y -= (tiny-vr.height)/2;
+        vr.height = tiny;
+      }
+      vr.x = min(1.0-vr.width,vr.x);
+      vr.y = min(1.0-vr.height,vr.y);
+
       // Set view rectangle of one tile, and mosaic will set the others.
       tile.setViewRectangle(vr);
     }
