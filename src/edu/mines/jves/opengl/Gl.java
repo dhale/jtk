@@ -3024,11 +3024,53 @@ public class Gl {
     nglGetBufferSubData(getContext().glGetBufferSubData,
       target,offset,size,data);
   }
+  /**
+   * Maps the specified OpenGL buffer object to a new direct byte buffer.
+   * The corresponding OpenGL function has only two arguments. Here,
+   * the additional argument, capacity, is used to construct the new 
+   * byte buffer.
+   * <p>
+   * Construction and finalization of direct byte buffers is costly. 
+   * Therefore, when mapping the same OpenGL buffer object repeatedly,
+   * call this method once, cache the byte buffer returned, and pass 
+   * that buffer to the method {@link #glMapBuffer(int,int,ByteBuffer)} 
+   * in subsequent mappings.
+   * @param target the buffer target.
+   * @param access the access hint.
+   * @param capacity the capacity of the new direct byte buffer.
+   * @return the new direct byte buffer; null, if buffer not mapped.
+   */
   public static ByteBuffer glMapBuffer(
-    int target, int access, int size, ByteBuffer buffer)
+    int target, int access, long capacity)
   {
-    return nglMapBuffer(getContext().glMapBuffer,
-      target,access,size,buffer);
+    return nglMapBuffer1(getContext().glMapBuffer,
+      target,access,capacity);
+  }
+  /**
+   * Maps the specified OpenGL buffer object to a new direct byte buffer.
+   * The corresponding OpenGL function has only two arguments. Here, the
+   * additional argument, buffer, is used to avoid constructing a new 
+   * direct byte buffer for every mapping of an OpenGL buffer object.
+   * <p>
+   * Construction and finalization of direct byte buffers is costly. 
+   * Therefore, when mapping the same OpenGL buffer object repeatedly,
+   * call {@link #glMapBuffer(int,int,long)} once, cache the byte
+   * buffer returned, and pass that buffer to this method in subsequent
+   * mappings.
+   * @param target the buffer target.
+   * @param access the access hint.
+   * @param buffer the direct byte buffer
+   * @return the specified direct byte buffer; null, if buffer not 
+   *  mapped, or if the mapped buffer does not have the same address 
+   *  as the existing direct buffer. In the latter case, one should call 
+   *  the method {@link #glMapBuffer(int,int,long)} instead, which will 
+   *  create a new direct byte buffer.
+   */
+  public static ByteBuffer glMapBuffer(
+    int target, int access, ByteBuffer buffer)
+  {
+    return nglMapBuffer2(getContext().glMapBuffer,
+      target,access,buffer);
   }
   public static boolean glUnmapBuffer(
     int target)
@@ -3078,8 +3120,10 @@ public class Gl {
     int target, int offset, int size, Buffer data);
   private static native void nglGetBufferSubData(long pfunc,
     int target, int offset, int size, Buffer data);
-  private static native ByteBuffer nglMapBuffer(long pfunc,
-    int target, int access, int size, ByteBuffer buffer);
+  private static native ByteBuffer nglMapBuffer1(long pfunc,
+    int target, int access, long capacity);
+  private static native ByteBuffer nglMapBuffer2(long pfunc,
+    int target, int access, ByteBuffer buffer);
   private static native boolean nglUnmapBuffer(long pfunc,
     int target);
   private static native void nglGetBufferParameteriv(long pfunc,
