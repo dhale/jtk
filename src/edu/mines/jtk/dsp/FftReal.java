@@ -34,7 +34,7 @@ public class FftReal {
     for (int i=0,j=0; i<nfft/2+1; ++i,j+=2)
       System.out.println("ca["+i+"] = ("+ca[j]+","+ca[j+1]+")");
     fft.complexToReal(-1,ca,ra);
-    fft.scale(ra);
+    fft.scale(nfft,ra);
     for (int i=0; i<n; ++i)
       System.out.println("ra["+i+"] = "+ra[i]);
     testRandom(1441440);
@@ -50,7 +50,7 @@ public class FftReal {
       ra[i] = random.nextFloat();
     fft.realToComplex( 1,ra,ca);
     fft.complexToReal(-1,ca,rb);
-    fft.scale(rb);
+    fft.scale(nfft,rb);
     double sum = 0.0;
     for (int i=0; i<n; ++i)
       sum += abs(rb[i]-ra[i]);
@@ -163,16 +163,16 @@ public class FftReal {
   }
 
   /**
-   * Scales nfft real numbers in the specified array by 1/nfft. The 
+   * Scales n1 real numbers in the specified array by 1/nfft. The 
    * inverse of a real-to-complex FFT is a complex-to-real FFT (with 
    * opposite sign) followed by this scaling.
-   * @param rx the input/output array; rx.length must not be less than nfft.
+   * @param n1 1st (only) dimension of the array rx.
+   * @param rx the input/output array.
    */
-  public void scale(float[] rx) {
+  public void scale(int n1, float[] rx) {
     float s = 1.0f/(float)_nfft;
-    int n = _nfft;
-    while (--n>=0)
-      rx[n] *= s;
+    while (--n1>=0)
+      rx[n1] *= s;
   }
 
   /**
