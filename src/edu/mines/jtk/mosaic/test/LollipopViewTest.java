@@ -23,7 +23,8 @@ import edu.mines.jtk.mosaic.*;
 public class LollipopViewTest {
 
   public static void main(String[] args) {
-    int nrow = 2;
+    //int nrow = 2;
+    int nrow = 1;
     int ncol = 1;
     Set<Mosaic.AxesPlacement> axesPlacement = EnumSet.of(
       Mosaic.AxesPlacement.LEFT,
@@ -36,14 +37,10 @@ public class LollipopViewTest {
     mosaic.setPreferredSize(new Dimension(950,400));
 
     Tile tileA = mosaic.getTile(0,0);
-    Tile tileB = mosaic.getTile(1,0);
-    tileA.setZeroLinePaint(true,true);
-    tileB.setZeroLinePaint(true,true);
-    tileA.setZeroLineColor(Color.RED,Color.RED);
-    tileB.setZeroLineColor(Color.RED,Color.RED);
+    //Tile tileB = mosaic.getTile(1,0);
 
     tileA.addTiledView(makeView(101, 1.0,-50.0,1.0));
-    tileB.addTiledView(makeView( 13,-1.0,  5.0,2.0));
+    //tileB.addTiledView(makeView( 13,-1.0,  5.0,2.0));
 
     TileZoomMode zoomMode = new TileZoomMode(mosaic);
 
@@ -74,7 +71,7 @@ public class LollipopViewTest {
     float[] f = new float[nx];
     for (int ix=0; ix<nx; ++ix) {
       double xi = fx+ix*dx;
-      f[ix] = (float)(a*cos(2.0*PI*xi/20));
+      f[ix] = (float)(a*cos(2.0*PI*xi*(1.0+0.02*xi)/20));
     }
     LollipopView lv = new LollipopView(sx,f);
     lv.setLollipopColor(Color.BLUE);

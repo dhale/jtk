@@ -109,11 +109,9 @@ public class LollipopView extends TiledView {
   }
 
   public void paint(Graphics2D g2d) {
-    /*
     g2d.setRenderingHint(
       RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);
-    */
 
     // Lollipop sampling.
     int nx = _sx.getCount();
