@@ -1,3 +1,12 @@
+//////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2004, Colorado School of Mines and others.
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Common Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/cpl-v10.html
+// Contributors:
+//   Dave Hale, Colorado School of Mines
+//////////////////////////////////////////////////////////////////////////////
 package edu.mines.jves.ant;
 
 import java.io.*;
@@ -210,7 +219,7 @@ public class Jnicpp extends MatchingTask {
     throws BuildException 
   {
     String[] cl = {
-      "g++","-c","-O2","-fPIC",
+      "g++","-c","-O2","-fPIC","-Wall",
     };
     cl = addArgs(cl,incArgs);
     cl = addArgs(cl,new String[]{"-o",objFile.getPath(),cppFile.getPath()});

@@ -1,3 +1,12 @@
+//////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2004, Colorado School of Mines and others.
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Common Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/cpl-v10.html
+// Contributors:
+//   Dave Hale, Colorado School of Mines
+//////////////////////////////////////////////////////////////////////////////
 #ifdef WIN32 // If Microsoft Windows, ...
 #include <stddef.h>
 #else // Else, assume Linux, Unix, ...
@@ -13,28 +22,28 @@ inline static jlong fromPointer(void* pvoid) {
   return (jlong)((intptr_t)pvoid);
 }
 
-// Throw a Java Exception with the specified name.
-inline static void throwException(
-  JNIEnv* env, const char* exceptionClassName, const char* message) 
-{
-  env->ThrowNew(env->FindClass(exceptionClassName),message);
+// Throw a Java Error with the specified message.
+inline static void throwJavaError(JNIEnv* env, const char* message) {
+  env->ThrowNew(env->FindClass("java/lang/Error"),message);
 }
 
 // Throw a Java RuntimeException with the specified name.
-inline static void throwRuntimeException(JNIEnv* env, const char* message) {
-  throwException(env,"java/lang/RuntimeException",message); 
+inline static void throwJavaRuntimeException(JNIEnv* env, const char* message) {
+  env->ThrowNew(env->FindClass("java/lang/RuntimeException"),message);
 }
 
 // Macros that try and catch C++ exceptions thrown by native code.
+// Bracket all native code with JNI_TRY and JNI_CATCH. Then, if
+// an unhandled C++ exception is thrown, the JNI_CATCH macro will
+// throw a Java Error, which should be not be caught. But, just in
+// case it is caught, this macro rethrows the C++ exception. Also,
+// if we did not rethrow the C++ exception, then compilers will warn
+// that functions declared to return a value do not return a value.
 #define JNI_TRY try {
 #define JNI_CATCH \
 } catch (...) { \
-  throwRuntimeException(env,"C++ exception thrown by native code"); \
-}
-#define JNI_CATCH_RETURN(retval) \
-} catch (...) { \
-  throwRuntimeException(env,"C++ exception thrown by native code"); \
-  return retval; \
+  throwJavaError(env,"C++ exception thrown by native code"); \
+  throw; \
 }
 
 // Java string
