@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic.test;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import edu.mines.jtk.mosaic.*;
@@ -37,9 +38,25 @@ public class MosaicTest {
     mosaic.setPreferredSize(new Dimension(600,600));
     Tile tile11 = mosaic.getTile(1,1);
     tile11.setViewRectangle(new DRectangle(0.1,0.1,0.8,0.8));
+
+    TileZoomMode zoomMode = new TileZoomMode(mosaic);
+
+    JMenuBar menuBar = new JMenuBar();
+    JMenu modeMenu = new JMenu("Mode");
+    modeMenu.setMnemonic(KeyEvent.VK_M);
+    JMenuItem zoomItem = new ModeMenuItem(zoomMode);
+    modeMenu.add(zoomItem);
+    menuBar.add(modeMenu);
+
+    JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+    JToggleButton zoomButton = new ModeToggleButton(zoomMode);
+    toolBar.add(zoomButton);
+
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.add(mosaic);
+    frame.setJMenuBar(menuBar);
+    frame.add(toolBar,BorderLayout.WEST);
+    frame.add(mosaic,BorderLayout.CENTER);
     frame.pack();
     frame.setVisible(true);
   }

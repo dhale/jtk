@@ -34,24 +34,18 @@ import javax.swing.*;
 public abstract class Mode extends AbstractAction {
 
   /**
-   * Constructs a mode with specified manager, name, and icon.
-   * @param manager the manager.
-   * @param name the name.
-   * @param icon the icon.
-   */
-  public Mode(ModeManager manager, String name, Icon icon) {
-    super(name,icon);
-    manager.add(this);
-    _manager = manager;
-  }
-
-  /**
-   * Activates or deactivates this mode.
+   * Activates or deactivates this mode. If this mode is not enabled,
+   * this method does nothing.
    * @param active true, to activate; false, to deactivate.
    */
   public void setActive(boolean active) {
-    if (isEnabled() && _active!=active)
+    if (isEnabled() && _active!=active) {
+      Boolean oldValue = Boolean.valueOf(_active);
+      Boolean newValue = Boolean.valueOf(active);
+      firePropertyChange("active",oldValue,newValue);
       _manager.setActive(this,active);
+      _active = active;
+    }
   }
 
   /**
@@ -88,8 +82,100 @@ public abstract class Mode extends AbstractAction {
     super.setEnabled(enabled);
   }
 
+  /**
+   * Sets the name (text) for this mode.
+   * Used for mode menu items.
+   * <p>
+   * Typically, this method is called by classes that 
+   * extend this abstract base class.
+   * @param name the name.
+   */
+  public void setName(String name) {
+    putValue(Action.NAME,name);
+  }
+
+  /**
+   * Sets the icon for this mode.
+   * Used for mode toggle buttons.
+   * <p>
+   * Typically, this method is called by classes that 
+   * extend this abstract base class.
+   * @param icon the icon.
+   */
+  public void setIcon(Icon icon) {
+    putValue(Action.SMALL_ICON,icon);
+  }
+
+  /**
+   * Sets the mnemonic key for this mode.
+   * Used for mode menu items.
+   * <p>
+   * Typically, this method is called by classes that 
+   * extend this abstract base class.
+   * @param mk the mnemonic key; e.g., KeyEvent.VK_K.
+   */
+  public void setMnemonicKey(int mk) {
+    putValue(Action.MNEMONIC_KEY,new Integer(mk));
+  }
+
+  /**
+   * Sets the accelerator key stroke for this mode.
+   * <p>
+   * Typically, this method is called by classes that 
+   * extend this abstract base class.
+   * @param ak the accelerator key stroke.
+   */
+  public void setAcceleratorKey(KeyStroke ak) {
+    putValue(Action.ACCELERATOR_KEY,ak);
+  }
+
+  /**
+   * Sets the short description for this mode.
+   * Used in tool tips for mode menu items and toggle buttons.
+   * <p>
+   * Typically, this method is called by classes that 
+   * extend this abstract base class.
+   * @param sd the short description.
+   */
+  public void setShortDescription(String sd) {
+    putValue(Action.SHORT_DESCRIPTION,sd);
+  }
+
+  /**
+   * Sets the long description for this mode.
+   * <p>
+   * Typically, this method is called by classes that 
+   * extend this abstract base class.
+   * @param ld the long description.
+   */
+  public void setLongDescription(String ld) {
+    putValue(Action.LONG_DESCRIPTION,ld);
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
+
+  /**
+   * Constructs a mode with specified manager, name, and icon.
+   * @param manager the manager.
+   * @param name the name.
+   * @param icon the icon.
+   */
+  protected Mode(ModeManager manager) {
+    manager.add(this);
+    _manager = manager;
+  }
+
+  /**
+   * Loads an icon from the specified resource name. The resource
+   * with specified name is found relative to the specified class.
+   * @param cls the class used to find the resource.
+   * @param res the name of the resource that contains the icon.
+   */
+  protected static Icon loadIcon(Class cls, String res) {
+    java.net.URL url = cls.getResource(res);
+    return (url!=null)?new ImageIcon(url):null;
+  }
   
   /**
    * Activates or deactivates this mode for the specified component. 

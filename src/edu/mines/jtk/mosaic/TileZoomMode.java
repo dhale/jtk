@@ -18,13 +18,16 @@ import javax.swing.*;
 public class TileZoomMode extends Mode {
 
   /**
-   * Constructs a tile zoom mode with specified mosaic, name, and icon.
+   * Constructs a tile zoom mode for the specified mosaic.
    * @param mosaic the mosaic.
-   * @param name the name.
-   * @param icon the icon.
    */
-  public TileZoomMode(Mosaic mosaic, String name, Icon icon) {
-    super(mosaic.getModeManager(),name,icon);
+  public TileZoomMode(Mosaic mosaic) {
+    super(mosaic.getModeManager());
+    setName("Zoom");
+    setIcon(loadIcon(TileZoomMode.class,"resources/Zoom24.gif"));
+    setMnemonicKey(KeyEvent.VK_Z);
+    setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_Z,0));
+    setShortDescription("Zoom in tile or axis");
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -76,6 +79,7 @@ public class TileZoomMode extends Mode {
   };
 
   private void beginZoom(Tile tile, MouseEvent e) {
+    System.out.println("TileZoomMode.beginZoom: tile="+tile);
     tile.addMouseMotionListener(_mml);
     _tile = tile;
     _axis = null;
@@ -87,12 +91,14 @@ public class TileZoomMode extends Mode {
   }
 
   private void endZoom(Tile tile, MouseEvent e) {
+    System.out.println("TileZoomMode.endZoom: tile="+tile);
     _tile = null;
     _axis = null;
     tile.removeMouseMotionListener(_mml);
   }
 
   private void beginZoom(TileAxis axis, MouseEvent e) {
+    System.out.println("TileZoomMode.beginZoom: axis="+axis);
     axis.addMouseMotionListener(_mml);
     _axis = axis;
     _tile = null;
@@ -104,6 +110,7 @@ public class TileZoomMode extends Mode {
   }
 
   private void endZoom(TileAxis axis, MouseEvent e) {
+    System.out.println("TileZoomMode.endZoom: axis="+axis);
     _axis = null;
     _tile = null;
     axis.removeMouseMotionListener(_mml);
@@ -118,6 +125,7 @@ public class TileZoomMode extends Mode {
 
       // Draw zoom rectangle in this tile.
       // TODO: implement draw zoom rectangle
+      System.out.println("draw zoom rect in tile="+tile);
 
       // Draw zoom lines in other tiles and axes in this tile's row and column.
       Mosaic mosaic = tile.getMosaic();
@@ -144,6 +152,7 @@ public class TileZoomMode extends Mode {
 
       // Draw zoom lines in other tile.
       // TODO: implement draw zoom lines
+      System.out.println("draw zoom lines in other tile="+tile);
     }
   }
 
@@ -156,6 +165,7 @@ public class TileZoomMode extends Mode {
 
       // Draw zoom lines in this axis.
       // TODO: implement draw zoom lines
+      System.out.println("draw zoom lines in axis="+axis);
 
       // Draw zoom lines in other tiles and axes in this axis's row or column.
       Mosaic mosaic = axis.getMosaic();
@@ -188,6 +198,7 @@ public class TileZoomMode extends Mode {
 
       // Draw zoom lines in other axis.
       // TODO: implement draw zoom lines
+      System.out.println("draw zoom lines in other axis="+axis);
     }
   }
 }

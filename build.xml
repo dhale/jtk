@@ -85,9 +85,16 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   </target>
 
   <!-- Build Java archive -->
-  <target name="jar" depends="compile-java"
+  <target name="jar" depends="compile-java,copy-resources"
       description="build Java archive">
     <jar jarfile="${build.jar}/edu_mines_jtk.jar" basedir="${build.cls}"/>
+  </target>
+  <target name="copy-resources">
+    <copy todir="${build.cls}">
+      <fileset dir="${src}">
+        <include name="**/resources/*"/>
+      </fileset>
+    </copy>
   </target>
 
   <!-- Build JNI libraries -->
