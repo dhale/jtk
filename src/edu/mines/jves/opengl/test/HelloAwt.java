@@ -17,7 +17,7 @@ import edu.mines.jves.opengl.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.11.24
  */
-public class Hello {
+public class HelloAwt {
 
   private static class MyCanvas extends GlAwtCanvas {
     public void glPaint() {

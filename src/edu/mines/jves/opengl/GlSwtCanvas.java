@@ -15,20 +15,20 @@ import org.eclipse.swt.widgets.Composite;
  * An SWT canvas that paints via OpenGL. To paint an SWT canvas using 
  * OpenGL, extend this class and implement the method {@link #glPaint()}.
  * @author Dave Hale, Colorado School of Mines
+ * @author Dean Witte, Transform Software
  * @version 2004.11.24
  */
 public abstract class GlSwtCanvas extends Canvas {
 
   /**
    * Constructs a canvas.
-   * @param parent The parent component of this canvas;
-   *               passed to the superclass constructor.
+   * @param parent The parent component of this canvas; passed to the 
+   *  superclass constructor.
    * @param style The style flags; passed to the superclass constructor.
    */
   public GlSwtCanvas(Composite parent, int style) {
-    super(parent, style);
+    super(parent,style);
     _context = new GlContext(this);
-
     addPaintListener(new PaintListener() {
       public void paintControl(PaintEvent e) {
         paint(e);
@@ -51,7 +51,7 @@ public abstract class GlSwtCanvas extends Canvas {
 
   /**
    * Paints this canvas.  This implementation (1) locks the OpenGL context,
-   * (2) calls * {@link #glPaint()}, (3) swaps the front and back buffers, and 
+   * (2) calls {@link #glPaint()}, (3) swaps the front and back buffers, and 
    * finally (4) unlocks the OpenGL context.
    * @param pe the PaintEvent; not used in this implementation.
    */

@@ -48,7 +48,10 @@ public class GlContext {
    * @param canvas the canvas.
    */
   public GlContext(org.eclipse.swt.widgets.Canvas canvas) {
-    _peer = makeGlSwtCanvasContext(canvas);
+    long handleCanvas = canvas.handle;
+    //long handleDisplay = canvas.getDisplay().xDisplay;
+    long handleDisplay = 0;
+    _peer = makeGlSwtCanvasContext(handleCanvas,handleDisplay);
   }
 
   /**
@@ -118,7 +121,7 @@ public class GlContext {
 
   private static native void killGlContext(long peer);
   private static native long makeGlAwtCanvasContext(java.awt.Canvas canvas);
-  private static native long makeGlSwtCanvasContext(org.eclipse.swt.widgets.Canvas canvas);
+  private static native long makeGlSwtCanvasContext(long canvas, long display);
   private static native boolean lock(long peer);
   private static native boolean unlock(long peer);
   private static native boolean swapBuffers(long peer);

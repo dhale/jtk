@@ -17,7 +17,6 @@ import org.eclipse.swt.events.*;
 
 import edu.mines.jves.opengl.*;
 
-
 /**
  * Simple OpenGL program.
  * @author Dave Hale, Colorado School of Mines
@@ -58,10 +57,8 @@ public class HelloSwt {
     Display display = new Display();
     Shell shell = new Shell(display);
     shell.setLayout(new FillLayout());
-    shell.setSize(800, 800);
-
+    shell.setSize(800,800);
     MyCanvas canvas = new MyCanvas(shell,SWT.NO_BACKGROUND);
-
     shell.layout();
     shell.open();
     while (!shell.isDisposed())
