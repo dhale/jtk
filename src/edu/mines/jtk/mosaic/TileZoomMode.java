@@ -47,90 +47,78 @@ public class TileZoomMode extends Mode {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private Tile _tile; // non-null while zooming a tile
-  private TileAxis _axis; // non-null while zooming an axis
+  private Tile _tile; // tile in which zooming began; null, if in axis
+  private TileAxis _axis; // axis in which zooming began; null, if in tile
   private int _xbegin; // x coordinate where zoom began
   private int _ybegin; // y coordinate where zoom began
-  private int _xlast; // x coordinate where mouse was last
-  private int _ylast; // y coordinate where mouse was last
-  private Graphics _graphics; // graphics used to draw zoom rectangle
+  private int _xdraw; // x coordinate to which zoom rect was last drawn
+  private int _ydraw; // y coordinate to which zoom rect was last drawn
 
   private MouseListener _ml = new MouseAdapter() {;
     public void mousePressed(MouseEvent e) {
-      if (e.getSource() instanceof Tile) {
-        beginZoom((Tile)e.getSource(),e);
-      } else if (e.getSource() instanceof TileAxis) {
-        beginZoom((TileAxis)e.getSource(),e);
-      }
+      beginZoom(e);
     }
     public void mouseReleased(MouseEvent e) {
-      if (e.getSource() instanceof Tile) {
-        endZoom((Tile)e.getSource(),e);
-      } else if (e.getSource() instanceof TileAxis) {
-        endZoom((TileAxis)e.getSource(),e);
-      }
+      endZoom(e);
     }
   };
 
   private MouseMotionListener _mml = new MouseMotionAdapter() {
     public void mouseDragged(MouseEvent e) {
-      if (e.getSource() instanceof Tile) {
-        duringZoom((Tile)e.getSource(),e);
-      } else if (e.getSource() instanceof TileAxis) {
-        duringZoom((TileAxis)e.getSource(),e);
-      }
+      duringZoom(e);
     }
   };
 
-  private void beginZoom(Tile tile, MouseEvent e) {
-    _tile = tile;
-    _axis = null;
+  private void beginZoom(MouseEvent e) {
     _xbegin = e.getX();
     _ybegin = e.getY();
-    drawZoom(tile,_xbegin,_ybegin);
-    tile.addMouseMotionListener(_mml);
+    Object source = e.getSource();
+    if (source instanceof Tile) {
+      Tile tile = _tile = (Tile)source;
+      drawZoom(tile,_xbegin,_ybegin,true,true);
+      tile.addMouseMotionListener(_mml);
+    } else if (source instanceof TileAxis) {
+      TileAxis axis = _axis = (TileAxis)source;
+      drawZoom(axis,_xbegin,_ybegin,_axis.isHorizontal(),_axis.isVertical());
+      axis.addMouseMotionListener(_mml);
+    }
   }
 
-  private void duringZoom(Tile tile, MouseEvent e) {
-    drawZoom(tile,_xlast,_ylast);
-    drawZoom(tile,e.getX(),e.getY());
+  private void duringZoom(MouseEvent e) {
+    int xdraw = e.getX();
+    int ydraw = e.getY();
+    if (_tile!=null) {
+      drawZoom(_tile,_xdraw,_ydraw,true,true);
+      drawZoom(_tile, xdraw, ydraw,true,true);
+    } else if (_axis!=null) {
+      drawZoom(_axis,_xdraw,_ydraw,_axis.isHorizontal(),_axis.isVertical());
+      drawZoom(_axis, xdraw, ydraw,_axis.isHorizontal(),_axis.isVertical());
+    }
   }
 
-  private void endZoom(Tile tile, MouseEvent e) {
-    drawZoom(tile,_xlast,_ylast);
-    tile.removeMouseMotionListener(_mml);
-    _tile = null;
-    _axis = null;
+  private void endZoom(MouseEvent e) {
+    if (_tile!=null) {
+      drawZoom(_tile,_xdraw,_ydraw,true,true);
+      _tile.removeMouseMotionListener(_mml);
+      _tile = null;
+    } else if (_axis!=null) {
+      drawZoom(_axis,_xdraw,_ydraw,_axis.isHorizontal(),_axis.isVertical());
+      _axis.removeMouseMotionListener(_mml);
+      _axis = null;
+    }
   }
 
-  private void beginZoom(TileAxis axis, MouseEvent e) {
-    _axis = axis;
-    _tile = null;
-    _xbegin = e.getX();
-    _ybegin = e.getY();
-    axis.addMouseMotionListener(_mml);
-  }
-
-  private void duringZoom(TileAxis axis, MouseEvent e) {
-  }
-
-  private void endZoom(TileAxis axis, MouseEvent e) {
-    axis.removeMouseMotionListener(_mml);
-    _axis = null;
-    _tile = null;
-  }
-
-  private void drawZoom(Tile tile, int x, int y) {
+  private void drawZoom(Tile tile, int x, int y, boolean bx, boolean by) {
     if (tile==null)
       return;
 
     // If this is tile in which zoom began, ...
     if (tile==_tile) {
 
-      // Draw zoom rectangle in this tile.
-      drawRect(tile,x,y);
+      // Draw zoom in this tile.
+      drawRect(tile,x,y,bx,by);
 
-      // Draw zoom lines in other tiles and axes in this tile's row and column.
+      // Draw zoom in other tiles and axes in this tile's row and column.
       Mosaic mosaic = tile.getMosaic();
       int jrow = tile.getRowIndex();
       int jcol = tile.getColumnIndex();
@@ -138,76 +126,58 @@ public class TileZoomMode extends Mode {
       int ncol = mosaic.countColumns();
       for (int irow=0; irow<nrow; ++irow) {
         if (irow!=jrow)
-          drawZoom(mosaic.getTile(irow,jcol),x,y);
+          drawZoom(mosaic.getTile(irow,jcol),x,y,true,false);
       }
       for (int icol=0; icol<ncol; ++icol) {
         if (icol!=jcol)
-          drawZoom(mosaic.getTile(jrow,icol),x,y);
+          drawZoom(mosaic.getTile(jrow,icol),x,y,false,true);
       }
-      drawZoom(mosaic.getTileAxisTop(jcol),x,y);
-      drawZoom(mosaic.getTileAxisLeft(jrow),x,y);
-      drawZoom(mosaic.getTileAxisBottom(jcol),x,y);
-      drawZoom(mosaic.getTileAxisRight(jrow),x,y);
+      drawZoom(mosaic.getTileAxisTop(jcol),x,y,true,false);
+      drawZoom(mosaic.getTileAxisLeft(jrow),x,y,false,true);
+      drawZoom(mosaic.getTileAxisBottom(jcol),x,y,true,false);
+      drawZoom(mosaic.getTileAxisRight(jrow),x,y,false,true);
     }
     
     // Else, if this is not the tile in which zoom began, ...
     else {
 
-      // Draw zoom lines in other tile.
-      // TODO: implement draw zoom lines
+      // Draw zoom in other tile.
+      drawRect(tile,x,y,bx,by);
     }
   }
 
-  private void drawRect(JComponent c, int x, int y) {
-    int x1 = _xbegin;
-    int y1 = _ybegin;
-    int x2 = x;
-    int y2 = y;
-    int xmin = min(x1,x2);
-    int xmax = max(x1,x2);
-    int ymin = min(y1,y2);
-    int ymax = max(y1,y2);
-    Graphics g = c.getGraphics();
-    g.setXORMode(c.getBackground());
-    g.setColor(Color.RED);
-    g.drawRect(xmin,ymin,xmax-xmin,ymax-ymin);
-    g.dispose();
-    _xlast = x;
-    _ylast = y;
-  }
-
-  private void drawZoom(TileAxis axis, int x, int y) {
+  private void drawZoom(TileAxis axis, int x, int y, boolean bx, boolean by) {
     if (axis==null)
       return;
 
     // If this is the axis in which zoom began, ...
     if (axis==_axis) {
 
-      // Draw zoom lines in this axis.
-      // TODO: implement draw zoom lines
+      // Draw zoom in this axis.
+      drawRect(axis,x,y,bx,by);
 
-      // Draw zoom lines in other tiles and axes in this axis's row or column.
+      // Draw zoom in other tiles and axes in this axis's row or column.
       Mosaic mosaic = axis.getMosaic();
       int index = axis.getIndex();
       if (axis.isHorizontal()) {
         int jcol = axis.getIndex();
         int nrow = mosaic.countRows();
         for (int irow=0; irow<nrow; ++irow)
-          drawZoom(mosaic.getTile(irow,jcol),x,y);
+          drawZoom(mosaic.getTile(irow,jcol),x,y,true,false);
         if (axis.isTop()) {
-          drawZoom(mosaic.getTileAxisBottom(jcol),x,y);
+          drawZoom(mosaic.getTileAxisBottom(jcol),x,y,true,false);
         } else {
-          drawZoom(mosaic.getTileAxisTop(jcol),x,y);
+          drawZoom(mosaic.getTileAxisTop(jcol),x,y,true,false);
         }
       } else {
         int jrow = axis.getIndex();
         int ncol = mosaic.countColumns();
         for (int icol=0; icol<ncol; ++icol)
-          drawZoom(mosaic.getTile(jrow,icol),x,y);
+          drawZoom(mosaic.getTile(jrow,icol),x,y,false,true);
         if (axis.isLeft()) {
-          drawZoom(mosaic.getTileAxisRight(jrow),x,y);
+          drawZoom(mosaic.getTileAxisRight(jrow),x,y,false,true);
         } else {
-          drawZoom(mosaic.getTileAxisLeft(jrow),x,y);
+          drawZoom(mosaic.getTileAxisLeft(jrow),x,y,false,true);
         }
       }
     }
@@ -215,9 +185,23 @@ public class TileZoomMode extends Mode {
     // Else, if this is not the axis in which zoom began, ...
     else {
 
-      // Draw zoom lines in other axis.
-      // TODO: implement draw zoom lines
+      // Draw zoom in other axis.
+      drawRect(axis,x,y,bx,by);
     }
+  }
+
+  private void drawRect(JComponent c, int x, int y, boolean bx, boolean by) {
+    _xdraw = x;
+    _ydraw = y;
+    int xmin = bx?min(_xbegin,_xdraw):-1;
+    int xmax = bx?max(_xbegin,_xdraw):c.getWidth();
+    int ymin = by?min(_ybegin,_ydraw):-1;
+    int ymax = by?max(_ybegin,_ydraw):c.getHeight();
+    Graphics g = c.getGraphics();
+    g.setColor(Color.RED);
+    g.setXORMode(c.getBackground());
+    g.drawRect(xmin,ymin,xmax-xmin,ymax-ymin);
+    g.dispose();
   }
 }
 
