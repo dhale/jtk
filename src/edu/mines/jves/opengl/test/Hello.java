@@ -20,10 +20,10 @@ public class Hello {
       glClearColor(0.0f,0.0f,0.0f,0.0f);
     }
     public void glResize(int width, int height, int widthOld, int heightOld) {
-        glViewport(0,0,width,height);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0.0,1.0,0.0,1.0,-1.0,1.0);
+      glViewport(0,0,width,height);
+      glMatrixMode(GL_PROJECTION);
+      glLoadIdentity();
+      glOrtho(0.0,1.0,0.0,1.0,-1.0,1.0);
     }
     public void glPaint() {
       glClear(GL_COLOR_BUFFER_BIT);
