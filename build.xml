@@ -12,22 +12,22 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   </description>
 
   <!-- Project directories -->
-  <property name="src" value="src"/>
+  <property name="bin" value="bin"/>
   <property name="jar" value="jar"/>
-  <property name="jni" value="jni"/>
+  <property name="lib" value="lib"/>
+  <property name="src" value="src"/>
   <property name="build" value="build"/>
   <property name="build.cls" value="${build}/cls"/>
+  <property name="build.doc" value="${build}/doc"/>
+  <property name="build.jar" value="${build}/jar"/>
+  <property name="build.lib" value="${build}/lib"/>
   <property name="build.obj" value="${build}/obj"/>
   <property name="build.src" value="${build}/src"/>
-  <property name="build.jar" value="${build}/jar"/>
-  <property name="build.jni" value="${build}/jni"/>
-  <property name="build.doc" value="${build}/doc"/>
-  <property name="dist" value="dist"/>
-  <property name="src.jtk" value="${src}/edu/mines/jtk"/>
   <property name="obj.jtk" value="${build.obj}/edu/mines/jtk"/>
+  <property name="src.jtk" value="${src}/edu/mines/jtk"/>
+  <property name="dist" value="dist"/>
 
   <!-- Other global settings -->
-  <tstamp/>
   <property name="title" value="MinesJTK"/>
   <property environment="env"/>
   <path id="classpath">
@@ -53,7 +53,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <mkdir dir="${build.cls}"/>
     <mkdir dir="${build.doc}"/>
     <mkdir dir="${build.jar}"/>
-    <mkdir dir="${build.jni}"/>
+    <mkdir dir="${build.lib}"/>
     <mkdir dir="${build.obj}"/>
     <mkdir dir="${build.src}"/>
   </target>
@@ -120,7 +120,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <jnicpp 
         srcdir="${src.jtk}/bench" 
         objdir="${obj.jtk}/bench"
-        jnidir="${build.jni}" 
+        jnidir="${build.lib}" 
         jniname="edu_mines_jtk_bench">
       <incarg arg="-I${jdk.include}"/>
       <incarg arg="-I${jdk.include}/linux"/>
@@ -133,7 +133,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <jnicpp 
         srcdir="${src.jtk}/opengl" 
         objdir="${obj.jtk}/opengl"
-        jnidir="${build.jni}" 
+        jnidir="${build.lib}" 
         jniname="edu_mines_jtk_opengl">
       <incarg arg="-I${jdk.include}"/>
       <incarg arg="-I${jdk.include}/linux"/>
@@ -156,7 +156,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <jnicpp 
         srcdir="${src.jtk}/bench" 
         objdir="${obj.jtk}/bench"
-        jnidir="${build.jni}" 
+        jnidir="${build.lib}" 
         jniname="edu_mines_jtk_bench">
       <incarg arg="/I${jdk.include}"/>
       <incarg arg="/I${jdk.include}\win32"/>
@@ -168,7 +168,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <jnicpp 
         srcdir="${src.jtk}/opengl" 
         objdir="${obj.jtk}/opengl"
-        jnidir="${build.jni}" 
+        jnidir="${build.lib}" 
         jniname="edu_mines_jtk_opengl">
       <incarg arg="/I${jdk.include}"/>
       <incarg arg="/I${jdk.include}\win32"/>
@@ -189,7 +189,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       author="true"
       version="true"
       use="true"
-      windowtitle="CSM JTK">
+      windowtitle="${title}">
       <packageset dir="src" defaultexcludes="yes">
         <include name="edu/mines/jtk/**"/>
         <exclude name="edu/mines/jtk/**/new"/>
@@ -203,17 +203,54 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <target name="all" depends="jar,jni"
       description="build everything"/>
 
-  <!-- Build distributions -->
+  <!-- Build distribution -->
   <target name="dist" depends="dist-init,dist-linux,dist-windows"/>
   <target name="dist-init" depends="all,doc">
+    <tstamp/>
     <mkdir dir="${dist}"/>
+    <mkdir dir="${dist}/bin"/>
+    <mkdir dir="${dist}/doc"/>
+    <mkdir dir="${dist}/jar"/>
+    <mkdir dir="${dist}/lib"/>
+    <mkdir dir="${dist}/src"/>
+    <copy todir="${dist}" file="license.txt"/>
+    <copy todir="${dist}/doc">
+      <fileset dir="${build.doc}"/>
+    </copy>
+    <copy todir="${dist}/jar">
+      <fileset dir="${build.jar}"/>
+      <fileset dir="${jar}" includes="junit.jar"/>
+    </copy>
+    <copy todir="${dist}/lib">
+      <fileset dir="${build.lib}"/>
+    </copy>
+    <copy todir="${dist}/src">
+      <fileset dir="${src}">
+        <exclude name="**/new/*"/>
+        <exclude name="**/old/*"/>
+      </fileset>
+    </copy>
   </target>
   <target name="dist-linux" depends="all,doc" if="linux">
   </target>
   <target name="dist-windows" depends="all,doc" if="windows">
+    <copy todir="${dist}/bin">
+      <fileset dir="${bin}" includes="antrun.bat"/>
+      <fileset dir="${bin}" includes="javarun.bat"/>
+    </copy>
+    <copy todir="${dist}/lib">
+      <fileset dir="${lib}/windows/x86"/>
+    </copy>
+    <copy todir="${dist}/jar">
+      <fileset dir="${jar}/windows/x86"/>
+    </copy>
     <zip destfile="${dist}/${title}_${DSTAMP}_${TSTAMP}.zip">
-      <zipfileset dir="${src}" prefix="${title}"/>
-      <zipfileset dir="${jar}" prefix="${title}"/>
+      <zipfileset file="${dist}/license.txt" prefix="${title}"/>
+      <zipfileset dir="${dist}/bin" prefix="${title}/bin"/>
+      <zipfileset dir="${dist}/doc" prefix="${title}/doc"/>
+      <zipfileset dir="${dist}/jar" prefix="${title}/jar"/>
+      <zipfileset dir="${dist}/lib" prefix="${title}/lib"/>
+      <zipfileset dir="${dist}/src" prefix="${title}/src"/>
     </zip>
   </target>
 
@@ -227,8 +264,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <!-- Clean jni -->
   <target name="clean-jni"
       description="delete all products of jni build">
-    <delete dir="${build.jni}"/>
+    <delete dir="${build.lib}"/>
     <delete dir="${build.obj}"/>
+  </target>
+
+  <!-- Clean build -->
+  <target name="clean-build"
+      description="delete all products of build, not including dist">
+    <delete dir="${build}"/>
   </target>
 
   <!-- Clean dist -->
@@ -238,8 +281,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   </target>
 
   <!-- Cleanup -->
-  <target name="clean" 
-      description="delete all products of build">
+  <target name="clean"
+      description="delete all products of build, including dist">
     <delete dir="${build}"/>
     <delete dir="${dist}"/>
   </target>

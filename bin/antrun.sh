@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Customize these locations as necessary.
 export JDK_HOME=/usr/java/jdk

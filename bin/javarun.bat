@@ -1,33 +1,20 @@
 @echo off
 setlocal
 
-set CSM_JTK_HOME=c:\dev\jtk
-set JAVA_HOME=c:\tools\Java\j2sdk1.4.2_06\jre
+rem Where is the Mines Java Toolkit?
+set MINES_JTK_HOME=c:\dhale\box\jtk\trunk\dist
 
+rem Where is the Java Runtime Environment (JRE)?
+set JRE_HOME=c:\pro\jdk\jre
 
-rem Set the Windows platform.
-rem At this point the only valid value is windows\x86
+set CLASSPATH=^
+%MINES_JTK_HOME%\jar\edu_mines_jtk.jar;^
+%MINES_JTK_HOME%\jar\swt.jar;^
+%MINES_JTK_HOME%\jar\junit.jar
 
-set PLATFORM=windows\x86
-
-
-rem Set CLASSPATH to include required jars.
-
-set CLASSPATH=
-set CLASSPATH=%CLASSPATH%;%CSM_JTK_HOME%\build\jar\edu_mines_jtk.jar
-set CLASSPATH=%CLASSPATH%;%CSM_JTK_HOME%\jar\%PLATFORM%\swt.jar
-set CLASSPATH=%CLASSPATH%;%CSM_JTK_HOME%\jar\junit.jar
-
-
-rem Set PATH to include required libraries.
-
-set JLIB=
-set JLIB=%JLIB%;%CSM_JTK_HOME%\lib\%PLATFORM%
-set JLIB=%JLIB%;%CSM_JTK_HOME%\build\jni
-set PATH=%JAVA_HOME%\bin;%JLIB%
-
-
-rem Invoke the jvm.
+set PATH=^
+%MINES_JTK_HOME%\lib\;^
+%JRE_HOME%\bin
 
 java -server -ea -Xmx1000m %*
 

@@ -1,16 +1,15 @@
 @echo off
 setlocal
 
-@rem Customize these locations as necessary.
-set TOOLS=c:\tools
-set VC_HOME=%TOOLS%\vc\vctk2003
-set SDK_HOME=%TOOLS%\mssdk
-set ANT_HOME=%TOOLS%\ant
-set JDK_HOME=%TOOLS%\Java\j2sdk1.4.2_06
+rem Customize these locations as necessary.
+set VC_HOME=c:\pro\msvc
+set SDK_HOME=c:\pro\mssdk
+set ANT_HOME=c:\pro\ant
+set JDK_HOME=c:\pro\jdk
 
-set TPATH=%JDK_HOME%\bin;%ANT_HOME%\bin;%VC_HOME%\bin
-set PATH=%TPATH%;%PATH%
+rem These are needed by VC++ compiler and linker.
 set LIB=%JDK_HOME%\lib;%VC_HOME%\lib;%SDK_HOME%\lib
+set PATH=%JDK_HOME%\bin;%ANT_HOME%\bin;%VC_HOME%\bin;%PATH%
 
 ant -e %*
 
