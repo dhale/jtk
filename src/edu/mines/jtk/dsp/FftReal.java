@@ -23,41 +23,6 @@ import static java.lang.Math.*;
  */
 public class FftReal {
 
-  public static void main(String[] args) {
-    int n = 8;
-    FftReal fft = FftReal.small(n);
-    int nfft = fft.getNfft();
-    float[] ra = new float[nfft+2];
-    float[] ca = ra;
-    ra[1] = 1.0f;
-    fft.realToComplex(1,ra,ca);
-    for (int i=0,j=0; i<nfft/2+1; ++i,j+=2)
-      System.out.println("ca["+i+"] = ("+ca[j]+","+ca[j+1]+")");
-    fft.complexToReal(-1,ca,ra);
-    fft.scale(nfft,ra);
-    for (int i=0; i<n; ++i)
-      System.out.println("ra["+i+"] = "+ra[i]);
-    testRandom(1441440);
-  }
-  private static void testRandom(int n) {
-    FftReal fft = FftReal.small(n);
-    int nfft = fft.getNfft();
-    float[] ca = new float[nfft+2];
-    float[] ra = ca;
-    float[] rb = new float[nfft];
-    java.util.Random random = new java.util.Random(314159);
-    for (int i=0; i<n; ++i)
-      ra[i] = random.nextFloat();
-    fft.realToComplex( 1,ra,ca);
-    fft.complexToReal(-1,ca,rb);
-    fft.scale(nfft,rb);
-    double sum = 0.0;
-    for (int i=0; i<n; ++i)
-      sum += abs(rb[i]-ra[i]);
-    double err = sum/n;
-    System.out.println("err="+err);
-  }
-
   /**
    * Constructs a new FFT, with specified length. Valid FFT lengths can 
    * be obtained by calling the methods {@link #nfftSmall(int)} and 
@@ -79,19 +44,20 @@ public class FftReal {
   }
 
   /**
-   * Computes a real-to-complex fast Fourier transform. Transforms nfft
-   * real numbers to nfft/2+1 complex numbers. If the input and output 
-   * arrays are the same array, the transform will be performed in-place.
+   * Computes a real-to-complex fast Fourier transform.
+   * Transforms an input array rx[nfft] of real numbers to an output 
+   * array cy[nfft+2] of complex numbers. If the input and output arrays 
+   * are the same, the transform is performed in-place.
    * @param sign the sign (1 or -1) of the exponent used in the FFT.
-   * @param rx the input array; rx.length must not be less than nfft.
-   * @param cy the output array; cy.length must not be less than nfft+2.
+   * @param rx the input array.
+   * @param cy the output array.
    */
   public void realToComplex(int sign, float[] rx, float[] cy) {
     Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
-    Check.argument(rx.length>=_nfft,"rx.length is sufficient");
-    Check.argument(cy.length>=_nfft+2,"cy.length is sufficient");
+    Check.argument(rx.length>=_nfft,"rx.length is valid");
+    Check.argument(cy.length>=_nfft+2,"cy.length is valid");
     int n = _nfft;
-    while (--n>0)
+    while (--n>=0)
       cy[n] = 0.5f*rx[n];
     _fftc.complexToComplex(sign,cy,cy);
     cy[_nfft] = 2.0f*(cy[0]-cy[1]);
@@ -100,10 +66,10 @@ public class FftReal {
     cy[1      ] = 0.0f;
     double theta = sign*2.0*PI/_nfft;
     double wt = sin(0.5*theta);
-    double wpi = sin(theta); // = sin(theta)
     double wpr = -2.0*wt*wt; // = cos(theta)-1, with less rounding error
-    double wi = wpi;
+    double wpi = sin(theta); // = sin(theta)
     double wr = 1.0+wpr;
+    double wi = wpi;
     for (int j=2,k=_nfft-2; j<=k; j+=2,k-=2) {
       float sumr = cy[j  ]+cy[k  ];
       float sumi = cy[j+1]+cy[k+1];
@@ -122,28 +88,31 @@ public class FftReal {
   }
 
   /**
-   * Computes a complex-to-real fast Fourier transform. Transforms nfft/2+1
-   * complex numbers to nfft real numbers. If the input and output arrays
-   * are the same array, the transform will be performed in-place.
+   * Computes a complex-to-real fast Fourier transform. 
+   * Transforms an input array cx[nfft+2] of complex numbers to an output 
+   * array ry[nfft] of real numbers. If the input and output arrays are the 
+   * same, the transform is performed in-place.
    * @param sign the sign (1 or -1) of the exponent used in the FFT.
-   * @param cx the input array; cx.length must not be less than nfft+2.
-   * @param ry the output array; ry.length must not be less than nfft.
+   * @param cx the input array.
+   * @param ry the output array.
    */
   public void complexToReal(int sign, float[] cx, float[] ry) {
     Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
-    Check.argument(cx.length>=_nfft+2,"cy.length is sufficient");
-    Check.argument(ry.length>=_nfft,"rx.length is sufficient");
-    int n = _nfft;
-    while (--n>2)
-      ry[n] = cx[n];
+    Check.argument(cx.length>=_nfft+2,"cy.length is valid");
+    Check.argument(ry.length>=_nfft,"rx.length is valid");
+    if (cx!=ry) {
+      int n = _nfft;
+      while (--n>=2)
+        ry[n] = cx[n];
+    }
     ry[1] = cx[0]-cx[_nfft];
     ry[0] = cx[0]+cx[_nfft];
     double theta = -sign*2.0*PI/_nfft;
     double wt = sin(0.5*theta);
-    double wpi = sin(theta); // = sin(theta)
     double wpr = -2.0*wt*wt; // = cos(theta)-1, with less rounding error
-    double wi = wpi;
+    double wpi = sin(theta); // = sin(theta)
     double wr = 1.0+wpr;
+    double wi = wpi;
     for (int j=2,k=_nfft-2; j<=k; j+=2,k-=2) {
       float sumr = ry[j  ]+ry[k  ];
       float sumi = ry[j+1]+ry[k+1];
@@ -163,11 +132,34 @@ public class FftReal {
   }
 
   /**
+   * Computes a real-to-complex dimension-1 fast Fourier transform. 
+   * Transforms an input array rx[n2][nfft] of real numbers to an output
+   * array cy[n2][nfft+2] of complex numbers. If the input and output 
+   * arrays are the same, the transform is performed in-place.
+   * @param sign the sign (1 or -1) of the exponent used in the FFT.
+   * @param n2 the number of transforms.
+   * @param rx the input array.
+   * @param cy the output array.
+   */
+  public void realToComplex1(int sign, int n2, float[][] rx, float[][] cy) {
+    Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
+    Check.argument(rx.length>=n2,"rx.length is valid");
+    Check.argument(cy.length>=n2,"cy.length is valid");
+    for (int i2=0; i2<n2; ++i2) {
+      Check.argument(rx[i2].length>=_nfft,"rx[i2].length is valid");
+      Check.argument(cy[i2].length>=_nfft+2,"cy[i2].length is valid");
+      if (rx[i2]!=cy[i2])
+        System.arraycopy(rx[i2],0,cy[i2],0,_nfft);
+      realToComplex(sign,cy[i2],cy[i2]);
+    }
+  }
+
+  /**
    * Scales n1 real numbers in the specified array by 1/nfft. The 
    * inverse of a real-to-complex FFT is a complex-to-real FFT (with 
    * opposite sign) followed by this scaling.
    * @param n1 1st (only) dimension of the array rx.
-   * @param rx the input/output array.
+   * @param rx the input/output array[n1].
    */
   public void scale(int n1, float[] rx) {
     float s = 1.0f/(float)_nfft;

@@ -21,17 +21,6 @@ import edu.mines.jtk.util.Check;
  */
 public class FftComplex {
 
-  public static void main(String[] args) {
-    int n = 18;
-    FftComplex fft = FftComplex.small(n);
-    int nfft = fft.getNfft();
-    float[] ca = new float[2*nfft];
-    ca[2] = 1.0f;
-    pfacc(1,nfft,ca);
-    for (int i=0,j=0; i<nfft; ++i,j+=2)
-      System.out.println("("+ca[j]+","+ca[j+1]+")");
-  }
-
   /**
    * Constructs a new FFT, with specified length. Valid FFT lengths can 
    * be obtained by calling the methods {@link #nfftSmall(int)} and 
@@ -54,35 +43,58 @@ public class FftComplex {
   }
 
   /**
-   * Computes a complex-to-complex fast Fourier transform. Transforms nfft
-   * complex numbers to nfft complex numbers. If the input and output arrays
-   * are the same array, the transform will be performed in-place.
+   * Computes a complex-to-complex fast Fourier transform. 
+   * Transforms an input array cx[2*nfft] of complex numbers to an
+   * output array cy[2*nfft] of complex numbers. If the input and 
+   * output arrays are the array, the transform is performed in-place.
    * @param sign the sign (1 or -1) of the exponent used in the FFT.
-   * @param cx the input array; cx.length must not be less than 2*nfft.
-   * @param cy the output array; cy.length must not be less than 2*nfft.
+   * @param cx the input array
+   * @param cy the output array
    */
   public void complexToComplex(int sign, float[] cx, float[] cy) {
     Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
-    Check.argument(cx.length>=2*_nfft,"cx.length is sufficient");
-    Check.argument(cy.length>=2*_nfft,"cy.length is sufficient");
+    Check.argument(cx.length>=2*_nfft,"cx.length is valid");
+    Check.argument(cy.length>=2*_nfft,"cy.length is valid");
     if (cx!=cy)
       System.arraycopy(cx,0,cy,0,_nfft);
     pfacc(sign,_nfft,cy);
   }
 
   /**
-   * Computes a complex-to-complex fast Fourier transform. Transforms nfft
-   * complex numbers to nfft complex numbers. If the input and output arrays
-   * are the same array, the transform will be performed in-place.
+   * Computes a complex-to-complex dimension-1 fast Fourier transform. 
+   * Transforms an input array cx[n2][2*nfft] of complex numbers to an 
+   * output array cy[n2][2*nfft] of complex numbers. If the input and 
+   * output arrays are the same, the transform is performed in-place.
+   * @param sign the sign (1 or -1) of the exponent used in the FFT.
+   * @param n2 the number of transforms; 2nd dimension of arrays.
+   * @param cx the input array
+   * @param cy the output array
+   */
+  public void complexToComplex1(int sign, int n2, float[][] cx, float[][] cy) {
+    Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
+    Check.argument(cx.length>=n2,"cx.length is valid");
+    Check.argument(cy.length>=n2,"cy.length is valid");
+    for (int i2=0; i2<n2; ++i2) {
+      Check.argument(cx[i2].length>=2*_nfft,"cx[i2].length is valid");
+      Check.argument(cy[i2].length>=2*_nfft,"cy[i2].length is valid");
+      complexToComplex(sign,cx[i2],cy[i2]);
+    }
+  }
+
+  /**
+   * Computes a complex-to-complex dimension-2 fast Fourier transform. 
+   * Transforms an input array cx[nfft][2*n1] of complex numbers to an 
+   * output array cy[nfft][2*n1] of complex numbers. If the input and 
+   * output arrays are the same, the transform is performed in-place.
    * @param sign the sign (1 or -1) of the exponent used in the FFT.
    * @param n1 the number of transforms; 1st dimension of arrays.
-   * @param cx the input array; cx.length must not be less than nfft.
-   * @param cy the output array; cy.length must not be less than nfft.
+   * @param cx the input array
+   * @param cy the output array
    */
   public void complexToComplex2(int sign, int n1, float[][] cx, float[][] cy) {
     Check.argument(sign==1 || sign==-1,"sign equals 1 or -1");
-    Check.argument(cx.length>=_nfft,"cx.length is sufficient");
-    Check.argument(cy.length>=_nfft,"cy.length is sufficient");
+    Check.argument(cx.length>=_nfft,"cx.length is valid");
+    Check.argument(cy.length>=_nfft,"cy.length is valid");
     if (cx!=cy) {
       for (int i2=0; i2<_nfft; ++i2)
         System.arraycopy(cx[i2],0,cy[i2],0,2*n1);
@@ -95,7 +107,7 @@ public class FftComplex {
    * The inverse of a complex-to-complex FFT is a complex-to-complex 
    * FFT (with opposite sign) followed by this scaling.
    * @param n1 1st (only) dimension of the array cx.
-   * @param cx the input/output array
+   * @param cx the input/output array[2*n1].
    */
   public void scale(int n1, float[] cx) {
     float s = 1.0f/(float)_nfft;
@@ -110,7 +122,7 @@ public class FftComplex {
    * FFT (with opposite sign) followed by this scaling.
    * @param n1 the 1st dimension of the array cx.
    * @param n2 the 2nd dimension of the array cx.
-   * @param cx the input/output array.
+   * @param cx the input/output array[n2][2*n1].
    */
   public void scale(int n1, int n2, float[][] cx) {
     float s = 1.0f/(float)_nfft;
