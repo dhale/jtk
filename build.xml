@@ -20,6 +20,7 @@
   <property name="obj.jves" value="${build.obj}/edu/mines/jves"/>
 
   <!-- Other global settings -->
+  <property environment="env"/>
   <path id="classpath">
     <fileset dir="${jar}">
       <include name="**/*.jar"/>
@@ -67,13 +68,15 @@
 
   <!-- Build JNI libraries for Linux -->
   <target name="jni-linux" if="linux">
+    <property name="jdk.home" value="${env.JDK_HOME}"/>
+    <property name="jdk.include" value="${jdk.home}/include"/>
     <jnicpp 
         srcdir="${src.jves}/bench" 
         objdir="${obj.jves}/bench"
         jnidir="${build.jni}" 
         jniname="edu_mines_jves_bench">
-      <incarg arg="-Iinclude"/>
-      <incarg arg="-Iinclude/linux"/>
+      <incarg arg="-I${jdk.include}"/>
+      <incarg arg="-I${jdk.include}/linux"/>
       <libarg arg="-L/usr/X11R6/lib"/>
       <libarg arg="-lGL"/>
       <libarg arg="-lGLU"/>
@@ -82,22 +85,21 @@
 
   <!-- Build JNI libraries for Windows -->
   <target name="jni-windows" if="windows">
-    <property environment="env"/>
-    <property name="java.include" value="${env.JAVA_INCLUDE}"/>
     <property name="vc.home" value="${env.VC_HOME}"/>
     <property name="sdk.home" value="${env.SDK_HOME}"/>
-
+    <property name="jdk.home" value="${env.JDK_HOME}"/>
+    <property name="vc.include" value="${vc.home}\include"/>
+    <property name="sdk.include" value="${sdk.home}\include"/>
+    <property name="jdk.include" value="${jdk.home}/include"/>
     <jnicpp 
         srcdir="${src.jves}/bench" 
         objdir="${obj.jves}/bench"
         jnidir="${build.jni}" 
         jniname="edu_mines_jves_bench">
-      <!-- Insert appropriate include locations here -->
       <incarg arg="/I${java.include}"/>
       <incarg arg="/I${java.include}\win32"/>
-      <incarg arg="/I${vc.home}\include"/>
-      <incarg arg="/I${sdk.home}\include"/>
-      <!-- Insert appropriate lib locations here -->
+      <incarg arg="/I${vc.include}"/>
+      <incarg arg="/I${sdk.include}"/>
       <libarg arg="openGL32.lib"/>
     </jnicpp>
   </target>
