@@ -385,7 +385,7 @@ public class TileAxis extends JPanel {
     return fm.stringWidth(formatTic(vtic));
   }
 
-  // Formats tic value, removing any trailing zeros and decimal point.
+  // Formats tic value, removing any trailing zeros after a decimal point.
   private String formatTic(double v) {
     String s = String.format(_format,v);
     int len = s.length();
@@ -395,10 +395,12 @@ public class TileAxis extends JPanel {
     if (iend<0)
       iend = len;
     int ibeg = iend;
-    while (ibeg>0 && s.charAt(ibeg-1)=='0')
-      --ibeg;
-    if (ibeg>0 && s.charAt(ibeg-1)=='.')
-      --ibeg;
+    if (s.indexOf('.')>0) {
+      while (ibeg>0 && s.charAt(ibeg-1)=='0')
+        --ibeg;
+      if (ibeg>0 && s.charAt(ibeg-1)=='.')
+        --ibeg;
+    }
     if (ibeg<iend) {
       String sb = s.substring(0,ibeg);
       s = (iend<len)?sb+s.substring(iend,len):sb;

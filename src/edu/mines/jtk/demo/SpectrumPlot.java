@@ -27,7 +27,8 @@ import static edu.mines.jtk.mosaic.Mosaic.*;
 public class SpectrumPlot extends JFrame {
 
     public static void main(String[] args) {
-      Real1 x = readData("data/bob1.txt");
+      //Real1 x = readData("data/bob1.txt");
+      Real1 x = readData("data/dylan1.txt");
       SpectrumPlot plot = new SpectrumPlot(x);
       /*
       int nt = 101;
@@ -52,7 +53,6 @@ public class SpectrumPlot extends JFrame {
             nt = s.nextInt();
             s = new Scanner(br.readLine().substring(5));
             dt = s.nextDouble();
-            dt = 60.0;
             s = new Scanner(br.readLine().substring(5));
             ft = s.nextDouble();
             //System.out.println("nt="+nt+" dt="+dt+" ft="+ft);
@@ -129,12 +129,12 @@ public class SpectrumPlot extends JFrame {
     MarkLineView pv = new MarkLineView(p.getSampling(),p.getF());
     tileA.addTiledView(av);
     tileP.addTiledView(pv);
-    tileP.setBestVerticalProjector(new Projector(180.0,-180.0));
+    tileP.setBestVerticalProjector(new Projector(0.5,-0.5));
     TileAxis axisSA = mosaicS.getTileAxisLeft(0);
     TileAxis axisSP = mosaicS.getTileAxisLeft(1);
     TileAxis axisSF = mosaicS.getTileAxisBottom(0);
     axisSA.setLabel("Amplitude");
-    axisSP.setLabel("Phase (deg)");
+    axisSP.setLabel("Phase (cycles)");
     axisSF.setLabel("Frequency (Hz)");
 
     // Modes.
@@ -201,9 +201,11 @@ public class SpectrumPlot extends JFrame {
     float[] cf = new float[2*nf];
     Rap.copy(nt,xt,cf);
     fft.realToComplex(-1,cf,cf);
+    float[] wft = Rap.ramp(0.0f,-2.0f*FLT_PI*(float)(df*ft),nf);
+    cf = Cap.mul(cf,Cap.complex(Rap.cos(wft),Rap.sin(wft)));
     float[] af = Cap.abs(cf);
     float[] pf = Cap.arg(cf);
-    pf = Rap.mul(180.0f/FLT_PI,pf);
+    pf = Rap.mul(0.5f/FLT_PI,pf);
     Sampling sf = new Sampling(nf,df,ff);
     Real1 a = new Real1(sf,af);
     Real1 p = new Real1(sf,pf);
