@@ -1248,9 +1248,12 @@ public class Gl {
   public static native void glRasterPos4s(short x, short y, short z, short w);
   public static native void glRasterPos4sv(short[] v);
   public static native void glReadBuffer(int mode);
-//  public static native void glReadPixels(
-//    int x, int y, int width, int height, 
-//    int format, int type, GLvoid *pixels);
+  public static native void glReadPixels(
+    int x, int y, int width, int height, int format, int type, byte[] pixels);
+  public static native void glReadPixels(
+    int x, int y, int width, int height, int format, int type, int[] pixels);
+  public static native void glReadPixels(
+    int x, int y, int width, int height, int format, int type, short[] pixels);
   public static native void glRectd(double x1, double y1, double x2, double y2);
   public static native void glRectdv(double[] v1, double[] v2);
   public static native void glRectf(float x1, float y1, float x2, float y2);
@@ -1266,7 +1269,7 @@ public class Gl {
   public static native void glScaled(double x, double y, double z);
   public static native void glScalef(float x, float y, float z);
   public static native void glScissor(int x, int y, int width, int height);
-  public static native void glSelectBuffer(int size, int[] buffer);
+  public static native void glSelectBuffer(int size, IntBuffer buffer);
   public static native void glShadeModel(int mode);
   public static native void glStencilFunc(int func, int ref, int mask);
   public static native void glStencilMask(int mask);
@@ -1304,8 +1307,8 @@ public class Gl {
   public static native void glTexCoord4iv(int[] v);
   public static native void glTexCoord4s(short s, short t, short r, short q);
   public static native void glTexCoord4sv(short[] v);
-//  public static native void glTexCoordPointer(
-//    int size, int type, int stride, GLvoid *pointer);
+  public static native void glTexCoordPointer(
+    int size, int type, int stride, Buffer pointer);
   public static native void glTexEnvf(int target, int pname, float param);
   public static native void glTexEnvfv(int target, int pname, float[] params);
   public static native void glTexEnvi(int target, int pname, int param);
@@ -1316,24 +1319,48 @@ public class Gl {
   public static native void glTexGenfv(int coord, int pname, float[] params);
   public static native void glTexGeni(int coord, int pname, int param);
   public static native void glTexGeniv(int coord, int pname, int[] params);
-//  public static native void glTexImage1D(
-//    int target, int level, int internalformat, 
-//    int width, int border, int format, int type, GLvoid *pixels);
-//  public static native void glTexImage2D(
-//    int target, int level, int internalformat, 
-//    int width, int height, int border, int format, int type, GLvoid *pixels);
+  public static native void glTexImage1D(
+    int target, int level, int internalformat, 
+    int width, int border, int format, int type, byte[] pixels);
+  public static native void glTexImage1D(
+    int target, int level, int internalformat, 
+    int width, int border, int format, int type, int[] pixels);
+  public static native void glTexImage1D(
+    int target, int level, int internalformat, 
+    int width, int border, int format, int type, short[] pixels);
+  public static native void glTexImage2D(
+    int target, int level, int internalformat, 
+    int width, int height, int border, int format, int type, byte[] pixels);
+  public static native void glTexImage2D(
+    int target, int level, int internalformat, 
+    int width, int height, int border, int format, int type, int[] pixels);
+  public static native void glTexImage2D(
+    int target, int level, int internalformat, 
+    int width, int height, int border, int format, int type, short[] pixels);
   public static native void glTexParameterf(int target, int pname, float param);
   public static native void glTexParameterfv(
     int target, int pname, float[] params);
   public static native void glTexParameteri(int target, int pname, int param);
   public static native void glTexParameteriv(
     int target, int pname, int[] params);
-//  public static native void glTexSubImage1D(
-//    int target, int level, int xoffset, 
-//    int width, int format, int type, GLvoid *pixels);
-//  public static native void glTexSubImage2D(
-//    int target, int level, int xoffset, int yoffset, 
-//    int width, int height, int format, int type, GLvoid *pixels);
+  public static native void glTexSubImage1D(
+    int target, int level, int xoffset, 
+    int width, int format, int type, byte[] pixels);
+  public static native void glTexSubImage1D(
+    int target, int level, int xoffset, 
+    int width, int format, int type, int[] pixels);
+  public static native void glTexSubImage1D(
+    int target, int level, int xoffset, 
+    int width, int format, int type, short[] pixels);
+  public static native void glTexSubImage2D(
+    int target, int level, int xoffset, int yoffset, 
+    int width, int height, int format, int type, byte[] pixels);
+  public static native void glTexSubImage2D(
+    int target, int level, int xoffset, int yoffset, 
+    int width, int height, int format, int type, int[] pixels);
+  public static native void glTexSubImage2D(
+    int target, int level, int xoffset, int yoffset, 
+    int width, int height, int format, int type, short[] pixels);
   public static native void glTranslated(double x, double y, double z);
   public static native void glTranslatef(float x, float y, float z);
   public static native void glVertex2d(double x, double y);
@@ -1360,8 +1387,8 @@ public class Gl {
   public static native void glVertex4iv(int[] v);
   public static native void glVertex4s(short x, short y, short z, short w);
   public static native void glVertex4sv(short[] v);
-//  public static native void glVertexPointer(
-//    int size, int type, int stride, GLvoid *pointer);
+  public static native void glVertexPointer(
+    int size, int type, int stride, Buffer pointer);
   public static native void glViewport(int x, int y, int width, int height);
 
   ///////////////////////////////////////////////////////////////////////////
@@ -1377,14 +1404,645 @@ public class Gl {
   // OpenGL 1.2
 
   public static void glBlendColor(
-    float red, float green, float blue, float alpha) 
+    float red, float green, float blue, float alpha)
   {
     nglBlendColor(getContext().glBlendColor,
       red,green,blue,alpha);
   }
-  private static native void nglBlendColor(long glBlendColor,
+  public static void glBlendEquation(
+    int mode)
+  {
+    nglBlendEquation(getContext().glBlendEquation,
+      mode);
+  }
+  public static void glDrawRangeElements(
+    int mode, int start, int end, int count, int type, byte[] indices)
+  {
+    nglDrawRangeElements(getContext().glDrawRangeElements,
+      mode,start,end,count,type,indices);
+  }
+  public static void glDrawRangeElements(
+    int mode, int start, int end, int count, int type, int[] indices)
+  {
+    nglDrawRangeElements(getContext().glDrawRangeElements,
+      mode,start,end,count,type,indices);
+  }
+  public static void glDrawRangeElements(
+    int mode, int start, int end, int count, int type, short[] indices)
+  {
+    nglDrawRangeElements(getContext().glDrawRangeElements,
+      mode,start,end,count,type,indices);
+  }
+  public static void glColorTable(
+    int target, int internalformat, int width, 
+    int format, int type, byte[] table)
+  {
+    nglColorTable(getContext().glColorTable,
+      target,internalformat,width,format,type,table);
+  }
+  public static void glColorTable(
+    int target, int internalformat, int width, 
+    int format, int type, int[] table)
+  {
+    nglColorTable(getContext().glColorTable,
+      target,internalformat,width,format,type,table);
+  }
+  public static void glColorTable(
+    int target, int internalformat, int width, 
+    int format, int type, short[] table)
+  {
+    nglColorTable(getContext().glColorTable,
+      target,internalformat,width,format,type,table);
+  }
+  public static void glColorTableParameterfv(
+    int target, int pname, float[] params)
+  {
+    nglColorTableParameterfv(getContext().glColorTableParameterfv,
+      target,pname,params);
+  }
+  public static void glColorTableParameteriv(
+    int target, int pname, int[] params)
+  {
+    nglColorTableParameteriv(getContext().glColorTableParameteriv,
+      target,pname,params);
+  }
+  public static void glCopyColorTable(
+    int target, int internalformat, int x, int y, int width)
+  {
+    nglCopyColorTable(getContext().glCopyColorTable,
+      target,internalformat,x,y,width);
+  }
+  public static void glGetColorTable(
+    int target, int format, int type, byte[] table)
+  {
+    nglGetColorTable(getContext().glGetColorTable,
+      target,format,type,table);
+  }
+  public static void glGetColorTable(
+    int target, int format, int type, int[] table)
+  {
+    nglGetColorTable(getContext().glGetColorTable,
+      target,format,type,table);
+  }
+  public static void glGetColorTable(
+    int target, int format, int type, short[] table)
+  {
+    nglGetColorTable(getContext().glGetColorTable,
+      target,format,type,table);
+  }
+  public static void glGetColorTableParameterfv(
+    int target, int pname, float[] params)
+  {
+    nglGetColorTableParameterfv(getContext().glGetColorTableParameterfv,
+      target,pname,params);
+  }
+  public static void glGetColorTableParameteriv(
+    int target, int pname, int[] params)
+  {
+    nglGetColorTableParameteriv(getContext().glGetColorTableParameteriv,
+      target,pname,params);
+  }
+  public static void glColorSubTable(
+    int target, int start, int count, int format, int type, byte[] data)
+  {
+    nglColorSubTable(getContext().glColorSubTable,
+      target,start,count,format,type,data);
+  }
+  public static void glColorSubTable(
+    int target, int start, int count, int format, int type, int[] data)
+  {
+    nglColorSubTable(getContext().glColorSubTable,
+      target,start,count,format,type,data);
+  }
+  public static void glColorSubTable(
+    int target, int start, int count, int format, int type, short[] data)
+  {
+    nglColorSubTable(getContext().glColorSubTable,
+      target,start,count,format,type,data);
+  }
+  public static void glCopyColorSubTable(
+    int target, int start, int x, int y, int width)
+  {
+    nglCopyColorSubTable(getContext().glCopyColorSubTable,
+      target,start,x,y,width);
+  }
+  public static void glConvolutionFilter1D(
+    int target, int internalformat, int width, 
+    int format, int type, byte[] image)
+  {
+    nglConvolutionFilter1D(getContext().glConvolutionFilter1D,
+      target,internalformat,width,format,type,image);
+  }
+  public static void glConvolutionFilter1D(
+    int target, int internalformat, int width, 
+    int format, int type, float[] image)
+  {
+    nglConvolutionFilter1D(getContext().glConvolutionFilter1D,
+      target,internalformat,width,format,type,image);
+  }
+  public static void glConvolutionFilter1D(
+    int target, int internalformat, int width, 
+    int format, int type, int[] image)
+  {
+    nglConvolutionFilter1D(getContext().glConvolutionFilter1D,
+      target,internalformat,width,format,type,image);
+  }
+  public static void glConvolutionFilter1D(
+    int target, int internalformat, int width, 
+    int format, int type, short[] image)
+  {
+    nglConvolutionFilter1D(getContext().glConvolutionFilter1D,
+      target,internalformat,width,format,type,image);
+  }
+  public static void glConvolutionFilter2D(
+    int target, int internalformat, int width, int height, 
+    int format, int type, byte[] image)
+  {
+    nglConvolutionFilter2D(getContext().glConvolutionFilter2D,
+      target,internalformat,width,height,format,type,image);
+  }
+  public static void glConvolutionFilter2D(
+    int target, int internalformat, int width, int height, 
+    int format, int type, float[] image)
+  {
+    nglConvolutionFilter2D(getContext().glConvolutionFilter2D,
+      target,internalformat,width,height,format,type,image);
+  }
+  public static void glConvolutionFilter2D(
+    int target, int internalformat, int width, int height, 
+    int format, int type, int[] image)
+  {
+    nglConvolutionFilter2D(getContext().glConvolutionFilter2D,
+      target,internalformat,width,height,format,type,image);
+  }
+  public static void glConvolutionFilter2D(
+    int target, int internalformat, int width, int height, 
+    int format, int type, short[] image)
+  {
+    nglConvolutionFilter2D(getContext().glConvolutionFilter2D,
+      target,internalformat,width,height,format,type,image);
+  }
+  public static void glConvolutionParameterf(
+    int target, int pname, float param)
+  {
+    nglConvolutionParameterf(getContext().glConvolutionParameterf,
+      target,pname,param);
+  }
+  public static void glConvolutionParameterfv(
+    int target, int pname, float[] params)
+  {
+    nglConvolutionParameterfv(getContext().glConvolutionParameterfv,
+      target,pname,params);
+  }
+  public static void glConvolutionParameteri(
+    int target, int pname, int param)
+  {
+    nglConvolutionParameteri(getContext().glConvolutionParameteri,
+      target,pname,param);
+  }
+  public static void glConvolutionParameteriv(
+    int target, int pname, int[] params)
+  {
+    nglConvolutionParameteriv(getContext().glConvolutionParameteriv,
+      target,pname,params);
+  }
+  public static void glCopyConvolutionFilter1D(
+    int target, int internalformat, int x, int y, int width)
+  {
+    nglCopyConvolutionFilter1D(getContext().glCopyConvolutionFilter1D,
+      target,internalformat,x,y,width);
+  }
+  public static void glCopyConvolutionFilter2D(
+    int target, int internalformat, int x, int y, int width, int height)
+  {
+    nglCopyConvolutionFilter2D(getContext().glCopyConvolutionFilter2D,
+      target,internalformat,x,y,width,height);
+  }
+  public static void glGetConvolutionFilter(
+    int target, int format, int type, byte[] image)
+  {
+    nglGetConvolutionFilter(getContext().glGetConvolutionFilter,
+      target,format,type,image);
+  }
+  public static void glGetConvolutionFilter(
+    int target, int format, int type, float[] image)
+  {
+    nglGetConvolutionFilter(getContext().glGetConvolutionFilter,
+      target,format,type,image);
+  }
+  public static void glGetConvolutionFilter(
+    int target, int format, int type, int[] image)
+  {
+    nglGetConvolutionFilter(getContext().glGetConvolutionFilter,
+      target,format,type,image);
+  }
+  public static void glGetConvolutionFilter(
+    int target, int format, int type, short[] image)
+  {
+    nglGetConvolutionFilter(getContext().glGetConvolutionFilter,
+      target,format,type,image);
+  }
+  public static void glGetConvolutionParameterfv(
+    int target, int pname, float[] params)
+  {
+    nglGetConvolutionParameterfv(getContext().glGetConvolutionParameterfv,
+      target,pname,params);
+  }
+  public static void glGetConvolutionParameteriv(
+    int target, int pname, int[] params)
+  {
+    nglGetConvolutionParameteriv(getContext().glGetConvolutionParameteriv,
+      target,pname,params);
+  }
+  public static void glGetSeparableFilter(
+    int target, int format, int type, 
+    byte[] row, byte[] column, byte[] span)
+  {
+    nglGetSeparableFilter(getContext().glGetSeparableFilter,
+      target,format,type,row,column,span);
+  }
+  public static void glGetSeparableFilter(
+    int target, int format, int type, 
+    float[] row, float[] column, float[] span)
+  {
+    nglGetSeparableFilter(getContext().glGetSeparableFilter,
+      target,format,type,row,column,span);
+  }
+  public static void glGetSeparableFilter(
+    int target, int format, int type, 
+    int[] row, int[] column, int[] span)
+  {
+    nglGetSeparableFilter(getContext().glGetSeparableFilter,
+      target,format,type,row,column,span);
+  }
+  public static void glGetSeparableFilter(
+    int target, int format, int type, 
+    short[] row, short[] column, short[] span)
+  {
+    nglGetSeparableFilter(getContext().glGetSeparableFilter,
+      target,format,type,row,column,span);
+  }
+  public static void glSeparableFilter2D(
+    int target, int internalformat, int width, int height, 
+    int format, int type, byte[] row, byte[] column)
+  {
+    nglSeparableFilter2D(getContext().glSeparableFilter2D,
+      target,internalformat,width,height, 
+      format,type,row,column);
+  }
+  public static void glSeparableFilter2D(
+    int target, int internalformat, int width, int height, 
+    int format, int type, float[] row, float[] column)
+  {
+    nglSeparableFilter2D(getContext().glSeparableFilter2D,
+      target,internalformat,width,height, 
+      format,type,row,column);
+  }
+  public static void glSeparableFilter2D(
+    int target, int internalformat, int width, int height, 
+    int format, int type, int[] row, int[] column)
+  {
+    nglSeparableFilter2D(getContext().glSeparableFilter2D,
+      target,internalformat,width,height, 
+      format,type,row,column);
+  }
+  public static void glSeparableFilter2D(
+    int target, int internalformat, int width, int height, 
+    int format, int type, short[] row, short[] column)
+  {
+    nglSeparableFilter2D(getContext().glSeparableFilter2D,
+      target,internalformat,width,height, 
+      format,type,row,column);
+  }
+  public static void glGetHistogram(
+    int target, boolean reset, int format, int type, byte[] values)
+  {
+    nglGetHistogram(getContext().glGetHistogram,
+      target,reset,format,type,values);
+  }
+  public static void glGetHistogram(
+    int target, boolean reset, int format, int type, float[] values)
+  {
+    nglGetHistogram(getContext().glGetHistogram,
+      target,reset,format,type,values);
+  }
+  public static void glGetHistogram(
+    int target, boolean reset, int format, int type, int[] values)
+  {
+    nglGetHistogram(getContext().glGetHistogram,
+      target,reset,format,type,values);
+  }
+  public static void glGetHistogram(
+    int target, boolean reset, int format, int type, short[] values)
+  {
+    nglGetHistogram(getContext().glGetHistogram,
+      target,reset,format,type,values);
+  }
+  public static void glGetHistogramParameterfv(
+    int target, int pname, float[] params)
+  {
+    nglGetHistogramParameterfv(getContext().glGetHistogramParameterfv,
+      target,pname,params);
+  }
+  public static void glGetHistogramParameteriv(
+    int target, int pname, int[] params)
+  {
+    nglGetHistogramParameteriv(getContext().glGetHistogramParameteriv,
+      target,pname,params);
+  }
+  public static void glGetMinmax(
+    int target, boolean reset, int format, int type, byte[] values)
+  {
+    nglGetMinmax(getContext().glGetMinmax,
+      target,reset,format,type,values);
+  }
+  public static void glGetMinmax(
+    int target, boolean reset, int format, int type, float[] values)
+  {
+    nglGetMinmax(getContext().glGetMinmax,
+      target,reset,format,type,values);
+  }
+  public static void glGetMinmax(
+    int target, boolean reset, int format, int type, int[] values)
+  {
+    nglGetMinmax(getContext().glGetMinmax,
+      target,reset,format,type,values);
+  }
+  public static void glGetMinmax(
+    int target, boolean reset, int format, int type, short[] values)
+  {
+    nglGetMinmax(getContext().glGetMinmax,
+      target,reset,format,type,values);
+  }
+  public static void glGetMinmaxParameterfv(
+    int target, int pname, float[] params)
+  {
+    nglGetMinmaxParameterfv(getContext().glGetMinmaxParameterfv,
+      target,pname,params);
+  }
+  public static void glGetMinmaxParameteriv(
+    int target, int pname, int[] params)
+  {
+    nglGetMinmaxParameteriv(getContext().glGetMinmaxParameteriv,
+      target,pname,params);
+  }
+  public static void glHistogram(
+    int target, int width, int internalformat, boolean sink)
+  {
+    nglHistogram(getContext().glHistogram,
+      target,width,internalformat,sink);
+  }
+  public static void glMinmax(
+    int target, int internalformat, boolean sink)
+  {
+    nglMinmax(getContext().glMinmax,
+      target,internalformat,sink);
+  }
+  public static void glResetHistogram(
+    int target)
+  {
+    nglResetHistogram(getContext().glResetHistogram,
+      target);
+  }
+  public static void glResetMinmax(
+    int target)
+  {
+    nglResetMinmax(getContext().glResetMinmax,
+      target);
+  }
+  public static void glTexImage3D(
+    int target, int level, int internalformat, int width, int height, 
+    int depth, int border, int format, int type, byte[] pixels)
+  {
+    nglTexImage3D(getContext().glTexImage3D,
+      target,level,internalformat,width,height, 
+      depth,border,format,type,pixels);
+  }
+  public static void glTexImage3D(
+    int target, int level, int internalformat, int width, int height, 
+    int depth, int border, int format, int type, int[] pixels)
+  {
+    nglTexImage3D(getContext().glTexImage3D,
+      target,level,internalformat,width,height, 
+      depth,border,format,type,pixels);
+  }
+  public static void glTexImage3D(
+    int target, int level, int internalformat, int width, int height, 
+    int depth, int border, int format, int type, short[] pixels)
+  {
+    nglTexImage3D(getContext().glTexImage3D,
+      target,level,internalformat,width,height, 
+      depth,border,format,type,pixels);
+  }
+  public static void glTexSubImage3D(
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int type, 
+    byte[] pixels)
+  {
+    nglTexSubImage3D(getContext().glTexSubImage3D,
+      target,level,xoffset,yoffset,zoffset, 
+      width,height,depth,format,type, 
+      pixels);
+  }
+  public static void glTexSubImage3D(
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int type, 
+    int[] pixels)
+  {
+    nglTexSubImage3D(getContext().glTexSubImage3D,
+      target,level,xoffset,yoffset,zoffset, 
+      width,height,depth,format,type, 
+      pixels);
+  }
+  public static void glTexSubImage3D(
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int type, 
+    short[] pixels)
+  {
+    nglTexSubImage3D(getContext().glTexSubImage3D,
+      target,level,xoffset,yoffset,zoffset, 
+      width,height,depth,format,type, 
+      pixels);
+  }
+  public static void glCopyTexSubImage3D(
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int x, int y, int width, int height)
+  {
+    nglCopyTexSubImage3D(getContext().glCopyTexSubImage3D,
+      target,level,xoffset,yoffset,zoffset, 
+      x,y,width,height);
+  }
+  private static native void nglBlendColor(long pfunc,
     float red, float green, float blue, float alpha);
-
+  private static native void nglBlendEquation(long pfunc,
+    int mode);
+  private static native void nglDrawRangeElements(long pfunc,
+    int mode, int start, int end, int count, int type, byte[] indices);
+  private static native void nglDrawRangeElements(long pfunc,
+    int mode, int start, int end, int count, int type, int[] indices);
+  private static native void nglDrawRangeElements(long pfunc,
+    int mode, int start, int end, int count, int type, short[] indices);
+  private static native void nglColorTable(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, byte[] table);
+  private static native void nglColorTable(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, int[] table);
+  private static native void nglColorTable(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, short[] table);
+  private static native void nglColorTableParameterfv(long pfunc,
+    int target, int pname, float[] params);
+  private static native void nglColorTableParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglCopyColorTable(long pfunc,
+    int target, int internalformat, int x, int y, int width);
+  private static native void nglGetColorTable(long pfunc,
+    int target, int format, int type, byte[] table);
+  private static native void nglGetColorTable(long pfunc,
+    int target, int format, int type, int[] table);
+  private static native void nglGetColorTable(long pfunc,
+    int target, int format, int type, short[] table);
+  private static native void nglGetColorTableParameterfv(long pfunc,
+    int target, int pname, float[] params);
+  private static native void nglGetColorTableParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglColorSubTable(long pfunc,
+    int target, int start, int count, int format, int type, byte[] data);
+  private static native void nglColorSubTable(long pfunc,
+    int target, int start, int count, int format, int type, int[] data);
+  private static native void nglColorSubTable(long pfunc,
+    int target, int start, int count, int format, int type, short[] data);
+  private static native void nglCopyColorSubTable(long pfunc,
+    int target, int start, int x, int y, int width);
+  private static native void nglConvolutionFilter1D(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, byte[] image);
+  private static native void nglConvolutionFilter1D(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, float[] image);
+  private static native void nglConvolutionFilter1D(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, int[] image);
+  private static native void nglConvolutionFilter1D(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, short[] image);
+  private static native void nglConvolutionFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, byte[] image);
+  private static native void nglConvolutionFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, float[] image);
+  private static native void nglConvolutionFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, int[] image);
+  private static native void nglConvolutionFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, short[] image);
+  private static native void nglConvolutionParameterf(long pfunc,
+    int target, int pname, float param);
+  private static native void nglConvolutionParameterfv(long pfunc,
+    int target, int pname, float[] params);
+  private static native void nglConvolutionParameteri(long pfunc,
+    int target, int pname, int param);
+  private static native void nglConvolutionParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglCopyConvolutionFilter1D(long pfunc,
+    int target, int internalformat, int x, int y, int width);
+  private static native void nglCopyConvolutionFilter2D(long pfunc,
+    int target, int internalformat, int x, int y, int width, int height);
+  private static native void nglGetConvolutionFilter(long pfunc,
+    int target, int format, int type, byte[] image);
+  private static native void nglGetConvolutionFilter(long pfunc,
+    int target, int format, int type, float[] image);
+  private static native void nglGetConvolutionFilter(long pfunc,
+    int target, int format, int type, int[] image);
+  private static native void nglGetConvolutionFilter(long pfunc,
+    int target, int format, int type, short[] image);
+  private static native void nglGetConvolutionParameterfv(long pfunc,
+    int target, int pname, float[] params);
+  private static native void nglGetConvolutionParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglGetSeparableFilter(long pfunc,
+    int target, int format, int type, 
+    byte[] row, byte[] column, byte[] span);
+  private static native void nglGetSeparableFilter(long pfunc,
+    int target, int format, int type, 
+    float[] row, float[] column, float[] span);
+  private static native void nglGetSeparableFilter(long pfunc,
+    int target, int format, int type, 
+    int[] row, int[] column, int[] span);
+  private static native void nglGetSeparableFilter(long pfunc,
+    int target, int format, int type, 
+    short[] row, short[] column, short[] span);
+  private static native void nglSeparableFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, byte[] row, byte[] column);
+  private static native void nglSeparableFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, float[] row, float[] column);
+  private static native void nglSeparableFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, int[] row, int[] column);
+  private static native void nglSeparableFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, short[] row, short[] column);
+  private static native void nglGetHistogram(long pfunc,
+    int target, boolean reset, int format, int type, byte[] values);
+  private static native void nglGetHistogram(long pfunc,
+    int target, boolean reset, int format, int type, float[] values);
+  private static native void nglGetHistogram(long pfunc,
+    int target, boolean reset, int format, int type, int[] values);
+  private static native void nglGetHistogram(long pfunc,
+    int target, boolean reset, int format, int type, short[] values);
+  private static native void nglGetHistogramParameterfv(long pfunc,
+    int target, int pname, float[] params);
+  private static native void nglGetHistogramParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglGetMinmax(long pfunc,
+    int target, boolean reset, int format, int type, byte[] values);
+  private static native void nglGetMinmax(long pfunc,
+    int target, boolean reset, int format, int type, float[] values);
+  private static native void nglGetMinmax(long pfunc,
+    int target, boolean reset, int format, int type, int[] values);
+  private static native void nglGetMinmax(long pfunc,
+    int target, boolean reset, int format, int type, short[] values);
+  private static native void nglGetMinmaxParameterfv(long pfunc,
+    int target, int pname, float[] params);
+  private static native void nglGetMinmaxParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglHistogram(long pfunc,
+    int target, int width, int internalformat, boolean sink);
+  private static native void nglMinmax(long pfunc,
+    int target, int internalformat, boolean sink);
+  private static native void nglResetHistogram(long pfunc,
+    int target);
+  private static native void nglResetMinmax(long pfunc,
+    int target);
+  private static native void nglTexImage3D(long pfunc,
+    int target, int level, int internalformat, int width, int height, 
+    int depth, int border, int format, int type, byte[] pixels);
+  private static native void nglTexImage3D(long pfunc,
+    int target, int level, int internalformat, int width, int height, 
+    int depth, int border, int format, int type, int[] pixels);
+  private static native void nglTexImage3D(long pfunc,
+    int target, int level, int internalformat, int width, int height, 
+    int depth, int border, int format, int type, short[] pixels);
+  private static native void nglTexSubImage3D(long pfunc,
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int type, 
+    byte[] pixels);
+  private static native void nglTexSubImage3D(long pfunc,
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int type, 
+    int[] pixels);
+  private static native void nglTexSubImage3D(long pfunc,
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int type, 
+    short[] pixels);
+  private static native void nglCopyTexSubImage3D(long pfunc,
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int x, int y, int width, int height);
 
   ///////////////////////////////////////////////////////////////////////////
   // package

@@ -118,6 +118,43 @@ public class GlContext {
 
   // OpenGL 1.2
   long glBlendColor;
+  long glBlendEquation;
+  long glDrawRangeElements;
+  long glColorTable;
+  long glColorTableParameterfv;
+  long glColorTableParameteriv;
+  long glCopyColorTable;
+  long glGetColorTable;
+  long glGetColorTableParameterfv;
+  long glGetColorTableParameteriv;
+  long glColorSubTable;
+  long glCopyColorSubTable;
+  long glConvolutionFilter1D;
+  long glConvolutionFilter2D;
+  long glConvolutionParameterf;
+  long glConvolutionParameterfv;
+  long glConvolutionParameteri;
+  long glConvolutionParameteriv;
+  long glCopyConvolutionFilter1D;
+  long glCopyConvolutionFilter2D;
+  long glGetConvolutionFilter;
+  long glGetConvolutionParameterfv;
+  long glGetConvolutionParameteriv;
+  long glGetSeparableFilter;
+  long glSeparableFilter2D;
+  long glGetHistogram;
+  long glGetHistogramParameterfv;
+  long glGetHistogramParameteriv;
+  long glGetMinmax;
+  long glGetMinmaxParameterfv;
+  long glGetMinmaxParameteriv;
+  long glHistogram;
+  long glMinmax;
+  long glResetHistogram;
+  long glResetMinmax;
+  long glTexImage3D;
+  long glTexSubImage3D;
+  long glCopyTexSubImage3D;
 
   // OpenGL 1.3
   long glActiveTexture;
@@ -131,6 +168,44 @@ public class GlContext {
   private void init() {
     // OpenGL 1.2
     glBlendColor = getProcAddress("glBlendColor");
+    glBlendEquation = getProcAddress("glBlendEquation");
+    glDrawRangeElements = getProcAddress("glDrawRangeElements");
+    glColorTable = getProcAddress("glColorTable");
+    glColorTableParameterfv = getProcAddress("glColorTableParameterfv");
+    glColorTableParameteriv = getProcAddress("glColorTableParameteriv");
+    glCopyColorTable = getProcAddress("glCopyColorTable");
+    glGetColorTable = getProcAddress("glGetColorTable");
+    glGetColorTableParameterfv = getProcAddress("glGetColorTableParameterfv");
+    glGetColorTableParameteriv = getProcAddress("glGetColorTableParameteriv");
+    glColorSubTable = getProcAddress("glColorSubTable");
+    glCopyColorSubTable = getProcAddress("glCopyColorSubTable");
+    glConvolutionFilter1D = getProcAddress("glConvolutionFilter1D");
+    glConvolutionFilter2D = getProcAddress("glConvolutionFilter2D");
+    glConvolutionParameterf = getProcAddress("glConvolutionParameterf");
+    glConvolutionParameterfv = getProcAddress("glConvolutionParameterfv");
+    glConvolutionParameteri = getProcAddress("glConvolutionParameteri");
+    glConvolutionParameteriv = getProcAddress("glConvolutionParameteriv");
+    glCopyConvolutionFilter1D = getProcAddress("glCopyConvolutionFilter1D");
+    glCopyConvolutionFilter2D = getProcAddress("glCopyConvolutionFilter2D");
+    glGetConvolutionFilter = getProcAddress("glGetConvolutionFilter");
+    glGetConvolutionParameterfv = getProcAddress("glGetConvolutionParameterfv");
+    glGetConvolutionParameteriv = getProcAddress("glGetConvolutionParameteriv");
+    glGetSeparableFilter = getProcAddress("glGetSeparableFilter");
+    glSeparableFilter2D = getProcAddress("glSeparableFilter2D");
+    glGetHistogram = getProcAddress("glGetHistogram");
+    glGetHistogramParameterfv = getProcAddress("glGetHistogramParameterfv");
+    glGetHistogramParameteriv = getProcAddress("glGetHistogramParameteriv");
+    glGetMinmax = getProcAddress("glGetMinmax");
+    glGetMinmaxParameterfv = getProcAddress("glGetMinmaxParameterfv");
+    glGetMinmaxParameteriv = getProcAddress("glGetMinmaxParameteriv");
+    glHistogram = getProcAddress("glHistogram");
+    glMinmax = getProcAddress("glMinmax");
+    glResetHistogram = getProcAddress("glResetHistogram");
+    glResetMinmax = getProcAddress("glResetMinmax");
+    glTexImage3D = getProcAddress("glTexImage3D");
+    glTexSubImage3D = getProcAddress("glTexSubImage3D");
+    glCopyTexSubImage3D = getProcAddress("glCopyTexSubImage3D");
+
     // OpenGL 1.3
     glActiveTexture = getProcAddress("glActiveTexture");
     // OpenGL 1.4

@@ -24,7 +24,7 @@ Java_edu_mines_jves_opengl_Gl_##name(\
   JNIEnv* env, jclass cls,
 #define JNI_GL_DECLARE2(name) extern "C" JNIEXPORT void JNICALL \
 Java_edu_mines_jves_opengl_Gl_n##name(\
-  JNIEnv* env, jclass cls, jlong name,
+  JNIEnv* env, jclass cls, jlong pfunc,
 #define JNI_GL_DECLARE_RETURN0(type,name) extern "C" JNIEXPORT type JNICALL \
 Java_edu_mines_jves_opengl_Gl_##name(\
   JNIEnv* env, jclass cls)
@@ -1558,13 +1558,746 @@ JNI_GL_BEGIN1
   glRasterPos4sv(v);
 JNI_GL_END
 
-/*
-*/
+JNI_GL_DECLARE1(glReadBuffer)
+  jint mode
+JNI_GL_BEGIN1
+  glReadBuffer(mode);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glReadPixels__IIIIII_3B)
+  jint x, jint y, jint width, jint height,
+  jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glReadPixels(x,y,width,height,format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glReadPixels__IIIIII_3I)
+  jint x, jint y, jint width, jint height,
+  jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glReadPixels(x,y,width,height,format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glReadPixels__IIIIII_3S)
+  jint x, jint y, jint width, jint height,
+  jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glReadPixels(x,y,width,height,format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glRectd)
+  jdouble x1, jdouble y1, jdouble x2, jdouble y2
+JNI_GL_BEGIN1
+  glRectd(x1,y1,x2,y2);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glRectdv)
+  jdoubleArray jv1, jdoubleArray jv2
+JNI_GL_BEGIN1
+  JdoubleArray v1(env,jv1);
+  JdoubleArray v2(env,jv2);
+  glRectdv(v1,v2);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glRectf)
+  jfloat x1, jfloat y1, jfloat x2, jfloat y2
+JNI_GL_BEGIN1
+  glRectf(x1,y1,x2,y2);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glRectfv)
+  jfloatArray jv1, jfloatArray jv2
+JNI_GL_BEGIN1
+  JfloatArray v1(env,jv1);
+  JfloatArray v2(env,jv2);
+  glRectfv(v1,v2);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glRecti)
+  jint x1, jint y1, jint x2, jint y2
+JNI_GL_BEGIN1
+  glRecti(x1,y1,x2,y2);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glRectiv)
+  jintArray jv1, jintArray jv2
+JNI_GL_BEGIN1
+  JintArray v1(env,jv1);
+  JintArray v2(env,jv2);
+  glRectiv(v1,v2);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glRects)
+  jshort x1, jshort y1, jshort x2, jshort y2
+JNI_GL_BEGIN1
+  glRects(x1,y1,x2,y2);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glRectsv)
+  jshortArray jv1, jshortArray jv2
+JNI_GL_BEGIN1
+  JshortArray v1(env,jv1);
+  JshortArray v2(env,jv2);
+  glRectsv(v1,v2);
+JNI_GL_END
+
+JNI_GL_DECLARE_RETURN1(jint,glRenderMode)
+  jint mode
+JNI_GL_BEGIN1
+  return glRenderMode(mode);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glRotated)
+  jdouble angle, jdouble x, jdouble y, jdouble z
+JNI_GL_BEGIN1
+  glRotated(angle,x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glRotatef)
+  jfloat angle, jfloat x, jfloat y, jfloat z
+JNI_GL_BEGIN1
+  glRotatef(angle,x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glScaled)
+  jdouble x, jdouble y, jdouble z
+JNI_GL_BEGIN1
+  glScaled(x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glScalef)
+  jfloat x, jfloat y, jfloat z
+JNI_GL_BEGIN1
+  glScalef(x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glScissor)
+  jint x, jint y, jint width, jint height
+JNI_GL_BEGIN1
+  glScissor(x,y,width,height);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glSelectBuffer)
+  jint size, jobject jbuffer
+JNI_GL_BEGIN1
+  JuintBuffer buffer(env,jbuffer);
+  glSelectBuffer(size,buffer);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glShadeModel)
+  jint mode
+JNI_GL_BEGIN1
+  glShadeModel(mode);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glStencilFunc)
+  jint func, jint ref, jint mask
+JNI_GL_BEGIN1
+  glStencilFunc(func,ref,mask);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glStencilMask)
+  jint mask
+JNI_GL_BEGIN1
+  glStencilMask(mask);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glStencilOp)
+  jint fail, jint zfail, jint zpass
+JNI_GL_BEGIN1
+  glStencilOp(fail,zfail,zpass);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord1d)
+  jdouble s
+JNI_GL_BEGIN1
+  glTexCoord1d(s);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord1dv)
+  jdoubleArray jv
+JNI_GL_BEGIN1
+  JdoubleArray v(env,jv);
+  glTexCoord1dv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord1f)
+  jfloat s
+JNI_GL_BEGIN1
+  glTexCoord1f(s);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord1fv)
+  jfloatArray jv
+JNI_GL_BEGIN1
+  JfloatArray v(env,jv);
+  glTexCoord1fv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord1i)
+  jint s
+JNI_GL_BEGIN1
+  glTexCoord1i(s);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord1iv)
+  jintArray jv
+JNI_GL_BEGIN1
+  JintArray v(env,jv);
+  glTexCoord1iv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord1s)
+  jshort s
+JNI_GL_BEGIN1
+  glTexCoord1s(s);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord1sv)
+  jshortArray jv
+JNI_GL_BEGIN1
+  JshortArray v(env,jv);
+  glTexCoord1sv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord2d)
+  jdouble s, jdouble t
+JNI_GL_BEGIN1
+  glTexCoord2d(s,t);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord2dv)
+  jdoubleArray jv
+JNI_GL_BEGIN1
+  JdoubleArray v(env,jv);
+  glTexCoord2dv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord2f)
+  jfloat s, jfloat t
+JNI_GL_BEGIN1
+  glTexCoord2f(s,t);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord2fv)
+  jfloatArray jv
+JNI_GL_BEGIN1
+  JfloatArray v(env,jv);
+  glTexCoord2fv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord2i)
+  jint s, jint t
+JNI_GL_BEGIN1
+  glTexCoord2i(s,t);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord2iv)
+  jintArray jv
+JNI_GL_BEGIN1
+  JintArray v(env,jv);
+  glTexCoord2iv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord2s)
+  jshort s, jshort t
+JNI_GL_BEGIN1
+  glTexCoord2s(s,t);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord2sv)
+  jshortArray jv
+JNI_GL_BEGIN1
+  JshortArray v(env,jv);
+  glTexCoord2sv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord3d)
+  jdouble s, jdouble t, jdouble r
+JNI_GL_BEGIN1
+  glTexCoord3d(s,t,r);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord3dv)
+  jdoubleArray jv
+JNI_GL_BEGIN1
+  JdoubleArray v(env,jv);
+  glTexCoord3dv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord3f)
+  jfloat s, jfloat t, jfloat r
+JNI_GL_BEGIN1
+  glTexCoord3f(s,t,r);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord3fv)
+  jfloatArray jv
+JNI_GL_BEGIN1
+  JfloatArray v(env,jv);
+  glTexCoord3fv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord3i)
+  jint s, jint t, jint r
+JNI_GL_BEGIN1
+  glTexCoord3i(s,t,r);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord3iv)
+  jintArray jv
+JNI_GL_BEGIN1
+  JintArray v(env,jv);
+  glTexCoord3iv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord3s)
+  jshort s, jshort t, jshort r
+JNI_GL_BEGIN1
+  glTexCoord3s(s,t,r);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord3sv)
+  jshortArray jv
+JNI_GL_BEGIN1
+  JshortArray v(env,jv);
+  glTexCoord3sv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord4d)
+  jdouble s, jdouble t, jdouble r, jdouble q
+JNI_GL_BEGIN1
+  glTexCoord4d(s,t,r,q);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord4dv)
+  jdoubleArray jv
+JNI_GL_BEGIN1
+  JdoubleArray v(env,jv);
+  glTexCoord4dv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord4f)
+  jfloat s, jfloat t, jfloat r, jfloat q
+JNI_GL_BEGIN1
+  glTexCoord4f(s,t,r,q);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord4fv)
+  jfloatArray jv
+JNI_GL_BEGIN1
+  JfloatArray v(env,jv);
+  glTexCoord4fv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord4i)
+  jint s, jint t, jint r, jint q
+JNI_GL_BEGIN1
+  glTexCoord4i(s,t,r,q);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord4iv)
+  jintArray jv
+JNI_GL_BEGIN1
+  JintArray v(env,jv);
+  glTexCoord4iv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord4s)
+  jshort s, jshort t, jshort r, jshort q
+JNI_GL_BEGIN1
+  glTexCoord4s(s,t,r,q);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoord4sv)
+  jshortArray jv
+JNI_GL_BEGIN1
+  JshortArray v(env,jv);
+  glTexCoord4sv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexCoordPointer)
+  jint size, jint type, jint stride, jobject jpointer
+JNI_GL_BEGIN1
+  JvoidBuffer pointer(env,jpointer);
+  glTexCoordPointer(size,type,stride,pointer);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexEnvf)
+  jint target, jint pname, jfloat param
+JNI_GL_BEGIN1
+  glTexEnvf(target,pname,param);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexEnvfv)
+  jint target, jint pname, jfloatArray jparams
+JNI_GL_BEGIN1
+  JfloatArray params(env,jparams);
+  glTexEnvfv(target,pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexEnvi)
+  jint target, jint pname, jint param
+JNI_GL_BEGIN1
+  glTexEnvi(target,pname,param);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexEnviv)
+  jint target, jint pname, jintArray jparams
+JNI_GL_BEGIN1
+  JintArray params(env,jparams);
+  glTexEnviv(target,pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexGend)
+  jint coord, jint pname, jdouble param
+JNI_GL_BEGIN1
+  glTexGend(coord,pname,param);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexGendv)
+  jint coord, jint pname, jdoubleArray jparams
+JNI_GL_BEGIN1
+  JdoubleArray params(env,jparams);
+  glTexGendv(coord,pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexGenf)
+  jint coord, jint pname, jfloat param
+JNI_GL_BEGIN1
+  glTexGenf(coord,pname,param);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexGenfv)
+  jint coord, jint pname, jfloatArray jparams
+JNI_GL_BEGIN1
+  JfloatArray params(env,jparams);
+  glTexGenfv(coord,pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexGeni)
+  jint coord, jint pname, jint param
+JNI_GL_BEGIN1
+  glTexGeni(coord,pname,param);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexGeniv)
+  jint coord, jint pname, jintArray jparams
+JNI_GL_BEGIN1
+  JintArray params(env,jparams);
+  glTexGeniv(coord,pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexImage1D__IIIIIII_3B)
+  jint target, jint level, jint internalformat,
+  jint width, jint border, jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glTexImage1D(target,level,internalformat,width,border,format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexImage1D__IIIIIII_3I)
+  jint target, jint level, jint internalformat,
+  jint width, jint border, jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glTexImage1D(target,level,internalformat,width,border,format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexImage1D__IIIIIII_3S)
+  jint target, jint level, jint internalformat,
+  jint width, jint border, jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glTexImage1D(target,level,internalformat,width,border,format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexImage2D__IIIIIIII_3B)
+  jint target, jint level, jint internalformat,
+  jint width, jint height, jint border, jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glTexImage2D(
+    target,level,internalformat,width,height,border,
+    format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexImage2D__IIIIIIII_3I)
+  jint target, jint level, jint internalformat,
+  jint width, jint height, jint border, jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glTexImage2D(
+    target,level,internalformat,width,height,border,
+    format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexImage2D__IIIIIIII_3S)
+  jint target, jint level, jint internalformat,
+  jint width, jint height, jint border, jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glTexImage2D(
+    target,level,internalformat,width,height,border,
+    format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexParameterf)
+  jint target, jint pname, jfloat param
+JNI_GL_BEGIN1
+  glTexParameterf(target,pname,param);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexParameterfv)
+  jint target, jint pname, jfloatArray jparams
+JNI_GL_BEGIN1
+  JfloatArray params(env,jparams);
+  glTexParameterfv(target,pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexParameteri)
+  jint target, jint pname, jint param
+JNI_GL_BEGIN1
+  glTexParameteri(target,pname,param);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexParameteriv)
+  jint target, jint pname, jintArray jparams
+JNI_GL_BEGIN1
+  JintArray params(env,jparams);
+  glTexParameteriv(target,pname,params);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexSubImage1D__IIIIII_3B)
+  jint target, jint level, jint xoffset,
+  jint width, jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glTexSubImage1D(target,level,xoffset,width,format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexSubImage1D__IIIIII_3I)
+  jint target, jint level, jint xoffset,
+  jint width, jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glTexSubImage1D(target,level,xoffset,width,format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexSubImage1D__IIIIII_3S)
+  jint target, jint level, jint xoffset,
+  jint width, jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glTexSubImage1D(target,level,xoffset,width,format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexSubImage2D__IIIIIIII_3B)
+  jint target, jint level, jint xoffset, jint yoffset,
+  jint width, jint height, jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glTexSubImage2D(
+    target,level,xoffset,yoffset,width,height,
+    format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexSubImage2D__IIIIIIII_3I)
+  jint target, jint level, jint xoffset, jint yoffset,
+  jint width, jint height, jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glTexSubImage2D(
+    target,level,xoffset,yoffset,width,height,
+    format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTexSubImage2D__IIIIIIII_3S)
+  jint target, jint level, jint xoffset, jint yoffset,
+  jint width, jint height, jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glTexSubImage2D(
+    target,level,xoffset,yoffset,width,height,
+    format,type,pixels);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTranslated)
+  jdouble x, jdouble y, jdouble z
+JNI_GL_BEGIN1
+  glTranslated(x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glTranslatef)
+  jfloat x, jfloat y, jfloat z
+JNI_GL_BEGIN1
+  glTranslatef(x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex2d)
+  jdouble x, jdouble y
+JNI_GL_BEGIN1
+  glVertex2d(x,y);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex2dv)
+  jdoubleArray jv
+JNI_GL_BEGIN1
+  JdoubleArray v(env,jv);
+  glVertex2dv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex2f)
+  jfloat x, jfloat y
+JNI_GL_BEGIN1
+  glVertex2f(x,y);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex2fv)
+  jfloatArray jv
+JNI_GL_BEGIN1
+  JfloatArray v(env,jv);
+  glVertex2fv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex2i)
+  jint x, jint y
+JNI_GL_BEGIN1
+  glVertex2i(x,y);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex2iv)
+  jintArray jv
+JNI_GL_BEGIN1
+  JintArray v(env,jv);
+  glVertex2iv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex2s)
+  jshort x, jshort y
+JNI_GL_BEGIN1
+  glVertex2s(x,y);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex2sv)
+  jshortArray jv
+JNI_GL_BEGIN1
+  JshortArray v(env,jv);
+  glVertex2sv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex3d)
+  jdouble x, jdouble y, jdouble z
+JNI_GL_BEGIN1
+  glVertex3d(x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex3dv)
+  jdoubleArray jv
+JNI_GL_BEGIN1
+  JdoubleArray v(env,jv);
+  glVertex3dv(v);
+JNI_GL_END
 
 JNI_GL_DECLARE1(glVertex3f)
   jfloat x, jfloat y, jfloat z
 JNI_GL_BEGIN1
   glVertex3f(x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex3fv)
+  jfloatArray jv
+JNI_GL_BEGIN1
+  JfloatArray v(env,jv);
+  glVertex3fv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex3i)
+  jint x, jint y, jint z
+JNI_GL_BEGIN1
+  glVertex3i(x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex3iv)
+  jintArray jv
+JNI_GL_BEGIN1
+  JintArray v(env,jv);
+  glVertex3iv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex3s)
+  jshort x, jshort y, jshort z
+JNI_GL_BEGIN1
+  glVertex3s(x,y,z);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex3sv)
+  jshortArray jv
+JNI_GL_BEGIN1
+  JshortArray v(env,jv);
+  glVertex3sv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex4d)
+  jdouble x, jdouble y, jdouble z, jdouble w
+JNI_GL_BEGIN1
+  glVertex4d(x,y,z,w);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex4dv)
+  jdoubleArray jv
+JNI_GL_BEGIN1
+  JdoubleArray v(env,jv);
+  glVertex4dv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex4f)
+  jfloat x, jfloat y, jfloat z, jfloat w
+JNI_GL_BEGIN1
+  glVertex4f(x,y,z,w);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex4fv)
+  jfloatArray jv
+JNI_GL_BEGIN1
+  JfloatArray v(env,jv);
+  glVertex4fv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex4i)
+  jint x, jint y, jint z, jint w
+JNI_GL_BEGIN1
+  glVertex4i(x,y,z,w);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex4iv)
+  jintArray jv
+JNI_GL_BEGIN1
+  JintArray v(env,jv);
+  glVertex4iv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex4s)
+  jshort x, jshort y, jshort z, jshort w
+JNI_GL_BEGIN1
+  glVertex4s(x,y,z,w);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertex4sv)
+  jshortArray jv
+JNI_GL_BEGIN1
+  JshortArray v(env,jv);
+  glVertex4sv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glVertexPointer)
+  jint size, jint type, jint stride, jobject jpointer
+JNI_GL_BEGIN1
+  JvoidBuffer pointer(env,jpointer);
+  glVertexPointer(size,type,stride,pointer);
 JNI_GL_END
 
 JNI_GL_DECLARE1(glViewport)
@@ -1579,6 +2312,207 @@ JNI_GL_END
 JNI_GL_DECLARE2(glBlendColor)
   jfloat red, jfloat green, jfloat blue, jfloat alpha
 JNI_GL_BEGIN2
-  (*(PFNGLBLENDCOLORPROC)toPointer(glBlendColor))
+  (*(PFNGLBLENDCOLORPROC)toPointer(pfunc))
     (red,green,blue,alpha);
 JNI_GL_END
+
+JNI_GL_DECLARE2(glBlendEquation)
+  jint mode
+JNI_GL_BEGIN2
+  (*(PFNGLBLENDEQUATIONPROC)toPointer(pfunc))
+    (mode);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glDrawRangeElements__IIIII_3B)
+  jint mode, jint start, jint end, jint count, jint type, jarray jindices
+JNI_GL_BEGIN2
+  JvoidArray indices(env,jindices);
+  (*(PFNGLDRAWRANGEELEMENTSPROC)toPointer(pfunc))
+    (mode,start,end,count,type,indices);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glDrawRangeElements__IIIII_3I)
+  jint mode, jint start, jint end, jint count, jint type, jarray jindices
+JNI_GL_BEGIN2
+  JvoidArray indices(env,jindices);
+  (*(PFNGLDRAWRANGEELEMENTSPROC)toPointer(pfunc))
+    (mode,start,end,count,type,indices);
+JNI_GL_END
+
+JNI_GL_DECLARE2(glDrawRangeElements__IIIII_3S)
+  jint mode, jint start, jint end, jint count, jint type, jarray jindices
+JNI_GL_BEGIN2
+  JvoidArray indices(env,jindices);
+  (*(PFNGLDRAWRANGEELEMENTSPROC)toPointer(pfunc))
+    (mode,start,end,count,type,indices);
+JNI_GL_END
+
+/*
+  private static native void nglDrawRangeElements(long pfunc,
+    int mode, int start, int end, int count, int type, byte[] indices);
+  private static native void nglDrawRangeElements(long pfunc,
+    int mode, int start, int end, int count, int type, int[] indices);
+  private static native void nglDrawRangeElements(long pfunc,
+    int mode, int start, int end, int count, int type, short[] indices);
+  private static native void nglColorTable(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, byte[] table);
+  private static native void nglColorTable(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, int[] table);
+  private static native void nglColorTable(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, short[] table);
+  private static native void nglColorTableParameterfv(long pfunc,
+    int target, int pname, float[] params);
+  private static native void nglColorTableParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglCopyColorTable(long pfunc,
+    int target, int internalformat, int x, int y, int width);
+  private static native void nglGetColorTable(long pfunc,
+    int target, int format, int type, byte[] table);
+  private static native void nglGetColorTable(long pfunc,
+    int target, int format, int type, int[] table);
+  private static native void nglGetColorTable(long pfunc,
+    int target, int format, int type, short[] table);
+  private static native void nglGetColorTableParameterfv(long pfunc,
+    int target, int pname, float[] params);
+  private static native void nglGetColorTableParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglColorSubTable(long pfunc,
+    int target, int start, int count, int format, int type, byte[] data);
+  private static native void nglColorSubTable(long pfunc,
+    int target, int start, int count, int format, int type, int[] data);
+  private static native void nglColorSubTable(long pfunc,
+    int target, int start, int count, int format, int type, short[] data);
+  private static native void nglCopyColorSubTable(long pfunc,
+    int target, int start, int x, int y, int width);
+  private static native void nglConvolutionFilter1D(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, byte[] image);
+  private static native void nglConvolutionFilter1D(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, float[] image);
+  private static native void nglConvolutionFilter1D(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, int[] image);
+  private static native void nglConvolutionFilter1D(long pfunc,
+    int target, int internalformat, int width, 
+    int format, int type, short[] image);
+  private static native void nglConvolutionFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, byte[] image);
+  private static native void nglConvolutionFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, float[] image);
+  private static native void nglConvolutionFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, int[] image);
+  private static native void nglConvolutionFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, short[] image);
+  private static native void nglConvolutionParameterf(long pfunc,
+    int target, int pname, float param);
+  private static native void nglConvolutionParameterfv(long pfunc,
+    int target, int pname, float[] params);
+  private static native void nglConvolutionParameteri(long pfunc,
+    int target, int pname, int param);
+  private static native void nglConvolutionParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglCopyConvolutionFilter1D(long pfunc,
+    int target, int internalformat, int x, int y, int width);
+  private static native void nglCopyConvolutionFilter2D(long pfunc,
+    int target, int internalformat, int x, int y, int width, int height);
+  private static native void nglGetConvolutionFilter(long pfunc,
+    int target, int format, int type, byte[] image);
+  private static native void nglGetConvolutionFilter(long pfunc,
+    int target, int format, int type, float[] image);
+  private static native void nglGetConvolutionFilter(long pfunc,
+    int target, int format, int type, int[] image);
+  private static native void nglGetConvolutionFilter(long pfunc,
+    int target, int format, int type, short[] image);
+  private static native void nglGetConvolutionParameterfv(long pfunc,
+    int target, int pname, float[] params);
+  private static native void nglGetConvolutionParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglGetSeparableFilter(long pfunc,
+    int target, int format, int type, 
+    byte[] row, byte[] column, byte[] span);
+  private static native void nglGetSeparableFilter(long pfunc,
+    int target, int format, int type, 
+    float[] row, float[] column, float[] span);
+  private static native void nglGetSeparableFilter(long pfunc,
+    int target, int format, int type, 
+    int[] row, int[] column, int[] span);
+  private static native void nglGetSeparableFilter(long pfunc,
+    int target, int format, int type, 
+    short[] row, short[] column, short[] span);
+  private static native void nglSeparableFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, byte[] row, byte[] column);
+  private static native void nglSeparableFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, float[] row, float[] column);
+  private static native void nglSeparableFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, int[] row, int[] column);
+  private static native void nglSeparableFilter2D(long pfunc,
+    int target, int internalformat, int width, int height, 
+    int format, int type, short[] row, short[] column);
+  private static native void nglGetHistogram(long pfunc,
+    int target, boolean reset, int format, int type, byte[] values);
+  private static native void nglGetHistogram(long pfunc,
+    int target, boolean reset, int format, int type, float[] values);
+  private static native void nglGetHistogram(long pfunc,
+    int target, boolean reset, int format, int type, int[] values);
+  private static native void nglGetHistogram(long pfunc,
+    int target, boolean reset, int format, int type, short[] values);
+  private static native void nglGetHistogramParameterfv(long pfunc,
+    int target, int pname, float[] params);
+  private static native void nglGetHistogramParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglGetMinmax(long pfunc,
+    int target, boolean reset, int format, int type, byte[] values);
+  private static native void nglGetMinmax(long pfunc,
+    int target, boolean reset, int format, int type, float[] values);
+  private static native void nglGetMinmax(long pfunc,
+    int target, boolean reset, int format, int type, int[] values);
+  private static native void nglGetMinmax(long pfunc,
+    int target, boolean reset, int format, int type, short[] values);
+  private static native void nglGetMinmaxParameterfv(long pfunc,
+    int target, int pname, float[] params);
+  private static native void nglGetMinmaxParameteriv(long pfunc,
+    int target, int pname, int[] params);
+  private static native void nglHistogram(long pfunc,
+    int target, int width, int internalformat, boolean sink);
+  private static native void nglMinmax(long pfunc,
+    int target, int internalformat, boolean sink);
+  private static native void nglResetHistogram(long pfunc,
+    int target);
+  private static native void nglResetMinmax(long pfunc,
+    int target);
+  private static native void nglTexImage3D(long pfunc,
+    int target, int level, int internalformat, int width, int height, 
+    int depth, int border, int format, int type, byte[] pixels);
+  private static native void nglTexImage3D(long pfunc,
+    int target, int level, int internalformat, int width, int height, 
+    int depth, int border, int format, int type, int[] pixels);
+  private static native void nglTexImage3D(long pfunc,
+    int target, int level, int internalformat, int width, int height, 
+    int depth, int border, int format, int type, short[] pixels);
+  private static native void nglTexSubImage3D(long pfunc,
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int type, 
+    byte[] pixels);
+  private static native void nglTexSubImage3D(long pfunc,
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int type, 
+    int[] pixels);
+  private static native void nglTexSubImage3D(long pfunc,
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int width, int height, int depth, int format, int type, 
+    short[] pixels);
+  private static native void nglCopyTexSubImage3D(long pfunc,
+    int target, int level, int xoffset, int yoffset, int zoffset, 
+    int x, int y, int width, int height);
+*/
