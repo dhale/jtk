@@ -32,8 +32,18 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     </fileset>
   </path>
 
+  <!-- Determine operating system -->
+  <target name="os-init">
+    <condition property="linux">
+      <os family="unix"/>
+    </condition>
+    <condition property="windows">
+      <os family="windows"/>
+    </condition>
+  </target>
+
   <!-- Initialize -->
-  <target name="init">
+  <target name="init" depends="os-init">
     <tstamp/>
     <mkdir dir="${build}"/>
     <mkdir dir="${build.cls}"/>
@@ -43,9 +53,26 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   </target>
 
   <!-- Compile Java -->
-  <target name="compile-java" depends="init">
+  <target name="compile-java" 
+    depends="init,compile-java-linux,compile-java-windows,compile-java-other">
+  </target>
+  <target name="compile-java-linux" depends="init" if="linux">
     <javac srcdir="${src}" destdir="${build.cls}" debug="on">
       <classpath refid="classpath"/>
+      <include name="edu/mines/jves/opengl/linux-gtk/**"/>
+    </javac>
+  </target>
+  <target name="compile-java-windows" depends="init" if="windows">
+    <javac srcdir="${src}" destdir="${build.cls}" debug="on">
+      <classpath refid="classpath"/>
+      <include name="edu/mines/jves/opengl/win32/**"/>
+    </javac>
+  </target>
+  <target name="compile-java-other" depends="init">
+    <javac srcdir="${src}" destdir="${build.cls}" debug="on">
+      <classpath refid="classpath"/>
+      <exclude name="edu/mines/jves/opengl/linux-gtk/**"/>
+      <exclude name="edu/mines/jves/opengl/win32/**"/>
     </javac>
   </target>
 
@@ -56,19 +83,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   </target>
 
   <!-- Build JNI libraries -->
-  <target name="jni" depends="jni-init,jni-linux,jni-windows"
+  <target name="jni" depends="os-init,jni-init,jni-linux,jni-windows"
       description="build JNI libraries (compile and link C++)">
   </target>
   <target name="jni-init" depends="compile-java">
     <taskdef name="jnicpp" 
         classname="edu.mines.jves.ant.Jnicpp"
         classpath="${build.cls}"/>
-    <condition property="linux">
-      <os family="unix"/>
-    </condition>
-    <condition property="windows">
-      <os family="windows"/>
-    </condition>
   </target>
 
   <!-- Build JNI libraries for Linux -->

@@ -201,14 +201,14 @@ protected:
 #if defined(MWIN)
 class WglSwtCanvasContext : public GlSwtCanvasContext {
 public:
-  WglSwtCanvasContext(JNIEnv* env, jlong handleCanvas) : 
-    GlSwtCanvasContext(env),_hdc(0),_hglrc(0) 
+  WglSwtCanvasContext(JNIEnv* env, jlong hwnd, jlong hdc) : 
+    GlSwtCanvasContext(env),_hglrc(0) 
   {
-    _hwnd = (HWND)handleCanvas;
+    _hwnd = (HWND)hwnd;
+    _hdc = (HDC)hdc;
   }
   virtual ~WglSwtCanvasContext() {
     if (_hglrc!=0) {
-      ReleaseDC(_hdc);
       wglDeleteContext(_hglrc);
     }
   }
@@ -226,7 +226,6 @@ public:
       pfd.cColorBits = 16;
       pfd.cDepthBits = 16;
       pfd.iLayerType = PFD_MAIN_PLANE;
-      _hdc = GetDC(_hwnd);
       int format = ChoosePixelFormat(_hdc,&pfd);
       SetPixelFormat(_hdc,format,&pfd);
       _hglrc = wglCreateContext(_hdc);
@@ -238,24 +237,26 @@ public:
     return JNI_TRUE;
   }
 private:
+  HWND _hwnd;
   HDC _hdc;
   HGLRC _hglrc;
 };
 
 // X Windows OpenGL context for SWT Canvas.
 #elif defined(XWIN)
-/*
 class GlxSwtCanvasContext : public GlSwtCanvasContext {
 public:
-  GlxSwtCanvasContext(JNIEnv* env, jlong handleCanvas, jlong handleDisplay) :
+  GlxSwtCanvasContext(JNIEnv* env, 
+    jlong xdisplay, jlong xdrawable, jlong xgc) :
     GlSwtCanvasContext(env),_context(0) 
   {
-    _drawable = (Drawable)handleCanvas;
-    _display = (Display*)toPointer(handleDisplay);
+    _xdisplay = (Display*)toPointer(xdisplay);
+    _xdrawable = (Drawable)xdrawable;
+    _xgc = (GC)toPointer(xgc);
   }
   virtual ~GlxSwtCanvasContext() {
     if (_context!=0) {
-      glXDestroyContext(_display,_context);
+      glXDestroyContext(_xdisplay,_context);
     }
   }
   virtual void makeCurrent(JNIEnv*) {
@@ -268,22 +269,22 @@ public:
         GLX_BLUE_SIZE,1,
         None};
       XVisualInfo* visualInfo = glXChooseVisual(
-        _display,DefaultScreen(_display),config);
-      _context = glXCreateContext(_display,visualInfo,0,GL_TRUE);
+        _xdisplay,DefaultScreen(_xdisplay),config);
+      _context = glXCreateContext(_xdisplay,visualInfo,0,GL_TRUE);
     }
-    glXMakeCurrent(_display,_drawable,_context);
-    XFlush(_display);
+    glXMakeCurrent(_xdisplay,_xdrawable,_context);
+    XFlush(_xdisplay);
   }
   virtual jboolean swapBuffers(JNIEnv*) {
-    glXSwapBuffers(_display,_drawable);
+    glXSwapBuffers(_xdisplay,_xdrawable);
     return JNI_TRUE;
   }
 private:
-  Display* _display;
-  Drawable _drawable;
+  Display* _xdisplay;
+  Drawable _xdrawable;
+  GC _xgc;
   GLXContext _context;
 };
-*/
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -317,14 +318,15 @@ Java_edu_mines_jves_opengl_GlContext_makeGlAwtCanvasContext(
 
 extern "C" JNIEXPORT jlong JNICALL
 Java_edu_mines_jves_opengl_GlContext_makeGlSwtCanvasContext(
-  JNIEnv* env, jclass cls, jlong handleCanvas, jlong handleDisplay) 
+  JNIEnv* env, jclass cls, 
+  jlong xdisplay, jlong xdrawable, jlong xgc,
+  jlong hwnd, jlong hdc) 
 {
   JNI_TRY
 #if defined(MWIN)
-  GlContext* context = new WglSwtCanvasContext(env,handleCanvas);
+  GlContext* context = new WglSwtCanvasContext(env,hwnd,hdc);
 #elif defined(XWIN)
-//GlContext* context = new GlxSwtCanvasContext(env,handleCanvas,handleDisplay);
-  GlContext* context = 0;
+  GlContext* context = new GlxSwtCanvasContext(env,xdisplay,xdrawable,xgc);
 #endif
   return fromPointer(context);
   JNI_CATCH

@@ -48,10 +48,13 @@ public class GlContext {
    * @param canvas the canvas.
    */
   public GlContext(org.eclipse.swt.widgets.Canvas canvas) {
-    long handleCanvas = canvas.handle;
-    //long handleDisplay = canvas.getDisplay().xDisplay;
-    long handleDisplay = 0;
-    _peer = makeGlSwtCanvasContext(handleCanvas,handleDisplay);
+    _swtHandles = new SwtHandles(canvas);
+    long xdisplay = _swtHandles.xdisplay;
+    long xdrawable = _swtHandles.xdrawable;
+    long xgc = _swtHandles.xgc;
+    long hwnd = _swtHandles.hwnd;
+    long hdc = _swtHandles.hdc;
+    _peer = makeGlSwtCanvasContext(xdisplay,xdrawable,xgc,hwnd,hdc);
   }
 
   /**
@@ -67,8 +70,7 @@ public class GlContext {
     Gl.setContext(this);
     boolean locked = lock(_peer);
     Check.state(locked,"this OpenGL context has been locked");
-    if (!_gotProcAddresses)
-      getProcAddresses();
+    getProcAddresses();
   }
 
   /**
@@ -95,10 +97,13 @@ public class GlContext {
   }
 
   /**
-   * Dispose of this context.
+   * Dispose this context.
    */
   public void dispose() {
     killGlContext(_peer);
+    _swtHandles.dispose();
+    _peer = 0;
+    _gotProcAddresses = false;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -116,12 +121,15 @@ public class GlContext {
   // private
 
   private long _peer; // C++ peer of this OpenGL context
+  private SwtHandles _swtHandles; // SWT handles (for X11 or WIN32)
   private ReentrantLock _lock = new ReentrantLock(); // mutual exclusion lock
   private boolean _gotProcAddresses;
 
   private static native void killGlContext(long peer);
   private static native long makeGlAwtCanvasContext(java.awt.Canvas canvas);
-  private static native long makeGlSwtCanvasContext(long canvas, long display);
+  private static native long makeGlSwtCanvasContext(
+    long xdisplay, long xdrawable, long xgc, 
+    long hwnd, long hdc);
   private static native boolean lock(long peer);
   private static native boolean unlock(long peer);
   private static native boolean swapBuffers(long peer);
@@ -326,6 +334,10 @@ public class GlContext {
   long glGetBufferPointerv;
 
   private void getProcAddresses() {
+
+    // Do this only once.
+    if (_gotProcAddresses)
+      return;
 
     // OpenGL 1.2
     glBlendColor = getProcAddress("glBlendColor");

@@ -49,13 +49,16 @@ public abstract class GlSwtCanvas extends Canvas {
    */
   public abstract void glPaint();
 
+  ///////////////////////////////////////////////////////////////////////////
+  // protected
+
   /**
    * Paints this canvas.  This implementation (1) locks the OpenGL context,
    * (2) calls {@link #glPaint()}, (3) swaps the front and back buffers, and 
    * finally (4) unlocks the OpenGL context.
-   * @param pe the PaintEvent; not used in this implementation.
+   * @param pe the paint event; not used in this implementation.
    */
-  private void paint(PaintEvent pe) {
+  protected void paint(PaintEvent pe) {
     _context.lock();
     try {
       glPaint();
