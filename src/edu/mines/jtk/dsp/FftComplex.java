@@ -96,8 +96,11 @@ public class FftComplex {
     Check.argument(cx.length>=_nfft,"cx.length is valid");
     Check.argument(cy.length>=_nfft,"cy.length is valid");
     if (cx!=cy) {
-      for (int i2=0; i2<_nfft; ++i2)
+      for (int i2=0; i2<_nfft; ++i2) {
+        Check.argument(cx[i2].length>=2*n1,"cx[i2].length is valid");
+        Check.argument(cy[i2].length>=2*n1,"cy[i2].length is valid");
         System.arraycopy(cx[i2],0,cy[i2],0,2*n1);
+      }
     }
     pfacc2(sign,n1,_nfft,cy);
   }
