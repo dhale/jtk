@@ -6,43 +6,60 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import org.eclipse.swt.graphics.*;
+import java.awt.*;
 
 /**
  * A tiled view in a tile.
  * @author Dave Hale, Colorado School of Mines
- * @version 2004.12.17
+ * @version 2004.12.28
  */
 public abstract class TiledView {
 
   /**
+   * Paints this tiled view.
+   * @param g the graphics.
+   */
+  public abstract void paint(Graphics g);
+
+  /**
    * Gets the tile that contains this tiled view.
-   * @return the tile.
+   * @return the tile; null, if none.
    */
   public Tile getTile() {
     return _tile;
   }
 
   /**
-   * Paints this tiled view.
-   * @param gc the graphics context.
-   */
-  public abstract void paint(GC gc);
-
-  /**
    * Gets the horizontal projector of this tiled view.
-   * @return the horizontal projector.
+   * The returned horizontal projector is a reference to that for the tile 
+   * that contains this tiled view or null, if this tiled view is not in a 
+   * tile.
+   * @return the horizontal projector; null, if none.
    */
   public Projector getHorizontalProjector() {
-    return _hp;
+    return _tile.getHorizontalProjector();
   }
 
   /**
    * Gets the vertical projector of this tiled view.
-   * @return the vertical projector.
+   * The returned vertical projector is a reference to that for the tile 
+   * that contains this tiled view or null, if this tiled view is not in 
+   * a tile.
+   * @return the vertical projector; null, if none.
    */
   public Projector getVerticalProjector() {
-    return _vp;
+    return _tile.getVerticalProjector();
+  }
+
+  /**
+   * Gets the transcaler of this tiled view.
+   * The returned transcaler is a reference to that for the tile that
+   * contains this tiled view or null, if this tiled view is not in a 
+   * tile.
+   * @return the transcaler; null, if none.
+   */
+  public Transcaler getTranscaler() {
+    return _tile.getTranscaler();
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -59,7 +76,7 @@ public abstract class TiledView {
       _bhp = bhp.clone();
       _bvp = bvp.clone();
       if (_tile!=null) {
-        _tile.alignTiledView(this);
+        _tile.alignProjectors();
       }
     }
   }
@@ -82,19 +99,16 @@ public abstract class TiledView {
   }
 
   /**
-   * Called during alignment of this tiled view by its tile.
+   * Called by the tile when this tiled view is added/removed to/from it.
    */
-  void setProjectors(Projector hp, Projector vp) {
-    _hp = hp;
-    _vp = vp;
+  void setTile(Tile tile) {
+    _tile = tile;
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
   private Tile _tile;
-  private Projector _hp = new Projector(0.0,1.0,0.0,1.0);
-  private Projector _vp = new Projector(0.0,1.0,0.0,1.0);
   private Projector _bhp = null;
   private Projector _bvp = null;
 

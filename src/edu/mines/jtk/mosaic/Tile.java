@@ -67,6 +67,30 @@ public class Tile extends JPanel {
   }
 
   /**
+   * Adds the specified tiled view to this tile. If the tiled view is
+   * already in this tile, it is first removed, before adding it again.
+   * @param tv the tiled view.
+   */
+  public void addTiledView(TiledView tv) {
+    _tvs.remove(tv);
+    _tvs.add(tv);
+    tv.setTile(this);
+    alignProjectors();
+  }
+
+  /**
+   * Removes the specified tiled view from this tile. If the tiled view
+   * is not in this tile, this method does nothing.
+   * @param tv the tiled view.
+   */
+  public void removeTiledView(TiledView tv) {
+    if (_tvs.remove(tv)) {
+      tv.setTile(null);
+      alignProjectors();
+    }
+  }
+
+  /**
    * Returns the number of tiled views in this this.
    * @return the number of tiled views.
    */
@@ -75,7 +99,26 @@ public class Tile extends JPanel {
   }
 
   /**
-   * Gets the view rectangle for this tile.
+   * Gets the tiled view with specified index.
+   * @param index the index.
+   * @return the tiled view.
+   */
+  public TiledView getTiledView(int index) {
+    return _tvs.get(index);
+  }
+
+  /**
+   * Gets an iterator for the tiled views in this tile.
+   * @return the iterator.
+   */
+  public Iterator<TiledView> getTiledViews() {
+    return _tvs.iterator();
+  }
+
+  /**
+   * Gets the view rectangle for this tile. The view rectangle represents
+   * the subset of normalized coordinate space that is displayed in this 
+   * tile.
    * @return the view rectangle.
    */
   public DRectangle getViewRectangle() {
@@ -89,7 +132,7 @@ public class Tile extends JPanel {
    * <p>
    * If this tile is in a mosaic, calling this method will cause the mosaic 
    * to set the view rectangles of any other tiles in the same row or column 
-   * accordingly.
+   * to be consistent with this tile.
    * @param vr the view rectangle.
    */
   public void setViewRectangle(DRectangle vr) {
@@ -158,26 +201,39 @@ public class Tile extends JPanel {
   void setProjectors(Projector hp, Projector vp) {
     _hp = hp;
     _vp = vp;
-    for (TiledView tv : _tvs) {
-      tv.setProjectors(_hp,_vp);
-    }
     repaint();
   }
 
   /**
-   * Called by a tiled view when it requires alignment.
+   * Called during alignment of this tile by its mosaic.
    */
-  void alignTiledView(TiledView tv) {
+  void setHorizontalProjector(Projector hp) {
+    _hp = hp;
+    repaint();
+  }
+
+  /**
+   * Called during alignment of this tile by its mosaic.
+   */
+  void setVerticalProjector(Projector vp) {
+    _vp = vp;
+    repaint();
+  }
+
+  /**
+   * Called by this tile or by a tiled view when this tile needs alignment.
+   */
+  void alignProjectors() {
     updateBestProjectors();
     if (_mosaic!=null) {
-      _mosaic.alignTile(this);
+      _mosaic.alignProjectors(this);
     } else {
       setProjectors(_bhp,_bvp);
     }
   }
 
   /**
-   * Called by this tile's mosaic.
+   * Called by this tile's mosaic or, if no mosaic, by this tile.
    */
   void setViewRectangleInternal(DRectangle vr) {
     _vr = vr.clone();
@@ -208,10 +264,10 @@ public class Tile extends JPanel {
     Projector bvp = null;
     int ntv = _tvs.size();
     if (ntv>0) {
-      TiledView tv = _tvs.get(0);
+      TiledView tv = _tvs.get(ntv-1);
       bhp = tv.getBestHorizontalProjector();
       bvp = tv.getBestVerticalProjector();
-      for (int itv=1; itv<ntv; ++itv) {
+      for (int itv=ntv-2; itv>=0; --itv) {
         tv = _tvs.get(itv);
         bhp.merge(tv.getBestHorizontalProjector());
         bvp.merge(tv.getBestVerticalProjector());

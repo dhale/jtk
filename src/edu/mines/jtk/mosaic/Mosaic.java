@@ -297,8 +297,28 @@ public class Mosaic extends JPanel {
   ///////////////////////////////////////////////////////////////////////////
   // package
 
-  void alignTile(Tile tile) {
-    // TODO
+  void alignProjectors(Tile tile) {
+    int jrow = tile.getRowIndex();
+    int jcol = tile.getColumnIndex();
+    Projector bhp = tile.getBestHorizontalProjector().clone();
+    for (int irow=0; irow<_nrow; ++irow) {
+      if (irow!=jrow)
+        bhp.merge(_tiles[irow][jcol].getBestHorizontalProjector());
+    }
+    Projector bvp = tile.getBestVerticalProjector().clone();
+    for (int icol=0; icol<_ncol; ++icol) {
+      if (icol!=jcol)
+        bvp.merge(_tiles[jrow][icol].getBestVerticalProjector());
+    }
+    tile.setProjectors(bhp,bvp);
+    for (int irow=0; irow<_nrow; ++irow) {
+      if (irow!=jrow)
+        _tiles[irow][jcol].setHorizontalProjector(bhp);
+    }
+    for (int icol=0; icol<_ncol; ++icol) {
+      if (icol!=jcol)
+        _tiles[jrow][icol].setVerticalProjector(bvp);
+    }
   }
 
   void needsLayout() {
