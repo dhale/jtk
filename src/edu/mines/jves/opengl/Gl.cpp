@@ -304,9 +304,9 @@ JNI_GL_BEGIN1
 JNI_GL_END
 
 JNI_GL_DECLARE1(glColorMask)
-  jbyte red, jbyte green, jbyte blue, jbyte alpha
+  jboolean red, jboolean green, jboolean blue, jboolean alpha
 JNI_GL_BEGIN1
-  glColorMask(red,green,blue,alpha);
+  glColorMask(fromJava(red),fromJava(green),fromJava(blue),fromJava(alpha));
 JNI_GL_END
 
 JNI_GL_DECLARE1(glColorMaterial)
@@ -381,9 +381,9 @@ JNI_GL_BEGIN1
 JNI_GL_END
 
 JNI_GL_DECLARE1(glDepthMask)
-  jbyte flag
+  jboolean flag
 JNI_GL_BEGIN1
-  glDepthMask(flag);
+  glDepthMask(fromJava(flag));
 JNI_GL_END
 
 JNI_GL_DECLARE1(glDepthRange)
@@ -459,7 +459,7 @@ JNI_GL_BEGIN1
 JNI_GL_END
 
 JNI_GL_DECLARE1(glEdgeFlag)
-  jbyte flag
+  jboolean flag
 JNI_GL_BEGIN1
   glEdgeFlag(flag);
 JNI_GL_END
@@ -472,9 +472,9 @@ JNI_GL_BEGIN1
 JNI_GL_END
 
 JNI_GL_DECLARE1(glEdgeFlagv)
-  jbyteArray jflag
+  jbooleanArray jflag
 JNI_GL_BEGIN1
-  JubyteArray flag(env,jflag);
+  JbooleanArray flag(env,jflag);
   glEdgeFlagv(flag);
 JNI_GL_END
 
@@ -647,9 +647,9 @@ JNI_GL_BEGIN1
 JNI_GL_END
 
 JNI_GL_DECLARE1(glGetBooleanv)
-  jint pname, jbyteArray jparams
+  jint pname, jbooleanArray jparams
 JNI_GL_BEGIN1
-  JubyteArray params(env,jparams);
+  JbooleanArray params(env,jparams);
   glGetBooleanv(pname,params);
 JNI_GL_END
 

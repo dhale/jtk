@@ -930,7 +930,7 @@ public class Gl {
   public static native void glAccum(int op, float value);
   public static native void glAlphaFunc(int func, float ref);
   public static native boolean glAreTexturesResident(
-    int n, int[] textures, byte[] residences);
+    int n, int[] textures, byte[] residences); // xxx
   public static native void glArrayElement(int i);
   public static native void glBegin(int mode);
   public static native void glBindTexture(int target, int texture);
@@ -995,7 +995,7 @@ public class Gl {
     short red, short green, short blue, short alpha);
   public static native void glColor4usv(short[] v);
   public static native void glColorMask(
-    byte red, byte green, byte blue, byte alpha);
+    boolean red, boolean green, boolean blue, boolean alpha);
   public static native void glColorMaterial(int face, int mode);
   public static native void glColorPointer(
     int size, int type, int stride, Buffer pointer);
@@ -1016,7 +1016,7 @@ public class Gl {
   public static native void glDeleteLists(int list, int range);
   public static native void glDeleteTextures(int n, int[] textures);
   public static native void glDepthFunc(int func);
-  public static native void glDepthMask(byte flag);
+  public static native void glDepthMask(boolean flag);
   public static native void glDepthRange(double zNear, double zFar);
   public static native void glDisable(int cap);
   public static native void glDisableClientState(int array);
@@ -1043,9 +1043,9 @@ public class Gl {
     int width, int height, int format, int type, int[] pixels);
   public static native void glDrawPixels(
     int width, int height, int format, int type, short[] pixels);
-  public static native void glEdgeFlag(byte flag);
+  public static native void glEdgeFlag(boolean flag);
   public static native void glEdgeFlagPointer(int stride, Buffer pointer);
-  public static native void glEdgeFlagv(byte[] flag);
+  public static native void glEdgeFlagv(boolean[] flag);
   public static native void glEnable(int cap);
   public static native void glEnableClientState(int array);
   public static native void glEnd();
@@ -1078,7 +1078,7 @@ public class Gl {
     double zNear, double zFar);
   public static native int glGenLists(int range);
   public static native void glGenTextures(int n, int[] textures);
-  public static native void glGetBooleanv(int pname, byte[] params);
+  public static native void glGetBooleanv(int pname, boolean[] params);
   public static native void glGetClipPlane(int plane, double[] equation);
   public static native void glGetDoublev(int pname, double[] params);
   public static native int glGetError();
