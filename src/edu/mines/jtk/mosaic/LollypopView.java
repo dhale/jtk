@@ -47,12 +47,11 @@ public class LollypopView extends TiledView {
     // Radius in pixels of balls.
     double rbx = ballRadiusX();
     double rby = ballRadiusY();
-    double hsf = hp.getScaleFactor(getBestHorizontalProjector());
-    double vsf = vp.getScaleFactor(getBestVerticalProjector());
-    int rx = ts.x(rbx*hsf)-ts.x(0.0);
-    int ry = ts.y(rby*vsf)-ts.y(0.0);
-    int rp = min(rx,ry);
-    //System.out.println("rbx="+rbx+" hsf="+hsf+" rx="+rx+" rp="+rp);
+    double hsr = hp.getScaleRatio(getBestHorizontalProjector());
+    double vsr = vp.getScaleRatio(getBestVerticalProjector());
+    int rx = ts.x(rbx*hsr)-ts.x(0.0);
+    int ry = ts.y(rby*vsr)-ts.y(0.0);
+    int rb = min(rx,ry);
 
     // Horizontal line for function value 0.0.
     int x0 = ts.x(hp.u0());
@@ -70,7 +69,7 @@ public class LollypopView extends TiledView {
       int x = ts.x(hp.u(xi));
       int y = ts.y(vp.u(fi));
       g2d.drawLine(x,y0,x,y);
-      g2d.fillArc(x-rp,y-rp,2*rp,2*rp,0,360);
+      g2d.fillOval(x-rb,y-rb,2*rb,2*rb);
     }
   }
 
@@ -110,7 +109,7 @@ public class LollypopView extends TiledView {
 
   private double ballRadiusX() {
     double nx = _sx.getCount();
-    return 1.0/max(4.4,2.2*(nx-1));
+    return 0.9/(2.0*nx);
   }
 
   private double ballRadiusY() {

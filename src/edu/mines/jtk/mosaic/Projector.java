@@ -14,14 +14,18 @@ import edu.mines.jtk.util.*;
  * The projection is a simple scale and translation, such that specified
  * world coordinates (v0,v1) correspond to specified normalized coordinates 
  * (u0,u1).
+ * <p>
+ * Specifically, a projector computes u = shift+scale*v, where scale = 
+ * (u1-u0)/(v1-v0), and shift = u0-scale*v0. The projection exists only 
+ * for v1 != v0. However, v0 and v1 are otherwise unconstrained. v0 may 
+ * be greater than v1.
+ * <p>
+ * The projection from normalized coordinates u to world coordinates v is 
+ * simply the inverse, and this inverse exists only for u1 != u0.
  * <p> 
  * By definition, u0 is closest to normalized coordinate u=0, and u1 is 
  * closest to normalized coordinate u=1. These coordinates must satisfy
  * the constraints 0.0 &lt;= u0 &lt; u1 &lt;= 1.0.
- * <p>
- * The corresponding world coordinates (v0,v1) must not be equal (so that
- * the mapping to (u0,u1) is well-defined), but are otherwise unconstrained.
- * Note, in particular, that v0 may be greater than v1.
  * <p>
  * Typically, the coordinates (v0,v1) represent bounds in world coordinate 
  * space. Then, the gaps in normalized coordinate space [0,u0) and (u1,1] 
@@ -36,23 +40,14 @@ import edu.mines.jtk.util.*;
  * that a graphic might use if it were the only one being rendered.
  * <p>
  * We assume that each graphic has a preferred projector that indicates 
- * (1) its world coordinate span and (2) the margins [0,u0) and (u1,1]
- * that it would need if it were the only graphic rendered. We then merge
- * two projectors into one so that the merged projector (1) contains the 
- * union of the two world coordinate spans and (2) has adequate normalized 
- * coordinate margins. 
+ * the world coordinate span [v0,v1] and margins [0,u0) and (u1,1] that
+ * it would prefer if it were the only graphic rendered. We then merge
+ * two projectors into one so that the merged projector contains the 
+ * union of the two world coordinate spans and has adequate margins. 
  * <p>
- * When rendering via such a merged projector, each graphic may use only 
- * a subset of the merged world coordinate span. The ratio of the span
- * v1-v0 in the preferred projector for a graphic to that in the merged
- * projector is its <em>scale factor</em>, a number with magnitude less
- * than or equal to one. We assume that the preferred margins of a graphic 
- * scale by this same factor, and we use those scaled preferred margins to 
- * compute the margins in the merged projector.
- * <p>
- * A projector has a sign, which is the sign of v1-v0. This sign is never
- * ambiguous, because v1 never equals v0. When merging a projector B into
- * into a projector A, we preserve the sign of projector A.
+ * A projector has a sign, which is the sign of v1-v0. Note that this sign 
+ * is never ambiguous, because v1 never equals v0. When merging a projector 
+ * B into into a projector A, we preserve the sign of projector A.
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.01.01
@@ -145,10 +140,6 @@ public class Projector implements Cloneable {
 
   /**
    * Merges the specified projector into this projector. 
-   * <p>
-   *  to be If the sign of
-   * v1-v0 for the specified projector is different from that for this 
-   * projector, the sign for this projector is preserved.
    * @param p the projector.
    */
   public void merge(Projector p) {
@@ -175,40 +166,56 @@ public class Projector implements Cloneable {
     _v0 = (v0a<v1a)?vmin:vmax;
     _v1 = (v0a<v1a)?vmax:vmin;
 
-    // Scale factors for projectors A and B. These scale factors are never 
-    // greater than one. They represent the fractions of the merged span 
-    // v1-v0 that are consumed by projectors A and B. Note that the scale
-    // factor sa for projector A is always positive, because we preserve
-    // sign of projector A. If the sign of scale factor sb for projector
-    // B is negative, then we are flipping projector B in the merge.
-    double sa = (v1a-v0a)/(_v1-_v0); 
-    double sb = (v1b-v0b)/(_v1-_v0);
+    // If sign of B does not equal sign of A, flip B.
+    double ra = (v1a-v0a)/(_v1-_v0); 
+    double rb = (v1b-v0b)/(_v1-_v0);
+    if (rb<0.0) {
+      rb = -rb;
+      double u0t = u0b;
+      u0b = 1.0-u1b;
+      u1b = 1.0-u0t;
+      double v0t = v0b;
+      v0b = v1b;
+      v1b = v0t;
+    }
 
-    // Scaled normalized coordinate bounds for A and B. We assume that the 
-    // margins u0 and 1-u1 for projectors A and B scale just like their spans
-    // v1-v0. If we are flipping projector B, then we must flip its margins.
-    u0a = sa*u0a;
-    u1a = 1.0-sa*(1.0-u1a);
-    u0b = (sb>0.0)?sb*u0b:-sb*(1.0-u1b);
-    u1b = (sb>0.0)?1.0-sb*(1.0-u1b):1.0+sb*u0b;
-
-    // Merged normalized coordinate bounds.
-    _u0 = max(u0a,u0b);
-    _u1 = min(u1a,u1b);
-    assert _u0<_u1 : "_u0<_u1";
+    // Merged normalized coordinate bounds. This is tricky. The merged 
+    // bound u0 equals the maximum of sa*u0a and sb*u0b, where sa and sb 
+    // are scale factors that depend on the difference u1-u0. Specifically 
+    // sa = ra*(u1-u0)/(u1a-u0a), and sb = rb*(u1-u0)/(u1b-u0b). It seems 
+    // that we cannot get u0 without knowing u0 and u1. However, we also 
+    // know that the merged margin 1-u1 equals the maximum of sa*(1-u1a)
+    // and sb*(1-u1b). So we have two linear equations that we solve for 
+    // the two unknowns u0 and u1. Note: 0 <= u0 < u1 <= 1 is invariant.
+    double ca = u0a*ra/(u1a-u0a);
+    double cb = u0b*rb/(u1b-u0b);
+    double c = max(ca,cb);
+    double da = (1.0-u1a)*ra/(u1a-u0a);
+    double db = (1.0-u1b)*rb/(u1b-u0b);
+    double d = max(da,db);
+    _u0 = c/(1.0+c+d);
+    _u1 = 1.0-d/(1.0+c+d);
 
     // Recompute shifts and scales.
     computeShiftsAndScales();
   }
 
   /**
-   * Gets the scale factor for the specified projector relative to this one.
-   * The scale factor is the ratio of the span v1-v0 of the specified 
-   * projector to the span v1-v0 for this projector.
+   * Gets the scale ratio for this projector and a specified projector.
+   * Recall that a projector converts world coordinates v to normalized 
+   * coordinates u by a simple scaling and translation: u = shift+scale*v. 
+   * This method returns the scale for this projector divided by the scale 
+   * for the specified projector.
+   * <p>
+   * This method is typically used to account for the effects of merging
+   * two or more projectors. For example, after merging, parameters that 
+   * are proportional to the sizes of margins [0,u0) or (u1,1] in the
+   * specified projector should be scaled by this ratio before being used
+   * with this projector.
    * @return the scale factor.
    */
-  public double getScaleFactor(Projector p) {
-    return (p._v1-p._v0)/(_v1-_v0);
+  public double getScaleRatio(Projector p) {
+    return _vscale/p._vscale;
   }
 
   public boolean equals(Object obj) {

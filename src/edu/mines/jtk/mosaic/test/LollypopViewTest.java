@@ -35,8 +35,8 @@ public class LollypopViewTest {
     mosaic.setFont(new Font("SansSerif",Font.PLAIN,12));
     mosaic.setPreferredSize(new Dimension(900,600));
 
-    mosaic.getTile(0,0).addTiledView(makeView(101,1.0,-50.0,1.0));
-    mosaic.getTile(1,0).addTiledView(makeView( 17,1.0, -5.0,2.0));
+    mosaic.getTile(0,0).addTiledView(makeView(101, 1.0,-50.0,1.0));
+    mosaic.getTile(1,0).addTiledView(makeView( 17,-1.0,  5.0,2.0));
 
     TileZoomMode zoomMode = new TileZoomMode(mosaic);
 
