@@ -33,7 +33,7 @@ public class BufferBench {
       bb = ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     } catch (OutOfMemoryError e1) {
       System.gc();
-      System.out.println("attempted gc after"+e1.getMessage());
+      System.out.println("attempted gc after exception: "+e1);
       System.out.println("now attempting to allocate again");
       try {
         bb = ByteBuffer.allocateDirect(capacity);
