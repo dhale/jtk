@@ -35,7 +35,7 @@ public class TileAxis extends Canvas {
     super.setFont(font);
     _mosaic.needsLayout();
   }
-  
+
   public void setLabel(String label) {
     _label = label;
     _mosaic.needsLayout();
