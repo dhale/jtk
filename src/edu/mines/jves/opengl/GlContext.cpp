@@ -234,7 +234,7 @@ public:
   WglSwtCanvasContext(JNIEnv* env, jobject canvas) : 
     GlSwtCanvasContext(env,canvas),_hglrc(0) 
   {
-    _hdc = getCanvasHDC();
+    _hdc = getCanvasHdc();
   }
   virtual ~WglSwtCanvasContext() {
   }
@@ -263,7 +263,7 @@ public:
     return JNI_TRUE;
   }
 private:
-  HDC getCanvasHDC() {
+  HDC getCanvasHdc() {
     // Equivalent to this Java code: 
     //   return _canvas.internal_new_GC(new GCData());
 
@@ -314,9 +314,7 @@ Java_edu_mines_jves_opengl_GlContext_makeGlSwtCanvasContext(
   jobject canvas) {
   JNI_TRY
 #if defined(MWIN)
-trace("before new WglSwtCanvasContext");
   GlContext* context = new WglSwtCanvasContext(env,canvas);
-trace("after new WglSwtCanvasContext");
 #endif
   return fromPointer(context);
   JNI_CATCH

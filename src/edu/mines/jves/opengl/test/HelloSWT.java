@@ -23,7 +23,7 @@ import edu.mines.jves.opengl.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.11.24
  */
-public class HelloSWT {
+public class HelloSwt {
 
   private static class MyCanvas extends GlSwtCanvas {
     public MyCanvas(Composite parent, int style) {
