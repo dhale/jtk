@@ -44,6 +44,21 @@ public class Rap {
   public static float[][][] copy(int n1, int n2, int n3, float[][][] rx) {
     return copy(n1,n2,n3,rx,new float[n3][n2][n1]);
   }
+  public static float[] copy(float[] rx, float[] ry) {
+    return copy(rx.length,rx,ry);
+  }
+  public static float[][] copy(float[][] rx, float[][] ry) {
+    int n2 = rx.length;
+    for (int i2=0; i2<n2; ++i2)
+      copy(rx[i2],ry[i2]);
+    return ry;
+  }
+  public static float[][][] copy(float[][][] rx, float[][][] ry) {
+    int n3 = rx.length;
+    for (int i3=0; i3<n3; ++i3)
+      copy(rx[i3],ry[i3]);
+    return ry;
+  }
   public static float[] copy(int n1, float[] rx, float[] ry) {
     for (int i1=0; i1<n1; ++i1)
       ry[i1] = rx[i1];
@@ -96,6 +111,21 @@ public class Rap {
   public static float[][][] zero(int n1, int n2, int n3) {
     return new float[n3][n2][n1];
   }
+  public static float[] zero(float[] rx) {
+    return zero(rx.length,rx);
+  }
+  public static float[][] zero(float[][] rx) {
+    int n2 = rx.length;
+    for (int i2=0; i2<n2; ++i2)
+      zero(rx[i2]);
+    return rx;
+  }
+  public static float[][][] zero(float[][][] rx) {
+    int n3 = rx.length;
+    for (int i3=0; i3<n3; ++i3)
+      zero(rx[i3]);
+    return rx;
+  }
   public static float[] zero(int n1, float[] rx) {
     for (int i1=0; i1<n1; ++i1)
       rx[i1] = 0.0f;
@@ -122,6 +152,21 @@ public class Rap {
   }
   public static float[][][] fill(float ra, int n1, int n2, int n3) {
     return fill(ra,n1,n2,n3,new float[n3][n2][n1]);
+  }
+  public static float[] fill(float ra, float[] rx) {
+    return fill(ra,rx.length,rx);
+  }
+  public static float[][] fill(float ra, float[][] rx) {
+    int n2 = rx.length;
+    for (int i2=0; i2<n2; ++i2)
+      fill(ra,rx[i2]);
+    return rx;
+  }
+  public static float[][][] fill(float ra, float[][][] rx) {
+    int n3 = rx.length;
+    for (int i3=0; i3<n3; ++i3)
+      fill(ra,rx[i3]);
+    return rx;
   }
   public static float[] fill(float ra, int n1, float[] rx) {
     for (int i1=0; i1<n1; ++i1)
@@ -154,6 +199,25 @@ public class Rap {
     int n1, int n2, int n3) {
     return ramp(ra,rb1,rb2,rb3,n1,n2,n3,new float[n3][n2][n1]);
   }
+
+  public static float[] ramp(float ra, float rb, float[] rx) {
+    return ramp(ra,rb,rx.length,rx);
+  }
+  public static float[][] ramp(float ra, float rb1, float rb2, float[][] rx) {
+    int n2 = rx.length;
+    float ra2 = ra;
+    for (int i2=0; i2<n2; ++i2,ra2+=rb2)
+      ramp(ra2,rb1,rx[i2]);
+    return rx;
+  }
+  public static float[][][] ramp(
+    float ra, float rb1, float rb2, float rb3, float[][][] rx) {
+    int n3 = rx.length;
+    float ra3 = ra;
+    for (int i3=0; i3<n3; ++i3,ra3+=rb3)
+      ramp(ra3,rb1,rb2,rx[i3]);
+    return rx;
+  }
   public static float[] ramp(float ra, float rb, int n1, float[] rx) {
     for (int i1=0; i1<n1; ++i1,ra+=rb)
       rx[i1] = ra;
@@ -176,9 +240,61 @@ public class Rap {
   }
 
   ///////////////////////////////////////////////////////////////////////////
+  // almostEqual
+  public static boolean almostEqual(
+    float tolerance, float[] rx, float[] ry) {
+    return almostEqual(tolerance,rx.length,rx,ry);
+  }
+  public static boolean almostEqual(
+    float tolerance, float[][] rx, float[][] ry) {
+    int n2 = rx.length;
+    for (int i2=0; i2<n2; ++i2) {
+      if (!almostEqual(tolerance,rx[i2],ry[i2]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean almostEqual(
+    float tolerance, float[][][] rx, float[][][] ry) {
+    int n3 = rx.length;
+    for (int i3=0; i3<n3; ++i3) {
+      if (!almostEqual(tolerance,rx[i3],ry[i3]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean almostEqual(
+    float tolerance, int n1, float[] rx, float[] ry) {
+    for (int i1=0; i1<n1; ++i1) {
+      if (!almostEqual(tolerance,rx[i1],ry[i1]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean almostEqual(
+    float tolerance, int n1, int n2, float[][] rx, float[][] ry) {
+    for (int i2=0; i2<n2; ++i2) {
+      if (!almostEqual(tolerance,n1,rx[i2],ry[i2]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean almostEqual(
+    float tolerance, int n1, int n2, int n3, float[][][] rx, float[][][] ry) {
+    for (int i3=0; i3<n3; ++i3) {
+      if (!almostEqual(tolerance,n1,n2,rx[i3],ry[i3]))
+        return false;
+    }
+    return true;
+  }
+  private static boolean almostEqual(float tolerance, float ra, float rb) {
+    return (ra<rb)?rb-ra<=tolerance:ra-rb<=tolerance;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
   // add, sub, mul, div
   public static float[] add(int n1, float[] rx, float[] ry) {
-    return add(n1,rx,ry,new float[2*n1]);
+    return add(n1,rx,ry,new float[n1]);
   }
   public static float[][] add(int n1, int n2, float[][] rx, float[][] ry) {
     return add(n1,n2,rx,ry,new float[n2][n1]);
@@ -202,6 +318,60 @@ public class Rap {
     int n1, int n2, int n3, float[][][] rx, float[][][] ry, float[][][] rz) {
     for (int i3=0; i3<n3; ++i3)
       add(n1,n2,rx[i3],ry[i3],rz[i3]);
+    return rz;
+  }
+  public static float[] add(int n1, float ra, float[] ry) {
+    return add(n1,ra,ry,new float[n1]);
+  }
+  public static float[][] add(int n1, int n2, float ra, float[][] ry) {
+    return add(n1,n2,ra,ry,new float[n2][n1]);
+  }
+  public static float[][][] add(
+    int n1, int n2, int n3, float ra, float[][][] ry) {
+    return add(n1,n2,n3,ra,ry,new float[n3][n2][n1]);
+  }
+  public static float[] add(int n1, float ra, float[] ry, float[] rz) {
+    for (int i1=0; i1<n1; ++i1)
+      rz[i1] = ra+ry[i1];
+    return rz;
+  }
+  public static float[][] add(
+    int n1, int n2, float ra, float[][] ry, float[][] rz) {
+    for (int i2=0; i2<n2; ++i2)
+      add(n1,ra,ry[i2],rz[i2]);
+    return rz;
+  }
+  public static float[][][] add(
+    int n1, int n2, int n3, float ra, float[][][] ry, float[][][] rz) {
+    for (int i3=0; i3<n3; ++i3)
+      add(n1,n2,ra,ry[i3],rz[i3]);
+    return rz;
+  }
+  public static float[] add(int n1, float[] rx, float rb) {
+    return add(n1,rx,rb,new float[n1]);
+  }
+  public static float[][] add(int n1, int n2, float[][] rx, float rb) {
+    return add(n1,n2,rx,rb,new float[n2][n1]);
+  }
+  public static float[][][] add(
+    int n1, int n2, int n3, float[][][] rx, float rb) {
+    return add(n1,n2,n3,rx,rb,new float[n3][n2][n1]);
+  }
+  public static float[] add(int n1, float[] rx, float rb, float[] rz) {
+    for (int i1=0; i1<n1; ++i1)
+      rz[i1] = rx[i1]+rb;
+    return rz;
+  }
+  public static float[][] add(
+    int n1, int n2, float[][] rx, float rb, float[][] rz) {
+    for (int i2=0; i2<n2; ++i2)
+      add(n1,rx[i2],rb,rz[i2]);
+    return rz;
+  }
+  public static float[][][] add(
+    int n1, int n2, int n3, float[][][] rx, float rb, float[][][] rz) {
+    for (int i3=0; i3<n3; ++i3)
+      add(n1,n2,rx[i3],rb,rz[i3]);
     return rz;
   }
 }

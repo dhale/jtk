@@ -47,6 +47,21 @@ public class Cap {
   public static float[][][] copy(int n1, int n2, int n3, float[][][] cx) {
     return copy(n1,n2,n3,cx,new float[n3][n2][2*n1]);
   }
+  public static float[] copy(float[] cx, float[] cy) {
+    return copy(cx.length/2,cx,cy);
+  }
+  public static float[][] copy(float[][] cx, float[][] cy) {
+    int n2 = cx.length;
+    for (int i2=0; i2<n2; ++i2)
+      copy(cx[i2],cy[i2]);
+    return cy;
+  }
+  public static float[][][] copy(float[][][] cx, float[][][] cy) {
+    int n3 = cx.length;
+    for (int i3=0; i3<n3; ++i3)
+      copy(cx[i3],cy[i3]);
+    return cy;
+  }
   public static float[] copy(int n1, float[] cx, float[] cy) {
     int n = 2*n1;
     while (--n>=0)
@@ -102,6 +117,21 @@ public class Cap {
   public static float[][][] zero(int n1, int n2, int n3) {
     return new float[n3][n2][2*n1];
   }
+  public static float[] zero(float[] cx) {
+    return zero(cx.length/2,cx);
+  }
+  public static float[][] zero(float[][] cx) {
+    int n2 = cx.length;
+    for (int i2=0; i2<n2; ++i2)
+      zero(cx[i2]);
+    return cx;
+  }
+  public static float[][][] zero(float[][][] cx) {
+    int n3 = cx.length;
+    for (int i3=0; i3<n3; ++i3)
+      zero(cx[i3]);
+    return cx;
+  }
   public static float[] zero(int n1, float[] cx) {
     for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
       cx[ir] = 0.0f;
@@ -130,6 +160,21 @@ public class Cap {
   }
   public static float[][][] fill(Complex ca, int n1, int n2, int n3) {
     return fill(ca,n1,n2,n3,new float[n3][n2][2*n1]);
+  }
+  public static float[] fill(Complex ca, float[] cx) {
+    return fill(ca,cx.length/2,cx);
+  }
+  public static float[][] fill(Complex ca, float[][] cx) {
+    int n2 = cx.length;
+    for (int i2=0; i2<n2; ++i2)
+      fill(ca,cx[i2]);
+    return cx;
+  }
+  public static float[][][] fill(Complex ca, float[][][] cx) {
+    int n3 = cx.length;
+    for (int i3=0; i3<n3; ++i3)
+      fill(ca,cx[i3]);
+    return cx;
   }
   public static float[] fill(Complex ca, int n1, float[] cx) {
     float ar = ca.r;
@@ -166,6 +211,25 @@ public class Cap {
     int n1, int n2, int n3) {
     return ramp(ca,cb1,cb2,cb3,n1,n2,n3,new float[n3][n2][2*n1]);
   }
+  public static float[] ramp(Complex ca, Complex cb, float[] cx) {
+    return ramp(ca,cb,cx.length/2,cx);
+  }
+  public static float[][] ramp(
+    Complex ca, Complex cb1, Complex cb2, float[][] cx) {
+    int n2 = cx.length;
+    Complex ca2 = new Complex(ca);
+    for (int i2=0; i2<n2; ++i2,ca2.plusEquals(cb2))
+      ramp(ca2,cb1,cx[i2]);
+    return cx;
+  }
+  public static float[][][] ramp(
+    Complex ca, Complex cb1, Complex cb2, Complex cb3, float[][][] cx) {
+    int n3 = cx.length;
+    Complex ca3 = new Complex(ca);
+    for (int i3=0; i3<n3; ++i3,ca3.plusEquals(cb3))
+      ramp(ca3,cb1,cb2,cx[i3]);
+    return cx;
+  }
   public static float[] ramp(Complex ca, Complex cb, int n1, float[] cx) {
     float ar = ca.r;
     float ai = ca.i;
@@ -191,6 +255,59 @@ public class Cap {
     for (int i3=0; i3<n3; ++i3,ca3.plusEquals(cb3))
       ramp(ca3,cb1,cb2,n1,n2,cx[i3]);
     return cx;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // almostEqual
+  public static boolean almostEqual(
+    float tolerance, float[] cx, float[] cy) {
+    return almostEqual(tolerance,cx.length/2,cx,cy);
+  }
+  public static boolean almostEqual(
+    float tolerance, float[][] cx, float[][] cy) {
+    int n2 = cx.length;
+    for (int i2=0; i2<n2; ++i2) {
+      if (!almostEqual(tolerance,cx[i2],cy[i2]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean almostEqual(
+    float tolerance, float[][][] cx, float[][][] cy) {
+    int n3 = cx.length;
+    for (int i3=0; i3<n3; ++i3) {
+      if (!almostEqual(tolerance,cx[i3],cy[i3]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean almostEqual(
+    float tolerance, int n1, float[] cx, float[] cy) {
+    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+      if (!almostEqual(tolerance,cx[ir],cy[ir]) || 
+          !almostEqual(tolerance,cx[ii],cy[ii])) 
+        return false;
+    }
+    return true;
+  }
+  public static boolean almostEqual(
+    float tolerance, int n1, int n2, float[][] cx, float[][] cy) {
+    for (int i2=0; i2<n2; ++i2) {
+      if (!almostEqual(tolerance,n1,cx[i2],cy[i2]))
+        return false;
+    }
+    return true;
+  }
+  public static boolean almostEqual(
+    float tolerance, int n1, int n2, int n3, float[][][] cx, float[][][] cy) {
+    for (int i3=0; i3<n3; ++i3) {
+      if (!almostEqual(tolerance,n1,n2,cx[i3],cy[i3]))
+        return false;
+    }
+    return true;
+  }
+  private static boolean almostEqual(float tolerance, float ra, float rb) {
+    return (ra<rb)?rb-ra<=tolerance:ra-rb<=tolerance;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -222,6 +339,70 @@ public class Cap {
     int n1, int n2, int n3, float[][][] cx, float[][][] cy, float[][][] cz) {
     for (int i3=0; i3<n3; ++i3)
       add(n1,n2,cx[i3],cy[i3],cz[i3]);
+    return cz;
+  }
+
+  public static float[] add(int n1, Complex ca, float[] cy) {
+    return add(n1,ca,cy,new float[2*n1]);
+  }
+  public static float[][] add(int n1, int n2, Complex ca, float[][] cy) {
+    return add(n1,n2,ca,cy,new float[n2][2*n1]);
+  }
+  public static float[][][] add(
+    int n1, int n2, int n3, Complex ca, float[][][] cy) {
+    return add(n1,n2,n3,ca,cy,new float[n3][n2][2*n1]);
+  }
+  public static float[] add(int n1, Complex ca, float[] cy, float[] cz) {
+    float ar = ca.r;
+    float ai = ca.i;
+    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+      cz[ir] = ar+cy[ir];
+      cz[ii] = ai+cy[ii];
+    }
+    return cz;
+  }
+  public static float[][] add(
+    int n1, int n2, Complex ca, float[][] cy, float[][] cz) {
+    for (int i2=0; i2<n2; ++i2)
+      add(n1,ca,cy[i2],cz[i2]);
+    return cz;
+  }
+  public static float[][][] add(
+    int n1, int n2, int n3, Complex ca, float[][][] cy, float[][][] cz) {
+    for (int i3=0; i3<n3; ++i3)
+      add(n1,n2,ca,cy[i3],cz[i3]);
+    return cz;
+  }
+
+  public static float[] add(int n1, float[] cx, Complex cb) {
+    return add(n1,cx,cb,new float[2*n1]);
+  }
+  public static float[][] add(int n1, int n2, float[][] cx, Complex cb) {
+    return add(n1,n2,cx,cb,new float[n2][2*n1]);
+  }
+  public static float[][][] add(
+    int n1, int n2, int n3, float[][][] cx, Complex cb) {
+    return add(n1,n2,n3,cx,cb,new float[n3][n2][2*n1]);
+  }
+  public static float[] add(int n1, float[] cx, Complex cb, float[] cz) {
+    float br = cb.r;
+    float bi = cb.i;
+    for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
+      cz[ir] = cx[ir]+br;
+      cz[ii] = cx[ii]+bi;
+    }
+    return cz;
+  }
+  public static float[][] add(
+    int n1, int n2, float[][] cx, Complex cb, float[][] cz) {
+    for (int i2=0; i2<n2; ++i2)
+      add(n1,cx[i2],cb,cz[i2]);
+    return cz;
+  }
+  public static float[][][] add(
+    int n1, int n2, int n3, float[][][] cx, Complex cb, float[][][] cz) {
+    for (int i3=0; i3<n3; ++i3)
+      add(n1,n2,cx[i3],cb,cz[i3]);
     return cz;
   }
 }
