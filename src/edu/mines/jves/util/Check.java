@@ -20,7 +20,7 @@ public class Check {
    * @param message a description of the condition.
    * @exception IllegalArgumentException if the condition is false.
    */
-  public static void arg(boolean condition, String message) {
+  public static void argument(boolean condition, String message) {
     if (!condition)
       throw new IllegalArgumentException("required condition: "+message);
   }
