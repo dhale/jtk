@@ -32,7 +32,7 @@ public class MosaicTest {
       Mosaic.AXES_LEFT |
       Mosaic.AXES_BOTTOM |
       Mosaic.AXES_RIGHT;
-    int borderStyle = Mosaic.BORDER_SHADOW_IN;
+    int borderStyle = Mosaic.BORDER_FLAT;
     Mosaic mosaic = new Mosaic(shell,SWT.NONE,
       nrow,ncol,axesPlacement,borderStyle);
     mosaic.setWidthMinimum(1,200);

@@ -224,31 +224,54 @@ public class Mosaic extends Composite {
     // Tiles.
     for (int irow=0; irow<_nrow; ++irow) {
       for (int icol=0; icol<_ncol; ++icol) {
-        Rectangle bounds = _tiles[irow][icol].getBounds();
-        paintBorderShadowIn(gc,bounds);
+        paintBorder(gc,_tiles[irow][icol]);
       }
     }
 
     // Axes.
     if (_axesTop!=null) {
       for (int icol=0; icol<_ncol; ++icol)
-        paintBorderShadowIn(gc,_axesTop[icol].getBounds());
+        paintBorder(gc,_axesTop[icol]);
     }
     if (_axesLeft!=null) {
       for (int irow=0; irow<_nrow; ++irow)
-        paintBorderShadowIn(gc,_axesLeft[irow].getBounds());
+        paintBorder(gc,_axesLeft[irow]);
     }
     if (_axesBottom!=null) {
       for (int icol=0; icol<_ncol; ++icol)
-        paintBorderShadowIn(gc,_axesBottom[icol].getBounds());
+        paintBorder(gc,_axesBottom[icol]);
     }
     if (_axesRight!=null) {
       for (int irow=0; irow<_nrow; ++irow)
-        paintBorderShadowIn(gc,_axesRight[irow].getBounds());
+        paintBorder(gc,_axesRight[irow]);
     }
   }
 
-  private void paintBorderShadowIn(GC gc, Rectangle r) {
+  private void paintBorder(GC gc, Tile tile) {
+    if (_borderStyle==BORDER_FLAT) {
+      paintBorderFlat(gc,tile.getBounds());
+    } else if (_borderStyle==BORDER_SHADOW) {
+      paintBorderShadow(gc,tile.getBounds());
+    }
+  }
+
+  private void paintBorder(GC gc, TileAxis axis) {
+    if (_borderStyle==BORDER_FLAT) {
+    } else if (_borderStyle==BORDER_SHADOW) {
+      paintBorderShadow(gc,axis.getBounds());
+    }
+  }
+
+  private void paintBorderFlat(GC gc, Rectangle r) {
+    int x = r.x;
+    int y = r.y;
+    int w = r.width;
+    int h = r.height;
+    gc.setForeground(getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+    gc.drawRectangle(x-1,y-1,w+1,h+1);
+  }
+
+  private void paintBorderShadow(GC gc, Rectangle r) {
     int x = r.x;
     int y = r.y;
     int w = r.width;
