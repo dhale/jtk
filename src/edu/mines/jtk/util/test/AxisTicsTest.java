@@ -39,9 +39,6 @@ public class AxisTicsTest extends TestCase {
     check(0.9, 10.1,   9,   5, 2.0,   2.0,   10, 1.0,   1.0);
   }
 
-  public void testCount() {
-  }
-
   private void check(
     double xmin, double xmax, double dtic,
     int nmajor, double dmajor, double fmajor,
