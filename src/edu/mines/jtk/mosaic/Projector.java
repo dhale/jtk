@@ -6,8 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static java.lang.Math.*;
-import edu.mines.jtk.util.Check;
+import static edu.mines.jtk.util.M.*;
+import edu.mines.jtk.util.*;
 
 /**
  * Converts (projects) world coordinates v to/from normalized coordinates u.
@@ -38,6 +38,7 @@ public class Projector {
     _u1 = u1;
     _v0 = v0;
     _v1 = v1;
+    computeShiftsAndScales();
   }
 
   /**
@@ -58,6 +59,46 @@ public class Projector {
     return _ushift+_uscale*u;
   }
 
+  /**
+   * Merges the specified projector into this projector.
+   * @param p the projector.
+   */
+  public void merge(Projector p) {
+
+    // Parameters for this projector A.
+    double u0a = _u0;
+    double u1a = _u1;
+    double v0a = _v0;
+    double v1a = _v1;
+
+    // Parameters for that projector B.
+    double u0b = p._u0;
+    double u1b = p._u1;
+    double v0b = p._v0;
+    double v1b = p._v1;
+
+    // Merge normalized coordinate bounds. Ensure u0 < u1.
+    _u0 = max(u0a,u0b);
+    _u1 = min(u1a,u1b);
+    if (_u0>=_u1) {
+      double um = 0.5*(_u0+_u1);
+      _u0 = um-10.0*DBL_EPSILON;
+      _u1 = um+10.0*DBL_EPSILON;
+    }
+
+    // Merge world coordinate bounds. (Condition v0 < v1 is invariant.)
+    if (v0a<v1a) {
+      _v0 = min(v0a,min(v0b,v1b));
+      _v1 = max(v1a,max(v0b,v1b));
+    } else {
+      _v0 = max(v0a,max(v0b,v1b));
+      _v1 = min(v1a,min(v0b,v1b));
+    }
+
+    // Recompute shifts and scales.
+    computeShiftsAndScales();
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -66,7 +107,7 @@ public class Projector {
   private double _ushift,_uscale;
   private double _vshift,_vscale;
 
-  private void computeShiftAndScale() {
+  private void computeShiftsAndScales() {
     _uscale = (_v1-_v0)/(_u1-_u0);
     _ushift = _v0-_uscale*_u0;
     _vscale = (_u1-_u0)/(_v1-_v0);
