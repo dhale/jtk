@@ -6,6 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import edu.mines.jtk.util.MathPlus;
+
 /**
  * Real array processing. A real array is an array of floats, in which
  * each float represents one real number.
@@ -425,6 +427,42 @@ public class Rap {
   public static void neg(float[][][] rx, float[][][] ry) {
     _neg.apply(rx,ry);
   }
+  public static float[] cos(float[] rx) {
+    return _cos.apply(rx);
+  }
+  public static float[][] cos(float[][] rx) {
+    return _cos.apply(rx);
+  }
+  public static float[][][] cos(float[][][] rx) {
+    return _cos.apply(rx);
+  }
+  public static void cos(float[] rx, float[] ry) {
+    _cos.apply(rx,ry);
+  }
+  public static void cos(float[][] rx, float[][] ry) {
+    _cos.apply(rx,ry);
+  }
+  public static void cos(float[][][] rx, float[][][] ry) {
+    _cos.apply(rx,ry);
+  }
+  public static float[] sin(float[] rx) {
+    return _sin.apply(rx);
+  }
+  public static float[][] sin(float[][] rx) {
+    return _sin.apply(rx);
+  }
+  public static float[][][] sin(float[][][] rx) {
+    return _sin.apply(rx);
+  }
+  public static void sin(float[] rx, float[] ry) {
+    _sin.apply(rx,ry);
+  }
+  public static void sin(float[][] rx, float[][] ry) {
+    _sin.apply(rx,ry);
+  }
+  public static void sin(float[][][] rx, float[][][] ry) {
+    _sin.apply(rx,ry);
+  }
   private static abstract class Unary {
     float[] apply(float[] rx) {
       int n1 = rx.length;
@@ -472,6 +510,20 @@ public class Rap {
       int n1 = rx.length;
       for (int i1=0; i1<n1; ++i1)
         ry[i1] = -rx[i1];
+    }
+  };
+  private static Unary _cos = new Unary() {
+    void apply(float[] rx, float[] ry) {
+      int n1 = rx.length;
+      for (int i1=0; i1<n1; ++i1)
+        ry[i1] = MathPlus.cos(rx[i1]);
+    }
+  };
+  private static Unary _sin = new Unary() {
+    void apply(float[] rx, float[] ry) {
+      int n1 = rx.length;
+      for (int i1=0; i1<n1; ++i1)
+        ry[i1] = MathPlus.sin(rx[i1]);
     }
   };
 

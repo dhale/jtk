@@ -315,6 +315,24 @@ public class Cap {
   public static void conj(float[][][] cx, float[][][] cy) {
     _conj.apply(cx,cy);
   }
+  public static float[] exp(float[] cx) {
+    return _exp.apply(cx);
+  }
+  public static float[][] exp(float[][] cx) {
+    return _exp.apply(cx);
+  }
+  public static float[][][] exp(float[][][] cx) {
+    return _exp.apply(cx);
+  }
+  public static void exp(float[] cx, float[] cy) {
+    _exp.apply(cx,cy);
+  }
+  public static void exp(float[][] cx, float[][] cy) {
+    _exp.apply(cx,cy);
+  }
+  public static void exp(float[][][] cx, float[][][] cy) {
+    _exp.apply(cx,cy);
+  }
   private static abstract class ComplexToComplex {
     float[] apply(float[] cx) {
       int n1 = cx.length/2;
@@ -361,6 +379,19 @@ public class Cap {
       for (int ir=0,ii=1,nn=2*n1; ir<nn; ir+=2,ii+=2) {
         cy[ir] =  cx[ir];
         cy[ii] = -cx[ii];
+      }
+    }
+  };
+  private static ComplexToComplex _exp = new ComplexToComplex() {
+    void apply(float[] cx, float[] cy) {
+      Complex ct = new Complex();
+      int n1 = cx.length/2;
+      for (int i1=0,ir=0,ii=1; i1<n1; ++i1,ir+=2,ii+=2) {
+        ct.r = cx[ir];
+        ct.i = cx[ii];
+        Complex ce = Complex.exp(ct);
+        cy[ir] = ce.r;
+        cy[ii] = ce.i;
       }
     }
   };
