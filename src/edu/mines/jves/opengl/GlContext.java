@@ -9,29 +9,38 @@
 //////////////////////////////////////////////////////////////////////////////
 package edu.mines.jves.opengl;
 
+import java.awt.Canvas;
+
 public class GlContext {
 
-  public GlContext(long handle) {
+  public GlContext(java.awt.Canvas canvas) {
+    _peer = makeGlAwtCanvasContext(canvas);
   }
 
-  public void makeCurrent() {
+  public void lock() {
+    // TODO: acquire mutex
+    lock(_peer);
+  }
+
+  public void unlock() {
+    unlock(_peer);
+    // TODO: release mutex
   }
 
   public void swapBuffers() {
-    nswapBuffers(_display,_handle);
+    // TODO: ensure context is locked
+    swapBuffers(_peer);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private long _display;
-  private long _handle;
-  private long _context;
+  private long _peer; // C++ peer of this OpenGL context
 
-  private native void nswapBuffers(long display, long handle);
-
-  private native long makeContext(
-    int type, long display, long handle);
+  private static native long makeGlAwtCanvasContext(java.awt.Canvas canvas);
+  private static native void lock(long peer);
+  private static native void unlock(long peer);
+  private static native void swapBuffers(long peer);
 
   ///////////////////////////////////////////////////////////////////////////
   // pointers to OpenGL functions after version 1.1
