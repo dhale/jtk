@@ -349,7 +349,7 @@ public class Mosaic extends Composite {
     if (_borderStyle==BORDER_FLAT) {
       return 1;
     } else if (_borderStyle==BORDER_SHADOW_IN) {
-      return 6;
+      return 2;
     } else {
       return 0;
     }
