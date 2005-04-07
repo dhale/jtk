@@ -26,7 +26,7 @@ public class Stopwatch {
   public void start() {
     if (!_running) {
       _running = true;
-      _start = System.currentTimeMillis();
+      _start = System.nanoTime();
     }
   }
 
@@ -35,7 +35,7 @@ public class Stopwatch {
    */
   public void stop() {
     if (_running) {
-      _time += System.currentTimeMillis()-_start;
+      _time += System.nanoTime()-_start;
       _running = false;
     }
   }
@@ -62,9 +62,9 @@ public class Stopwatch {
    */
   public double time() {
     if (_running) {
-      return (double)(0.001*(_time+System.currentTimeMillis()-_start));
+      return 1.0e-9*(_time+System.nanoTime()-_start);
     } else {
-      return (double)(0.001*_time);
+      return 1.0e-9*_time;
     }
   }
 

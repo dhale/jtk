@@ -21,31 +21,35 @@ public class StopwatchTest extends TestCase {
   }
 
   public void test() {
-    double sleepTime = 0.1;
-    double extraTime = 0.5;
+    double sleepTime = 0.1;  // time to sleep in seconds
+    double smallTime = 0.01; // time errors less than this are ignored
     Stopwatch sw = new Stopwatch();
 
     // Start and check time (while running).
     sw.start();
     sleep(sleepTime);
-    assertTrue(sleepTime<=sw.time() && sw.time()<sleepTime+extraTime);
+    assertTrue(sleepTime-smallTime<sw.time());
+    assertTrue(sw.time()<sleepTime+smallTime);
 
     // Stop and check time.
     sw.stop();
-    assertTrue(sleepTime<=sw.time() && sw.time()<sleepTime+extraTime);
+    assertTrue(sleepTime-smallTime<sw.time());
+    assertTrue(sw.time()<sleepTime+smallTime);
 
     // Wait, start, stop, and check accumulated time.
     sleep(sleepTime);
     sw.start();
     sleep(sleepTime);
     sw.stop();
-    assertTrue(2.0*sleepTime<=sw.time() && sw.time()<2.0*(sleepTime+extraTime));
+    assertTrue(2.0*(sleepTime-smallTime)<sw.time());
+    assertTrue(sw.time()<2.0*(sleepTime+smallTime));
 
     // Restart, stop, and check time.
     sw.restart();
     sleep(sleepTime);
     sw.stop();
-    assertTrue(sleepTime<=sw.time() && sw.time()<sleepTime+extraTime);
+    assertTrue(sleepTime-smallTime<sw.time());
+    assertTrue(sw.time()<sleepTime+smallTime);
   }
 
   private static void sleep(double time) {
