@@ -175,7 +175,11 @@ public class SpectrumPlot extends JFrame {
     TileAxis axisSA = mosaicS.getTileAxisLeft(0);
     TileAxis axisSP = mosaicS.getTileAxisLeft(1);
     TileAxis axisSF = mosaicS.getTileAxisBottom(0);
-    axisSA.setLabel("Amplitude");
+    if (db) {
+      axisSA.setLabel("Amplitude (dB)");
+    } else {
+      axisSA.setLabel("Amplitude");
+    }
     axisSP.setLabel("Phase (cycles)");
     axisSF.setLabel("Frequency (Hz)");
 

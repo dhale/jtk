@@ -2,6 +2,9 @@ from edu.mines.jtk.demo import *
 from edu.mines.jtk.dsp import *
 from math import *
 
+True = 1
+False = 0
+
 def makeReal1(x):
   return Real1(len(x),1.0,0.0,x)
 
