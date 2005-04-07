@@ -73,6 +73,39 @@ public class SpectrumPlot extends JFrame {
       }
     }
 
+    public static Real1 readMatt(String fileName) {
+      try {
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        int nt = 0;
+        double dt = 0.0;
+        double ft = 0.0;
+        for (String line=br.readLine(); line!=null; line=br.readLine()) {
+          if (line.indexOf("nt =")>=0) {
+            Scanner s = new Scanner(line.substring(5));
+            nt = s.nextInt();
+            s = new Scanner(br.readLine().substring(5));
+            dt = s.nextDouble();
+            s = new Scanner(br.readLine().substring(5));
+            ft = s.nextDouble();
+            //System.out.println("nt="+nt+" dt="+dt+" ft="+ft);
+            br.readLine();
+            break;
+          }
+        }
+        float[] xt = new float[nt];
+        for (int it=0; it<nt; ++it) {
+          String line = br.readLine();
+          int tab = line.indexOf("\t");
+          xt[it] = Float.parseFloat(line.substring(tab+1,tab+9));
+          //System.out.println("xt["+it+"]="+xt[it]);
+        }
+        br.close();
+        return new Real1(nt,dt,ft,xt);
+      } catch (IOException ioe) {
+        throw new RuntimeException("Error reading data from file: "+fileName);
+      }
+    }
+
     /**
      * Plot width, in pixels.
      */
@@ -97,10 +130,19 @@ public class SpectrumPlot extends JFrame {
      * @param x the sampled sequence x(t). The sampling must be uniform.
      */
     public SpectrumPlot(Real1 x) {
+      this(x,false);
+    }
+
+    /**
+     * Constructs a new spectrum plot for the specified sampled sequence.
+     * @param x the sampled sequence x(t). The sampling must be uniform.
+     * @param db true, to plot amplitude spectrum in dB.
+     */
+    public SpectrumPlot(Real1 x, boolean db) {
       Check.argument(x.getSampling().isUniform(),"sampling of x is uniform");
 
     // Amplitude and phase spectra.
-    Real1[] ap = computeSpectra(x);
+    Real1[] ap = computeSpectra(x,db);
     Real1 a = ap[0];
     Real1 p = ap[1];
 
@@ -187,13 +229,13 @@ public class SpectrumPlot extends JFrame {
     return lv;
   }
 
-  private Real1[] computeSpectra(Real1 x) {
+  private Real1[] computeSpectra(Real1 x, boolean db) {
     Sampling st = x.getSampling();
     int nt = st.getCount();
     double dt = st.getDelta();
     double ft = st.getFirst();
     float[] xt = x.getF();
-    int nfft = FftReal.nfftSmall(4*nt);
+    int nfft = FftReal.nfftSmall(5*nt);
     FftReal fft = new FftReal(nfft);
     int nf = nfft/2+1;
     double df = 1.0/(dt*nfft);
@@ -204,6 +246,12 @@ public class SpectrumPlot extends JFrame {
     float[] wft = Rap.ramp(0.0f,-2.0f*FLT_PI*(float)(df*ft),nf);
     cf = Cap.mul(cf,Cap.complex(Rap.cos(wft),Rap.sin(wft)));
     float[] af = Cap.abs(cf);
+    if (db) {
+      float amax = Rap.findMax(af);
+      af = Rap.mul(1.0f/amax,af);
+      af = Rap.log10(af);
+      af = Rap.mul(20.0f,af);
+    }
     float[] pf = Cap.arg(cf);
     pf = Rap.mul(0.5f/FLT_PI,pf);
     Sampling sf = new Sampling(nf,df,ff);
