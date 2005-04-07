@@ -1,4 +1,4 @@
-from edu.mines.jtk.demo import *
+from edu.mines.jtk.dave import *
 from edu.mines.jtk.dsp import *
 from math import *
 
