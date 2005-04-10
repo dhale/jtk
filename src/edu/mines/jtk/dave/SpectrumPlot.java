@@ -8,7 +8,6 @@ package edu.mines.jtk.dave;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -25,86 +24,6 @@ import static edu.mines.jtk.mosaic.Mosaic.*;
  * @version 2005.03.25
  */
 public class SpectrumPlot extends JFrame {
-
-    public static void main(String[] args) {
-      //Real1 x = readData("data/bob1.txt");
-      Real1 x = readData("data/dylan1.txt");
-      SpectrumPlot plot = new SpectrumPlot(x);
-      /*
-      int nt = 101;
-      double dt = 1.0f;
-      double ft = 0.0f;
-      float[] xt = new float[nt];
-      xt[0] = xt[1] = xt[2] = xt[3] = xt[4] = xt[5] = 1.0f;
-      Real1 x = new Real1(nt,dt,ft,xt);
-      SpectrumPlot plot = new SpectrumPlot(x);
-      */
-    }
-
-    public static Real1 readData(String fileName) {
-      try {
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
-        int nt = 0;
-        double dt = 0.0;
-        double ft = 0.0;
-        for (String line=br.readLine(); line!=null; line=br.readLine()) {
-          if (line.indexOf("nt =")>=0) {
-            Scanner s = new Scanner(line.substring(5));
-            nt = s.nextInt();
-            s = new Scanner(br.readLine().substring(5));
-            dt = s.nextDouble();
-            s = new Scanner(br.readLine().substring(5));
-            ft = s.nextDouble();
-            //System.out.println("nt="+nt+" dt="+dt+" ft="+ft);
-            br.readLine();
-            break;
-          }
-        }
-        float[] xt = new float[nt];
-        for (int it=0; it<nt; ++it) {
-          String line = br.readLine();
-          xt[it] = Float.parseFloat(line);
-          //System.out.println("xt["+it+"]="+xt[it]);
-        }
-        br.close();
-        return new Real1(nt,dt,ft,xt);
-      } catch (IOException ioe) {
-        throw new RuntimeException("Error reading data from file: "+fileName);
-      }
-    }
-
-    public static Real1 readMatt(String fileName) {
-      try {
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
-        int nt = 0;
-        double dt = 0.0;
-        double ft = 0.0;
-        for (String line=br.readLine(); line!=null; line=br.readLine()) {
-          if (line.indexOf("nt =")>=0) {
-            Scanner s = new Scanner(line.substring(5));
-            nt = s.nextInt();
-            s = new Scanner(br.readLine().substring(5));
-            dt = s.nextDouble();
-            s = new Scanner(br.readLine().substring(5));
-            ft = s.nextDouble();
-            //System.out.println("nt="+nt+" dt="+dt+" ft="+ft);
-            br.readLine();
-            break;
-          }
-        }
-        float[] xt = new float[nt];
-        for (int it=0; it<nt; ++it) {
-          String line = br.readLine();
-          int tab = line.indexOf("\t");
-          xt[it] = Float.parseFloat(line.substring(tab+1,tab+9));
-          //System.out.println("xt["+it+"]="+xt[it]);
-        }
-        br.close();
-        return new Real1(nt,dt,ft,xt);
-      } catch (IOException ioe) {
-        throw new RuntimeException("Error reading data from file: "+fileName);
-      }
-    }
 
     /**
      * Plot width, in pixels.
