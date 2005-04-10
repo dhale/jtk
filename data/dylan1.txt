@@ -1,20 +1,20 @@
 Dylan Mikesel, 2005
-The data was bandpassed filtered before it was recorded. 
-The filter passband was between 0.03-300Hz. 
+The data was bandpassed filtered before it was recorded.
+The filter passband was between 0.03-300Hz.
 The data was also gained by 10x.
 
 About the data:
-This is a seismic record. The instrument used to measure the seismic wave 
-was a 24 GHz microwave vibrometer. The source was a hammer. The vibrometer 
-was 1 m away from the source and suspended 10 cm above the ground. A 
-geophone was placed next to the vibrometer. The point of this experiment 
-was to see if the vibrometer was as sensitive to low frequencies as the 
-geophone. The vibrometer triggered off of the geophone. 
+This is a seismic record. The instrument used to measure the seismic wave
+was a 24 GHz microwave vibrometer. The source was a hammer. The vibrometer
+was 1 m away from the source and suspended 10 cm above the ground. A
+geophone was placed next to the vibrometer. The point of this experiment
+was to see if the vibrometer was as sensitive to low frequencies as the
+geophone. The vibrometer triggered off of the geophone.
 
-nt = 1000 
-dt = 0.00001 s
-ft = 0.000 s
-xt = 
+nx1=1000
+dx1=0.00001 s
+fx1=0.000 s
+f=
 -0.00429
 -0.00421
 -0.00403

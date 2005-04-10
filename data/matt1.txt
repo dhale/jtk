@@ -15,10 +15,10 @@ Geophysical Institute Magnetometer Array
 
 Minute	H-Comp(nT)	D-Comp(nT)	Z-Comp(nT)
 
-nt = 1440
-dt = 60 s
-ft = 0 s
-xt = 
+nx1=1440
+dx1=60 s
+fx1=0 s
+f=
 0	14014.85	-540.772	54278.24
 1	14015.96	-540.255	54277.47
 2	14016.55	-537.765	54276.95

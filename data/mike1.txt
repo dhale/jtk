@@ -6,11 +6,11 @@ granite sample with the sensor .5 cm from the source.  first time is time 0 and
 there are 30072 samples.  THe file 3901.asc has the same sampling interval
 withthe same number of samples but is spaced 15.5 cm from the source. 
 
-ntAll = 30072 
-nt = 1000
-dt = 1.0e-7 s
-ft = 0.000 s
-xt = 
+nx1All = 30072
+nx1=1000
+dx1=1.0e-7 s
+fx1=0.000 s
+f=
 0.006714
 0.005494
 0.013428
