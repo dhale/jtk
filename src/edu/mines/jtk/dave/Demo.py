@@ -15,17 +15,17 @@ def plotReal1(rx):
   SpectrumPlot(rx)
 
 def bob1():
-  return SpectrumPlot.readData("data/bob1.txt")
+  return Real1Reader.readData("data/bob1.txt")
 def dylan1():
-  return SpectrumPlot.readData("data/dylan1.txt")
+  return Real1Reader.readData("data/dylan1.txt")
 def mike1():
-  return SpectrumPlot.readData("data/mike1.txt")
+  return Real1Reader.readData("data/mike1.txt")
 def emily1():
-  rx = SpectrumPlot.readData("data/emily1.txt")
+  rx = Real1Reader.readData("data/emily1.txt",5)
   return rx
   #return Real1(rx.getSampling(),Rap.sub(rx.getF(),550))
 def matt1():
-  rx = SpectrumPlot.readMatt("data/matt1.txt")
+  rx = Real1Reader.readMatt("data/matt1.txt",2)
   return rx
   #return Real1(rx.getSampling(),Rap.sub(rx.getF(),14000))
 
