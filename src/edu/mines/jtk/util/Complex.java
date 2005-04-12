@@ -142,6 +142,15 @@ public class Complex {
   }
 
   /**
+   * Returns the complex inverse of this complex number.
+   * @return the complex inverse.
+   */
+  public Complex inv() {
+    float d = norm();
+    return new Complex(r/d,-i/d);
+  }
+
+  /**
    * Returns the sum z += x, where z is this complex number.
    * @param x a complex number.
    * @return z += x.
@@ -378,13 +387,13 @@ public class Complex {
   }
 
   /**
-   * Returns the complex number (r*cos(theta),r*sin(theta)).
+   * Returns the complex number (r*cos(a),r*sin(a)).
    * @param r the polar radius.
-   * @param theta the polar angle.
+   * @param a the polar angle.
    * @return the complex number.
    */
-  public static Complex polar(float r, float theta) {
-    return new Complex(r*cos(theta),r*sin(theta));
+  public static Complex polar(float r, float a) {
+    return new Complex(r*cos(a),r*sin(a));
   }
 
   /**
@@ -599,7 +608,11 @@ public class Complex {
   }
 
   public String toString() {
-    return ""+r+" + "+i+"j";
+    if (i>=0.0f) {
+      return "("+r+"+"+i+"i)";
+    } else {
+      return "("+r+"-"+(-i)+"i)";
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
