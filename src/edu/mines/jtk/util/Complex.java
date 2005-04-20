@@ -62,6 +62,22 @@ public class Complex {
   }
 
   /**
+   * Returns true if this complex number is real (has zero imaginary part).
+   * @return true, if real; false, otherwise.
+   */
+  public boolean isReal() {
+    return i==0.0f;
+  }
+
+  /**
+   * Returns true if this complex number is imaginary (has zero real part).
+   * @return true, if imaginary; false, otherwise.
+   */
+  public boolean isImag() {
+    return r==0.0f;
+  }
+
+  /**
    * Returns the sum z + x, where z is this complex number.
    * @param x a complex number.
    * @return z + x.
@@ -605,6 +621,19 @@ public class Complex {
    */
   public static Complex tanh(Complex x) {
     return sinh(x).overEquals(cosh(x));
+  }
+
+  public boolean equals(Object obj) {
+    if (this==obj)
+      return true;
+    if (obj==null || this.getClass()!=obj.getClass())
+      return false;
+    Complex that = (Complex)obj;
+    return this.r==that.r && this.i==that.i;
+  }
+
+  public int hashCode() {
+    return (int)(Float.floatToIntBits(r)^Float.floatToIntBits(i));
   }
 
   public String toString() {

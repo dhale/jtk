@@ -14,23 +14,73 @@ def plotArray(x):
 def plotReal1(rx):
   SpectrumPlot(rx)
 
+def plotReal1db(rx):
+  SpectrumPlot(rx,True)
+
+#############################################################################
+# Data from GP404 students
+
 def bob1():
   return Real1Reader.readData("data/bob1.txt")
 def dylan1():
   return Real1Reader.readData("data/dylan1.txt")
-def mike1():
-  return Real1Reader.readData("data/mike1.txt")
-def emily1():
-  rx = Real1Reader.readData("data/emily1.txt",5)
+def emily1(c):
+  rx = Real1Reader.readData("data/emily1.txt",2+c)
   return rx
   #return Real1(rx.getSampling(),Rap.sub(rx.getF(),550))
-def matt1():
-  rx = Real1Reader.readMatt("data/matt1.txt",2)
+def hunter1():
+  return Real1Reader.readData("data/hunter1.txt",2)
+def jen1():
+  return Real1Reader.readData("data/jen1.txt",2)
+def matt1(c):
+  rx = Real1Reader.readData("data/matt1.txt",c)
   return rx
   #return Real1(rx.getSampling(),Rap.sub(rx.getF(),14000))
+def mike1():
+  return Real1Reader.readData("data/mike1.txt")
 
 #############################################################################
 # Simple functions for interesting signals
+
+def subsample(x):
+  n = len(x)
+  m = n/2
+  y = Rap.zero(m)
+  for i in range(0,m):
+    y[i] = x[2*i]
+  return y
+
+def supersample(x):
+  n = len(x)
+  m = n*2
+  y = Rap.zero(m)
+  for i in range(0,n):
+    y[2*i] = x[i]
+  return y
+
+def sub(rx):
+  s = rx.x1;
+  x = rx.f;
+  n = len(x)
+  m = n/2
+  y = Rap.zero(m)
+  for i in range(0,m):
+    y[i] = x[2*i]
+  s = Sampling(m,2*s.delta,s.first)
+  ry = Real1(s,y)
+  return ry
+
+def super(rx):
+  s = rx.x1;
+  x = rx.f;
+  n = len(x)
+  m = 2*n
+  y = Rap.zero(m)
+  for i in range(0,n):
+    y[2*i] = x[i]
+  s = Sampling(m,0.5*s.delta,s.first)
+  ry = Real1(s,y)
+  return ry
 
 def shift(m,rx):
   return Real1(rx.getSampling().shift(m),rx.getValues())
@@ -66,3 +116,16 @@ def problems(n):
 #impulse(2,101)
 #sinc(0.25,101)
 #box(6,101)
+
+#############################################################################
+# Test low-pass filter
+
+def testLowPass(fc,np,n):
+  x = Rap.zero(n)
+  y = Rap.zero(n)
+  bf = ButterworthFilter(fc,np)
+  x[0] = 1
+  bf.apply(x,y)
+  plotArray(y)
+
+testLowPass(0.25,2,101)
