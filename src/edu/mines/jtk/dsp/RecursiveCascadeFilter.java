@@ -44,6 +44,8 @@ public class RecursiveCascadeFilter extends RecursiveFilter {
   }
 
   protected void init(Complex[] poles, Complex[] zeros, float gain) {
+    Check.argument(poles.length>0 || zeros.length>0,
+      "at least one pole or zero is specified");
 
     // Sort poles and zeros so that complex conjugate pairs are first.
     poles = sortPolesOrZeros(poles);
@@ -54,14 +56,14 @@ public class RecursiveCascadeFilter extends RecursiveFilter {
     int nz = zeros.length;
     _n2 = max((np+1)/2,(nz+1)/2);
     _f2 = new Recursive2ndOrderFilter[_n2];
+    gain = pow(gain,1.0f/_n2);
     Complex c0 = new Complex(0.0f,0.0f);
     for (int i2=0,ip=0,iz=0; i2<_n2; ++i2) {
       Complex pole1 = (ip<np)?poles[ip++]:c0;
       Complex pole2 = (ip<np)?poles[ip++]:c0;
       Complex zero1 = (iz<nz)?zeros[iz++]:c0;
       Complex zero2 = (iz<nz)?zeros[iz++]:c0;
-      float g = (i2==0)?gain:1.0f;
-      _f2[i2] = new Recursive2ndOrderFilter(pole1,pole2,zero1,zero2,g);
+      _f2[i2] = new Recursive2ndOrderFilter(pole1,pole2,zero1,zero2,gain);
     }
   }
 
