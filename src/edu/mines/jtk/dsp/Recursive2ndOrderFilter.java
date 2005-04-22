@@ -80,8 +80,6 @@ public class Recursive2ndOrderFilter extends RecursiveFilter {
     _b2 = (zero1.times(zero2)).r*gain;
     _a1 = -(pole1.r+pole2.r);
     _a2 = (pole1.times(pole2)).r;
-    System.out.println("b0="+_b0+" b1="+_b1+" b2="+_b2);
-    System.out.println(" a1="+_a1+" a2="+_a2);
   }
 
   /**

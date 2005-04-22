@@ -118,14 +118,14 @@ def problems(n):
 #box(6,101)
 
 #############################################################################
-# Test low-pass filter
+# Test filter
 
-def testLowPass(fc,np,n):
+def testFilter(fl,al,fh,ah,n):
   x = Rap.zero(n)
   y = Rap.zero(n)
-  bf = ButterworthFilter(fc,np)
+  bf = ButterworthFilter(fl,al,fh,ah)
   x[0] = 1
   bf.apply(x,y)
   plotArray(y)
 
-testLowPass(0.25,2,101)
+testFilter(0.2,0.1,0.3,0.9,101)

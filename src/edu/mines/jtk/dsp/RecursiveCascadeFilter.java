@@ -86,7 +86,6 @@ public class RecursiveCascadeFilter extends RecursiveFilter {
     for (int i=0; i<n; ++i) {
       if (!c[i].isReal()) {
         Complex cc = c[i].conj();
-        System.out.println("cc="+cc);
         int j = 0;
         while (j<n && !cc.equals(c[j]))
           ++j;

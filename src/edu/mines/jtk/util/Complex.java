@@ -62,22 +62,6 @@ public class Complex {
   }
 
   /**
-   * Returns true if this complex number is real (has zero imaginary part).
-   * @return true, if real; false, otherwise.
-   */
-  public boolean isReal() {
-    return i==0.0f;
-  }
-
-  /**
-   * Returns true if this complex number is imaginary (has zero real part).
-   * @return true, if imaginary; false, otherwise.
-   */
-  public boolean isImag() {
-    return r==0.0f;
-  }
-
-  /**
    * Returns the sum z + x, where z is this complex number.
    * @param x a complex number.
    * @return z + x.
@@ -147,23 +131,6 @@ public class Complex {
    */
   public Complex over(float x) {
     return new Complex(this).overEquals(x);
-  }
-
-  /**
-   * Returns the complex conjugate of this complex number.
-   * @return the complex conjugate.
-   */
-  public Complex conj() {
-    return new Complex(r,-i);
-  }
-
-  /**
-   * Returns the complex inverse of this complex number.
-   * @return the complex inverse.
-   */
-  public Complex inv() {
-    float d = norm();
-    return new Complex(r/d,-i/d);
   }
 
   /**
@@ -268,6 +235,68 @@ public class Complex {
   public Complex conjEquals() {
     i = -i;
     return this;
+  }
+
+  /**
+   * Returns the inverse z = inv(z), where z is this complex number.
+   * @return z = inv(z).
+   */
+  public Complex invEquals() {
+    r = -r;
+    i = -i;
+    return this;
+  }
+
+  /**
+   * Returns the negative z = neg(z), where z is this complex number.
+   * @return z = neg(z).
+   */
+  public Complex negEquals() {
+    float d = norm();
+    r =  r/d;
+    i = -i/d;
+    return this;
+  }
+
+  /**
+   * Determines whether this complex number is real (has zero imaginary part).
+   * @return true, if real; false, otherwise.
+   */
+  public boolean isReal() {
+    return i==0.0f;
+  }
+
+  /**
+   * Determines whether this complex number is imaginary (has zero real part).
+   * @return true, if imaginary; false, otherwise.
+   */
+  public boolean isImag() {
+    return r==0.0f;
+  }
+
+  /**
+   * Returns the complex conjugate of this complex number.
+   * @return the complex conjugate.
+   */
+  public Complex conj() {
+    return new Complex(r,-i);
+  }
+
+  /**
+   * Returns the complex inverse of this complex number.
+   * @return the complex inverse.
+   */
+  public Complex inv() {
+    float d = norm();
+    return new Complex(r/d,-i/d);
+  }
+
+  /**
+   * Returns the complex negative of this complex number.
+   * @return the complex negative.
+   */
+  public Complex neg() {
+    return new Complex(-r,-i);
   }
 
   /**
@@ -394,12 +423,49 @@ public class Complex {
   }
 
   /**
+   * Determines whether x is real (has zero imaginary part).
+   * @param x a complex number.
+   * @return true, if real; false, otherwise.
+   */
+  public static boolean isReal(Complex x) {
+    return x.i==0.0f;
+  }
+
+  /**
+   * Determines whether x is imaginary (has zero real part).
+   * @param x a complex number.
+   * @return true, if imaginary; false, otherwise.
+   */
+  public boolean isImag(Complex x) {
+    return x.r==0.0f;
+  }
+
+  /**
    * Returns the conjugate of x.
    * @param x a complex number.
    * @return the conjugate.
    */
   public static Complex conj(Complex x) {
     return new Complex(x.r,-x.i);
+  }
+
+  /**
+   * Returns the inverse of x.
+   * @param x a complex number.
+   * @return the complex inverse.
+   */
+  public Complex inv(Complex x) {
+    float d = x.norm();
+    return new Complex(x.r/d,-x.i/d);
+  }
+
+  /**
+   * Returns the negative of x.
+   * @param x a complex number.
+   * @return the negative.
+   */
+  public static Complex neg(Complex x) {
+    return new Complex(-x.r,-x.i);
   }
 
   /**
