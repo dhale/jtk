@@ -15,6 +15,7 @@ import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.mosaic.*;
 import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.Array.*;
 import static edu.mines.jtk.util.MathPlus.*;
 import static edu.mines.jtk.mosaic.Mosaic.*;
 
@@ -164,19 +165,19 @@ public class SpectrumPlot extends JFrame {
     double df = 1.0/(dt*nfft);
     double ff = 0.0;
     float[] cf = new float[2*nf];
-    Rap.copy(nt,xt,cf);
+    copy(nt,xt,cf);
     fft.realToComplex(-1,cf,cf);
-    float[] wft = Rap.ramp(0.0f,-2.0f*FLT_PI*(float)(df*ft),nf);
-    cf = Cap.mul(cf,Cap.complex(Rap.cos(wft),Rap.sin(wft)));
-    float[] af = Cap.abs(cf);
+    float[] wft = rampfloat(0.0f,-2.0f*FLT_PI*(float)(df*ft),nf);
+    cf = cmul(cf,cmplx(cos(wft),sin(wft)));
+    float[] af = cabs(cf);
     if (db) {
-      float amax = Rap.findMax(af);
-      af = Rap.mul(1.0f/amax,af);
-      af = Rap.log10(af);
-      af = Rap.mul(20.0f,af);
+      float amax = max(af);
+      af = mul(1.0f/amax,af);
+      af = log10(af);
+      af = mul(20.0f,af);
     }
-    float[] pf = Cap.arg(cf);
-    pf = Rap.mul(0.5f/FLT_PI,pf);
+    float[] pf = carg(cf);
+    pf = mul(0.5f/FLT_PI,pf);
     Sampling sf = new Sampling(nf,df,ff);
     Real1 a = new Real1(sf,af);
     Real1 p = new Real1(sf,pf);

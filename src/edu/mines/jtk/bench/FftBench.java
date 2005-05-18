@@ -38,7 +38,7 @@ public class FftBench {
   private static double time(int nfft) {
     double maxtime = 2.0;
     FftComplex fft = new FftComplex(nfft);
-    float[] cx = Cap.rand(nfft);
+    float[] cx = Array.crandfloat(nfft);
     int count;
     Stopwatch sw = new Stopwatch();
     sw.start();

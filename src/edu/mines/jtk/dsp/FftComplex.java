@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -95,7 +96,7 @@ public class FftComplex {
     checkArray(2*_nfft,cx,"cx");
     checkArray(2*_nfft,cy,"cy");
     if (cx!=cy)
-      Cap.copy(_nfft,cx,cy);
+      Array.ccopy(_nfft,cx,cy);
     Pfacc.transform(sign,_nfft,cy);
   }
 
@@ -130,7 +131,7 @@ public class FftComplex {
     checkArray(2*n1,_nfft,cx,"cx");
     checkArray(2*n1,_nfft,cy,"cy");
     if (cx!=cy) 
-      Cap.copy(n1,_nfft,cx,cy);
+      Array.ccopy(n1,_nfft,cx,cy);
     Pfacc.transform2a(sign,n1,_nfft,cy);
   }
 

@@ -17,10 +17,8 @@ public class Suite extends TestCase {
   public static void main(String[] args) {
     TestSuite suite = new TestSuite();
 
-    suite.addTestSuite(CapTest.class);
     suite.addTestSuite(FftComplexTest.class);
     suite.addTestSuite(FftRealTest.class);
-    suite.addTestSuite(RapTest.class);
     suite.addTestSuite(Real1Test.class);
     suite.addTestSuite(SamplingTest.class);
 

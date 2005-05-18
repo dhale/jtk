@@ -1,6 +1,7 @@
+import math
+from edu.mines.jtk.util.Array import *
 from edu.mines.jtk.dave import *
 from edu.mines.jtk.dsp import *
-from math import *
 
 True = 1
 False = 0
@@ -30,7 +31,7 @@ def dylan1():
 def emily1(c):
   rx = Real1Reader.readData("data/emily1.txt",2+c)
   return rx
-  #return Real1(rx.getSampling(),Rap.sub(rx.getF(),550))
+  #return Real1(rx.getSampling(),sub(rx.getF(),550))
 def hunter1():
   return Real1Reader.readData("data/hunter1.txt",2)
 def jen1():
@@ -38,7 +39,7 @@ def jen1():
 def matt1(c):
   rx = Real1Reader.readData("data/matt1.txt",c)
   return rx
-  #return Real1(rx.getSampling(),Rap.sub(rx.getF(),14000))
+  #return Real1(rx.getSampling(),sub(rx.getF(),14000))
 def mike1():
   return Real1Reader.readData("data/mike1.txt")
 
@@ -48,7 +49,7 @@ def mike1():
 def subsample(x):
   n = len(x)
   m = n/2
-  y = Rap.zero(m)
+  y = zerofloat(m)
   for i in range(0,m):
     y[i] = x[2*i]
   return y
@@ -56,7 +57,7 @@ def subsample(x):
 def supersample(x):
   n = len(x)
   m = n*2
-  y = Rap.zero(m)
+  y = zerofloat(m)
   for i in range(0,n):
     y[2*i] = x[i]
   return y
@@ -66,7 +67,7 @@ def sub(rx):
   x = rx.f;
   n = len(x)
   m = n/2
-  y = Rap.zero(m)
+  y = zerofloat(m)
   for i in range(0,m):
     y[i] = x[2*i]
   s = Sampling(m,2*s.delta,s.first)
@@ -78,7 +79,7 @@ def super(rx):
   x = rx.f;
   n = len(x)
   m = 2*n
-  y = Rap.zero(m)
+  y = zerofloat(m)
   for i in range(0,n):
     y[2*i] = x[i]
   s = Sampling(m,0.5*s.delta,s.first)
@@ -89,12 +90,12 @@ def shift(m,rx):
   return Real1(rx.getSampling().shift(m),rx.getValues())
 
 def impulse(m,n):
-  x = Rap.zero(n)
+  x = zerofloat(n)
   x[m] = 1
   return x
 
 def box(m,n):
-  x = Rap.zero(n)
+  x = zerofloat(n)
   for i in range(0,m):
     x[i] = 1
   return x
@@ -103,16 +104,16 @@ def sinc(f,n):
   m = n/2
   w = 2*pi*f
   e = 0.0001;
-  a = Rap.ramp(-w*(m+e),w,n)
-  s = Rap.mul(w/pi,Rap.div(Rap.sin(a),a))
+  a = rampfloat(-w*(m+e),w,n)
+  s = mul(w/math.pi,div(sin(a),a))
   sx = Real1(n,1.0,-m,s)
   return sx
 
 def problems(n):
-  x = Rap.zero(n);  x[0] =  1;  x[1] =  1;  plotArray(x)
-  x = Rap.zero(n);  x[0] =  1;  x[1] = -1;  plotArray(x)
-  x = Rap.zero(n);  x[0] =  1;  x[2] =  1;  plotArray(x)
-  x = Rap.zero(n);  x[0] =  1;  x[2] = -1;  plotArray(x)
+  x = zerofloat(n);  x[0] =  1;  x[1] =  1;  plotArray(x)
+  x = zerofloat(n);  x[0] =  1;  x[1] = -1;  plotArray(x)
+  x = zerofloat(n);  x[0] =  1;  x[2] =  1;  plotArray(x)
+  x = zerofloat(n);  x[0] =  1;  x[2] = -1;  plotArray(x)
 
 #px = SpectrumPlot(emily1(),1)
 #problems(101)
@@ -134,7 +135,7 @@ def filterReal1X(r,fl,al,fh,ah):
   fh *= d1
   bf = ButterworthFilter(fl,al,fh,ah)
   x = r.f
-  y = Rap.zero(n1)
+  y = zerofloat(n1)
   bf.apply(x,y)
   return Real1(n1,d1,f1,y)
 
@@ -145,7 +146,7 @@ def filterReal1(r,f3db,npole,type):
   f3db *= d1
   bf = ButterworthFilter(f3db,npole,type)
   x = r.f
-  y = Rap.zero(n1)
+  y = zerofloat(n1)
   bf.apply(x,y)
   return Real1(n1,d1,f1,y)
 
