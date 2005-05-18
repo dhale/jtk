@@ -34,7 +34,7 @@ public class ScannerBug {
   private static void scan(String input) {
     Scanner s = new Scanner(input);
     while (s.hasNextLine()) {
-      //s.findInLine("5");
+      s.findInLine("5");
       System.out.println(s.nextLine());
     }
   }

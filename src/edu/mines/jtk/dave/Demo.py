@@ -11,6 +11,9 @@ def makeReal1(x):
 def plotArray(x):
   plotReal1(Real1(len(x),1.0,0.0,x))
 
+def plotArraydb(x):
+  plotReal1db(Real1(len(x),1.0,0.0,x))
+
 def plotReal1(rx):
   SpectrumPlot(rx)
 
@@ -120,12 +123,70 @@ def problems(n):
 #############################################################################
 # Test filter
 
-def testFilter(fl,al,fh,ah,n):
-  x = Rap.zero(n)
-  y = Rap.zero(n)
-  bf = ButterworthFilter(fl,al,fh,ah)
-  x[0] = 1
-  bf.apply(x,y)
-  plotArray(y)
+HP = ButterworthFilter.Type.HIGH_PASS
+LP = ButterworthFilter.Type.LOW_PASS
 
-testFilter(0.2,0.1,0.3,0.9,101)
+def filterReal1X(r,fl,al,fh,ah):
+  n1 = r.x1.count
+  d1 = r.x1.delta
+  f1 = r.x1.first
+  fl *= d1
+  fh *= d1
+  bf = ButterworthFilter(fl,al,fh,ah)
+  x = r.f
+  y = Rap.zero(n1)
+  bf.apply(x,y)
+  return Real1(n1,d1,f1,y)
+
+def filterReal1(r,f3db,npole,type):
+  n1 = r.x1.count
+  d1 = r.x1.delta
+  f1 = r.x1.first
+  f3db *= d1
+  bf = ButterworthFilter(f3db,npole,type)
+  x = r.f
+  y = Rap.zero(n1)
+  bf.apply(x,y)
+  return Real1(n1,d1,f1,y)
+
+def makeImpulse(n,m=0):
+  return Real1(n,1.0,-m,impulse(m,n))
+
+x = makeImpulse(101)
+y = filterReal1(x,0.25,3,LP)
+plotReal1(y)
+
+#ri = emily1(1)
+#plotReal1db(ri)
+#ro = filterReal1(ri,0.002,0.01,0.02,0.99)
+#ro = filterReal1(ri,0.002,1)
+#plotReal1db(ro)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -17,6 +17,7 @@ public class Suite extends TestCase {
   public static void main(String[] args) {
     TestSuite suite = new TestSuite();
 
+    suite.addTestSuite(ArrayTest.class);
     suite.addTestSuite(AxisTicsTest.class);
     suite.addTestSuite(ComplexTest.class);
     suite.addTestSuite(MathPlusTest.class);
