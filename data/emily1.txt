@@ -10,11 +10,12 @@ actually requested, the second file only contains one column of the vertical
 component of magnetometer data (same data).  It all has a sampling period of
 3 seconds.
 
-Vertical component
+Date     Time     Horizontal  Declination Vertical (nT)
+
 nx1All=28781
 nx1=1000
 dx1=3 s
-fx1=0 s ???
+fx1=0 s
 f= 
 20040115 00:00:00 969.863464 -115.698112 598.064270
 20040115 00:00:03 970.416321 -115.025986 598.095886
