@@ -333,8 +333,7 @@ public class TileAxis extends JPanel {
    * any border that will be drawn by the mosaic.
    */
   int getWidthMinimum() {
-    Graphics g = getGraphics();
-    FontMetrics fm = g.getFontMetrics();
+    FontMetrics fm = getFontMetrics(getFont());
     int width = 0;
     if (isVertical()) {
       width = maxTicStringWidth(fm)+fm.getHeight();
@@ -345,7 +344,6 @@ public class TileAxis extends JPanel {
       if (_label!=null)
         width = max(width,fm.stringWidth(_label));
     }
-    g.dispose();
     return width;
   }
 
@@ -354,8 +352,7 @@ public class TileAxis extends JPanel {
    * any border that will be drawn by the mosaic.
    */
   int getHeightMinimum() {
-    Graphics g = getGraphics();
-    FontMetrics fm = g.getFontMetrics();
+    FontMetrics fm = getFontMetrics(getFont());
     int height = 0;
     if (isHorizontal()) {
       height = 2*fm.getHeight();
@@ -366,7 +363,6 @@ public class TileAxis extends JPanel {
       if (_label!=null)
         height = max(height,fm.stringWidth(_label));
     }
-    g.dispose();
     return height;
   }
 

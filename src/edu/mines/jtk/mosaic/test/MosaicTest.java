@@ -36,7 +36,8 @@ public class MosaicTest {
     mosaic.setWidthMinimum(1,200);
     mosaic.setWidthElastic(1,200);
     mosaic.setHeightElastic(0,0);
-    mosaic.setPreferredSize(new Dimension(700,600));
+    //mosaic.setPreferredSize(new Dimension(700,600));
+    mosaic.setPreferredSize(mosaic.getMinimumSize());
     Tile tile11 = mosaic.getTile(1,1);
     tile11.setViewRectangle(new DRectangle(0.1,0.1,0.8,0.8));
 
