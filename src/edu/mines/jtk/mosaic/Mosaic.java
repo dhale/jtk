@@ -12,6 +12,7 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
+import edu.mines.jtk.gui.ModeManager;
 
 /**
  * A mosaic of tiles and tile axes. A mosaic lays out its tiles in a matrix,

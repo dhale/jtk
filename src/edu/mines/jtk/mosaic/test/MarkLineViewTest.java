@@ -13,6 +13,7 @@ import java.util.*;
 import javax.swing.*;
 
 import edu.mines.jtk.dsp.Sampling;
+import edu.mines.jtk.gui.*;
 import edu.mines.jtk.util.*;
 import edu.mines.jtk.mosaic.*;
 

@@ -10,6 +10,7 @@ import static java.lang.Math.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import edu.mines.jtk.gui.*;
 
 /**
  * A mode for zooming tiles and tile axes.
