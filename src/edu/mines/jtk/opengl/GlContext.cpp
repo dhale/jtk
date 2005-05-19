@@ -9,7 +9,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 GlContext JNI glue.
 @author Dave Hale, Colorado School of Mines
 ****************************************************************************/
-#ifdef WIN32 // If Microsoft Windows, ...
+#ifdef _WIN32 // If Microsoft Windows, ...
 #define MWIN
 #include <windows.h>
 #else // Else, assume X Windows, ...
@@ -220,8 +220,8 @@ public:
   WglSwtCanvasContext(JNIEnv* env, jlong hwnd, jlong hdc) : 
     GlSwtCanvasContext(env),_hglrc(0) 
   {
-    _hwnd = (HWND)hwnd;
-    _hdc = (HDC)hdc;
+    _hwnd = (HWND)toPointer(hwnd);
+    _hdc = (HDC)toPointer(hdc);
   }
   virtual ~WglSwtCanvasContext() {
     if (_hglrc!=0) {

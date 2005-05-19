@@ -9,7 +9,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 AwtBench JNI glue
 @author Dave Hale, Colorado School of Mines
 ****************************************************************************/
-#ifdef WIN32 // if Microsoft Windows, ...
+#ifdef _WIN32 // if Microsoft Windows, ...
 #define MWIN
 #include <windows.h>
 #else // else, assume X Windows, ...
@@ -52,10 +52,10 @@ Java_edu_mines_jtk_bench_AwtBench_00024NativeCanvas_paintNative(
     return;
   }
 #if defined(MWIN)
-  JAWT_Win32DrawingSurfaceInfo* pdsi = 
-    (JAWT_Win32DrawingSurfaceInfo*)dsi->platformInfo;
-  HWND hwnd = pdsi->hwnd;
-  HDC hdc = pdsi->hdc;
+  //JAWT_Win32DrawingSurfaceInfo* pdsi = 
+  //  (JAWT_Win32DrawingSurfaceInfo*)dsi->platformInfo;
+  //HWND hwnd = pdsi->hwnd;
+  //HDC hdc = pdsi->hdc;
   // TODO: draw something with Microsoft Windows
   printf("Should draw something via Microsoft Windows!\n");
 #elif defined(XWIN)

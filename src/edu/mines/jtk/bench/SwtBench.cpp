@@ -10,7 +10,7 @@ SwtBench JNI glue
 @author Dave Hale, Colorado School of Mines
 ****************************************************************************/
 #include <stdio.h>
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 #include <GL/gl.h>
@@ -22,7 +22,7 @@ Java_edu_mines_jtk_bench_SwtBench_printHandleNative(
   jint handle)
 {
   JNI_TRY
-  printf("native method: handle=%d\n",handle);
+  printf("native method: handle=%d\n",(int)handle);
   char* version = (char*)glGetString(GL_VERSION);
   if (version==0) {
     printf("Cannot yet get OpenGL version.\n");

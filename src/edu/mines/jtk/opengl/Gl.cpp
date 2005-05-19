@@ -9,7 +9,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 Gl JNI glue.
 @author Dave Hale, Colorado School of Mines
 ****************************************************************************/
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #endif
 #include <GL/gl.h>

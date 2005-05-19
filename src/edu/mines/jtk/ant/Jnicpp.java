@@ -21,6 +21,9 @@ import org.apache.tools.ant.util.*;
  */
 public class Jnicpp extends MatchingTask {
 
+  // On Windows, are we using MinGW instead of Microsoft Visual C++?
+  private static boolean USING_MINGW = true;
+
   public void setSrcdir(File srcdir) {
     if (!srcdir.exists())
       throwBuildException("srcdir \""+srcdir.getPath()+"\" does not exist!");
@@ -212,7 +215,10 @@ public class Jnicpp extends MatchingTask {
     if (_isLinux) {
       compileGcc(objFile,cppFile,incArgs);
     } else if (_isWindows) {
-      compileVc(objFile,cppFile,incArgs);
+      if (USING_MINGW)
+        compileMingw(objFile,cppFile,incArgs);
+      else
+        compileMsvc(objFile,cppFile,incArgs);
     }
   }
   private void compileGcc(File objFile, File cppFile, String[] incArgs) 
@@ -227,7 +233,19 @@ public class Jnicpp extends MatchingTask {
     if (exitCode!=0)
       throw new BuildException("g++ compile failed!",getLocation());
   }
-  private void compileVc(File objFile, File cppFile, String[] incArgs) 
+  private void compileMingw(File objFile, File cppFile, String[] incArgs) 
+    throws BuildException 
+  {
+    String[] cl = {
+      "g++","-c","-O2","-mthreads","-Wall",
+    };
+    cl = addArgs(cl,incArgs);
+    cl = addArgs(cl,new String[]{"-o",objFile.getPath(),cppFile.getPath()});
+    int exitCode = execute(cl);
+    if (exitCode!=0)
+      throw new BuildException("g++ compile failed!",getLocation());
+  }
+  private void compileMsvc(File objFile, File cppFile, String[] incArgs) 
     throws BuildException 
   {
     String[] cppArgs = {
@@ -249,7 +267,10 @@ public class Jnicpp extends MatchingTask {
     if (_isLinux) {
       linkGcc(jniFile,objFiles,libArgs);
     } else if (_isWindows) {
-      linkVc(jniFile,objFiles,libArgs);
+      if (USING_MINGW)
+        linkMingw(jniFile,objFiles,libArgs);
+      else
+        linkMsvc(jniFile,objFiles,libArgs);
     }
   }
   private void linkGcc(File jniFile, String[] objFiles, String[] libArgs) 
@@ -265,7 +286,20 @@ public class Jnicpp extends MatchingTask {
     if (exitCode!=0)
       throw new BuildException("g++ link failed!",getLocation());
   }
-  private void linkVc(File jniFile, String[] objFiles, String[] libArgs)
+  private void linkMingw(File jniFile, String[] objFiles, String[] libArgs) 
+    throws BuildException 
+  {
+    String[] cl = {
+      "g++","-shared","-mthreads","-Wl,--kill-at","-o",
+      jniFile.getPath()
+    };
+    cl = addArgs(cl,objFiles);
+    cl = addArgs(cl,libArgs);
+    int exitCode = execute(cl,_objdir);
+    if (exitCode!=0)
+      throw new BuildException("g++ link failed!",getLocation());
+  }
+  private void linkMsvc(File jniFile, String[] objFiles, String[] libArgs)
     throws BuildException
   {
     String[] lnkArgs = {
