@@ -556,6 +556,10 @@ public class Mosaic extends JPanel {
       if (icol!=jcol)
         _tiles[jrow][icol].setVerticalProjector(bvp);
     }
+    repaintAxis(_axesTop,jcol);
+    repaintAxis(_axesBottom,jcol);
+    repaintAxis(_axesLeft,jrow);
+    repaintAxis(_axesRight,jrow);
   }
 
   void setViewRect(Tile tile, DRectangle vr) {
@@ -672,7 +676,7 @@ public class Mosaic extends JPanel {
       width += widthMinimumColumn(icol);
     width += widthMinimumAxesRight();
     width += (_ncol-1)*widthTileSpacing();
-    width += widthVScrollBars();
+    width += widthMinimumVScrollBars();
     return width;
   }
 
@@ -713,6 +717,18 @@ public class Mosaic extends JPanel {
     return width;
   }
 
+  private int widthMinimumVScrollBars() {
+    return _vsb[0].getMinimumSize().width;
+  }
+
+  private int widthVScrollBars() {
+    for (int irow=0; irow<_nrow; ++irow) {
+      if (_vsb[irow].isVisible())
+        return _vsb[irow].getMinimumSize().width;
+    }
+    return 0;
+  }
+
   private int heightFixed() {
     int height = heightMinimumAxesTop();
     height += (_nrow-1)*widthTileSpacing();
@@ -728,7 +744,7 @@ public class Mosaic extends JPanel {
       height += heightMinimumRow(irow);
     height += heightMinimumAxesBottom();
     height += (_nrow-1)*widthTileSpacing();
-    height += heightHScrollBars();
+    height += heightMinimumHScrollBars();
     return height;
   }
 
@@ -769,18 +785,14 @@ public class Mosaic extends JPanel {
     return height;
   }
 
+  private int heightMinimumHScrollBars() {
+    return _hsb[0].getMinimumSize().height;
+  }
+
   private int heightHScrollBars() {
     for (int icol=0; icol<_ncol; ++icol) {
       if (_hsb[icol].isVisible())
         return _hsb[icol].getMinimumSize().height;
-    }
-    return 0;
-  }
-
-  private int widthVScrollBars() {
-    for (int irow=0; irow<_nrow; ++irow) {
-      if (_vsb[irow].isVisible())
-        return _vsb[irow].getMinimumSize().width;
     }
     return 0;
   }

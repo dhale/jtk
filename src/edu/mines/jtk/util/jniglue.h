@@ -106,6 +106,58 @@ typedef Jarray<float> JfloatArray;
 typedef Jarray<double> JdoubleArray;
 typedef Jarray<void> JvoidArray;
 
+// Java array of arrays
+template<typename T> class Jarray2 {
+public:
+  Jarray2(JNIEnv* env, jobjectArray arr) {
+    _env = env;
+    _arr = arr;
+    int n2 = _env->GetArrayLength(_arr);
+    _ptr = new T*[n2];
+    for (int i2=0; i2<n2; ++i2) {
+      jobject e2 = _env->GetObjectArrayElement(_arr,i2);
+      _ptr[i2] = (T*)_env->GetPrimitiveArrayCritical((jarray)e2,0);
+      _env->DeleteLocalRef(e2);
+    }
+  }
+  ~Jarray2() {
+    int n2 = _env->GetArrayLength(_arr);
+    for (int i2=0; i2<n2; ++i2) {
+      jobject e2 = _env->GetObjectArrayElement(_arr,i2);
+      _env->ReleasePrimitiveArrayCritical((jarray)e2,_ptr[i2],0);
+      _env->DeleteLocalRef(e2);
+    }
+    delete[] _ptr;
+  }
+  operator const T* const*() const {
+    return (const T* const*)_ptr;
+  }
+  operator T* const*() const {
+    return (T* const*)_ptr;
+  }
+  operator const T**() const {
+    return (const T**)_ptr;
+  }
+  operator T**() const {
+    return _ptr;
+  }
+private:
+  JNIEnv* _env;
+  jobjectArray _arr;
+  T** _ptr;
+};
+typedef Jarray2<unsigned char> JbooleanArray2;
+typedef Jarray2<signed char> JbyteArray2;
+typedef Jarray2<unsigned char> JubyteArray2;
+typedef Jarray2<unsigned short> JcharArray2;
+typedef Jarray2<short> JshortArray2;
+typedef Jarray2<unsigned short> JushortArray2;
+typedef Jarray2<int> JintArray2;
+typedef Jarray2<unsigned int> JuintArray2;
+typedef Jarray2<float> JfloatArray2;
+typedef Jarray2<double> JdoubleArray2;
+typedef Jarray2<void> JvoidArray2; 
+
 // Java NIO buffer
 template<typename T> class Jbuffer {
 public:

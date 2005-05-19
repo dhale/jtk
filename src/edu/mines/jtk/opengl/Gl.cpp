@@ -3475,34 +3475,32 @@ JNI_GL_BEGIN2
     (mode,first,count,primcount);
 JNI_GL_END
 
-/*
 JNI_GL_DECLARE2(glMultiDrawElements__JI_3II_3_3BI)
-  jint mode, jintArray jcount, jint type, jarray jindices, jint primcount
+  jint mode, jintArray jcount, jint type, jobjectArray jindices, jint primcount
 JNI_GL_BEGIN2
   JintArray count(env,jcount);
-  JintArray2 indices(env,jindices);
+  JvoidArray2 indices(env,jindices);
   (*(PFNGLMULTIDRAWELEMENTSPROC)toPointer(pfunc))
     (mode,count,type,indices,primcount);
 JNI_GL_END
 
 JNI_GL_DECLARE2(glMultiDrawElements__JI_3II_3_3II)
-  jint mode, jintArray jcount, jint type, jarray jindices, jint primcount
+  jint mode, jintArray jcount, jint type, jobjectArray jindices, jint primcount
 JNI_GL_BEGIN2
   JintArray count(env,jcount);
-  JintArray2 indices(env,jindices);
+  JvoidArray2 indices(env,jindices);
   (*(PFNGLMULTIDRAWELEMENTSPROC)toPointer(pfunc))
     (mode,count,type,indices,primcount);
 JNI_GL_END
 
 JNI_GL_DECLARE2(glMultiDrawElements__JI_3II_3_3SI)
-  jint mode, jintArray jcount, jint type, jarray jindices, jint primcount
+  jint mode, jintArray jcount, jint type, jobjectArray jindices, jint primcount
 JNI_GL_BEGIN2
   JintArray count(env,jcount);
-  JintArray2 indices(env,jindices);
+  JvoidArray2 indices(env,jindices);
   (*(PFNGLMULTIDRAWELEMENTSPROC)toPointer(pfunc))
     (mode,count,type,indices,primcount);
 JNI_GL_END
-*/
 
 JNI_GL_DECLARE2(glPointParameterf)
   jint pname, jfloat param
