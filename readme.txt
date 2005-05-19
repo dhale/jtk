@@ -47,7 +47,7 @@ only Linux and Windows platforms.
 To build the Mines JTK (after SVN checkout), you need the following:
 * J2SE JDK 5.0 (or later): http://java.sun.com/j2se
 * Apache Ant 1.6.2 (or later): http://ant.apache.org
-* A C++ compiler: g++ (for Linux) or Visual C++ (for Windows)
+* g++ (GCC) 3.2.3 (or later): http://www.mingw.org (for Windows only)
 
 The Mines JTK exploits significant new language features and classes that 
 became available only with Java 5.0. Therefore, this software cannot be 
@@ -57,35 +57,28 @@ used or built with Java 1.4.2 (or earlier).
 C++ compilers
 -------------
 
-The Mines JTK depends on some external libraries, which can be accessed
-only via native code. For example, the package edu.mines.jtk.opengl wraps
-the OpenGL 3-D graphics libraries via glue that we wrote in C++. For such 
+The Mines JTK depends on some external libraries, which can be accessed only 
+via native (non-Java) code. For example, the package edu.mines.jtk.opengl 
+wraps OpenGL 3-D graphics libraries via glue that we wrote in C++. For such 
 packages, we require a C++ compiler.
 
-For Linux, we simply use g++, the GNU C++ compiler, which is free software. 
-For Windows, we use Microsoft's Visual C++, which is freely available, but
-requires some effort to install.
+For both Linux and Windows, we use g++, the GNU C++ compiler. For Linux,
+we simply use the g++ compiler provided with our Linux distribution. 
 
-The Visual C++ Toolkit 2003 is freely available from Microsoft. However, 
-to build the Mines JTK for Windows, you will also need Microsoft's Platform
-SDK and their .NET Framework SDK, in addition to the VC++ Toolkit. The SDKs 
-are also freely available, but they are huge downloads. This is unfortunate,
-since you need only a few files from them. In particular, from the .NET 
-Framework SDK, you need only the file MSVCRT.LIB.
+For Windows, we use g++ as provided with the MinGW (Minimalist GNU for 
+Windows) system, which is free software. As its name implies, MinGW is 
+relatively small and easy to download and install. 
 
-Alternatively, you may simply buy Microsoft VC++ 2003. We have seen
-academic prices as low as $60. If you do not qualify for that version,
-then you might buy the standard version for about $90. That version does
-not have an optimizing compiler, but you can simply replace the compiler 
-in that version with the optimizing one in the free VC++ Toolkit 2003.
+Libraries built with MinGW depend on the file mingwm10.dll provided here 
+(lib\windows\x86) and with the MinGW distribution. At runtime, this file 
+must be in your PATH.
 
-We chose VC++ for our Windows builds, because VC++ is a defacto standard
-on Windows, and because everything we need is freely available, albeit
-with some effort. We are considering switching to the free software MinGW 
-(Minimalist GNU for Windows) for our Windows builds. As its name implies,
-MinGW is relatively small and easy to download and install. Unlike software
-built with VC++, software built with MinGW requires an extra, small, and 
-freely-distributable library at runtime, in addition to the libraries that 
-Microsoft provides with Windows. Aside from that small annoyance, we have 
-had good experience with the g++ compiler and other tools in MinGW in the 
-past. If you prefer MinGW to VC++, please let us know.
+To build our C++ code on any platform, you will need appropriate header 
+files. In particular, to build the native code glue for edu.mines.jtk.opengl, 
+you will need the header files gl.h, glext.h, and so on. These files are 
+freely available, but with licenses that do not permit us to redistribute 
+them. 
+
+Alternatively, you may simply build only the Java source code, and then use 
+the native code libraries from one of our binary distributions.
+

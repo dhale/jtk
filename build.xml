@@ -145,7 +145,36 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     </jnicpp>
   </target>
 
-  <!-- Build JNI libraries for Windows -->
+  <!-- Build JNI libraries for Windows (using MinGW) -->
+  <target name="jni-windows" if="windows">
+    <property name="jdk.home" value="${env.JDK_HOME}"/>
+    <property name="jdk.include" value="${jdk.home}/include"/>
+    <property name="jdk.lib" value="${jdk.home}\lib"/>
+    <jnicpp 
+        srcdir="${src.jtk}/bench" 
+        objdir="${obj.jtk}/bench"
+        jnidir="${build.lib}" 
+        jniname="edu_mines_jtk_bench">
+      <incarg arg="-I${jdk.include}"/>
+      <incarg arg="-I${jdk.include}/win32"/>
+      <libarg arg="-lopengl32"/>
+      <libarg arg="${jdk.lib}\jawt.lib"/>
+    </jnicpp>
+    <jnicpp 
+        srcdir="${src.jtk}/opengl" 
+        objdir="${obj.jtk}/opengl"
+        jnidir="${build.lib}" 
+        jniname="edu_mines_jtk_opengl">
+      <incarg arg="-I${jdk.include}"/>
+      <incarg arg="-I${jdk.include}/win32"/>
+      <libarg arg="-lopengl32"/>
+      <libarg arg="-lglu32"/>
+      <libarg arg="-lgdi32"/>
+      <libarg arg="${jdk.lib}\jawt.lib"/>
+    </jnicpp>
+  </target>
+
+  <!-- Build JNI libraries for Windows (using MSVC) - CURRENTLY NOT USED!
   <target name="jni-windows" if="windows">
     <property name="vc.home" value="${env.VC_HOME}"/>
     <property name="sdk.home" value="${env.SDK_HOME}"/>
@@ -180,6 +209,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <libarg arg="jawt.lib"/>
     </jnicpp>
   </target>
+  -->
 
   <!--Build javadocs -->
   <target name="doc" depends="init" description="build javadocs">
