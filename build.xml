@@ -194,6 +194,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
         <include name="edu/mines/jtk/**"/>
         <exclude name="edu/mines/jtk/**/new"/>
         <exclude name="edu/mines/jtk/**/old"/>
+        <exclude name="edu/mines/jtk/**/test"/>
       </packageset>
     </javadoc>
   </target>
