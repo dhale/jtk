@@ -47,11 +47,16 @@ public class MatrixPointVectorTest extends TestCase {
   public void testVector() {
     int ntrial = 10;
     for (int itrial=0; itrial<ntrial; ++itrial) {
+      Vector3 u = randomVector3();
       Vector3 v = randomVector3();
+      assertEquals(v,v.negate().negate());
+      assertEquals(v,v.clone().negateEquals().negateEquals());
       assertEquals(1.0,v.normalize().length());
       assertEquals(1.0,v.clone().normalizeEquals().length());
       assertEquals(1.0,v.normalize().lengthSquared());
       assertEquals(v.dot(v),v.lengthSquared());
+      assertEquals(0.0,u.cross(v).dot(u));
+      assertEquals(0.0,u.cross(v).dot(v));
     }
   }
 
