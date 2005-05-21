@@ -40,13 +40,29 @@ public class Node {
   ///////////////////////////////////////////////////////////////////////////
   // package
 
-  void addParent(Group parent) {
-    if (!_parentList.contains(parent))
+  /**
+   * Adds the specified parent to this node's list of parents.
+   * If this node is already a child of the parent, this method simply 
+   * returns false. Called by Group.addChild(Node).
+   * @return true, if this node was not a child of parent; false, otherwise.
+   */
+  boolean addParent(Group parent) {
+    if (!_parentList.contains(parent)) {
       _parentList.add(parent);
+      return true;
+    } else {
+      return false;
+    }
   }
 
-  void removeParent(Group parent) {
-    _parentList.remove(parent);
+  /**
+   * Removes the specified parent from this node's list of parents.
+   * If this node is not a child of the parent, this method simply
+   * returns false. Called by Group.removeChild(Node).
+   * @return true, if this node was a child of parent; false, otherwise.
+   */
+  boolean removeParent(Group parent) {
+    return _parentList.remove(parent);
   }
 
   void cullNode(CullContext cc) {
@@ -64,5 +80,5 @@ public class Node {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  ArrayList<Group> _parentList = new ArrayList<Group>();
+  ArrayList<Group> _parentList = new ArrayList<Group>(2);
 }
