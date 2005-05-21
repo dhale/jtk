@@ -38,9 +38,27 @@ public class Point3 extends Tuple3 {
   }
 
   /**
-   * Moves this point by adding the specified vector v.
-   * @param v the vector.
-   * @return this point, moved.
+   * Returns the point q = p+v, for this point p and the specified vector v.
+   * @param v the vector v.
+   * @return the point q = p+v.
+   */
+  public Point3 plus(Vector3 v) {
+    return new Point3(x+v.x,y+v.y,z+v.z);
+  }
+
+  /**
+   * Returns the point q = p-v, for this point p and the specified vector v.
+   * @param v the vector v.
+   * @return the point q = p-v.
+   */
+  public Point3 minus(Vector3 v) {
+    return new Point3(x-v.x,y-v.y,z-v.z);
+  }
+
+  /**
+   * Moves this point p by adding the specified vector v.
+   * @param v the vector v.
+   * @return this point, p += v, moved.
    */
   public Point3 plusEquals(Vector3 v) {
     x += v.x;
@@ -50,9 +68,9 @@ public class Point3 extends Tuple3 {
   }
 
   /**
-   * Moves this point by subtracting the specified vector v.
-   * @param v the vector.
-   * @return this point, moved.
+   * Moves this point p by subtracting the specified vector v.
+   * @param v the vector v.
+   * @return this point, p -= v, moved.
    */
   public Point3 minusEquals(Vector3 v) {
     x -= v.x;
@@ -62,35 +80,26 @@ public class Point3 extends Tuple3 {
   }
 
   /**
-   * Returns the vector q-p from the specified point p to this point q.
-   * @param p the point p.
-   * @return the vector.
+   * Returns an affine combination of this point p and the specified point q.
+   * @param a the weight of the point q.
+   * @param q the point q.
+   * @return the affine combination (1-a)*p + a*q.
    */
-  public Vector3 minus(Point3 p) {
-    return new Vector3(this.x-p.x,this.y-p.y,this.z-p.z);
-  }
-
-  /**
-   * Returns an affine combination of this point q and the specified point p.
-   * @param a the weight of the point p.
-   * @param p the point p.
-   * @return the affine combination (1-a)*q + a*p.
-   */
-  public Point3 affine(double a, Point3 p) {
+  public Point3 affine(double a, Point3 q) {
     double b = 1.0-a;
-    Point3 q = this;
-    return new Point3(b*q.x+a*p.x,b*q.y+a*p.y,b*q.z+a*p.z);
+    Point3 p = this;
+    return new Point3(b*p.x+a*q.x,b*p.y+a*q.y,b*p.z+a*q.z);
   }
 
   /**
-   * Returns the distance between this point q and the specified point p.
-   * @param p the point.
+   * Returns the distance between this point p and the specified point q.
+   * @param q the point.
    * @return the distance |q-p|.
    */
-  public double distanceTo(Point3 p) {
-    double dx = x-p.x;
-    double dy = y-p.y;
-    double dz = z-p.z;
+  public double distanceTo(Point3 q) {
+    double dx = x-q.x;
+    double dy = y-q.y;
+    double dz = z-q.z;
     return Math.sqrt(dx*dx+dy*dy+dz*dz);
   }
 }

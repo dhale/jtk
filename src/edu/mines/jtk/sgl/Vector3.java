@@ -48,6 +48,7 @@ public class Vector3 extends Tuple3 {
 
   /**
    * Returns the length of this vector.
+   * @return the length.
    */
   public double length() {
     return Math.sqrt(x*x+y*y+z*z);
@@ -55,9 +56,29 @@ public class Vector3 extends Tuple3 {
 
   /**
    * Returns the length-squared of this vector.
+   * @return the length-squared.
    */
   public double lengthSquared() {
     return x*x+y*y+z*z;
+  }
+
+  /**
+   * Returns the negation -u of this vector u.
+   * @return the negation -u.
+   */
+  public Vector3 negate() {
+    return new Vector3(-x,-y,-z);
+  }
+
+  /**
+   * Negates this vector.
+   * @return this vector, negated.
+   */
+  public Vector3 negateEquals() {
+    x = -x;
+    y = -y;
+    z = -z;
+    return this;
   }
 
   /**
@@ -71,7 +92,7 @@ public class Vector3 extends Tuple3 {
 
   /**
    * Normalizes this vector to have unit length; makes this a unit vector.
-   * @return the unit vector, normalized.
+   * @return this vector, normalized.
    */
   public Vector3 normalizeEquals() {
     double s = 1.0/length();

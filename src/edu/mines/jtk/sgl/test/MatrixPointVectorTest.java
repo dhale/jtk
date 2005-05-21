@@ -12,13 +12,13 @@ import edu.mines.jtk.sgl.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * Tests {@link edu.mines.jtk.sgl.Matrix44}.
+ * Tests classes for matrix, point, and vector math.
  * @author Dave Hale
  * @version 2005.05.20
  */
-public class Matrix44Test extends TestCase {
+public class MatrixPointVectorTest extends TestCase {
   public static void main(String[] args) {
-    TestSuite suite = new TestSuite(Matrix44Test.class);
+    TestSuite suite = new TestSuite(MatrixPointVectorTest.class);
     junit.textui.TestRunner.run(suite);
   }
 
@@ -44,7 +44,7 @@ public class Matrix44Test extends TestCase {
     }
   }
 
-  public void testMatrixVector() {
+  public void testVector() {
     int ntrial = 10;
     for (int itrial=0; itrial<ntrial; ++itrial) {
       Vector3 v = randomVector3();
@@ -52,7 +52,25 @@ public class Matrix44Test extends TestCase {
       assertEquals(1.0,v.clone().normalizeEquals().length());
       assertEquals(1.0,v.normalize().lengthSquared());
       assertEquals(v.dot(v),v.lengthSquared());
+    }
+  }
 
+  public void testPoint() {
+    int ntrial = 10;
+    for (int itrial=0; itrial<ntrial; ++itrial) {
+      Point3 p = randomPoint3();
+      Vector3 v = randomVector3();
+      assertEquals(p,p.plus(v).minus(v));
+      assertEquals(p,p.clone().plusEquals(v).minusEquals(v));
+      Point3 q = p.minus(v);
+      assertEquals(q.distanceTo(p),v.length());
+    }
+  }
+
+  public void testMatrixVector() {
+    int ntrial = 10;
+    for (int itrial=0; itrial<ntrial; ++itrial) {
+      Vector3 v = randomVector3();
       Matrix44 a = randomMatrix33();
       Matrix44 ata = a.transposeTimes(a);
       assertEquals(ata.times(v),a.transposeTimes(a.times(v)));
@@ -65,14 +83,12 @@ public class Matrix44Test extends TestCase {
     int ntrial = 10;
     for (int itrial=0; itrial<ntrial; ++itrial) {
       Matrix44 a,ata,aat;
-
       a = randomMatrix33();
       ata = a.transposeTimes(a);
       aat = a.timesTranspose(a);
       Point3 p3 = randomPoint3();
       assertEquals(ata.times(p3),a.transposeTimes(a.times(p3)));
       assertEquals(aat.times(p3),a.times(a.transposeTimes(p3)));
-
       a = randomMatrix44();
       ata = a.transposeTimes(a);
       aat = a.timesTranspose(a);
@@ -82,24 +98,23 @@ public class Matrix44Test extends TestCase {
     }
   }
 
-  public static Matrix44 randomMatrix44() {
-    double[] m = new double[16];
-    for (int i=0; i<16; ++i)
-      m[i] = _random.nextDouble();
-    m[ 0] += 4.0; // Make matrix
-    m[ 5] += 4.0; // diagonally
-    m[10] += 4.0; // dominant so 
-    m[15] += 4.0; // inverse exists.
-    return new Matrix44(m);
-  }
+  ///////////////////////////////////////////////////////////////////////////
+  // private
 
-  public static Matrix44 randomMatrix33() {
+  private static Random _random = new Random(314159);
+
+  private static final double TOLERANCE = 100*DBL_EPSILON;
+
+  /**
+   * Returns a diagonally dominant random 3x3 matrix.
+   */
+  private static Matrix44 randomMatrix33() {
     double[] m = new double[16];
     for (int i=0; i<16; ++i)
       m[i] = _random.nextDouble();
-    m[ 0] += 4.0; // Make matrix diagonally
-    m[ 5] += 4.0; // dominant so  
-    m[10] += 4.0; // inverse exists.
+    m[ 0] += 4.0;
+    m[ 5] += 4.0;
+    m[10] += 4.0;
     m[ 3] = m[12] = 0.0;
     m[ 7] = m[13] = 0.0;
     m[11] = m[14] = 0.0;
@@ -107,21 +122,35 @@ public class Matrix44Test extends TestCase {
     return new Matrix44(m);
   }
 
-  public static Point3 randomPoint3() {
+  /**
+   * Returns Makes a diagonally dominant random 4x4 matrix.
+   */
+  private static Matrix44 randomMatrix44() {
+    double[] m = new double[16];
+    for (int i=0; i<16; ++i)
+      m[i] = _random.nextDouble();
+    m[ 0] += 4.0;
+    m[ 5] += 4.0;
+    m[10] += 4.0;
+    m[15] += 4.0;
+    return new Matrix44(m);
+  }
+
+  private static Point3 randomPoint3() {
     double x = _random.nextDouble();
     double y = _random.nextDouble();
     double z = _random.nextDouble();
     return new Point3(x,y,z);
   }
 
-  public static Vector3 randomVector3() {
+  private static Vector3 randomVector3() {
     double x = _random.nextDouble();
     double y = _random.nextDouble();
     double z = _random.nextDouble();
     return new Vector3(x,y,z);
   }
 
-  public static Point4 randomPoint4() {
+  private static Point4 randomPoint4() {
     double x = _random.nextDouble();
     double y = _random.nextDouble();
     double z = _random.nextDouble();
@@ -129,33 +158,28 @@ public class Matrix44Test extends TestCase {
     return new Point4(x,y,z,w);
   }
 
-  public static void assertEquals(Matrix44 e, Matrix44 a) {
+  private static void assertEquals(Matrix44 e, Matrix44 a) {
     double t = 100.0*DBL_EPSILON;
     double[] em = e.m;
     double[] am = a.m;
     for (int i=0; i<16; ++i)
-      assertEquals(em[i],am[i],t);
+      assertEquals(em[i],am[i],TOLERANCE);
   }
 
-  public static void assertEquals(Tuple3 e, Tuple3 a) {
-    double t = 100.0*DBL_EPSILON;
-    assertEquals(e.x,a.x,t);
-    assertEquals(e.y,a.y,t);
-    assertEquals(e.z,a.z,t);
+  private static void assertEquals(Tuple3 e, Tuple3 a) {
+    assertEquals(e.x,a.x,TOLERANCE);
+    assertEquals(e.y,a.y,TOLERANCE);
+    assertEquals(e.z,a.z,TOLERANCE);
   }
 
-  public static void assertEquals(Tuple4 e, Tuple4 a) {
-    double t = 100.0*DBL_EPSILON;
-    assertEquals(e.x,a.x,t);
-    assertEquals(e.y,a.y,t);
-    assertEquals(e.z,a.z,t);
-    assertEquals(e.w,a.w,t);
+  private static void assertEquals(Tuple4 e, Tuple4 a) {
+    assertEquals(e.x,a.x,TOLERANCE);
+    assertEquals(e.y,a.y,TOLERANCE);
+    assertEquals(e.z,a.z,TOLERANCE);
+    assertEquals(e.w,a.w,TOLERANCE);
   }
 
-  public static void assertEquals(double e, double a) {
-    double t = 100.0*DBL_EPSILON;
-    assertEquals(e,a,t);
+  private static void assertEquals(double e, double a) {
+    assertEquals(e,a,TOLERANCE);
   }
-
-  private static Random _random = new Random(314159);
 }

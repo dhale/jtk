@@ -50,9 +50,27 @@ public class Point4 extends Tuple4 {
   }
 
   /**
-   * Moves this point q by adding the specified vector v.
-   * @param v the vector.
-   * @return this point q += v.
+   * Returns the point q = p+v, for this point p and the specified vector v.
+   * @param v the vector v.
+   * @return the point q = p+v.
+   */
+  public Point4 plus(Vector3 v) {
+    return new Point4(x+v.x,y+v.y,z+v.z,w);
+  }
+
+  /**
+   * Returns the point q = p-v, for this point p and the specified vector v.
+   * @param v the vector v.
+   * @return the point q = p-v.
+   */
+  public Point4 minus(Vector3 v) {
+    return new Point4(x-v.x,y-v.y,z-v.z,w);
+  }
+
+  /**
+   * Moves this point p by adding the specified vector v.
+   * @param v the vector v.
+   * @return this point, p += v, moved.
    */
   public Point4 plusEquals(Vector3 v) {
     x += v.x;
@@ -62,9 +80,9 @@ public class Point4 extends Tuple4 {
   }
 
   /**
-   * Moves this point by subtracting the specified vector.
-   * @param v the vector.
-   * @return this point q -= v.
+   * Moves this point p by subtracting the specified vector v.
+   * @param v the vector v.
+   * @return this point, p -= v, moved.
    */
   public Point4 minusEquals(Vector3 v) {
     x -= v.x;
@@ -74,14 +92,14 @@ public class Point4 extends Tuple4 {
   }
 
   /**
-   * Returns an affine combination of this point q and the specified point p.
-   * @param a the weight of the point p.
-   * @param p the point p.
-   * @return the affine combination (1-a)*q + a*p.
+   * Returns an affine combination of this point p and the specified point q.
+   * @param a the weight of the point q.
+   * @param q the point q.
+   * @return the affine combination (1-a)*p + a*q.
    */
-  public Point4 affine(double a, Point4 p) {
+  public Point4 affine(double a, Point4 q) {
     double b = 1.0-a;
-    Point4 q = this;
-    return new Point4(b*q.x+a*p.x,b*q.y+a*p.y,b*q.z+a*p.z,b*q.w+a*p.w);
+    Point4 p = this;
+    return new Point4(b*p.x+a*q.x,b*p.y+a*q.y,b*p.z+a*q.z,b*p.w+a*q.w);
   }
 }
