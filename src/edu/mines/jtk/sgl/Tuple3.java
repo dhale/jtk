@@ -16,17 +16,17 @@ public class Tuple3 implements Cloneable {
   /**
    * The component x.
    */
-  double x;
+  public double x;
 
   /**
    * The component y.
    */
-  double y;
+  public double y;
 
   /**
    * The component z.
    */
-  double z;
+  public double z;
 
   /**
    * Constructs a tuple with all components equal to zero.

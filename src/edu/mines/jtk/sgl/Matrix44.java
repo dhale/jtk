@@ -304,6 +304,25 @@ public class Matrix44 implements Cloneable {
     return new Vector3(ux,uy,uz);
   }
 
+  /**
+   * Returns an identity matrix.
+   * @return an identity matrix.
+   */
+  public static Matrix44 identity() {
+    return new Matrix44();
+  }
+
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    for (int i=0; i<4; ++i) {
+      sb.append("| ");
+      for (int j=0; j<4; ++j)
+        sb.append(String.format("% 12.5e ",m[i+j*4]));
+      sb.append("|\n");
+    }
+    return sb.toString();
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -391,7 +410,7 @@ public class Matrix44 implements Cloneable {
     c[ 1] = a01*b00+a11*b10+a21*b20+a31*b30;
     c[ 2] = a02*b00+a12*b10+a22*b20+a32*b30;
     c[ 3] = a03*b00+a13*b10+a23*b20+a33*b30;
-    c[ 4] = a00*b01+a01*b11+a20*b21+a30*b31;
+    c[ 4] = a00*b01+a10*b11+a20*b21+a30*b31;
     c[ 5] = a01*b01+a11*b11+a21*b21+a31*b31;
     c[ 6] = a02*b01+a12*b11+a22*b21+a32*b31;
     c[ 7] = a03*b01+a13*b11+a23*b21+a33*b31;

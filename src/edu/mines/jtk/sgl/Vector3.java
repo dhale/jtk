@@ -14,21 +14,6 @@ package edu.mines.jtk.sgl;
 public class Vector3 extends Tuple3 {
 
   /**
-   * The component x.
-   */
-  double x;
-
-  /**
-   * The component y.
-   */
-  double y;
-
-  /**
-   * The component z.
-   */
-  double z;
-
-  /**
    * Constructs a vector with components zero.
    */
   public Vector3() {
