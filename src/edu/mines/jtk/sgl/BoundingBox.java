@@ -26,19 +26,23 @@ public class BoundingBox {
     return _xmin<=_xmax && _ymin<=_ymax && _zmin<=_zmax;
   }
 
-  public Point3 min() {
+  public Point3 getMin() {
     return new Point3(_xmin,_ymin,_zmin);
   }
 
-  public Point3 max() {
+  public Point3 getMax() {
     return new Point3(_xmax,_ymax,_zmax);
   }
 
-  public double radius() {
-    return Math.sqrt(radiusSquared());
+  public Point3 getCenter() {
+    return new Point3(0.5*(_xmin+_xmax),0.5*(_ymin+_ymax),0.5*(_zmin+_zmax));
   }
 
-  public double radiusSquared() {
+  public double getRadius() {
+    return Math.sqrt(getRadiusSquared());
+  }
+
+  public double getRadiusSquared() {
     double dx = _xmax-_xmin;
     double dy = _ymax-_ymin;
     double dz = _zmax-_zmin;
@@ -70,7 +74,8 @@ public class BoundingBox {
   }
 
   public boolean contains(Point3 p) {
-    return _xmin<=p.x && p.x<=_xmax &&
+    return isValid() &&
+           _xmin<=p.x && p.x<=_xmax &&
            _ymin<=p.y && p.y<=_ymax &&
            _zmin<=p.z && p.z<=_zmax;
   }

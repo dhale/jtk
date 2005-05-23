@@ -6,6 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import edu.mines.jtk.util.Check;
+
 /**
  * A 4-by-4 matrix.
  * @author Dave Hale, Colorado School of Mines
@@ -56,10 +58,10 @@ public class Matrix44 implements Cloneable {
                   double m20, double m21, double m22, double m23,
                   double m30, double m31, double m32, double m33)
   {
-    m[ 0] = m00;  m[ 4] = m01;  m[ 8] = m02;  m[12] = m03;
-    m[ 1] = m10;  m[ 5] = m11;  m[ 9] = m12;  m[13] = m13;
-    m[ 2] = m20;  m[ 6] = m21;  m[10] = m22;  m[14] = m23;
-    m[ 3] = m30;  m[ 7] = m31;  m[11] = m32;  m[15] = m33;
+    set(m00,m01,m01,m03,
+        m10,m11,m11,m13,
+        m20,m21,m21,m23,
+        m30,m31,m31,m33);
   }
 
   /**
@@ -82,6 +84,36 @@ public class Matrix44 implements Cloneable {
                         m[ 1],m[ 5],m[ 9],m[13],
                         m[ 2],m[ 6],m[10],m[14],
                         m[ 3],m[ 7],m[11],m[15]);
+  }
+
+  /**
+   * Sets all elements of this matrix.
+   * @param m00 the element with (row,col) indices (0,0)
+   * @param m01 the element with (row,col) indices (0,1)
+   * @param m02 the element with (row,col) indices (0,2)
+   * @param m03 the element with (row,col) indices (0,3)
+   * @param m10 the element with (row,col) indices (1,0)
+   * @param m11 the element with (row,col) indices (1,1)
+   * @param m12 the element with (row,col) indices (1,2)
+   * @param m13 the element with (row,col) indices (1,3)
+   * @param m20 the element with (row,col) indices (2,0)
+   * @param m21 the element with (row,col) indices (2,1)
+   * @param m22 the element with (row,col) indices (2,2)
+   * @param m23 the element with (row,col) indices (2,3)
+   * @param m30 the element with (row,col) indices (3,0)
+   * @param m31 the element with (row,col) indices (3,1)
+   * @param m32 the element with (row,col) indices (3,2)
+   * @param m33 the element with (row,col) indices (3,3)
+   */
+  public void set(double m00, double m01, double m02, double m03,
+                  double m10, double m11, double m12, double m13,
+                  double m20, double m21, double m22, double m23,
+                  double m30, double m31, double m32, double m33)
+  {
+    m[ 0] = m00;  m[ 4] = m01;  m[ 8] = m02;  m[12] = m03;
+    m[ 1] = m10;  m[ 5] = m11;  m[ 9] = m12;  m[13] = m13;
+    m[ 2] = m20;  m[ 6] = m21;  m[10] = m22;  m[14] = m23;
+    m[ 3] = m30;  m[ 7] = m31;  m[11] = m32;  m[15] = m33;
   }
 
   /**
@@ -305,11 +337,353 @@ public class Matrix44 implements Cloneable {
   }
 
   /**
-   * Returns an identity matrix.
+   * Returns a new identity matrix.
    * @return an identity matrix.
    */
   public static Matrix44 identity() {
     return new Matrix44();
+  }
+
+  /**
+   * Returns a new translation matrix.
+   * @param tx the x component of the translation.
+   * @param ty the y component of the translation.
+   * @param tz the z component of the translation.
+   * @return the translation matrix.
+   */
+  public static Matrix44 translate(double tx, double ty, double tz) {
+    return (new Matrix44()).setTranslate(tx,ty,tz);
+  }
+
+  /**
+   * Returns a new translation matrix.
+   * @param tv the translation vector.
+   * @return the translation matrix.
+   */
+  public static Matrix44 translate(Vector3 tv) {
+    return (new Matrix44()).setTranslate(tv);
+  }
+
+  /**
+   * Returns a new scaling matrix.
+   * @param sx the x component of the scaling.
+   * @param sy the y component of the scaling.
+   * @param sz the z component of the scaling.
+   * @return the scaling matrix.
+   */
+  public static Matrix44 scale(double sx, double sy, double sz) {
+    return (new Matrix44()).setScale(sx,sy,sz);
+  }
+
+  /**
+   * Returns a new rotation matrix.
+   * The rotation is about a specified vector axis.
+   * @param ra the angle of rotation, in radians.
+   * @param rx the x component of the vector axis of rotation
+   * @param ry the y component of the vector axis of rotation
+   * @param rz the z component of the vector axis of rotation
+   * @return the rotation matrix.
+   */
+  public static Matrix44 rotate(double ra, double rx, double ry, double rz) {
+    return (new Matrix44()).setRotate(ra,rx,ry,rz);
+  }
+
+  /**
+   * Returns a new rotation matrix.
+   * The rotation is about a specified vector axis.
+   * @param ra the angle of rotation, in radians.
+   * @param rv the vector axis of rotation.
+   * @return the rotation matrix.
+   */
+  public static Matrix44 rotate(double ra, Vector3 rv) {
+    return (new Matrix44()).setRotate(ra,rv);
+  }
+
+  /**
+   * Returns a new rotation matrix.
+   * The rotation is about the x axis.
+   * @param ra the angle of rotation, in radians.
+   * @return the rotation matrix.
+   */
+  public static Matrix44 rotateX(double ra) {
+    return (new Matrix44()).setRotateX(ra);
+  }
+
+  /**
+   * Returns a new rotation matrix.
+   * The rotation is about the y axis.
+   * @param ra the angle of rotation, in radians.
+   * @return the rotation matrix.
+   */
+  public static Matrix44 rotateY(double ra) {
+    return (new Matrix44()).setRotateY(ra);
+  }
+
+  /**
+   * Returns a new rotation matrix.
+   * The rotation is about the z axis.
+   * @param ra the angle of rotation, in radians.
+   * @return the rotation matrix.
+   */
+  public static Matrix44 rotateZ(double ra) {
+    return (new Matrix44()).setRotateZ(ra);
+  }
+
+  /**
+   * Returns a new orthographic-projection matrix. Parameters 
+   * correspond to those for the OpenGL standard function glOrtho.
+   * @param left the coordinate for the left clipping plane.
+   * @param right the coordinate for the right clipping plane.
+   * @param bottom the coordinate for the bottom clipping plane.
+   * @param top the coordinate for the top clipping plane.
+   * @param znear the distance to the near depth clipping plane
+   * @param zfar the distance to the far depth clipping plane
+   * @return the orthographic-projection matrix.
+   */
+  public static Matrix44 ortho(
+    double left, double right, 
+    double bottom, double top, 
+    double znear, double zfar)
+  {
+    return (new Matrix44()).setOrtho(left,right,bottom,top,znear,zfar);
+  }
+
+  /**
+   * Returns a new perspective-projection matrix. Parameters 
+   * correspond to those for the OpenGL standard function glFrustum.
+   * @param left the coordinate for the left clipping plane.
+   * @param right the coordinate for the right clipping plane.
+   * @param bottom the coordinate for the bottom clipping plane.
+   * @param top the coordinate for the top clipping plane.
+   * @param znear the distance to the near depth clipping plane
+   * @param zfar the distance to the far depth clipping plane
+   * @return the perspective-projection matrix.
+   */
+  public static Matrix44 frustum(
+    double left, double right, 
+    double bottom, double top, 
+    double znear, double zfar)
+  {
+    return (new Matrix44()).setFrustum(left,right,bottom,top,znear,zfar);
+  }
+
+  /////////
+  ////
+  /////
+
+  /**
+   * Sets this matrix to an identity matrix.
+   * @return this identity matrix.
+   */
+  public Matrix44 setIdentity() {
+    set(1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0);
+    return this;
+  }
+
+  /**
+   * Sets this matrix to a translation-only matrix.
+   * @param tx the x component of the translation.
+   * @param ty the y component of the translation.
+   * @param tz the z component of the translation.
+   * @return this translation-only matrix.
+   */
+  public Matrix44 setTranslate(double tx, double ty, double tz) {
+    set(1.0, 0.0, 0.0,  tx,
+        0.0, 1.0, 0.0,  ty,
+        0.0, 0.0, 1.0,  tz,
+        0.0, 0.0, 0.0, 1.0);
+    return this;
+  }
+
+  /**
+   * Sets this matrix to a translation-only matrix.
+   * @param tv the translation vector.
+   * @return this translation-only matrix.
+   */
+  public Matrix44 setTranslate(Vector3 tv) {
+    return setTranslate(tv.x,tv.y,tv.z);
+  }
+
+  /**
+   * Sets this matrix to a scaling-only matrix.
+   * @param sx the x component of the scaling.
+   * @param sy the y component of the scaling.
+   * @param sz the z component of the scaling.
+   * @return this scaling-only matrix.
+   */
+  public Matrix44 setScale(double sx, double sy, double sz) {
+    set( sx, 0.0, 0.0, 0.0,
+        0.0,  sx, 0.0, 0.0,
+        0.0, 0.0,  sx, 0.0,
+        0.0, 0.0, 0.0, 1.0);
+    return this;
+  }
+
+  /**
+   * Sets this matrix to a rotation-only matrix.
+   * The rotation is about a specified vector axis.
+   * @param ra the angle of rotation, in radians.
+   * @param rx the x component of the vector axis of rotation
+   * @param ry the y component of the vector axis of rotation
+   * @param rz the z component of the vector axis of rotation
+   * @return this rotation-only matrix.
+   */
+  public Matrix44 setRotate(double ra, double rx, double ry, double rz) {
+    double rs = 1.0/Math.sqrt(rx*rx+ry*ry+rz*rz);
+    rx *= rs;
+    ry *= rs;
+    rz *= rs;
+    double ca = Math.cos(ra);
+    double sa = Math.sin(ra);
+    double xx = rx*rx;
+    double xy = rx*ry;
+    double xz = rx*rz;
+    double yx = xy;
+    double yy = ry*ry;
+    double yz = ry*rz;
+    double zx = xz;
+    double zy = yz;
+    double zz = rz*rz;
+    double m00 = xx + ca*(1.0-xx) + sa*(0.0);
+    double m01 = xy + ca*(0.0-xy) + sa*(-rz);
+    double m02 = xz + ca*(0.0-xz) + sa*( ry);
+    double m10 = yx + ca*(0.0-yx) + sa*( rz);
+    double m11 = yy + ca*(1.0-yy) + sa*(0.0);
+    double m12 = yz + ca*(0.0-yz) + sa*(-rx);
+    double m20 = zx + ca*(0.0-zx) + sa*(-ry);
+    double m21 = zy + ca*(0.0-zy) + sa*( rx);
+    double m22 = zz + ca*(1.0-zz) + sa*(0.0);
+    set(m00, m01, m02, 0.0,
+        m10, m11, m12, 0.0,
+        m20, m21, m22, 0.0,
+        0.0, 0.0, 0.0, 1.0);
+    return this;
+  }
+
+  /**
+   * Sets this matrix to a rotation-only matrix.
+   * The rotation is about a specified axis.
+   * @param ra the angle of rotation, in radians.
+   * @param rv the vector axis of rotation.
+   * @return this rotation-only matrix.
+   */
+  public Matrix44 setRotate(double ra, Vector3 rv) {
+    return setRotate(ra,rv.x,rv.y,rv.z);
+  }
+
+  /**
+   * Sets this matrix to a rotation-only matrix.
+   * The rotation is about the x axis.
+   * @param ra the angle of rotation, in radians.
+   * @return this rotation-only matrix.
+   */
+  public Matrix44 setRotateX(double ra) {
+    double ca = Math.cos(ra);
+    double sa = Math.sin(ra);
+    set(1.0, 0.0, 0.0, 0.0,
+        0.0,  ca, -sa, 0.0,
+        0.0,  sa,  ca, 0.0,
+        0.0, 0.0, 0.0, 1.0);
+    return this;
+  }
+
+  /**
+   * Sets this matrix to a rotation-only matrix.
+   * The rotation is about the y axis.
+   * @param ra the angle of rotation, in radians.
+   * @return this rotation-only matrix.
+   */
+  public Matrix44 setRotateY(double ra) {
+    double ca = Math.cos(ra);
+    double sa = Math.sin(ra);
+    set( ca, 0.0,  sa, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        -sa, 0.0,  ca, 0.0,
+        0.0, 0.0, 0.0, 1.0);
+    return this;
+  }
+
+  /**
+   * Sets this matrix to a rotation-only matrix.
+   * The rotation is about the z axis.
+   * @param ra the angle of rotation, in radians.
+   * @return this rotation-only matrix.
+   */
+  public Matrix44 setRotateZ(double ra) {
+    double ca = Math.cos(ra);
+    double sa = Math.sin(ra);
+    set( ca, -sa, 0.0, 0.0,
+         sa,  ca, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0);
+    return this;
+  }
+
+  /**
+   * Sets this matrix to a orthographic-projection matrix. Parameters 
+   * correspond to those for the OpenGL standard function glOrtho.
+   * @param left the coordinate for the left clipping plane.
+   * @param right the coordinate for the right clipping plane.
+   * @param bottom the coordinate for the bottom clipping plane.
+   * @param top the coordinate for the top clipping plane.
+   * @param znear the distance to the near depth clipping plane
+   * @param zfar the distance to the far depth clipping plane
+   * @return this orthographic-projection matrix.
+   */
+  public Matrix44 setOrtho(
+    double left, double right, 
+    double bottom, double top, 
+    double znear, double zfar)
+  {
+    Check.argument(left!=right,"left!=right");
+    Check.argument(bottom!=top,"bottom!=top");
+    Check.argument(znear!=zfar,"znear!=zfar");
+    double tx = -(right+left)/(right-left);
+    double ty = -(top+bottom)/(top-bottom);
+    double tz = -(zfar+znear)/(zfar-znear);
+    double sx =  2.0/(right-left);
+    double sy =  2.0/(top-bottom);
+    double sz = -2.0/(zfar-znear);
+    set( sx, 0.0, 0.0,  tx,
+        0.0,  sy, 0.0,  ty,
+        0.0, 0.0,  sz,  tz,
+        0.0, 0.0, 0.0, 1.0);
+    return this;
+  }
+
+  /**
+   * Sets this matrix to a perspective-projection matrix. Parameters 
+   * correspond to those for the OpenGL standard function glFrustum.
+   * @param left the coordinate for the left clipping plane.
+   * @param right the coordinate for the right clipping plane.
+   * @param bottom the coordinate for the bottom clipping plane.
+   * @param top the coordinate for the top clipping plane.
+   * @param znear the distance to the near depth clipping plane
+   * @param zfar the distance to the far depth clipping plane
+   * @return this perspective-projection matrix.
+   */
+  public Matrix44 setFrustum(
+    double left, double right, 
+    double bottom, double top, 
+    double znear, double zfar)
+  {
+    Check.argument(left!=right,"left!=right");
+    Check.argument(bottom!=top,"bottom!=top");
+    Check.argument(znear!=zfar,"znear!=zfar");
+    double sx =  2.0*znear/(right-left);
+    double sy =  2.0*znear/(top-bottom);
+    double a = (right+left)/(right-left);
+    double b = (top+bottom)/(top-bottom);
+    double c = (zfar+znear)/(zfar-znear);
+    double d = -2.0*zfar*znear/(zfar-znear);
+    set( sx,  0.0,    a,  0.0,
+        0.0,   sy,    b,  0.0,
+        0.0,  0.0,    c,    d,
+        0.0,  0.0, -1.0,  0.0);
+    return this;
   }
 
   public String toString() {
