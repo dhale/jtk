@@ -19,7 +19,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.21
  */
-public class BoundingBox {
+public class BoundingBox implements Cloneable {
 
   /**
    * Constructs an empty bounding box.
@@ -76,6 +76,10 @@ public class BoundingBox {
     _zmax = zmax;
   }
 
+  public BoundingBox clone() {
+    return new BoundingBox(_xmin,_ymin,_zmin,_xmax,_ymax,_zmax);
+  }
+
   /**
    * Determines whether this box is empty.
    * @return true, if empty; false, otherwise.
@@ -128,6 +132,22 @@ public class BoundingBox {
   }
 
   /**
+   * Gets the point at a specified corner of this box.
+   * The corner is specified by index, an integer between 0 and 7. From
+   * least to most significant, the three bits of this index correspond 
+   * to x, y, and z coordinates of a corner point. A zero bit selects a
+   * minimum coordinate; a one bit selects a maximum coordinate.
+   * @param index the corner index.
+   * @return the corner point.
+   */
+  public Point3 getCorner(int index) {
+    double x = ((index&1)==0)?_xmin:_xmax;
+    double y = ((index&2)==0)?_ymin:_ymax;
+    double z = ((index&4)==0)?_zmin:_zmax;
+    return new Point3(x,y,z);
+  }
+
+  /**
    * Expands this box to include the point with specified coordinates.
    * @param x the point x coordinate.
    * @param y the point y coordinate.
@@ -155,6 +175,8 @@ public class BoundingBox {
    * @param bb the bounding box.
    */
   public void expandBy(BoundingBox bb) {
+    if (bb.isEmpty())
+      return;
     if (_xmin>bb._xmin) _xmin = bb._xmin;
     if (_ymin>bb._ymin) _ymin = bb._ymin;
     if (_zmin>bb._zmin) _zmin = bb._zmin;
@@ -168,6 +190,8 @@ public class BoundingBox {
    * @param bs the bounding sphere.
    */
   public void expandBy(BoundingSphere bs) {
+    if (bs.isEmpty())
+      return;
     Point3 c = bs.getCenter();
     double x = c.x;
     double y = c.y;

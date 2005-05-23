@@ -86,7 +86,8 @@ public class Vector3 extends Tuple3 {
    * @return the unit vector.
    */
   public Vector3 normalize() {
-    double s = 1.0/length();
+    double d = length();
+    double s = (d>0.0)?1.0/d:1.0;
     return new Vector3(x*s,y*s,z*s);
   }
 
@@ -95,7 +96,27 @@ public class Vector3 extends Tuple3 {
    * @return this vector, normalized.
    */
   public Vector3 normalizeEquals() {
-    double s = 1.0/length();
+    double d = length();
+    double s = (d>0.0)?1.0/d:1.0;
+    x *= s;
+    y *= s;
+    z *= s;
+    return this;
+  }
+
+  /**
+   * Returns the scaled vector s*u for this vector u.
+   * @return the scaled vector.
+   */
+  public Vector3 times(double s) {
+    return new Vector3(x*s,y*s,z*s);
+  }
+
+  /**
+   * Scales this vector.
+   * @return this vector, scaled.
+   */
+  public Vector3 timesEquals(double s) {
     x *= s;
     y *= s;
     z *= s;
