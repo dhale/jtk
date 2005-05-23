@@ -197,12 +197,12 @@ public class BoundingBox implements Cloneable {
     double y = c.y;
     double z = c.z;
     double r = bs.getRadius();
-    if (x-r<_xmin) _xmin = x-r;
-    if (y-r<_ymin) _ymin = y-r;
-    if (z-r<_zmin) _zmin = z-r;
-    if (x+r>_xmax) _xmax = x+r;
-    if (y+r>_ymax) _ymax = y+r;
-    if (z+r>_zmax) _zmax = z+r;
+    if (_xmin>x-r) _xmin = x-r;
+    if (_ymin>y-r) _ymin = y-r;
+    if (_zmin>z-r) _zmin = z-r;
+    if (_xmax<x+r) _xmax = x+r;
+    if (_ymax<y+r) _ymax = y+r;
+    if (_zmax<z+r) _zmax = z+r;
   }
 
   /**

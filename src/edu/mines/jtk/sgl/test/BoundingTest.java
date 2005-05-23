@@ -23,6 +23,32 @@ public class BoundingTest extends TestCase {
   }
 
   public void testBox() {
+    BoundingBox bb = new BoundingBox();
+    bb.expandBy(0,0,0);
+    bb.expandBy(1,1,1);
+    double a = 10.0*DBL_EPSILON;
+    double b = 1.0-a;
+    assertTrue(bb.contains(new Point3(a,a,a)));
+    assertTrue(bb.contains(new Point3(a,a,b)));
+    assertTrue(bb.contains(new Point3(a,b,a)));
+    assertTrue(bb.contains(new Point3(a,b,b)));
+    assertTrue(bb.contains(new Point3(b,a,a)));
+    assertTrue(bb.contains(new Point3(b,a,b)));
+    assertTrue(bb.contains(new Point3(b,b,a)));
+    assertTrue(bb.contains(new Point3(b,b,b)));
+    a = -10.0*DBL_EPSILON;
+    b = 1.0-a;
+    assertTrue(!bb.contains(new Point3(a,a,a)));
+    assertTrue(!bb.contains(new Point3(a,a,b)));
+    assertTrue(!bb.contains(new Point3(a,b,a)));
+    assertTrue(!bb.contains(new Point3(a,b,b)));
+    assertTrue(!bb.contains(new Point3(b,a,a)));
+    assertTrue(!bb.contains(new Point3(b,a,b)));
+    assertTrue(!bb.contains(new Point3(b,b,a)));
+    assertTrue(!bb.contains(new Point3(b,b,b)));
+  }
+
+  public void testBoxExpand() {
     int ntrial = 100;
     for (int itrial=0; itrial<ntrial; ++itrial) {
       BoundingBox bb = new BoundingBox();
@@ -45,6 +71,32 @@ public class BoundingTest extends TestCase {
   }
 
   public void testSphere() {
+    BoundingSphere bs = new BoundingSphere();
+    bs.expandBy(0,0,0);
+    bs.expandBy(1,1,1);
+    double a = 10.0*DBL_EPSILON;
+    double b = 1.0-a;
+    assertTrue(bs.contains(new Point3(a,a,a)));
+    assertTrue(bs.contains(new Point3(a,a,b)));
+    assertTrue(bs.contains(new Point3(a,b,a)));
+    assertTrue(bs.contains(new Point3(a,b,b)));
+    assertTrue(bs.contains(new Point3(b,a,a)));
+    assertTrue(bs.contains(new Point3(b,a,b)));
+    assertTrue(bs.contains(new Point3(b,b,a)));
+    assertTrue(bs.contains(new Point3(b,b,b)));
+    a = -10.0*DBL_EPSILON;
+    b = 1.0-a;
+    assertTrue(!bs.contains(new Point3(a,a,a)));
+    assertTrue(!bs.contains(new Point3(a,a,b)));
+    assertTrue(!bs.contains(new Point3(a,b,a)));
+    assertTrue(!bs.contains(new Point3(a,b,b)));
+    assertTrue(!bs.contains(new Point3(b,a,a)));
+    assertTrue(!bs.contains(new Point3(b,a,b)));
+    assertTrue(!bs.contains(new Point3(b,b,a)));
+    assertTrue(!bs.contains(new Point3(b,b,b)));
+  }
+
+  public void testSphereExpand() {
     int ntrial = 100;
     for (int itrial=0; itrial<ntrial; ++itrial) {
       BoundingSphere bs = new BoundingSphere();
