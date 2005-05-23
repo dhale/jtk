@@ -60,7 +60,7 @@ public class BoundingSphere implements Cloneable {
    * @return true, if empty; false, otherwise.
    */
   public boolean isEmpty() {
-    return _r>=0.0;
+    return _r<0.0;
   }
 
   /**
@@ -189,10 +189,10 @@ public class BoundingSphere implements Cloneable {
           _z = 0.5*(za+zb);
         }
       } else {
+        _r = bs._r;
         _x = bs._x;
         _y = bs._y;
         _z = bs._z;
-        _r = bs._r;
       }
     }
   }
@@ -213,10 +213,10 @@ public class BoundingSphere implements Cloneable {
         if (r>_r)
           _r = r;
       } else {
+        _r = bs._r;
         _x = bs._x;
         _y = bs._y;
         _z = bs._z;
-        _r = bs._r;
       }
     }
   }
@@ -262,7 +262,7 @@ public class BoundingSphere implements Cloneable {
       double dx = xmax-xmin;
       double dy = ymax-ymin;
       double dz = zmax-zmin;
-      _r = 0.25*(dx*dx+dy*dy+dz*dz);
+      _r = 0.5*sqrt(dx*dx+dy*dy+dz*dz);
       _x = 0.5*(xmin+xmax);
       _y = 0.5*(ymin+ymax);
       _z = 0.5*(zmin+zmax);
@@ -295,7 +295,7 @@ public class BoundingSphere implements Cloneable {
         double dx = xmax-xmin;
         double dy = ymax-ymin;
         double dz = zmax-zmin;
-        _r = 0.25*(dx*dx+dy*dy+dz*dz);
+        _r = 0.5*sqrt(dx*dx+dy*dy+dz*dz);
         _x = 0.5*(xmin+xmax);
         _y = 0.5*(ymin+ymax);
         _z = 0.5*(zmin+zmax);
