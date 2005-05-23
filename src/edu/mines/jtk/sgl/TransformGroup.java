@@ -7,10 +7,47 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import static edu.mines.jtk.opengl.Gl.*;
+
 /**
- * A group node with a coordinate transform.
+ * A group node that transforms the coordinates for its children.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.21
  */
 public class TransformGroup extends Group {
+
+  /**
+   * Constructs a new transform group with specified transform.
+   * @param transform the transform; copied, not referenced.
+   */
+  public TransformGroup(Matrix44 transform) {
+    _transform = transform.clone();
+  }
+
+  /**
+   * Gets the transform for this group.
+   * @return the transform; by copy, not by reference.
+   */
+  public Matrix44 getTransform() {
+    return _transform.clone();
+  }
+
+  public void drawBegin(DrawContext dc) {
+    glPushMatrix();
+    glMultMatrixd(_transform.m);
+    dc.pushTransform(_transform);
+  }
+
+  public void draw(DrawContext dc) {
+  }
+
+  public void drawEnd(DrawContext dc) {
+    dc.popTransform();
+    glPopMatrix();
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // private
+
+  private Matrix44 _transform;
 }

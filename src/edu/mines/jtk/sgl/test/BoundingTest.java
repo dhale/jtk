@@ -12,9 +12,9 @@ import edu.mines.jtk.sgl.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * Tests classes for matrix, point, and vector math.
+ * Tests classes for bounding box and sphere.
  * @author Dave Hale
- * @version 2005.05.20
+ * @version 2005.05.23
  */
 public class BoundingTest extends TestCase {
   public static void main(String[] args) {

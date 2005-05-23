@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.sgl;
 
 import java.util.*;
+import static edu.mines.jtk.opengl.Gl.*;
 
 /**
  * A node in the scene graph.
@@ -31,10 +32,12 @@ public class Node {
   }
 
   public void drawBegin(DrawContext dc) {
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
   }
   public void draw(DrawContext dc) {
   }
   public void drawEnd(DrawContext dc) {
+    glPopAttrib();
   }
 
   ///////////////////////////////////////////////////////////////////////////
