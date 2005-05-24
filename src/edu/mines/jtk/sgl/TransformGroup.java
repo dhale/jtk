@@ -32,16 +32,24 @@ public class TransformGroup extends Group {
     return _transform.clone();
   }
 
-  public void drawBegin(DrawContext dc) {
+  ///////////////////////////////////////////////////////////////////////////
+  // protected
+
+  /**
+   * Pushes the transform matrix onto the specified drawing context.
+   * @param the drawing context.
+   */
+  protected void drawBegin(DrawContext dc) {
     glPushMatrix();
     glMultMatrixd(_transform.m);
     dc.pushTransform(_transform);
   }
 
-  public void draw(DrawContext dc) {
-  }
-
-  public void drawEnd(DrawContext dc) {
+  /**
+   * Pops the transform matrix from the specified drawing context.
+   * @param the drawing context.
+   */
+  protected void drawEnd(DrawContext dc) {
     dc.popTransform();
     glPopMatrix();
   }
