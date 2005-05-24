@@ -59,7 +59,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   </target>
 
   <!-- Compile Java -->
-  <target name="compile-java" depends="init,copy-linux,copy-windows">
+  <target name="compile-java" depends="init">
     <javac srcdir="${build.src}" destdir="${build.cls}"
       compiler="javac1.5"
       debug="on" 
@@ -73,19 +73,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       deprecation="on">
       <compilerarg value="-Xlint:unchecked"/>
       <classpath refid="classpath"/>
-      <exclude name="edu/mines/jtk/opengl/linuxgtk/**"/>
-      <exclude name="edu/mines/jtk/opengl/win32/**"/>
       <exclude name="**/old/*"/>
       <exclude name="**/new/*"/>
     </javac>
-  </target>
-  <target name="copy-linux" depends="init" if="linux">
-    <copy file="${src}/edu/mines/jtk/opengl/linuxgtk/SwtHooks.java"
-      todir="${build.src}/edu/mines/jtk/opengl"/>
-  </target>
-  <target name="copy-windows" depends="init" if="windows">
-    <copy file="${src}/edu/mines/jtk/opengl/win32/SwtHooks.java"
-      todir="${build.src}/edu/mines/jtk/opengl"/>
   </target>
 
   <!-- Build Java archive -->
