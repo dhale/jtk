@@ -13,5 +13,5 @@ import edu.mines.jtk.opengl.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.21
  */
-public class ViewCanvas extends GlAwtCanvas {
+public class ViewCanvas extends GlCanvas {
 }

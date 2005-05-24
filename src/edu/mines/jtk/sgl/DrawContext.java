@@ -12,4 +12,8 @@ package edu.mines.jtk.sgl;
  * @version 2005.05.21
  */
 public class DrawContext extends TransformContext {
+  public DrawContext(Node root) {
+    // TODO: need more arguments
+    super(root);
+  }
 }

@@ -25,8 +25,6 @@ public class AwtBench {
 
   public static void main(String[] args) {
     testImage();
-    //testNativeJFrame();
-    //testNativeFrame();
     //benchPrimitives();
   }
 
@@ -142,37 +140,6 @@ public class AwtBench {
     private double _xushift,_xuscale,_yushift,_yuscale;
     private double _xdshift,_xdscale,_ydshift,_ydscale;
     Graphics2D _g2d;
-  }
-
-  private static void testNativeJFrame() {
-    JFrame frame = new JFrame();
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(new Dimension(500,200));
-    frame.getContentPane().add(new NativeCanvas());
-    frame.setVisible(true);
-  }
-
-  private static void testNativeFrame() {
-    Frame frame = new Frame();
-    frame.setBounds(100,100,500,200);
-    frame.add(new NativeCanvas());
-    frame.addWindowListener(new WindowAdapter() {
-      public void windowClosing(WindowEvent event) {
-        System.exit(0);
-      }
-    });
-    frame.setVisible(true);
-  }
-
-  private static class NativeCanvas extends Canvas {
-    private static final long serialVersionUID = 1L;
-    public void paint(Graphics g) {
-      paintNative(this);
-    }
-    private static native void paintNative(Canvas canvas);
-    static {
-      System.loadLibrary("edu_mines_jtk_bench");
-    }
   }
 
   private static void benchPrimitives() {

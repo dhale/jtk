@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opengl;
 
+import java.awt.Canvas;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -36,25 +37,11 @@ import edu.mines.jtk.util.Check;
 public class GlContext {
 
   /**
-   * Constructs an OpenGL context for the specified AWT canvas.
+   * Constructs an OpenGL context for the specified canvas.
    * @param canvas the canvas.
    */
-  public GlContext(java.awt.Canvas canvas) {
+  public GlContext(Canvas canvas) {
     _peer = makeGlAwtCanvasContext(canvas);
-    Check.state(_peer!=0,"successfully created OpenGL context peer");
-  }
-
-  /**
-   * Constructs an OpenGL context for the specified SWT canvas.
-   * @param canvas the canvas.
-   */
-  public GlContext(org.eclipse.swt.widgets.Canvas canvas) {
-    _swtHooks = new SwtHooks(canvas);
-    long xdisplay = _swtHooks.xdisplay;
-    long xdrawable = _swtHooks.xdrawable;
-    long hwnd = _swtHooks.hwnd;
-    long hdc = _swtHooks.hdc;
-    _peer = makeGlSwtCanvasContext(xdisplay,xdrawable,hwnd,hdc);
     Check.state(_peer!=0,"successfully created OpenGL context peer");
   }
 
@@ -113,7 +100,6 @@ public class GlContext {
     Check.state(_peer!=0,"this OpenGL context has not been disposed");
     Check.state(!_locked,"this OpenGL context is not locked in any thread");
     killGlContext(_peer);
-    _swtHooks.dispose();
     _peer = 0;
     _gotProcAddresses = false;
   }
@@ -133,16 +119,12 @@ public class GlContext {
   // private
 
   private long _peer; // C++ peer of this OpenGL context
-  private SwtHooks _swtHooks; // SWT hooks (for X11 or WIN32)
   private ReentrantLock _lock = new ReentrantLock(); // mutual exclusion lock
   private boolean _gotProcAddresses; // true if got addresses for 1.[2-5]
   private boolean _locked; // true, if this context locked in any thread
 
   private static native void killGlContext(long peer);
-  private static native long makeGlAwtCanvasContext(java.awt.Canvas canvas);
-  private static native long makeGlSwtCanvasContext(
-    long xdisplay, long xdrawable,
-    long hwnd, long hdc);
+  private static native long makeGlAwtCanvasContext(Canvas canvas);
   private static native boolean lock(long peer);
   private static native boolean unlock(long peer);
   private static native boolean swapBuffers(long peer);
