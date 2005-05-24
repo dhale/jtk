@@ -33,11 +33,12 @@ public class Node {
   }
 
   /**
-   * Marks dirty the drawing of this node. Calling this method forces
-   * a drawing traversal of the scene graph containing this node.
+   * Marks dirty the drawing of this node. Calling this method causes
+   * a repaint of all view canvases in which this node may be rendered.
    */
   public void dirtyDraw() {
-    _drawDirty = true;
+    for (Group parent : _parentList)
+      parent.dirtyDraw();
   }
 
   /**
@@ -168,7 +169,6 @@ public class Node {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private boolean _drawDirty = true;
   private boolean _boundingSphereDirty = true;
   private BoundingSphere _boundingSphere = null;
   private ArrayList<Group> _parentList = new ArrayList<Group>(2);

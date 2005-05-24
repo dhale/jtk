@@ -51,6 +51,22 @@ public class World extends Group {
     return _viewList.iterator();
   }
 
+  /**
+   * Marks dirty the drawing of this world. Calling this method causes
+   * a repaint of all views of this world.
+   */
+  public void dirtyDraw() {
+    repaint();
+  }
+
+  /**
+   * Repaints all views of this world.
+   */
+  public void repaint() {
+    for (View view : _viewList)
+      view.repaint();
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 

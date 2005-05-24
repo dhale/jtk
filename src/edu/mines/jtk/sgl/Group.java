@@ -71,6 +71,10 @@ public class Group extends Node {
     drawEnd(dc);
   }
   
+  /**
+   * Computes the bounding sphere for this group, including its children.
+   * @return the computed bounding sphere.
+   */
   protected BoundingSphere computeBoundingSphere() {
     BoundingBox bb = new BoundingBox();
     for (Node child : _childList)
