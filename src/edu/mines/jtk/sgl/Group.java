@@ -66,8 +66,8 @@ public class Group extends Node {
    */
   protected void drawNode(DrawContext dc) {
     drawBegin(dc);
-    for (Node node : _childList)
-      node.drawNode(dc);
+    for (Node child : _childList)
+      child.drawNode(dc);
     drawEnd(dc);
   }
   

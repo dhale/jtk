@@ -11,7 +11,10 @@ import java.util.*;
 
 /**
  * A world is a root node in the scene graph.
- * A world can have a view
+ * <p>
+ * A world maintains a list of views. When a node in the scene graph must 
+ * be redrawn, the world updates those views.
+ * the world changes.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.21
  */
