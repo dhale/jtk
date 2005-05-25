@@ -12,11 +12,10 @@ import java.util.*;
 /**
  * A world is a root node in the scene graph.
  * <p>
- * A world maintains a list of views. When a node in the scene graph must 
- * be redrawn, the world updates those views.
- * the world changes.
+ * A world maintains a list of views in which it is drawn. When a world
+ * must be redrawn, it requests a repaint of its views.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.05.21
+ * @version 2005.05.24
  */
 public class World extends Group {
 
@@ -29,7 +28,7 @@ public class World extends Group {
   }
 
   /**
-   * Removes the specified view from this world.
+   * Removes the specified view of this world.
    * @param view the view.
    */
   public void removeView(View view) {
@@ -38,6 +37,7 @@ public class World extends Group {
 
   /**
    * Returns the number of views of this world.
+   * @return the number of views.
    */
   public int countViews() {
     return _viewList.size();
@@ -52,15 +52,24 @@ public class World extends Group {
   }
 
   /**
-   * Marks dirty the drawing of this world. Calling this method causes
-   * a repaint of all views of this world.
+   * Marks dirty the drawing of this world. 
+   * This method requests a repaint of all views of this world.
    */
   public void dirtyDraw() {
     repaint();
   }
 
   /**
-   * Repaints all views of this world.
+   * Marks dirty the bounding sphere of this world.
+   */
+  public void dirtyBoundingSphere() {
+    super.dirtyBoundingSphere();
+    for (View view : _viewList)
+      view.updateTransforms();
+  }
+
+  /**
+   * Requests a repaint of all views of this world.
    */
   public void repaint() {
     for (View view : _viewList)
