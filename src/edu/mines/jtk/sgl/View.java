@@ -24,22 +24,25 @@ import static edu.mines.jtk.opengl.Gl.*;
  * <p>
  * All three transforms - world-to-view, view-to-cube, and cube-to-pixel -
  * are view-dependent. Because the latter two transforms may vary among
- * the multiple view canvases on which a view is painted, those transforms 
+ * the multiple view canvases on which a view paints, those transforms 
  * are stored with each view canvas. Nevertheless, the view is responsible 
  * for updating the view-to-cube and cube-to-pixel transforms for each view 
- * canvas on which it is painted.
+ * canvas on which it paints.
  * <p>
  * When changes to its world might invalidate one or more of these three 
  * transforms, the abstract method {@link #updateTransforms(World)} for a 
  * view is called. Likewise, when changes to one of its view canvases might 
  * invalidate one or more of these three transforms, the abstract method 
  * {@link #updateTransforms(ViewCanvas)} is called. Classes that extend
- * this base class must implement these two methods in view-specific ways.
+ * this abstract base class must implement these two methods.
  * <p>
- * A view paints itself by simply calling the methods
- * (1) {@link #paintCanvas(ViewCanvas)}, (2) {@link #paintView(ViewCanvas)}, 
- * and (3) {@link #paintWorld(ViewCanvas)}, in that order. (See the method 
- * {@link #paintAll(ViewCanvas)} below.)
+ * A view paints its world on a canvas by simply calling its methods
+ * (1) {@link #paintCanvas(ViewCanvas)}, 
+ * (2) {@link #paintView(ViewCanvas)}, and
+ * (3) {@link #paintWorld(ViewCanvas)}, 
+ * in that order, in its method {@link #paintAll(ViewCanvas)}.
+ * This base class provides useful implementations of these methods,
+ * which may be overridden, to customize the view.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.24
  */
@@ -99,7 +102,7 @@ public abstract class View {
   }
 
   /**
-   * Returns the number of canvases on which this view is painted.
+   * Returns the number of canvases on which this view paints.
    * @return the number of canvases.
    */
   public int countCanvases() {
@@ -107,7 +110,7 @@ public abstract class View {
   }
 
   /**
-   * Gets an iterator for the canvases on which this view is painted.
+   * Gets an iterator for the canvases on which this view paints.
    * @return the iterator.
    */
   public Iterator<ViewCanvas> getCanvases() {
@@ -115,7 +118,7 @@ public abstract class View {
   }
 
   /**
-   * Repaints all canvases on which this view is painted.
+   * Repaints all canvases on which this view paints.
    */
   public void repaint() {
     for (ViewCanvas canvas : _canvasList)

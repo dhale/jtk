@@ -17,20 +17,25 @@ public class OrbitView extends View {
   // protected
 
   /**
-   * Updates the transforms managed by this view.
+   * Updates transforms for the world painted by this view.
    * Classes that extend this base class must implement this method.
-   * This method is called when the world painted in a view has changed 
-   * so that a new world-to-view transform may be required.
+   * <p>
+   * This method is called when the world-to-view transform of this 
+   * view might require updating; e.g., when the bounds of the specified 
+   * world have changed. Furthermore, this method might also update the 
+   * view-to-cube and cube-to-pixel transforms of its view canvases.
+   * @param world the world.
    */
-  protected void updateTransforms() {
+  protected void updateTransforms(World world) {
   }
 
   /**
-   * Updates the transforms for a canvas on which this view is painted.
+   * Updates the transforms for a canvas on which this view paints.
    * Classes that extend this base class must implement this method.
-   * This method is called when the view-to-cube and/or cube-to-pixel
-   * transforms of the specified view canvas must be recomputed; e.g.,
-   * when the canvas has been resized. 
+   * <p>
+   * This method is called when the view-to-cube and cube-to-pixel
+   * transforms of the specified view canvas might require updating; 
+   * e.g., when the canvas has been resized.
    * @param canvas the view canvas.
    */
   protected void updateTransforms(ViewCanvas canvas) {

@@ -9,14 +9,11 @@ package edu.mines.jtk.sgl;
 import edu.mines.jtk.opengl.*;
 
 /**
- * An OpenGL canvas that paints a view of a world (scenegraph).
+ * An OpenGL canvas on which a view paints its world.
  * <p>
- * The relationship between views and view canvases is one-to-many.
- * Each view canvas can paint exactly one view, but a view can be
- * painted on one or more view canvases.
- * <p>
- * The view canvas paints its view in response to paint events.
- * It sets up all the 
+ * The relationship between views and view canvases is one-to-many. A view 
+ * canvas is managed by only one view, but that view may paint its world on
+ * on one or more view canvases.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.24
  */
@@ -37,9 +34,9 @@ public class ViewCanvas extends GlCanvas {
   }
 
   /**
-   * Sets the view painted on this canvas. Also, adds this canvas
-   * to the list of canvases on which the specified view is painted.
-   * @param view the view.
+   * Sets the view that paints on this canvas. Adds this canvas to the 
+   * list of canvases on which the specified view paints.
+   * @param view the view; null, if none.
    */
   public void setView(View view) {
     if (_view!=null)
