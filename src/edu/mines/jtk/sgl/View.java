@@ -49,7 +49,11 @@ public abstract class View {
    * @param world the world.
    */
   public void setWorld(World world) {
+    if (_world!=null)
+      _world.removeView(this);
     _world = world;
+    if (_world!=null)
+      _world.addView(this);
     repaint();
   }
 

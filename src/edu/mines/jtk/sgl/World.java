@@ -20,22 +20,6 @@ import java.util.*;
 public class World extends Group {
 
   /**
-   * Adds the specified view of this world.
-   * @param view the view.
-   */
-  public void addView(View view) {
-    _viewList.add(view);
-  }
-
-  /**
-   * Removes the specified view of this world.
-   * @param view the view.
-   */
-  public void removeView(View view) {
-    _viewList.remove(view);
-  }
-
-  /**
    * Returns the number of views of this world.
    * @return the number of views.
    */
@@ -53,9 +37,11 @@ public class World extends Group {
 
   /**
    * Marks dirty the drawing of this world. 
-   * This method requests a repaint of all views of this world.
+   * This implementation calls that of its base class, and
+   * then requests a repaint of all views of this world.
    */
   public void dirtyDraw() {
+    super.dirtyDraw();
     repaint();
   }
 
@@ -74,6 +60,28 @@ public class World extends Group {
   public void repaint() {
     for (View view : _viewList)
       view.repaint();
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // package
+
+  /**
+   * Called by View.setWorld(World).
+   */
+  boolean addView(View view) {
+    if (!_viewList.contains(view)) {
+      _viewList.add(view);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   * Called by View.setWorld(World).
+   */
+  boolean removeView(View view) {
+    return _viewList.remove(view);
   }
 
   ///////////////////////////////////////////////////////////////////////////
