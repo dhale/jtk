@@ -7,10 +7,16 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.sgl;
 
 import edu.mines.jtk.opengl.*;
-import static edu.mines.jtk.opengl.Gl.*;
 
 /**
- * An OpenGL canvas on which a view is painted.
+ * An OpenGL canvas that paints a view of a world (scenegraph).
+ * <p>
+ * The relationship between views and view canvases is one-to-many.
+ * Each view canvas can paint exactly one view, but a view can be
+ * painted on one or more view canvases.
+ * <p>
+ * The view canvas paints its view in response to paint events.
+ * It sets up all the 
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.24
  */
@@ -55,7 +61,7 @@ public class ViewCanvas extends GlCanvas {
   /**
    * Sets the view-to-cube transform for this canvas.
    * Typically, the view sets the view-to-cube transform.
-   * @param viewToCube the view-to-cube transform.
+   * @param viewToCube the view-to-cube transform; copied, not referenced.
    */
   public void setViewToCube(Matrix44 viewToCube) {
     _viewToCube = viewToCube.clone();
@@ -64,16 +70,16 @@ public class ViewCanvas extends GlCanvas {
 
   /**
    * Gets the view-to-cube transform for this canvas.
-   * @return the view-to-cube transform.
+   * @return the view-to-cube transform; by copy, not by reference.
    */
   public Matrix44 getViewToCube() {
-    return _viewToCube;
+    return _viewToCube.clone();
   }
 
   /**
    * Sets the cube-to-pixel transform for this canvas.
    * Typically, the view sets the cube-to-pixel transform.
-   * @param cubeToPixel the cube-to-pixel transform.
+   * @param cubeToPixel the cube-to-pixel transform; copied, not referenced.
    */
   public void setCubeToPixel(Matrix44 cubeToPixel) {
     _cubeToPixel = cubeToPixel.clone();
@@ -82,51 +88,22 @@ public class ViewCanvas extends GlCanvas {
 
   /**
    * Gets the cube-to-pixel transform for this canvas.
-   * @return the cube-to-pixel transform.
+   * @return the cube-to-pixel transform; by copy, not by reference.
    */
   public Matrix44 getCubeToPixel() {
-    return _cubeToPixel;
+    return _cubeToPixel.clone();
   }
 
   public void glPaint() {
-    if (_view==null)
-      return;
-
-    // Viewport.
-    Point4 p = new Point4(-1.0,-1.0, 0.0, 1.0);
-    Point4 q = new Point4( 1.0, 1.0, 0.0, 1.0);
-    p = _cubeToPixel.times(p);
-    q = _cubeToPixel.times(q);
-    int x = Math.max(0,(int)(p.x+0.5));
-    int y = Math.max(0,(int)(p.y+0.5));
-    int w = Math.min( getWidth(),(int)(q.x-p.x+0.5));
-    int h = Math.min(getHeight(),(int)(q.y-p.y+0.5));
-    glViewport(x,y,w,h);
-
-    // Projection.
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixd(_viewToCube.m);
-
-    // View transform.
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixd(_view.getWorldToView().m);
-
-    // Draw the world.
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-    World world = _view.getWorld();
-    if (world!=null) {
-      DrawContext dc = new DrawContext(world);
-      world.drawNode(dc);
-    }
-    glFlush();
+    if (_view!=null)
+      _view.paintAll(this);
   }
 
   public void glResize(
     int width, int height, int widthBefore, int heightBefore)
   {
-    if (_view==null)
-      return;
-    _view.updateTransforms(this);
+    if (_view!=null)
+      _view.updateTransforms(this);
   }
 
   ///////////////////////////////////////////////////////////////////////////
