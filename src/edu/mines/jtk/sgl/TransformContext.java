@@ -13,13 +13,17 @@ package edu.mines.jtk.sgl;
  */
 public class TransformContext extends TraversalContext {
 
-  /**
-   * Constructs a transform context for the specified root node.
-   * @param root the root node.
-   */
-  public TransformContext(Node root) {
-    // TODO: need more arguments to initialize transforms
-    super(root);
+  public TransformContext() {
+    // TODO: get rid of this
+  }
+
+  public TransformContext(ViewCanvas canvas) {
+    View view = canvas.getView();
+    World world = view.getWorld();
+    _localToWorld = Matrix44.identity();
+    _worldToView = view.getWorldToView();
+    _viewToCube = canvas.getViewToCube();
+    _cubeToPixel = canvas.getCubeToPixel();
   }
 
   /**

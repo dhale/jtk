@@ -152,6 +152,10 @@ public abstract class View {
    */
   protected abstract void updateTransforms(ViewCanvas canvas);
 
+  protected abstract void cull(CullContext cc);
+
+  protected abstract void draw(DrawContext dc);
+
   /**
    * Draws the canvas-specific part of this view on the specified canvas.
    * The canvas-specific parts of a view include the OpenGL viewport and 
@@ -199,10 +203,12 @@ public abstract class View {
    * @param canvas the canvas on which this view is being drawn.
    */
   protected void drawWorld(ViewCanvas canvas) {
+    /*
     if (_world!=null) {
       DrawContext dc = new DrawContext(_world);
       _world.drawNode(dc);
     }
+    */
   }
 
   /**

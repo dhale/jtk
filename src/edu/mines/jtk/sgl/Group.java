@@ -59,16 +59,15 @@ public class Group extends Node {
   // protected
 
   /**
-   * Draws this node.
-   * This implementation first calls {@link #drawBegin(DrawContext)}.
-   * Then, for each child node, it calls {@link #drawNode(DrawContext)}.
-   * Finally, it calls {@link #drawEnd(DrawContext)}.
+   * Draws this node. This implementation of {@link Node.draw(DrawContext)}
+   * does nothing, and is final, because group nodes should not implement
+   * this method. Rather they should implement only the methods
+   * {@link Node.beginDraw(DrawContext)} and 
+   * {@link Node.endDraw(DrawContext)}, which bracket the drawing of their
+   * children.
    */
-  protected void drawNode(DrawContext dc) {
-    drawBegin(dc);
-    for (Node child : _childList)
-      child.drawNode(dc);
-    drawEnd(dc);
+  protected final void draw(DrawContext dc) {
+    assert false:"Group.draw(DrawContext) is never called";
   }
   
   /**

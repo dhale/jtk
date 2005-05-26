@@ -42,6 +42,7 @@ public class TransformGroup extends Group {
   protected void drawBegin(DrawContext dc) {
     glPushMatrix();
     glMultMatrixd(_transform.m);
+    dc.pushNode(this);
     dc.pushTransform(_transform);
   }
 
@@ -51,6 +52,7 @@ public class TransformGroup extends Group {
    */
   protected void drawEnd(DrawContext dc) {
     dc.popTransform();
+    dc.popNode();
     glPopMatrix();
   }
 

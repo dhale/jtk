@@ -40,4 +40,10 @@ public class OrbitView extends View {
    */
   protected void updateTransforms(ViewCanvas canvas) {
   }
+
+  protected void cull(CullContext cc) {
+  }
+
+  protected void draw(DrawContext dc) {
+  }
 }

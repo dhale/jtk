@@ -90,6 +90,22 @@ public class ViewCanvas extends GlCanvas {
     return _cubeToPixel.clone();
   }
 
+  /**
+   * Gets the OpenGL viewport rectangle for this canvas.
+   * Uses the cube-to-pixel transform for this canvas to compute the 
+   * lower-left corner (x,y), width, and height of the OpenGL viewport.
+   * @return array {x,y,width,height}
+   */
+  public int[] getViewport() {
+    Point4 p = _cubeToPixel.times(new Point4(-1.0,-1.0, 0.0, 1.0));
+    Point4 q = _cubeToPixel.times(new Point4( 1.0, 1.0, 0.0, 1.0));
+    int x = Math.max(0,(int)(p.x+0.5));
+    int y = Math.max(0,(int)(p.y+0.5));
+    int w = Math.min(getWidth(), (int)(q.x-p.x+0.5));
+    int h = Math.min(getHeight(),(int)(q.y-p.y+0.5));
+    return new int[]{x,y,w,h};
+  }
+
   public void glPaint() {
     if (_view!=null)
       _view.drawAll(this);

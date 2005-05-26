@@ -84,58 +84,45 @@ public class Node {
   }
 
   protected void cullBegin(CullContext cc) {
+    cc.pushNode(this);
   }
 
   protected void cull(CullContext cc) {
   }
 
   protected void cullEnd(CullContext cc) {
-  }
-
-  protected void cullNode(CullContext cc) {
-    cullBegin(cc);
-    cull(cc);
-    cullEnd(cc);
+    cc.popNode();
   }
 
   /**
-   * Begins drawing for this node.
-   * This implementation simply pushes all OpenGL attributes.
+   * Begins drawing for this node, in the specified context.
+   * This implementation pushes this node onto the drawing context,
+   * and then pushes (saves) all OpenGL attributes.
    * @param dc the draw context.
    */
   protected void drawBegin(DrawContext dc) {
+    dc.pushNode(this);
     glPushAttrib(GL_ALL_ATTRIB_BITS);
   }
 
   /**
-   * Draws this node. 
-   * Leaf nodes typically override this implementation, which does nothing.
+   * Draws this node, in the specified context. Leaf nodes typically 
+   * override this implementation, which does nothing. Group nodes
+   * do not implement this method.
    * @param dc the draw context.
    */
   protected void draw(DrawContext dc) {
   }
 
   /**
-   * Ends drawing for this node.
-   * This implementation simply pops all OpenGL attributes.
+   * Ends drawing for this node, in the specified context.
+   * This implementation pops (restores) any OpenGL attributes that were 
+   * pushed (saved) and then pops this node from the drawing context.
    * @param dc the draw context.
    */
   protected void drawEnd(DrawContext dc) {
     glPopAttrib();
-  }
-
-  /**
-   * Draws this node.
-   * This implementation calls 
-   * (1) {@link #drawBegin(DrawContext)},
-   * (2) {@link #draw(DrawContext)}, and
-   * (3) {@link #drawEnd(DrawContext)}.
-   * @param dc the draw context.
-   */
-  protected void drawNode(DrawContext dc) {
-    drawBegin(dc);
-    draw(dc);
-    drawEnd(dc);
+    dc.popNode();
   }
 
   ///////////////////////////////////////////////////////////////////////////

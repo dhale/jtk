@@ -6,14 +6,19 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import java.util.*;
+
 /**
  * A transform context for view frustum culling.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.21
  */
 public class CullContext extends TransformContext {
-  public CullContext(Node root) {
-    // TODO: need more arguments
-    super(root);
+
+  public void add(Node node) {
+
   }
+
+  private DrawList _drawList;
+  private ArrayList<Node> _nodes;
 }
