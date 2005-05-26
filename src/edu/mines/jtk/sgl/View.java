@@ -14,8 +14,8 @@ import static edu.mines.jtk.opengl.Gl.*;
 /**
  * An abstract view of a world.
  * <p>
- * A view paints its world on one or more view canvases. The simplest 
- * and typical scenario is that a view paints on only one canvas.
+ * A view draws its world on one or more view canvases. The simplest 
+ * and typical scenario is that a view draws on only one canvas.
  * <p>
  * A view manages a world-to-view transform, which is that part of the 
  * OpenGL modelview transform that depends on the view. A view also 
@@ -24,23 +24,23 @@ import static edu.mines.jtk.opengl.Gl.*;
  * <p>
  * All three transforms - world-to-view, view-to-cube, and cube-to-pixel -
  * are view-dependent. Because the latter two transforms may vary among
- * the multiple view canvases on which a view paints, those transforms 
+ * the multiple view canvases on which a view draws, those transforms 
  * are stored with each view canvas. Nevertheless, the view is responsible 
  * for updating the view-to-cube and cube-to-pixel transforms for each view 
- * canvas on which it paints.
+ * canvas on which it draws.
  * <p>
- * When changes to its world might invalidate one or more of these three 
- * transforms, the abstract method {@link #updateTransforms(World)} for a 
- * view is called. Likewise, when changes to one of its view canvases might 
- * invalidate one or more of these three transforms, the abstract method 
- * {@link #updateTransforms(ViewCanvas)} is called. Classes that extend
- * this abstract base class must implement these two methods.
+ * When changes to a view's world might invalidate one or more of these 
+ * three transforms, the abstract method {@link #updateTransforms(World)} 
+ * for that view is called. Likewise, when changes to one of its view 
+ * canvases might invalidate one or more of these three transforms, the 
+ * abstract method {@link #updateTransforms(ViewCanvas)} is called. Classes 
+ * that extend this abstract base class must implement these two methods.
  * <p>
- * A view paints its world on a canvas by simply calling its methods
- * (1) {@link #paintCanvas(ViewCanvas)}, 
- * (2) {@link #paintView(ViewCanvas)}, and
- * (3) {@link #paintWorld(ViewCanvas)}, 
- * in that order, in its method {@link #paintAll(ViewCanvas)}.
+ * A view draws its world on a canvas by simply calling its methods
+ * (1) {@link #drawCanvas(ViewCanvas)}, 
+ * (2) {@link #drawView(ViewCanvas)}, and
+ * (3) {@link #drawWorld(ViewCanvas)}, 
+ * in that order, in its method {@link #drawAll(ViewCanvas)}.
  * This base class provides useful implementations of these methods,
  * which may be overridden, to customize the view.
  * @author Dave Hale, Colorado School of Mines
@@ -63,7 +63,7 @@ public abstract class View {
   }
 
   /**
-   * Sets the world painted in this view.
+   * Sets the world drawn by this view.
    * Then repaints this view.
    * @param world the world.
    */
@@ -77,7 +77,7 @@ public abstract class View {
   }
 
   /**
-   * Gets the world painted in this view.
+   * Gets the world drawn by in this view.
    */
   public World getWorld() {
     return _world;
@@ -102,7 +102,7 @@ public abstract class View {
   }
 
   /**
-   * Returns the number of canvases on which this view paints.
+   * Returns the number of canvases on which this view draws.
    * @return the number of canvases.
    */
   public int countCanvases() {
@@ -110,7 +110,7 @@ public abstract class View {
   }
 
   /**
-   * Gets an iterator for the canvases on which this view paints.
+   * Gets an iterator for the canvases on which this view draws.
    * @return the iterator.
    */
   public Iterator<ViewCanvas> getCanvases() {
@@ -118,7 +118,7 @@ public abstract class View {
   }
 
   /**
-   * Repaints all canvases on which this view paints.
+   * Repaints all canvases on which this view draws.
    */
   public void repaint() {
     for (ViewCanvas canvas : _canvasList)
@@ -130,7 +130,7 @@ public abstract class View {
   // protected
 
   /**
-   * Updates transforms for the world painted by this view.
+   * Updates transforms for the world drawn by this view.
    * Classes that extend this base class must implement this method.
    * <p>
    * This method is called when the world-to-view transform of this 
@@ -142,7 +142,7 @@ public abstract class View {
   protected abstract void updateTransforms(World world);
 
   /**
-   * Updates the transforms for a canvas on which this view paints.
+   * Updates the transforms for a canvas on which this view draws.
    * Classes that extend this base class must implement this method.
    * <p>
    * This method is called when the view-to-cube and cube-to-pixel
@@ -153,14 +153,14 @@ public abstract class View {
   protected abstract void updateTransforms(ViewCanvas canvas);
 
   /**
-   * Paints the canvas-specific part of this view on the specified canvas.
+   * Draws the canvas-specific part of this view on the specified canvas.
    * The canvas-specific parts of a view include the OpenGL viewport and 
    * projection matrix, which this method sets using the cube-to-pixel and
    * view-to-cube transforms of the specified canvas. This method also 
    * clears the color and depth buffers.
-   * @param canvas the canvas on which this view is being painted.
+   * @param canvas the canvas on which this view is being drawn.
    */
-  protected void paintCanvas(ViewCanvas canvas) {
+  protected void drawCanvas(ViewCanvas canvas) {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     // Viewport.
@@ -179,47 +179,45 @@ public abstract class View {
     Matrix44 viewToCube = canvas.getViewToCube();
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixd(viewToCube.m);
-    glMatrixMode(GL_MODELVIEW);
   }
 
   /**
-   * Paints the view-specific part of this view on the specified canvas.
+   * Draws the view-specific part of this view on the specified canvas.
    * The view-specific part of a view includes the world-to-view transform,
    * which this method loads into the OpenGL modelview matrix stack.
-   * @param canvas the canvas on which this view is being painted.
+   * @param canvas the canvas on which this view is being drawn.
    */
-  protected void paintView(ViewCanvas canvas) {
+  protected void drawView(ViewCanvas canvas) {
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixd(_worldToView.m);
   }
 
   /**
-   * Paints the world-specific part of this view on the specified canvas.
+   * Draws the world-specific part of this view on the specified canvas.
    * The world-specific part of a view is its world, which this method
-   * simply draws, if it has one. After drawing its world, this method
-   * flushes the OpenGL context.
-   * @param canvas the canvas on which this view is being painted.
+   * draws, if it has a world.
+   * @param canvas the canvas on which this view is being drawn.
    */
-  protected void paintWorld(ViewCanvas canvas) {
+  protected void drawWorld(ViewCanvas canvas) {
     if (_world!=null) {
       DrawContext dc = new DrawContext(_world);
       _world.drawNode(dc);
     }
-    glFlush();
   }
 
   /**
-   * Paints everything for this view on the specified view canvas.
+   * Draws everything for this view on the specified view canvas.
    * This implementation simply calls the methods
-   * (1) {@link #paintCanvas(ViewCanvas)},
-   * (2) {@link #paintView(ViewCanvas)}, and
-   * (3) {@link #paintWorld(ViewCanvas)},
-   * in that order.
+   * (1) {@link #drawCanvas(ViewCanvas)},
+   * (2) {@link #drawView(ViewCanvas)},
+   * (3) {@link #drawWorld(ViewCanvas)},
+   * and then flushes the OpenGL context.
    */
-  protected void paintAll(ViewCanvas canvas) {
-    paintCanvas(canvas);
-    paintView(canvas);
-    paintWorld(canvas);
+  protected void drawAll(ViewCanvas canvas) {
+    drawCanvas(canvas);
+    drawView(canvas);
+    drawWorld(canvas);
+    glFlush();
   }
 
   ///////////////////////////////////////////////////////////////////////////

@@ -60,9 +60,9 @@ public class Group extends Node {
 
   /**
    * Draws this node.
-   * This implementation first calls {@link drawBegin(DrawContext)}.
-   * Then, for each child node, it calls {@link drawNode(DrawContext)}.
-   * Finally, it calls {@link drawEnd(DrawContext)}.
+   * This implementation first calls {@link #drawBegin(DrawContext)}.
+   * Then, for each child node, it calls {@link #drawNode(DrawContext)}.
+   * Finally, it calls {@link #drawEnd(DrawContext)}.
    */
   protected void drawNode(DrawContext dc) {
     drawBegin(dc);

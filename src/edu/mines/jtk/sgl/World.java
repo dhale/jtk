@@ -36,12 +36,10 @@ public class World extends Group {
   }
 
   /**
-   * Marks dirty the drawing of this world. 
-   * This implementation calls that of its base class, and
-   * then requests a repaint of all views of this world.
+   * Marks dirty the drawing of this world. Calling this method causes
+   * a repaint of all view canvases in which this world may be drawn.
    */
   public void dirtyDraw() {
-    super.dirtyDraw();
     repaint();
   }
 
@@ -55,7 +53,7 @@ public class World extends Group {
   }
 
   /**
-   * Requests a repaint of all views of this world.
+   * Requests a repaint of all view canvases of all views of this world.
    */
   public void repaint() {
     for (View view : _viewList)

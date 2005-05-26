@@ -17,7 +17,7 @@ public class OrbitView extends View {
   // protected
 
   /**
-   * Updates transforms for the world painted by this view.
+   * Updates transforms for the world drawn by this view.
    * Classes that extend this base class must implement this method.
    * <p>
    * This method is called when the world-to-view transform of this 
@@ -30,7 +30,7 @@ public class OrbitView extends View {
   }
 
   /**
-   * Updates the transforms for a canvas on which this view paints.
+   * Updates the transforms for a canvas on which this view draws.
    * Classes that extend this base class must implement this method.
    * <p>
    * This method is called when the view-to-cube and cube-to-pixel

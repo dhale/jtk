@@ -37,7 +37,7 @@ public class TransformGroup extends Group {
 
   /**
    * Pushes the transform matrix onto the specified drawing context.
-   * @param the drawing context.
+   * @param dc the drawing context.
    */
   protected void drawBegin(DrawContext dc) {
     glPushMatrix();
@@ -47,7 +47,7 @@ public class TransformGroup extends Group {
 
   /**
    * Pops the transform matrix from the specified drawing context.
-   * @param the drawing context.
+   * @param dc the drawing context.
    */
   protected void drawEnd(DrawContext dc) {
     dc.popTransform();

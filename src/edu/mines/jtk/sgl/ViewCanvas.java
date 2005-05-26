@@ -9,10 +9,10 @@ package edu.mines.jtk.sgl;
 import edu.mines.jtk.opengl.*;
 
 /**
- * An OpenGL canvas on which a view paints its world.
+ * An OpenGL canvas on which a view draws its world.
  * <p>
  * The relationship between views and view canvases is one-to-many. A view 
- * canvas is managed by only one view, but that view may paint its world on
+ * canvas is managed by only one view, but that view may draw its world on
  * on one or more view canvases.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.24
@@ -34,8 +34,7 @@ public class ViewCanvas extends GlCanvas {
   }
 
   /**
-   * Sets the view that paints on this canvas. Adds this canvas to the 
-   * list of canvases on which the specified view paints.
+   * Sets the view that draws on this canvas.
    * @param view the view; null, if none.
    */
   public void setView(View view) {
@@ -48,7 +47,7 @@ public class ViewCanvas extends GlCanvas {
   }
 
   /**
-   * Gets the view painted on this canvas.
+   * Gets the view that draws on this canvas.
    * @return the view; null, if none.
    */
   public View getView() {
@@ -93,7 +92,7 @@ public class ViewCanvas extends GlCanvas {
 
   public void glPaint() {
     if (_view!=null)
-      _view.paintAll(this);
+      _view.drawAll(this);
   }
 
   public void glResize(

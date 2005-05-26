@@ -127,9 +127,9 @@ public class Node {
   /**
    * Draws this node.
    * This implementation calls 
-   * (1) {@link drawBegin(DrawContext)},
-   * (2) {@link draw(DrawContext)}, and
-   * (3) {@link drawEnd(DrawContext)}.
+   * (1) {@link #drawBegin(DrawContext)},
+   * (2) {@link #draw(DrawContext)}, and
+   * (3) {@link #drawEnd(DrawContext)}.
    * @param dc the draw context.
    */
   protected void drawNode(DrawContext dc) {
