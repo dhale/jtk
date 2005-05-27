@@ -83,20 +83,64 @@ public class Node {
     return new BoundingSphere();
   }
 
+  /**
+   * Applies the cull process to this node. Calls the three methods 
+   * {@link #cullBegin(CullContext)}, 
+   * {@link #cull(CullContext)}, and
+   * {@link #cullEnd(CullContext)}, in that order.
+   * @param cc the cull context.
+   */
+  protected void cullApply(CullContext cc) {
+    cullBegin(cc);
+    cull(cc);
+    cullEnd(cc);
+  }
+
+  /**
+   * Begins the cull process for this node.
+   * This implementation pushes this node onto the cull context,
+   * @param cc the cull context.
+   */
   protected void cullBegin(CullContext cc) {
     cc.pushNode(this);
   }
 
+  /**
+   * Culls this node. This implementation first tests this node for
+   * intersection with the view frustum of the cull context. If that
+   * frustum intersects the bounding sphere of this node, then this
+   * method appends the node stack to the draw list in the cull context.
+   * @param cc the cull context.
+   */
   protected void cull(CullContext cc) {
+    if (cc.frustumIntersects(this))
+      cc.appendNodes();
   }
 
+  /**
+   * Ends the cull process for this node.
+   * @param cc the cull context.
+   */
   protected void cullEnd(CullContext cc) {
     cc.popNode();
   }
 
   /**
-   * Begins drawing for this node, in the specified context.
-   * This implementation pushes this node onto the drawing context,
+   * Applies the draw process to this node. Calls the three methods 
+   * {@link #drawBegin(DrawContext)}, 
+   * {@link #draw(DrawContext)}, and
+   * {@link #drawEnd(DrawContext)}, in that order.
+   * @param dc the draw context.
+   */
+  protected void drawApply(DrawContext dc) {
+    drawBegin(dc);
+    draw(dc);
+    drawEnd(dc);
+  }
+
+  /**
+   * Begins the draw process for this node.
+   * This implementation pushes this node onto the draw context,
    * and then pushes (saves) all OpenGL attributes.
    * @param dc the draw context.
    */
@@ -106,18 +150,16 @@ public class Node {
   }
 
   /**
-   * Draws this node, in the specified context. Leaf nodes typically 
-   * override this implementation, which does nothing. Group nodes
-   * do not implement this method.
+   * Draws this node. This implementation does nothing.
    * @param dc the draw context.
    */
   protected void draw(DrawContext dc) {
   }
 
   /**
-   * Ends drawing for this node, in the specified context.
+   * Ends the draw process for this node.
    * This implementation pops (restores) any OpenGL attributes that were 
-   * pushed (saved) and then pops this node from the drawing context.
+   * pushed (saved) and then pops this node from the draw context.
    * @param dc the draw context.
    */
   protected void drawEnd(DrawContext dc) {

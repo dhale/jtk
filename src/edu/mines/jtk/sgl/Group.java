@@ -59,15 +59,32 @@ public class Group extends Node {
   // protected
 
   /**
-   * Draws this node. This implementation of {@link Node.draw(DrawContext)}
-   * does nothing, and is final, because group nodes should not implement
-   * this method. Rather they should implement only the methods
-   * {@link Node.beginDraw(DrawContext)} and 
-   * {@link Node.endDraw(DrawContext)}, which bracket the drawing of their
-   * children.
+   * Culls this group. If the view frustum in the cull context intersects 
+   * the bounding sphere of this group, then this group applies the cull
+   * process to its children. Otherwise, this method does nothing, and its
+   * children will be omitted from the draw list accumulated in the cull 
+   * context.
+   * @param cc the cull context.
    */
-  protected final void draw(DrawContext dc) {
-    assert false:"Group.draw(DrawContext) is never called";
+  protected void cull(CullContext cc) {
+    if (cc.frustumIntersects(this)) {
+      for (Node child : _childList)
+        child.cullApply(cc);
+    }
+  }
+
+  /**
+   * Draws this group. This implementation simply applies the draw process
+   * to its children.
+   * <p>
+   * When culling is applied before drawing, the draw list accumulated
+   * in the cull context will draw the child nodes, and this method will 
+   * never be called.
+   * @param dc the draw context.
+   */
+  protected void draw(DrawContext dc) {
+    for (Node child : _childList)
+      child.drawApply(dc);
   }
   
   /**

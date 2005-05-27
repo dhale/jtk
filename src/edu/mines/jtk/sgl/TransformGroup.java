@@ -36,23 +36,41 @@ public class TransformGroup extends Group {
   // protected
 
   /**
-   * Pushes the transform matrix onto the specified drawing context.
-   * @param dc the drawing context.
+   * Pushes the transform matrix onto the specified cull context.
+   * @param cc the cull context.
+   */
+  protected void cullBegin(CullContext cc) {
+    cc.pushLocalToWorld(_transform);
+    cc.pushNode(this);
+  }
+
+  /**
+   * Pops the transform matrix from the specified cull context.
+   * @param cc the cull context.
+   */
+  protected void cullEnd(CullContext cc) {
+    cc.popNode();
+    cc.popLocalToWorld();
+  }
+
+  /**
+   * Pushes the transform matrix onto the specified draw context.
+   * @param dc the draw context.
    */
   protected void drawBegin(DrawContext dc) {
     glPushMatrix();
     glMultMatrixd(_transform.m);
+    dc.pushLocalToWorld(_transform);
     dc.pushNode(this);
-    dc.pushTransform(_transform);
   }
 
   /**
-   * Pops the transform matrix from the specified drawing context.
-   * @param dc the drawing context.
+   * Pops the transform matrix from the specified draw context.
+   * @param dc the draw context.
    */
   protected void drawEnd(DrawContext dc) {
-    dc.popTransform();
     dc.popNode();
+    dc.popLocalToWorld();
     glPopMatrix();
   }
 

@@ -13,8 +13,14 @@ package edu.mines.jtk.sgl;
  */
 public class TransformContext extends TraversalContext {
 
+  /**
+   * Constructs
+   */
   public TransformContext() {
-    // TODO: get rid of this
+    _localToWorld = Matrix44.identity();
+    _worldToView = Matrix44.identity();
+    _viewToCube = Matrix44.identity();
+    _cubeToPixel = Matrix44.identity();
   }
 
   public TransformContext(ViewCanvas canvas) {
@@ -193,8 +199,8 @@ public class TransformContext extends TraversalContext {
    * first when transforming local coordinates to world coordinates.
    * @param transform the transform to append.
    */
-  public void pushTransform(Matrix44 transform) {
-    _transformStack.push(_localToWorld.clone());
+  public void pushLocalToWorld(Matrix44 transform) {
+    _localToWorldStack.push(_localToWorld.clone());
     _localToWorld.timesEquals(transform);
   }
 
@@ -202,8 +208,8 @@ public class TransformContext extends TraversalContext {
    * Restores the most recently saved (pushed) local-to-world transform.
    * Discards the current local-to-world transform.
    */
-  public void popTransform() {
-    _localToWorld = _transformStack.pop();
+  public void popLocalToWorld() {
+    _localToWorld = _localToWorldStack.pop();
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -213,5 +219,5 @@ public class TransformContext extends TraversalContext {
   private Matrix44 _worldToView = new Matrix44();
   private Matrix44 _viewToCube = new Matrix44();
   private Matrix44 _cubeToPixel = new Matrix44();
-  private ArrayStack<Matrix44> _transformStack = new ArrayStack<Matrix44>();
+  private ArrayStack<Matrix44> _localToWorldStack = new ArrayStack<Matrix44>();
 }
