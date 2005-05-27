@@ -70,6 +70,7 @@ public abstract class View {
     _world = world;
     if (_world!=null)
       _world.addView(this);
+    updateTransforms(_world);
     repaint();
   }
 

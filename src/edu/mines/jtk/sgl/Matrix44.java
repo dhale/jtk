@@ -58,10 +58,10 @@ public class Matrix44 implements Cloneable {
                   double m20, double m21, double m22, double m23,
                   double m30, double m31, double m32, double m33)
   {
-    set(m00,m01,m01,m03,
-        m10,m11,m11,m13,
-        m20,m21,m21,m23,
-        m30,m31,m31,m33);
+    set(m00,m01,m02,m03,
+        m10,m11,m12,m13,
+        m20,m21,m22,m23,
+        m30,m31,m32,m33);
   }
 
   /**
@@ -467,6 +467,21 @@ public class Matrix44 implements Cloneable {
     return (new Matrix44()).setFrustum(left,right,bottom,top,znear,zfar);
   }
 
+  /**
+   * Returns a new perspective-projection matrix. Parameters correspond 
+   * to those for the OpenGL standard function gluPerspective.
+   * @param fovy the field of view, in degrees, in the vertical direction.
+   * @param aspect the aspect ratio width/height.
+   * @param znear the distance to the near depth clipping plane
+   * @param zfar the distance to the far depth clipping plane
+   * @return this perspective-projection matrix.
+   */
+  public static Matrix44 perspective(
+    double fovy, double aspect, double znear, double zfar)
+  {
+    return (new Matrix44()).setPerspective(fovy,aspect,znear,zfar);
+  }
+
   /////////
   ////
   /////
@@ -583,6 +598,7 @@ public class Matrix44 implements Cloneable {
   public Matrix44 setRotateX(double ra) {
     double ca = Math.cos(ra);
     double sa = Math.sin(ra);
+    System.out.println("setRotateX: ra="+ra+" ca="+ca+" sa="+sa);
     set(1.0, 0.0, 0.0, 0.0,
         0.0,  ca, -sa, 0.0,
         0.0,  sa,  ca, 0.0,
@@ -684,6 +700,26 @@ public class Matrix44 implements Cloneable {
         0.0,  0.0,    c,    d,
         0.0,  0.0, -1.0,  0.0);
     return this;
+  }
+
+  /**
+   * Sets this matrix to a perspective-projection matrix. Parameters 
+   * correspond to those for the OpenGL standard function gluPerspective.
+   * @param fovy the field of view, in degrees, in the vertical direction.
+   * @param aspect the aspect ratio width/height.
+   * @param znear the distance to the near depth clipping plane
+   * @param zfar the distance to the far depth clipping plane
+   * @return this perspective-projection matrix.
+   */
+  public Matrix44 setPerspective(
+    double fovy, double aspect, double znear, double zfar)
+  {
+    double tfovy = Math.tan(fovy*Math.PI/180.0);
+    double right = tfovy*aspect*znear;
+    double left = -right;
+    double top = tfovy*znear;
+    double bottom = -top;
+    return setFrustum(left,right,bottom,top,znear,zfar);
   }
 
   public String toString() {

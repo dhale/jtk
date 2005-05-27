@@ -43,6 +43,8 @@ public class ViewCanvas extends GlCanvas {
     _view = view;
     if (_view!=null)
       _view.addCanvas(this);
+    if (_view!=null)
+      _view.updateTransforms(this);
     repaint();
   }
 

@@ -85,5 +85,5 @@ public class World extends Group {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private ArrayList<View> _viewList;
+  private ArrayList<View> _viewList = new ArrayList<View>();
 }
