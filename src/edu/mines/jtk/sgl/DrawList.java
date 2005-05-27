@@ -72,7 +72,7 @@ public class DrawList {
       // Index of top current node that differs from previous nodes.
       int mnode = (nnode<nprev)?nnode:nprev;
       int knode = 0;
-      while (knode<mnode && nodes[knode]!=prevs[knode])
+      while (knode<mnode && nodes[knode]==prevs[knode])
         ++knode;
 
       // End draw (from bottom to top) for previous nodes that differ.
