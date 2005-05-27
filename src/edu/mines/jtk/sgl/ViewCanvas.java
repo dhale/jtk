@@ -108,7 +108,7 @@ public class ViewCanvas extends GlCanvas {
 
   public void glPaint() {
     if (_view!=null)
-      _view.drawAll(this);
+      _view.draw(this);
   }
 
   public void glResize(

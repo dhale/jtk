@@ -16,15 +16,15 @@ import java.util.*;
  * next to last node is that leaf node's parent, and so on. The first node
  * in each array is the root node of the scene graph.
  * <p>
- * Conceptually, this list draws an array of nodes as follows. Starting 
- * with the first (root) node, and working from top to bottom, this list 
+ * Conceptually, this list draws each array of nodes as follows. Starting 
+ * with the first (top) node, and working from top to bottom, this list 
  * calls {@link Node.drawBegin(DrawContext)} for each node in the array. 
- * It then calls {@link Node.draw(DrawContext)} for the last (leaf) node. 
- * Finally, starting with that leaf node, and working from bottom to top, 
+ * It then calls {@link Node.draw(DrawContext)} for the last (bottom) node. 
+ * Finally, starting with that last node, and working from bottom to top, 
  * it calls {@link Node.drawEnd(DrawContext)} for each node in the array.
  * <p>
  * In practice, at least some parent nodes are likely to be the same from 
- * one array to the next. For example, the first root node is likely to 
+ * one array to the next. For example, the first (top) node is likely to 
  * be the same in all arrays of nodes. Therefore, during drawing, this 
  * list avoids any redundant calls to {@link Node.drawEnd(DrawContext)} 
  * and {@link Node.drawBegin(DrawContext)}.
@@ -41,11 +41,7 @@ public class DrawList {
   }
 
   /**
-   * Draws all nodes in this list. Conceptually, this method works as 
-   * follows. Each array of nodesFor each parent nodeFor each node, it first 
-   * calls {@link Node.drawBegin(DrawContext)} . Then, if this node is a 
-   * leaf node, it calls {@link Node.draw(DrawContext)}. Finally, for each 
-   * node, it calls {@link Node.drawEnd(DrawContext)}.
+   * Draws all nodes in this list.
    * @param dc the draw context.
    */
   public void draw(DrawContext dc) {

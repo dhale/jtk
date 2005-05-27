@@ -21,6 +21,22 @@ import java.util.*;
 public class CullContext extends TransformContext {
 
   /**
+   * Constructs a cull context with identity transforms.
+   */
+  public CullContext() {
+    super();
+  }
+
+  /**
+   * Constructs a transform context for the specified view canvas.
+   * @param canvas the view canvas.
+   */
+  public CullContext(ViewCanvas canvas) {
+    super(canvas);
+    // TODO: initialize view frustum
+  }
+
+  /**
    * Tests the specified node for intersection with the view frustum.
    * @return true, if the view frustum intersects the bounding sphere
    *  of the node; false, otherwise.

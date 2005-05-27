@@ -6,6 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import edu.mines.jtk.opengl.*;
+import static edu.mines.jtk.opengl.Gl.*;
+
 /**
  * A view of a world, as if in orbit around that world.
  * @author Dave Hale, Colorado School of Mines
@@ -41,9 +44,39 @@ public class OrbitView extends View {
   protected void updateTransforms(ViewCanvas canvas) {
   }
 
-  protected void cull(CullContext cc) {
-  }
+  /**
+   * Draws this view on the specified canvas.
+   * @param canvas the canvas.
+   */
+  protected void draw(ViewCanvas canvas) {
 
-  protected void draw(DrawContext dc) {
+    // Clear.
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+    // Our world.
+    World world = getWorld();
+    if (world==null)
+      return;
+
+    // Viewport (cube-to-pixel) transform.
+    int[] xywh = canvas.getViewport();
+    glViewport(xywh[0],xywh[1],xywh[2],xywh[3]);
+
+    // Projection (view-to-cube) transform.
+    Matrix44 viewToCube = canvas.getViewToCube();
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixd(viewToCube.m);
+
+    // View (world-to-view) transform.
+    Matrix44 worldToView = this.getWorldToView();
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixd(worldToView.m);
+
+    // Cull and draw the world.
+    CullContext cc = new CullContext(canvas);
+    world.cullApply(cc);
+    DrawList dl = cc.getDrawList();
+    DrawContext dc = new DrawContext(canvas);
+    dl.draw(dc);
   }
 }

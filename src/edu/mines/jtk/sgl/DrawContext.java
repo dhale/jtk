@@ -12,4 +12,19 @@ package edu.mines.jtk.sgl;
  * @version 2005.05.21
  */
 public class DrawContext extends TransformContext {
+
+  /**
+   * Constructs a draw context with identity transforms.
+   */
+  public DrawContext() {
+    super();
+  }
+
+  /**
+   * Constructs a draw context for the specified view canvas.
+   * @param canvas the view canvas.
+   */
+  public DrawContext(ViewCanvas canvas) {
+    super(canvas);
+  }
 }

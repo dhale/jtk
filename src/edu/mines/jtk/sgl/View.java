@@ -8,9 +8,6 @@ package edu.mines.jtk.sgl;
 
 import java.util.*;
 
-import edu.mines.jtk.opengl.*;
-import static edu.mines.jtk.opengl.Gl.*;
-
 /**
  * An abstract view of a world.
  * <p>
@@ -152,79 +149,12 @@ public abstract class View {
    */
   protected abstract void updateTransforms(ViewCanvas canvas);
 
-  protected abstract void cull(CullContext cc);
-
-  protected abstract void draw(DrawContext dc);
-
   /**
-   * Draws the canvas-specific part of this view on the specified canvas.
-   * The canvas-specific parts of a view include the OpenGL viewport and 
-   * projection matrix, which this method sets using the cube-to-pixel and
-   * view-to-cube transforms of the specified canvas. This method also 
-   * clears the color and depth buffers.
-   * @param canvas the canvas on which this view is being drawn.
+   * Draws this view on the specified canvas.
+   * Classes that extend this base class must implement this method.
+   * @param canvas the canvas.
    */
-  protected void drawCanvas(ViewCanvas canvas) {
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-    // Viewport.
-    Matrix44 cubeToPixel = canvas.getCubeToPixel();
-    Point4 p = new Point4(-1.0,-1.0, 0.0, 1.0);
-    Point4 q = new Point4( 1.0, 1.0, 0.0, 1.0);
-    p = cubeToPixel.times(p);
-    q = cubeToPixel.times(q);
-    int x = Math.max(0,(int)(p.x+0.5));
-    int y = Math.max(0,(int)(p.y+0.5));
-    int w = Math.min(canvas.getWidth(),(int)(q.x-p.x+0.5));
-    int h = Math.min(canvas.getHeight(),(int)(q.y-p.y+0.5));
-    glViewport(x,y,w,h);
-
-    // Projection.
-    Matrix44 viewToCube = canvas.getViewToCube();
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixd(viewToCube.m);
-  }
-
-  /**
-   * Draws the view-specific part of this view on the specified canvas.
-   * The view-specific part of a view includes the world-to-view transform,
-   * which this method loads into the OpenGL modelview matrix stack.
-   * @param canvas the canvas on which this view is being drawn.
-   */
-  protected void drawView(ViewCanvas canvas) {
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixd(_worldToView.m);
-  }
-
-  /**
-   * Draws the world-specific part of this view on the specified canvas.
-   * The world-specific part of a view is its world, which this method
-   * draws, if it has a world.
-   * @param canvas the canvas on which this view is being drawn.
-   */
-  protected void drawWorld(ViewCanvas canvas) {
-    /*
-    if (_world!=null) {
-      DrawContext dc = new DrawContext(_world);
-      _world.drawNode(dc);
-    }
-    */
-  }
-
-  /**
-   * Draws everything for this view on the specified view canvas.
-   * This implementation simply calls the methods
-   * (1) {@link #drawCanvas(ViewCanvas)},
-   * (2) {@link #drawView(ViewCanvas)},
-   * (3) {@link #drawWorld(ViewCanvas)},
-   * and then flushes the OpenGL context.
-   */
-  protected void drawAll(ViewCanvas canvas) {
-    drawCanvas(canvas);
-    drawView(canvas);
-    drawWorld(canvas);
-    glFlush();
-  }
+  protected abstract void draw(ViewCanvas canvas);
 
   ///////////////////////////////////////////////////////////////////////////
   // package

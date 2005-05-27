@@ -14,7 +14,9 @@ package edu.mines.jtk.sgl;
 public class TransformContext extends TraversalContext {
 
   /**
-   * Constructs
+   * Constructs a transform context with identity transforms.
+   * Sets the local-to-world, world-to-view, view-to-cube, and
+   * cube-to-pixel transforms to the identity matrix.
    */
   public TransformContext() {
     _localToWorld = Matrix44.identity();
@@ -23,6 +25,14 @@ public class TransformContext extends TraversalContext {
     _cubeToPixel = Matrix44.identity();
   }
 
+  /**
+   * Constructs a transform context for the specified view canvas.
+   * Gets its view-to-cube and cube-to-pixel transforms from the
+   * canvas. Gets its world-to-view transform from the view drawn
+   * on that canvas, and sets the local-to-world transform to the
+   * identity matrix.
+   * @param canvas the view canvas.
+   */
   public TransformContext(ViewCanvas canvas) {
     View view = canvas.getView();
     World world = view.getWorld();
