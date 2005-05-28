@@ -108,28 +108,28 @@ public class OrbitView extends View {
     double ss = sqrt(xs*xs+ys*ys);
 
     // Cube to pixel.
-    double s = 0.5*max(w,h);
     double x = 0.5*w;
     double y = 0.5*h;
     Matrix44 cubeToPixel = Matrix44.translate(x,y,0);
-    cubeToPixel.timesEquals(Matrix44.scale(s,s,s));
+    cubeToPixel.timesEquals(Matrix44.scale(0.5*w,0.5*h,1.0));
     canvas.setCubeToPixel(cubeToPixel);
 
     // View to cube.
-    double r = 1; // radius of world bounding sphere, after scaling
-    double e = ss; // distance eye-to-screen (in pixels, approximate)
-    double m = min(w,h); // minimum of viewport width and height
-    double a = 2*atan(m/(2*e)); // angle subtended by sphere
-    double d = r/sin(a/2); // distance from eye to center of sphere
-    double fovy = 2*atan(h/(2*e))*180/PI;
-    double aspect = (double)w/(double)h;
-    double znear = d-2*r;
-    double zfar = 100*znear;
-    Matrix44 viewToCube = Matrix44.perspective(fovy,aspect,znear,zfar);
-    canvas.setViewToCube(viewToCube);
-
-    _distance = d;
-    System.out.println("d="+d);
+    if (_perspective) {
+      double r = 1; // radius of world bounding sphere, after scaling
+      double e = ss; // distance eye-to-screen (in pixels, approximate)
+      double m = min(w,h); // minimum of viewport width and height
+      double a = 2*atan(m/(2*e)); // angle subtended by sphere
+      double d = r/sin(a/2); // distance from eye to center of sphere
+      double fovy = 2*atan(h/(2*e))*180/PI;
+      double aspect = (double)w/(double)h;
+      double znear = max(d-3*r,0.1); // scaling by 3 before clipping
+      double zfar  = max(d+3*r,1000*znear);
+      Matrix44 viewToCube = Matrix44.perspective(fovy,aspect,znear,zfar);
+      canvas.setViewToCube(viewToCube);
+      _distance = d;
+    } else {
+    }
     updateView();
   }
 
@@ -158,13 +158,11 @@ public class OrbitView extends View {
     Matrix44 viewToCube = canvas.getViewToCube();
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixd(viewToCube.m);
-    System.out.println("viewToCube=\n"+viewToCube);
 
     // View (world-to-view) transform.
     Matrix44 worldToView = this.getWorldToView();
     glMatrixMode(GL_MODELVIEW);
     glLoadMatrixd(worldToView.m);
-    System.out.println("worldToView=\n"+worldToView);
 
     // Cull and draw the world.
     CullContext cc = new CullContext(canvas);
@@ -178,8 +176,9 @@ public class OrbitView extends View {
   // private
 
   private double _distance = 5.0;
-  private double _azimuth = PI/4.4;
-  private double _elevation = PI/6.6;
+  private double _azimuth = 40.0;
+  private double _elevation = 25.0;
+  private boolean _perspective = true;
 
   private void updateView() {
     World world = getWorld();

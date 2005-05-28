@@ -378,7 +378,7 @@ public class Matrix44 implements Cloneable {
   /**
    * Returns a new rotation matrix.
    * The rotation is about a specified vector axis.
-   * @param ra the angle of rotation, in radians.
+   * @param ra the angle of rotation, in degrees.
    * @param rx the x component of the vector axis of rotation
    * @param ry the y component of the vector axis of rotation
    * @param rz the z component of the vector axis of rotation
@@ -391,7 +391,7 @@ public class Matrix44 implements Cloneable {
   /**
    * Returns a new rotation matrix.
    * The rotation is about a specified vector axis.
-   * @param ra the angle of rotation, in radians.
+   * @param ra the angle of rotation, in degrees.
    * @param rv the vector axis of rotation.
    * @return the rotation matrix.
    */
@@ -402,7 +402,7 @@ public class Matrix44 implements Cloneable {
   /**
    * Returns a new rotation matrix.
    * The rotation is about the x axis.
-   * @param ra the angle of rotation, in radians.
+   * @param ra the angle of rotation, in degrees.
    * @return the rotation matrix.
    */
   public static Matrix44 rotateX(double ra) {
@@ -412,7 +412,7 @@ public class Matrix44 implements Cloneable {
   /**
    * Returns a new rotation matrix.
    * The rotation is about the y axis.
-   * @param ra the angle of rotation, in radians.
+   * @param ra the angle of rotation, in degrees.
    * @return the rotation matrix.
    */
   public static Matrix44 rotateY(double ra) {
@@ -422,7 +422,7 @@ public class Matrix44 implements Cloneable {
   /**
    * Returns a new rotation matrix.
    * The rotation is about the z axis.
-   * @param ra the angle of rotation, in radians.
+   * @param ra the angle of rotation, in degrees.
    * @return the rotation matrix.
    */
   public static Matrix44 rotateZ(double ra) {
@@ -540,7 +540,7 @@ public class Matrix44 implements Cloneable {
   /**
    * Sets this matrix to a rotation-only matrix.
    * The rotation is about a specified vector axis.
-   * @param ra the angle of rotation, in radians.
+   * @param ra the angle of rotation, in degrees.
    * @param rx the x component of the vector axis of rotation
    * @param ry the y component of the vector axis of rotation
    * @param rz the z component of the vector axis of rotation
@@ -551,8 +551,8 @@ public class Matrix44 implements Cloneable {
     rx *= rs;
     ry *= rs;
     rz *= rs;
-    double ca = Math.cos(ra);
-    double sa = Math.sin(ra);
+    double ca = Math.cos(ra*D2R);
+    double sa = Math.sin(ra*D2R);
     double xx = rx*rx;
     double xy = rx*ry;
     double xz = rx*rz;
@@ -581,7 +581,7 @@ public class Matrix44 implements Cloneable {
   /**
    * Sets this matrix to a rotation-only matrix.
    * The rotation is about a specified axis.
-   * @param ra the angle of rotation, in radians.
+   * @param ra the angle of rotation, in degrees.
    * @param rv the vector axis of rotation.
    * @return this rotation-only matrix.
    */
@@ -592,13 +592,12 @@ public class Matrix44 implements Cloneable {
   /**
    * Sets this matrix to a rotation-only matrix.
    * The rotation is about the x axis.
-   * @param ra the angle of rotation, in radians.
+   * @param ra the angle of rotation, in degrees.
    * @return this rotation-only matrix.
    */
   public Matrix44 setRotateX(double ra) {
-    double ca = Math.cos(ra);
-    double sa = Math.sin(ra);
-    System.out.println("setRotateX: ra="+ra+" ca="+ca+" sa="+sa);
+    double ca = Math.cos(ra*D2R);
+    double sa = Math.sin(ra*D2R);
     set(1.0, 0.0, 0.0, 0.0,
         0.0,  ca, -sa, 0.0,
         0.0,  sa,  ca, 0.0,
@@ -609,12 +608,12 @@ public class Matrix44 implements Cloneable {
   /**
    * Sets this matrix to a rotation-only matrix.
    * The rotation is about the y axis.
-   * @param ra the angle of rotation, in radians.
+   * @param ra the angle of rotation, in degrees.
    * @return this rotation-only matrix.
    */
   public Matrix44 setRotateY(double ra) {
-    double ca = Math.cos(ra);
-    double sa = Math.sin(ra);
+    double ca = Math.cos(ra*D2R);
+    double sa = Math.sin(ra*D2R);
     set( ca, 0.0,  sa, 0.0,
         0.0, 1.0, 0.0, 0.0,
         -sa, 0.0,  ca, 0.0,
@@ -625,12 +624,12 @@ public class Matrix44 implements Cloneable {
   /**
    * Sets this matrix to a rotation-only matrix.
    * The rotation is about the z axis.
-   * @param ra the angle of rotation, in radians.
+   * @param ra the angle of rotation, in degrees.
    * @return this rotation-only matrix.
    */
   public Matrix44 setRotateZ(double ra) {
-    double ca = Math.cos(ra);
-    double sa = Math.sin(ra);
+    double ca = Math.cos(ra*D2R);
+    double sa = Math.sin(ra*D2R);
     set( ca, -sa, 0.0, 0.0,
          sa,  ca, 0.0, 0.0,
         0.0, 0.0, 1.0, 0.0,
@@ -714,7 +713,7 @@ public class Matrix44 implements Cloneable {
   public Matrix44 setPerspective(
     double fovy, double aspect, double znear, double zfar)
   {
-    double t = Math.tan(0.5*fovy*Math.PI/180.0);
+    double t = Math.tan(0.5*fovy*D2R);
     double right = t*aspect*znear;
     double left = -right;
     double top = t*znear;
@@ -735,6 +734,8 @@ public class Matrix44 implements Cloneable {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  private static final double D2R = Math.PI/180.0; // degrees-to-radians
 
   /**
    * Computes the matrix product C = AB. The product may be computed 
