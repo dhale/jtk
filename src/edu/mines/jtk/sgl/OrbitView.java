@@ -6,8 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import java.awt.*;
+import static java.lang.Math.*;
+
 import edu.mines.jtk.opengl.*;
 import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.opengl.Glu.*;
 
 /**
  * A view of a world, as if in orbit around that world.
@@ -73,13 +77,10 @@ public class OrbitView extends View {
     Matrix44 distance = Matrix44.translate(0,0,-_distance);
     Matrix44 worldToView = Matrix44.identity();
     worldToView.timesEquals(distance);
-    System.out.println("d: worldToView=\n"+worldToView);
     worldToView.timesEquals(elevation);
     worldToView.timesEquals(azimuth);
     worldToView.timesEquals(scale);
-    System.out.println("s: worldToView=\n"+worldToView);
     worldToView.timesEquals(center);
-    System.out.println("c: worldToView=\n"+worldToView);
     setWorldToView(worldToView);
   }
 
@@ -94,19 +95,42 @@ public class OrbitView extends View {
    */
   protected void updateTransforms(ViewCanvas canvas) {
 
-    // View to cube.
-    Matrix44 viewToCube = Matrix44.perspective(45.0,1.0,0.1,10.0);
-    canvas.setViewToCube(viewToCube);
-
-    // Cube to pixel.
+    // Canvas width and height, in pixels.
     int w = canvas.getWidth();
     int h = canvas.getHeight();
-    double s = 0.5*Math.min(w,h);
+    if (w==0 || h==0)
+      return;
+
+    // Screen size, in pixels.
+    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    double xs = screenSize.width;
+    double ys = screenSize.height;
+    double ss = sqrt(xs*xs+ys*ys);
+
+    // Cube to pixel.
+    double s = 0.5*max(w,h);
     double x = 0.5*w;
     double y = 0.5*h;
     Matrix44 cubeToPixel = Matrix44.translate(x,y,0);
     cubeToPixel.timesEquals(Matrix44.scale(s,s,s));
     canvas.setCubeToPixel(cubeToPixel);
+
+    // View to cube.
+    double r = 1; // radius of world bounding sphere, after scaling
+    double e = ss; // distance eye-to-screen (in pixels, approximate)
+    double m = min(w,h); // minimum of viewport width and height
+    double a = 2*atan(m/(2*e)); // angle subtended by sphere
+    double d = r/sin(a/2); // distance from eye to center of sphere
+    double fovy = 2*atan(h/(2*e))*180/PI;
+    double aspect = (double)w/(double)h;
+    double znear = d-2*r;
+    double zfar = 100*znear;
+    Matrix44 viewToCube = Matrix44.perspective(fovy,aspect,znear,zfar);
+    canvas.setViewToCube(viewToCube);
+
+    _distance = d;
+    System.out.println("d="+d);
+    updateView();
   }
 
   /**
@@ -126,20 +150,14 @@ public class OrbitView extends View {
       return;
 
     // Viewport (cube-to-pixel) transform.
-    int[] viewport = canvas.getViewport();
-    int x = viewport[0];
-    int y = viewport[1];
-    int w = viewport[2];
-    int h = viewport[3];
-    glViewport(x,y,w,h);
-    System.out.println("x="+x+" y="+y+" w="+w+" h="+h);
+    int w = canvas.getWidth();
+    int h = canvas.getHeight();
+    glViewport(0,0,w,h);
 
     // Projection (view-to-cube) transform.
     Matrix44 viewToCube = canvas.getViewToCube();
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixd(viewToCube.m);
-    glLoadIdentity();
-    glOrtho(-5.0,5.0,-5.0,5.0,-5.0,5.0);
     System.out.println("viewToCube=\n"+viewToCube);
 
     // View (world-to-view) transform.
@@ -159,9 +177,9 @@ public class OrbitView extends View {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private double _distance = 2.0;
-  private double _azimuth = Math.PI/4.4;
-  private double _elevation = Math.PI/6.6;
+  private double _distance = 5.0;
+  private double _azimuth = PI/4.4;
+  private double _elevation = PI/6.6;
 
   private void updateView() {
     World world = getWorld();

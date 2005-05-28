@@ -693,8 +693,8 @@ public class Matrix44 implements Cloneable {
     double sy =  2.0*znear/(top-bottom);
     double a = (right+left)/(right-left);
     double b = (top+bottom)/(top-bottom);
-    double c = (zfar+znear)/(zfar-znear);
-    double d = -2.0*zfar*znear/(zfar-znear);
+    double c = (znear+zfar)/(znear-zfar);
+    double d = 2.0*zfar*znear/(znear-zfar);
     set( sx,  0.0,    a,  0.0,
         0.0,   sy,    b,  0.0,
         0.0,  0.0,    c,    d,
@@ -714,10 +714,10 @@ public class Matrix44 implements Cloneable {
   public Matrix44 setPerspective(
     double fovy, double aspect, double znear, double zfar)
   {
-    double tfovy = Math.tan(fovy*Math.PI/180.0);
-    double right = tfovy*aspect*znear;
+    double t = Math.tan(0.5*fovy*Math.PI/180.0);
+    double right = t*aspect*znear;
     double left = -right;
-    double top = tfovy*znear;
+    double top = t*znear;
     double bottom = -top;
     return setFrustum(left,right,bottom,top,znear,zfar);
   }

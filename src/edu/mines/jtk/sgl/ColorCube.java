@@ -21,7 +21,7 @@ public class ColorCube extends Node {
 
   protected BoundingSphere computeBoundingSphere() {
     Point3 c = new Point3(0.5,0.5,0.5);
-    double r = 0.5;
+    double r = 0.5*Math.sqrt(3.0);
     return new BoundingSphere(c,r);
   }
 
