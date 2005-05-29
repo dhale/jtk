@@ -64,7 +64,7 @@ public class OrbitView extends View {
 
   /**
    * Sets the world sphere used to parameterize this view.
-   * If not set (or null), the world's bounding sphere is used.
+   * If null (the default), the world's bounding sphere is used.
    * @param worldSphere the world sphere; null, if none.
    */
   public void setWorldSphere(BoundingSphere worldSphere) {
@@ -72,6 +72,18 @@ public class OrbitView extends View {
     updateView();
   }
 
+  /**
+   * Gets the world sphere used to parameterize this view.
+   * @return the world sphere; null, if none.
+   */
+  public BoundingSphere getWorldSphere() {
+    return _worldSphere.clone();
+  }
+
+  /**
+   * Sets the projection for this view.
+   * @param projection the projection.
+   */
   public void setProjection(Projection projection) {
     if (_projection==projection)
       return;
@@ -79,6 +91,18 @@ public class OrbitView extends View {
     updateView();
   }
 
+  /**
+   * Gets the projection for this view.
+   * @return the projection.
+   */
+  public Projection getProjection() {
+    return _projection;
+  }
+
+  /**
+   * Sets the azimuth for this view.
+   * @param azimuth the azimuth.
+   */
   public void setAzimuth(double azimuth) {
     if (_azimuth==azimuth)
       return;
@@ -86,12 +110,65 @@ public class OrbitView extends View {
     updateView();
   }
 
+  /**
+   * Gets the azimuth for this view.
+   * @return the azimuth.
+   */
+  public double getAzimuth() {
+    return _azimuth;
+  }
+
+  /**
+   * Sets the elevation for this view.
+   * @param elevation the elevation.
+   */
   public void setElevation(double elevation) {
     if (_elevation==elevation)
       return;
     _elevation = elevation;
     updateView();
   }
+
+  /**
+   * Gets the elevation for this view.
+   * @return the elevation.
+   */
+  public double getElevation() {
+    return _elevation;
+  }
+
+  /**
+   * Sets the azimuth and elevation for this view.
+   * @param azimuth the azimuth.
+   * @param elevation the elevation.
+   */
+  public void setAzimuthAndElevation(double azimuth, double elevation) {
+    if (_azimuth==azimuth && _elevation==elevation)
+      return;
+    _azimuth = azimuth;
+    _elevation = elevation;
+    updateView();
+  }
+
+  /**
+   * Sets the scale for this view.
+   * @param scale the scale.
+   */
+  public void setScale(double scale) {
+    if (_scale==scale)
+      return;
+    _scale = scale;
+    updateView();
+  }
+
+  /**
+   * Gets the scale for this view.
+   * @return the scale.
+   */
+  public double getScale() {
+    return _scale;
+  }
+
 
   ///////////////////////////////////////////////////////////////////////////
   // protected
@@ -124,7 +201,7 @@ public class OrbitView extends View {
     Matrix44 viewToCube;
     double distance;
     if (_projection==Projection.PERSPECTIVE) {
-      double r = 1; // radius of world sphere, after scaling
+      double r = 1.0; // radius of world sphere, after scaling
       double e = ss; // distance eye-to-screen (in pixels, approximate)
       double m = min(w,h); // minimum of viewport width and height
       double a = 2*atan(m/(2*e)); // angle subtended by sphere
@@ -136,7 +213,7 @@ public class OrbitView extends View {
       viewToCube = Matrix44.perspective(fovy,aspect,znear,zfar);
       distance = d;
     } else {
-      double r = 1; // radius of world sphere, after scaling
+      double r = 1.0; // radius of world sphere, after scaling
       double m = min(w,h); // minimum of viewport width and height
       double d = maxscale*r; // distance from eye to center of sphere
       double right = w/m;
@@ -159,7 +236,7 @@ public class OrbitView extends View {
         ws = world.getBoundingSphere();
       Point3 c = (!ws.isEmpty())?ws.getCenter():new Point3();
       double r = (!ws.isEmpty())?ws.getRadius():1.0;
-      double s = (r>0.0)?1.0/r:1.0;
+      double s = (r>0.0)?_scale/r:_scale;
       worldToView.timesEquals(Matrix44.translate(0,0,-distance));
       worldToView.timesEquals(Matrix44.rotateX(_elevation));
       worldToView.timesEquals(Matrix44.rotateY(-_azimuth));
@@ -212,6 +289,7 @@ public class OrbitView extends View {
 
   private double _azimuth = 40.0;
   private double _elevation = 25.0;
+  private double _scale = 1.0;
   private Projection _projection = Projection.PERSPECTIVE;
   private BoundingSphere _worldSphere = null;
 
