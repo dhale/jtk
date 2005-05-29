@@ -49,7 +49,7 @@ public class World extends Group {
   public void dirtyBoundingSphere() {
     super.dirtyBoundingSphere();
     for (View view : _viewList)
-      view.updateTransforms(this);
+      view.updateTransforms();
   }
 
   /**

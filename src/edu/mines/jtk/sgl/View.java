@@ -22,24 +22,16 @@ import java.util.*;
  * All three transforms - world-to-view, view-to-cube, and cube-to-pixel -
  * are view-dependent. Because the latter two transforms may vary among
  * the multiple view canvases on which a view draws, those transforms 
- * are stored with each view canvas. Nevertheless, the view is responsible 
- * for updating the view-to-cube and cube-to-pixel transforms for each view 
- * canvas on which it draws.
+ * are stored with each view canvas. Nevertheless, the view updates the
+ * view-to-cube and cube-to-pixel transforms for each view canvas on which 
+ * it draws.
  * <p>
- * When changes to a view's world might invalidate one or more of these 
- * three transforms, the abstract method {@link #updateTransforms(World)} 
- * for that view is called. Likewise, when changes to one of its view 
- * canvases might invalidate one or more of these three transforms, the 
- * abstract method {@link #updateTransforms(ViewCanvas)} is called. Classes 
- * that extend this abstract base class must implement these two methods.
- * <p>
- * A view draws its world on a canvas by simply calling its methods
- * (1) {@link #drawCanvas(ViewCanvas)}, 
- * (2) {@link #drawView(ViewCanvas)}, and
- * (3) {@link #drawWorld(ViewCanvas)}, 
- * in that order, in its method {@link #drawAll(ViewCanvas)}.
- * This base class provides useful implementations of these methods,
- * which may be overridden, to customize the view.
+ * Classes that extend this abstract base class must implement two methods: 
+ * {@link #updateTransforms(ViewCanvas)} and {@link #draw(ViewCanvas)}. The 
+ * method {@link #updateTransforms(ViewCanvas)} is called to update the
+ * three view-dependent transforms for a specified view canvas. The method
+ * {@link #draw(ViewCanvas)} is called to draw the view on a specified view
+ * canvas.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.24
  */
@@ -70,7 +62,7 @@ public abstract class View {
     _world = world;
     if (_world!=null)
       _world.addView(this);
-    updateTransforms(_world);
+    updateTransforms();
     repaint();
   }
 
@@ -116,7 +108,20 @@ public abstract class View {
   }
 
   /**
-   * Repaints all canvases on which this view draws.
+   * Updates transforms for this view and all canvases on which it draws.
+   * This method should be called when the world drawn by this view changes, 
+   * when the view parameters change, and when any canvas on which this view
+   * draws changes.
+   */
+  public void updateTransforms() {
+    for (ViewCanvas canvas : _canvasList)
+      updateTransforms(canvas);
+  }
+
+  /**
+   * Repaints all canvases on which this view draws. This method should be 
+   * called when this view must redraw its world, for example, when that 
+   * world changes, or when a canvas on which this view draws changes.
    */
   public void repaint() {
     for (ViewCanvas canvas : _canvasList)
@@ -128,31 +133,14 @@ public abstract class View {
   // protected
 
   /**
-   * Updates transforms for the world drawn by this view.
-   * Classes that extend this base class must implement this method.
-   * <p>
-   * This method is called when the world-to-view transform of this 
-   * view might require updating; e.g., when the bounds of the specified 
-   * world have changed. Furthermore, this method might also update the 
-   * view-to-cube and cube-to-pixel transforms of its view canvases.
-   * @param world the world.
-   */
-  protected abstract void updateTransforms(World world);
-
-  /**
-   * Updates the transforms for a canvas on which this view draws.
-   * Classes that extend this base class must implement this method.
-   * <p>
-   * This method is called when the view-to-cube and cube-to-pixel
-   * transforms of the specified view canvas might require updating; 
-   * e.g., when the canvas has been resized.
+   * Updates the transforms for a canvas on which this view draws. 
+   * The view-to-cube and cube-to-pixel transforms are canvas-specific.
    * @param canvas the view canvas.
    */
   protected abstract void updateTransforms(ViewCanvas canvas);
 
   /**
    * Draws this view on the specified canvas.
-   * Classes that extend this base class must implement this method.
    * @param canvas the canvas.
    */
   protected abstract void draw(ViewCanvas canvas);
@@ -166,7 +154,8 @@ public abstract class View {
   boolean addCanvas(ViewCanvas canvas) {
     if (!_canvasList.contains(canvas)) {
       _canvasList.add(canvas);
-      updateTransforms(canvas);
+      updateTransforms();
+      repaint();
       return true;
     } else {
       return false;
@@ -177,7 +166,13 @@ public abstract class View {
    * Called by ViewCanvas.setView(View).
    */
   boolean removeCanvas(ViewCanvas canvas) {
-    return _canvasList.remove(canvas);
+    if (_canvasList.remove(canvas)) {
+      updateTransforms();
+      repaint();
+      return true;
+    } else {
+      return false;
+    }
   }
 
 
@@ -185,6 +180,6 @@ public abstract class View {
   // private
 
   private World _world;
-  private Matrix44 _worldToView;
+  private Matrix44 _worldToView = Matrix44.identity();
   private ArrayList<ViewCanvas> _canvasList = new ArrayList<ViewCanvas>(1);
 }

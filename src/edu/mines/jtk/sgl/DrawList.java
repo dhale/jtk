@@ -45,7 +45,6 @@ public class DrawList {
    * @param dc the draw context.
    */
   public void draw(DrawContext dc) {
-    System.out.println("DrawList.draw: size="+_list.size());
 
     // While drawing, need current and previous arrays of nodes.
     Node[] empty = new Node[0];
