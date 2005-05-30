@@ -30,7 +30,7 @@ import static edu.mines.jtk.opengl.Gl.*;
  * Ideally, this bounding sphere is the smallest sphere that contains the
  * node's geometry. Nodes with bounding spheres that do not intersect a 
  * view's frustum will be culled, and not drawn or picked within that 
- * view.
+ * view. Bounding spheres are specified in local coordinates.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.21
  */

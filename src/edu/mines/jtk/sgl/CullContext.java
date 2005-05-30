@@ -42,6 +42,8 @@ public class CullContext extends TransformContext {
    *  of the node; false, otherwise.
    */
   public boolean frustumIntersects(Node node) {
+    BoundingSphere bs = node.getBoundingSphere();
+
     return true; // TODO: test bounding sphere
   }
 
@@ -61,4 +63,14 @@ public class CullContext extends TransformContext {
   }
 
   private DrawList _drawList = new DrawList();
+  private Plane[] _frustum = new Plane[6];
+
+  private void initFrustum(ViewCanvas canvas) {
+    _frustum[0] = new Plane(-1.0, 0.0, 0.0, 1.0); // right
+    _frustum[1] = new Plane( 1.0, 0.0, 0.0, 1.0); // left
+    _frustum[2] = new Plane( 0.0,-1.0, 0.0, 1.0); // top
+    _frustum[3] = new Plane( 0.0, 1.0, 0.0, 1.0); // bottom
+    _frustum[4] = new Plane( 0.0, 0.0,-1.0, 1.0); // near
+    _frustum[5] = new Plane( 0.0, 0.0, 1.0, 1.0); // far
+  }
 }
