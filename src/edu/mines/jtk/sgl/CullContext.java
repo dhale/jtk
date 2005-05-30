@@ -21,19 +21,12 @@ import java.util.*;
 public class CullContext extends TransformContext {
 
   /**
-   * Constructs a cull context with identity transforms.
-   */
-  public CullContext() {
-    super();
-  }
-
-  /**
    * Constructs a transform context for the specified view canvas.
    * @param canvas the view canvas.
    */
   public CullContext(ViewCanvas canvas) {
     super(canvas);
-    // TODO: initialize view frustum
+    initFrustum();
   }
 
   /**
@@ -42,9 +35,23 @@ public class CullContext extends TransformContext {
    *  of the node; false, otherwise.
    */
   public boolean frustumIntersects(Node node) {
-    BoundingSphere bs = node.getBoundingSphere();
-
-    return true; // TODO: test bounding sphere
+    if (_active!=0) { // if at least one frustum plane is active, ...
+      BoundingSphere bs = node.getBoundingSphere();
+      Point3 c = bs.getCenter();
+      double r = bs.getRadius();
+      double s = -r;
+      for (int i=0,plane=1; i<6; ++i,plane<<=1) {
+        if ((_active&plane)!=0) { // if plane is active, ...
+          double d = _planes[i].distanceTo(c);
+          if (d<s) { // if sphere is entirely outside (below plane)
+            return false;
+          } else if (d>r) { // else if sphere is entirely above plane
+            _active ^= plane; // need not test this plane again
+          }
+        }
+      }
+    }
+    return true;
   }
 
   /**
@@ -62,15 +69,104 @@ public class CullContext extends TransformContext {
     return _drawList;
   }
 
-  private DrawList _drawList = new DrawList();
-  private Plane[] _frustum = new Plane[6];
+  /**
+   * Saves the current node, and then makes the specified node current.
+   * @param node the new current node.
+   */
+  public void pushNode(Node node) {
+    super.pushNode(node);
+    _activeStack.push(_active);
+  }
 
-  private void initFrustum(ViewCanvas canvas) {
-    _frustum[0] = new Plane(-1.0, 0.0, 0.0, 1.0); // right
-    _frustum[1] = new Plane( 1.0, 0.0, 0.0, 1.0); // left
-    _frustum[2] = new Plane( 0.0,-1.0, 0.0, 1.0); // top
-    _frustum[3] = new Plane( 0.0, 1.0, 0.0, 1.0); // bottom
-    _frustum[4] = new Plane( 0.0, 0.0,-1.0, 1.0); // near
-    _frustum[5] = new Plane( 0.0, 0.0, 1.0, 1.0); // far
+  /**
+   * Restores the most recently saved (pushed) node.
+   * Discards the current node.
+   */
+  public void popNode() {
+    super.popNode();
+    _active = _activeStack.pop();
+  }
+
+  /**
+   * Saves the local-to-world transform before appending a transform.
+   * The specified transform matrix is post-multiplied with the current
+   * local-to-world transform, such that the specified transform is applied
+   * first when transforming local coordinates to world coordinates.
+   * @param transform the transform to append.
+   */
+  public void pushLocalToWorld(Matrix44 transform) {
+    super.pushLocalToWorld(transform);
+    pushPlanes();
+    for (int i=0,plane=1; i<6; ++i,plane<<=1) {
+      if ((_active&plane)!=0) // if plane is active, ...
+        _planes[i] = _planes[i].transformWithInverse(transform);
+    }
+  }
+
+  /**
+   * Restores the most recently saved (pushed) local-to-world transform.
+   * Discards the current local-to-world transform.
+   */
+  public void popLocalToWorld() {
+    super.popLocalToWorld();
+    popPlanes();
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // private
+
+  // More efficient than ArrayStack<Integer>.
+  private static class IntStack {
+    void push(int active) {
+      if (_n==_a.length) {
+        int[] a = new int[2*_n];
+        for (int i=0; i<_n; ++i)
+          a[i] = _a[i];
+        _a = a;
+      }
+      _a[_n++] = active;
+    }
+    int pop() {
+      return _a[--_n];
+    }
+    private int _n = 0;
+    private int[] _a = new int[8];
+  }
+
+  private DrawList _drawList = new DrawList();
+  private Plane[] _planes = new Plane[6];
+  private int _active;
+  private ArrayStack<Plane> _planesStack = new ArrayStack<Plane>();
+  private IntStack _activeStack = new IntStack();
+
+  private void pushPlanes() {
+    for (int i=0; i<6; ++i)
+      _planesStack.push(_planes[i].clone());
+  }
+
+  private void popPlanes() {
+    for (int i=5; i>=0; --i)
+      _planes[i] = _planesStack.pop();
+  }
+
+  private void initFrustum() {
+
+    // Frustum planes. Point inside lie in or above the planes.
+    _planes[0] = new Plane(-1.0, 0.0, 0.0, 1.0); // right
+    _planes[1] = new Plane( 1.0, 0.0, 0.0, 1.0); // left
+    _planes[2] = new Plane( 0.0,-1.0, 0.0, 1.0); // top
+    _planes[3] = new Plane( 0.0, 1.0, 0.0, 1.0); // bottom
+    _planes[4] = new Plane( 0.0, 0.0,-1.0, 1.0); // near
+    _planes[5] = new Plane( 0.0, 0.0, 1.0, 1.0); // far
+
+    // Initially, all planes are active.
+    _active = 0x0000003F;
+
+    // Transform frustum from cube to world coordinates.
+    ViewCanvas canvas = getViewCanvas();
+    View view = getView();
+    Matrix44 worldToCube = getWorldToCube();
+    for (int i=0; i<6; ++i)
+      _planes[i].transformWithInverse(worldToCube);
   }
 }

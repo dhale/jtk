@@ -40,8 +40,8 @@ public class TransformGroup extends Group {
    * @param cc the cull context.
    */
   protected void cullBegin(CullContext cc) {
-    cc.pushLocalToWorld(_transform);
     cc.pushNode(this);
+    cc.pushLocalToWorld(_transform);
   }
 
   /**
@@ -58,10 +58,10 @@ public class TransformGroup extends Group {
    * @param dc the draw context.
    */
   protected void drawBegin(DrawContext dc) {
+    dc.pushNode(this);
+    dc.pushLocalToWorld(_transform);
     glPushMatrix();
     glMultMatrixd(_transform.m);
-    dc.pushLocalToWorld(_transform);
-    dc.pushNode(this);
   }
 
   /**

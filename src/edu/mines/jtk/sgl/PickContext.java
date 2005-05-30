@@ -12,4 +12,8 @@ package edu.mines.jtk.sgl;
  * @version 2005.05.21
  */
 public class PickContext extends TransformContext {
+
+  public PickContext(ViewCanvas canvas) {
+    super(canvas);
+  }
 }

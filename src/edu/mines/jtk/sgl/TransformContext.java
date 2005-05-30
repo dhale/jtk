@@ -14,18 +14,6 @@ package edu.mines.jtk.sgl;
 public class TransformContext extends TraversalContext {
 
   /**
-   * Constructs a transform context with identity transforms.
-   * Sets the local-to-world, world-to-view, view-to-cube, and
-   * cube-to-pixel transforms to the identity matrix.
-   */
-  public TransformContext() {
-    _localToWorld = Matrix44.identity();
-    _worldToView = Matrix44.identity();
-    _viewToCube = Matrix44.identity();
-    _cubeToPixel = Matrix44.identity();
-  }
-
-  /**
    * Constructs a transform context for the specified view canvas.
    * Gets its view-to-cube and cube-to-pixel transforms from the
    * canvas. Gets its world-to-view transform from the view drawn
@@ -34,12 +22,37 @@ public class TransformContext extends TraversalContext {
    * @param canvas the view canvas.
    */
   public TransformContext(ViewCanvas canvas) {
-    View view = canvas.getView();
-    World world = view.getWorld();
+    _canvas = canvas;
+    _view = _canvas.getView();
+    _world = _view.getWorld();
     _localToWorld = Matrix44.identity();
-    _worldToView = view.getWorldToView();
-    _viewToCube = canvas.getViewToCube();
-    _cubeToPixel = canvas.getCubeToPixel();
+    _worldToView = _view.getWorldToView();
+    _viewToCube = _canvas.getViewToCube();
+    _cubeToPixel = _canvas.getCubeToPixel();
+  }
+
+  /**
+   * Gets the canvas for which this transform context was constructed.
+   * @return the view canvas.
+   */
+  public ViewCanvas getViewCanvas() {
+    return _canvas;
+  }
+
+  /**
+   * Gets the view for which this transform context was constructed.
+   * @return the view.
+   */
+  public View getView() {
+    return _view;
+  }
+
+  /**
+   * Gets the world for which this transform context was constructed.
+   * @return the world.
+   */
+  public World getWorld() {
+    return _world;
   }
 
   /**
@@ -225,6 +238,9 @@ public class TransformContext extends TraversalContext {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  private ViewCanvas _canvas;
+  private View _view;
+  private World _world;
   private Matrix44 _localToWorld = new Matrix44();
   private Matrix44 _worldToView = new Matrix44();
   private Matrix44 _viewToCube = new Matrix44();
