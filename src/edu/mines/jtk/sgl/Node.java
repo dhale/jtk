@@ -11,6 +11,26 @@ import static edu.mines.jtk.opengl.Gl.*;
 
 /**
  * A node in the scene graph.
+ * <p>
+ * A node has zero or more parents. Because the number of parents can
+ * be greater than one, the scene graph forms a directed acyclic graph
+ * (DAG).
+ * <p>
+ * Nodes are drawn in what is called the <em>draw process</em>. The draw 
+ * process is applied to a node in three steps by calling the methods
+ * {@link #drawBegin(DrawContext)}, 
+ * {@link #draw(DrawContext)}, and
+ * {@link #drawEnd(DrawContext)}, in that order. The actual drawing occurs 
+ * in the method {@link #draw(DrawContext)}. Think of the other two methods
+ * as like opening and closing braces. They might save and restore OpenGL
+ * state, or otherwise push and pop state required for drawing. Nodes must 
+ * not leak OpenGL state set while drawing.
+ * <p>
+ * To facilitate drawing and picking, all nodes have a bounding sphere.
+ * Ideally, this bounding sphere is the smallest sphere that contains the
+ * node's geometry. Nodes with bounding spheres that do not intersect a 
+ * view's frustum will be culled, and not drawn or picked within that 
+ * view.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.21
  */
@@ -68,15 +88,14 @@ public class Node {
     }
   }
 
-
   ///////////////////////////////////////////////////////////////////////////
   // protected
   
   /**
    * Computes the bounding sphere for this node, including its children.
    * This method is called by {@link #getBoundingSphere()} whenever this 
-   * node's bounding sphere is dirty. This method is assumed to return
-   * a clean (valid) bounding sphere.
+   * node's bounding sphere is dirty. This implementation returns an
+   * empty bounding sphere.
    * @return the computed bounding sphere.
    */
   protected BoundingSphere computeBoundingSphere() {

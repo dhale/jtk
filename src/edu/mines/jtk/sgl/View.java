@@ -141,7 +141,7 @@ public abstract class View {
 
   /**
    * Draws this view on the specified canvas.
-   * @param canvas the canvas.
+   * @param canvas the view canvas.
    */
   protected abstract void draw(ViewCanvas canvas);
 

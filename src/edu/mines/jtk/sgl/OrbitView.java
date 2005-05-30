@@ -28,8 +28,8 @@ import static edu.mines.jtk.opengl.Glu.*;
  * <p>
  * An orbit view supports both perspective and orthographic projections.
  * For perspective projections, the field of view is computed by assuming 
- * that the distance from the eye to the default screen is proportional 
- * to the size of that screen.
+ * that the distance from the eye to the default screen is approximately 
+ * equal to the size of that screen.
  * <p>
  * An orbit view is designed to draw on a single view canvas, and the
  * distance from the camera to the center of the world's sphere is 
@@ -40,7 +40,7 @@ import static edu.mines.jtk.opengl.Glu.*;
 public class OrbitView extends View {
 
   /**
-   * Type of projection.
+   * Perspective or orthographic projection.
    */
   public enum Projection {
     PERSPECTIVE, ORTHOGRAPHIC
@@ -197,23 +197,23 @@ public class OrbitView extends View {
     canvas.setCubeToPixel(cubeToPixel);
 
     // View to cube.
-    double maxscale = 3.0; // max scaling without clipping
+    double maxscale = 3.0; // clipping occurs after this much scaling
     Matrix44 viewToCube;
     double distance;
     if (_projection==Projection.PERSPECTIVE) {
-      double r = 1.0; // radius of world sphere, after scaling
+      double r = 1.0; // normalized radius of world sphere
       double e = ss; // distance eye-to-screen (in pixels, approximate)
       double m = min(w,h); // minimum of viewport width and height
       double a = 2*atan(m/(2*e)); // angle subtended by sphere
       double d = r/sin(a/2); // distance from eye to center of sphere
       double fovy = 2*atan(h/(2*e))*180/PI;
       double aspect = (double)w/(double)h;
-      double znear = max(d-maxscale*r,0.1); // scaling by 3 before clipping
+      double znear = max(d-maxscale*r,0.1);
       double zfar  = max(d+maxscale*r,100*znear);
       viewToCube = Matrix44.perspective(fovy,aspect,znear,zfar);
       distance = d;
     } else {
-      double r = 1.0; // radius of world sphere, after scaling
+      double r = 1.0; // normalized radius of world sphere
       double m = min(w,h); // minimum of viewport width and height
       double d = maxscale*r; // distance from eye to center of sphere
       double right = w/m;
