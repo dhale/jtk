@@ -9,7 +9,6 @@ set JRE_HOME=c:\pro\jdk\jre
 
 set CLASSPATH=^
 %MINES_JTK_HOME%\jar\edu_mines_jtk.jar;^
-%MINES_JTK_HOME%\jar\swt.jar;^
 %MINES_JTK_HOME%\jar\junit.jar
 
 set PATH=^
