@@ -96,8 +96,8 @@ public class CullContext extends TransformContext {
    */
   public void pushLocalToWorld(Matrix44 transform) {
     super.pushLocalToWorld(transform);
-    pushPlanes();
-    for (int i=0,plane=1; i<6; ++i,plane<<=1) {
+    for (int i=0,plane=1; i<6; ++i,plane<<=1) { // for all planes
+      _planesStack.push(_planes[i].clone()); // save plane
       if ((_active&plane)!=0) // if plane is active
         _planes[i].transformWithInverse(transform); // transform it
     }
@@ -109,7 +109,8 @@ public class CullContext extends TransformContext {
    */
   public void popLocalToWorld() {
     super.popLocalToWorld();
-    popPlanes();
+    for (int i=5; i>=0; --i) // for all planes (in reverse order!)
+      _planes[i] = _planesStack.pop(); // restore plane
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -138,16 +139,6 @@ public class CullContext extends TransformContext {
   private int _active;
   private ArrayStack<Plane> _planesStack = new ArrayStack<Plane>();
   private IntStack _activeStack = new IntStack();
-
-  private void pushPlanes() {
-    for (int i=0; i<6; ++i)
-      _planesStack.push(_planes[i].clone());
-  }
-
-  private void popPlanes() {
-    for (int i=5; i>=0; --i)
-      _planes[i] = _planesStack.pop();
-  }
 
   private void initFrustum() {
 
