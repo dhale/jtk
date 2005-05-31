@@ -139,10 +139,9 @@ public class Plane implements Cloneable {
    * satisfies the equation a'*x' + b'*y' + c'*z' + d' = 0 for all 
    * transformed points p' = (x',y',z') within the transformed plane.
    * @param m the transform matrix.
-   * @return the transformed plane.
    */
-  public Plane transform(Matrix44 m) {
-    return transformWithInverse(m.inverse());
+  public void transform(Matrix44 m) {
+    transformWithInverse(m.inverse());
   }
 
   /**
@@ -151,14 +150,18 @@ public class Plane implements Cloneable {
    * more efficient than the method {@link #transform(Matrix44)}.
    * @param mi the inverse of the transform matrix.
    */
-  public Plane transformWithInverse(Matrix44 mi) {
+  public void transformWithInverse(Matrix44 mi) {
     // (transpose of inverse matrix) times (plane coefficient vector)
     double[] m = mi.m;
     double a = m[ 0]*_a + m[ 1]*_b + m[ 2]*_c + m[ 3]*_d;
     double b = m[ 4]*_a + m[ 5]*_b + m[ 6]*_c + m[ 7]*_d;
     double c = m[ 8]*_a + m[ 9]*_b + m[10]*_c + m[11]*_d;
     double d = m[12]*_a + m[13]*_b + m[14]*_c + m[15]*_d;
-    return new Plane(a,b,c,d);
+    set(a,b,c,d);
+  }
+
+  public String toString() {
+    return "("+_a+","+_b+","+_c+","+_d+")";
   }
 
   ///////////////////////////////////////////////////////////////////////////

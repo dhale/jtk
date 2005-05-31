@@ -99,7 +99,7 @@ public class CullContext extends TransformContext {
     pushPlanes();
     for (int i=0,plane=1; i<6; ++i,plane<<=1) {
       if ((_active&plane)!=0) // if plane is active, ...
-        _planes[i] = _planes[i].transformWithInverse(transform);
+        _planes[i].transformWithInverse(transform);
     }
   }
 

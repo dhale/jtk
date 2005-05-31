@@ -26,6 +26,7 @@ public class ColorCube extends Node {
   }
 
   protected void draw(DrawContext dc) {
+    System.out.println("draw: this="+this);
     glBegin(GL_QUADS); {
       glColor3d(1,0,0);
       glVertex3d(0,0,0);
@@ -42,8 +43,16 @@ public class ColorCube extends Node {
 
   public static void main(String[] args) {
     World world = new World();
-    world.addChild(new ColorCube());
+    TransformGroup tg1 = new TransformGroup(Matrix44.translate(-2,0,0));
+    TransformGroup tg2 = new TransformGroup(Matrix44.translate( 2,0,0));
+    world.addChild(tg1);
+    world.addChild(tg2);
+    tg1.addChild(new ColorCube());
+    tg2.addChild(new ColorCube());
     OrbitView view = new OrbitView(world);
+    //view.setWorldSphere(new BoundingSphere(new Point3(2.5,0.5,0.5),0.867));
+    //view.setAzimuthAndElevation(0.0,0.0);
+    //view.setProjection(OrbitView.Projection.ORTHOGRAPHIC);
     ViewCanvas canvas = new ViewCanvas(view);
     canvas.setView(view);
     JFrame frame = new JFrame();

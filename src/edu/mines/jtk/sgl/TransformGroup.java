@@ -73,6 +73,36 @@ public class TransformGroup extends Group {
     dc.popLocalToWorld();
     glPopMatrix();
   }
+  
+  /**
+   * Computes the bounding sphere for this transform group.
+   * @return the computed bounding sphere.
+   */
+  protected BoundingSphere computeBoundingSphere() {
+    BoundingSphere bs = super.computeBoundingSphere();
+    if (bs.isEmpty())
+      return bs;
+    Point3 c = bs.getCenter();
+    double r = bs.getRadius();
+    Point3 x = new Point3(c.x+r,c.y,c.z);
+    Point3 y = new Point3(c.x,c.y+r,c.z);
+    Point3 z = new Point3(c.x,c.y,c.z+r);
+    x = _transform.times(x);
+    y = _transform.times(y);
+    z = _transform.times(z);
+    c = _transform.times(c);
+    Vector3 cx = new Vector3(c,x);
+    Vector3 cy = new Vector3(c,y);
+    Vector3 cz = new Vector3(c,z);
+    double lx = cx.length();
+    double ly = cy.length();
+    double lz = cz.length();
+    r = lx;
+    if (r<ly) r = ly;
+    if (r<lz) r = lz;
+    bs = new BoundingSphere(c,r);
+    return bs;
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
