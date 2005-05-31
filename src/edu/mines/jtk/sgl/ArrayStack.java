@@ -13,22 +13,28 @@ import java.util.ArrayList;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.23
  */
-class ArrayStack<E> extends ArrayList<E> {
-
-  public ArrayStack() {
-    super();
-  }
+class ArrayStack<E> {
 
   public E push(E e) {
-    add(e);
+    _list.add(e);
     return e;
   }
 
   public E pop() {
-    return remove(size()-1);
+    return _list.remove(_list.size()-1);
   }
 
   public E peek() {
-    return get(size()-1);
+    return _list.get(_list.size()-1);
   }
+
+  public E get(int index) {
+    return _list.get(index);
+  }
+
+  public int size() {
+    return _list.size();
+  }
+
+  private ArrayList<E> _list = new ArrayList<E>();
 }
