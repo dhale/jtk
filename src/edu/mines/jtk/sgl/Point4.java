@@ -42,11 +42,42 @@ public class Point4 extends Tuple4 {
   }
 
   /**
+   * Constructs a point from the specified 3-D point.
+   * The (x,y,z,w) coordinates of the constructed point are (p.x,p.y,p.z,1).
+   * @param p the 3-D point.
+   */
+  public Point4(Point3 p) {
+    super(p.x,p.y,p.z,1.0);
+  }
+
+  /**
    * Returns a clone of this point.
    * @return the clone.
    */
   public Point4 clone() {
     return new Point4(x,y,z,w);
+  }
+
+  /**
+   * Returns the homogenized point equivalent to this point.
+   * Homogenization is division of the coordinates (x,y,z,w) by w.
+   * @return the homogenized point.
+   */
+  public Point4 homogenize() {
+    return new Point4(x/w,y/w,z/w,1.0);
+  }
+
+  /**
+   * Homogenizes this point.
+   * Homogenization is division of the coordinates (x,y,z,w) by w.
+   * @return this homogenized point.
+   */
+  public Point4 homogenizeEquals() {
+    x /= w;
+    y /= w;
+    z /= w;
+    w = 1.0;
+    return this;
   }
 
   /**

@@ -103,6 +103,19 @@ public class Group extends Node {
     return bs;
   }
 
+  /**
+   * Gets the OpenGL attribute bits for this group. For efficiency, this 
+   * implementation simply returns 0 (no bits). This value is correct only 
+   * if the group leaves all OpenGL state unchanged in its draw process. 
+   * Specifically, the OpenGL state may change <em>during</em> the draw 
+   * process for a group, but the state <em>before</em> and <em>after</em> 
+   * that process must be the same.
+   * @return the attribute bits.
+   */
+  protected int getAttributeBits() {
+    return 0;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 

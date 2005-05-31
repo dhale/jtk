@@ -93,9 +93,9 @@ public class TransformGroup extends Group {
     x = _transform.times(x);
     y = _transform.times(y);
     z = _transform.times(z);
-    Vector3 cx = new Vector3(c,x);
-    Vector3 cy = new Vector3(c,y);
-    Vector3 cz = new Vector3(c,z);
+    Vector3 cx = c.minus(x);
+    Vector3 cy = c.minus(y);
+    Vector3 cz = c.minus(z);
     double lx = cx.length();
     double ly = cy.length();
     double lz = cz.length();

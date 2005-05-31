@@ -30,6 +30,15 @@ public class Point3 extends Tuple3 {
   }
 
   /**
+   * Constructs a point from the specified 4-d point. The (x,y,z) 
+   * coordinates of the constructed point are (p.x/p.w,p.y/p.w,p.z/p.w).
+   * @param p the 4-D point.
+   */
+  public Point3(Point4 p) {
+    super(p.x/p.w,p.y/p.w,p.z/p.w);
+  }
+
+  /**
    * Returns a clone of this point.
    * @return the clone.
    */
@@ -53,6 +62,15 @@ public class Point3 extends Tuple3 {
    */
   public Point3 minus(Vector3 v) {
     return new Point3(x-v.x,y-v.y,z-v.z);
+  }
+
+  /**
+   * Returns the vector v = p-q, for this point p and the specified point q.
+   * @param q the point q.
+   * @return the vector v = p-q.
+   */
+  public Vector3 minus(Point3 q) {
+    return new Vector3(x-q.x,y-q.y,z-q.z);
   }
 
   /**

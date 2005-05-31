@@ -30,15 +30,6 @@ public class Vector3 extends Tuple3 {
   }
 
   /**
-   * Constructs a vector from a specified point p to a specified point q.
-   * @param p the point p.
-   * @param q the point q.
-   */
-  public Vector3(Point3 p, Point3 q) {
-    super(q.x-p.x,q.y-p.y,q.z-p.z);
-  }
-
-  /**
    * Returns a clone of this vector.
    * @return the clone.
    */

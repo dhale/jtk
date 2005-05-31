@@ -88,6 +88,14 @@ public class Node {
     }
   }
 
+  /**
+   * Sets the OpenGL states for this node.
+   * @param states the OpenGL states.
+   */
+  public void setStates(StateSet states) {
+    _states = states;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
   
@@ -100,6 +108,28 @@ public class Node {
    */
   protected BoundingSphere computeBoundingSphere() {
     return new BoundingSphere();
+  }
+
+  /**
+   * Gets the OpenGL attribute bits for this node. These bits determine 
+   * which OpenGL state attributes are pushed and popped in the methods
+   * {@link #drawBegin(DrawContext)} and {@link #drawEnd(DrawContext)}.
+   * <p>
+   * The attribute bits returned by this method need not include any 
+   * bits from this node's {@link StateSet}, if it has one. Those bits
+   * will be combined with any bits returned by this method.
+   * <p>
+   * Classes that extend this base class may override this method to 
+   * return only those bits corresponding to OpenGL state that they 
+   * modify but do not restore. However, classes that do so should take 
+   * care to include all relevant bits. Nodes must not leak OpenGL state!
+   * <p>
+   * This implementation simply returns GL_ALL_ATTRIB_BITS, which is
+   * safe, but may be inefficient.
+   * @return the attribute bits.
+   */
+  protected int getAttributeBits() {
+    return GL_ALL_ATTRIB_BITS;
   }
 
   /**
@@ -165,7 +195,10 @@ public class Node {
    */
   protected void drawBegin(DrawContext dc) {
     dc.pushNode(this);
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
+    int bits = getAttributeBits();
+    if (bits!=GL_ALL_ATTRIB_BITS && _states!=null)
+      bits |= _states.getAttributeBits();
+    glPushAttrib(bits);
   }
 
   /**
@@ -220,4 +253,5 @@ public class Node {
   private boolean _boundingSphereDirty = true;
   private BoundingSphere _boundingSphere = null;
   private ArrayList<Group> _parentList = new ArrayList<Group>(2);
+  private StateSet _states;
 }

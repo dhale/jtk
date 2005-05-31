@@ -18,16 +18,16 @@ import java.util.*;
  * <p>
  * Conceptually, this list draws each array of nodes as follows. Starting 
  * with the first (top) node, and working from top to bottom, this list 
- * calls {@link Node.drawBegin(DrawContext)} for each node in the array. 
- * It then calls {@link Node.draw(DrawContext)} for the last (bottom) node. 
+ * calls {@link Node#drawBegin(DrawContext)} for each node in the array. 
+ * It then calls {@link Node#draw(DrawContext)} for the last (bottom) node. 
  * Finally, starting with that last node, and working from bottom to top, 
- * it calls {@link Node.drawEnd(DrawContext)} for each node in the array.
+ * it calls {@link Node#drawEnd(DrawContext)} for each node in the array.
  * <p>
  * In practice, at least some parent nodes are likely to be the same from 
  * one array to the next. For example, the first (top) node is likely to 
  * be the same in all arrays of nodes. Therefore, during drawing, this 
- * list avoids any redundant calls to {@link Node.drawEnd(DrawContext)} 
- * and {@link Node.drawBegin(DrawContext)}.
+ * list avoids any redundant calls to {@link Node#drawEnd(DrawContext)} 
+ * and {@link Node#drawBegin(DrawContext)}.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.26
  */
