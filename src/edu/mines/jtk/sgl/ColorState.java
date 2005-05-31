@@ -24,8 +24,8 @@ public class ColorState implements State {
   }
 
   /**
-   * Determines whether this state has a current color.
-   * @return true, if a current color; false, otherwise.
+   * Determines whether this state has current color.
+   * @return true, if current color; false, otherwise.
    */
   public boolean hasColor() {
     return _colorSet;
@@ -49,7 +49,7 @@ public class ColorState implements State {
   }
 
   /**
-   * Unsets the current color,  
+   * Unsets the current color.  
    */
   public void unsetColor() {
     _color = _colorDefault;
@@ -57,8 +57,8 @@ public class ColorState implements State {
   }
 
   /**
-   * Determines whether this state has a shade model.
-   * @return true, if a shade model; false, otherwise.
+   * Determines whether this state has shade model.
+   * @return true, if shade model; false, otherwise.
    */
   public boolean hasShadeModel() {
     return _shadeModelSet;
@@ -82,7 +82,7 @@ public class ColorState implements State {
   }
 
   /**
-   * Unsets the shade model,  
+   * Unsets the shade model.
    */
   public void unsetShadeModel() {
     _shadeModel = _shadeModelDefault;
