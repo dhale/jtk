@@ -199,6 +199,8 @@ public class Node {
     if (bits!=GL_ALL_ATTRIB_BITS && _states!=null)
       bits |= _states.getAttributeBits();
     glPushAttrib(bits);
+    if (_states!=null)
+      _states.apply();
   }
 
   /**

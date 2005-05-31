@@ -24,21 +24,69 @@ public class ColorState implements State {
   }
 
   /**
+   * Determines whether this state has a current color.
+   * @return true, if a current color; false, otherwise.
+   */
+  public boolean hasColor() {
+    return _colorSet;
+  }
+
+  /**
+   * Gets the current color.
+   * @return the current color.
+   */
+  public Color getColor() {
+    return _color;
+  }
+
+  /**
    * Sets the current color.
    * @param color the current color.
    */
   public void setColor(Color color) {
     _color = color;
-    _colorSet = color!=null;
+    _colorSet = true;
+  }
+
+  /**
+   * Unsets the current color,  
+   */
+  public void unsetColor() {
+    _color = _colorDefault;
+    _colorSet = false;
+  }
+
+  /**
+   * Determines whether this state has a shade model.
+   * @return true, if a shade model; false, otherwise.
+   */
+  public boolean hasShadeModel() {
+    return _shadeModelSet;
+  }
+
+  /**
+   * Gets the shade model.
+   * @return the shade model.
+   */
+  public int getShadeModel() {
+    return _shadeModel;
   }
 
   /**
    * Sets the shade model.
-   * @param mode the shade model (GL_FLAT or GL_SMOOTH).
+   * @param shadeModel the shade model.
    */
-  public void setShadeModel(int mode) {
-    _shadeModel = mode;
+  public void setShadeModel(int shadeModel) {
+    _shadeModel = shadeModel;
     _shadeModelSet = true;
+  }
+
+  /**
+   * Unsets the shade model,  
+   */
+  public void unsetShadeModel() {
+    _shadeModel = _shadeModelDefault;
+    _shadeModelSet = false;
   }
 
   public void apply() {
@@ -63,8 +111,11 @@ public class ColorState implements State {
     return bits;
   }
 
-  private Color _color;
+  private static Color _colorDefault = new Color(1.0f,1.0f,1.0f,1.0f);
+  private Color _color = _colorDefault;
   private boolean _colorSet;
-  private int _shadeModel;
+
+  private static int _shadeModelDefault = GL_SMOOTH;
+  private int _shadeModel = _shadeModelDefault;
   private boolean _shadeModelSet;
 }
