@@ -40,11 +40,11 @@ public class CullContext extends TransformContext {
       Point3 c = bs.getCenter();
       double r = bs.getRadius();
       double s = -r;
-      for (int i=0,plane=1; i<6; ++i,plane<<=1) {
-        if ((_active&plane)!=0) { // if plane is active, ...
-          double d = _planes[i].distanceTo(c);
+      for (int i=0,plane=1; i<6; ++i,plane<<=1) { // for all six planes
+        if ((_active&plane)!=0) { // if plane is active
+          double d = _planes[i].distanceTo(c); // distance from center
           if (d<s) { // if sphere is entirely outside (below plane)
-            return false;
+            return false; // no intersection
           } else if (d>r) { // else if sphere is entirely above plane
             _active ^= plane; // need not test this plane again
           }
@@ -98,8 +98,8 @@ public class CullContext extends TransformContext {
     super.pushLocalToWorld(transform);
     pushPlanes();
     for (int i=0,plane=1; i<6; ++i,plane<<=1) {
-      if ((_active&plane)!=0) // if plane is active, ...
-        _planes[i].transformWithInverse(transform);
+      if ((_active&plane)!=0) // if plane is active
+        _planes[i].transformWithInverse(transform); // transform it
     }
   }
 
@@ -159,7 +159,7 @@ public class CullContext extends TransformContext {
     _planes[4] = new Plane( 0.0, 0.0,-1.0, 1.0); // near
     _planes[5] = new Plane( 0.0, 0.0, 1.0, 1.0); // far
 
-    // Initially, all planes are active.
+    // Initially, all six planes are active; mark each with one bit.
     _active = 0x0000003F;
 
     // Transform frustum from cube to world coordinates.

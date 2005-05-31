@@ -76,21 +76,23 @@ public class TransformGroup extends Group {
   
   /**
    * Computes the bounding sphere for this transform group.
+   * A transform group computes its bounding sphere in the untransformed 
+   * coordinate system, not the transformed system of its children.
    * @return the computed bounding sphere.
    */
   protected BoundingSphere computeBoundingSphere() {
     BoundingSphere bs = super.computeBoundingSphere();
     if (bs.isEmpty())
       return bs;
-    Point3 c = bs.getCenter();
     double r = bs.getRadius();
+    Point3 c = bs.getCenter();
     Point3 x = new Point3(c.x+r,c.y,c.z);
     Point3 y = new Point3(c.x,c.y+r,c.z);
     Point3 z = new Point3(c.x,c.y,c.z+r);
+    c = _transform.times(c);
     x = _transform.times(x);
     y = _transform.times(y);
     z = _transform.times(z);
-    c = _transform.times(c);
     Vector3 cx = new Vector3(c,x);
     Vector3 cy = new Vector3(c,y);
     Vector3 cz = new Vector3(c,z);
