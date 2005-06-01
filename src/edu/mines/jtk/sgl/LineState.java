@@ -24,8 +24,8 @@ public class LineState implements State {
   }
 
   /**
-   * Determines whether this state has line smooth.
-   * @return true, if line smooth; false, otherwise.
+   * Determines whether line smooth is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasSmooth() {
     return _smoothSet;
@@ -57,8 +57,8 @@ public class LineState implements State {
   }
 
   /**
-   * Determines whether this state has line stipple.
-   * @return true, if line stipple; false, otherwise.
+   * Determines whether line stipple is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasStipple() {
     return _stippleSet;
@@ -101,8 +101,8 @@ public class LineState implements State {
   }
 
   /**
-   * Determines whether this state has line width.
-   * @return true, if line width; false, otherwise.
+   * Determines whether line width is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasWidth() {
     return _widthSet;

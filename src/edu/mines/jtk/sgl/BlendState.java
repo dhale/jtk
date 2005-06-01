@@ -24,8 +24,8 @@ public class BlendState implements State {
   }
 
   /**
-   * Determines whether this state has blend color.
-   * @return true, if blend color; false, otherwise.
+   * Determines whether blend color is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasColor() {
     return _colorSet;
@@ -57,8 +57,8 @@ public class BlendState implements State {
   }
 
   /**
-   * Determines whether this state has blend equation.
-   * @return true, if blend equation; false, otherwise.
+   * Determines whether blend equation is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasEquation() {
     return _equationSet;
@@ -90,8 +90,8 @@ public class BlendState implements State {
   }
 
   /**
-   * Determines whether this state has blend function.
-   * @return true, if blend function; false, otherwise.
+   * Determines whether blend function is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasBlendFunction() {
     return _functionSet;

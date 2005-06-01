@@ -13,9 +13,7 @@ import static edu.mines.jtk.opengl.Gl.*;
 /**
  * OpenGL material state. 
  * <p>
- * When applied, this state enables GL_LIGHTING, along with any other 
- * OpenGL attributes set explicitly.
- * <p>
+ * When applied, this state enables GL_LIGHTING, always.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.31
  */
@@ -28,16 +26,16 @@ public class MaterialState implements State {
   }
 
   /**
-   * Determines whether this state has ambient color for front faces.
-   * @return true, if ambient color; false, otherwise.
+   * Determines whether ambient color for front faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasAmbientFront() {
     return _ambientFrontSet;
   }
 
   /**
-   * Determines whether this state has ambient color for back faces.
-   * @return true, if ambient color; false, otherwise.
+   * Determines whether ambient color for back faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasAmbientBack() {
     return _ambientBackSet;
@@ -111,16 +109,16 @@ public class MaterialState implements State {
   }
 
   /**
-   * Determines whether this state has diffuse color for front faces.
-   * @return true, if diffuse color; false, otherwise.
+   * Determines whether diffuse color for front faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasDiffuseFront() {
     return _diffuseFrontSet;
   }
 
   /**
-   * Determines whether this state has diffuse color for back faces.
-   * @return true, if diffuse color; false, otherwise.
+   * Determines whether diffuse color for back faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasDiffuseBack() {
     return _diffuseBackSet;
@@ -194,16 +192,16 @@ public class MaterialState implements State {
   }
 
   /**
-   * Determines whether this state has specular color for front faces.
-   * @return true, if specular color; false, otherwise.
+   * Determines whether specular color for front faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasSpecularFront() {
     return _specularFrontSet;
   }
 
   /**
-   * Determines whether this state has specular color for back faces.
-   * @return true, if specular color; false, otherwise.
+   * Determines whether specular color for back faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasSpecularBack() {
     return _specularBackSet;
@@ -277,16 +275,16 @@ public class MaterialState implements State {
   }
 
   /**
-   * Determines whether this state has emissive color for front faces.
-   * @return true, if emissive color; false, otherwise.
+   * Determines whether emissive color for front faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasEmissiveFront() {
     return _emissiveFrontSet;
   }
 
   /**
-   * Determines whether this state has emissive color for back faces.
-   * @return true, if emissive color; false, otherwise.
+   * Determines whether emissive color for back faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasEmissiveBack() {
     return _emissiveBackSet;
@@ -360,16 +358,16 @@ public class MaterialState implements State {
   }
 
   /**
-   * Determines whether this state has shininess for front faces.
-   * @return true, if shininess; false, otherwise.
+   * Determines whether shininess for front faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasShininessFront() {
     return _shininessFrontSet;
   }
 
   /**
-   * Determines whether this state has shininess for back faces.
-   * @return true, if shininess; false, otherwise.
+   * Determines whether shininess for back faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasShininessBack() {
     return _shininessBackSet;
@@ -443,16 +441,16 @@ public class MaterialState implements State {
   }
 
   /**
-   * Determines whether this state has color material mode for front faces.
-   * @return true, if color material mode; false, otherwise.
+   * Determines whether color material mode for front faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasColorMaterialFront() {
     return _colorMaterialFrontSet;
   }
 
   /**
-   * Determines whether this state has color material mode for back faces.
-   * @return true, if color material mode; false, otherwise.
+   * Determines whether color material mode for back faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasColorMaterialBack() {
     return _colorMaterialBackSet;

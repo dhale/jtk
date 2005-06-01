@@ -24,8 +24,8 @@ public class PolygonState implements State {
   }
 
   /**
-   * Determines whether this state has cull face mode.
-   * @return true, if cull face mode; false, otherwise.
+   * Determines whether cull face mode is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasCullFace() {
     return _cullFaceSet;
@@ -57,8 +57,8 @@ public class PolygonState implements State {
   }
 
   /**
-   * Determines whether this state has front face mode.
-   * @return true, if front face mode; false, otherwise.
+   * Determines whether front face mode is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasFrontFace() {
     return _frontFaceSet;
@@ -90,16 +90,16 @@ public class PolygonState implements State {
   }
 
   /**
-   * Determines whether this state has polygon mode for front faces.
-   * @return true, if polygon mode; false, otherwise.
+   * Determines whether polygon mode for front faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasPolygonModeFront() {
     return _polygonModeFrontSet;
   }
 
   /**
-   * Determines whether this state has polygon mode for back faces.
-   * @return true, if polygon mode; false, otherwise.
+   * Determines whether polygon mode for back faces is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasPolygonModeBack() {
     return _polygonModeBackSet;
@@ -173,8 +173,8 @@ public class PolygonState implements State {
   }
 
   /**
-   * Determines whether this state has polygon offset.
-   * @return true, if polygon offset; false, otherwise.
+   * Determines whether polygon offset is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasPolygonOffset() {
     return _polygonOffsetSet;
@@ -208,7 +208,7 @@ public class PolygonState implements State {
   }
 
   /**
-   * Unsets the polygon offset.  
+   * Unsets the polygon offset.
    */
   public void unsetPolygonOffset() {
     _polygonOffsetFactor = _polygonOffsetFactorDefault;
@@ -217,8 +217,8 @@ public class PolygonState implements State {
   }
 
   /**
-   * Determines whether this state has polygon offset fill.
-   * @return true, if polygon offset fill; false, otherwise.
+   * Determines whether polygon offset fill is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasPolygonOffsetFill() {
     return _polygonOffsetFillSet;
@@ -250,8 +250,8 @@ public class PolygonState implements State {
   }
 
   /**
-   * Determines whether this state has polygon offset line.
-   * @return true, if polygon offset line; false, otherwise.
+   * Determines whether polygon offset line is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasPolygonOffsetLine() {
     return _polygonOffsetLineSet;
@@ -283,8 +283,8 @@ public class PolygonState implements State {
   }
 
   /**
-   * Determines whether this state has polygon offset point.
-   * @return true, if polygon offset point; false, otherwise.
+   * Determines whether polygon offset point is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasPolygonOffsetPoint() {
     return _polygonOffsetPointSet;
@@ -308,8 +308,8 @@ public class PolygonState implements State {
   }
 
   /**
-   * Determines whether this state has polygon stipple.
-   * @return true, if polygon stipple; false, otherwise.
+   * Determines whether polygon stipple is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasPolygonStipple() {
     return _polygonStippleSet;

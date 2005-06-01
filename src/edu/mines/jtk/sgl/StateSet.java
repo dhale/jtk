@@ -9,41 +9,88 @@ package edu.mines.jtk.sgl;
 import java.util.*;
 
 /**
- * A set of OpenGL states.
+ * A set of OpenGL states. State sets can be associated with nodes in
+ * a scene graph. During the draw process for a node, these states are 
+ * applied in the method {@link Node#drawBegin(DrawContext)}, before
+ * the method {@link Node#draw(DrawContext)} is called.
+ * <p>
+ * If two states of the same class with the same attributes are added
+ * to a state set, then the order in which those states are applied
+ * is undefined. Generally, 
+ * Nothing prevents two states of the same class from being added to
+ * the same state set. Howev
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.31
  */
 public class StateSet implements State {
 
+  /**
+   * Adds the specified state to this set.
+   * @param state the state.
+   */
   public void add(State state) {
-    _states.put(state.getClass(),state);
-    _attributeBits |= state.getAttributeBits();
+    _states.add(state);
   }
 
+  /**
+   * Removes the specified state from this set.
+   * @param state the state.
+   */
   public void remove(State state) {
-    _states.remove(state.getClass());
-    _attributeBits &= ~state.getAttributeBits();
+    _states.remove(state);
   }
 
-  public Iterator<State> getStates() {
-    return _states.values().iterator();
+  /**
+   * Determines whether this set contains a state of the specified class.
+   * @param stateClass the state class.
+   * @return true; if this state contains such a state; false, otherwise.
+   */
+  public boolean contains(Class stateClass) {
+    return find(stateClass)!=null;
   }
 
-  public void apply() {
-    Iterator<State> is = getStates();
-    while (is.hasNext()) {
-      State s = is.next();
-      s.apply();
+  /**
+   * Finds a state in this set of the specified class.
+   * @param stateClass the state class.
+   * @return the state; null, if the set contains no such state.
+   */
+  public State find(Class stateClass) {
+    for (State s : _states) {
+      if (s.getClass().equals(stateClass))
+        return s;
     }
+    return null;
   }
 
+  /**
+   * Gets an iterator for all states in this set.
+   * @return the iterator.
+   */
+  public Iterator<State> getStates() {
+    return _states.iterator();
+  }
+
+  /**
+   * Applies all states in this set.
+   */
+  public void apply() {
+    for (State s : _states)
+      s.apply();
+  }
+
+  /**
+   * Gets the combined attribute bits for all states in this set.
+   * @return the attribute bits.
+   */
   public int getAttributeBits() {
-    return _attributeBits;
+    int attributeBits = 0;
+    for (State state : _states)
+      attributeBits |= state.getAttributeBits();
+    return attributeBits;
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private Map<Class,State> _states = new HashMap<Class,State>();
-  private int _attributeBits = 0;
+  private Set<State> _states = new HashSet<State>();
 }

@@ -24,8 +24,8 @@ public class PointState implements State {
   }
 
   /**
-   * Determines whether this state has point smooth.
-   * @return true, if point smooth; false, otherwise.
+   * Determines whether point smooth is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasSmooth() {
     return _smoothSet;
@@ -57,8 +57,8 @@ public class PointState implements State {
   }
 
   /**
-   * Determines whether this state has point size.
-   * @return true, if point size; false, otherwise.
+   * Determines whether point size is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasSize() {
     return _sizeSet;

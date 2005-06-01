@@ -24,48 +24,48 @@ public class LightModelState implements State {
   }
 
   /**
-   * Determines whether this state has ambient color.
-   * @return true, if ambient color; false, otherwise.
+   * Determines whether the ambient color attribute is set.
+   * @return true, if set; false, otherwise.
    */
-  public boolean hasAmbientColor() {
-    return _ambientColorSet;
+  public boolean hasAmbient() {
+    return _ambientSet;
   }
 
   /**
-   * Gets the ambient color.
+   * Gets the ambient color attribute.
    * @return the ambient color.
    */
-  public Color getAmbientColor() {
-    return toColor(_ambientColor);
+  public Color getAmbient() {
+    return toColor(_ambient);
   }
 
   /**
-   * Sets the ambient color.
+   * Sets the ambient color attribute.
    * @param color the ambient color.
    */
-  public void setAmbientColor(Color color) {
-    _ambientColor = toArray(color);
-    _ambientColorSet = true;
+  public void setAmbient(Color color) {
+    _ambient = toArray(color);
+    _ambientSet = true;
   }
 
   /**
-   * Unsets the ambient color.  
+   * Unsets the ambient color attribute.
    */
-  public void unsetAmbientColor() {
-    _ambientColor = _ambientColorDefault;
-    _ambientColorSet = false;
+  public void unsetAmbient() {
+    _ambient = _ambientDefault;
+    _ambientSet = false;
   }
 
   /**
-   * Determines whether this state has color control.
-   * @return true, if color control; false, otherwise.
+   * Determines whether the color control attribute is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasColorControl() {
     return _colorControlSet;
   }
 
   /**
-   * Gets the color control.
+   * Gets the color control attribute.
    * @return the color control.
    */
   public int getColorControl() {
@@ -73,7 +73,7 @@ public class LightModelState implements State {
   }
 
   /**
-   * Sets the color control.
+   * Sets the color control attribute.
    * @param control the color control.
    */
   public void setColorControl(int control) {
@@ -82,7 +82,7 @@ public class LightModelState implements State {
   }
 
   /**
-   * Unsets the color control.  
+   * Unsets the color control attribute.
    */
   public void unsetColorControl() {
     _colorControl = _colorControlDefault;
@@ -90,15 +90,15 @@ public class LightModelState implements State {
   }
 
   /**
-   * Determines whether this state has local viewer.
-   * @return true, if local viewer; false, otherwise.
+   * Determines whether the local viewer attribute is set.
+   * @return true, if set; false, otherwise.
    */
   public boolean hasLocalViewer() {
     return _localViewerSet;
   }
 
   /**
-   * Gets the local viewer.
+   * Gets the local viewer attribute.
    * @return the local viewer.
    */
   public boolean getLocalViewer() {
@@ -106,7 +106,7 @@ public class LightModelState implements State {
   }
 
   /**
-   * Sets the local viewer.
+   * Sets the local viewer attribute.
    * @param local the local viewer.
    */
   public void setLocalViewer(boolean local) {
@@ -115,7 +115,7 @@ public class LightModelState implements State {
   }
 
   /**
-   * Unsets the local viewer.  
+   * Unsets the local viewer attribute.
    */
   public void unsetLocalViewer() {
     _localViewer = _localViewerDefault;
@@ -123,41 +123,41 @@ public class LightModelState implements State {
   }
 
   /**
-   * Determines whether this state has two-sided lighting.
-   * @return true, if two-sided lighting; false, otherwise.
+   * Determines whether the two-sided lighting attribute is set.
+   * @return true, if set; false, otherwise.
    */
-  public boolean hasTwoSidedLighting() {
+  public boolean hasTwoSide() {
     return _twoSideSet;
   }
 
   /**
-   * Gets the two-sided lighting.
+   * Gets the two-sided lighting attribute.
    * @return the two-sided lighting.
    */
-  public boolean getTwoSidedLighting() {
+  public boolean getTwoSide() {
     return _twoSide;
   }
 
   /**
-   * Sets the two-sided lighting.
+   * Sets the two-sided lighting attribute.
    * @param local the two-sided lighting.
    */
-  public void setTwoSidedLighting(boolean local) {
+  public void setTwoSide(boolean local) {
     _twoSide = local;
     _twoSideSet = true;
   }
 
   /**
-   * Unsets the two-sided lighting.  
+   * Unsets the two-sided lighting attribute.
    */
-  public void unsetTwoSidedLighting() {
+  public void unsetTwoSide() {
     _twoSide = _twoSideDefault;
     _twoSideSet = false;
   }
 
   public void apply() {
-    if (_ambientColorSet)
-      glLightModelfv(GL_LIGHT_MODEL_AMBIENT,_ambientColor);
+    if (_ambientSet)
+      glLightModelfv(GL_LIGHT_MODEL_AMBIENT,_ambient);
     if (_colorControlSet)
       glLightModelf(GL_LIGHT_MODEL_COLOR_CONTROL,_colorControl);
     if (_localViewerSet)
@@ -170,9 +170,9 @@ public class LightModelState implements State {
     return GL_LIGHTING;
   }
 
-  private static float[] _ambientColorDefault = {0.2f,0.2f,0.2f,1.0f};
-  private float[] _ambientColor = _ambientColorDefault;
-  private boolean _ambientColorSet;
+  private static float[] _ambientDefault = {0.2f,0.2f,0.2f,1.0f};
+  private float[] _ambient = _ambientDefault;
+  private boolean _ambientSet;
 
   private static int _colorControlDefault = GL_SINGLE_COLOR;
   private int _colorControl = _colorControlDefault;
