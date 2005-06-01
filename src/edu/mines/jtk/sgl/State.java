@@ -30,15 +30,6 @@ public interface State {
 }
 
 /*
-PointState
-  setSmooth(boolean smooth)
-    glEnable(GL_POINT_SMOOTH)
-    GL_POINT_BIT
-    GL_ENABLE_BIT
-  setSize(float size)
-    glPointSize
-    GL_POINT_BIT
-
 PolygonState
   setCullFace(int mode)
     glEnable(GL_CULL_FACE)

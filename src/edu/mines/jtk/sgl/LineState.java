@@ -141,8 +141,10 @@ public class LineState implements State {
         glDisable(GL_LINE_SMOOTH);
       }
     }
-    if (_stippleSet)
+    if (_stippleSet) {
+      glEnable(GL_LINE_STIPPLE);
       glLineStipple(_factor,_pattern);
+    }
     if (_widthSet)
       glLineWidth(_width);
   }
