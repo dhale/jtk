@@ -56,9 +56,114 @@ public class LightModelState implements State {
     _ambientColorSet = false;
   }
 
+  /**
+   * Determines whether this state has color control.
+   * @return true, if color control; false, otherwise.
+   */
+  public boolean hasColorControl() {
+    return _colorControlSet;
+  }
+
+  /**
+   * Gets the color control.
+   * @return the color control.
+   */
+  public int getColorControl() {
+    return _colorControl;
+  }
+
+  /**
+   * Sets the color control.
+   * @param control the color control.
+   */
+  public void setColorControl(int control) {
+    _colorControl = control;
+    _colorControlSet = true;
+  }
+
+  /**
+   * Unsets the color control.  
+   */
+  public void unsetColorControl() {
+    _colorControl = _colorControlDefault;
+    _colorControlSet = false;
+  }
+
+  /**
+   * Determines whether this state has local viewer.
+   * @return true, if local viewer; false, otherwise.
+   */
+  public boolean hasLocalViewer() {
+    return _localViewerSet;
+  }
+
+  /**
+   * Gets the local viewer.
+   * @return the local viewer.
+   */
+  public boolean getLocalViewer() {
+    return _localViewer;
+  }
+
+  /**
+   * Sets the local viewer.
+   * @param local the local viewer.
+   */
+  public void setLocalViewer(boolean local) {
+    _localViewer = local;
+    _localViewerSet = true;
+  }
+
+  /**
+   * Unsets the local viewer.  
+   */
+  public void unsetLocalViewer() {
+    _localViewer = _localViewerDefault;
+    _localViewerSet = false;
+  }
+
+  /**
+   * Determines whether this state has two-sided lighting.
+   * @return true, if two-sided lighting; false, otherwise.
+   */
+  public boolean hasTwoSidedLighting() {
+    return _twoSideSet;
+  }
+
+  /**
+   * Gets the two-sided lighting.
+   * @return the two-sided lighting.
+   */
+  public boolean getTwoSidedLighting() {
+    return _twoSide;
+  }
+
+  /**
+   * Sets the two-sided lighting.
+   * @param local the two-sided lighting.
+   */
+  public void setTwoSidedLighting(boolean local) {
+    _twoSide = local;
+    _twoSideSet = true;
+  }
+
+  /**
+   * Unsets the two-sided lighting.  
+   */
+  public void unsetTwoSidedLighting() {
+    _twoSide = _twoSideDefault;
+    _twoSideSet = false;
+  }
+
   public void apply() {
     if (_ambientColorSet)
       glLightModelfv(GL_LIGHT_MODEL_AMBIENT,_ambientColor);
+    if (_colorControlSet)
+      glLightModelf(GL_LIGHT_MODEL_COLOR_CONTROL,_colorControl);
+    if (_localViewerSet)
+      glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER,(_localViewer?1.0f:0.0f));
+    if (_twoSideSet)
+      glLightModelf(GL_LIGHT_MODEL_TWO_SIDE,(_twoSide?1.0f:0.0f));
   }
 
   public int getAttributeBits() {
@@ -68,6 +173,18 @@ public class LightModelState implements State {
   private static float[] _ambientColorDefault = {0.2f,0.2f,0.2f,1.0f};
   private float[] _ambientColor = _ambientColorDefault;
   private boolean _ambientColorSet;
+
+  private static int _colorControlDefault = GL_SINGLE_COLOR;
+  private int _colorControl = _colorControlDefault;
+  private boolean _colorControlSet;
+
+  private static boolean _localViewerDefault = false;
+  private boolean _localViewer = _localViewerDefault;
+  private boolean _localViewerSet;
+
+  private static boolean _twoSideDefault = false;
+  private boolean _twoSide = _twoSideDefault;
+  private boolean _twoSideSet;
 
   private static float[] toArray(Color c) {
     float r = c.getRed()/255.0f;
@@ -81,27 +198,3 @@ public class LightModelState implements State {
     return new Color(a[0],a[1],a[2],a[3]);
   }
 }
-
-/*
-LightModelState
-  setAmbient(Color color)
-    glLightMOdelfv
-    glEnable(GL_LIGHTING)
-    GL_LIGHTING_BIT
-    GL_ENABLE_BIT
-  setColorControl(int mode)
-    glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,mode)
-    glEnable(GL_LIGHTING)
-    GL_LIGHTING_BIT
-    GL_ENABLE_BIT
-  setTwoSide(boolean twoSide)
-    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,(twoSide?1:0));
-    glEnable(GL_LIGHTING)
-    GL_LIGHTING_BIT
-    GL_ENABLE_BIT
-  setLocalViewer(boolean localViewer)
-    glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER,(localViewer?1:0));
-    glEnable(GL_LIGHTING)
-    GL_LIGHTING_BIT
-    GL_ENABLE_BIT
-*/
