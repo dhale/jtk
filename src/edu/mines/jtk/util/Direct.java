@@ -44,7 +44,7 @@ public class Direct {
    * @param capacity the buffer capacity.
    * @return the new buffer.
    */
-  public static ByteBuffer byteBuffer(int capacity) {
+  public static ByteBuffer newByteBuffer(int capacity) {
     ByteBuffer b = null;
     try {
       b = ByteBuffer.allocateDirect(capacity);
@@ -67,8 +67,31 @@ public class Direct {
    * @param a the array.
    * @return the new buffer.
    */
-  public static ByteBuffer byteBuffer(byte[] a) {
-    ByteBuffer b = byteBuffer(a.length);
+  public static ByteBuffer newByteBuffer(byte[] a) {
+    ByteBuffer b = newByteBuffer(a.length);
+    b.put(a);
+    b.flip();
+    return b;
+  }
+
+  /**
+   * Returns a new direct double buffer.
+   * @param capacity the buffer capacity.
+   * @return the new buffer.
+   */
+  public static DoubleBuffer newDoubleBuffer(int capacity) {
+    return newByteBuffer(8*capacity).asDoubleBuffer();
+  }
+
+  /**
+   * Returns a new direct double buffer. Allocates the buffer with capacity 
+   * equal to the length of the specified array, and copies all array 
+   * elements to the buffer.
+   * @param a the array.
+   * @return the new buffer.
+   */
+  public static DoubleBuffer newDoubleBuffer(double[] a) {
+    DoubleBuffer b = newDoubleBuffer(a.length);
     b.put(a);
     b.flip();
     return b;
@@ -79,8 +102,8 @@ public class Direct {
    * @param capacity the buffer capacity.
    * @return the new buffer.
    */
-  public static FloatBuffer floatBuffer(int capacity) {
-    return byteBuffer(4*capacity).asFloatBuffer();
+  public static FloatBuffer newFloatBuffer(int capacity) {
+    return newByteBuffer(4*capacity).asFloatBuffer();
   }
 
   /**
@@ -90,8 +113,77 @@ public class Direct {
    * @param a the array.
    * @return the new buffer.
    */
-  public static FloatBuffer floatBuffer(float[] a) {
-    FloatBuffer b = floatBuffer(a.length);
+  public static FloatBuffer newFloatBuffer(float[] a) {
+    FloatBuffer b = newFloatBuffer(a.length);
+    b.put(a);
+    b.flip();
+    return b;
+  }
+
+  /**
+   * Returns a new direct int buffer.
+   * @param capacity the buffer capacity.
+   * @return the new buffer.
+   */
+  public static IntBuffer newIntBuffer(int capacity) {
+    return newByteBuffer(4*capacity).asIntBuffer();
+  }
+
+  /**
+   * Returns a new direct int buffer. Allocates the buffer with capacity 
+   * equal to the length of the specified array, and copies all array 
+   * elements to the buffer.
+   * @param a the array.
+   * @return the new buffer.
+   */
+  public static IntBuffer newIntBuffer(int[] a) {
+    IntBuffer b = newIntBuffer(a.length);
+    b.put(a);
+    b.flip();
+    return b;
+  }
+
+  /**
+   * Returns a new direct long buffer.
+   * @param capacity the buffer capacity.
+   * @return the new buffer.
+   */
+  public static LongBuffer newLongBuffer(int capacity) {
+    return newByteBuffer(8*capacity).asLongBuffer();
+  }
+
+  /**
+   * Returns a new direct long buffer. Allocates the buffer with capacity 
+   * equal to the length of the specified array, and copies all array 
+   * elements to the buffer.
+   * @param a the array.
+   * @return the new buffer.
+   */
+  public static LongBuffer newLongBuffer(long[] a) {
+    LongBuffer b = newLongBuffer(a.length);
+    b.put(a);
+    b.flip();
+    return b;
+  }
+
+  /**
+   * Returns a new direct short buffer.
+   * @param capacity the buffer capacity.
+   * @return the new buffer.
+   */
+  public static ShortBuffer newShortBuffer(int capacity) {
+    return newByteBuffer(2*capacity).asShortBuffer();
+  }
+
+  /**
+   * Returns a new direct short buffer. Allocates the buffer with capacity 
+   * equal to the length of the specified array, and copies all array 
+   * elements to the buffer.
+   * @param a the array.
+   * @return the new buffer.
+   */
+  public static ShortBuffer newShortBuffer(short[] a) {
+    ShortBuffer b = newShortBuffer(a.length);
     b.put(a);
     b.flip();
     return b;
