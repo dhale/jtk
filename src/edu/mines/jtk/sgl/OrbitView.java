@@ -256,10 +256,10 @@ public class OrbitView extends View {
       double r = (!ws.isEmpty())?ws.getRadius():1.0;
       double s = (r>0.0)?1.0/r:1.0;
       worldToView.timesEquals(Matrix44.translate(0,0,-distance));
+      worldToView.timesEquals(Matrix44.translate(_translate));
       worldToView.timesEquals(Matrix44.rotateX(_elevation));
       worldToView.timesEquals(Matrix44.rotateY(-_azimuth));
       worldToView.timesEquals(Matrix44.scale(_scale,_scale,_scale));
-      worldToView.timesEquals(Matrix44.translate(_translate));
       worldToView.timesEquals(Matrix44.scale(s,s,s));
       worldToView.timesEquals(Matrix44.translate(-c.x,-c.y,-c.z));
     }

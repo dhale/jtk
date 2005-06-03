@@ -132,12 +132,13 @@ public class OrbitViewMode extends Mode {
   private void duringTranslate(MouseEvent e) {
     int w = _canvas.getWidth();
     int h = _canvas.getHeight();
+    int m = Math.min(w,h);
     int x = e.getX();
     int y = e.getY();
     int dx = x-_xmouse;
     int dy = y-_ymouse;
-    double tx =  2.0*(double)dx/(double)w;
-    double ty = -2.0*(double)dy/(double)h;
+    double tx =  2.0*(double)dx/(double)m;
+    double ty = -2.0*(double)dy/(double)m;
     Vector3 t = new Vector3(tx,ty,0.0);
     _view.setTranslate(_translate.plus(t));
   }
