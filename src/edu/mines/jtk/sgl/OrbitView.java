@@ -11,7 +11,6 @@ import static java.lang.Math.*;
 
 import edu.mines.jtk.opengl.*;
 import static edu.mines.jtk.opengl.Gl.*;
-import static edu.mines.jtk.opengl.Glu.*;
 
 /**
  * A view of a world, as if in orbit around that world.
@@ -151,8 +150,8 @@ public class OrbitView extends View {
   }
 
   /**
-   * Sets the scale for this view.
-   * @param scale the scale.
+   * Sets the scale factor for this view.
+   * @param scale the scale factor.
    */
   public void setScale(double scale) {
     if (_scale==scale)
@@ -162,11 +161,30 @@ public class OrbitView extends View {
   }
 
   /**
-   * Gets the scale for this view.
-   * @return the scale.
+   * Gets the scale factor for this view.
+   * @return the scale factor.
    */
   public double getScale() {
     return _scale;
+  }
+
+  /**
+   * Sets the translate vector for this view.
+   * @param translate the translate vector.
+   */
+  public void setTranslate(Vector3 translate) {
+    if (_translate.equals(translate))
+      return;
+    _translate = translate.clone();
+    updateView();
+  }
+
+  /**
+   * Gets the translate vector for this view.
+   * @return the translate vector.
+   */
+  public Vector3 getTranslate() {
+    return _translate.clone();
   }
 
 
@@ -236,10 +254,12 @@ public class OrbitView extends View {
         ws = world.getBoundingSphere();
       Point3 c = (!ws.isEmpty())?ws.getCenter():new Point3();
       double r = (!ws.isEmpty())?ws.getRadius():1.0;
-      double s = (r>0.0)?_scale/r:_scale;
+      double s = (r>0.0)?1.0/r:1.0;
       worldToView.timesEquals(Matrix44.translate(0,0,-distance));
       worldToView.timesEquals(Matrix44.rotateX(_elevation));
       worldToView.timesEquals(Matrix44.rotateY(-_azimuth));
+      worldToView.timesEquals(Matrix44.scale(_scale,_scale,_scale));
+      worldToView.timesEquals(Matrix44.translate(_translate));
       worldToView.timesEquals(Matrix44.scale(s,s,s));
       worldToView.timesEquals(Matrix44.translate(-c.x,-c.y,-c.z));
     }
@@ -298,9 +318,10 @@ public class OrbitView extends View {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  private double _scale = 1.0;
+  private Vector3 _translate = new Vector3(0.0,0.0,0.0);
   private double _azimuth = 40.0;
   private double _elevation = 25.0;
-  private double _scale = 1.0;
   private Projection _projection = Projection.PERSPECTIVE;
   private BoundingSphere _worldSphere = null;
 

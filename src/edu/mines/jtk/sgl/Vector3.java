@@ -96,7 +96,50 @@ public class Vector3 extends Tuple3 {
   }
 
   /**
+   * Returns the vector sum u+v for this vector u.
+   * @param v the other vector.
+   * @return the vector sum u+v
+   */
+  public Vector3 plus(Vector3 v) {
+    return new Vector3(x+v.x,y+v.y,z+v.z);
+  }
+
+  /**
+   * Adds a vector v to this vector u.
+   * @param v the other vector.
+   * @return this vector, after adding the vector v.
+   */
+  public Vector3 plusEquals(Vector3 v) {
+    x += v.x;
+    y += v.y;
+    z += v.z;
+    return this;
+  }
+
+  /**
+   * Returns the vector difference u-v for this vector u.
+   * @param v the other vector.
+   * @return the vector difference u-v
+   */
+  public Vector3 minus(Vector3 v) {
+    return new Vector3(x-v.x,y-v.y,z-v.z);
+  }
+
+  /**
+   * Subtracts a vector v from this vector u.
+   * @param v the other vector.
+   * @return this vector, after subtracting the vector v.
+   */
+  public Vector3 minusEquals(Vector3 v) {
+    x -= v.x;
+    y -= v.y;
+    z -= v.z;
+    return this;
+  }
+
+  /**
    * Returns the scaled vector s*u for this vector u.
+   * @param s the scale factor.
    * @return the scaled vector.
    */
   public Vector3 times(double s) {
@@ -105,6 +148,7 @@ public class Vector3 extends Tuple3 {
 
   /**
    * Scales this vector.
+   * @param s the scale factor.
    * @return this vector, scaled.
    */
   public Vector3 timesEquals(double s) {
