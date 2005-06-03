@@ -157,7 +157,8 @@ public class CullContext extends TransformContext {
     ViewCanvas canvas = getViewCanvas();
     View view = getView();
     Matrix44 worldToCube = getWorldToCube();
-    for (int i=0; i<6; ++i)
+    for (int i=0; i<6; ++i) {
       _planes[i].transformWithInverse(worldToCube);
+    }
   }
 }

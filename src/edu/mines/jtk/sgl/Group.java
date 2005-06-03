@@ -59,18 +59,13 @@ public class Group extends Node {
   // protected
 
   /**
-   * Culls this group. If the view frustum in the cull context intersects 
-   * the bounding sphere of this group, then this group applies the cull
-   * process to its children. Otherwise, this method does nothing, and its
-   * children will be omitted from the draw list accumulated in the cull 
-   * context.
+   * Culls this group. This implementation simply applies the cull process
+   * to its children.
    * @param cc the cull context.
    */
   protected void cull(CullContext cc) {
-    if (cc.frustumIntersects(this)) {
-      for (Node child : _childList)
-        child.cullApply(cc);
-    }
+    for (Node child : _childList)
+      child.cullApply(cc);
   }
 
   /**

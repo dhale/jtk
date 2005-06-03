@@ -76,7 +76,7 @@ public class TransformGroup extends Group {
   
   /**
    * Computes the bounding sphere for this transform group.
-   * A transform group computes its bounding sphere in the untransformed 
+   * A transform group computes its bounding sphere in its untransformed 
    * coordinate system, not the transformed system of its children.
    * @return the computed bounding sphere.
    */

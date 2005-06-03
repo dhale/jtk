@@ -133,16 +133,19 @@ public class Node {
   }
 
   /**
-   * Applies the cull process to this node. Calls the three methods 
+   * Applies the cull process to this node. If the view frustum intersects
+   * this node, then this method calls the three methods 
    * {@link #cullBegin(CullContext)}, 
    * {@link #cull(CullContext)}, and
    * {@link #cullEnd(CullContext)}, in that order.
    * @param cc the cull context.
    */
   protected void cullApply(CullContext cc) {
-    cullBegin(cc);
-    cull(cc);
-    cullEnd(cc);
+    if (cc.frustumIntersects(this)) {
+      cullBegin(cc);
+      cull(cc);
+      cullEnd(cc);
+    }
   }
 
   /**
@@ -155,15 +158,12 @@ public class Node {
   }
 
   /**
-   * Culls this node. This implementation first tests this node for
-   * intersection with the view frustum of the cull context. If that
-   * frustum intersects the bounding sphere of this node, then this
-   * method appends the node stack to the draw list in the cull context.
+   * Culls this node. This implementation appends the node stack to
+   * the draw list in the cull context.
    * @param cc the cull context.
    */
   protected void cull(CullContext cc) {
-    if (cc.frustumIntersects(this))
-      cc.appendNodes();
+    cc.appendNodes();
   }
 
   /**

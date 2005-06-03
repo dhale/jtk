@@ -256,6 +256,10 @@ public class OrbitView extends View {
     glClearColor(0.0f,0.0f,0.0f,0.0f);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+    // Other stuff.
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_DEPTH_TEST);
+
     // Our world.
     World world = getWorld();
     if (world==null)
@@ -270,10 +274,17 @@ public class OrbitView extends View {
     Matrix44 viewToCube = canvas.getViewToCube();
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixd(viewToCube.m);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    // Light.
+    // TODO: make lighting customizable.
+    float[] lightPosition = {-0.1f,-0.1f,1.0f,0.0f};
+    glLightfv(GL_LIGHT0,GL_POSITION,lightPosition);
+    glEnable(GL_LIGHT0);
 
     // View (world-to-view) transform.
     Matrix44 worldToView = this.getWorldToView();
-    glMatrixMode(GL_MODELVIEW);
     glLoadMatrixd(worldToView.m);
 
     // Cull and draw the world.
