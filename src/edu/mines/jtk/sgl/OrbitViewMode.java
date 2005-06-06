@@ -53,13 +53,13 @@ public class OrbitViewMode extends Mode {
   private OrbitView _view; // the view
   private int _xmouse; // mouse x coordinate
   private int _ymouse; // mouse y coordinate
+  private double _zmouse; // mouse z coordinate
   private double _scale; // view scale factor at beginning of scale
   private double _azimuth; // view azimuth at beginning of rotate
   private double _elevation; // view elevation at beginning of rotate
   private Vector3 _translate; // view translate at beginning of translate
   private Point3 _translateP; // used in translate (see below)
   private Matrix44 _translateM; // used in translate (see below)
-  private double _translateZ; // used in translate (see below)
   private boolean _rotating;
   private boolean _scaling;
   private boolean _translating;
@@ -124,56 +124,45 @@ public class OrbitViewMode extends Mode {
   }
 
   private void beginTranslate(MouseEvent e) {
-    int x = e.getX();
-    int y = e.getY();
+    _xmouse = e.getX();
+    _ymouse = e.getY();
     _canvas = (ViewCanvas)e.getSource();
     _canvas.addMouseMotionListener(_mml);
     _view = (OrbitView)_canvas.getView();
 
-    // Compute the cube-to-unit-sphere transform.
+    // The mouse z coordinate, read from the depth buffer. The value 1.0 
+    // corresponds to the far clipping plane, which indicates that the 
+    // mouse was not pressed on any object rendered into the z-buffer.
+    // In this case, we use the middle value pixel z value 0.5.
+    _zmouse = _canvas.getPixelZ(_xmouse,_ymouse);
+    if (_zmouse==1.0)
+      _zmouse = 0.5;
+
+    // Pixel-to-unit-sphere transform.
+    Matrix44 cubeToPixel = _canvas.getCubeToPixel();
     Matrix44 viewToCube = _canvas.getViewToCube();
+    Matrix44 viewToPixel = cubeToPixel.times(viewToCube);
     Matrix44 unitSphereToView = _view.getUnitSphereToView();
-    Matrix44 unitSphereToCube = viewToCube.times(unitSphereToView);
-    Matrix44 cubeToUnitSphere = unitSphereToCube.inverse();
+    Matrix44 unitSphereToPixel = viewToPixel.times(unitSphereToView);
+    Matrix44 pixelToUnitSphere = unitSphereToPixel.inverse();
 
-    // Compute 3-D cube coordinates. If the cube z coordinate is 1.0,
-    // then the mouse is not over any object that painted the depth
-    // buffer, and we set the cube z coordinate to zero, which is in
-    // the middle of the unit cube.
-    Point3 pc = _canvas.transformPixelToCube(x,y);
-    if (pc.z==1.0)
-      pc.z = 0.0;
-
-    // The translate vector at the beginning of the translate.
+    // The current translate vector.
     _translate = _view.getTranslate();
 
-    // The cube z coordinate of the picked point. During translate, the 
-    // user will change the cube x and y coordinates of that point, but
-    // not the cube z coordinate.
-    _translateZ = pc.z;
+    // The matrix inverse of the unit-sphere-to-pixel transform, but 
+    // with the current translate part removed, because that is the 
+    // part that we will change during translate.
+    _translateM = Matrix44.translate(_translate).times(pixelToUnitSphere);
 
-    // The matrix inverse of the unit-sphere-to-cube transform, but with 
-    // the first translate part of that transform removed, because that 
-    // is the part that we will change during translate.
-    _translateM = Matrix44.translate(_translate).times(cubeToUnitSphere);
-
-    // The picked point, transformed to unit-sphere coordinates, but
-    // without the translate part that we will change during translate.
-    _translateP = _translateM.times(pc);
+    // The transformed 3-D pixel (mouse) coordinates.
+    _translateP = _translateM.times(new Point3(_xmouse,_ymouse,_zmouse));
   }
 
   private void duringTranslate(MouseEvent e) {
     int x = e.getX();
     int y = e.getY();
-
-    // Compute 3-D cube coordinates, but use the previously computed
-    // cube z coordinate. We translate in a constant-z plane.
-    Point3 pc = _canvas.transformPixelToCube(x,y,_translateZ);
-
-    // Compute the new translate vector. This vector will change neither
-    // the cube z-coordinate of the picked point, nor the unit-sphere 
-    // coordinates of that point. (Prove it!)
-    Vector3 t = _translate.plus(_translateM.times(pc).minus(_translateP));
+    Point3 p = new Point3(x,y,_zmouse);
+    Vector3 t = _translate.plus(_translateM.times(p).minus(_translateP));
     _view.setTranslate(t);
   }
 

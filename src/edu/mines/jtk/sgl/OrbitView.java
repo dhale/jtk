@@ -244,8 +244,8 @@ public class OrbitView extends View {
 
     // Cube to pixel.
     Matrix44 cubeToPixel = Matrix44.identity();
-    cubeToPixel.timesEquals(Matrix44.translate(0.5*w,0.5*h,0.0));
-    cubeToPixel.timesEquals(Matrix44.scale(0.5*w,-0.5*h,1.0));
+    cubeToPixel.timesEquals(Matrix44.translate(0.5*w,0.5*h,0.5));
+    cubeToPixel.timesEquals(Matrix44.scale(0.5*w,-0.5*h,0.5));
     canvas.setCubeToPixel(cubeToPixel);
 
     // View to cube.
