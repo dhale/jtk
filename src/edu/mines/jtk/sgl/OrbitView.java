@@ -14,25 +14,40 @@ import static edu.mines.jtk.opengl.Gl.*;
 
 /**
  * A view of a world, as if in orbit around that world.
- * The view camera is always aimed towards the world, from a point outside 
- * the world's sphere. The camera's up axis is parallel to lines of constant 
- * longitude.
+ * By default, the view camera is aimed towards the world, from a point 
+ * outside the world's sphere. The camera's up axis is always aligned 
+ * with lines of constant longitude. An orbit view is designed to draw
+ * on a single view canvas.
  * <p>
- * The view camera has both azimuth and elevation angles. Imagine a line 
- * from the center of the world's sphere to the camera. The point where 
- * that line intersects the sphere has a latitude and longitude. The 
- * azimuth angle is the longitude, positive for degrees East, negative 
- * for degrees West. The elevation angle is the latitude, positive for 
- * degrees North, negative for degrees South.
+ * All view maintain a world-to-view transform. In an orbit view, that 
+ * world-to-view transform is comprised of a world-to-unit-sphere 
+ * transform and a unit-sphere-to-view transform.
+ * <p>
+ * The world-to-unit-sphere transform centers and normalizes the world. 
+ * A world drawn by an orbit view has a world sphere that, by default, is 
+ * the bounding sphere of the world. The world-to-unit-sphere transform 
+ * first translates the world sphere's center to the origin, and then 
+ * scales the world sphere to have unit radius. The purpose of this 
+ * first transform is to make other orbit view parameters independent 
+ * of world coordinates. To modify the world-to-unit-sphere transform, 
+ * set the world sphere.
+ * <p>
+ * The second unit-sphere-to-view transform applies a translate, scale, 
+ * and rotate to the unit sphere, and then applies a final translate 
+ * down the z-axis to push the transformed sphere into the view frustum.
+ * <p>
+ * The rotate part of the unit-sphere-to-view transform is comprised of
+ * two rotations, because an orbit view camera has both azimuth and 
+ * elevation angles. Imagine a line from the center of the unit sphere 
+ * to the camera. The point where that line intersects the sphere has a 
+ * latitude and longitude. The azimuth angle is the longitude, positive 
+ * for degrees East, negative for degrees West. The elevation angle is 
+ * the latitude, positive for degrees North, negative for degrees South.
  * <p>
  * An orbit view supports both perspective and orthographic projections.
  * For perspective projections, the field of view is computed by assuming 
  * that the distance from the eye to the default screen is approximately 
  * equal to the size of that screen.
- * <p>
- * An orbit view is designed to draw on a single view canvas, and the
- * distance from the camera to the center of the world's sphere is 
- * computed so that the entire world is visible inside that canvas.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.29
  */
@@ -187,6 +202,22 @@ public class OrbitView extends View {
     return _translate.clone();
   }
 
+  /**
+   * Gets the world-to-unit-sphere transform for this view.
+   * @return the world-to-unit-sphere transform.
+   */
+  public Matrix44 getWorldToUnitSphere() {
+    return _worldToUnitSphere.clone();
+  }
+
+  /**
+   * Gets the unit-sphere-to-view transform for this view.
+   * @return the unit-sphere-to-view transform.
+   */
+  public Matrix44 getUnitSphereToView() {
+    return _unitSphereToView.clone();
+  }
+
 
   ///////////////////////////////////////////////////////////////////////////
   // protected
@@ -210,8 +241,8 @@ public class OrbitView extends View {
 
     // Cube to pixel.
     Matrix44 cubeToPixel = Matrix44.identity();
-    cubeToPixel.timesEquals(Matrix44.translate(0.5*w,0.5*h,0));
-    cubeToPixel.timesEquals(Matrix44.scale(0.5*w,0.5*h,1.0));
+    cubeToPixel.timesEquals(Matrix44.translate(0.5*w,0.5*h,0.0));
+    cubeToPixel.timesEquals(Matrix44.scale(0.5*w,-0.5*h,1.0));
     canvas.setCubeToPixel(cubeToPixel);
 
     // View to cube.
@@ -223,17 +254,17 @@ public class OrbitView extends View {
       double e = ss; // distance eye-to-screen (in pixels, approximate)
       double m = min(w,h); // minimum of viewport width and height
       double a = 2*atan(m/(2*e)); // angle subtended by sphere
-      double d = r/sin(a/2); // distance from eye to center of sphere
+      double d = r/sin(a/2); // distance from eye to center of frustum
       double fovy = 2*atan(h/(2*e))*180/PI;
       double aspect = (double)w/(double)h;
       double znear = max(d-maxscale*r,0.1);
-      double zfar  = max(d+maxscale*r,100*znear);
+      double zfar  = max(d+maxscale*r,100.0*znear);
       viewToCube = Matrix44.perspective(fovy,aspect,znear,zfar);
       distance = d;
     } else {
       double r = 1.0; // normalized radius of world sphere
       double m = min(w,h); // minimum of viewport width and height
-      double d = maxscale*r; // distance from eye to center of sphere
+      double d = maxscale*r; // distance from eye to center of frustum
       double right = w/m;
       double left = -right;
       double top = h/m;
@@ -245,8 +276,16 @@ public class OrbitView extends View {
     }
     canvas.setViewToCube(viewToCube);
 
-    // World to view.
-    Matrix44 worldToView = Matrix44.identity();
+    // Unit sphere to view.
+    _unitSphereToView = Matrix44.identity();
+    _unitSphereToView.timesEquals(Matrix44.translate(0,0,-distance));
+    _unitSphereToView.timesEquals(Matrix44.rotateX(_elevation));
+    _unitSphereToView.timesEquals(Matrix44.rotateY(-_azimuth));
+    _unitSphereToView.timesEquals(Matrix44.scale(_scale,_scale,_scale));
+    _unitSphereToView.timesEquals(Matrix44.translate(_translate));
+
+    //  World to unit sphere.
+    _worldToUnitSphere = Matrix44.identity();
     World world = getWorld();
     if (world!=null) {
       BoundingSphere ws = _worldSphere;
@@ -255,15 +294,14 @@ public class OrbitView extends View {
       Point3 c = (!ws.isEmpty())?ws.getCenter():new Point3();
       double r = (!ws.isEmpty())?ws.getRadius():1.0;
       double s = (r>0.0)?1.0/r:1.0;
-      worldToView.timesEquals(Matrix44.translate(0,0,-distance));
-      worldToView.timesEquals(Matrix44.translate(_translate));
-      worldToView.timesEquals(Matrix44.rotateX(_elevation));
-      worldToView.timesEquals(Matrix44.rotateY(-_azimuth));
-      worldToView.timesEquals(Matrix44.scale(_scale,_scale,_scale));
-      worldToView.timesEquals(Matrix44.scale(s,s,s));
-      worldToView.timesEquals(Matrix44.translate(-c.x,-c.y,-c.z));
+      // TODO: add rotation for XRIGHT_YOUT_ZDOWN, ...
+      _worldToUnitSphere.timesEquals(Matrix44.scale(s,s,s));
+      _worldToUnitSphere.timesEquals(Matrix44.translate(-c.x,-c.y,-c.z));
     }
-    setWorldToView(worldToView);
+
+
+    // World to view.
+    setWorldToView(_unitSphereToView.times(_worldToUnitSphere));
   }
 
   /**
@@ -324,6 +362,8 @@ public class OrbitView extends View {
   private double _elevation = 25.0;
   private Projection _projection = Projection.PERSPECTIVE;
   private BoundingSphere _worldSphere = null;
+  private Matrix44 _worldToUnitSphere;
+  private Matrix44 _unitSphereToView;
 
   private void updateView() {
     updateTransforms();

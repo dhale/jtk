@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.sgl;
 
 import edu.mines.jtk.opengl.*;
+import static edu.mines.jtk.opengl.Gl.*;
 
 /**
  * An OpenGL canvas on which a view draws its world.
@@ -90,6 +91,48 @@ public class ViewCanvas extends GlCanvas {
    */
   public Matrix44 getCubeToPixel() {
     return _cubeToPixel.clone();
+  }
+
+  /**
+   * Transforms the specified pixel coordinates to cube coordinates.
+   * Reads the depth buffer for this canvas to compute (approximately) 
+   * the cube z coordinate. Often, the pixel coordinates are mouse event 
+   * coordinates.
+   * @param xp the x pixel coordinate.
+   * @param yp the y pixel coordinate.
+   */
+  public Point3 transformPixelToCube(int xp, int yp) {
+    int hp = getHeight();
+    GlContext context = getContext();
+    float zdepth = 0.0f;
+    context.lock();
+    try {
+      glPushAttrib(GL_PIXEL_MODE_BIT);
+      glReadBuffer(GL_FRONT);
+      float[] pixels = {0.0f};
+      glReadPixels(xp,hp-1-yp,1,1,GL_DEPTH_COMPONENT,GL_FLOAT,pixels);
+      zdepth = pixels[0];
+      glPopAttrib();
+    } finally {
+      context.unlock();
+    }
+    double zc = 2.0*zdepth-1.0;
+    return transformPixelToCube(xp,yp,zc);
+  }
+
+  /**
+   * Transforms the specified pixel coordinates to cube coordinates.
+   * Uses the specified cube z coordinate. (Does not read the depth buffer.)
+   * Often, the pixel coordinates are mouse event coordinates.
+   * @param xp the x pixel coordinate.
+   * @param yp the y pixel coordinate.
+   * @param zc the z cube coordinate.
+   */
+  public Point3 transformPixelToCube(int xp, int yp, double zc) {
+    Point3 pp = new Point3(xp,yp,0);
+    Point3 pc = _cubeToPixel.inverse().times(pp);
+    pc.z = zc;
+    return pc;
   }
 
   public void glPaint() {

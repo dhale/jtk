@@ -50,7 +50,7 @@ public class ModeManager {
   /**
    * Called by a mode when it is constructed.
    */
-  public void add(Mode m) {
+  void add(Mode m) {
     _mset.add(m);
   }
 

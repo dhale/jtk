@@ -1583,6 +1583,14 @@ JNI_GL_BEGIN1
   glReadPixels(x,y,width,height,format,type,pixels);
 JNI_GL_END
 
+JNI_GL_DECLARE1(glReadPixels__IIIIII_3F)
+  jint x, jint y, jint width, jint height,
+  jint format, jint type, jarray jpixels
+JNI_GL_BEGIN1
+  JvoidArray pixels(env,jpixels);
+  glReadPixels(x,y,width,height,format,type,pixels);
+JNI_GL_END
+
 JNI_GL_DECLARE1(glRectd)
   jdouble x1, jdouble y1, jdouble x2, jdouble y2
 JNI_GL_BEGIN1

@@ -1254,6 +1254,8 @@ public class Gl {
     int x, int y, int width, int height, int format, int type, int[] pixels);
   public static native void glReadPixels(
     int x, int y, int width, int height, int format, int type, short[] pixels);
+  public static native void glReadPixels(
+    int x, int y, int width, int height, int format, int type, float[] pixels);
   public static native void glRectd(double x1, double y1, double x2, double y2);
   public static native void glRectdv(double[] v1, double[] v2);
   public static native void glRectf(float x1, float y1, float x2, float y2);

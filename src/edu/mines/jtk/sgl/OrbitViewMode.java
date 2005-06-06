@@ -53,10 +53,13 @@ public class OrbitViewMode extends Mode {
   private OrbitView _view; // the view
   private int _xmouse; // mouse x coordinate
   private int _ymouse; // mouse y coordinate
-  private double _scale; // view scale factor
-  private Vector3 _translate; // view translate vector
-  private double _azimuth; // view azimuth
-  private double _elevation; // view elevation
+  private double _scale; // view scale factor at beginning of scale
+  private double _azimuth; // view azimuth at beginning of rotate
+  private double _elevation; // view elevation at beginning of rotate
+  private Vector3 _translate; // view translate at beginning of translate
+  private Point3 _translateP; // used in translate (see below)
+  private Matrix44 _translateM; // used in translate (see below)
+  private double _translateZ; // used in translate (see below)
   private boolean _rotating;
   private boolean _scaling;
   private boolean _translating;
@@ -121,26 +124,39 @@ public class OrbitViewMode extends Mode {
   }
 
   private void beginTranslate(MouseEvent e) {
-    _xmouse = e.getX();
-    _ymouse = e.getY();
+    int x = e.getX();
+    int y = e.getY();
     _canvas = (ViewCanvas)e.getSource();
     _canvas.addMouseMotionListener(_mml);
     _view = (OrbitView)_canvas.getView();
+
+    // Compute the cube-to-unit-sphere transform.
+    Matrix44 viewToCube = _canvas.getViewToCube();
+    Matrix44 unitSphereToView = _view.getUnitSphereToView();
+    Matrix44 unitSphereToCube = viewToCube.times(unitSphereToView);
+    Matrix44 cubeToUnitSphere = unitSphereToCube.inverse();
+
+    // Compute 3-D cube coordinates. If the cube z coordinate is 1.0,
+    // then the mouse is not over any object that painted the depth
+    // buffer, and we set the cube z coordinate to zero, which is in
+    // the middle of the unit cube.
+    Point3 pc = _canvas.transformPixelToCube(x,y);
+    if (pc.z==1.0)
+      pc.z = 0.0;
+
+    // Remember everything we need during translate below.
     _translate = _view.getTranslate();
+    _translateZ = pc.z;
+    _translateM = Matrix44.translate(_translate).times(cubeToUnitSphere);
+    _translateP = _translateM.times(pc);
   }
 
   private void duringTranslate(MouseEvent e) {
-    int w = _canvas.getWidth();
-    int h = _canvas.getHeight();
-    int m = Math.min(w,h);
     int x = e.getX();
     int y = e.getY();
-    int dx = x-_xmouse;
-    int dy = y-_ymouse;
-    double tx =  2.0*(double)dx/(double)m;
-    double ty = -2.0*(double)dy/(double)m;
-    Vector3 t = new Vector3(tx,ty,0.0);
-    _view.setTranslate(_translate.plus(t));
+    Point3 pc = _canvas.transformPixelToCube(x,y,_translateZ);
+    Vector3 t = _translate.plus(_translateM.times(pc).minus(_translateP));
+    _view.setTranslate(t);
   }
 
   private void endTranslate(MouseEvent e) {

@@ -531,8 +531,8 @@ public class Matrix44 implements Cloneable {
    */
   public Matrix44 setScale(double sx, double sy, double sz) {
     set( sx, 0.0, 0.0, 0.0,
-        0.0,  sx, 0.0, 0.0,
-        0.0, 0.0,  sx, 0.0,
+        0.0,  sy, 0.0, 0.0,
+        0.0, 0.0,  sz, 0.0,
         0.0, 0.0, 0.0, 1.0);
     return this;
   }
