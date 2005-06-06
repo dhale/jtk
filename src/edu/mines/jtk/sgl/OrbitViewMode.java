@@ -144,17 +144,35 @@ public class OrbitViewMode extends Mode {
     if (pc.z==1.0)
       pc.z = 0.0;
 
-    // Remember everything we need during translate below.
+    // The translate vector at the beginning of the translate.
     _translate = _view.getTranslate();
+
+    // The cube z coordinate of the picked point. During translate, the 
+    // user will change the cube x and y coordinates of that point, but
+    // not the cube z coordinate.
     _translateZ = pc.z;
+
+    // The matrix inverse of the unit-sphere-to-cube transform, but with 
+    // the first translate part of that transform removed, because that 
+    // is the part that we will change during translate.
     _translateM = Matrix44.translate(_translate).times(cubeToUnitSphere);
+
+    // The picked point, transformed to unit-sphere coordinates, but
+    // without the translate part that we will change during translate.
     _translateP = _translateM.times(pc);
   }
 
   private void duringTranslate(MouseEvent e) {
     int x = e.getX();
     int y = e.getY();
+
+    // Compute 3-D cube coordinates, but use the previously computed
+    // cube z coordinate. We translate in a constant-z plane.
     Point3 pc = _canvas.transformPixelToCube(x,y,_translateZ);
+
+    // Compute the new translate vector. This vector will change neither
+    // the cube z-coordinate of the picked point, nor the unit-sphere 
+    // coordinates of that point. (Prove it!)
     Vector3 t = _translate.plus(_translateM.times(pc).minus(_translateP));
     _view.setTranslate(t);
   }

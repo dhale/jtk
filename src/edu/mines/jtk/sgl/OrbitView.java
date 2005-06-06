@@ -35,6 +35,9 @@ import static edu.mines.jtk.opengl.Gl.*;
  * The second unit-sphere-to-view transform applies a translate, scale, 
  * and rotate to the unit sphere, and then applies a final translate 
  * down the z-axis to push the transformed sphere into the view frustum.
+ * The orbit view applies the first translate, scale, and rotate in that
+ * order, so that the scale and rotate occurs about the center of
+ * the view.
  * <p>
  * The rotate part of the unit-sphere-to-view transform is comprised of
  * two rotations, because an orbit view camera has both azimuth and 
