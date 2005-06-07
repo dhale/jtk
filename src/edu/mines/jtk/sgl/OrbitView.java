@@ -68,6 +68,7 @@ public class OrbitView extends View {
    */
   public OrbitView() {
     super();
+    init();
   }
 
   /**
@@ -76,7 +77,16 @@ public class OrbitView extends View {
    */
   public OrbitView(World world) {
     super(world);
+    init();
     updateTransforms();
+  }
+
+  /**
+   * Resets this view to its state when constructed.
+   */
+  public void reset() {
+    init();
+    updateView();
   }
 
   /**
@@ -359,14 +369,22 @@ public class OrbitView extends View {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private double _scale = 1.0;
-  private Vector3 _translate = new Vector3(0.0,0.0,0.0);
-  private double _azimuth = 40.0;
-  private double _elevation = 25.0;
+  private double _scale;
+  private Vector3 _translate;
+  private double _azimuth;
+  private double _elevation;
   private Projection _projection = Projection.PERSPECTIVE;
   private BoundingSphere _worldSphere = null;
   private Matrix44 _worldToUnitSphere;
   private Matrix44 _unitSphereToView;
+
+  private void init() {
+    _scale = 1.0;
+    _translate = new Vector3(0.0,0.0,0.0);
+    _azimuth = 40.0;
+    _elevation = 25.0;
+    _projection = Projection.PERSPECTIVE;
+  }
 
   private void updateView() {
     updateTransforms();

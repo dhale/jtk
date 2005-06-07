@@ -71,7 +71,23 @@ public class OrbitViewMode extends Mode {
       ViewCanvas canvas = (ViewCanvas)e.getSource();
       OrbitView view = (OrbitView)canvas.getView();
       int kc = e.getKeyCode();
-      if (e.isControlDown()) { // scale
+
+      // Home.
+      if (kc==KeyEvent.VK_HOME) {
+        view.reset();
+
+      // Projection.
+      } else if (kc==KeyEvent.VK_INSERT) {
+        OrbitView.Projection projection = view.getProjection();
+        if (projection==OrbitView.Projection.ORTHOGRAPHIC) {
+          projection = OrbitView.Projection.PERSPECTIVE;
+        } else if (projection==OrbitView.Projection.PERSPECTIVE) {
+          projection = OrbitView.Projection.ORTHOGRAPHIC;
+        }
+        view.setProjection(projection);
+      
+      // Scale.
+      } else if (e.isControlDown()) {
         double scale = view.getScale();
         if (kc==KeyEvent.VK_UP) {
           scale *= 0.9;
@@ -79,7 +95,10 @@ public class OrbitViewMode extends Mode {
           scale *= 1.1;
         }
         view.setScale(scale);
-      } else if (e.isShiftDown()) { // shift
+      } else 
+      
+      // Translate.
+      if (e.isShiftDown()) {
         Matrix44 viewToCube = _canvas.getViewToCube();
         Matrix44 unitSphereToView = _view.getUnitSphereToView();
         Matrix44 unitSphereToCube = viewToCube.times(unitSphereToView);
@@ -102,7 +121,11 @@ public class OrbitViewMode extends Mode {
         Point3 c2 = new Point3(xc,yc,zc);
         translate.plusEquals(m.times(c2).minus(m.times(c1)));
         view.setTranslate(translate);
-      } else { // rotate
+
+      } 
+      
+      // Rotate.
+      else {
         double azimuth = view.getAzimuth();
         double elevation = view.getElevation();
         if (kc==KeyEvent.VK_LEFT) {
