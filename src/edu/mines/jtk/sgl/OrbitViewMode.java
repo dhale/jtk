@@ -40,8 +40,10 @@ public class OrbitViewMode extends Mode {
     if ((component instanceof ViewCanvas)) {
       if (active) {
         component.addMouseListener(_ml);
+        component.addKeyListener(_kl);
       } else {
         component.removeMouseListener(_ml);
+        component.removeKeyListener(_kl);
       }
     }
   }
@@ -64,7 +66,60 @@ public class OrbitViewMode extends Mode {
   private boolean _scaling;
   private boolean _translating;
 
-  private MouseListener _ml = new MouseAdapter() {;
+  private KeyListener _kl = new KeyAdapter() {
+    public void keyPressed(KeyEvent e) {
+      ViewCanvas canvas = (ViewCanvas)e.getSource();
+      OrbitView view = (OrbitView)canvas.getView();
+      int kc = e.getKeyCode();
+      if (e.isControlDown()) { // scale
+        double scale = view.getScale();
+        if (kc==KeyEvent.VK_UP) {
+          scale *= 0.9;
+        } else if (kc==KeyEvent.VK_DOWN) {
+          scale *= 1.1;
+        }
+        view.setScale(scale);
+      } else if (e.isShiftDown()) { // shift
+        Matrix44 viewToCube = _canvas.getViewToCube();
+        Matrix44 unitSphereToView = _view.getUnitSphereToView();
+        Matrix44 unitSphereToCube = viewToCube.times(unitSphereToView);
+        Matrix44 cubeToUnitSphere = unitSphereToCube.inverse();
+        Vector3 translate = view.getTranslate();
+        Matrix44 m = Matrix44.translate(translate).times(cubeToUnitSphere);
+        double xc = 0.0;
+        double yc = 0.0;
+        double zc = 0.0;
+        Point3 c1 = new Point3(xc,yc,zc);
+        if (kc==KeyEvent.VK_LEFT) {
+          xc -= 0.05;
+        } else if (kc==KeyEvent.VK_RIGHT) {
+          xc += 0.05;
+        } else if (kc==KeyEvent.VK_UP) {
+          yc += 0.05;
+        } else if (kc==KeyEvent.VK_DOWN) {
+          yc -= 0.05;
+        }
+        Point3 c2 = new Point3(xc,yc,zc);
+        translate.plusEquals(m.times(c2).minus(m.times(c1)));
+        view.setTranslate(translate);
+      } else { // rotate
+        double azimuth = view.getAzimuth();
+        double elevation = view.getElevation();
+        if (kc==KeyEvent.VK_LEFT) {
+          azimuth += 5.0;
+        } else if (kc==KeyEvent.VK_RIGHT) {
+          azimuth -= 5.0;
+        } else if (kc==KeyEvent.VK_UP) {
+          elevation -= 5.0;
+        } else if (kc==KeyEvent.VK_DOWN) {
+          elevation += 5.0;
+        }
+        view.setAzimuthAndElevation(azimuth,elevation);
+      }
+    }
+  };
+
+  private MouseListener _ml = new MouseAdapter() {
     public void mousePressed(MouseEvent e) {
       if (e.isControlDown()) {
         beginScale(e);
