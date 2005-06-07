@@ -95,8 +95,8 @@ public class ViewCanvas extends GlCanvas {
 
   /**
    * Gets the pixel z coordinate at the specified pixel x and y coordinates.
-   * Reads the depth buffer of this canvas at the specified pixel coordinates 
-   * (xp,yp) to compute (approximately) the pixel z coordinate zp. 
+   * Reads the front depth buffer of this canvas at the specified pixel 
+   * coordinates (xp,yp) to compute (approximately) the pixel z coordinate zp. 
    * <p>
    * The pixel z coordinate is a floating point number between 0.0 and 1.0. 
    * The value zp = 0.0 corresponds to the near clipping plane, and the value 
@@ -121,47 +121,6 @@ public class ViewCanvas extends GlCanvas {
       context.unlock();
     }
     return zp;
-  }
-
-  /**
-   * Transforms the specified pixel coordinates to cube coordinates.
-   * Reads the depth buffer for this canvas to compute (approximately) 
-   * the pixel z coordinate.
-   * @param xp the pixel x coordinate.
-   * @param yp the pixel y coordinate.
-   * @return the point, in cube coordinates.
-   */
-  public Point3 transformPixelToCube(int xp, int yp) {
-    int hp = getHeight();
-    GlContext context = getContext();
-    float zdepth = 0.0f;
-    context.lock();
-    try {
-      glPushAttrib(GL_PIXEL_MODE_BIT);
-      glReadBuffer(GL_FRONT);
-      float[] pixels = {0.0f};
-      glReadPixels(xp,hp-1-yp,1,1,GL_DEPTH_COMPONENT,GL_FLOAT,pixels);
-      zdepth = pixels[0];
-      glPopAttrib();
-    } finally {
-      context.unlock();
-    }
-    double zc = 2.0*zdepth-1.0;
-    return transformPixelToCube(xp,yp,zc);
-  }
-
-  /**
-   * Transforms the specified pixel coordinates to cube coordinates.
-   * Uses the specified cube z coordinate. (Does not read the depth buffer.)
-   * @param xp the pixel x coordinate.
-   * @param yp the pixel y coordinate.
-   * @param zc the cube z coordinate.
-   */
-  public Point3 transformPixelToCube(int xp, int yp, double zc) {
-    Point3 pp = new Point3(xp,yp,0);
-    Point3 pc = _cubeToPixel.inverse().times(pp);
-    pc.z = zc;
-    return pc;
   }
 
   public void glPaint() {
