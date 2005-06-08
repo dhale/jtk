@@ -79,6 +79,8 @@ public class ColorCube extends Node {
   private static FloatBuffer _nb = Direct.newFloatBuffer(_na);
   private static FloatBuffer _cb = Direct.newFloatBuffer(_ca);
 
+  // Simple testing.
+  private static final int SIZE = 600;
   public static void main(String[] args) {
     ColorCube cc = new ColorCube();
     TransformGroup tg1 = new TransformGroup(Matrix44.translate(-2,0,0));
@@ -105,5 +107,4 @@ public class ColorCube extends Node {
     frame.getContentPane().add(canvas,BorderLayout.CENTER);
     frame.setVisible(true);
   }
-  private static final int SIZE = 600;
 }

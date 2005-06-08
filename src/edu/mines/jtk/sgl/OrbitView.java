@@ -19,7 +19,7 @@ import static edu.mines.jtk.opengl.Gl.*;
  * with lines of constant longitude. An orbit view is designed to draw
  * on a single view canvas.
  * <p>
- * All view maintain a world-to-view transform. In an orbit view, that 
+ * All views maintain a world-to-view transform. In an orbit view, that 
  * world-to-view transform is comprised of a world-to-unit-sphere 
  * transform and a unit-sphere-to-view transform.
  * <p>
