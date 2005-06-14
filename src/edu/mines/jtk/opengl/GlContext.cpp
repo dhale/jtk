@@ -14,6 +14,7 @@ GlContext JNI glue.
 #include <windows.h>
 #else // Else, assume X Windows, ...
 #define XWIN
+#define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h> 
 #endif
 #include <GL/gl.h>
@@ -267,6 +268,7 @@ Java_edu_mines_jtk_opengl_GlContext_getProcAddress(
   PFV p = (PFV)wglGetProcAddress(functionName);
 #elif defined(XWIN)
   void (*p)() = glXGetProcAddressARB(functionName);
+  //void (*p)() = glXGetProcAddress(functionName);
 #endif
   return (jlong)(intptr_t)p;
   JNI_CATCH
