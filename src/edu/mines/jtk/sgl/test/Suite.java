@@ -17,6 +17,7 @@ public class Suite extends TestCase {
   public static void main(String[] args) {
     TestSuite suite = new TestSuite();
 
+    suite.addTestSuite(BoundingTest.class);
     suite.addTestSuite(MatrixPointVectorTest.class);
 
     junit.textui.TestRunner.run(suite);

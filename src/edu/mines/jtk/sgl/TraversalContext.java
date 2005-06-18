@@ -37,7 +37,7 @@ public class TraversalContext {
 
   /**
    * Gets an array of nodes representing the state of this traversal. 
-   * Nodes in the array are ordered from top to bottom. The last node 
+   * Nodes in the array are ordered from parent to child. The last node 
    * in the array is the current node, the next to last node is the 
    * current node's parent, and so on.
    * @return the array of nodes.
