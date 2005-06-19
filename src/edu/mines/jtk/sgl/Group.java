@@ -81,6 +81,16 @@ public class Group extends Node {
     for (Node child : _childList)
       child.drawApply(dc);
   }
+
+  /**
+   * Picks this group. This implementation simply applies the pick process
+   * to its children.
+   * @param pc the pick context.
+   */
+  protected void pick(PickContext pc) {
+    for (Node child : _childList)
+      child.pickApply(pc);
+  }
   
   /**
    * Computes the bounding sphere for this group, including its children.

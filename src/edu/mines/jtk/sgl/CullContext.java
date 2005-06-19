@@ -30,11 +30,13 @@ public class CullContext extends TransformContext {
   }
 
   /**
-   * Tests the specified node for intersection with the view frustum.
-   * @return true, if the view frustum intersects the bounding sphere
-   *  of the node; false, otherwise.
+   * Determines whether the view frustrum intersects the bounding sphere
+   * of the specified node.
+   * @param node the node with a bounding sphere.
+   * @return true, if the view frustum intersects the bounding sphere;
+   *  false, otherwise.
    */
-  public boolean frustumIntersects(Node node) {
+  public boolean frustumIntersectsSphereOf(Node node) {
     if (_active!=0) { // if at least one frustum plane is active, ...
       BoundingSphere bs = node.getBoundingSphere();
       Point3 c = bs.getCenter();

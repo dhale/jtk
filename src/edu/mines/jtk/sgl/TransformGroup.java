@@ -73,6 +73,24 @@ public class TransformGroup extends Group {
     dc.popLocalToWorld();
     glPopMatrix();
   }
+
+  /**
+   * Pushes the transform matrix onto the specified pick context.
+   * @param pc the pick context.
+   */
+  protected void pickBegin(PickContext pc) {
+    pc.pushNode(this);
+    pc.pushLocalToWorld(_transform);
+  }
+
+  /**
+   * Pops the transform matrix from the specified pick context.
+   * @param pc the pick context.
+   */
+  protected void pickEnd(PickContext pc) {
+    pc.popNode();
+    pc.popLocalToWorld();
+  }
   
   /**
    * Computes the bounding sphere for this transform group.

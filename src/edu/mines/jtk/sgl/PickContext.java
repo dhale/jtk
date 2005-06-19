@@ -16,7 +16,7 @@ import static edu.mines.jtk.opengl.Gl.*;
  * <p>
  * A pick context has a pick segment, which is a line segment in a local 
  * coordinate system. During a pick traversal of the scene graph, pickable 
- * nodes compute points of intersection, if any, between themselves and 
+ * nodes compute points of intersection, if any, between their geometry and 
  * the pick segment. For efficiency, only nodes with bounding spheres that 
  * intersect the pick segment perform this computation.
  * <p>
@@ -36,12 +36,12 @@ import static edu.mines.jtk.opengl.Gl.*;
  * pick segment cannot, for example, intersect a pickable node that is hidden
  * behind a non-pickable node.
  * <p>
- * Care must be taken when picking nodes that render themselves with polygon 
- * offset. Polygon offset modifies values in the depth buffer, and therefore
- * the far endpoint of the pick segment. For example, a negative polygon
- * offset may cause the pick segment to not quite intersect the geometry
- * of a node that would otherwise be picked. A solution to this problem is 
- * to use non-negative polygon offsets.
+ * Care must be taken when picking nodes that rendered with polygon offset. 
+ * Polygon offset modifies values in the depth buffer and thereby the far 
+ * endpoint of the pick segment. A negative polygon offset may cause the 
+ * pick segment to not quite intersect the geometry of a node that might 
+ * otherwise be picked. A solution to this problem is to use non-negative 
+ * polygon offsets.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.06.17
  */
@@ -63,27 +63,28 @@ public class PickContext extends TransformContext {
     double dz = 1.0/(Math.pow(2.0,getDepthBits(canvas))-1.0);
 
     // The far endpoint of the pick segment.
-    Point3 f = new Point3(xp,yp,zp+0.5*dz);
+    Point3 far = new Point3(xp,yp,zp+0.5*dz);
 
     // The near endpoint of the pick segment.
-    Point3 n = new Point3(xp,yp,0.0);
+    Point3 near = new Point3(xp,yp,0.0);
 
     // The pick segment, transformed to world coordinates.
-    _pickSegment = new PickSegment(n,f);
+    _pickSegment = new PickSegment(near,far);
     _pickSegment.transform(getPixelToWorld());
   }
 
   /**
-   * Tests a bounding sphere for intersection with the pick segment.
+   * Determines whether the pick segment intersects the bounding sphere
+   * of the specified node.
    * @param node the node with a bounding sphere.
-   * @return true, if the bounding sphere of the node intersects the pick 
-   *  segment; false, otherwise.
+   * @return true, if the pick segment intersects the bounding sphere;
+   *  false, otherwise.
    */
-  public boolean sphereIntersects(Node node) {
+  public boolean segmentIntersectsSphereOf(Node node) {
     BoundingSphere bs = node.getBoundingSphere();
     Point3 c = bs.getCenter();
     double r = bs.getRadius();
-    return true; // TODO: sphere pick segment intersection calculations
+    return true; // TODO: pick segment and sphere intersection calculations
   }
 
   /**

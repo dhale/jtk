@@ -134,14 +134,15 @@ public class Node {
 
   /**
    * Applies the cull process to this node. If the view frustum intersects
-   * this node, then this method calls the three methods 
+   * the bounding sphere of this node, then this method calls the three 
+   * methods 
    * {@link #cullBegin(CullContext)}, 
    * {@link #cull(CullContext)}, and
    * {@link #cullEnd(CullContext)}, in that order.
    * @param cc the cull context.
    */
   protected void cullApply(CullContext cc) {
-    if (cc.frustumIntersects(this)) {
+    if (cc.frustumIntersectsSphereOf(this)) {
       cullBegin(cc);
       cull(cc);
       cullEnd(cc);
@@ -219,6 +220,50 @@ public class Node {
   protected void drawEnd(DrawContext dc) {
     glPopAttrib();
     dc.popNode();
+  }
+
+  /**
+   * Applies the pick process to this node. If the pick segment intersects
+   * the bounding sphere of this node, then this method calls the three 
+   * methods 
+   * {@link #pickBegin(PickContext)}, 
+   * {@link #pick(PickContext)}, and
+   * {@link #pickEnd(PickContext)}, in that order.
+   * @param pc the pick context.
+   */
+  protected void pickApply(PickContext pc) {
+    if (pc.segmentIntersectsSphereOf(this)) {
+      pickBegin(pc);
+      pick(pc);
+      pickEnd(pc);
+    }
+  }
+
+  /**
+   * Begins the pick process for this node.
+   * This implementation pushes this node onto the pick context,
+   * @param pc the pick context.
+   */
+  protected void pickBegin(PickContext pc) {
+    pc.pushNode(this);
+  }
+
+  /**
+   * Picks this node. This implementation does nothing. Implementations
+   * of this method in classes that extend this class may test the pick
+   * segment for intersection with node geometry. If an intersection is
+   * found, then a pick result should be added to the context.
+   * @param pc the pick context.
+   */
+  protected void pick(PickContext pc) {
+  }
+
+  /**
+   * Ends the pick process for this node.
+   * @param pc the pick context.
+   */
+  protected void pickEnd(PickContext pc) {
+    pc.popNode();
   }
 
   ///////////////////////////////////////////////////////////////////////////
