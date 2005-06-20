@@ -31,6 +31,22 @@ public class PickSegment implements Cloneable {
   }
 
   /**
+   * Gets the near endpoint of this pick segment.
+   * @return the near endpoint.
+   */
+  public Point3 getNearPoint() {
+    return _n.clone();
+  }
+
+  /**
+   * Gets the far endpoint of this pick segment.
+   * @return the far endpoint.
+   */
+  public Point3 getFarPoint() {
+    return _f.clone();
+  }
+
+  /**
    * Transforms this pick segment, given the specified transform matrix.
    * @param m the transform matrix.
    */

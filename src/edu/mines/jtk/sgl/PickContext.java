@@ -82,9 +82,63 @@ public class PickContext extends TransformContext {
    */
   public boolean segmentIntersectsSphereOf(Node node) {
     BoundingSphere bs = node.getBoundingSphere();
+    Point3 a = _pickSegment.getFarPoint();
+    Point3 b = _pickSegment.getNearPoint();
     Point3 c = bs.getCenter();
     double r = bs.getRadius();
-    return true; // TODO: pick segment and sphere intersection calculations
+    double rr = r*r;
+    double ax = a.x;
+    double ay = a.y;
+    double az = a.z;
+    double bx = b.x;
+    double by = b.y;
+    double bz = b.z;
+    double cx = c.x;
+    double cy = c.y;
+    double cz = c.z;
+    double bax = bx-ax;
+    double bay = by-ay;
+    double baz = bz-az;
+    double cax = cx-ax;
+    double cay = cy-ay;
+    double caz = cz-az;
+    double caba = cax*bax+cay*bay+caz*baz;
+
+    // Point on line through (a,b) that is closest to sphere.
+    double px,py,pz;
+
+    // If endpoint a is closest, ...
+    if (caba<=0.0) {
+      px = ax;
+      py = ay;
+      pz = az;
+    }
+
+    // Else if endpoint a is not closest, ...
+    else {
+      double baba = bax*bax+bay*bay+baz*baz;
+
+      // If endpoint b is closest, ...
+      if (baba<=caba) {
+        px = bx;
+        py = by;
+        pz = bz;
+      } 
+      
+      // Else if closest point is between endpoints a and b, ...
+      else {
+        double u = caba/baba;
+        px = ax+u*bax;
+        py = ay+u*bay;
+        pz = az+u*baz;
+      }
+    }
+
+    // Compare distance-to-closest-point-squared with radius-squared.
+    double dx = px-cx;
+    double dy = py-cy;
+    double dz = pz-cz;
+    return dx*dx+dy*dy+dz*dz<=rr;
   }
 
   /**
