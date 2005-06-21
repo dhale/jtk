@@ -63,14 +63,27 @@ public class PickContext extends TransformContext {
     double dz = 1.0/(Math.pow(2.0,getDepthBits(canvas))-1.0);
 
     // The far endpoint of the pick segment.
-    Point3 far = new Point3(xp,yp,zp+0.5*dz);
+    //Point3 far = new Point3(xp,yp,zp+0.5*dz);
+    Point3 far = new Point3(xp,yp,1.0);
 
     // The near endpoint of the pick segment.
     Point3 near = new Point3(xp,yp,0.0);
 
     // The pick segment, transformed to world coordinates.
     _pickSegment = new PickSegment(near,far);
+    System.out.println("near="+_pickSegment.getNearPoint());
+    System.out.println(" far="+_pickSegment.getFarPoint());
     _pickSegment.transform(getPixelToWorld());
+    System.out.println("near="+_pickSegment.getNearPoint());
+    System.out.println(" far="+_pickSegment.getFarPoint());
+  }
+
+  /**
+   * Gets the pick segment for this context.
+   * @return the pick segment.
+   */
+  public PickSegment getPickSegment() {
+    return _pickSegment.clone();
   }
 
   /**
@@ -135,6 +148,8 @@ public class PickContext extends TransformContext {
     }
 
     // Compare distance-to-closest-point-squared with radius-squared.
+    Point3 p = new Point3(px,py,pz);
+    System.out.println("p="+p+" c="+c+" r="+r);
     double dx = px-cx;
     double dy = py-cy;
     double dz = pz-cz;
@@ -146,26 +161,29 @@ public class PickContext extends TransformContext {
    * @param point the pick point, in local coordinates.
    */
   public void addResult(Point3 point) {
-    PickResult pr = new PickResult(this,point);
-    _pickResults.add(pr);
+    if (point!=null) {
+      PickResult pr = new PickResult(this,point);
+      _pickResults.add(pr);
+    }
   }
 
   /**
    * Gets the pick result closest to the origin of the pick segment.
-   * The pick segment origin is located on the near clipping plane.
-   * @return the pick result.
+   * @return the pick result; null, if none.
    */
   public PickResult getClosest() {
+    System.out.println("PickContext.getClosest: npick="+_pickResults.size());
     PickResult prmin = null;
     double zpmin = Double.MAX_VALUE;
     for (PickResult pr : _pickResults) {
       double zp = pr.getPixelZ();
+      System.out.println(" zp="+zp);
       if (zp<zpmin) {
         zpmin = zp;
         prmin = pr;
       }
     }
-    return prmin.clone();
+    return (prmin!=null)?prmin.clone():null;
   }
 
   /**
@@ -178,7 +196,7 @@ public class PickContext extends TransformContext {
   public void pushLocalToWorld(Matrix44 transform) {
     super.pushLocalToWorld(transform);
     _pickSegmentStack.push(_pickSegment.clone());
-    _pickSegment.transform(transform);
+    _pickSegment.transform(transform.inverse());
   }
 
   /**

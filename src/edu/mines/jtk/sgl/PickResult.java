@@ -87,7 +87,7 @@ public class PickResult implements Cloneable {
    * @return the picked point in local coordinates.
    */
   public Point3 getPointLocal() {
-    return _pointLocal;
+    return _pointLocal.clone();
   }
 
   /**
@@ -95,7 +95,7 @@ public class PickResult implements Cloneable {
    * @return the picked point in world coordinates.
    */
   public Point3 getPointWorld() {
-    return _pointWorld;
+    return _pointWorld.clone();
   }
 
   /**

@@ -50,6 +50,31 @@ public class ColorCube extends Node {
     glPopClientAttrib();
   }
 
+  protected void pick(PickContext pc) {
+    System.out.println("ColorCube.pick");
+    PickSegment ps = pc.getPickSegment();
+    for (int iside=0; iside<6; ++iside) {
+      double xa = _va[12*iside+ 0];
+      double ya = _va[12*iside+ 1];
+      double za = _va[12*iside+ 2];
+      double xb = _va[12*iside+ 3];
+      double yb = _va[12*iside+ 4];
+      double zb = _va[12*iside+ 5];
+      double xc = _va[12*iside+ 6];
+      double yc = _va[12*iside+ 7];
+      double zc = _va[12*iside+ 8];
+      double xd = _va[12*iside+ 9];
+      double yd = _va[12*iside+10];
+      double zd = _va[12*iside+11];
+      Point3 p = ps.intersectWithTriangle(xa,ya,za,xb,yb,zb,xc,yc,zc);
+      Point3 q = ps.intersectWithTriangle(xa,ya,za,xc,yc,zc,xd,yd,zd);
+      if (p!=null)
+        pc.addResult(p);
+      if (q!=null)
+        pc.addResult(q);
+    }
+  }
+
   // Vertices, normals, and colors.
   private static float[] _va = {
      0.0f, 0.0f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 1.0f, 1.0f,  0.0f, 1.0f, 0.0f,
@@ -92,14 +117,17 @@ public class ColorCube extends Node {
     world.addChild(tg2);
 
     OrbitView view = new OrbitView(world);
-    //view.setProjection(OrbitView.Projection.ORTHOGRAPHIC);
+    view.setProjection(OrbitView.Projection.ORTHOGRAPHIC);
+    view.setAzimuthAndElevation(45.0,45.0);
     ViewCanvas canvas = new ViewCanvas(view);
     canvas.setView(view);
 
     ModeManager mm = new ModeManager();
     mm.add(canvas);
-    OrbitViewMode ovm = new OrbitViewMode(mm);
-    ovm.setActive(true);
+    // OrbitViewMode ovm = new OrbitViewMode(mm);
+    // ovm.setActive(true);
+    SelectDragMode sdm = new SelectDragMode(mm);
+    sdm.setActive(true);
 
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
