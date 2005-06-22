@@ -82,6 +82,7 @@ public class ModeManager {
   private Set<Component> _cset = new HashSet<Component>();
 
   private void setActiveInternal(Mode mode, boolean active) {
+    mode.setActiveInternal(active);
     for (Component c : _cset) {
       mode.setActive(c,active);
     }

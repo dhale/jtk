@@ -39,13 +39,8 @@ public abstract class Mode extends AbstractAction {
    * @param active true, to activate; false, to deactivate.
    */
   public void setActive(boolean active) {
-    if (isEnabled() && _active!=active) {
-      Boolean oldValue = Boolean.valueOf(_active);
-      Boolean newValue = Boolean.valueOf(active);
-      firePropertyChange("active",oldValue,newValue);
+    if (isEnabled() && _active!=active)
       _manager.setActive(this,active);
-      _active = active;
-    }
   }
 
   /**
@@ -188,6 +183,17 @@ public abstract class Mode extends AbstractAction {
    * @param active true, to activate; false, to deactivate.
    */
   protected abstract void setActive(Component component, boolean active);
+
+  ///////////////////////////////////////////////////////////////////////////
+  // package
+
+  // Called here and by manager.
+  void setActiveInternal(boolean active) {
+    Boolean oldValue = Boolean.valueOf(_active);
+    Boolean newValue = Boolean.valueOf(active);
+    firePropertyChange("active",oldValue,newValue);
+    _active = active;
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
