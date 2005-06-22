@@ -187,7 +187,10 @@ public abstract class Mode extends AbstractAction {
   ///////////////////////////////////////////////////////////////////////////
   // package
 
-  // Called here and by manager.
+  /**
+   * Called by the mode manager. When changing the active state of this
+   * mode, the manager may also change the active state of other modes.
+   */
   void setActiveInternal(boolean active) {
     Boolean oldValue = Boolean.valueOf(_active);
     Boolean newValue = Boolean.valueOf(active);

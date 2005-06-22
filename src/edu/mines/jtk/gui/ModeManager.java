@@ -63,16 +63,31 @@ public class ModeManager {
     if (active==mode.isActive())
       return;
 
-    // If activating an exclusive mode, deactive all other exclusive modes.
+    // If activating an exclusive mode, deactivate any other exclusive modes.
+    // If we deactivate another node, remember it, so that we can reactivate
+    // it later.
+    Mode modeDeactivated = null;
     if (active && mode.isExclusive()) {
       for (Mode m : _mset) {
-        if (m!=mode && m.isExclusive() && m.isActive())
+        if (m!=mode && m.isExclusive() && m.isActive()) {
           setActiveInternal(m,false);
+          modeDeactivated = m;
+          break;
+        }
       }
     }
 
     // Activate or deactivate the mode.
     setActiveInternal(mode,active);
+
+    // If an exclusive mode was deactivated, reactivate the most recently 
+    // active exclusive mode. This enables a quick toggle between two modes.
+    if (!active && mode.isExclusive() && _modeDeactivated!=null) {
+      setActiveInternal(_modeDeactivated,true);
+    }
+
+    // Remember any mode that was deactivated during this call.
+    _modeDeactivated = modeDeactivated;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -80,6 +95,7 @@ public class ModeManager {
 
   private Set<Mode> _mset = new HashSet<Mode>();
   private Set<Component> _cset = new HashSet<Component>();
+  private Mode _modeDeactivated;
 
   private void setActiveInternal(Mode mode, boolean active) {
     mode.setActiveInternal(active);
