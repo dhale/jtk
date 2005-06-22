@@ -27,7 +27,7 @@ public class OrbitViewMode extends Mode {
   public OrbitViewMode(ModeManager modeManager) {
     super(modeManager);
     setName("View");
-    //setIcon(loadIcon(OrbitViewMode.class,"resources/View24.gif"));
+    setIcon(loadIcon(OrbitViewMode.class,"resources/ViewHand24.png"));
     setMnemonicKey(KeyEvent.VK_SPACE);
     setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE,0));
     setShortDescription("Manipulate view");

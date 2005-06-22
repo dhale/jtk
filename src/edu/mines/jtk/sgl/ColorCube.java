@@ -130,6 +130,7 @@ public class ColorCube extends Node {
     sdm.setActive(true);
 
     JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+    ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 
     JMenu fileMenu = new JMenu("File");
     Action exitAction = new AbstractAction("Exit") {
@@ -150,8 +151,11 @@ public class ColorCube extends Node {
     menuBar.add(modeMenu);
 
     JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+    toolBar.setRollover(true);
     JToggleButton ovmButton = new ModeToggleButton(ovm);
+    toolBar.add(ovmButton);
     JToggleButton sdmButton = new ModeToggleButton(sdm);
+    toolBar.add(sdmButton);
 
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
