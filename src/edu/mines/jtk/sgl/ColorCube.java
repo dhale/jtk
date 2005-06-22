@@ -133,17 +133,20 @@ public class ColorCube extends Node {
     ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
 
     JMenu fileMenu = new JMenu("File");
+    fileMenu.setMnemonic('F');
     Action exitAction = new AbstractAction("Exit") {
       public void actionPerformed(ActionEvent event) {
         System.exit(0);
       }
     };
     JMenuItem exitItem = fileMenu.add(exitAction);
+    exitItem.setMnemonic('x');
 
     JMenu modeMenu = new JMenu("Mode");
+    modeMenu.setMnemonic('M');
     JMenuItem ovmItem = new ModeMenuItem(ovm);
-    JMenuItem sdmItem = new ModeMenuItem(sdm);
     modeMenu.add(ovmItem);
+    JMenuItem sdmItem = new ModeMenuItem(sdm);
     modeMenu.add(sdmItem);
 
     JMenuBar menuBar = new JMenuBar();
