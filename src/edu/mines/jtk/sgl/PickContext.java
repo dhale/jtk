@@ -10,40 +10,27 @@ import java.util.*;
 
 import edu.mines.jtk.opengl.*;
 import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * A transform context for picking.
  * <p>
  * A pick context has a pick segment, which is a line segment in a local 
- * coordinate system. During a pick traversal of the scene graph, pickable 
- * nodes compute points of intersection, if any, between their geometry and 
+ * coordinate system. During a pick traversal of the scene graph, nodes 
+ * compute points of intersection, if any, between their geometry and 
  * the pick segment. For efficiency, only nodes with bounding spheres that 
- * intersect the pick segment perform this computation.
+ * intersect the pick segment will perform intersection computations.
  * <p>
- * The pick segment in a pick context has two endpoints. One endpoint lies
- * on the near clipping plane, with specified pixel (x,y) coordinates and z 
- * (depth) coordinate equal to 0.0. This endpoint is called the <em>near</em> 
- * endpoint of the pick segment. The <em>far</em> endpoint has the same pixel 
- * (x,y) coordinates as the near endpoint. Its pixel z coordinate equals the 
- * value read from the front z-buffer, plus dz/2, where dz is the z-buffer 
- * sampling interval. The added term dz/2 accounts for rounding of pixel 
- * depth coordinates, which are fixed-point numbers between 0.0 and 1.0.
- * Specifically, dz = 1.0/(2^m-1), where m is the constant GL_DEPTH_BITS, 
- * the number of bits in the z-buffer.
- * <p>
- * With these near and far endpoints, only the nearest pickable nodes (those 
- * with the smallest pixel z coordinates) can intersect the pick segment. The 
- * pick segment cannot, for example, intersect a pickable node that is hidden
- * behind a non-pickable node.
- * <p>
- * Care must be taken when picking nodes that rendered with polygon offset. 
- * Polygon offset modifies values in the depth buffer and thereby the far 
- * endpoint of the pick segment. A negative polygon offset may cause the 
- * pick segment to not quite intersect the geometry of a node that might 
- * otherwise be picked. A solution to this problem is to use non-negative 
- * polygon offsets.
+ * The pick segment in a pick context has two endpoints. One endpoint lies 
+ * on the near clipping plane, with specified pixel (x,y) coordinates and 
+ * pixel z coordinate 0.0. This endpoint is called the <em>near</em> 
+ * endpoint of the pick segment. The <em>far</em> endpoint lies on the far
+ * clipping plane. It has the same specified pixel (x,y) coordinates as 
+ * the near endpoint, but has pixel z coordinate 1.0. With these pick
+ * segment endpoints, only geometry between the near and far clipping
+ * planes can be picked.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.06.17
+ * @version 2005.06.21
  */
 public class PickContext extends TransformContext {
 
@@ -56,26 +43,15 @@ public class PickContext extends TransformContext {
   public PickContext(ViewCanvas canvas, int xp, int yp) {
     super(canvas);
 
-    // The pixel depth z from the z-buffer.
-    double zp = canvas.getPixelZ(xp,yp);
-
-    // The pixel depth z-buffer sampling interval.
-    double dz = 1.0/(Math.pow(2.0,getDepthBits(canvas))-1.0);
-
-    // The far endpoint of the pick segment.
-    //Point3 far = new Point3(xp,yp,zp+0.5*dz);
-    Point3 far = new Point3(xp,yp,1.0);
-
-    // The near endpoint of the pick segment.
+    // The near endpoint.
     Point3 near = new Point3(xp,yp,0.0);
+
+    // The far endpoint.
+    Point3 far = new Point3(xp,yp,1.0);
 
     // The pick segment, transformed to world coordinates.
     _pickSegment = new PickSegment(near,far);
-    System.out.println("near="+_pickSegment.getNearPoint());
-    System.out.println(" far="+_pickSegment.getFarPoint());
     _pickSegment.transform(getPixelToWorld());
-    System.out.println("near="+_pickSegment.getNearPoint());
-    System.out.println(" far="+_pickSegment.getFarPoint());
   }
 
   /**
@@ -149,7 +125,6 @@ public class PickContext extends TransformContext {
 
     // Compare distance-to-closest-point-squared with radius-squared.
     Point3 p = new Point3(px,py,pz);
-    System.out.println("p="+p+" c="+c+" r="+r);
     double dx = px-cx;
     double dy = py-cy;
     double dz = pz-cz;
@@ -172,12 +147,10 @@ public class PickContext extends TransformContext {
    * @return the pick result; null, if none.
    */
   public PickResult getClosest() {
-    System.out.println("PickContext.getClosest: npick="+_pickResults.size());
     PickResult prmin = null;
     double zpmin = Double.MAX_VALUE;
     for (PickResult pr : _pickResults) {
       double zp = pr.getPixelZ();
-      System.out.println(" zp="+zp);
       if (zp<zpmin) {
         zpmin = zp;
         prmin = pr;

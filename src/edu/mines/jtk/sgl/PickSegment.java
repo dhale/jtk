@@ -95,8 +95,8 @@ public class PickSegment implements Cloneable {
       return null;
     double f = 1.0/a;
     double xna = _n.x-xa;
-    double yna = _n.y-xa;
-    double zna = _n.z-xa;
+    double yna = _n.y-ya;
+    double zna = _n.z-za;
     double u =  f*(xna*xp+yna*yp+zna*zp);
     if (u<0.0 || u>1.0)
       return null;

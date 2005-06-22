@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.sgl;
 
 import java.awt.*;
+import java.awt.event.*;
 import java.nio.*;
 import java.util.*;
 import javax.swing.*;
@@ -51,7 +52,6 @@ public class ColorCube extends Node {
   }
 
   protected void pick(PickContext pc) {
-    System.out.println("ColorCube.pick");
     PickSegment ps = pc.getPickSegment();
     for (int iside=0; iside<6; ++iside) {
       double xa = _va[12*iside+ 0];
@@ -117,22 +117,48 @@ public class ColorCube extends Node {
     world.addChild(tg2);
 
     OrbitView view = new OrbitView(world);
-    view.setProjection(OrbitView.Projection.ORTHOGRAPHIC);
-    view.setAzimuthAndElevation(45.0,45.0);
+    //view.setProjection(OrbitView.Projection.ORTHOGRAPHIC);
+    //view.setAzimuthAndElevation(45.0,45.0);
     ViewCanvas canvas = new ViewCanvas(view);
     canvas.setView(view);
 
     ModeManager mm = new ModeManager();
     mm.add(canvas);
-    // OrbitViewMode ovm = new OrbitViewMode(mm);
-    // ovm.setActive(true);
+    OrbitViewMode ovm = new OrbitViewMode(mm);
+    //ovm.setActive(true);
     SelectDragMode sdm = new SelectDragMode(mm);
     sdm.setActive(true);
+
+    JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+
+    JMenu fileMenu = new JMenu("File");
+    Action exitAction = new AbstractAction("Exit") {
+      public void actionPerformed(ActionEvent event) {
+        System.exit(0);
+      }
+    };
+    JMenuItem exitItem = fileMenu.add(exitAction);
+
+    JMenu modeMenu = new JMenu("Mode");
+    JMenuItem ovmItem = new ModeMenuItem(ovm);
+    JMenuItem sdmItem = new ModeMenuItem(sdm);
+    modeMenu.add(ovmItem);
+    modeMenu.add(sdmItem);
+
+    JMenuBar menuBar = new JMenuBar();
+    menuBar.add(fileMenu);
+    menuBar.add(modeMenu);
+
+    JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+    JToggleButton ovmButton = new ModeToggleButton(ovm);
+    JToggleButton sdmButton = new ModeToggleButton(sdm);
 
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(new Dimension(SIZE,SIZE));
-    frame.getContentPane().add(canvas,BorderLayout.CENTER);
+    frame.add(canvas,BorderLayout.CENTER);
+    frame.add(toolBar,BorderLayout.WEST);
+    frame.setJMenuBar(menuBar);
     frame.setVisible(true);
   }
 }
