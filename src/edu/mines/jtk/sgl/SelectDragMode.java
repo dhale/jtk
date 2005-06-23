@@ -29,7 +29,7 @@ public class SelectDragMode extends Mode {
     setName("Select");
     Class cls = SelectDragMode.class;
     setIcon(loadIcon(cls,"resources/SelectDragIcon16.png"));
-    setCursor(loadCursor(cls,"resources/SelectDragIcon16.png",1,1));
+    setCursor(loadCursor(cls,"resources/SelectDragCursor16.png",1,1));
     setMnemonicKey(KeyEvent.VK_S);
     setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_S,0));
     setShortDescription("Select/drag");
