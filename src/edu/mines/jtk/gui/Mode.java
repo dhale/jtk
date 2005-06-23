@@ -208,55 +208,6 @@ public abstract class Mode extends AbstractAction {
     Point point = new Point(x,y);
     return toolkit.createCustomCursor(image,point,res);
   }
-  private static Image resizeCursorImage(Image image) {
-    image = new ImageIcon(image).getImage(); // ensure all pixels loaded
-    int w = image.getWidth(null);
-    int h = image.getHeight(null);
-    Dimension size = new Dimension(w,h);
-    try {
-      size = Toolkit.getDefaultToolkit().getBestCursorSize(w,h);
-      int mcc = Toolkit.getDefaultToolkit().getMaximumCursorColors();
-      System.out.println("mcc="+mcc);
-    } catch (HeadlessException e) {
-      return image;
-    }
-    if (w==size.width && h==size.height)
-      return image;
-    w = size.width;
-    h = size.height;
-    boolean hasAlpha = hasAlpha(image);
-    BufferedImage bimage = null;
-    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-    try {
-      int transparency = hasAlpha?Transparency.BITMASK:Transparency.OPAQUE;
-      GraphicsDevice gs = ge.getDefaultScreenDevice();
-      GraphicsConfiguration gc = gs.getDefaultConfiguration();
-      bimage = gc.createCompatibleImage(w,h,transparency);
-    } catch (HeadlessException e) {
-      int type = hasAlpha ?
-                 BufferedImage.TYPE_INT_ARGB :
-                 BufferedImage.TYPE_INT_RGB;
-      bimage = new BufferedImage(w,h,type);
-    }
-    Graphics g = bimage.createGraphics();
-    g.drawImage(image,0,0,null);
-    g.dispose();
-    return bimage;
-  }
-  private static boolean hasAlpha(Image image) {
-    if (image instanceof BufferedImage) {
-      BufferedImage bimage = (BufferedImage)image;
-      return bimage.getColorModel().hasAlpha();
-    }
-    PixelGrabber pg = new PixelGrabber(image,0,0,1,1,false);
-    try {
-      pg.grabPixels();
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
-    ColorModel cm = pg.getColorModel();
-    return cm.hasAlpha();
-  }
   
   /**
    * Activates or deactivates this mode for the specified component. 
@@ -292,5 +243,54 @@ public abstract class Mode extends AbstractAction {
   private ModeManager _manager;
   private boolean _active = false;
   private Cursor _cursor = null;
+
+  private static Image resizeCursorImage(Image image) {
+    image = new ImageIcon(image).getImage(); // ensure all pixels loaded
+    int w = image.getWidth(null); // so we can get width
+    int h = image.getHeight(null); // and height
+    Dimension size = new Dimension(w,h);
+    try {
+      size = Toolkit.getDefaultToolkit().getBestCursorSize(w,h);
+    } catch (HeadlessException e) { // no screen?
+      return image;
+    }
+    if (w==size.width && h==size.height)
+      return image;
+    w = size.width;
+    h = size.height;
+    boolean hasAlpha = hasAlpha(image);
+    BufferedImage bimage = null;
+    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    try {
+      int transparency = hasAlpha?Transparency.BITMASK:Transparency.OPAQUE;
+      GraphicsDevice gs = ge.getDefaultScreenDevice();
+      GraphicsConfiguration gc = gs.getDefaultConfiguration();
+      bimage = gc.createCompatibleImage(w,h,transparency);
+    } catch (HeadlessException e) { // no screen?
+      int type = hasAlpha ?
+                 BufferedImage.TYPE_INT_ARGB :
+                 BufferedImage.TYPE_INT_RGB;
+      bimage = new BufferedImage(w,h,type);
+    }
+    Graphics g = bimage.createGraphics();
+    g.drawImage(image,0,0,null);
+    g.dispose();
+    return bimage;
+  }
+
+  private static boolean hasAlpha(Image image) {
+    if (image instanceof BufferedImage) {
+      BufferedImage bimage = (BufferedImage)image;
+      return bimage.getColorModel().hasAlpha();
+    }
+    PixelGrabber pg = new PixelGrabber(image,0,0,1,1,false);
+    try {
+      pg.grabPixels();
+    } catch (InterruptedException e) {
+      return true;
+    }
+    ColorModel cm = pg.getColorModel();
+    return cm.hasAlpha();
+  }
 }
 

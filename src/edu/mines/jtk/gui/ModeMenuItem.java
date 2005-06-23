@@ -10,8 +10,8 @@ import java.beans.*;
 import javax.swing.*;
 
 /**
- * A check box menu item for a mode. When the mode is active, the mode 
- * menu item appears to be selected. 
+ * A menu item for a mode. When the mode is active, the mode menu item 
+ * appears to be selected. 
  * <p>
  * Ordinary menu items constructed with an action (such as a mode) update 
  * their appearance when the action is enabled or disabled. A mode menu 
@@ -21,7 +21,7 @@ import javax.swing.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.30
  */
-public class ModeMenuItem extends JCheckBoxMenuItem {
+public class ModeMenuItem extends JRadioButtonMenuItem {
   private static final long serialVersionUID = 1L;
 
 /**
