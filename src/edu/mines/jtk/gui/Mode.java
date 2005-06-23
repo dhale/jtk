@@ -212,7 +212,14 @@ public abstract class Mode extends AbstractAction {
     image = new ImageIcon(image).getImage(); // ensure all pixels loaded
     int w = image.getWidth(null);
     int h = image.getHeight(null);
-    Dimension size = Toolkit.getDefaultToolkit().getBestCursorSize(w,h);
+    Dimension size = new Dimension(w,h);
+    try {
+      size = Toolkit.getDefaultToolkit().getBestCursorSize(w,h);
+      int mcc = Toolkit.getDefaultToolkit().getMaximumCursorColors();
+      System.out.println("mcc="+mcc);
+    } catch (HeadlessException e) {
+      return image;
+    }
     if (w==size.width && h==size.height)
       return image;
     w = size.width;
@@ -226,9 +233,6 @@ public abstract class Mode extends AbstractAction {
       GraphicsConfiguration gc = gs.getDefaultConfiguration();
       bimage = gc.createCompatibleImage(w,h,transparency);
     } catch (HeadlessException e) {
-      // no screen?
-    }
-    if (bimage==null) {
       int type = hasAlpha ?
                  BufferedImage.TYPE_INT_ARGB :
                  BufferedImage.TYPE_INT_RGB;

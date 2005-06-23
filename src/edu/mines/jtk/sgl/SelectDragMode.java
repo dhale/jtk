@@ -33,7 +33,7 @@ public class SelectDragMode extends Mode {
     setCursor(loadCursor(cls,res,4,1));
     setMnemonicKey(KeyEvent.VK_S);
     setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_S,0));
-    setShortDescription("Select/drag)");
+    setShortDescription("Select/drag");
   }
 
   ///////////////////////////////////////////////////////////////////////////
