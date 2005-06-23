@@ -107,7 +107,7 @@ public class PickSegment implements Cloneable {
     if (v<0.0 || u+v>1.0)
       return null;
     double t = f*(xca*xq+yca*yq+zca*zq);
-    if (t>1.0)
+    if (t<0.0 || 1.0<t)
       return null;
     double w = 1.0-u-v;
     double xi = w*xa+u*xb+v*xc;

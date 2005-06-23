@@ -118,16 +118,15 @@ public class ColorCube extends Node {
 
     OrbitView view = new OrbitView(world);
     //view.setProjection(OrbitView.Projection.ORTHOGRAPHIC);
-    //view.setAzimuthAndElevation(45.0,45.0);
+    //view.setAzimuthAndElevation(90.0,0.0);
+    //view.setScale(5.0);
     ViewCanvas canvas = new ViewCanvas(view);
     canvas.setView(view);
 
     ModeManager mm = new ModeManager();
     mm.add(canvas);
     OrbitViewMode ovm = new OrbitViewMode(mm);
-    //ovm.setActive(true);
     SelectDragMode sdm = new SelectDragMode(mm);
-    sdm.setActive(true);
 
     JPopupMenu.setDefaultLightWeightPopupEnabled(false);
     ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
@@ -159,6 +158,8 @@ public class ColorCube extends Node {
     toolBar.add(ovmButton);
     JToggleButton sdmButton = new ModeToggleButton(sdm);
     toolBar.add(sdmButton);
+
+    ovm.setActive(true);
 
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -169,6 +169,26 @@ public abstract class Mode extends AbstractAction {
     java.net.URL url = cls.getResource(res);
     return (url!=null)?new ImageIcon(url):null;
   }
+
+  /**
+   * Loads a cursor from the specified resource name. The resource
+   * with specified name is found relative to the specified class.
+   * @param cls the class used to find the resource.
+   * @param res the name of the resource that contains the cursor image.
+   * @param x the x coordinate of the cursor hot spot
+   * @param y the y coordinate of the cursor hot spot
+   */
+  protected static Cursor loadCursor(Class cls, String res, int x, int y) {
+    java.net.URL url = cls.getResource(res);
+    if (url==null)
+      return null;
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
+    Image image = toolkit.getImage(url);
+    if (image==null)
+      return null;
+    Point point = new Point(x,y);
+    return toolkit.createCustomCursor(image,point,res);
+  }
   
   /**
    * Activates or deactivates this mode for the specified component. 
