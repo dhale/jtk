@@ -147,6 +147,23 @@ public abstract class Mode extends AbstractAction {
     putValue(Action.LONG_DESCRIPTION,ld);
   }
 
+  /**
+   * Sets the cursor for this mode.
+   * If not null, the specified cursor is used when this mode is active.
+   * @param cursor the cursor; null, if the default cursor should be used.
+   */
+  public void setCursor(Cursor cursor) {
+    _cursor = cursor;
+  }
+
+  /**
+   * Gets the cursor for this mode.
+   * @return the cursor; null, if the default cursor should be used.
+   */
+  public Cursor getCursor() {
+    return _cursor;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
 
@@ -223,5 +240,6 @@ public abstract class Mode extends AbstractAction {
 
   private ModeManager _manager;
   private boolean _active = false;
+  private Cursor _cursor = null;
 }
 

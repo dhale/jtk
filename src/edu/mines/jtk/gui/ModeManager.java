@@ -98,8 +98,12 @@ public class ModeManager {
   private Mode _modeDeactivated;
 
   private void setActiveInternal(Mode mode, boolean active) {
+    Cursor cursor = (active)?mode.getCursor():null;
+    if (cursor==null)
+      cursor = Cursor.getDefaultCursor();
     mode.setActiveInternal(active);
     for (Component c : _cset) {
+      c.setCursor(cursor);
       mode.setActive(c,active);
     }
   }
