@@ -28,9 +28,9 @@ public class SelectDragMode extends Mode {
     super(modeManager);
     setName("Select");
     Class cls = SelectDragMode.class;
-    String res = "resources/SelectDrag24.png";
+    String res = "resources/SelectDrag16.png";
     setIcon(loadIcon(cls,res));
-    setCursor(loadCursor(cls,res,7,2));
+    setCursor(loadCursor(cls,res,4,1));
     setMnemonicKey(KeyEvent.VK_S);
     setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_S,0));
     setShortDescription("Select/drag)");
