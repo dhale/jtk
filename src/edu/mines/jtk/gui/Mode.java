@@ -8,6 +8,7 @@ package edu.mines.jtk.gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
 import javax.swing.*;
 
 /**
@@ -203,8 +204,54 @@ public abstract class Mode extends AbstractAction {
     Image image = toolkit.getImage(url);
     if (image==null)
       return null;
+    image = resizeCursorImage(image);
     Point point = new Point(x,y);
     return toolkit.createCustomCursor(image,point,res);
+  }
+  private static Image resizeCursorImage(Image image) {
+    image = new ImageIcon(image).getImage(); // ensure all pixels loaded
+    int w = image.getWidth(null);
+    int h = image.getHeight(null);
+    Dimension size = Toolkit.getDefaultToolkit().getBestCursorSize(w,h);
+    if (w==size.width && h==size.height)
+      return image;
+    w = size.width;
+    h = size.height;
+    boolean hasAlpha = hasAlpha(image);
+    BufferedImage bimage = null;
+    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    try {
+      int transparency = hasAlpha?Transparency.BITMASK:Transparency.OPAQUE;
+      GraphicsDevice gs = ge.getDefaultScreenDevice();
+      GraphicsConfiguration gc = gs.getDefaultConfiguration();
+      bimage = gc.createCompatibleImage(w,h,transparency);
+    } catch (HeadlessException e) {
+      // no screen?
+    }
+    if (bimage==null) {
+      int type = hasAlpha ?
+                 BufferedImage.TYPE_INT_ARGB :
+                 BufferedImage.TYPE_INT_RGB;
+      bimage = new BufferedImage(w,h,type);
+    }
+    Graphics g = bimage.createGraphics();
+    g.drawImage(image,0,0,null);
+    g.dispose();
+    return bimage;
+  }
+  private static boolean hasAlpha(Image image) {
+    if (image instanceof BufferedImage) {
+      BufferedImage bimage = (BufferedImage)image;
+      return bimage.getColorModel().hasAlpha();
+    }
+    PixelGrabber pg = new PixelGrabber(image,0,0,1,1,false);
+    try {
+      pg.grabPixels();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+    ColorModel cm = pg.getColorModel();
+    return cm.hasAlpha();
   }
   
   /**
