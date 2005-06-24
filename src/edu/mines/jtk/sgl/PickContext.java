@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import java.awt.event.*;
 import java.util.*;
 
 import edu.mines.jtk.opengl.*;
@@ -35,13 +36,14 @@ import static edu.mines.jtk.util.MathPlus.*;
 public class PickContext extends TransformContext {
 
   /**
-   * Constructs a pick context at specified pixel (x,y) coordinates.
-   * @param canvas the canvas
-   * @param xp the pixel x coordinate.
-   * @param yp the pixel y coordinate.
+   * Constructs a pick context for the specified mouse event.
+   * @param event the mouse event.
    */
-  public PickContext(ViewCanvas canvas, int xp, int yp) {
-    super(canvas);
+  public PickContext(MouseEvent event) {
+    super((ViewCanvas)event.getSource());
+    _event = event;
+    int xp = event.getX();
+    int yp = event.getY();
 
     // The near endpoint.
     Point3 near = new Point3(xp,yp,0.0);
@@ -52,6 +54,14 @@ public class PickContext extends TransformContext {
     // The pick segment, transformed to world coordinates.
     _pickSegment = new PickSegment(near,far);
     _pickSegment.transform(getPixelToWorld());
+  }
+
+  /**
+   * Gets the mouse event for which this context was constructed.
+   * @return the mouse event.
+   */
+  public MouseEvent getMouseEvent() {
+    return _event;
   }
 
   /**
@@ -181,6 +191,7 @@ public class PickContext extends TransformContext {
     _pickSegment = _pickSegmentStack.pop();
   }
 
+  private MouseEvent _event;
   private PickSegment _pickSegment;
   private ArrayStack<PickSegment> _pickSegmentStack = 
     new ArrayStack<PickSegment>();

@@ -6,6 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import java.awt.event.*;
+
 /**
  * A result from a pick traversal.
  * <p>
@@ -27,6 +29,7 @@ public class PickResult implements Cloneable {
    * @param point the picked point, in local coordinates.
    */
   public PickResult(PickContext pc, Point3 point) {
+    _event = pc.getMouseEvent();
     _nodes = pc.getNodes();
     _localToWorld = pc.getLocalToWorld();
     _pointLocal = point.clone();
@@ -46,6 +49,14 @@ public class PickResult implements Cloneable {
     pr._depthPixel = _depthPixel;
     pr._localToWorld = _localToWorld.clone();
     return pr;
+  }
+
+  /**
+   * Gets the mouse event for this pick result.
+   * @return the mouse event.
+   */
+  public MouseEvent getMouseEvent() {
+    return _event;
   }
 
   /**
@@ -73,10 +84,10 @@ public class PickResult implements Cloneable {
    * specified class. If no such node exists, this method returns null.
    * @return the node; null, if none.
    */
-  public Node getNode(Class nodeClass) {
+  public Node getNode(Class<?> nodeClass) {
     for (int i=_nodes.length-1; i>=0; --i) {
       Node node = _nodes[i];
-      if (node.getClass().equals(nodeClass))
+      if (nodeClass.isAssignableFrom(node.getClass()))
         return node;
     }
     return null;
@@ -116,6 +127,7 @@ public class PickResult implements Cloneable {
     return _localToWorld;
   }
 
+  private MouseEvent _event;
   private Node[] _nodes;
   private Point3 _pointLocal;
   private Point3 _pointWorld;

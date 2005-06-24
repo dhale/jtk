@@ -21,9 +21,9 @@ import static edu.mines.jtk.opengl.Gl.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.27
  */
-public class ColorCube extends Node {
+public class ColorCube extends Node implements Selectable {
 
-  ColorCube() {
+  public ColorCube() {
     StateSet states = new StateSet();
     MaterialState ms = new MaterialState();
     ms.setColorMaterialFront(GL_AMBIENT_AND_DIFFUSE);
@@ -32,6 +32,13 @@ public class ColorCube extends Node {
     states.add(ms);
     setStates(states);
   }
+
+  public void beginSelect(PickResult pr) {
+    System.out.println("ColorCube.beginSelect");
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // protected
 
   protected BoundingSphere computeBoundingSphere() {
     Point3 c = new Point3(0.5,0.5,0.5);
@@ -74,6 +81,9 @@ public class ColorCube extends Node {
         pc.addResult(q);
     }
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // private
 
   // Vertices, normals, and colors.
   private static float[] _va = {

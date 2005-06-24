@@ -70,6 +70,31 @@ public class SelectDragMode extends Mode {
     }
   };
 
+  private void beginSelect(MouseEvent event) {
+    _xmouse = event.getX();
+    _ymouse = event.getY();
+    _canvas = (ViewCanvas)event.getSource();
+    _canvas.addMouseMotionListener(_mml);
+    _view = _canvas.getView();
+    _world = _view.getWorld();
+    PickContext pc = new PickContext(event);
+    _world.pickApply(pc);
+    PickResult pr = pc.getClosest();
+    if (pr!=null) {
+      Point3 pointLocal = pr.getPointLocal();
+      Point3 pointWorld = pr.getPointWorld();
+      System.out.println("Pick");
+      System.out.println("  local="+pointLocal);
+      System.out.println("  world="+pointWorld);
+      Selectable node = (Selectable)pr.getNode(Selectable.class);
+      if (node!=null)
+        node.beginSelect(pr);
+    } else {
+      System.out.println("Pick nothing");
+    }
+  }
+
+  /*
   private void beginSelect(MouseEvent e) {
     _xmouse = e.getX();
     _ymouse = e.getY();
@@ -90,5 +115,6 @@ public class SelectDragMode extends Mode {
       System.out.println("Pick nothing");
     }
   }
+  */
 }
 
