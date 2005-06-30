@@ -34,7 +34,7 @@ import static edu.mines.jtk.opengl.Gl.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.21
  */
-public class Node {
+public abstract class Node {
 
   /**
    * Returns the number of parents of this node.
@@ -62,27 +62,26 @@ public class Node {
   }
 
   /**
-   * Gets the bounding sphere for this node. If the bounding sphere 
-   * is dirty, then this method will first clean it by calling the 
-   * method {@link #computeBoundingSphere()}.
+   * Gets the bounding sphere for this node. If the bounding sphere is 
+   * dirty, then this method will first call the method 
+   * {@link #computeBoundingSphere()} 
+   * and then mark the bounding sphere clean.
    * @return the bounding sphere.
    */
   public BoundingSphere getBoundingSphere() {
-    if (_boundingSphereDirty) {
+    if (_boundingSphere==null)
       _boundingSphere = computeBoundingSphere();
-      _boundingSphereDirty = false;
-    }
     return _boundingSphere;
   }
   
   /**
    * Marks dirty the bounding sphere of this node (and any parent nodes).
-   * Subsequent calls to the method {@link #getBoundingSphere()} will
-   * cause this node to recompute its bounding sphere.
+   * If dirty when the method {@link #getBoundingSphere(TransformContext)}
+   * is next called, this node's bounding sphere will be recomputed.
    */
   public void dirtyBoundingSphere() {
-    if (!_boundingSphereDirty) {
-      _boundingSphereDirty = true;
+    if (_boundingSphere!=null) {
+      _boundingSphere = null;
       for (Group parent : _parentList)
         parent.dirtyBoundingSphere();
     }
@@ -101,14 +100,11 @@ public class Node {
   
   /**
    * Computes the bounding sphere for this node, including its children.
-   * This method is called by {@link #getBoundingSphere()} whenever this 
-   * node's bounding sphere is dirty. This implementation returns an
-   * empty bounding sphere.
+   * This method is called by {@link #getBoundingSphere()} when this node's 
+   * bounding sphere is dirty.
    * @return the computed bounding sphere.
    */
-  protected BoundingSphere computeBoundingSphere() {
-    return new BoundingSphere();
-  }
+  protected abstract BoundingSphere computeBoundingSphere();
 
   /**
    * Gets the OpenGL attribute bits for this node. These bits determine 
@@ -131,6 +127,9 @@ public class Node {
   protected int getAttributeBits() {
     return GL_ALL_ATTRIB_BITS;
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // cull
 
   /**
    * Applies the cull process to this node. If the view frustum intersects
@@ -174,6 +173,9 @@ public class Node {
   protected void cullEnd(CullContext cc) {
     cc.popNode();
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // draw
 
   /**
    * Applies the draw process to this node. Calls the three methods 
@@ -222,6 +224,9 @@ public class Node {
     dc.popNode();
   }
 
+  ///////////////////////////////////////////////////////////////////////////
+  // pick
+
   /**
    * Applies the pick process to this node. If the pick segment intersects
    * the bounding sphere of this node, then this method calls the three 
@@ -267,6 +272,35 @@ public class Node {
   }
 
   ///////////////////////////////////////////////////////////////////////////
+  // select
+
+  /**
+   * Begins selection of this node for the specified pick result.
+   * This implementation marks this node selected and returns false.
+   * @param pr the pick result.
+   */
+  public boolean selectBegin(PickResult pr) {
+    _selected = true;
+    return true;
+  }
+
+  /**
+   * Ends selection of this node.
+   * This implementation simply marks this node as being not selected.
+   */
+  public void selectEnd() {
+    _selected = false;
+  }
+
+  /**
+   * Determines whether this node is currently selected.
+   */
+  public boolean isSelected() {
+    return _selected;
+  }
+  private boolean _selected;
+
+  ///////////////////////////////////////////////////////////////////////////
   // package
 
   /**
@@ -297,8 +331,7 @@ public class Node {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private boolean _boundingSphereDirty = true;
-  private BoundingSphere _boundingSphere = null;
+  private BoundingSphere _boundingSphere = null; // null, if dirty
   private ArrayList<Group> _parentList = new ArrayList<Group>(2);
   private StateSet _states;
 }

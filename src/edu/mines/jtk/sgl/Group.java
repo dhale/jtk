@@ -101,7 +101,9 @@ public class Group extends Node {
     for (Node child : _childList)
       bb.expandBy(child.getBoundingSphere());
     if (bb.isEmpty())
-      return new BoundingSphere();
+      return BoundingSphere.empty();
+    if (bb.isInfinite())
+      return BoundingSphere.infinite();
     BoundingSphere bs = new BoundingSphere(bb.getCenter(),0.0);
     for (Node child : _childList)
       bs.expandRadiusBy(child.getBoundingSphere());

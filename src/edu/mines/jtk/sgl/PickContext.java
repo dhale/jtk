@@ -54,6 +54,8 @@ public class PickContext extends TransformContext {
     // The pick segment, transformed to world coordinates.
     _pickSegment = new PickSegment(near,far);
     _pickSegment.transform(getPixelToWorld());
+    _nearPoint = _pickSegment.getNearPoint();
+    _farPoint = _pickSegment.getFarPoint();
   }
 
   /**
@@ -81,8 +83,12 @@ public class PickContext extends TransformContext {
    */
   public boolean segmentIntersectsSphereOf(Node node) {
     BoundingSphere bs = node.getBoundingSphere();
-    Point3 a = _pickSegment.getFarPoint();
-    Point3 b = _pickSegment.getNearPoint();
+    if (bs.isEmpty())
+      return false;
+    if (bs.isInfinite())
+      return true;
+    Point3 a = _farPoint;
+    Point3 b = _nearPoint;
     Point3 c = bs.getCenter();
     double r = bs.getRadius();
     double rr = r*r;
@@ -180,6 +186,8 @@ public class PickContext extends TransformContext {
     super.pushLocalToWorld(transform);
     _pickSegmentStack.push(_pickSegment.clone());
     _pickSegment.transform(transform.inverse());
+    _nearPoint = _pickSegment.getNearPoint();
+    _farPoint = _pickSegment.getFarPoint();
   }
 
   /**
@@ -189,10 +197,14 @@ public class PickContext extends TransformContext {
   public void popLocalToWorld() {
     super.popLocalToWorld();
     _pickSegment = _pickSegmentStack.pop();
+    _nearPoint = _pickSegment.getNearPoint();
+    _farPoint = _pickSegment.getFarPoint();
   }
 
   private MouseEvent _event;
   private PickSegment _pickSegment;
+  private Point3 _nearPoint;
+  private Point3 _farPoint;
   private ArrayStack<PickSegment> _pickSegmentStack = 
     new ArrayStack<PickSegment>();
   private ArrayList<PickResult> _pickResults = new ArrayList<PickResult>();

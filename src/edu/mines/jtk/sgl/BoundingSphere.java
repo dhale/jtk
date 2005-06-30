@@ -6,18 +6,22 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import static java.lang.Math.*;
+
 import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * A bounding sphere.
  * <p>
- * A bounding sphere may be empty or not. An empty sphere contains no points.
- * A non-empty sphere contains at least one point. Some attributes, such as 
- * the sphere center and radius, are meaningful only for spheres that are not 
+ * A bounding sphere may be empty. An empty sphere contains no points. A 
+ * non-empty sphere contains at least one point. Some attributes, such as 
+ * the sphere center and radius, are defined only for spheres that are not 
  * empty.
+ * <p>
+ * A bounding sphere may be infinite. An infinite sphere contains all points. 
+ * Its radius is Double.POSITIVE_INFINITY, and its center is undefined.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.05.21
+ * @version 2005.06.28
  */
 public class BoundingSphere implements Cloneable {
 
@@ -25,6 +29,7 @@ public class BoundingSphere implements Cloneable {
    * Constructs an empty bounding sphere.
    */
   public BoundingSphere() {
+    setEmpty();
   }
 
   /**
@@ -64,10 +69,20 @@ public class BoundingSphere implements Cloneable {
   }
 
   /**
+   * Determines whether this sphere is infinite.
+   * @return true, if infinite; false, otherwise.
+   */
+  public boolean isInfinite() {
+    return _r==Double.POSITIVE_INFINITY;
+  }
+
+  /**
    * Gets the sphere center.
    * @return the center.
    */
   public Point3 getCenter() {
+    Check.state(!isEmpty(),"bounding sphere is not empty");
+    Check.state(!isInfinite(),"bounding sphere is not infinite");
     return new Point3(_x,_y,_z);
   }
 
@@ -76,6 +91,7 @@ public class BoundingSphere implements Cloneable {
    * @return the radius.
    */
   public double getRadius() {
+    Check.state(!isEmpty(),"bounding sphere is not empty");
     return _r;
   }
 
@@ -84,6 +100,7 @@ public class BoundingSphere implements Cloneable {
    * @return the radius-squared.
    */
   public double getRadiusSquared() {
+    Check.state(!isEmpty(),"bounding sphere is not empty");
     return _r*_r;
   }
 
@@ -95,24 +112,26 @@ public class BoundingSphere implements Cloneable {
    * @param z the z coordinate of the point.
    */
   public void expandBy(double x, double y, double z) {
-    if (!isEmpty()) {
-      double dx = x-_x;
-      double dy = y-_y;
-      double dz = z-_z;
-      double d = sqrt(dx*dx+dy*dy+dz*dz);
-      if (d>_r) {
-        double dr = 0.5*(d-_r);
-        double ds = dr/d;
-        _x += dx*ds;
-        _y += dy*ds;
-        _z += dz*ds;
-        _r += dr;
+    if (!isInfinite()) {
+      if (!isEmpty()) {
+        double dx = x-_x;
+        double dy = y-_y;
+        double dz = z-_z;
+        double d = sqrt(dx*dx+dy*dy+dz*dz);
+        if (d>_r) {
+          double dr = 0.5*(d-_r);
+          double ds = dr/d;
+          _x += dx*ds;
+          _y += dy*ds;
+          _z += dz*ds;
+          _r += dr;
+        }
+      } else {
+        _x = x;
+        _y = y;
+        _z = z;
+        _r = 0.0;
       }
-    } else {
-      _x = x;
-      _y = y;
-      _z = z;
-      _r = 0.0;
     }
   }
 
@@ -124,18 +143,20 @@ public class BoundingSphere implements Cloneable {
    * @param z the z coordinate of the point.
    */
   public void expandRadiusBy(double x, double y, double z) {
-    if (!isEmpty()) {
-      double dx = x-_x;
-      double dy = y-_y;
-      double dz = z-_z;
-      double d = sqrt(dx*dx+dy*dy+dz*dz);
-      if (d>_r)
-        _r = d;
-    } else {
-      _x = x;
-      _y = y;
-      _z = z;
-      _r = 0.0;
+    if (!isInfinite()) {
+      if (!isEmpty()) {
+        double dx = x-_x;
+        double dy = y-_y;
+        double dz = z-_z;
+        double d = sqrt(dx*dx+dy*dy+dz*dz);
+        if (d>_r)
+          _r = d;
+      } else {
+        _x = x;
+        _y = y;
+        _z = z;
+        _r = 0.0;
+      }
     }
   }
 
@@ -163,36 +184,42 @@ public class BoundingSphere implements Cloneable {
    * @param bs the bounding sphere.
    */
   public void expandBy(BoundingSphere bs) {
-    if (!bs.isEmpty()) {
-      if (!isEmpty()) {
-        double dx = bs._x-_x;
-        double dy = bs._y-_y;
-        double dz = bs._z-_z;
-        double d = sqrt(dx*dx+dy*dy+dz*dz);
-        if (d==0.0 && bs._r>_r) {
-          _r = bs._r;
-        } else if (d+bs._r>_r) {
-          double da = _r/d;
-          double xa = _x-dx*da;
-          double ya = _y-dy*da;
-          double za = _z-dz*da;
-          double db = bs._r/d;
-          double xb = bs._x+dx*db;
-          double yb = bs._y+dy*db;
-          double zb = bs._z+dz*db;
-          dx = xb-_x;
-          dy = yb-_y;
-          dz = zb-_z;
-          _r = sqrt(dx*dx+dy*dy+dz*dz);
-          _x = 0.5*(xa+xb);
-          _y = 0.5*(ya+yb);
-          _z = 0.5*(za+zb);
+    if (!isInfinite()) {
+      if (!bs.isInfinite()) {
+        if (!bs.isEmpty()) {
+          if (!isEmpty()) {
+            double dx = bs._x-_x;
+            double dy = bs._y-_y;
+            double dz = bs._z-_z;
+            double d = sqrt(dx*dx+dy*dy+dz*dz);
+            if (d==0.0 && bs._r>_r) {
+              _r = bs._r;
+            } else if (d+bs._r>_r) {
+              double da = _r/d;
+              double xa = _x-dx*da;
+              double ya = _y-dy*da;
+              double za = _z-dz*da;
+              double db = bs._r/d;
+              double xb = bs._x+dx*db;
+              double yb = bs._y+dy*db;
+              double zb = bs._z+dz*db;
+              dx = xb-_x;
+              dy = yb-_y;
+              dz = zb-_z;
+              _r = sqrt(dx*dx+dy*dy+dz*dz);
+              _x = 0.5*(xa+xb);
+              _y = 0.5*(ya+yb);
+              _z = 0.5*(za+zb);
+            }
+          } else {
+            _r = bs._r;
+            _x = bs._x;
+            _y = bs._y;
+            _z = bs._z;
+          }
         }
       } else {
-        _r = bs._r;
-        _x = bs._x;
-        _y = bs._y;
-        _z = bs._z;
+        setInfinite();
       }
     }
   }
@@ -203,25 +230,29 @@ public class BoundingSphere implements Cloneable {
    * @param bs the bounding sphere.
    */
   public void expandRadiusBy(BoundingSphere bs) {
-    if (!bs.isEmpty()) {
-      if (!isEmpty()) {
-        double dx = bs._x-_x;
-        double dy = bs._y-_y;
-        double dz = bs._z-_z;
-        double d = sqrt(dx*dx+dy*dy+dz*dz);
-        double r = d+bs._r;
-        if (r>_r)
-          _r = r;
+    if (!isInfinite()) {
+      if (!bs.isInfinite()) {
+        if (!bs.isEmpty()) {
+          if (!isEmpty()) {
+            double dx = bs._x-_x;
+            double dy = bs._y-_y;
+            double dz = bs._z-_z;
+            double d = sqrt(dx*dx+dy*dy+dz*dz);
+            double r = d+bs._r;
+            if (r>_r)
+              _r = r;
+          } else {
+            _r = bs._r;
+            _x = bs._x;
+            _y = bs._y;
+            _z = bs._z;
+          }
+        }
       } else {
-        _r = bs._r;
-        _x = bs._x;
-        _y = bs._y;
-        _z = bs._z;
+        setInfinite();
       }
     }
   }
-
-  ///////////////////////////
 
   /**
    * Expands this sphere to include the specified bounding box.
@@ -229,43 +260,49 @@ public class BoundingSphere implements Cloneable {
    * @param bb the bounding box.
    */
   public void expandBy(BoundingBox bb) {
-    if (!bb.isEmpty()) {
-      Point3 pmin = bb.getMin();
-      Point3 pmax = bb.getMax();
-      double xmin = pmin.x;
-      double ymin = pmin.y;
-      double zmin = pmin.z;
-      double xmax = pmax.x;
-      double ymax = pmax.y;
-      double zmax = pmax.z;
-      if (!isEmpty()) {
-        for (int i=0; i<8; ++i) {
-          double x = ((i&1)==0)?xmin:xmax;
-          double y = ((i&2)==0)?ymin:ymax;
-          double z = ((i&4)==0)?zmin:zmax;
-          double dx = x-_x;
-          double dy = y-_y;
-          double dz = z-_z;
-          double d = sqrt(dx*dx+dy*dy+dz*dz);
-          double ds = (d>0.0)?_r/d:_r;
-          x = _x-dx*ds;
-          y = _y-dy*ds;
-          z = _z-dz*ds;
-          if (x<xmin) xmin = x;
-          if (y<ymin) ymin = y;
-          if (z<zmin) zmin = z;
-          if (x>xmax) xmax = x;
-          if (y>ymax) ymax = y;
-          if (z>zmax) zmax = z;
+    if (!isInfinite()) {
+      if (!bb.isInfinite()) {
+        if (!bb.isEmpty()) {
+          Point3 pmin = bb.getMin();
+          Point3 pmax = bb.getMax();
+          double xmin = pmin.x;
+          double ymin = pmin.y;
+          double zmin = pmin.z;
+          double xmax = pmax.x;
+          double ymax = pmax.y;
+          double zmax = pmax.z;
+          if (!isEmpty()) {
+            for (int i=0; i<8; ++i) {
+              double x = ((i&1)==0)?xmin:xmax;
+              double y = ((i&2)==0)?ymin:ymax;
+              double z = ((i&4)==0)?zmin:zmax;
+              double dx = x-_x;
+              double dy = y-_y;
+              double dz = z-_z;
+              double d = sqrt(dx*dx+dy*dy+dz*dz);
+              double ds = (d>0.0)?_r/d:_r;
+              x = _x-dx*ds;
+              y = _y-dy*ds;
+              z = _z-dz*ds;
+              if (x<xmin) xmin = x;
+              if (y<ymin) ymin = y;
+              if (z<zmin) zmin = z;
+              if (x>xmax) xmax = x;
+              if (y>ymax) ymax = y;
+              if (z>zmax) zmax = z;
+            }
+          }
+          double dx = xmax-xmin;
+          double dy = ymax-ymin;
+          double dz = zmax-zmin;
+          _r = 0.5*sqrt(dx*dx+dy*dy+dz*dz);
+          _x = 0.5*(xmin+xmax);
+          _y = 0.5*(ymin+ymax);
+          _z = 0.5*(zmin+zmax);
         }
+      } else {
+        setInfinite();
       }
-      double dx = xmax-xmin;
-      double dy = ymax-ymin;
-      double dz = zmax-zmin;
-      _r = 0.5*sqrt(dx*dx+dy*dy+dz*dz);
-      _x = 0.5*(xmin+xmax);
-      _y = 0.5*(ymin+ymax);
-      _z = 0.5*(zmin+zmax);
     }
   }
 
@@ -275,30 +312,36 @@ public class BoundingSphere implements Cloneable {
    * @param bb the bounding box.
    */
   public void expandRadiusBy(BoundingBox bb) {
-    if (!bb.isEmpty()) {
-      Point3 pmin = bb.getMin();
-      Point3 pmax = bb.getMax();
-      double xmin = pmin.x;
-      double ymin = pmin.y;
-      double zmin = pmin.z;
-      double xmax = pmax.x;
-      double ymax = pmax.y;
-      double zmax = pmax.z;
-      if (!isEmpty()) {
-        for (int i=0; i<8; ++i) {
-          double x = ((i&1)==0)?xmin:xmax;
-          double y = ((i&2)==0)?ymin:ymax;
-          double z = ((i&4)==0)?zmin:zmax;
-          expandRadiusBy(x,y,z);
+    if (!isInfinite()) {
+      if (!bb.isInfinite()) {
+        if (!bb.isEmpty()) {
+          Point3 pmin = bb.getMin();
+          Point3 pmax = bb.getMax();
+          double xmin = pmin.x;
+          double ymin = pmin.y;
+          double zmin = pmin.z;
+          double xmax = pmax.x;
+          double ymax = pmax.y;
+          double zmax = pmax.z;
+          if (!isEmpty()) {
+            for (int i=0; i<8; ++i) {
+              double x = ((i&1)==0)?xmin:xmax;
+              double y = ((i&2)==0)?ymin:ymax;
+              double z = ((i&4)==0)?zmin:zmax;
+              expandRadiusBy(x,y,z);
+            }
+          } else {
+            double dx = xmax-xmin;
+            double dy = ymax-ymin;
+            double dz = zmax-zmin;
+            _r = 0.5*sqrt(dx*dx+dy*dy+dz*dz);
+            _x = 0.5*(xmin+xmax);
+            _y = 0.5*(ymin+ymax);
+            _z = 0.5*(zmin+zmax);
+          }
         }
       } else {
-        double dx = xmax-xmin;
-        double dy = ymax-ymin;
-        double dz = zmax-zmin;
-        _r = 0.5*sqrt(dx*dx+dy*dy+dz*dz);
-        _x = 0.5*(xmin+xmax);
-        _y = 0.5*(ymin+ymax);
-        _z = 0.5*(zmin+zmax);
+        setInfinite();
       }
     }
   }
@@ -311,6 +354,10 @@ public class BoundingSphere implements Cloneable {
    * @return true, if this sphere contains the point; false, otherwise.
    */
   public boolean contains(double x, double y, double z) {
+    if (isEmpty())
+      return false;
+    if (isInfinite())
+      return true;
     double dx = _x-x;
     double dy = _y-y;
     double dz = _z-z;
@@ -327,6 +374,24 @@ public class BoundingSphere implements Cloneable {
     return contains(p.x,p.y,p.z);
   }
 
+  /**
+   * Returns a new empty bounding sphere.
+   * @return a new empty bounding sphere.
+   */
+  public static BoundingSphere empty() {
+    return new BoundingSphere();
+  }
+
+  /**
+   * Returns a new infinite bounding sphere.
+   * @return a new infinite bounding sphere.
+   */
+  public static BoundingSphere infinite() {
+    BoundingSphere bs = new BoundingSphere();
+    bs.setInfinite();
+    return bs;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -334,4 +399,24 @@ public class BoundingSphere implements Cloneable {
   private double _y =  0.0; // center y coordinate
   private double _z =  0.0; // center z coordinate
   private double _r = -1.0; // radius
+
+  /**
+   * Sets this sphere to the empty sphere.
+   */
+  private void setEmpty() {
+    _x = 0.0;
+    _y = 0.0;
+    _z = 0.0;
+    _r = -1.0;
+  }
+
+  /**
+   * Sets this sphere to the infinite sphere.
+   */
+  private void setInfinite() {
+    _x = 0.0;
+    _y = 0.0;
+    _z = 0.0;
+    _r = Double.POSITIVE_INFINITY;
+  }
 }

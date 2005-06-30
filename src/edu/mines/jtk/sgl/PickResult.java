@@ -52,7 +52,8 @@ public class PickResult implements Cloneable {
   }
 
   /**
-   * Gets the mouse event for this pick result.
+   * Gets the mouse event for this pick result. This is the mouse event
+   * of the pick context for which this pick result was constructed.
    * @return the mouse event.
    */
   public MouseEvent getMouseEvent() {

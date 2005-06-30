@@ -39,6 +39,10 @@ public class CullContext extends TransformContext {
   public boolean frustumIntersectsSphereOf(Node node) {
     if (_active!=0) { // if at least one frustum plane is active, ...
       BoundingSphere bs = node.getBoundingSphere();
+      if (bs.isEmpty())
+        return false;
+      if (bs.isInfinite())
+        return true;
       Point3 c = bs.getCenter();
       double r = bs.getRadius();
       double s = -r;

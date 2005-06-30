@@ -6,18 +6,23 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import static java.lang.Math.*;
+
 import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * An axis-aligned bounding box.
  * <p>
- * A bounding box may be empty or not. An empty box contains no points.
- * A non-empty box contains at least one point. Some attributes, such as 
- * the box minimum and maximum points, center, and radius, are meaningful 
- * only for boxes that are not empty.
+ * A bounding box may be empty. An empty box contains no points. A non-empty 
+ * box contains at least one point. Some attributes, such as the box minimum 
+ * and maximum points, center, and radius, are defined only for boxes that 
+ * are not empty.
+ * <p>
+ * A bounding box may be infinite. An infinite box contains all points. 
+ * Its minimum and maximum points are at Double.NEGATIVE_INFINITY and
+ * Double.POSITIVE_INFINITY, respectively, and its center is undefined.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.05.21
+ * @version 2005.06.28
  */
 public class BoundingBox implements Cloneable {
 
@@ -25,6 +30,7 @@ public class BoundingBox implements Cloneable {
    * Constructs an empty bounding box.
    */
   public BoundingBox() {
+    setEmpty();
   }
 
   /**
@@ -89,10 +95,24 @@ public class BoundingBox implements Cloneable {
   }
 
   /**
+   * Determines whether this box is infinite.
+   * @return true, if infinite; false, otherwise.
+   */
+  public boolean isInfinite() {
+    return _xmin==Double.NEGATIVE_INFINITY &&
+           _ymin==Double.NEGATIVE_INFINITY &&
+           _zmin==Double.NEGATIVE_INFINITY &&
+           _xmax==Double.POSITIVE_INFINITY &&
+           _ymax==Double.POSITIVE_INFINITY &&
+           _zmax==Double.POSITIVE_INFINITY;
+  }
+
+  /**
    * Gets the point in this box with minimum coordinates.
    * @return the minimim point.
    */
   public Point3 getMin() {
+    Check.state(!isEmpty(),"bounding box is not empty");
     return new Point3(_xmin,_ymin,_zmin);
   }
 
@@ -101,6 +121,7 @@ public class BoundingBox implements Cloneable {
    * @return the maximim point.
    */
   public Point3 getMax() {
+    Check.state(!isEmpty(),"bounding box is not empty");
     return new Point3(_xmax,_ymax,_zmax);
   }
 
@@ -109,7 +130,11 @@ public class BoundingBox implements Cloneable {
    * @return the box center.
    */
   public Point3 getCenter() {
-    return new Point3(0.5*(_xmin+_xmax),0.5*(_ymin+_ymax),0.5*(_zmin+_zmax));
+    Check.state(!isEmpty(),"bounding box is not empty");
+    Check.state(!isInfinite(),"bounding box is not infinite");
+    return (isInfinite()) ?
+           new Point3(0.0,0.0,0.0) :
+           new Point3(0.5*(_xmin+_xmax),0.5*(_ymin+_ymax),0.5*(_zmin+_zmax));
   }
 
   /**
@@ -125,6 +150,7 @@ public class BoundingBox implements Cloneable {
    * @return the box radius-squared.
    */
   public double getRadiusSquared() {
+    Check.state(!isEmpty(),"bounding box is not empty");
     double dx = _xmax-_xmin;
     double dy = _ymax-_ymin;
     double dz = _zmax-_zmin;
@@ -141,6 +167,7 @@ public class BoundingBox implements Cloneable {
    * @return the corner point.
    */
   public Point3 getCorner(int index) {
+    Check.state(!isEmpty(),"bounding box is not empty");
     double x = ((index&1)==0)?_xmin:_xmax;
     double y = ((index&2)==0)?_ymin:_ymax;
     double z = ((index&4)==0)?_zmin:_zmax;
@@ -175,8 +202,6 @@ public class BoundingBox implements Cloneable {
    * @param bb the bounding box.
    */
   public void expandBy(BoundingBox bb) {
-    if (bb.isEmpty())
-      return;
     if (_xmin>bb._xmin) _xmin = bb._xmin;
     if (_ymin>bb._ymin) _ymin = bb._ymin;
     if (_zmin>bb._zmin) _zmin = bb._zmin;
@@ -190,19 +215,23 @@ public class BoundingBox implements Cloneable {
    * @param bs the bounding sphere.
    */
   public void expandBy(BoundingSphere bs) {
-    if (bs.isEmpty())
-      return;
-    Point3 c = bs.getCenter();
-    double x = c.x;
-    double y = c.y;
-    double z = c.z;
-    double r = bs.getRadius();
-    if (_xmin>x-r) _xmin = x-r;
-    if (_ymin>y-r) _ymin = y-r;
-    if (_zmin>z-r) _zmin = z-r;
-    if (_xmax<x+r) _xmax = x+r;
-    if (_ymax<y+r) _ymax = y+r;
-    if (_zmax<z+r) _zmax = z+r;
+    if (!bs.isInfinite()) {
+      if (!bs.isEmpty()) {
+        double r = bs.getRadius();
+        Point3 c = bs.getCenter();
+        double x = c.x;
+        double y = c.y;
+        double z = c.z;
+        if (_xmin>x-r) _xmin = x-r;
+        if (_ymin>y-r) _ymin = y-r;
+        if (_zmin>z-r) _zmin = z-r;
+        if (_xmax<x+r) _xmax = x+r;
+        if (_ymax<y+r) _ymax = y+r;
+        if (_zmax<z+r) _zmax = z+r;
+      }
+    } else {
+      setInfinite();
+    }
   }
 
   /**
@@ -238,10 +267,55 @@ public class BoundingBox implements Cloneable {
            max(_zmin,bb._zmin)<=min(_zmax,bb._zmax);
   }
 
-  private double _xmin =  DBL_MAX;
-  private double _ymin =  DBL_MAX;
-  private double _zmin =  DBL_MAX;
-  private double _xmax = -DBL_MAX;
-  private double _ymax = -DBL_MAX;
-  private double _zmax = -DBL_MAX;
+  /**
+   * Returns a new empty bounding box.
+   * @return a new empty bounding box.
+   */
+  public static BoundingBox empty() {
+    return new BoundingBox();
+  }
+
+  /**
+   * Returns a new infinite bounding box.
+   * @return a new infinite bounding box.
+   */
+  public static BoundingBox infinite() {
+    BoundingBox bb = new BoundingBox();
+    bb.setInfinite();
+    return bb;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // private
+
+  private double _xmin;
+  private double _ymin;
+  private double _zmin;
+  private double _xmax;
+  private double _ymax;
+  private double _zmax;
+
+  /**
+   * Sets this box to the empty box.
+   */
+  private void setEmpty() {
+    _xmin = Double.POSITIVE_INFINITY;
+    _ymin = Double.POSITIVE_INFINITY;
+    _zmin = Double.POSITIVE_INFINITY;
+    _xmax = Double.NEGATIVE_INFINITY;
+    _ymax = Double.NEGATIVE_INFINITY;
+    _zmax = Double.NEGATIVE_INFINITY;
+  }
+
+  /**
+   * Sets this box to the infinite box.
+   */
+  private void setInfinite() {
+    _xmin = Double.NEGATIVE_INFINITY;
+    _ymin = Double.NEGATIVE_INFINITY;
+    _zmin = Double.NEGATIVE_INFINITY;
+    _xmax = Double.POSITIVE_INFINITY;
+    _ymax = Double.POSITIVE_INFINITY;
+    _zmax = Double.POSITIVE_INFINITY;
+  }
 }

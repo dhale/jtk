@@ -26,6 +26,12 @@ import java.util.*;
  * view-to-cube and cube-to-pixel transforms for each view canvas on which 
  * it draws.
  * <p>
+ * Some aspects of the world-to-view transform are common to all classes of
+ * views. These include an initial translation, scaling, and rotation of the 
+ * world coordinate system. Typically, these initial transforms are followed 
+ * by other view-specific transforms, but all classes of views provide at 
+ * least these aspects.
+ * <p>
  * Classes that extend this abstract base class must implement two methods: 
  * {@link #updateTransforms(ViewCanvas)} and {@link #draw(ViewCanvas)}. The 
  * method {@link #updateTransforms(ViewCanvas)} is called to update the
@@ -127,6 +133,41 @@ public abstract class View {
     for (ViewCanvas canvas : _canvasList)
       canvas.repaint();
   }
+
+  /**
+   * Gets the world scale factors. This implementation simply returns
+   * the tuple (1,1,1).
+   * @return the world scale factors.
+   */
+  /*
+  public Tuple3 getWorldScale() {
+    return new Tuple3(1.0,1.0,1.0);
+  }
+
+  public void setWorldScale(Tuple3 s) {
+  }
+
+  public void setWorldTranslate(double tx, double ty, double tz) {
+    _tx
+  }
+
+  public Tuple3 getWorldTranslate() {
+    return 
+  }
+
+  public Matrix44 getWorldTranslate() {
+    return _translate.clone();
+  }
+
+  public Matrix44 getWorldScale() {
+    return _scale.clone();
+  }
+
+  public Matrix44 getWorldRotate() {
+    return _rotate.clone();
+  }
+  */
+
 
 
   ///////////////////////////////////////////////////////////////////////////
