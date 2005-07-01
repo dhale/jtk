@@ -60,7 +60,7 @@ public abstract class Handle extends Group implements Selectable, Dragable {
    */
   protected Matrix44 computeTransform(TransformContext tc) {
     Matrix44 transform = Matrix44.translate(_tx,_ty,_tz);
-    Matrix44 localToPixel = tc.getLocalToPixel();
+    Matrix44 localToPixel = tc.getLocalToPixel().times(transform);
     Matrix44 pixelToLocal = localToPixel.inverse();
     Point3 p = new Point3(0.0,0.0,0.0);
     Point3 q = localToPixel.times(p);

@@ -136,7 +136,7 @@ public class ColorCube extends Node implements Selectable {
     //view.setProjection(OrbitView.Projection.ORTHOGRAPHIC);
     //view.setAzimuthAndElevation(90.0,0.0);
     //view.setScale(5.0);
-    view.setWorldSphere(new BoundingSphere(0,0,0,4));
+    view.setWorldSphere(new BoundingSphere(0.5,0.5,0.5,4));
     ViewCanvas canvas = new ViewCanvas(view);
     canvas.setView(view);
 
