@@ -118,10 +118,8 @@ public class ColorCube extends Node implements Selectable {
   private static final int SIZE = 600;
   public static void main(String[] args) {
     ColorCube cc = new ColorCube();
-    HandleBox hb1 = new HandleBox();
-    hb1.setLocation(1,1,1);
-    HandleBox hb2 = new HandleBox();
-    hb2.setLocation(1,1,1);
+    HandleBox hb1 = new HandleBox(1,1,1);
+    HandleBox hb2 = new HandleBox(1,1,1);
     TransformGroup tg1 = new TransformGroup(Matrix44.translate(-2,0,0));
     TransformGroup tg2 = new TransformGroup(Matrix44.translate( 2,0,0));
     tg1.addChild(cc);

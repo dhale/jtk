@@ -49,7 +49,7 @@ public class TransformGroup extends Group {
    * @param cc the cull context.
    */
   protected void cullBegin(CullContext cc) {
-    cc.pushNode(this);
+    super.cullBegin(cc);
     cc.pushLocalToWorld(_transform);
   }
 
@@ -58,8 +58,8 @@ public class TransformGroup extends Group {
    * @param cc the cull context.
    */
   protected void cullEnd(CullContext cc) {
-    cc.popNode();
     cc.popLocalToWorld();
+    super.cullEnd(cc);
   }
 
   /**
@@ -67,7 +67,7 @@ public class TransformGroup extends Group {
    * @param dc the draw context.
    */
   protected void drawBegin(DrawContext dc) {
-    dc.pushNode(this);
+    super.drawBegin(dc);
     dc.pushLocalToWorld(_transform);
     glPushMatrix();
     glMultMatrixd(_transform.m);
@@ -78,9 +78,9 @@ public class TransformGroup extends Group {
    * @param dc the draw context.
    */
   protected void drawEnd(DrawContext dc) {
-    dc.popNode();
     dc.popLocalToWorld();
     glPopMatrix();
+    super.drawEnd(dc);
   }
 
   /**
@@ -88,7 +88,7 @@ public class TransformGroup extends Group {
    * @param pc the pick context.
    */
   protected void pickBegin(PickContext pc) {
-    pc.pushNode(this);
+    super.pickBegin(pc);
     pc.pushLocalToWorld(_transform);
   }
 
@@ -97,14 +97,14 @@ public class TransformGroup extends Group {
    * @param pc the pick context.
    */
   protected void pickEnd(PickContext pc) {
-    pc.popNode();
     pc.popLocalToWorld();
+    super.pickEnd(pc);
   }
   
   /**
-   * Computes the bounding sphere for this transform group.
-   * A transform group computes its bounding sphere in its untransformed 
-   * coordinate system, not the transformed system of its children.
+   * Computes the bounding sphere for this transform group. A transform 
+   * group computes its bounding sphere in its untransformed coordinate 
+   * system, not the transformed system of its children.
    * @return the computed bounding sphere.
    */
   protected BoundingSphere computeBoundingSphere() {
