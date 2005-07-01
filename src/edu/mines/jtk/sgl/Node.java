@@ -101,10 +101,13 @@ public abstract class Node {
   /**
    * Computes the bounding sphere for this node, including its children.
    * This method is called by {@link #getBoundingSphere()} when this node's 
-   * bounding sphere is dirty.
+   * bounding sphere is dirty. This implementation returns the infinite
+   * bounding sphere.
    * @return the computed bounding sphere.
    */
-  protected abstract BoundingSphere computeBoundingSphere();
+  protected BoundingSphere computeBoundingSphere() {
+    return BoundingSphere.infinite();
+  }
 
   /**
    * Gets the OpenGL attribute bits for this node. These bits determine 

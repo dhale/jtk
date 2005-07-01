@@ -24,6 +24,7 @@ public class Group extends Node {
     if (child.addParent(this)) {
       _childList.add(child);
       dirtyBoundingSphere();
+      dirtyDraw();
     }
   }
 
@@ -36,6 +37,7 @@ public class Group extends Node {
     if (child.removeParent(this)) {
       _childList.remove(child);
       dirtyBoundingSphere();
+      dirtyDraw();
     }
   }
 

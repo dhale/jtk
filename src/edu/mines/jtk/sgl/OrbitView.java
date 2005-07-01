@@ -268,7 +268,7 @@ public class OrbitView extends View {
       double m = min(w,h); // minimum of viewport width and height
       double a = 2*atan(m/(2*e)); // angle subtended by sphere
       double d = r/sin(a/2); // distance from eye to center of frustum
-      double fovy = 2*atan(h/(2*e))*180/PI;
+      double fovy = 2*atan(h/(2*e))*180.0/PI;
       double aspect = (double)w/(double)h;
       double znear = max(d-maxscale*r,0.1);
       double zfar  = max(d+maxscale*r,100.0*znear);

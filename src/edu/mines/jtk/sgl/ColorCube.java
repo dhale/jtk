@@ -118,10 +118,16 @@ public class ColorCube extends Node implements Selectable {
   private static final int SIZE = 600;
   public static void main(String[] args) {
     ColorCube cc = new ColorCube();
+    HandleBox hb1 = new HandleBox();
+    hb1.setLocation(1,1,1);
+    HandleBox hb2 = new HandleBox();
+    hb2.setLocation(1,1,1);
     TransformGroup tg1 = new TransformGroup(Matrix44.translate(-2,0,0));
     TransformGroup tg2 = new TransformGroup(Matrix44.translate( 2,0,0));
     tg1.addChild(cc);
+    tg1.addChild(hb1);
     tg2.addChild(cc);
+    tg2.addChild(hb2);
     World world = new World();
     world.addChild(tg1);
     world.addChild(tg2);
@@ -130,6 +136,7 @@ public class ColorCube extends Node implements Selectable {
     //view.setProjection(OrbitView.Projection.ORTHOGRAPHIC);
     //view.setAzimuthAndElevation(90.0,0.0);
     //view.setScale(5.0);
+    view.setWorldSphere(new BoundingSphere(0,0,0,4));
     ViewCanvas canvas = new ViewCanvas(view);
     canvas.setView(view);
 

@@ -28,11 +28,30 @@ public class TraversalContext {
   }
 
   /**
-   * Gets the current node in the traversal.
+   * Gets the current node in this traversal.
    * @return the current node.
    */
   public Node getNode() {
     return _nodeStack.peek();
+  }
+
+  /**
+   * Gets the node in this traversal with specified index. If count is the 
+   * number of nodes returned by the method {@link countNodes()}, then the
+   * current node has index count-1, and the root node has index zero.
+   * <p>
+   * If the specified index is negative, then count is added to the index.
+   * Therefore, the index -1 will get the current node, the index -2 will 
+   * get its parent node, and so on.
+   * @param index the index.
+   * @return the node.
+   */
+  public Node getNode(int index) {
+    if (index<0) {
+      return _nodeStack.get(index+countNodes());
+    } else {
+      return _nodeStack.get(index);
+    }
   }
 
   /**

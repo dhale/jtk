@@ -303,6 +303,45 @@ JNI_GL_BEGIN1
   glColor4sv(v);
 JNI_GL_END
 
+JNI_GL_DECLARE1(glColor4ub)
+  jbyte red, jbyte green, jbyte blue, jbyte alpha
+JNI_GL_BEGIN1
+  glColor4ub(red,green,blue,alpha);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glColor4ubv)
+  jbyteArray jv
+JNI_GL_BEGIN1
+  JubyteArray v(env,jv);
+  glColor4ubv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glColor4ui)
+  jint red, jint green, jint blue, jint alpha
+JNI_GL_BEGIN1
+  glColor4ui(red,green,blue,alpha);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glColor4uiv)
+  jintArray jv
+JNI_GL_BEGIN1
+  JuintArray v(env,jv);
+  glColor4uiv(v);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glColor4us)
+  jshort red, jshort green, jshort blue, jshort alpha
+JNI_GL_BEGIN1
+  glColor4us(red,green,blue,alpha);
+JNI_GL_END
+
+JNI_GL_DECLARE1(glColor4usv)
+  jshortArray jv
+JNI_GL_BEGIN1
+  JushortArray v(env,jv);
+  glColor4usv(v);
+JNI_GL_END
+
 JNI_GL_DECLARE1(glColorMask)
   jboolean red, jboolean green, jboolean blue, jboolean alpha
 JNI_GL_BEGIN1
