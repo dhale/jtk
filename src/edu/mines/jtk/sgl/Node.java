@@ -62,15 +62,17 @@ public abstract class Node {
   }
 
   /**
-   * Gets the bounding sphere for this node. If the bounding sphere is 
-   * dirty, then this method will first call the method 
-   * {@link #computeBoundingSphere()} 
-   * and then mark the bounding sphere clean.
+   * Gets the bounding sphere for this node. If a finite bounding sphere
+   * is specified, then any infinite bounding sphere is replaced by an
+   * empty bounding sphere, so that the returned sphere is always finite.
+   * @param finite true, for a finite bounding sphere; false, otherwise.
    * @return the bounding sphere.
    */
-  public BoundingSphere getBoundingSphere() {
-    if (_boundingSphere==null)
-      _boundingSphere = computeBoundingSphere();
+  public BoundingSphere getBoundingSphere(boolean finite) {
+    if (_boundingSphere==null || _boundingSphereFinite!=finite) {
+      _boundingSphere = computeBoundingSphere(finite);
+      _boundingSphereFinite = finite;
+    }
     return _boundingSphere;
   }
   
@@ -103,13 +105,18 @@ public abstract class Node {
    * This method is called by {@link #getBoundingSphere()} when this node's 
    * bounding sphere is dirty. 
    * <p>
-   * This implementation returns the infinite bounding sphere. For efficency,
-   * most classes that extend this abstract base class will override this
-   * method to return a finite bounding sphere.
+   * If a finite bounding sphere is specified, then any infinite bounding 
+   * sphere is replaced by an empty bounding sphere, so that the returned 
+   * sphere is always finite.
+   * <p>
+   * Classes that extend this abstract base class should override this
+   * implementation, which simply returns an empty or infinite bounding
+   * sphere, depending on whether or not a finite sphere is requested.
+   * @param finite true, for a finite bounding sphere.
    * @return the computed bounding sphere.
    */
-  protected BoundingSphere computeBoundingSphere() {
-    return BoundingSphere.infinite();
+  protected BoundingSphere computeBoundingSphere(boolean finite) {
+    return (finite)?BoundingSphere.empty():BoundingSphere.infinite();
   }
 
   /**
@@ -338,6 +345,7 @@ public abstract class Node {
   // private
 
   private BoundingSphere _boundingSphere = null; // null, if dirty
+  private boolean _boundingSphereFinite = false; // true, if BS is finite
   private ArrayList<Group> _parentList = new ArrayList<Group>(2);
   private StateSet _states;
 }

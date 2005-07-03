@@ -105,10 +105,11 @@ public class TransformGroup extends Group {
    * Computes the bounding sphere for this transform group. A transform 
    * group computes its bounding sphere in its untransformed coordinate 
    * system, not the transformed system of its children.
+   * @param finite true, for a finite bounding sphere.
    * @return the computed bounding sphere.
    */
-  protected BoundingSphere computeBoundingSphere() {
-    BoundingSphere bs = super.computeBoundingSphere();
+  protected BoundingSphere computeBoundingSphere(boolean finite) {
+    BoundingSphere bs = super.computeBoundingSphere(finite);
     if (!bs.isEmpty() && !bs.isInfinite()) {
       double r = bs.getRadius();
       Point3 c = bs.getCenter();

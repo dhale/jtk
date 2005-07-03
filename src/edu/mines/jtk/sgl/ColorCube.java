@@ -40,7 +40,7 @@ public class ColorCube extends Node implements Selectable {
   ///////////////////////////////////////////////////////////////////////////
   // protected
 
-  protected BoundingSphere computeBoundingSphere() {
+  protected BoundingSphere computeBoundingSphere(boolean finite) {
     Point3 c = new Point3(0.5,0.5,0.5);
     double r = 0.5*Math.sqrt(3.0);
     return new BoundingSphere(c,r);
@@ -134,7 +134,7 @@ public class ColorCube extends Node implements Selectable {
     //view.setProjection(OrbitView.Projection.ORTHOGRAPHIC);
     //view.setAzimuthAndElevation(90.0,0.0);
     //view.setScale(5.0);
-    view.setWorldSphere(new BoundingSphere(0.5,0.5,0.5,4));
+    //view.setWorldSphere(new BoundingSphere(0.5,0.5,0.5,4));
     view.setAxesOrientation(View.AxesOrientation.XRIGHT_YOUT_ZDOWN);
     view.setAxesScale(1.0,2.0,3.0);
     ViewCanvas canvas = new ViewCanvas(view);

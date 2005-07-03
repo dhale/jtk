@@ -107,11 +107,12 @@ public abstract class Handle extends Group {
 
   /**
    * Computes the bounding sphere for this handle.
+   * @param finite true, for a finite bounding sphere.
    * @return the bounding sphere.
    */
-  protected BoundingSphere computeBoundingSphere() {
-    _boundingSphereChildren = super.computeBoundingSphere();
-    return BoundingSphere.infinite();
+  protected BoundingSphere computeBoundingSphere(boolean finite) {
+    _boundingSphereChildren = super.computeBoundingSphere(true);
+    return (finite)?BoundingSphere.empty():BoundingSphere.infinite();
   }
 
   /**

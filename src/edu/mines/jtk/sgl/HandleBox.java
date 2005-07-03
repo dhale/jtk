@@ -102,7 +102,7 @@ public class HandleBox extends Handle implements Selectable {
           pc.addResult(q);
       }
     }
-    protected BoundingSphere computeBoundingSphere() {
+    protected BoundingSphere computeBoundingSphere(boolean finite) {
       return new BoundingSphere(0.0,0.0,0.0,Math.sqrt(3.0));
     }
   }

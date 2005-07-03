@@ -82,7 +82,7 @@ public class PickContext extends TransformContext {
    *  false, otherwise.
    */
   public boolean segmentIntersectsSphereOf(Node node) {
-    BoundingSphere bs = node.getBoundingSphere();
+    BoundingSphere bs = node.getBoundingSphere(false);
     if (bs.isEmpty())
       return false;
     if (bs.isInfinite())

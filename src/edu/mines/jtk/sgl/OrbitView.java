@@ -305,7 +305,7 @@ public class OrbitView extends View {
     if (world!=null) {
       BoundingSphere ws = _worldSphere;
       if (ws==null)
-        ws = world.getBoundingSphere();
+        ws = world.getBoundingSphere(true);
       Point3 c = (!ws.isEmpty())?ws.getCenter():new Point3();
       double tx = -c.x;
       double ty = -c.y;

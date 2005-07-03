@@ -96,22 +96,23 @@ public class Group extends Node {
   
   /**
    * Computes the bounding sphere for this group, including its children.
+   * @param finite true, for a finite bounding sphere; false, otherwise.
    * @return the computed bounding sphere.
    */
-  protected BoundingSphere computeBoundingSphere() {
+  protected BoundingSphere computeBoundingSphere(boolean finite) {
     if (countChildren()==1) {
-      return _childList.get(0).getBoundingSphere();
+      return _childList.get(0).getBoundingSphere(finite);
     } else {
       BoundingBox bb = new BoundingBox();
       for (Node child : _childList)
-        bb.expandBy(child.getBoundingSphere());
+        bb.expandBy(child.getBoundingSphere(finite));
       if (bb.isEmpty())
         return BoundingSphere.empty();
-      if (bb.isInfinite())
+      if (bb.isInfinite()) // then the argument finite == false
         return BoundingSphere.infinite();
       BoundingSphere bs = new BoundingSphere(bb.getCenter(),0.0);
       for (Node child : _childList)
-        bs.expandRadiusBy(child.getBoundingSphere());
+        bs.expandRadiusBy(child.getBoundingSphere(finite));
       return bs;
     }
   }
