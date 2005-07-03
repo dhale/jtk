@@ -9,40 +9,54 @@ package edu.mines.jtk.sgl;
 import static edu.mines.jtk.opengl.Gl.*;
 
 /**
- * A handle for manipulating objects. A handle is a special type of node.
- * Its size in pixel coordinates is view-independent, which makes its size
- * in local coordinates view-dependent. In other words, no matter where a 
- * handle appears in a view, its size in pixels will appear the same. This 
- * property makes handles easily pickable with a mouse or other pointer. A 
- * handle is always large enough to be picked easily, but no larger, so that 
- * it does not obscure the objects to which it is attached.
+ * A handle for manipulating other nodes. A handle is a special type of node, 
+ * because its size in pixel coordinates is constant. A handle has the same 
+ * pixel dimensions in all views (all contexts) in which it is rendered. This 
+ * property makes handles suitable for selecting and dragging with a mouse or 
+ * other pointing device.
  * <p>
- * One unfortunate effect of this constant-size-in-pixels property is that
- * a handle's bounding sphere (in local coordinates) varies among the views 
- * in which the handle appears. Therefore, the bounding sphere is often
- * infinite, and a handle with an infinite bounding sphere can never be 
- * culled during a drawing or picking traversal. Fortunately, handles should
- * be used sparingly - too many of them would clutter most views - so the
- * decrease in performance due to infinite bounding spheres is negligible.
+ * A handle maintains its constant pixel size by applying a context-dependent 
+ * scaling to its children. A handle is much like a transform group, one that 
+ * augments a specified transform with a context-dependent scaling.
  * <p>
- * The geometry of all handles is centered at the point (0,0,0) and 
- * normalized so that its bounding sphere in local coordinates has
- * approximately unit radius. This handle geometry is first scaled in a 
- * view-dependent manner to obtain a specified size in pixels. Then, a 
- * specified transform is applied to position and orient the handle in 
- * its local coordinate system.
+ * A consequence of this constant-size-in-pixels property is that a handle's 
+ * bounding sphere in local coordinates must be infinite. A bounding sphere 
+ * cannot be context-dependent, and the only sphere that is guaranteed to 
+ * bound a handle in any context in which it appears is the infinite sphere.
  * <p>
- * A handle is a group node, because most handle subclasses have a single 
- * child leaf node that is shared by all instances of that subclass. Any
- * changes to the shared child node's appearance or size (in pixels) are 
- * then conveniently reflected in all handles of that class.
+ * By convention, the geometry of a handle's node children is centered at the 
+ * point (0,0,0). A handle first scales the bounding sphere of its children 
+ * so that the radius of that sphere transforms to the handle pixel size. The 
+ * handle then applies a specified transform to position and orient its 
+ * children within its local coordinate system.
  * <p>
- * A handle is much like a transform group, one that augments its transform 
- * with a view-dependent scaling that maintains its constant size in pixels.
+ * A handle is a group node, because the child leaf nodes of each handle 
+ * subclass are typically  shared by instances of that subclass. Then, any 
+ * changes to the shared node children are conveniently reflected in all 
+ * handles of that class. Often, a handle subclass has a single leaf node 
+ * child.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.06.30
  */
 public abstract class Handle extends Group {
+
+  /**
+   * Gets the size in pixels of all handles.
+   * @return the size.
+   */
+  public static double getSize() {
+    return _size;
+  }
+
+  /**
+   * Sets the size in pixels of all handles. Because handle size is not
+   * associated with any particular handle or world, this method does
+   * force a repaint of any view canvases in which handles appear.
+   * @param the size.
+   */
+  public static void setSize(double size) {
+    _size = size;
+  }
 
   /**
    * Gets the view-independent transform matrix for this handle. 
@@ -92,12 +106,13 @@ public abstract class Handle extends Group {
   // protected
 
   /**
-   * Gets the size in pixels of this handle. Classes that extend this
-   * abstract base class must implement this method to return the handle
-   * size in pixels.
-   * @return the size.
+   * Computes the bounding sphere for this handle.
+   * @return the bounding sphere.
    */
-  protected abstract double getSize();
+  protected BoundingSphere computeBoundingSphere() {
+    _boundingSphereChildren = super.computeBoundingSphere();
+    return BoundingSphere.infinite();
+  }
 
   /**
    * Constructs a handle with specified transform matrix.
@@ -188,8 +203,14 @@ public abstract class Handle extends Group {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  // Size (radius in pixels) of handles.
+  private static double _size = 10;
+
   // The transform applied after view-dependent scaling.
   private Matrix44 _transform = Matrix44.identity();
+
+  // Bounding sphere of our children.
+  private BoundingSphere _boundingSphereChildren;
 
   /**
    * Computes the transform matrix for this handle in the specified context.
@@ -207,6 +228,8 @@ public abstract class Handle extends Group {
     q.x += getSize();
     q = pixelToLocal.times(q);
     double d = p.distanceTo(q);
-    return _transform.times(Matrix44.scale(d,d,d));
+    double r = _boundingSphereChildren.getRadius();
+    double s = d/r;
+    return _transform.times(Matrix44.scale(s,s,s));
   }
 }

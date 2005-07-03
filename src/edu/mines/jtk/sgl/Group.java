@@ -99,17 +99,21 @@ public class Group extends Node {
    * @return the computed bounding sphere.
    */
   protected BoundingSphere computeBoundingSphere() {
-    BoundingBox bb = new BoundingBox();
-    for (Node child : _childList)
-      bb.expandBy(child.getBoundingSphere());
-    if (bb.isEmpty())
-      return BoundingSphere.empty();
-    if (bb.isInfinite())
-      return BoundingSphere.infinite();
-    BoundingSphere bs = new BoundingSphere(bb.getCenter(),0.0);
-    for (Node child : _childList)
-      bs.expandRadiusBy(child.getBoundingSphere());
-    return bs;
+    if (countChildren()==1) {
+      return _childList.get(0).getBoundingSphere();
+    } else {
+      BoundingBox bb = new BoundingBox();
+      for (Node child : _childList)
+        bb.expandBy(child.getBoundingSphere());
+      if (bb.isEmpty())
+        return BoundingSphere.empty();
+      if (bb.isInfinite())
+        return BoundingSphere.infinite();
+      BoundingSphere bs = new BoundingSphere(bb.getCenter(),0.0);
+      for (Node child : _childList)
+        bs.expandRadiusBy(child.getBoundingSphere());
+      return bs;
+    }
   }
 
   /**

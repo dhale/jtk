@@ -101,8 +101,11 @@ public abstract class Node {
   /**
    * Computes the bounding sphere for this node, including its children.
    * This method is called by {@link #getBoundingSphere()} when this node's 
-   * bounding sphere is dirty. This implementation returns the infinite
-   * bounding sphere.
+   * bounding sphere is dirty. 
+   * <p>
+   * This implementation returns the infinite bounding sphere. For efficency,
+   * most classes that extend this abstract base class will override this
+   * method to return a finite bounding sphere.
    * @return the computed bounding sphere.
    */
   protected BoundingSphere computeBoundingSphere() {

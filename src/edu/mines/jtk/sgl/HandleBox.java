@@ -54,13 +54,6 @@ public class HandleBox extends Handle implements Selectable {
   }
 
   ///////////////////////////////////////////////////////////////////////////
-  // protected
-
-  protected double getSize() {
-    return _size;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
   // private
 
   // Every handle box shares one instance of this class.
@@ -109,10 +102,12 @@ public class HandleBox extends Handle implements Selectable {
           pc.addResult(q);
       }
     }
+    protected BoundingSphere computeBoundingSphere() {
+      return new BoundingSphere(0.0,0.0,0.0,Math.sqrt(3.0));
+    }
   }
 
   private static Box _box = new Box(); // the one box
-  private static double _size = 10; // size of box in pixels
   private static ColorState _colorState = new ColorState();
   private static MaterialState _materialState = new MaterialState();
 
