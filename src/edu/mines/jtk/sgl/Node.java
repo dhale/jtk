@@ -78,7 +78,7 @@ public abstract class Node {
   
   /**
    * Marks dirty the bounding sphere of this node (and any parent nodes).
-   * If dirty when the method {@link #getBoundingSphere(TransformContext)}
+   * If dirty when the method {@link #getBoundingSphere(boolean)}
    * is next called, this node's bounding sphere will be recomputed.
    */
   public void dirtyBoundingSphere() {
@@ -102,8 +102,8 @@ public abstract class Node {
   
   /**
    * Computes the bounding sphere for this node, including its children.
-   * This method is called by {@link #getBoundingSphere()} when this node's 
-   * bounding sphere is dirty. 
+   * This method is called by {@link #getBoundingSphere(boolean)} when this 
+   * node's bounding sphere is dirty. 
    * <p>
    * If a finite bounding sphere is specified, then any infinite bounding 
    * sphere is replaced by an empty bounding sphere, so that the returned 
