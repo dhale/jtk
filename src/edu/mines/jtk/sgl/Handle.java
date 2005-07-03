@@ -221,15 +221,23 @@ public abstract class Handle extends Group {
    * @return the transform matrix for this handle.
    */
   private Matrix44 computeTransform(TransformContext tc) {
+    View view = tc.getView();
+    Tuple3 as = view.getAxesScale();
     Matrix44 localToPixel = tc.getLocalToPixel().times(_transform);
     Matrix44 pixelToLocal = localToPixel.inverse();
     Point3 p = new Point3(0.0,0.0,0.0);
     Point3 q = localToPixel.times(p);
     q.x += getSize();
     q = pixelToLocal.times(q);
-    double d = p.distanceTo(q);
+    double dx = (q.x-p.x)*as.x;
+    double dy = (q.y-p.y)*as.y;
+    double dz = (q.z-p.z)*as.z;
+    double d = Math.sqrt(dx*dx+dy*dy+dz*dz);
     double r = _boundingSphereChildren.getRadius();
     double s = d/r;
-    return _transform.times(Matrix44.scale(s,s,s));
+    double sx = s/as.x;
+    double sy = s/as.y;
+    double sz = s/as.z;
+    return _transform.times(Matrix44.scale(sx,sy,sz));
   }
 }

@@ -298,6 +298,8 @@ public class OrbitView extends View {
     _unitSphereToView.timesEquals(Matrix44.translate(_translate));
 
     //  World to unit sphere.
+    Tuple3 as = getAxesScale();
+    AxesOrientation ao = getAxesOrientation();
     _worldToUnitSphere = Matrix44.identity();
     World world = getWorld();
     if (world!=null) {
@@ -305,13 +307,28 @@ public class OrbitView extends View {
       if (ws==null)
         ws = world.getBoundingSphere();
       Point3 c = (!ws.isEmpty())?ws.getCenter():new Point3();
+      double tx = -c.x;
+      double ty = -c.y;
+      double tz = -c.z;
       double r = (!ws.isEmpty())?ws.getRadius():1.0;
       double s = (r>0.0)?1.0/r:1.0;
-      // TODO: add rotation for XRIGHT_YOUT_ZDOWN, ...
-      _worldToUnitSphere.timesEquals(Matrix44.scale(s,s,s));
-      _worldToUnitSphere.timesEquals(Matrix44.translate(-c.x,-c.y,-c.z));
+      double sx = s*as.x;
+      double sy = s*as.y;
+      double sz = s*as.z;
+      if (ao==AxesOrientation.XRIGHT_YUP_ZOUT) {
+        _worldToUnitSphere.timesEquals(Matrix44.identity());
+      } else if (ao==AxesOrientation.XRIGHT_YOUT_ZDOWN) {
+        _worldToUnitSphere.timesEquals(Matrix44.rotateX(90.0));
+      } else if (ao==AxesOrientation.XRIGHT_YIN_ZDOWN) {
+        _worldToUnitSphere.timesEquals(Matrix44.rotateX(90.0));
+        sy = -sy;
+      } else if (ao==AxesOrientation.XOUT_YRIGHT_ZUP) {
+        _worldToUnitSphere.timesEquals(Matrix44.rotateY(-90.0));
+        _worldToUnitSphere.timesEquals(Matrix44.rotateX(-90.0));
+      }
+      _worldToUnitSphere.timesEquals(Matrix44.scale(sx,sy,sz));
+      _worldToUnitSphere.timesEquals(Matrix44.translate(tx,ty,tz));
     }
-
 
     // World to view.
     setWorldToView(_unitSphereToView.times(_worldToUnitSphere));

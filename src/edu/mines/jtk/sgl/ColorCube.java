@@ -135,6 +135,8 @@ public class ColorCube extends Node implements Selectable {
     //view.setAzimuthAndElevation(90.0,0.0);
     //view.setScale(5.0);
     view.setWorldSphere(new BoundingSphere(0.5,0.5,0.5,4));
+    view.setAxesOrientation(View.AxesOrientation.XOUT_YRIGHT_ZUP);
+    view.setAxesScale(1.0,2.0,3.0);
     ViewCanvas canvas = new ViewCanvas(view);
     canvas.setView(view);
 

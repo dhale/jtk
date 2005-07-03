@@ -44,6 +44,40 @@ import java.util.*;
 public abstract class View {
 
   /**
+   * Axes orientation.
+   */
+  public enum AxesOrientation {
+    XRIGHT_YUP_ZOUT,
+    XRIGHT_YOUT_ZDOWN,
+    XRIGHT_YIN_ZDOWN,
+    XOUT_YRIGHT_ZUP
+  };
+
+  public AxesOrientation getAxesOrientation() {
+    return _axesOrientation;
+  }
+
+  public void setAxesOrientation(AxesOrientation axesOrientation) {
+    _axesOrientation = axesOrientation;
+    updateTransforms();
+    repaint();
+  }
+
+  public Tuple3 getAxesScale() {
+    return _axesScale.clone();
+  }
+
+  public void setAxesScale(Tuple3 s) {
+    setAxesScale(s.x,s.y,s.z);
+  }
+
+  public void setAxesScale(double sx, double sy, double sz) {
+    _axesScale  = new Tuple3(sx,sy,sz);
+    updateTransforms();
+    repaint();
+  }
+
+  /**
    * Constructs a view of no world.
    */
   public View() {
@@ -134,41 +168,6 @@ public abstract class View {
       canvas.repaint();
   }
 
-  /**
-   * Gets the world scale factors. This implementation simply returns
-   * the tuple (1,1,1).
-   * @return the world scale factors.
-   */
-  /*
-  public Tuple3 getWorldScale() {
-    return new Tuple3(1.0,1.0,1.0);
-  }
-
-  public void setWorldScale(Tuple3 s) {
-  }
-
-  public void setWorldTranslate(double tx, double ty, double tz) {
-    _tx
-  }
-
-  public Tuple3 getWorldTranslate() {
-    return 
-  }
-
-  public Matrix44 getWorldTranslate() {
-    return _translate.clone();
-  }
-
-  public Matrix44 getWorldScale() {
-    return _scale.clone();
-  }
-
-  public Matrix44 getWorldRotate() {
-    return _rotate.clone();
-  }
-  */
-
-
 
   ///////////////////////////////////////////////////////////////////////////
   // protected
@@ -223,4 +222,6 @@ public abstract class View {
   private World _world;
   private Matrix44 _worldToView = Matrix44.identity();
   private ArrayList<ViewCanvas> _canvasList = new ArrayList<ViewCanvas>(1);
+  private Tuple3 _axesScale = new Tuple3(1.0,1.0,1.0);
+  private AxesOrientation _axesOrientation = AxesOrientation.XRIGHT_YUP_ZOUT;
 }
