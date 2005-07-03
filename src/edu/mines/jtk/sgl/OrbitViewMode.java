@@ -78,6 +78,16 @@ public class OrbitViewMode extends Mode {
       if (kc==KeyEvent.VK_HOME) {
         view.reset();
 
+      // Z shrink.
+      } else if (kc==KeyEvent.VK_PAGE_UP) {
+        Tuple3 s = view.getAxesScale();
+        view.setAxesScale(s.x,s.y,s.z/1.1);
+
+      // Z stretch.
+      } else if (kc==KeyEvent.VK_PAGE_DOWN) {
+        Tuple3 s = view.getAxesScale();
+        view.setAxesScale(s.x,s.y,s.z*1.1);
+
       // Projection.
       } else if (kc==KeyEvent.VK_INSERT) {
         OrbitView.Projection projection = view.getProjection();
