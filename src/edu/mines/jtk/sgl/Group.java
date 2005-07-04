@@ -96,7 +96,7 @@ public class Group extends Node {
   
   /**
    * Computes the bounding sphere for this group, including its children.
-   * @param finite true, for a finite bounding sphere; false, otherwise.
+   * @param finite true, to force bounding sphere to be finite.
    * @return the computed bounding sphere.
    */
   protected BoundingSphere computeBoundingSphere(boolean finite) {
@@ -108,7 +108,7 @@ public class Group extends Node {
         bb.expandBy(child.getBoundingSphere(finite));
       if (bb.isEmpty())
         return BoundingSphere.empty();
-      if (bb.isInfinite()) // then the argument finite == false
+      if (bb.isInfinite()) // should not happen if finite == true
         return BoundingSphere.infinite();
       BoundingSphere bs = new BoundingSphere(bb.getCenter(),0.0);
       for (Node child : _childList)

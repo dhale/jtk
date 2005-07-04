@@ -65,7 +65,7 @@ public abstract class Node {
    * Gets the bounding sphere for this node. If a finite bounding sphere
    * is specified, then any infinite bounding sphere is replaced by an
    * empty bounding sphere, so that the returned sphere is always finite.
-   * @param finite true, for a finite bounding sphere; false, otherwise.
+   * @param finite true, to force bounding sphere to be finite.
    * @return the bounding sphere.
    */
   public BoundingSphere getBoundingSphere(boolean finite) {
@@ -112,7 +112,7 @@ public abstract class Node {
    * Classes that extend this abstract base class should override this
    * implementation, which simply returns an empty or infinite bounding
    * sphere, depending on whether or not a finite sphere is requested.
-   * @param finite true, for a finite bounding sphere.
+   * @param finite true, to force bounding sphere to be finite.
    * @return the computed bounding sphere.
    */
   protected BoundingSphere computeBoundingSphere(boolean finite) {

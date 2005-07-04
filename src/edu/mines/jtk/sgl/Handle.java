@@ -107,7 +107,7 @@ public abstract class Handle extends Group {
 
   /**
    * Computes the bounding sphere for this handle.
-   * @param finite true, for a finite bounding sphere.
+   * @param finite true, to force bounding sphere to be finite.
    * @return the bounding sphere.
    */
   protected BoundingSphere computeBoundingSphere(boolean finite) {
