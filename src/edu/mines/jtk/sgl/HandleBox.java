@@ -18,7 +18,7 @@ import static edu.mines.jtk.opengl.Gl.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.06.30
  */
-public class HandleBox extends Handle implements Selectable {
+public class HandleBox extends Handle {
 
   /**
    * Constructs a handle box with specified center location.
@@ -47,10 +47,6 @@ public class HandleBox extends Handle implements Selectable {
   public static void setColor(Color color) {
     _colorState.setColor(color);
     _box.dirtyDraw();
-  }
-
-  public void beginSelect(PickResult pr) {
-    System.out.println("HandleBox.beginSelect");
   }
 
   ///////////////////////////////////////////////////////////////////////////

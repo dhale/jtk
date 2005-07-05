@@ -33,8 +33,12 @@ public class ColorCube extends Node implements Selectable {
     setStates(states);
   }
 
-  public void beginSelect(PickResult pr) {
-    System.out.println("ColorCube.beginSelect");
+  public void setSelected(boolean selected) {
+    System.out.println("ColorCube.setSelected: "+selected);
+  }
+
+  public boolean isSelected() {
+    return false;
   }
 
   ///////////////////////////////////////////////////////////////////////////

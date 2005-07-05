@@ -87,9 +87,8 @@ public class SelectDragMode extends Mode {
       System.out.println("  local="+pointLocal);
       System.out.println("  world="+pointWorld);
       Selectable node = (Selectable)pr.getNode(Selectable.class);
-      //if (node!=null && node.isSelectable() && !node.isSelected())
       if (node!=null)
-        node.beginSelect(pr);
+        node.setSelected(true);
     } else {
       System.out.println("Pick nothing");
     }

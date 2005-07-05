@@ -103,6 +103,15 @@ public class Plane implements Cloneable {
   }
 
   /**
+   * Gets the unit-vector normal to this plane. The vector points toward
+   * the space above the plane.
+   * @return the unit-vector normal.
+   */
+  public Vector3 getNormal() {
+    return new Vector3(_a,_b,_c);
+  }
+
+  /**
    * Returns the signed distance from this plane to a specified point.
    * Distance is negative for points below the plane, zero for points 
    * within the plane, and positive for points above the plane.

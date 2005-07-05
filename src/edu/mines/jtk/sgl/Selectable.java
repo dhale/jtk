@@ -14,18 +14,14 @@ package edu.mines.jtk.sgl;
 public interface Selectable {
 
   /**
-   * Begins selection.
-   * @param pr the pick result that initiated.
+   * Sets the selected state for this node.
+   * @param selected true, if selected; false, otherwise.
    */
-  public void beginSelect(PickResult pr);
+  public void setSelected(boolean selected);
 
-  /*
-  public void endSelect();
-
+  /**
+   * Determines whether this node is currently selected.
+   * @return true, if selected; false, otherwise.
+   */
   public boolean isSelected();
-
-  public boolean isSelectable();
-
-  public void setSelectable(boolean);
-  */
 }

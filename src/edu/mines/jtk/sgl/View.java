@@ -51,7 +51,7 @@ public abstract class View {
     XRIGHT_YOUT_ZDOWN,
     XRIGHT_YIN_ZDOWN,
     XOUT_YRIGHT_ZUP
-  };
+  }
 
   public AxesOrientation getAxesOrientation() {
     return _axesOrientation;

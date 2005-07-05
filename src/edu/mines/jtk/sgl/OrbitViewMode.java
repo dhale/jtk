@@ -79,12 +79,12 @@ public class OrbitViewMode extends Mode {
         view.reset();
 
       // Z shrink.
-      } else if (kc==KeyEvent.VK_PAGE_UP) {
+      } else if (kc==KeyEvent.VK_PAGE_DOWN) {
         Tuple3 s = view.getAxesScale();
         view.setAxesScale(s.x,s.y,s.z/1.1);
 
       // Z stretch.
-      } else if (kc==KeyEvent.VK_PAGE_DOWN) {
+      } else if (kc==KeyEvent.VK_PAGE_UP) {
         Tuple3 s = view.getAxesScale();
         view.setAxesScale(s.x,s.y,s.z*1.1);
 

@@ -7,9 +7,24 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.sgl;
 
 /**
- * An interface implemented by nodes that can be dragged.
+ * An interface implemented by nodes that can be dragged with a mouse.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.06.30
  */
 public interface Dragable {
+
+  /**
+   * Begins dragging.
+   */
+  public void dragBegin();
+
+  /**
+   * During dragging, this method is called when the mouse moves.
+   */
+  public void drag();
+
+  /**
+   * Ends dragging.
+   */
+  public void dragEnd();
 }
