@@ -171,7 +171,7 @@ public class Tile extends JPanel {
    * @return the view rectangle.
    */
   public DRectangle getViewRectangle() {
-    return _vr.clone();
+    return new DRectangle(_vr);
   }
 
   /**
@@ -313,7 +313,7 @@ public class Tile extends JPanel {
    * Called by this tile's mosaic.
    */
   void setViewRect(DRectangle vr) {
-    _vr = vr.clone();
+    _vr = new DRectangle(vr);
     _vr.x = max(0.0,min(1.0,_vr.x));
     _vr.y = max(0.0,min(1.0,_vr.y));
     _vr.width = max(0.0,min(1.0-_vr.x,_vr.width));

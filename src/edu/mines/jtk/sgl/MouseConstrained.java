@@ -24,7 +24,7 @@ public abstract class MouseConstrained {
    * @param localToPixel the transform from local to pixel coordinates.
    */
   public MouseConstrained(Matrix44 localToPixel) {
-    _localToPixel = localToPixel.clone();
+    _localToPixel = new Matrix44(localToPixel);
     _pixelToLocal = localToPixel.inverse();
   }
 

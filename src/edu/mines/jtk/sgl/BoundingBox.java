@@ -24,7 +24,7 @@ import edu.mines.jtk.util.Check;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.06.28
  */
-public class BoundingBox implements Cloneable {
+public class BoundingBox {
 
   /**
    * Constructs an empty bounding box.
@@ -82,8 +82,17 @@ public class BoundingBox implements Cloneable {
     _zmax = zmax;
   }
 
-  public BoundingBox clone() {
-    return new BoundingBox(_xmin,_ymin,_zmin,_xmax,_ymax,_zmax);
+  /**
+   * Constructs a copy of the specified bounding box.
+   * @param bb the bounding box.
+   */
+  public BoundingBox(BoundingBox bb) {
+    _xmin = bb._xmin;
+    _ymin = bb._ymin;
+    _zmin = bb._zmin;
+    _xmax = bb._xmax;
+    _ymax = bb._ymax;
+    _zmax = bb._zmax;
   }
 
   /**

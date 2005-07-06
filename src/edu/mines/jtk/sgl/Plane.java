@@ -18,7 +18,7 @@ import static java.lang.Math.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.30
  */
-public class Plane implements Cloneable {
+public class Plane {
 
   /**
    * Constructs a plane with specified coefficients.
@@ -43,16 +43,14 @@ public class Plane implements Cloneable {
   }
 
   /**
-   * Returns a clone of this plane.
-   * @return the plane.
+   * Constructs a copy of the specified plane.
+   * @param p the plane.
    */
-  public Plane clone() {
-    Plane p = new Plane();
-    p._a = _a;
-    p._b = _b;
-    p._c = _c;
-    p._d = _d;
-    return p;
+  public Plane(Plane p) {
+    _a = p._a;
+    _b = p._b;
+    _c = p._c;
+    _d = p._d;
   }
 
   /**

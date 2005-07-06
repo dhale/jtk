@@ -65,7 +65,7 @@ public abstract class Handle extends Group {
    * @return the transform.
    */
   public Matrix44 getTransform() {
-    return _transform.clone();
+    return new Matrix44(_transform);
   }
 
   /**
@@ -75,7 +75,7 @@ public abstract class Handle extends Group {
    * @param transform the transform.
    */
   public void setTransform(Matrix44 transform) {
-    _transform = transform.clone();
+    _transform = new Matrix44(transform);
     dirtyBoundingSphere();
     dirtyDraw();
   }

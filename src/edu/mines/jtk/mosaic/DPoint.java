@@ -11,7 +11,7 @@ package edu.mines.jtk.mosaic;
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.11
  */
-public class DPoint implements Cloneable {
+public class DPoint {
 
   /**
    * The x-coordinate of this point.
@@ -34,11 +34,11 @@ public class DPoint implements Cloneable {
   }
 
   /**
-   * Returns a clone of this point.
-   * @return the clone.
+   * Constructs a copy of the specified point.
+   * @param p the point.
    */
-  public DPoint clone() {
-    return new DPoint(x,y);
+  public DPoint(DPoint p) {
+    this(p.x,p.y);
   }
 
   public boolean equals(Object obj) {

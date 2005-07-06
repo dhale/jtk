@@ -83,8 +83,8 @@ public abstract class TiledView {
    */
   protected void setBestProjectors(Projector bhp, Projector bvp) {
     if (!equal(_bhp,bhp) || !equal(_bvp,bvp)) {
-      _bhp = bhp.clone();
-      _bvp = bvp.clone();
+      _bhp = new Projector(bhp);
+      _bvp = new Projector(bvp);
       if (_tile!=null) {
         _tile.alignProjectors();
       }

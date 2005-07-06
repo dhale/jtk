@@ -103,7 +103,7 @@ public class CullContext extends TransformContext {
   public void pushLocalToWorld(Matrix44 transform) {
     super.pushLocalToWorld(transform);
     for (int i=0,plane=1; i<6; ++i,plane<<=1) { // for all planes
-      _planesStack.push(_planes[i].clone()); // save plane
+      _planesStack.push(new Plane(_planes[i])); // save plane
       if ((_active&plane)!=0) // if plane is active
         _planes[i].transformWithInverse(transform); // transform it
     }

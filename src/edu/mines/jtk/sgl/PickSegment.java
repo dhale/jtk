@@ -23,11 +23,11 @@ public class PickSegment extends LineSegment {
   }
 
   /**
-   * Clones this pick segment.
-   * @return the clone.
+   * Constructs a copy of the specified pick segment.
+   * @param ps the pick segment.
    */
-  public PickSegment clone() throws CloneNotSupportedException {
-    return (PickSegment)super.clone();
+  public PickSegment(PickSegment ps) {
+    super(ps);
   }
 
   /**

@@ -13,7 +13,7 @@ import edu.mines.jtk.util.Check;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.20
  */
-public class Matrix44 implements Cloneable {
+public class Matrix44 {
 
   /**
    * The matrix elements stored contiguously in an array, as in OpenGL.
@@ -76,14 +76,14 @@ public class Matrix44 implements Cloneable {
   }
 
   /**
-   * Returns a clone of this matrix.
-   * @return the clone.
+   * Constructs a copy of the specified matrix.
+   * @param m the matrix.
    */
-  public Matrix44 clone() {
-    return new Matrix44(m[ 0],m[ 4],m[ 8],m[12],
-                        m[ 1],m[ 5],m[ 9],m[13],
-                        m[ 2],m[ 6],m[10],m[14],
-                        m[ 3],m[ 7],m[11],m[15]);
+  public Matrix44(Matrix44 m) {
+    set(m.m[ 0],m.m[ 4],m.m[ 8],m.m[12],
+        m.m[ 1],m.m[ 5],m.m[ 9],m.m[13],
+        m.m[ 2],m.m[ 6],m.m[10],m.m[14],
+        m.m[ 3],m.m[ 7],m.m[11],m.m[15]);
   }
 
   /**

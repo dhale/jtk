@@ -51,11 +51,11 @@ public class Point4 extends Tuple4 {
   }
 
   /**
-   * Returns a clone of this point.
-   * @return the clone.
+   * Constructs a copy of the specified point.
+   * @param p the point.
    */
-  public Point4 clone() {
-    return new Point4(x,y,z,w);
+  public Point4(Point4 p) {
+    super(p.x,p.y,p.z,p.w);
   }
 
   /**

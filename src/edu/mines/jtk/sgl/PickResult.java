@@ -21,7 +21,7 @@ import java.awt.event.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.06.17
  */
-public class PickResult implements Cloneable {
+public class PickResult {
 
   /**
    * Constructs a new pick result in the specified context.
@@ -32,23 +32,21 @@ public class PickResult implements Cloneable {
     _event = pc.getMouseEvent();
     _nodes = pc.getNodes();
     _localToWorld = pc.getLocalToWorld();
-    _pointLocal = point.clone();
+    _pointLocal = new Point3(point);
     _pointWorld = _localToWorld.times(point);
     _depthPixel = pc.getLocalToPixel().times(point).z;
   }
 
   /**
-   * Returns a clone of this pick result.
-   * @return the clone.
+   * Constructs a copy of the specified pick result.
+   * @param pr the pick result.
    */
-  public PickResult clone() {
-    PickResult pr = new PickResult();
-    pr._nodes = _nodes.clone();
-    pr._pointLocal = _pointLocal.clone();
-    pr._pointWorld = _pointWorld.clone();
-    pr._depthPixel = _depthPixel;
-    pr._localToWorld = _localToWorld.clone();
-    return pr;
+  public PickResult(PickResult pr) {
+    _nodes = pr._nodes.clone();
+    _pointLocal = new Point3(pr._pointLocal);
+    _pointWorld = new Point3(pr._pointWorld);
+    _depthPixel = pr._depthPixel;
+    _localToWorld = new Matrix44(pr._localToWorld);
   }
 
   /**
@@ -99,7 +97,7 @@ public class PickResult implements Cloneable {
    * @return the picked point in local coordinates.
    */
   public Point3 getPointLocal() {
-    return _pointLocal.clone();
+    return new Point3(_pointLocal);
   }
 
   /**
@@ -107,7 +105,7 @@ public class PickResult implements Cloneable {
    * @return the picked point in world coordinates.
    */
   public Point3 getPointWorld() {
-    return _pointWorld.clone();
+    return new Point3(_pointWorld);
   }
 
   /**

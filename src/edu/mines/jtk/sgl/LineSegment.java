@@ -13,7 +13,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.07.05
  */
-public class LineSegment implements Cloneable {
+public class LineSegment {
 
   /**
    * Constructs a line segment with the specified endpoints.
@@ -21,19 +21,17 @@ public class LineSegment implements Cloneable {
    * @param b the endpoint B.
    */
   public LineSegment(Point3 a, Point3 b) {
-    _a = a.clone();
-    _b = b.clone();
+    _a = new Point3(a);
+    _b = new Point3(b);
     _d = _b.minus(_a);
   }
 
   /**
-   * Clones this line segment.
+   * Constructs a copy of the specified line segment.
+   * @param ls the line segment.
    */
-  public LineSegment clone() throws CloneNotSupportedException {
-    LineSegment ls = (LineSegment)super.clone();
-    ls._a = _a.clone();
-    ls._b = _b.clone();
-    return ls;
+  public LineSegment(LineSegment ls) {
+    this(ls._a,ls._b);
   }
 
   /**
@@ -41,7 +39,7 @@ public class LineSegment implements Cloneable {
    * @return the endpoint A.
    */
   public Point3 getA() {
-    return _a.clone();
+    return new Point3(_a);
   }
 
   /**
@@ -49,7 +47,7 @@ public class LineSegment implements Cloneable {
    * @return the endpoint B.
    */
   public Point3 getB() {
-    return _b.clone();
+    return new Point3(_b);
   }
 
   /**

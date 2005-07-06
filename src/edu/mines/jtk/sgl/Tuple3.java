@@ -11,7 +11,7 @@ package edu.mines.jtk.sgl;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.20
  */
-public class Tuple3 implements Cloneable {
+public class Tuple3 {
 
   /**
    * The component x.
@@ -47,11 +47,13 @@ public class Tuple3 implements Cloneable {
   }
 
   /**
-   * Returns a clone of this tuple.
-   * @return the clone.
+   * Constructs a copy of the specified tuple.
+   * @param t the tuple.
    */
-  public Tuple3 clone() {
-    return new Tuple3(x,y,z);
+  public Tuple3(Tuple3 t) {
+    x = t.x;
+    y = t.y;
+    z = t.z;
   }
 
   public boolean equals(Object obj) {

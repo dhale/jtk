@@ -63,7 +63,7 @@ public class ViewCanvas extends GlCanvas {
    * @param viewToCube the view-to-cube transform; copied, not referenced.
    */
   public void setViewToCube(Matrix44 viewToCube) {
-    _viewToCube = viewToCube.clone();
+    _viewToCube = new Matrix44(viewToCube);
     repaint();
   }
 
@@ -72,7 +72,7 @@ public class ViewCanvas extends GlCanvas {
    * @return the view-to-cube transform; by copy, not by reference.
    */
   public Matrix44 getViewToCube() {
-    return _viewToCube.clone();
+    return new Matrix44(_viewToCube);
   }
 
   /**
@@ -81,7 +81,7 @@ public class ViewCanvas extends GlCanvas {
    * @param cubeToPixel the cube-to-pixel transform; copied, not referenced.
    */
   public void setCubeToPixel(Matrix44 cubeToPixel) {
-    _cubeToPixel = cubeToPixel.clone();
+    _cubeToPixel = new Matrix44(cubeToPixel);
     repaint();
   }
 
@@ -90,7 +90,7 @@ public class ViewCanvas extends GlCanvas {
    * @return the cube-to-pixel transform; by copy, not by reference.
    */
   public Matrix44 getCubeToPixel() {
-    return _cubeToPixel.clone();
+    return new Matrix44(_cubeToPixel);
   }
 
   /**

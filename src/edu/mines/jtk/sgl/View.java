@@ -64,7 +64,7 @@ public abstract class View {
   }
 
   public Tuple3 getAxesScale() {
-    return _axesScale.clone();
+    return new Tuple3(_axesScale);
   }
 
   public void setAxesScale(Tuple3 s) {
@@ -119,7 +119,7 @@ public abstract class View {
    * @param worldToView the world-to-view transform; copied, not referenced.
    */
   public void setWorldToView(Matrix44 worldToView) {
-    _worldToView = worldToView.clone();
+    _worldToView = new Matrix44(worldToView);
     repaint();
   }
 
@@ -128,7 +128,7 @@ public abstract class View {
    * @return the world-to-view transform; by copy, not by reference.
    */
   public Matrix44 getWorldToView() {
-    return _worldToView.clone();
+    return new Matrix44(_worldToView);
   }
 
   /**

@@ -23,7 +23,7 @@ import edu.mines.jtk.util.Check;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.06.28
  */
-public class BoundingSphere implements Cloneable {
+public class BoundingSphere {
 
   /**
    * Constructs an empty bounding sphere.
@@ -56,8 +56,15 @@ public class BoundingSphere implements Cloneable {
     this(c.x,c.y,c.z,r);
   }
 
-  public BoundingSphere clone() {
-    return new BoundingSphere(_x,_y,_z,_r);
+  /**
+   * Constructs a copy of the specified bounding sphere.
+   * @param bs the bounding sphere.
+   */
+  public BoundingSphere(BoundingSphere bs) {
+    _x = bs._x;
+    _y = bs._y;
+    _z = bs._z;
+    _r = bs._r;
   }
 
   /**

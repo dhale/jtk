@@ -21,7 +21,7 @@ public class TransformGroup extends Group {
    * @param transform the transform; copied, not referenced.
    */
   public TransformGroup(Matrix44 transform) {
-    _transform = transform.clone();
+    _transform = new Matrix44(transform);
   }
 
   /**
@@ -29,7 +29,7 @@ public class TransformGroup extends Group {
    * @return the transform; by copy, not by reference.
    */
   public Matrix44 getTransform() {
-    return _transform.clone();
+    return new Matrix44(_transform);
   }
 
   /**
@@ -37,7 +37,7 @@ public class TransformGroup extends Group {
    * @param transform the transform; by copy, not by reference.
    */
   public void setTransform(Matrix44 transform) {
-    _transform = transform.clone();
+    _transform = new Matrix44(transform);
     dirtyBoundingSphere();
   }
 

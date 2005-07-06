@@ -104,7 +104,7 @@ public class OrbitView extends View {
    * @return the world sphere; null, if none.
    */
   public BoundingSphere getWorldSphere() {
-    return _worldSphere.clone();
+    return new BoundingSphere(_worldSphere);
   }
 
   /**
@@ -203,7 +203,7 @@ public class OrbitView extends View {
   public void setTranslate(Vector3 translate) {
     if (_translate.equals(translate))
       return;
-    _translate = translate.clone();
+    _translate = new Vector3(translate);
     updateView();
   }
 
@@ -212,7 +212,7 @@ public class OrbitView extends View {
    * @return the translate vector.
    */
   public Vector3 getTranslate() {
-    return _translate.clone();
+    return new Vector3(_translate);
   }
 
   /**
@@ -220,7 +220,7 @@ public class OrbitView extends View {
    * @return the world-to-unit-sphere transform.
    */
   public Matrix44 getWorldToUnitSphere() {
-    return _worldToUnitSphere.clone();
+    return new Matrix44(_worldToUnitSphere);
   }
 
   /**
@@ -228,7 +228,7 @@ public class OrbitView extends View {
    * @return the unit-sphere-to-view transform.
    */
   public Matrix44 getUnitSphereToView() {
-    return _unitSphereToView.clone();
+    return new Matrix44(_unitSphereToView);
   }
 
 

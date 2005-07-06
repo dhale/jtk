@@ -30,11 +30,11 @@ public class Vector3 extends Tuple3 {
   }
 
   /**
-   * Returns a clone of this vector.
-   * @return the clone.
+   * Constructs a copy of the specified vector.
+   * @param v the vector.
    */
-  public Vector3 clone() {
-    return new Vector3(x,y,z);
+  public Vector3(Vector3 v) {
+    super(v.x,v.y,v.z);
   }
 
   /**

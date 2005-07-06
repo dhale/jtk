@@ -538,12 +538,12 @@ public class Mosaic extends JPanel {
   void alignProjectors(Tile tile) {
     int jrow = tile.getRowIndex();
     int jcol = tile.getColumnIndex();
-    Projector bhp = tile.getBestHorizontalProjector().clone();
+    Projector bhp = new Projector(tile.getBestHorizontalProjector());
     for (int irow=0; irow<_nrow; ++irow) {
       if (irow!=jrow)
         bhp.merge(_tiles[irow][jcol].getBestHorizontalProjector());
     }
-    Projector bvp = tile.getBestVerticalProjector().clone();
+    Projector bvp = new Projector(tile.getBestVerticalProjector());
     for (int icol=0; icol<_ncol; ++icol) {
       if (icol!=jcol)
         bvp.merge(_tiles[jrow][icol].getBestVerticalProjector());

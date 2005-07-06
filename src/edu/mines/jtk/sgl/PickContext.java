@@ -71,7 +71,7 @@ public class PickContext extends TransformContext {
    * @return the pick segment.
    */
   public PickSegment getPickSegment() {
-    return _pickSegment.clone();
+    return new PickSegment(_pickSegment);
   }
 
   /**
@@ -172,7 +172,7 @@ public class PickContext extends TransformContext {
         prmin = pr;
       }
     }
-    return (prmin!=null)?prmin.clone():null;
+    return (prmin!=null)?new PickResult(prmin):null;
   }
 
   /**
@@ -184,7 +184,7 @@ public class PickContext extends TransformContext {
    */
   public void pushLocalToWorld(Matrix44 transform) {
     super.pushLocalToWorld(transform);
-    _pickSegmentStack.push(_pickSegment.clone());
+    _pickSegmentStack.push(new PickSegment(_pickSegment));
     _pickSegment.transform(transform.inverse());
     _nearPoint = _pickSegment.getNearPoint();
     _farPoint = _pickSegment.getFarPoint();

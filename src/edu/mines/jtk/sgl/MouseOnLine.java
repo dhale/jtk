@@ -39,7 +39,7 @@ public class MouseOnLine extends MouseConstrained {
     super(localToPixel);
     _xmouse = event.getX();
     _ymouse = event.getY();
-    _origin = origin.clone();
+    _origin = new Point3(origin);
     _vector = vector.normalize();
 
     // The mode of operation is either nearest or push-pull, depending on 

@@ -52,7 +52,7 @@ import edu.mines.jtk.util.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.01.01
  */
-public class Projector implements Cloneable {
+public class Projector {
 
   /**
    * Constructs a projector with specified v values, u0=0, and u1=1.
@@ -93,11 +93,11 @@ public class Projector implements Cloneable {
   }
 
   /**
-   * Returns a clone of this projector.
-   * @return the clone.
+   * Constructs a copy of the specified projector.
+   * @param p the projector.
    */
-  public Projector clone() {
-    return new Projector(_v0,_v1,_u0,_u1);
+  public Projector(Projector p) {
+    this(p._v0,p._v1,p._u0,p._u1);
   }
 
   /**

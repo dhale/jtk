@@ -38,9 +38,10 @@ public class MatrixPointVectorTest extends TestCase {
       assertEquals(i,a.transpose().timesTranspose(ai));
       assertEquals(i,a.transposeTimes(ai.transpose()));
 
-      assertEquals(i,a.clone().timesEquals(ai));
-      assertEquals(i,a.clone().transposeEquals().timesTranspose(ai));
-      assertEquals(i,a.clone().transposeTimesEquals(ai.transpose()));
+      Matrix44 ac = new Matrix44(a);
+      assertEquals(i,ac.timesEquals(ai));
+      assertEquals(i,ac.transposeEquals().timesTranspose(ai));
+      assertEquals(i,ac.transposeTimesEquals(ai.transpose()));
     }
   }
 
@@ -49,10 +50,11 @@ public class MatrixPointVectorTest extends TestCase {
     for (int itrial=0; itrial<ntrial; ++itrial) {
       Vector3 u = randomVector3();
       Vector3 v = randomVector3();
+      Vector3 vc = new Vector3(v);
       assertEquals(v,v.negate().negate());
-      assertEquals(v,v.clone().negateEquals().negateEquals());
+      assertEquals(v,vc.negateEquals().negateEquals());
       assertEquals(1.0,v.normalize().length());
-      assertEquals(1.0,v.clone().normalizeEquals().length());
+      assertEquals(1.0,vc.normalizeEquals().length());
       assertEquals(1.0,v.normalize().lengthSquared());
       assertEquals(v.dot(v),v.lengthSquared());
       assertEquals(0.0,u.cross(v).dot(u));
@@ -64,9 +66,10 @@ public class MatrixPointVectorTest extends TestCase {
     int ntrial = 10;
     for (int itrial=0; itrial<ntrial; ++itrial) {
       Point3 p = randomPoint3();
+      Point3 pc = new Point3(p);
       Vector3 v = randomVector3();
       assertEquals(p,p.plus(v).minus(v));
-      assertEquals(p,p.clone().plusEquals(v).minusEquals(v));
+      assertEquals(p,pc.plusEquals(v).minusEquals(v));
       Point3 q = p.minus(v);
       assertEquals(q.distanceTo(p),v.length());
     }

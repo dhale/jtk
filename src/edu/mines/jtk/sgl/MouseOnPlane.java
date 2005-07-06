@@ -37,9 +37,9 @@ public class MouseOnPlane extends MouseConstrained {
     MouseEvent event, Point3 origin, Plane plane, Matrix44 localToPixel) 
   {
     super(localToPixel);
-    _origin = origin.clone();
+    _origin = new Point3(origin);
     _normal = plane.getNormal();
-    _plane = plane.clone();
+    _plane = new Plane(plane);
     _delta = origin.minus(getPointOnPlane(event,null));
   }
 

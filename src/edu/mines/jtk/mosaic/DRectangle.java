@@ -18,7 +18,7 @@ import edu.mines.jtk.util.Check;
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.11
  */
-public class DRectangle implements Cloneable {
+public class DRectangle {
 
   /**
    * The minimum x-coordinate for this rectangle.
@@ -57,11 +57,11 @@ public class DRectangle implements Cloneable {
   }
 
   /**
-   * Returns a clone of this rectangle.
-   * @return the clone.
+   * Constructs a copy of the specified rectangle.
+   * @param r the rectangle.
    */
-  public DRectangle clone() {
-    return new DRectangle(x,y,width,height);
+  public DRectangle(DRectangle r) {
+    this(r.x,r.y,r.width,r.height);
   }
 
   /**

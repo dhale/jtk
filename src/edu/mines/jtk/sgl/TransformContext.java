@@ -111,7 +111,7 @@ public class TransformContext extends TraversalContext {
    * @return the local-to-world transform.
    */
   public Matrix44 getLocalToWorld() {
-    return _localToWorld.clone();
+    return new Matrix44(_localToWorld);
   }
 
   /**
@@ -175,7 +175,7 @@ public class TransformContext extends TraversalContext {
    * @return the world-to-view transform.
    */
   public Matrix44 getWorldToView() {
-    return _worldToView.clone();
+    return new Matrix44(_worldToView);
   }
 
   /**
@@ -223,7 +223,7 @@ public class TransformContext extends TraversalContext {
    * @return the view-to-cube transform.
    */
   public Matrix44 getViewToCube() {
-    return _viewToCube.clone();
+    return new Matrix44(_viewToCube);
   }
 
   /**
@@ -255,7 +255,7 @@ public class TransformContext extends TraversalContext {
    * @return the cube-to-pixel transform.
    */
   public Matrix44 getCubeToPixel() {
-    return _cubeToPixel.clone();
+    return new Matrix44(_cubeToPixel);
   }
 
   /**
@@ -274,7 +274,7 @@ public class TransformContext extends TraversalContext {
    * @param transform the transform to append.
    */
   public void pushLocalToWorld(Matrix44 transform) {
-    _localToWorldStack.push(_localToWorld.clone());
+    _localToWorldStack.push(new Matrix44(_localToWorld));
     _localToWorld.timesEquals(transform);
   }
 
