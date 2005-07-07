@@ -9,33 +9,33 @@ package edu.mines.jtk.sgl;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * A line segment.
+ * A segment of a line.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.07.05
  */
-public class LineSegment {
+public class Segment {
 
   /**
-   * Constructs a line segment with the specified endpoints.
+   * Constructs a segment with the specified endpoints.
    * @param a the endpoint A.
    * @param b the endpoint B.
    */
-  public LineSegment(Point3 a, Point3 b) {
+  public Segment(Point3 a, Point3 b) {
     _a = new Point3(a);
     _b = new Point3(b);
     _d = _b.minus(_a);
   }
 
   /**
-   * Constructs a copy of the specified line segment.
-   * @param ls the line segment.
+   * Constructs a copy of the specified segment.
+   * @param ls the segment.
    */
-  public LineSegment(LineSegment ls) {
+  public Segment(Segment ls) {
     this(ls._a,ls._b);
   }
 
   /**
-   * Gets the endpoint A of this line segment.
+   * Gets the endpoint A of this segment.
    * @return the endpoint A.
    */
   public Point3 getA() {
@@ -43,7 +43,7 @@ public class LineSegment {
   }
 
   /**
-   * Gets the endpoint B of this line segment.
+   * Gets the endpoint B of this segment.
    * @return the endpoint B.
    */
   public Point3 getB() {
@@ -51,7 +51,7 @@ public class LineSegment {
   }
 
   /**
-   * Returns the length of this line segment.
+   * Returns the length of this segment.
    * @return the length.
    */
   public double length() {
@@ -59,7 +59,7 @@ public class LineSegment {
   }
 
   /**
-   * Transforms this line segment, given the specified transform matrix.
+   * Transforms this segment, given the specified transform matrix.
    * @param m the transform matrix.
    */
   public void transform(Matrix44 m) {
@@ -69,7 +69,7 @@ public class LineSegment {
   }
 
   /**
-   * Tests this pick segment for intersection with the specified triangle. If 
+   * Tests this segment for intersection with the specified triangle. If 
    * such an intersection exists, this method returns the intersection point.
    * @param xa x coordinate of triangle vertex a.
    * @param ya y coordinate of triangle vertex a.

@@ -44,7 +44,7 @@ public class MouseOnLine extends MouseConstrained {
 
     // The mode of operation is either nearest or push-pull, depending on 
     // how parallel the initial mouse segment is to the line of constraint.
-    LineSegment mouseSegment = getMouseSegment(event);
+    Segment mouseSegment = getMouseSegment(event);
     Point3 mouseNear = mouseSegment.getA();
     Point3 mouseFar = mouseSegment.getB();
     Vector3 mouseVector = mouseFar.minus(mouseNear).normalize();
@@ -85,7 +85,7 @@ public class MouseOnLine extends MouseConstrained {
     if (_mode==Mode.NEAREST) {
 
       // Ray 1 from near point A through far point B of mouse segment.
-      LineSegment segment = getMouseSegment(event);
+      Segment segment = getMouseSegment(event);
       Point3 p1 = segment.getA();
       Vector3 v1 = segment.getB().minus(p1);
 

@@ -63,7 +63,7 @@ public class MouseOnPlane extends MouseConstrained {
   private Point3 getPointOnPlane(MouseEvent event, Vector3 delta) {
 
     // Ray from near point A through far point B of mouse segment.
-    LineSegment segment = getMouseSegment(event);
+    Segment segment = getMouseSegment(event);
     Point3 a = segment.getA();
     Point3 b = segment.getB();
     Vector3 d = b.minus(a);

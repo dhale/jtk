@@ -7,11 +7,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.sgl;
 
 /**
- * A line segment for picking.
+ * A segment for picking.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.06.17
  */
-public class PickSegment extends LineSegment {
+public class PickSegment extends Segment {
 
   /**
    * Constructs a pick segment with the specified near and far endpoints.

@@ -45,14 +45,14 @@ public abstract class MouseConstrained {
    * @param event the mouse event.
    * @return the line segment.
    */
-  protected LineSegment getMouseSegment(MouseEvent event) {
+  protected Segment getMouseSegment(MouseEvent event) {
     int x = event.getX();
     int y = event.getY();
     Point3 near = new Point3(x,y,0);
     Point3 far = new Point3(x,y,1);
     near = _pixelToLocal.times(near);
     far = _pixelToLocal.times(far);
-    return new LineSegment(near,far);
+    return new Segment(near,far);
   }
 
   ///////////////////////////////////////////////////////////////////////////
