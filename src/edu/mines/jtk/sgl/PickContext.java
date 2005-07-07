@@ -52,10 +52,10 @@ public class PickContext extends TransformContext {
     Point3 far = new Point3(xp,yp,1.0);
 
     // The pick segment, transformed to world coordinates.
-    _pickSegment = new PickSegment(near,far);
+    _pickSegment = new Segment(near,far);
     _pickSegment.transform(getPixelToWorld());
-    _nearPoint = _pickSegment.getNearPoint();
-    _farPoint = _pickSegment.getFarPoint();
+    _nearPoint = _pickSegment.getA();
+    _farPoint = _pickSegment.getB();
   }
 
   /**
@@ -70,8 +70,8 @@ public class PickContext extends TransformContext {
    * Gets the pick segment for this context.
    * @return the pick segment.
    */
-  public PickSegment getPickSegment() {
-    return new PickSegment(_pickSegment);
+  public Segment getPickSegment() {
+    return new Segment(_pickSegment);
   }
 
   /**
@@ -184,10 +184,10 @@ public class PickContext extends TransformContext {
    */
   public void pushLocalToWorld(Matrix44 transform) {
     super.pushLocalToWorld(transform);
-    _pickSegmentStack.push(new PickSegment(_pickSegment));
+    _pickSegmentStack.push(new Segment(_pickSegment));
     _pickSegment.transform(transform.inverse());
-    _nearPoint = _pickSegment.getNearPoint();
-    _farPoint = _pickSegment.getFarPoint();
+    _nearPoint = _pickSegment.getA();
+    _farPoint = _pickSegment.getB();
   }
 
   /**
@@ -197,16 +197,16 @@ public class PickContext extends TransformContext {
   public void popLocalToWorld() {
     super.popLocalToWorld();
     _pickSegment = _pickSegmentStack.pop();
-    _nearPoint = _pickSegment.getNearPoint();
-    _farPoint = _pickSegment.getFarPoint();
+    _nearPoint = _pickSegment.getA();
+    _farPoint = _pickSegment.getB();
   }
 
   private MouseEvent _event;
-  private PickSegment _pickSegment;
+  private Segment _pickSegment;
   private Point3 _nearPoint;
   private Point3 _farPoint;
-  private ArrayStack<PickSegment> _pickSegmentStack = 
-    new ArrayStack<PickSegment>();
+  private ArrayStack<Segment> _pickSegmentStack = 
+    new ArrayStack<Segment>();
   private ArrayList<PickResult> _pickResults = new ArrayList<PickResult>();
 
   private int getDepthBits(ViewCanvas canvas) {

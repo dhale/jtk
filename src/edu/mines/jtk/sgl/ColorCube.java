@@ -63,7 +63,7 @@ public class ColorCube extends Node implements Selectable {
   }
 
   protected void pick(PickContext pc) {
-    PickSegment ps = pc.getPickSegment();
+    Segment ps = pc.getPickSegment();
     for (int iside=0; iside<6; ++iside) {
       double xa = _va[12*iside+ 0];
       double ya = _va[12*iside+ 1];
@@ -118,7 +118,9 @@ public class ColorCube extends Node implements Selectable {
   private static FloatBuffer _nb = Direct.newFloatBuffer(_na);
   private static FloatBuffer _cb = Direct.newFloatBuffer(_ca);
 
-  // Simple testing.
+  ///////////////////////////////////////////////////////////////////////////
+  // testing
+
   private static final int SIZE = 600;
   public static void main(String[] args) {
     ColorCube cc = new ColorCube();
