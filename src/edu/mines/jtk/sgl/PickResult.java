@@ -32,21 +32,12 @@ public class PickResult {
     _event = pc.getMouseEvent();
     _nodes = pc.getNodes();
     _localToWorld = pc.getLocalToWorld();
+    _localToPixel = pc.getLocalToPixel();
+    _worldToPixel = pc.getWorldToPixel();
     _pointLocal = new Point3(point);
     _pointWorld = _localToWorld.times(point);
-    _depthPixel = pc.getLocalToPixel().times(point).z;
-  }
-
-  /**
-   * Constructs a copy of the specified pick result.
-   * @param pr the pick result.
-   */
-  public PickResult(PickResult pr) {
-    _nodes = pr._nodes.clone();
-    _pointLocal = new Point3(pr._pointLocal);
-    _pointWorld = new Point3(pr._pointWorld);
-    _depthPixel = pr._depthPixel;
-    _localToWorld = new Matrix44(pr._localToWorld);
+    _pointPixel = _localToPixel.times(point);
+    _depthPixel = _pointPixel.z;
   }
 
   /**
@@ -74,6 +65,17 @@ public class PickResult {
    */
   public Node getNode() {
     return _nodes[_nodes.length-1];
+  }
+
+  /**
+   * Gets a node in this result that is selectable.
+   * The node returned is the last node in the list (ordered parent to
+   * child) of nodes in this pick result that implements the interface
+   * {@link Selectable}. If no such node exists, this method returns null.
+   * @return the selectable node; null, if none.
+   */
+  public Selectable getSelectableNode() {
+    return (Selectable)getNode(Selectable.class);
   }
 
   /**
@@ -109,6 +111,14 @@ public class PickResult {
   }
 
   /**
+   * Gets the picked point in pixel coordinates.
+   * @return the picked point in pixel coordinates.
+   */
+  public Point3 getPointPixel() {
+    return new Point3(_pointPixel);
+  }
+
+  /**
    * Gets the pixel z (depth) coordinate of the picked point. This depth
    * depth coordinate increases from 0.0 at the near clipping plane to 1.0 
    * at the far clipping plane.
@@ -123,16 +133,56 @@ public class PickResult {
    * @return the local-to-world coordinate transform matrix.
    */
   public Matrix44 getLocalToWorld() {
-    return _localToWorld;
+    return new Matrix44(_localToWorld);
+  }
+
+  /**
+   * Gets the local-to-pixel coordinate transform matrix.
+   * @return the local-to-pixel coordinate transform matrix.
+   */
+  public Matrix44 getLocalToPixel() {
+    return new Matrix44(_localToPixel);
+  }
+
+  /**
+   * Gets the world-to-pixel coordinate transform matrix.
+   * @return the world-to-pixel coordinate transform matrix.
+   */
+  public Matrix44 getWorldToPixel() {
+    return new Matrix44(_worldToPixel);
+  }
+
+  /**
+   * Gets the canvas for which this pick result was constructed.
+   * @return the view canvas.
+   */
+  public ViewCanvas getViewCanvas() {
+    return (ViewCanvas)_event.getSource();
+  }
+
+  /**
+   * Gets the view for which this pick result was constructed.
+   * @return the view.
+   */
+  public View getView() {
+    return getViewCanvas().getView();
+  }
+
+  /**
+   * Gets the world for which this pick result was constructed.
+   * @return the world.
+   */
+  public World getWorld() {
+    return getView().getWorld();
   }
 
   private MouseEvent _event;
   private Node[] _nodes;
   private Point3 _pointLocal;
   private Point3 _pointWorld;
+  private Point3 _pointPixel;
   private double _depthPixel;
   private Matrix44 _localToWorld;
-
-  private PickResult() {
-  }
+  private Matrix44 _localToPixel;
+  private Matrix44 _worldToPixel;
 }

@@ -35,10 +35,11 @@ public class ColorCube extends Node implements Selectable {
 
   public void setSelected(boolean selected) {
     System.out.println("ColorCube.setSelected: "+selected);
+    _selected = selected;
   }
 
   public boolean isSelected() {
-    return false;
+    return _selected;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -88,6 +89,8 @@ public class ColorCube extends Node implements Selectable {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  private boolean _selected;
 
   // Vertices, normals, and colors.
   private static float[] _va = {

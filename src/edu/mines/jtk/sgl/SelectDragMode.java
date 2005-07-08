@@ -13,9 +13,9 @@ import javax.swing.*;
 import edu.mines.jtk.gui.*;
 
 /**
- * A mode for selecting and dragging objects.
+ * A mode for selecting and dragging nodes.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.06.20
+ * @version 2005.07.08
  */
 public class SelectDragMode extends Mode {
   private static final long serialVersionUID = 1L;
@@ -54,12 +54,12 @@ public class SelectDragMode extends Mode {
   private ViewCanvas _canvas; // the canvas
   private View _view; // the view
   private World _world; // the world
-  private int _xmouse; // mouse x coordinate
-  private int _ymouse; // mouse y coordinate
+  private Selectable _node; // the selected node; null, if none
+  private PickResult _pickResult; // pick result; null, if none
 
   private MouseListener _ml = new MouseAdapter() {
     public void mousePressed(MouseEvent e) {
-      beginSelect(e);
+      doSelect(e);
     }
     public void mouseReleased(MouseEvent e) {
     }
@@ -70,25 +70,73 @@ public class SelectDragMode extends Mode {
     }
   };
 
-  private void beginSelect(MouseEvent event) {
-    _xmouse = event.getX();
-    _ymouse = event.getY();
+/*
+Design of selectable and dragable:
+
+  dragable and selectable are independent interfaces
+    nodes may implement dragable, selectable, neither, or both
+      can drag without selecting
+      can select without dragging
+    dragging requires a mouse (a drag context)
+    selecting requires no mouse or context
+      e.g., may select a node from a list of nodes
+    when selected, a node may reveal handles,
+      which may be used for editing, and
+      are typically dragable, but
+      are typically not selectable
+    selected nodes typically highlight themselves, perhaps 
+      by displaying handles (if editable), or
+      by changing their rendering in some other way
+
+  to select (or de-select) a node,
+    press and release mouse 
+      without dragging significantly (less than two pixels)
+    call setSelected
+
+  multiple selections are possible
+    selected node
+    shift-click to extend selection set
+    control-click to add/subtract node to/from current selection set
+
+  to drag a node,
+    press mouse on the node
+    drag mouse significantly (at least two pixels)
+      call drawBegin with new drag context
+      call drag with current drag context
+    continue dragging mouse
+      call drag with current drag context
+    release mouse anywhere
+      call dragEnd with final drag context
+  
+  a significant drag is two or more pixels in any direction
+    prevents inadvertant dragging when selecting is intended
+*/
+
+  private void doSelect(MouseEvent event) {
     _canvas = (ViewCanvas)event.getSource();
     _canvas.addMouseMotionListener(_mml);
     _view = _canvas.getView();
     _world = _view.getWorld();
     PickContext pc = new PickContext(event);
     _world.pickApply(pc);
-    PickResult pr = pc.getClosest();
-    if (pr!=null) {
-      Point3 pointLocal = pr.getPointLocal();
-      Point3 pointWorld = pr.getPointWorld();
+    _pickResult = pc.getClosest();
+    if (_pickResult!=null) {
+      Point3 pointLocal = _pickResult.getPointLocal();
+      Point3 pointWorld = _pickResult.getPointWorld();
       System.out.println("Pick");
       System.out.println("  local="+pointLocal);
       System.out.println("  world="+pointWorld);
-      Selectable node = (Selectable)pr.getNode(Selectable.class);
-      if (node!=null)
-        node.setSelected(true);
+      Selectable node = _pickResult.getSelectableNode();
+      if (node!=null) {
+        _node = node;
+        if (event.isControlDown()) {
+          node.setSelected(!node.isSelected());
+        } else {
+          node.setSelected(true);
+        }
+      } else {
+        _node = null;
+      }
     } else {
       System.out.println("Pick nothing");
     }

@@ -15,16 +15,19 @@ public interface Dragable {
 
   /**
    * Begins dragging.
+   * @param dc the drag context.
    */
-  public void dragBegin();
+  public void dragBegin(DragContext dc);
 
   /**
    * During dragging, this method is called when the mouse moves.
+   * @param dc the drag context.
    */
-  public void drag();
+  public void drag(DragContext dc);
 
   /**
    * Ends dragging.
+   * @param dc the drag context.
    */
-  public void dragEnd();
+  public void dragEnd(DragContext dc);
 }

@@ -67,7 +67,8 @@ public class PickContext extends TransformContext {
   }
 
   /**
-   * Gets the pick segment for this context.
+   * Gets the pick segment for this context. Endpoint A of the segment lies 
+   * on the near clipping plane; endpoint B lies on the far clipping plane.
    * @return the pick segment.
    */
   public Segment getPickSegment() {
@@ -172,7 +173,7 @@ public class PickContext extends TransformContext {
         prmin = pr;
       }
     }
-    return (prmin!=null)?new PickResult(prmin):null;
+    return prmin;
   }
 
   /**
