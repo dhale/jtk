@@ -58,10 +58,14 @@ public class SelectDragMode extends Mode {
   private Dragable _dragable; // used iff dragging
   private Selectable _selectable; // used iff selecting
   private DragContext _dragContext; // non-null iff dragging
+  private boolean _selecting; // true iff mouse moves too little for drag
 
   private MouseListener _ml = new MouseAdapter() {
 
     public void mousePressed(MouseEvent e) {
+
+      // Initially, assume we are selecting, not dragging.
+      _selecting = true;
 
       // Pick and look in the result for dragable and selectable nodes.
       _pickResult = pick(e);
@@ -85,11 +89,10 @@ public class SelectDragMode extends Mode {
       // If dragging, end the drag.
       if (_dragContext!=null) {
         _dragable.dragEnd(_dragContext);
-        _dragContext = null;
-      } 
+      }
       
-      // Else (if selecting or deselecting), ...
-      else {
+      // Else if selecting (or deselecting), ...
+      else if (_selecting) {
 
         // If control select, toggle selection of the picked node.
         if (e.isControlDown()) {
@@ -116,7 +119,9 @@ public class SelectDragMode extends Mode {
 
       // No longer dragging or selecting.
       _dragable = null;
+      _dragContext = null;
       _selectable = null;
+      _selecting = false;
 
       // End listening for mouse movement.
       _canvas.removeMouseMotionListener(_mml);
@@ -124,18 +129,23 @@ public class SelectDragMode extends Mode {
   };
 
   private MouseMotionListener _mml = new MouseMotionAdapter() {
+
     public void mouseDragged(MouseEvent e) {
 
-      // If the picked node is dragable, but we are not yet dragging, ...
-      if (_dragable!=null && _dragContext==null) {
+      // See if mouse has moved too much for selecting.
+      _selecting = _dragContext==null;
+      if (_selecting && _pickResult!=null) {
         Point3 pp = _pickResult.getPointPixel();
         Point3 pd = new Point3(e.getX(),e.getY(),pp.z);
+        if (pp.distanceTo(pd)>=2.0)
+          _selecting = false;
+      }
 
-        // If mouse has moved significantly, initiate dragging.
-        if (pp.distanceTo(pd)>=2.0) {
-          _dragContext = new DragContext(_pickResult);
-          _dragable.dragBegin(_dragContext);
-        }
+      // If (1) not selecting, and (2) the picked node is dragable, and 
+      // (3) we are not yet dragging, then initiate dragging.
+      if (!_selecting && _dragable!=null && _dragContext==null) {
+        _dragContext = new DragContext(_pickResult);
+        _dragable.dragBegin(_dragContext);
       }
 
       // If we are now dragging, update the drag context and drag.

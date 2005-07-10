@@ -38,6 +38,7 @@ public class ColorCube extends Node implements Selectable {
 
   protected void selectedChanged() {
     System.out.println("ColorCube: "+this+" selected="+isSelected());
+    dirtyDraw();
   }
 
   protected BoundingSphere computeBoundingSphere(boolean finite) {
@@ -47,15 +48,29 @@ public class ColorCube extends Node implements Selectable {
   }
 
   protected void draw(DrawContext dc) {
-    glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
     glVertexPointer(3,GL_FLOAT,0,_vb);
     glNormalPointer(GL_FLOAT,0,_nb);
     glColorPointer(3,GL_FLOAT,0,_cb);
+    if (isSelected()) {
+      glEnable(GL_POLYGON_OFFSET_FILL);
+      glPolygonOffset(1.0f,1.0f);
+    }
     glDrawArrays(GL_QUADS,0,24);
-    glPopClientAttrib();
+    if (isSelected()) {
+      glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+      glDisableClientState(GL_NORMAL_ARRAY);
+      glDisableClientState(GL_COLOR_ARRAY);
+      glColor3d(1.0,1.0,1.0);
+      glDisable(GL_LIGHTING);
+      glDrawArrays(GL_QUADS,0,24);
+    } else {
+      glDisableClientState(GL_NORMAL_ARRAY);
+      glDisableClientState(GL_COLOR_ARRAY);
+    }
+    glDisableClientState(GL_VERTEX_ARRAY);
   }
 
   protected void pick(PickContext pc) {
@@ -84,8 +99,6 @@ public class ColorCube extends Node implements Selectable {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
-
-  private boolean _selected;
 
   // Vertices, normals, and colors.
   private static float[] _va = {

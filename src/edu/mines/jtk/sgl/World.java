@@ -61,7 +61,7 @@ public class World extends Group {
    * Deselects all selected nodes in this world.
    */
   public void clearSelected() {
-    for (Node node : _selectedSet) {
+    for (Node node : new ArrayList<Node>(_selectedSet)) {
       if (node.isSelected())
         node.setSelected(false,false);
     }
