@@ -33,17 +33,12 @@ public class ColorCube extends Node implements Selectable {
     setStates(states);
   }
 
-  public void setSelected(boolean selected) {
-    System.out.println("ColorCube.setSelected: "+selected);
-    _selected = selected;
-  }
-
-  public boolean isSelected() {
-    return _selected;
-  }
-
   ///////////////////////////////////////////////////////////////////////////
   // protected
+
+  protected void selectedChanged() {
+    System.out.println("ColorCube: this="+this+" selected="+isSelected());
+  }
 
   protected BoundingSphere computeBoundingSphere(boolean finite) {
     Point3 c = new Point3(0.5,0.5,0.5);
@@ -126,14 +121,15 @@ public class ColorCube extends Node implements Selectable {
 
   private static final int SIZE = 600;
   public static void main(String[] args) {
-    ColorCube cc = new ColorCube();
+    ColorCube cc1 = new ColorCube();
+    ColorCube cc2 = new ColorCube();
     HandleBox hb1 = new HandleBox(1,1,1);
     HandleBox hb2 = new HandleBox(1,1,1);
     TransformGroup tg1 = new TransformGroup(Matrix44.translate(-2,0,0));
     TransformGroup tg2 = new TransformGroup(Matrix44.translate( 2,0,0));
-    tg1.addChild(cc);
+    tg1.addChild(cc1);
     tg1.addChild(hb1);
-    tg2.addChild(cc);
+    tg2.addChild(cc2);
     tg2.addChild(hb2);
     World world = new World();
     world.addChild(tg1);

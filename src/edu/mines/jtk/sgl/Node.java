@@ -16,7 +16,16 @@ import static edu.mines.jtk.opengl.Gl.*;
  * <p>
  * A node has zero or more parents. Because the number of parents can
  * be greater than one, the scene graph forms a directed acyclic graph
- * (DAG).
+ * (DAG). However, the DAG has a single root node, called a {@link World}.
+ * A node can be moved from one world to another, but cannot exist in more 
+ * than one world at a time.
+ * <p>
+ * A world maintains a selected set of nodes within it. Only nodes that 
+ * implement the marker interface {@link Selectable} can be selected. 
+ * For convenience, the methods of that interface are implemented in this 
+ * abstract base class. Classes that extend this abstract base class may
+ * override the method {@link #selectedChanged()}, typically to modify
+ * the appearance of selected nodes.
  * <p>
  * Nodes are drawn in what is called the <em>draw process</em>. The draw 
  * process is applied to a node in three steps by calling the methods
@@ -39,39 +48,70 @@ import static edu.mines.jtk.opengl.Gl.*;
 public abstract class Node {
 
   /**
-   * Determines whether this node is currently selected.
+   * Determines whether this node is currently selected. Only nodes that
+   * implement the marker interface {@link Selectable} can be selected.
    * @return true, if selected; false, otherwise.
    */
-  public boolean isSelected() {
-    return (this instanceof Selectable) && _selected;
+  public final boolean isSelected() {
+    return _selected;
   }
 
   /**
-   * Sets the selected state for this node. If the selection is exclusive 
-   * and this node is in a world, then selection of this node will cause 
-   * any other selected nodes in this node's world to be deselected.
+   * Sets the selected state for this node. Only nodes that implement the 
+   * marker interface {@link Selectable} can be selected. This method does 
+   * nothing if this node is not selectable.
    * <p>
-   * Only nodes that implement the marker interface {@link Selectable} can 
-   * be selected. This method does nothing if this node is not selectable.
+   * If the selection is exclusive and this node is in a world, then 
+   * selection of this node will cause any other selected nodes in this 
+   * node's world to be deselected.
    * <p>
-   * Classes that extend this abstract base class typically do not override 
-   * this implementation. Instead, they override the method
-   * {@link #selectedChanged()}.
+   * Classes that extend this abstract base class may override the method
+   * {@link #selectedChanged()}, typically to alter the appearance of a
+   * node that has been selected or deselected.
    * @param selected true, if selected; false, otherwise.
    * @param exclusive true, for exclusive selection; false, otherwise.
    */
-  public void setSelected(boolean selected, boolean exclusive) {
+  public final void setSelected(boolean selected, boolean exclusive) {
     if (this instanceof Selectable) {
-      boolean selectedOld = _selected;
-      _selected = selected;
+
+      // Are we changing the selected state of this node?
+      boolean changing = _selected!=selected;
+
+      // Are we selecting this node exclusively?
+      boolean exclusiveSelection = exclusive && selected;
+
+      // If not changing the selected state of this node, and not
+      // exclusively selecting this node, then simply return.
+      if (!changing && !exclusiveSelection)
+        return;
+
+      // If this node is in a world and is being selected exclusively, then 
+      // make a list of any currently selected nodes besides this one. Any 
+      //  nodes in this list will be deselected below.
+      ArrayList<Node> nodesToDeselect = new ArrayList<Node>();
       World world = getWorld();
-      if (world!=null) {
-        if (selected && exclusive)
-          world.clearSelected();
-        world.updateSelectedSet(this);
+      if (world!=null && exclusiveSelection) {
+        Iterator<Node> snodes = world.getSelected();
+        while (snodes.hasNext()) {
+          Node node = snodes.next();
+          if (node!=this && node.isSelected())
+            nodesToDeselect.add(node);
+        }
       }
-      if (_selected!=selectedOld)
+
+      // If necessary, change the selected state of this node.
+      if (changing) {
+        _selected = selected;
         selectedChanged();
+      }
+
+      // If exclusive selection, deselect any other selected nodes.
+      for (Node node : nodesToDeselect)
+        node.setSelected(false,false);
+
+      // If this node is in a world, update its selected set.
+      if (world!=null)
+        world.updateSelectedSet(this);
     }
   }
 
@@ -92,25 +132,16 @@ public abstract class Node {
   }
 
   /**
-   * Gets the world for this node. If this node is a world, then this
-   * method simply returns this node.
+   * Gets the world for this node.
    * @return the world; null, if this node is not currently in a world.
    */
   public World getWorld() {
-    World world = null;
-    if (this instanceof World) {
-      world = (World)this;
-    } else {
-      for (Group parent : _parentList) {
-        World worldParent = parent.getWorld();
-        if (world==null) {
-          world = worldParent;
-        } else if (worldParent!=null) {
-          Check.state(world==worldParent,"node is in only one world");
-        }
-      }
+    for (Group parent : _parentList) {
+      World world = parent.getWorld();
+      if (world!=null)
+        return world;
     }
-    return world;
+    return null;
   }
 
   /**

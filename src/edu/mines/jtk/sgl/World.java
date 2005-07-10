@@ -42,7 +42,15 @@ public class World extends Group {
   }
 
   /**
-   * Gets an iterator for any selected nodes in this world.
+   * Returns the number of selected nodes in this world.
+   * @return the number of selected nodes.
+   */
+  public int countSelected() {
+    return _selectedSet.size();
+  }
+
+  /**
+   * Gets an iterator for selected nodes in this world.
    * @return the iterator.
    */
   public Iterator<Node> getSelected() {
@@ -82,6 +90,15 @@ public class World extends Group {
   public void repaint() {
     for (View view : _viewList)
       view.repaint();
+  }
+
+  /**
+   * Gets the world for this node. This implementation overrides that
+   * in {@link Node#getWorld()} to simply return this world.
+   * @return this world.
+   */
+  public World getWorld() {
+    return this;
   }
 
   ///////////////////////////////////////////////////////////////////////////

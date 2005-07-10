@@ -22,19 +22,17 @@ public class Group extends Node {
    * node is already a child of this group, then this method does nothing.
    * <p>
    * The child must not be a world (root) node, because a world has no 
-   * parents. Also, the child must not already be in a world that is 
-   * different from the world of this group, because a node can be in
-   * no more than one world.
+   * parents. Also, if this group is in a world, the child must not already 
+   * be in a different world. A node cannot be in more than one world at a 
+   * time; it must be removed from one world before it can be added to another.
    * @param child the child node.
    */
   public void addChild(Node child) {
-    World worldGroup = getWorld();
+    Check.argument(!(child instanceof World),"child is not a world");
     World worldChild = child.getWorld();
+    World worldGroup = getWorld();
     Check.argument(
-      !(child instanceof World),
-      "child is not a world");
-    Check.argument(
-      worldChild==null || worldChild==worldGroup,
+      worldChild==null || worldGroup==null || worldChild==worldGroup,
       "child is not already in a different world");
     if (child.addParent(this)) {
       _childList.add(child);
