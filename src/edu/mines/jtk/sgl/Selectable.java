@@ -9,19 +9,22 @@ package edu.mines.jtk.sgl;
 /**
  * An interface implemented by nodes that can be selected.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.06.23
+ * @version 2005.07.10
  */
 public interface Selectable {
-
-  /**
-   * Sets the selected state for this node.
-   * @param selected true, if selected; false, otherwise.
-   */
-  public void setSelected(boolean selected);
 
   /**
    * Determines whether this node is currently selected.
    * @return true, if selected; false, otherwise.
    */
   public boolean isSelected();
+
+  /**
+   * Sets the selected state for this node. If the selection is exclusive 
+   * and this node is in a world, then selection of this node will cause 
+   * any other selected nodes in this node's world to be deselected.
+   * @param selected true, if selected; false, otherwise.
+   * @param exclusive true, for exclusive selection; false, otherwise.
+   */
+  public void setSelected(boolean selected, boolean exclusive);
 }

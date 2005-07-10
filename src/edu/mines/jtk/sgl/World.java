@@ -10,12 +10,18 @@ package edu.mines.jtk.sgl;
 import java.util.*;
 
 /**
- * A world is a root node in the scene graph.
+ * A world is a root node in the scene graph. A world is a group that 
+ * cannot be a child of any other group. To be viewed, a node must be 
+ * part of a world.
  * <p>
  * A world maintains a list of views in which it is drawn. When a world
  * must be redrawn, it requests a repaint of its views.
+ * <p>
+ * A world maintains a set of selected nodes. The world updates its selected
+ * set when (1) a node is added/removed to/from a world or any group that is 
+ * part of a world, or (2) a node in a world is selected or deselected.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.05.24
+ * @version 2005.07.07
  */
 public class World extends Group {
 
@@ -33,6 +39,24 @@ public class World extends Group {
    */
   public Iterator<View> getViews() {
     return _viewList.iterator();
+  }
+
+  /**
+   * Gets an iterator for any selected nodes in this world.
+   * @return the iterator.
+   */
+  public Iterator<Node> getSelected() {
+    return _selectedSet.iterator();
+  }
+
+  /**
+   * Deselects all selected nodes in this world.
+   */
+  public void clearSelected() {
+    for (Node node : _selectedSet) {
+      if (node.isSelected())
+        node.setSelected(false,false);
+    }
   }
 
   /**
@@ -64,6 +88,38 @@ public class World extends Group {
   // package
 
   /**
+   * Updates the selected set of this world for the specified node.
+   * This method must be called when (1) the specified node is added/removed 
+   * to/from this world or (2) the specified node is selected or deselected.
+   * @param node the node for which to update the selected set of this world.
+   */
+  void updateSelectedSet(Node node) {
+
+    // Update our selected set for the specified node. If the node is now 
+    // (1) selected and (2) part of this world, then add it to our selected
+    // set. (Ok if already there.) Otherwise, remove it from our selected 
+    // set. (Ok if not there.)
+    if (node instanceof Selectable) {
+      if (node.isSelected() && this==node.getWorld()) {
+        _selectedSet.add(node);
+      } else {
+        _selectedSet.remove(node);
+      }
+    }
+
+    // If the specified node is a group, then update our selected set
+    // for each of its children.
+    if (node instanceof Group) {
+      Group group = (Group)node;
+      Iterator<Node> children = group.getChildren();
+      while (children.hasNext()) {
+        Node child = children.next();
+        updateSelectedSet(child);
+      }
+    }
+  }
+
+  /**
    * Called by View.setWorld(World).
    */
   boolean addView(View view) {
@@ -86,4 +142,5 @@ public class World extends Group {
   // private
 
   private ArrayList<View> _viewList = new ArrayList<View>();
+  private HashSet<Node> _selectedSet = new HashSet<Node>();
 }

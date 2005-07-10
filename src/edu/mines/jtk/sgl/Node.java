@@ -7,6 +7,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.sgl;
 
 import java.util.*;
+
+import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.opengl.Gl.*;
 
 /**
@@ -37,6 +39,43 @@ import static edu.mines.jtk.opengl.Gl.*;
 public abstract class Node {
 
   /**
+   * Determines whether this node is currently selected.
+   * @return true, if selected; false, otherwise.
+   */
+  public boolean isSelected() {
+    return (this instanceof Selectable) && _selected;
+  }
+
+  /**
+   * Sets the selected state for this node. If the selection is exclusive 
+   * and this node is in a world, then selection of this node will cause 
+   * any other selected nodes in this node's world to be deselected.
+   * <p>
+   * Only nodes that implement the marker interface {@link Selectable} can 
+   * be selected. This method does nothing if this node is not selectable.
+   * <p>
+   * Classes that extend this abstract base class typically do not override 
+   * this implementation. Instead, they override the method
+   * {@link #selectedChanged()}.
+   * @param selected true, if selected; false, otherwise.
+   * @param exclusive true, for exclusive selection; false, otherwise.
+   */
+  public void setSelected(boolean selected, boolean exclusive) {
+    if (this instanceof Selectable) {
+      boolean selectedOld = _selected;
+      _selected = selected;
+      World world = getWorld();
+      if (world!=null) {
+        if (selected && exclusive)
+          world.clearSelected();
+        world.updateSelectedSet(this);
+      }
+      if (_selected!=selectedOld)
+        selectedChanged();
+    }
+  }
+
+  /**
    * Returns the number of parents of this node.
    * @return the number of parents.
    */
@@ -50,6 +89,28 @@ public abstract class Node {
    */
   public Iterator<Group> getParents() {
     return _parentList.iterator();
+  }
+
+  /**
+   * Gets the world for this node. If this node is a world, then this
+   * method simply returns this node.
+   * @return the world; null, if this node is not currently in a world.
+   */
+  public World getWorld() {
+    World world = null;
+    if (this instanceof World) {
+      world = (World)this;
+    } else {
+      for (Group parent : _parentList) {
+        World worldParent = parent.getWorld();
+        if (world==null) {
+          world = worldParent;
+        } else if (worldParent!=null) {
+          Check.state(world==worldParent,"node is in only one world");
+        }
+      }
+    }
+    return world;
   }
 
   /**
@@ -99,6 +160,16 @@ public abstract class Node {
 
   ///////////////////////////////////////////////////////////////////////////
   // protected
+
+  /**
+   * This method is called when the selected state of this node has changed. 
+   * Classes that extend this abstract base class typically override this 
+   * method to alter this node's appearance when selected or deselected.
+   * <p>
+   * This implementation does nothing.
+   */
+  protected void selectedChanged() {
+  }
   
   /**
    * Computes the bounding sphere for this node, including its children.
@@ -285,35 +356,6 @@ public abstract class Node {
   }
 
   ///////////////////////////////////////////////////////////////////////////
-  // select
-
-  /**
-   * Begins selection of this node for the specified pick result.
-   * This implementation marks this node selected and returns false.
-   * @param pr the pick result.
-   */
-  public boolean selectBegin(PickResult pr) {
-    _selected = true;
-    return true;
-  }
-
-  /**
-   * Ends selection of this node.
-   * This implementation simply marks this node as being not selected.
-   */
-  public void selectEnd() {
-    _selected = false;
-  }
-
-  /**
-   * Determines whether this node is currently selected.
-   */
-  public boolean isSelected() {
-    return _selected;
-  }
-  private boolean _selected;
-
-  ///////////////////////////////////////////////////////////////////////////
   // package
 
   /**
@@ -344,8 +386,9 @@ public abstract class Node {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  private boolean _selected; // true, if selected
   private BoundingSphere _boundingSphere = null; // null, if dirty
-  private boolean _boundingSphereFinite = false; // true, if BS is finite
+  private boolean _boundingSphereFinite = false; // true, if finite
   private ArrayList<Group> _parentList = new ArrayList<Group>(2);
   private StateSet _states;
 }

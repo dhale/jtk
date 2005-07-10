@@ -88,15 +88,22 @@ Design of selectable and dragable:
       by displaying handles (if editable), or
       by changing their rendering in some other way
 
+  selectable nodes can have selectable children and parents
+    selecting a node does not cause children and/or parents to be selected
+
   to select (or de-select) a node,
     press and release mouse 
       without dragging significantly (less than two pixels)
     call setSelected
 
   multiple selections are possible
-    selected node
+    by default, selection of one node causes deselection of all others
     shift-click to extend selection set
     control-click to add/subtract node to/from current selection set
+
+  each world has a selected set of nodes
+    when a branch is added/removed to/from a group in a world,
+      the branch is searched to update the world's selected set
 
   to drag a node,
     press mouse on the node
@@ -130,9 +137,9 @@ Design of selectable and dragable:
       if (node!=null) {
         _node = node;
         if (event.isControlDown()) {
-          node.setSelected(!node.isSelected());
+          node.setSelected(!node.isSelected(),false);
         } else {
-          node.setSelected(true);
+          node.setSelected(true,true);
         }
       } else {
         _node = null;
