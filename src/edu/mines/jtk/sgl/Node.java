@@ -63,7 +63,8 @@ public abstract class Node {
    * <p>
    * If the selection is exclusive and this node is in a world, then 
    * selection of this node will cause any other selected nodes in this 
-   * node's world to be deselected.
+   * node's world to be deselected. The exclusive flag is relevant only 
+   * when the selected flag is true.
    * <p>
    * Classes that extend this abstract base class may override the method
    * {@link #selectedChanged()}, typically to alter the appearance of a
@@ -78,19 +79,19 @@ public abstract class Node {
       boolean changing = _selected!=selected;
 
       // Are we selecting this node exclusively?
-      boolean exclusiveSelection = exclusive && selected;
+      exclusive = exclusive && selected;
 
       // If not changing the selected state of this node, and not
       // exclusively selecting this node, then simply return.
-      if (!changing && !exclusiveSelection)
+      if (!changing && !exclusive)
         return;
 
       // If this node is in a world and is being selected exclusively, then 
-      // make a list of any currently selected nodes besides this one. Any 
-      //  nodes in this list will be deselected below.
+      // make a list of any currently selected nodes, not including this one. 
+      // Any nodes in this list will be deselected below.
       ArrayList<Node> nodesToDeselect = new ArrayList<Node>();
       World world = getWorld();
-      if (world!=null && exclusiveSelection) {
+      if (world!=null && exclusive) {
         Iterator<Node> snodes = world.getSelected();
         while (snodes.hasNext()) {
           Node node = snodes.next();
@@ -105,7 +106,7 @@ public abstract class Node {
         selectedChanged();
       }
 
-      // If exclusive selection, deselect any other selected nodes.
+      // If necessary (see above), deselect other nodes.
       for (Node node : nodesToDeselect)
         node.setSelected(false,false);
 

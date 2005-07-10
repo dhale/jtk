@@ -68,6 +68,17 @@ public class PickResult {
   }
 
   /**
+   * Gets a node in this result that is dragable.
+   * The node returned is the last node in the list (ordered parent to
+   * child) of nodes in this pick result that implements the interface
+   * {@link Dragable}. If no such node exists, this method returns null.
+   * @return the dragable node; null, if none.
+   */
+  public Dragable getDragableNode() {
+    return (Dragable)getNode(Dragable.class);
+  }
+
+  /**
    * Gets a node in this result that is selectable.
    * The node returned is the last node in the list (ordered parent to
    * child) of nodes in this pick result that implements the interface

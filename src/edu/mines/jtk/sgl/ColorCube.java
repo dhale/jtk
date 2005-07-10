@@ -37,7 +37,7 @@ public class ColorCube extends Node implements Selectable {
   // protected
 
   protected void selectedChanged() {
-    System.out.println("ColorCube: this="+this+" selected="+isSelected());
+    System.out.println("ColorCube: "+this+" selected="+isSelected());
   }
 
   protected BoundingSphere computeBoundingSphere(boolean finite) {

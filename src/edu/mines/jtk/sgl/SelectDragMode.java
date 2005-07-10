@@ -51,24 +51,125 @@ public class SelectDragMode extends Mode {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private ViewCanvas _canvas; // the canvas
-  private View _view; // the view
-  private World _world; // the world
-  private Selectable _node; // the selected node; null, if none
-  private PickResult _pickResult; // pick result; null, if none
+  private ViewCanvas _canvas; // canvas when mouse pressed
+  private View _view; // view when mouse pressed; null, if none
+  private World _world; // world when mouse pressed; null, if none
+  private PickResult _pickResult; // pick result when mouse pressed
+  private Dragable _dragable; // used iff dragging
+  private Selectable _selectable; // used iff selecting
+  private DragContext _dragContext; // non-null iff dragging
 
   private MouseListener _ml = new MouseAdapter() {
+
     public void mousePressed(MouseEvent e) {
-      doSelect(e);
+
+      // Pick and look in the result for dragable and selectable nodes.
+      _pickResult = pick(e);
+      if (_pickResult!=null) {
+        _selectable = _pickResult.getSelectableNode();
+        _dragable = _pickResult.getDragableNode();
+      }
+
+      // Remember the canvas, view, and world.
+      _canvas = (ViewCanvas)e.getSource();
+      _view = _canvas.getView();
+      if (_view!=null)
+        _world = _view.getWorld();
+
+      // Begin listening for mouse movement.
+      _canvas.addMouseMotionListener(_mml);
     }
+      
     public void mouseReleased(MouseEvent e) {
+
+      // If dragging, end the drag.
+      if (_dragContext!=null) {
+        _dragable.dragEnd(_dragContext);
+        _dragContext = null;
+      } 
+      
+      // Else (if selecting or deselecting), ...
+      else {
+
+        // If control select, toggle selection of the picked node.
+        if (e.isControlDown()) {
+          if (_selectable!=null)
+            _selectable.setSelected(!_selectable.isSelected(),false);
+        }
+
+        // Else if shift select, extend the selection.
+        else if (e.isShiftDown()) {
+          if (_selectable!=null)
+            _selectable.setSelected(true,false);
+        }
+
+        // Else, select exclusively.
+        else {
+          if (_selectable!=null) {
+            _selectable.setSelected(true,true);
+          } else {
+            if (_world!=null)
+              _world.clearSelected();
+          }
+        }
+      }
+
+      // No longer dragging or selecting.
+      _dragable = null;
+      _selectable = null;
+
+      // End listening for mouse movement.
+      _canvas.removeMouseMotionListener(_mml);
     }
   };
 
   private MouseMotionListener _mml = new MouseMotionAdapter() {
     public void mouseDragged(MouseEvent e) {
+
+      // If the picked node is dragable, but we are not yet dragging, ...
+      if (_dragable!=null && _dragContext==null) {
+        Point3 pp = _pickResult.getPointPixel();
+        Point3 pd = new Point3(e.getX(),e.getY(),pp.z);
+
+        // If mouse has moved significantly, initiate dragging.
+        if (pp.distanceTo(pd)>=2.0) {
+          _dragContext = new DragContext(_pickResult);
+          _dragable.dragBegin(_dragContext);
+        }
+      }
+
+      // If we are now dragging, update the drag context and drag.
+      if (_dragContext!=null) {
+        _dragContext.update(e);
+        _dragable.drag(_dragContext);
+      }
     }
   };
+
+  private PickResult pick(MouseEvent event) {
+    ViewCanvas canvas = (ViewCanvas)event.getSource();
+    canvas.addMouseMotionListener(_mml);
+    View view = canvas.getView();
+    if (view==null)
+      return null;
+    World world = view.getWorld();
+    if (world==null)
+      return null;
+    PickContext pc = new PickContext(event);
+    world.pickApply(pc);
+    PickResult pickResult = pc.getClosest();
+    if (pickResult!=null) {
+      Point3 pointLocal = pickResult.getPointLocal();
+      Point3 pointWorld = pickResult.getPointWorld();
+      System.out.println("Pick");
+      System.out.println("  local="+pointLocal);
+      System.out.println("  world="+pointWorld);
+    } else {
+      System.out.println("Pick nothing");
+    }
+    return pickResult;
+  }
+}
 
 /*
 Design of selectable and dragable:
@@ -91,11 +192,6 @@ Design of selectable and dragable:
   selectable nodes can have selectable children and parents
     selecting a node does not cause children and/or parents to be selected
 
-  to select (or de-select) a node,
-    press and release mouse 
-      without dragging significantly (less than two pixels)
-    call setSelected
-
   multiple selections are possible
     by default, selection of one node causes deselection of all others
     shift-click to extend selection set
@@ -104,6 +200,11 @@ Design of selectable and dragable:
   each world has a selected set of nodes
     when a branch is added/removed to/from a group in a world,
       the branch is searched to update the world's selected set
+
+  to select (or de-select) a node,
+    press and release mouse 
+      without dragging significantly (less than two pixels)
+    call setSelected
 
   to drag a node,
     press mouse on the node
@@ -118,35 +219,3 @@ Design of selectable and dragable:
   a significant drag is two or more pixels in any direction
     prevents inadvertant dragging when selecting is intended
 */
-
-  private void doSelect(MouseEvent event) {
-    _canvas = (ViewCanvas)event.getSource();
-    _canvas.addMouseMotionListener(_mml);
-    _view = _canvas.getView();
-    _world = _view.getWorld();
-    PickContext pc = new PickContext(event);
-    _world.pickApply(pc);
-    _pickResult = pc.getClosest();
-    if (_pickResult!=null) {
-      Point3 pointLocal = _pickResult.getPointLocal();
-      Point3 pointWorld = _pickResult.getPointWorld();
-      System.out.println("Pick");
-      System.out.println("  local="+pointLocal);
-      System.out.println("  world="+pointWorld);
-      Selectable node = _pickResult.getSelectableNode();
-      if (node!=null) {
-        _node = node;
-        if (event.isControlDown()) {
-          node.setSelected(!node.isSelected(),false);
-        } else {
-          node.setSelected(true,true);
-        }
-      } else {
-        _node = null;
-      }
-    } else {
-      System.out.println("Pick nothing");
-    }
-  }
-}
-
