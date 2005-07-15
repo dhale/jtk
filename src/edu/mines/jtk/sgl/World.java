@@ -63,7 +63,21 @@ public class World extends Group {
   public void clearSelected() {
     for (Node node : new ArrayList<Node>(_selectedSet)) {
       if (node.isSelected())
-        node.setSelected(false,false);
+        node.setSelected(false);
+    }
+  }
+
+  /**
+   * Deselects all selected nodes in this world, except the specified node.
+   * Typically, this method is called to deselect any other nodes that may 
+   * be currently selected, before selecting the specified node.
+   * @param nodeToIgnore the node to ignore. The selected state of this
+   *  node will not be changed.
+   */
+  public void clearSelectedExcept(Selectable nodeToIgnore) {
+    for (Node node : new ArrayList<Node>(_selectedSet)) {
+      if (node!=nodeToIgnore && node.isSelected())
+        node.setSelected(false);
     }
   }
 

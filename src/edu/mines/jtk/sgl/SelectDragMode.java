@@ -97,19 +97,20 @@ public class SelectDragMode extends Mode {
         // If control select, toggle selection of the picked node.
         if (e.isControlDown()) {
           if (_selectable!=null)
-            _selectable.setSelected(!_selectable.isSelected(),false);
+            _selectable.setSelected(!_selectable.isSelected());
         }
 
         // Else if shift select, extend the selection.
         else if (e.isShiftDown()) {
           if (_selectable!=null)
-            _selectable.setSelected(true,false);
+            _selectable.setSelected(true);
         }
 
-        // Else, select exclusively.
+        // Else, select the picked node, if any, after deselecting others.
         else {
           if (_selectable!=null) {
-            _selectable.setSelected(true,true);
+            _world.clearSelectedExcept(_selectable);
+            _selectable.setSelected(true);
           } else {
             if (_world!=null)
               _world.clearSelected();

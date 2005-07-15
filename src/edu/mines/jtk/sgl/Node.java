@@ -61,56 +61,20 @@ public abstract class Node {
    * marker interface {@link Selectable} can be selected. This method does 
    * nothing if this node is not selectable.
    * <p>
-   * If the selection is exclusive and this node is in a world, then 
-   * selection of this node will cause any other selected nodes in this 
-   * node's world to be deselected. The exclusive flag is relevant only 
-   * when the selected flag is true.
-   * <p>
    * Classes that extend this abstract base class may override the method
    * {@link #selectedChanged()}, typically to alter the appearance of a
    * node that has been selected or deselected.
-   * @param selected true, if selected; false, otherwise.
-   * @param exclusive true, for exclusive selection; false, otherwise.
+   * @param selected true, for selected; false, otherwise.
    */
-  public final void setSelected(boolean selected, boolean exclusive) {
-    if (this instanceof Selectable) {
+  public final void setSelected(boolean selected) {
+    if (this instanceof Selectable && _selected!=selected) {
 
-      // Are we changing the selected state of this node?
-      boolean changing = _selected!=selected;
-
-      // Are we selecting this node exclusively?
-      exclusive = exclusive && selected;
-
-      // If not changing the selected state of this node, and not
-      // exclusively selecting this node, then simply return.
-      if (!changing && !exclusive)
-        return;
-
-      // If this node is in a world and is being selected exclusively, then 
-      // make a list of any currently selected nodes, not including this one. 
-      // Any nodes in this list will be deselected below.
-      ArrayList<Node> nodesToDeselect = new ArrayList<Node>();
-      World world = getWorld();
-      if (world!=null && exclusive) {
-        Iterator<Node> snodes = world.getSelected();
-        while (snodes.hasNext()) {
-          Node node = snodes.next();
-          if (node!=this && node.isSelected())
-            nodesToDeselect.add(node);
-        }
-      }
-
-      // If necessary, change the selected state of this node.
-      if (changing) {
-        _selected = selected;
-        selectedChanged();
-      }
-
-      // If necessary (see above), deselect other nodes.
-      for (Node node : nodesToDeselect)
-        node.setSelected(false,false);
+      // Change the selected state of this node.
+      _selected = selected;
+      selectedChanged();
 
       // If this node is in a world, update its selected set.
+      World world = getWorld();
       if (world!=null)
         world.updateSelectedSet(this);
     }

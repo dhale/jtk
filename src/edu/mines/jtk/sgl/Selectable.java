@@ -24,12 +24,8 @@ public interface Selectable {
   public boolean isSelected();
 
   /**
-   * Sets the selected state for this node. If the selection is exclusive 
-   * and this node is in a world, then selection of this node will cause 
-   * any other selected nodes in this node's world to be deselected. The 
-   * exclusive flag is relevant only when the selected flag is true.
-   * @param selected true, if selected; false, otherwise.
-   * @param exclusive true, for exclusive selection; false, otherwise.
+   * Sets the selected state for this node.
+   * @param selected true, for selected; false, otherwise.
    */
-  public void setSelected(boolean selected, boolean exclusive);
+  public void setSelected(boolean selected);
 }

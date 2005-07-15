@@ -61,10 +61,10 @@ public class ColorCube extends Node implements Selectable {
     glDrawArrays(GL_QUADS,0,24);
     if (isSelected()) {
       glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+      glDisable(GL_LIGHTING);
       glDisableClientState(GL_NORMAL_ARRAY);
       glDisableClientState(GL_COLOR_ARRAY);
       glColor3d(1.0,1.0,1.0);
-      glDisable(GL_LIGHTING);
       glDrawArrays(GL_QUADS,0,24);
     } else {
       glDisableClientState(GL_NORMAL_ARRAY);
