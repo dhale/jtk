@@ -13,8 +13,9 @@ import junit.framework.*;
  * @author Dave Hale
  * @version 2004.11.02
  */
-public class Suite extends TestCase {
-  public static void main(String[] args) {
+public class Suite extends TestSuite {
+
+  public static Test suite() {
     TestSuite suite = new TestSuite();
 
     suite.addTestSuite(ArrayTest.class);
@@ -23,6 +24,10 @@ public class Suite extends TestCase {
     suite.addTestSuite(MathPlusTest.class);
     suite.addTestSuite(StopwatchTest.class);
 
-    junit.textui.TestRunner.run(suite);
+    return suite;
+  }
+
+  public static void main(String[] args) {
+    junit.textui.TestRunner.run(suite());
   }
 }

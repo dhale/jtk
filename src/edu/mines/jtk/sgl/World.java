@@ -17,9 +17,9 @@ import java.util.*;
  * A world maintains a list of views in which it is drawn. When a world
  * must be redrawn, it requests a repaint of its views.
  * <p>
- * A world maintains a set of selected nodes. The world updates its selected
- * set when (1) a node is added/removed to/from a world or any group that is 
- * part of a world, or (2) a node in a world is selected or deselected.
+ * A world maintains a set of selected nodes. The selected set of a world is
+ * updated when (1) a node is added/removed to/from a world or any group that 
+ * is part of a world, or (2) a node in a world is selected or deselected.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.07.07
  */

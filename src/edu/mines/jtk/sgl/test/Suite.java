@@ -13,13 +13,18 @@ import junit.framework.*;
  * @author Dave Hale
  * @version 2005.05.20
  */
-public class Suite extends TestCase {
-  public static void main(String[] args) {
+public class Suite extends TestSuite {
+
+  public static Test suite() {
     TestSuite suite = new TestSuite();
 
     suite.addTestSuite(BoundingTest.class);
     suite.addTestSuite(MatrixPointVectorTest.class);
 
-    junit.textui.TestRunner.run(suite);
+    return suite;
+  }
+
+  public static void main(String[] args) {
+    junit.textui.TestRunner.run(suite());
   }
 }

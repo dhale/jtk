@@ -95,6 +95,30 @@ public class KaiserWindow {
     return (xx<=_xxmax)?_scale*ino(_alpha*sqrt(1.0-xx/_xxmax)):0.0;
   }
 
+  /**
+   * Gets the (two-sided) window length.
+   * @return the window length.
+   */
+  public double getLength() {
+    return _length;
+  }
+
+  /**
+   * Gets the maximum absolute error.
+   * @return the maximum absolute error.
+   */
+  public double getError() {
+    return _error;
+  }
+
+  /**
+   * Gets the transition width.
+   * @return the transition width.
+   */
+  public double getWidth() {
+    return _width;
+  }
+
   private static final double AMIN = 20.96;
   private double _length;
   private double _width;

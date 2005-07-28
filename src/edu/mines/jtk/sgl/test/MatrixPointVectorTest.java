@@ -40,7 +40,9 @@ public class MatrixPointVectorTest extends TestCase {
 
       Matrix44 ac = new Matrix44(a);
       assertEquals(i,ac.timesEquals(ai));
+      ac = new Matrix44(a);
       assertEquals(i,ac.transposeEquals().timesTranspose(ai));
+      ac = new Matrix44(a);
       assertEquals(i,ac.transposeTimesEquals(ai.transpose()));
     }
   }

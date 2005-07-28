@@ -13,8 +13,9 @@ import junit.framework.*;
  * @author Dave Hale
  * @version 2005.03.24
  */
-public class Suite extends TestCase {
-  public static void main(String[] args) {
+public class Suite extends TestSuite {
+
+  public static Test suite() {
     TestSuite suite = new TestSuite();
 
     suite.addTestSuite(FftComplexTest.class);
@@ -22,6 +23,10 @@ public class Suite extends TestCase {
     suite.addTestSuite(Real1Test.class);
     suite.addTestSuite(SamplingTest.class);
 
-    junit.textui.TestRunner.run(suite);
+    return suite;
+  }
+
+  public static void main(String[] args) {
+    junit.textui.TestRunner.run(suite());
   }
 }
