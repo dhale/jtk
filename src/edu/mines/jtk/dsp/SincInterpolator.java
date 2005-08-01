@@ -12,27 +12,37 @@ import static java.lang.Math.*;
 /**
  * A sinc interpolator for uniformly-sampled functions y(x). Interpolators
  * can be optimized for any two of three design parameters - maximum length, 
- * frequency, and error for frequencies less than the maximum frequency. 
+ * maximum frequency, and maximum error for frequencies less than the 
+ * maximum frequency. 
  * <p>
  * The length of an interpolator is the number of input samples required to
  * interpolate a single output sample. Ideally, the weights applied to each 
- * input sample are samples of a sinc function, which has infinite length, 
- * but yields zero error for all frequencies up to the Nyquist frequency.
+ * input sample are values of a sinc function. Although the ideal sinc 
+ * function yields zero interpolation error for all frequencies up to the 
+ * Nyquist frequency (0.5 cycles/sample), it has infinite length.
  * <p>
+ * With recursive filtering, infinite-length approximations to the sinc
+ * function are feasible and, in some applications, most efficient. When
+ * the number of interpolated (output) samples is large relative to the
+ * number of input samples, the cost of recursive filtering is amortized 
+ * over those many output samples, and is negligible. However, this cost 
+ * becomes significant when only a few output samples are needed.
+ * <p>
+ * This interpolator is based on a <em>finite-length</em> approximation 
+ * to the sinc function. The efficiency of finite-length interpolators 
+ * like this one does not depend on the number of interpolated output 
+ * samples. This interpolator is also robust in the presence of noise 
+ * spikes, which affect only nearby samples.
+ * <p>
+ * Finite-length interpolators present a tradeoff between cost and accuracy.
  * Interpolators with small lengths are most efficient, and those with high
  * maximum frequencies and low maximum errors are most accurate. Because
  * only two of these three parameters can be specified, one should specify
  * those two that are most important for a particular application.
  * <p>
- * In some applications, recursive infinite-length interpolators can be
- * most efficient. However, finite-length interpolators like this one
- * are more robust in the presence of noise spikes, and their efficiency 
- * does not depend on the number of interpolated (output) samples. This
- * interpolator always has a maximum length.
- * <p>
- * The default parameters are maximum length = 8, maximum frequency = 0.325 
- * cycles/sample (65% of Nyquist), which yields an error less than 0.01 (1%) 
- * for all frequencies less than the maximum frequency.
+ * The default parameters are maximum length = 8 and maximum frequency = 
+ * 0.325 cycles/sample (65% of Nyquist), which yields an error less than 
+ * 0.01 (1%) for all frequencies less than the maximum frequency.
  * <p>
  * When interpolating multiple uniformly sampled functions y(x) that share 
  * a common sampling of x, some redundant computations can be eliminated by 
@@ -214,6 +224,7 @@ public class SincInterpolator {
 
   /**
    * Sets the extrapolation method for this interpolator.
+   * The default extrapolation method is extrapolation with zeros.
    * @param extrap the extrapolation method.
    */
   public void setExtrapolation(Extrapolation extrap) {
@@ -221,9 +232,29 @@ public class SincInterpolator {
   }
 
   /**
-   * Sets the current input sampling. In some applications, the input
-   * sampling never changes, and this method may be called only once
-   * for this interpolator.
+   * Determines whether or not this interpolator is complex.
+   * @return true, if complex; false, otherwise.
+   */
+  public boolean isComplex() {
+    return _complex;
+  }
+
+  /**
+   * Sets the complex state of this interpolator. The default state is 
+   * false, which corresponds to a real interpolator. Input and output 
+   * samples are passed as arrays to and from an interpolator. A complex 
+   * interpolator assumes that complex values in those arrays are packed 
+   * as real, imaginary, real, imaginary, and so on.
+   * @param complex true, for complex; false, otherwise.
+   */
+  public void setComplex(boolean complex) {
+    _complex = true;
+  }
+
+  /**
+   * Sets the current input sampling for a uniformly-sampled function y(x).
+   * In some applications, this sampling never changes, and this method 
+   * may be called only once for this interpolator.
    * @param nxin the number of input samples.
    * @param dxin the interval at which the input y(x) is sampled.
    * @param fxin the first x at which the input y(x) is sampled.
@@ -241,34 +272,25 @@ public class SincInterpolator {
   }
 
   /**
-   * Sets the current input samples. For efficiency, some (but not all) 
-   * samples from the specified array are copied into this interpolator.
-   * Therefore, this method should be called whenever the contents of the 
-   * specified array change.
-   * @param yin array of input samples of y(x). The length of this array 
-   *  must not be less than the current number of input samples.
+   * Sets the current input samples for a uniformly-sampled function y(x).
+   * If this interpolator is complex, real and imaginary parts of complex 
+   * input values are packed as real, imaginary, real, imaginary, and so on.
+   * @param yin array of input samples of y(x).
    */
   public void setInputSamples(float[] yin) {
-    Check.argument(_nxin<=yin.length,
-      "length of yin is not less than the specified number of input samples");
     _yin = yin;
-    _yinl = 0.0f;
-    _yinr = 0.0f;
-    if (_extrap==Extrapolation.CONSTANT) {
-      _yinl = yin[0];
-      _yinr = yin[_nxin-1];
-    }
   }
 
   /**
-   * Sets the current input sampling and samples. This method simply calls
-   * the two methods {@link #setInputSampling(int,double,double)} and then
-   * {@link #setInputSamples(float[])} with the specified parameters.
+   * Sets the current input sampling and samples for a function y(x). 
+   * This method simply calls the two methods 
+   * {@link #setInputSampling(int,double,double)} and
+   * {@link #setInputSamples(float[])} 
+   * with the specified parameters.
    * @param nxin the number of input samples.
    * @param dxin the sampling interval for input y(x).
    * @param fxin the first x value at which the input y(x) is sampled.
-   * @param yin array of input samples of y(x). The length of this array 
-   *  must not be less than the current number of input samples.
+   * @param yin array of input samples of y(x).
    */
   public void setInput(int nxin, double dxin, double fxin, float[] yin) {
     setInputSampling(nxin,dxin,fxin);
@@ -276,37 +298,32 @@ public class SincInterpolator {
   }
 
   /**
-   * Interpolates the current samples of a uniformly-sampled function y(x).
-   * @param xout the value x at which to interpolate.
-   * @return interpolated output y(x).
+   * Interpolates the current input samples of a function y(x).
+   * If this interpolator is complex, then this method returns only the
+   * real part of the complex interpolated output sample.
+   * @param xout the value x at which to interpolate an output sample.
+   * @return the interpolated output sample.
    */
-  public float interpolate(float xout) {
+  public float interpolate(double xout) {
+    interpolate(xout,0,_yout);
+    return _yout[0];
+  }
 
-    // Which input samples?
-    double xoutn = _xoutb+xout*_xouts;
-    int ixoutn = (int)xoutn;
-    int kyin = _ioutb+ixoutn;
-
-    // Which sinc approximation?
-    double frac = xoutn-ixoutn;
-    if (frac<0.0)
-      frac += 1.0;
-    int ktab = (int)(frac*_ntabm1+0.5);
-    float[] stab = _stab[ktab];
-
-    // If no extrapolation is necessary, use a fast loop.
-      // Otherwise, extrapolate input samples, as necessary.
-    float yout = 0.0f;
-    if (kyin>=0 && kyin<=_nxinm) {
-      for (int itab=0; itab<_ltab; ++itab,++kyin)
-        yout += _yin[kyin]*stab[itab];
+  /**
+   * Interpolates the current input samples of a function y(x).
+   * @param xout the value x at which to interpolate an output sample.
+   * @param iout the index in the output array of the interpolated output
+   *  sample. If complex, the array index of the real part is 2*iout, and 
+   *  the array index of the imaginary part is 2*iout+1.
+   * @param yout array of output samples. This method modifies only the value 
+   *  yout[iout] or, if complex, the values yout[2*iout] and yout[2*iout+1].
+   */
+  public void interpolate(double xout, int iout, float[] yout) {
+    if (_complex) {
+      interpolateComplex(xout,iout,yout);
     } else {
-      for (int itab=0; itab<_ltab; ++itab,++kyin) {
-        float yini = (kyin<0)?_yinl:(kyin>=_nxin)?_yinr:_yin[kyin];
-        yout += yini*stab[itab];
-      }
+      interpolateReal(xout,iout,yout);
     }
-    return yout;
   }
 
   /**
@@ -316,8 +333,13 @@ public class SincInterpolator {
    * @param yout array of interpolated output y(x).
    */
   public void interpolate(int nxout, float[] xout, float[] yout) {
-    for (int ixout=0;  ixout<nxout; ++ixout)
-      yout[ixout] = interpolate(xout[ixout]);
+    if (_complex) {
+      for (int ixout=0;  ixout<nxout; ++ixout)
+        interpolateComplex(xout[ixout],ixout,yout);
+    } else {
+      for (int ixout=0;  ixout<nxout; ++ixout)
+        interpolateReal(xout[ixout],ixout,yout);
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -338,9 +360,11 @@ public class SincInterpolator {
   private int _nxinm;
 
   // Current input samples.
-  private float[] _yin;
-  private float _yinl;
-  private float _yinr;
+  private boolean _complex; // true if input/output samples are complex
+  private float[] _yin; // real or complex samples
+
+  // Temporary array for output values.
+  private float[] _yout = new float[2];
 
   // Table of interpolation coefficients.
   private int _ltab; // length of interpolators in table
@@ -350,5 +374,84 @@ public class SincInterpolator {
 
   private static double sinc(double x) {
     return (x!=0.0)?sin(PI*x)/(PI*x):1.0;
+  }
+
+  private void interpolateReal(double xout, int iout, float[] yout) {
+
+    // Which input samples?
+    double xoutn = _xoutb+xout*_xouts;
+    int ixoutn = (int)xoutn;
+    int kyin = _ioutb+ixoutn;
+
+    // Which sinc approximation?
+    double frac = xoutn-ixoutn;
+    if (frac<0.0)
+      frac += 1.0;
+    int ktab = (int)(frac*_ntabm1+0.5);
+    float[] stab = _stab[ktab];
+
+    // If no extrapolation is necessary, use a fast loop.
+      // Otherwise, extrapolate input samples, as necessary.
+    float youtr = 0.0f;
+    if (kyin>=0 && kyin<=_nxinm) {
+      for (int itab=0; itab<_ltab; ++itab,++kyin)
+        youtr += _yin[kyin]*stab[itab];
+    } else if (_extrap==Extrapolation.ZERO) {
+      for (int itab=0; itab<_ltab; ++itab,++kyin) {
+        if (0<=kyin && kyin<_nxin)
+          youtr += _yin[kyin]*stab[itab];
+      }
+    } else if (_extrap==Extrapolation.CONSTANT) {
+      for (int itab=0; itab<_ltab; ++itab,++kyin) {
+        int jyin = (kyin<0)?0:(_nxin<=kyin)?_nxin-1:kyin;
+        youtr += _yin[jyin]*stab[itab];
+      }
+    }
+    yout[iout] = youtr;
+  }
+
+  private void interpolateComplex(double xout, int iout, float[] yout) {
+
+    // Which input samples?
+    double xoutn = _xoutb+xout*_xouts;
+    int ixoutn = (int)xoutn;
+    int kyin = _ioutb+ixoutn;
+
+    // Which sinc approximation?
+    double frac = xoutn-ixoutn;
+    if (frac<0.0)
+      frac += 1.0;
+    int ktab = (int)(frac*_ntabm1+0.5);
+    float[] stab = _stab[ktab];
+
+    // If no extrapolation is necessary, use a fast loop.
+      // Otherwise, extrapolate input samples, as necessary.
+    float youtr = 0.0f;
+    float youti = 0.0f;
+    if (kyin>=0 && kyin<=_nxinm) {
+      for (int itab=0,jyin=2*kyin; itab<_ltab; ++itab,jyin+=2) {
+        float stabi = stab[itab];
+        youtr += _yin[jyin  ]*stabi;
+        youti += _yin[jyin+1]*stabi;
+      }
+    } else if (_extrap==Extrapolation.ZERO) {
+      for (int itab=0; itab<_ltab; ++itab,++kyin) {
+        if (0<=kyin && kyin<_nxin) {
+          int jyin = 2*kyin;
+          float stabi = stab[itab];
+          youtr += _yin[jyin  ]*stabi;
+          youti += _yin[jyin+1]*stabi;
+        }
+      }
+    } else if (_extrap==Extrapolation.CONSTANT) {
+      for (int itab=0; itab<_ltab; ++itab,++kyin) {
+        int jyin = (kyin<0)?0:(_nxin<=kyin)?2*_nxin-1:2*kyin;
+        float stabi = stab[itab];
+        youtr += _yin[jyin  ]*stabi;
+        youti += _yin[jyin+1]*stabi;
+      }
+    }
+    yout[iout  ] = youtr;
+    yout[iout+1] = youti;
   }
 }
