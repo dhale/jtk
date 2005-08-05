@@ -12,10 +12,10 @@ import static edu.mines.jtk.util.MathPlus.*;
 /**
  * A Kaiser window is often used in FIR filter design. It is easy to use 
  * and exhibits near-optimal properties for many filter design problems.
- * The Kaiser window may be defined by any two of three parameters: 
- * window length, transition width, and maximum absolute error. 
+ * The Kaiser window is defined by any two of three parameters: window 
+ * length, transition width, and maximum absolute error.
  * <p> 
- * For definiteness, we assume that the Kaiser window is a function w(x) 
+ * For definiteness, assume that the Kaiser window is a function w(x) 
  * of argument x. Then, the window length is that range of x, centered 
  * about x = 0, for which the Kaiser window is non-zero. In other words, 
  * w(x) = 0 for |x| &gt; length/2. When windowing functions of time, both 
@@ -24,65 +24,82 @@ import static edu.mines.jtk.util.MathPlus.*;
  * The transition width is the width of the central lobe in the Fourier 
  * transform of the window. For band-pass filters, this is the width of 
  * the transition between pass and stop bands. When windowing functions 
- * of time, the dimensions of transition width are 1/time (frequency). 
- * In any case, the product of window length and transition width is 
- * dimensionless.
+ * of time, the dimensions of transition width are cycles per unit time
+ * (frequency). In any case, the product of window length and transition 
+ * width is dimensionless.
  * <p>
- * The maximum absolute error corresponds to the magnitude of the ripples
- * adjacent to the central lobe in the Fourier transform of the window. If
- * we assume that an ideal band-pass filter has magnitude one in the pass
- * band, then the maximum (or minimum) amplitude in the passband of a 
- * windowed filter is one plus (or minus) the maximum amplitude error.
- * Likewise, the maximum amplitude in the stopband of such a windowed
- * filter equals the maximum amplitude error.
+ * The maximum absolute error corresponds to the magnitude of ripples in 
+ * the passbands and stopbands of windowed filters. For an ideal band-pass 
+ * filter that has magnitude one in the pass band, the maximum (or minimum) 
+ * amplitude in the passband of a windowed filter is one plus (or minus) 
+ * the maximum amplitude error. Likewise, the maximum amplitude in the 
+ * stopband of such a windowed filter equals the maximum amplitude error.
+ * <p>
+ * Kaiser windows are based on approximate relationships among the three
+ * design parameters. These approximations break down for passbands and
+ * stopbands that are narrow relative to the transition width. In such
+ * cases, the actual maximum error may exceed a specified maximum error 
+ * for which a Kaiser window is designed by up to a factor of two.
+ * <p>
+ * When constructing a Kaiser window for a specified window length and 
+ * transition width, the product of these two parameters cannot be less
+ * than one. When length*width is less than one, a useful upper bound for 
+ * the maximum absolute error cannot be obtained from the Kaiser window 
+ * design equations. However, in this case, the lower bound for maximum 
+ * absolute error is nearly 10%, which is too large for most applications,
+ * anyway. Therefore, in practice, this restriction seldom matters.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.03.17
+ * @version 2005.08.04
  */
 public class KaiserWindow {
 
   /**
-   * Returns a Kaiser window with specified length and transition width.
-   * @param length the (two-sided) window length.
-   * @param width the transition width.
-   * @return the Kaiser window.
-   */
-  public static KaiserWindow fromLengthAndWidth(double length, double width) {
-    Check.argument(length>0.0,"length > 0");
-    Check.argument(width>0.0,"width > 0");
-    double d = length*width;
-    double a = (d>=0.9222)?7.95+14.36*d:AMIN;
-    double error = pow(10.0,-a/20.0);
-    return new KaiserWindow(length,width,error);
-  }
-
-  /**
-   * Returns a Kaiser window with specified length and absolute error.
-   * @param length the (two-sided) window length.
+   * Returns a Kaiser window with specified error and transition width.
    * @param error the maximum absolute error.
-   * @return the Kaiser window.
-   */
-  public static KaiserWindow fromLengthAndError(double length, double error) {
-    Check.argument(length>0.0,"length > 0");
-    Check.argument(error<1.0,"error < 1");
-    double a = -20.0*log10(error);
-    double d = (a>AMIN)?(a-7.95)/14.36:0.9222;
-    double width = d/length;
-    return new KaiserWindow(length,width,error);
-  }
-
-  /**
-   * Returns a Kaiser window with specified transition width and absolute error.
    * @param width the transition width.
-   * @param error the maximum absolute error.
-   * @return the Kaiser window.
+   * @return the window.
    */
-  public static KaiserWindow fromWidthAndError(double width, double error) {
-    Check.argument(width>0.0,"width > 0");
-    Check.argument(error<1.0,"error < 1");
+  public static KaiserWindow fromErrorAndWidth(double error, double width) {
+    Check.argument(error>0.0,"error>0.0");
+    Check.argument(error<1.0,"error<1.0");
+    Check.argument(width>0.0,"width>0.0");
     double a = -20.0*log10(error);
-    double d = (a>AMIN)?(a-7.95)/14.36:0.9222;
+    double d = (a>21.0)?(a-7.95)/14.36:0.9222;
     double length = d/width;
-    return new KaiserWindow(length,width,error);
+    return new KaiserWindow(error,width,length);
+  }
+
+  /**
+   * Returns a Kaiser window with specified error and window length.
+   * @param error the maximum absolute error.
+   * @param length the two-sided window length.
+   * @return the window.
+   */
+  public static KaiserWindow fromErrorAndLength(double error, double length) {
+    Check.argument(error>0.0,"error>0.0");
+    Check.argument(error<1.0,"error<1.0");
+    Check.argument(length>0,"length>0");
+    double a = -20.0*log10(error);
+    double d = (a>21.0)?(a-7.95)/14.36:0.9222;
+    double width = d/length;
+    return new KaiserWindow(error,width,length);
+  }
+
+  /**
+   * Returns a Kaiser window with specified transition width and window length.
+   * The product width*length cannot be less than one.
+   * @param width the transition width
+   * @param length the two-sided window length.
+   * @return the window.
+   */
+  public static KaiserWindow fromWidthAndLength(double width, double length) {
+    Check.argument(width>0.0,"width>0.0");
+    Check.argument(length>0,"length>0");
+    Check.argument(width*length>=1.0,"width*length>=1.0");
+    double d = width*length;
+    double a = 14.36*d+7.95;
+    double error = pow(10.0,-a/20.0);
+    return new KaiserWindow(error,width,length);
   }
 
   /**
@@ -96,19 +113,19 @@ public class KaiserWindow {
   }
 
   /**
-   * Gets the (two-sided) window length.
-   * @return the window length.
-   */
-  public double getLength() {
-    return _length;
-  }
-
-  /**
    * Gets the maximum absolute error.
    * @return the maximum absolute error.
    */
   public double getError() {
     return _error;
+  }
+
+  /**
+   * Gets the two-sided window length.
+   * @return the window length.
+   */
+  public double getLength() {
+    return _length;
   }
 
   /**
@@ -119,26 +136,25 @@ public class KaiserWindow {
     return _width;
   }
 
-  private static final double AMIN = 20.96;
-  private double _length;
-  private double _width;
+  ///////////////////////////////////////////////////////////////////////////
+  // private
+
   private double _error;
+  private double _width;
+  private double _length;
   private double _alpha;
   private double _scale;
   private double _xxmax;
 
-  private KaiserWindow(double length, double width, double error) {
-    Check.argument(length>0.0,"length > 0");
-    Check.argument(width>0.0,"width > 0");
-    Check.argument(error<1.0,"error < 1");
-    _length = length;
-    _width = width;
+  private KaiserWindow(double error, double width, double length) {
     _error = error;
+    _width = width;
+    _length = length;
     double a = -20.0*log10(_error);
-    if (a<=AMIN) {
+    if (a<=21.0) {
       _alpha = 0.0;
     } else if (a<=50.0) {
-      _alpha = 0.5842*pow(a-AMIN,0.4)+0.07886*(a-AMIN);
+      _alpha = 0.5842*pow(a-21.0,0.4)+0.07886*(a-21.0);
     } else {
       _alpha = 0.1102*(a-8.7);
     }
