@@ -24,39 +24,40 @@ public class SincInterpolatorTest extends TestCase {
     junit.textui.TestRunner.run(suite);
   }
 
+  //private double[] _emaxs = {0.1,0.01,0.001,0.0001}; // takes too long
+  private double[] _emaxs = {0.1,0.01,0.001};
+  private double[] _fmaxs = {0.10,0.30,0.40,0.45};
+  private int[] _lmaxs = {8,10,12,14,16};
+
   public void testErrorAndFrequency() {
-    double[] emaxs = {0.1,0.01,0.001};
-    double[] fmaxs = {0.10,0.30,0.325,0.40,0.45};
-    for (int iemax=0; iemax<emaxs.length; ++iemax) {
-      double emax = emaxs[iemax];
-      for (int ifmax=0; ifmax<fmaxs.length; ++ifmax) {
-        double fmax = fmaxs[ifmax];
-        SincInterpolator si = SincInterpolator.fromErrorAndFrequency(emax,fmax);
+    for (int iemax=0; iemax<_emaxs.length; ++iemax) {
+      double emax = _emaxs[iemax];
+      for (int ifmax=0; ifmax<_fmaxs.length; ++ifmax) {
+        double fmax = _fmaxs[ifmax];
+        SincInterpolator si = 
+          SincInterpolator.fromErrorAndFrequency(emax,fmax);
         testInterpolator(si);
       }
     }
   }
 
   public void testErrorAndLength() {
-    double[] emaxs = {0.1,0.01,0.001};
-    int[] lmaxs = {2,4,6,8,10,12,14,16};
-    for (int iemax=0; iemax<emaxs.length; ++iemax) {
-      double emax = emaxs[iemax];
-      for (int ilmax=0; ilmax<lmaxs.length; ++ilmax) {
-        int lmax = lmaxs[ilmax];
-        SincInterpolator si = SincInterpolator.fromErrorAndLength(emax,lmax);
+    for (int iemax=0; iemax<_emaxs.length; ++iemax) {
+      double emax = _emaxs[iemax];
+      for (int ilmax=0; ilmax<_lmaxs.length; ++ilmax) {
+        int lmax = _lmaxs[ilmax];
+        SincInterpolator si = 
+          SincInterpolator.fromErrorAndLength(emax,lmax);
         testInterpolator(si);
       }
     }
   }
 
   public void testFrequencyAndLength() {
-    double[] fmaxs = {0.10,0.30,0.325,0.40,0.45};
-    int[] lmaxs = {2,4,6,8,10,12,14,16};
-    for (int ifmax=0; ifmax<fmaxs.length; ++ifmax) {
-      double fmax = fmaxs[ifmax];
-      for (int ilmax=0; ilmax<lmaxs.length; ++ilmax) {
-        int lmax = lmaxs[ilmax];
+    for (int ifmax=0; ifmax<_fmaxs.length; ++ifmax) {
+      double fmax = _fmaxs[ifmax];
+      for (int ilmax=0; ilmax<_lmaxs.length; ++ilmax) {
+        int lmax = _lmaxs[ilmax];
         if ((1.0-2.0*fmax)*lmax>1.0) {
           SincInterpolator si = 
             SincInterpolator.fromFrequencyAndLength(fmax,lmax);
@@ -67,12 +68,100 @@ public class SincInterpolatorTest extends TestCase {
   }
 
   private void testInterpolator(SincInterpolator si) {
+    testInterpolatorWithSweep(si);
+  }
+
+  private void testInterpolatorWithSweep(SincInterpolator si) {
+    double emax = si.getMaximumError();
+    double fmax = si.getMaximumFrequency();
+    int lmax = si.getMaximumLength();
+    
+    // Input signal is an up-down sweep. (See below.)
+    int nmax = (int)(1000*fmax);
+    double xmax = PI*nmax/fmax;
+    double dxin = 1.0;
+    double fxin = 0.0;
+    int nxin = 1+(int)((xmax-fxin)/dxin);
+    dxin = (xmax-fxin)/(nxin-1);
+    float[] yin = new float[nxin];
+    for (int ixin=0; ixin<nxin; ++ixin) {
+      double x = fxin+ixin*dxin;
+      yin[ixin] = (float)sweep(fmax,nmax,x);
+    }
+    si.setInput(nxin,dxin,fxin,yin);
+    si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
+    //System.out.println("xmax="+xmax+" nmax="+nmax+" nxin="+nxin);
+
+    // Interpolate.
+    double dxout = 0.01*dxin;
+    double fxout = 0.0;
+    int nxout = 1+(int)((xmax-fxout)/dxout);
+    dxout = (xmax-fxout)/(nxout-1);
+    float[] yout = new float[nxout];
+    si.interpolate(nxout,dxout,fxout,yout);
+
+    // Compute the maximum error and compare with emax.
+    double error = 0.0;
+    for (int ixout=0; ixout<nxout; ++ixout) {
+      double x = fxout+ixout*dxout;
+      double yi = yout[ixout];
+      double ys = sweep(fmax,nmax,x);
+      double ei = abs(yi-ys);
+      if (ei>emax)
+        System.out.println("    x="+x+" ys="+ys+" yi="+yi);
+      error = max(error,ei);
+      assertEquals(ys,yi,emax);
+    }
+    /*
+    System.out.println(
+      "lmax="+lmax+" fmax="+fmax+" emax="+emax+" error="+error);
+    System.out.println("  nbytes="+si.getTableBytes());
+    if (error>emax)
+      System.out.println("  WARNING: error = "+error+" > emax = "+emax);
+    */
+
+    /*
+    double shift = 0.5*dxin;
+    nxout = nxin;
+    dxout = dxin;
+    fxout = fxin+shift;
+    si.interpolate(nxout,dxout,fxout,yout);
+    error = 0.0;
+    for (int ixout=0; ixout<nxout; ++ixout) {
+      double x = fxout+ixout*dxout;
+      double yi = yout[ixout];
+      double ys = sweep(fmax,nmax,x+shift);
+      double ei = abs(yi-ys);
+      if (ei>emax)
+        System.out.println("    x="+x+" ys="+ys+" yi="+yi);
+      error = max(error,ei);
+      assertEquals(ys,yi,emax);
+    }
+    System.out.println(
+      "lmax="+lmax+" fmax="+fmax+" emax="+emax+" error="+error);
+    */
+  }
+
+  // An up-down sweep signal that begins with zero frequency, increases to
+  // frequency fmax (in cycles/sample) at x = xmax/2, then decreases to zero 
+  // frequency again at x = xmax, where xmax = PI*nmax/fmax. The frequency
+  // changes continuously and changes most slowly near x = xmax/2, where 
+  // frequencies are highest, and where interpolation errors may be largest.
+  private double sweep(double fmax, int nmax, double x) {
+    return cos(2.0*PI*nmax*cos(x*fmax/nmax));
+  }
+
+
+  ///////////////////////////////////////////////////////////////////////////
+  // more test code that was useful in debugging, and might be again
+
+  private void testInterpolatorWithSine(SincInterpolator si) {
 
     // Interpolator design parameters.
     int lmax = si.getMaximumLength();
     double fmax = si.getMaximumFrequency();
     double emax = si.getMaximumError();
-    //System.out.println("lmax="+lmax+" fmax="+fmax+" emax="+emax);
+    System.out.println("lmax="+lmax+" fmax="+fmax+" emax="+emax);
     if (fmax==0.0)
       return;
 
@@ -95,101 +184,40 @@ public class SincInterpolatorTest extends TestCase {
 
     // Loop over frequencies near maximum frequency.
     int nk = 51;
-    double fk = 0.8*fmax;
-    double dk = 2.0*PI*(fmax-fk)/((nk-1)*dxin);
+    double dk = 2.0*PI*fmax/((nk-1)*dxin);
+    double fk = 0.0;
     for (int ik=0; ik<nk; ++ik) {
       double k = fk+ik*dk;
 
-      // Input signal.
+      // Input sine wave.
       for (int ixin=0; ixin<nxin; ++ixin) {
         double x = fxin+ixin*dxin;
-        yin[ixin] = signal(k*x);
+        yin[ixin] = sine(k*x);
       }
-
-      // Interpolated signal, one output sample at a time.
       si.setInput(nxin,dxin,fxin,yin);
-      for (int ixout=0; ixout<nxout; ++ixout) {
-        double x = fxout+ixout*dxout;
-        float yi = si.interpolate(x);
-        float ye = signal(k*x);
-        assertEquals(ye,yi,2.0*emax);
-      }
 
-      // Interpolated signal, all output samples at once.
-      si.interpolate(nxout,xout,yout);
+      // Interpolated sine wave.
+      si.interpolate(nxout,dxout,fxout,yout);
       for (int ixout=0; ixout<nxout; ++ixout) {
         double x = fxout+ixout*dxout;
         float yi = yout[ixout];
-        float ye = signal(k*x);
-        assertEquals(ye,yi,2.0*emax);
+        float ye = sine(k*x);
+        if (abs(ye-yi)>emax)
+          System.out.println("k="+k+" x="+x+" ye="+ye+" yi="+yi);
+        //assertEquals(ye,yi,emax);
       }
     }
   }
 
-  private static float signal(double x) {
-    return (float)sin(0.25*PI+x);
+  // A simple sine wave, with an arbitrary but hardwired shift.
+  private static float sine(double x) {
+    return (float)sin(1+x);
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  // more test functions; may be useful for debugging
-
-  private static void testInterpolator2(SincInterpolator si) {
-    int lmax = si.getMaximumLength();
-    double fmax = si.getMaximumFrequency();
-    double emax = si.getMaximumError();
-    System.out.println("lmax="+lmax+" fmax="+fmax+" emax="+emax);
-    if (fmax==0.0)
-      return;
-    if (lmax<6)
-      return;
-
-    int nxin = 1;
-    double dxin = 1.0;
-    double fxin = 0.0;
-    float[] yin = new float[nxin];
-    yin[0] = 1.0f;
-    si.setInput(nxin,dxin,fxin,yin);
-
-    int nxout = lmax;
-    double dxout = 1.0;
-    float[] yout =  new float[nxout];
-
-    int nxfft = FftReal.nfftFast(100*nxout);
-    FftReal fft = new FftReal(nxfft);
-    int nk = nxfft/2+1;
-    double dk = 2.0*PI/nxfft;
-    double fk = 0.0;
-    double ikmax = (int)(2.0*PI*fmax/dk);
-    float[] yk = new float[2*nk];
-
-    int ntest = 11;
-    double dtest = 1.0/max(1,(ntest-1));
-    double ftest = 0.0;
-    for (int itest=0; itest<ntest; ++itest) {
-      double fxout = -lmax/2.0+itest*dtest;
-      for (int ixout=0; ixout<nxout; ++ixout)
-        yout[ixout] = si.interpolate(fxout+ixout*dxout);
-      zero(yk);
-      copy(nxout,yout,yk);
-      fft.realToComplex(1,yk,yk);
-      float[] ak = cabs(yk);
-      for (int ik=0; ik<=ikmax; ++ik) {
-        double k = fk+ik*dk;
-        if (abs(1.0-ak[ik])>emax) {
-          double f = k*0.5/PI;
-          double x = fxout+lmax/2;
-          double a = ak[ik];
-          System.out.println("f="+f+" x="+x+" a="+a);
-          for (int ixout=0; ixout<nxout; ++ixout)
-            System.out.println("yout["+ixout+"]="+yout[ixout]);
-          break;
-        }
-        //assertEquals(1.0,ak[ik],emax);
-      }
-    }
-  }
-
-  public void xtestDesign() {
+  // Used to test design via Kaiser windows. Shows the effect of summing 
+  // multiple aliases of Kaiser window spectra into the passband of an 
+  // interpolator.
+  private void xtestDesign() {
     int m = 100;
     int lsinc = 8;
     double xmax = lsinc/2;
@@ -214,7 +242,7 @@ public class SincInterpolatorTest extends TestCase {
     sx[0] = 1.0f;
     for (int ix=1,jx=nxfft-1; ix<nx/2; ++ix,--jx) {
       double x = fx+ix*dx;
-      sx[ix] = (float)(x<=xmax?sinc(x)*kwin.evaluate(x):0.0);
+      sx[ix] = (float)(x<=xmax?sinc(PI*x)*kwin.evaluate(x):0.0);
       sx[jx] = sx[ix];
       //System.out.println("s("+x+") = "+sx[ix]);
     }
@@ -248,6 +276,6 @@ public class SincInterpolatorTest extends TestCase {
   }
 
   private double sinc(double x) {
-    return (x==0.0)?1.0:sin(PI*x)/(PI*x);
+    return (x==0.0)?1.0:sin(x)/x;
   }
 }

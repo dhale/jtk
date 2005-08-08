@@ -13,12 +13,12 @@ import static java.lang.Math.*;
  * A sinc interpolator for bandlimited uniformly-sampled functions y(x). 
  * Interpolators can be designed for any two of three parameters: maximum 
  * error (emax), maximum frequency (fmax) and maximum length (lmax). The 
- * one parameter not specified is computed when an interpolator is designed.
+ * parameter not specified is computed when an interpolator is designed.
  * <p>
  * Below the specified (or computed) maximum frequency fmax, the maximum 
- * interpolation error approximately equals the specified (or computed) 
- * maximum error (emax). For frequencies above fmax, interpolation error 
- * may increase rapidly. Therefore, sequences to be interpolated should 
+ * interpolation error should be less than the specified (or computed) 
+ * maximum error emax. For frequencies above fmax, interpolation error 
+ * may be much greater. Therefore, sequences to be interpolated should 
  * be bandlimited to frequencies less than fmax.
  * <p>
  * The maximum length lmax of an interpolator is an even positive integer. 
@@ -43,16 +43,8 @@ import static java.lang.Math.*;
  * spikes, which affect only nearby samples.
  * <p>
  * Finite-length interpolators present a tradeoff between cost and accuracy.
- * Interpolators with small lmax are most efficient, and those with high 
- * fmax and small emax are most accurate.
- * <p>
- * The relationship between the three parameters maximum error (emax), 
- * maximum frequency (fmax), and maximum length (lmax) is approximately
- * -20.0*log10(emax) = 7.95+14.36*(1-2*fmax)*lmax. Note that the left-hand
- * side of this equation is simply the interpolation error in dB. This 
- * equation is approximate. The actual interpolation errors may exceed the 
- * specified or computed emax, (by only a small amount) for frequencies 
- * less than fmax.
+ * Interpolators with small maximum lengths are most efficient, and those 
+ * with high maximum frequencies and small maximum errors are most accurate.
  * <p>
  * When interpolating multiple uniformly sampled functions y(x) that share 
  * a common sampling of x, some redundant computations can be eliminated by 
@@ -60,6 +52,12 @@ import static java.lang.Math.*;
  * The resulting performance increase may be especially significant when 
  * only a few (perhaps only one) output samples are interpolated for each 
  * sequence of input samples.
+ * <p>
+ * For efficiency, interpolation coefficients (sinc approximations) are 
+ * tabulated when an interpolator is constructed. The cost of building 
+ * the table can easily exceed that of interpolating one input sequence 
+ * of samples, depending on the number of input samples. Therefore, one 
+ * typically constructs and reuses a single interpolator more than once.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.08.07
  */
@@ -79,10 +77,13 @@ public class SincInterpolator {
 
   /**
    * Returns a sinc interpolator with specified maximum error and length.
+   * Computes the maximum frequency fmax. Note that for some parameters
+   * emax and lmax, the maximum freuency fmax may be zero. In this case,
+   * the returned interpolator is useless.
    * @param emax the maximum error for frequencies less than fmax; e.g., 
-   *  0.01 for 1% percent error. Must be greater than 0.0 and less than 1.0.
-   * @param lmax the maximum interpolator length, in samples. Must be even
-   *  and greater than zero.
+   *  0.01 for 1% percent error. 0.0 &lt; emax &lt;= 0.1 is required.
+   * @param lmax the maximum interpolator length, in samples. 
+   *  Must be an even integer not less than 8.
    * @return the sinc interpolator.
    */
   public static SincInterpolator fromErrorAndLength(
@@ -93,6 +94,7 @@ public class SincInterpolator {
 
   /**
    * Returns a sinc interpolator with specified maximum error and frequency.
+   * Computes the maximum length lmax.
    * @param emax the maximum error for frequencies less than fmax; e.g., 
    *  0.01 for 1% percent error. Must be greater than 0.0 and less than 1.0.
    * @param fmax the maximum frequency, in cycles per sample. 
@@ -107,30 +109,32 @@ public class SincInterpolator {
 
   /**
    * Returns a sinc interpolator with specified maximum frequency and length.
-   * The product (1-2*fmax)*lmax must be greater than one. When this product 
-   * is less than one, a useful upper bound on interpolation error cannot be 
-   * computed.
+   * Computes the maximum error emax.
+   * <p>
+   * The product (1-2*fmax)*lmax must be greater than one. For when this 
+   * product is less than one, a useful upper bound on interpolation error 
+   * cannot be computed.
    * @param fmax the maximum frequency, in cycles per sample. 
    *  Must be greater than 0.0 and less than 0.5*(1.0-1.0/lmax).
    * @param lmax the maximum interpolator length, in samples. 
-   *  Must be an even integer greater than 1.0/(1.0-2.0*fmax).
+   *  Must be an even integer not less than 8 and greater than 
+   *  1.0/(1.0-2.0*fmax).
    * @return the sinc interpolator.
    */
   public static SincInterpolator fromFrequencyAndLength(
     double fmax, int lmax)
   {
-    Check.argument((1.0-2.0*fmax)*lmax>1.0,"(1.0-2.0*fmax)*lmax>1.0");
     return new SincInterpolator(0.0,fmax,lmax);
   }
 
   /**
-   * Constructs a default sinc interpolator. 
-   * The default design parameters are emax = 0.01 (1%) and lmax = 8 samples, 
-   * which yields a maximum frequency fmax greater than 0.325 cycles/sample 
-   * (65% of Nyquist).
+   * Constructs a default sinc interpolator. The default design parameters 
+   * are fmax = 0.3 cycles/sample (60% of Nyquist) and lmax = 8 samples.
+   * For these parameters, the computed maximum error is less than 0.007
+   * (0.7%). In testing, observed maximum error is less than 0.005 (0.5%).
    */
   public SincInterpolator() {
-    this(0.01,0.0,8);
+    this(0.0,0.3,8);
   }
 
   /**
@@ -155,6 +159,21 @@ public class SincInterpolator {
    */
   public int getMaximumLength() {
     return _lmax;
+  }
+
+  /**
+   * Gets the number of bytes consumed by the table of interpolators.
+   * The use of interpolators with small emax and large lmax may require 
+   * the computation of large tables. This method can be used to determine 
+   * how much memory is consumed by the table of an interpolator, before 
+   * that is computed (when the interpolator is used for the first time).
+   * @return the number of bytes.
+   */
+  public long getTableBytes() {
+    long nbytes = 4L;
+    nbytes *= _lsinc;
+    nbytes *= _nsinc;
+    return nbytes;
   }
 
   /**
@@ -199,7 +218,10 @@ public class SincInterpolator {
    * Sets the current input samples for a uniformly-sampled function y(x).
    * If input sample values are complex numbers, real and imaginary parts 
    * are packed in the array as real, imaginary, real, imaginary, and so on.
-   * @param yin array of input samples of y(x).
+   * <p>
+   * Input samples are passed by reference, not by copy. Changes to sample
+   * values in the specified array will yield changes in interpolated values.
+   * @param yin array of input samples of y(x); by reference, not by copy.
    */
   public void setInputSamples(float[] yin) {
     _yin = yin;
@@ -214,7 +236,7 @@ public class SincInterpolator {
    * @param nxin the number of input samples.
    * @param dxin the input sampling interval.
    * @param fxin the value x for the first input sample yin[0].
-   * @param yin array of input samples of y(x).
+   * @param yin array of input samples of y(x); by reference, not by copy.
    */
   public void setInput(int nxin, double dxin, double fxin, float[] yin) {
     setInputSampling(nxin,dxin,fxin);
@@ -400,12 +422,15 @@ public class SincInterpolator {
                    "exactly one of emax, fmax, and lmax is zero");
     if (emax==0.0) {
       Check.argument(fmax<0.5,"fmax<0.5");
+      Check.argument(lmax>=8,"lmax>=8");
       Check.argument(lmax%2==0,"lmax is even");
+      Check.argument((1.0-2.0*fmax)*lmax>1.0,"(1.0-2.0*fmax)*lmax>1.0");
     } else if (fmax==0.0) {
-      Check.argument(emax<1.0,"emax<1.0");
+      Check.argument(emax<=0.1,"emax<=0.1");
+      Check.argument(lmax>=8,"lmax>=8");
       Check.argument(lmax%2==0,"lmax is even");
     } else if (lmax==0) {
-      Check.argument(emax<1.0,"emax<1.0");
+      Check.argument(emax<=0.1,"emax<=0.1");
       Check.argument(fmax<0.5,"fmax<0.5");
     }
 
@@ -419,13 +444,17 @@ public class SincInterpolator {
     KaiserWindow kwin = null;
 
     // If maximum frequency and length are specified, compute the error
-    // due to windowing. That windowing error is twice the error reported 
-    // by the Kaiser window, because the stopband error is aliased with the
-    // passpand error. Also, apply a lower bound to the error, so that the
-    // table of sinc approximations does not become too large.
+    // due to windowing. That windowing error is three times the error 
+    // reported by the Kaiser window, because the conventional Kaiser
+    // window stopband error is aliased multiple times with the passband
+    // error. (A factor of at least two is necessary to handle the first 
+    // aliasing, but experiments showed this factor to be inadequate. The 
+    // factor three was found in testing to be sufficient for a wide range 
+    // of design parameters.) Also, apply a lower bound to the error, so 
+    // that the table of sinc approximations does not become too large.
     if (emax==0.0) {
       kwin = KaiserWindow.fromWidthAndLength(wwin,lmax);
-      ewin = 2.0*kwin.getError();
+      ewin = 3.0*kwin.getError();
       emax = ewin/EWIN_FRAC;
       double etabMin = 1.1*PI*fmax/(NTAB_MAX-1);
       double emaxMin = etabMin/(1.0-EWIN_FRAC);
@@ -443,31 +472,23 @@ public class SincInterpolator {
     // maximum error and/or length are too small for a practical
     // interpolator.
     else if (fmax==0.0) {
-      kwin = KaiserWindow.fromErrorAndLength(0.5*ewin,lmax);
+      kwin = KaiserWindow.fromErrorAndLength(ewin/3.0,lmax);
       fmax = max(0.0,0.5-0.5*kwin.getWidth());
     }
     
     // Else if maximum error and width are specified, first compute a
     // lower bound on the maximum length, and then round that up to the
-    // nearest even integer. Finally, reconstruct a Kaiser window with
-    // that maximum length, ignoring the maximum frequency, which may
-    // be exceeded.
+    // nearest even integer not less than 8. Finally, reconstruct a Kaiser 
+    // window with that maximum length, ignoring the maximum frequency, 
+    // which may be exceeded.
     else {
-      kwin = KaiserWindow.fromErrorAndWidth(0.5*ewin,wwin);
+      kwin = KaiserWindow.fromErrorAndWidth(ewin/3.0,wwin);
       double lwin = kwin.getLength();
       lmax = (int)(lwin); 
-      if (lmax<lwin)
+      while (lmax<lwin || lmax<8 || lmax%2==1)
         ++lmax;
-      if (lmax%2==1)
-        ++lmax;
-      kwin = KaiserWindow.fromErrorAndLength(0.5*ewin,lmax);
+      kwin = KaiserWindow.fromErrorAndLength(ewin/3.0,lmax);
     }
-
-    // Save design parameters and Kaiser window.
-    _emax = emax;
-    _fmax = fmax;
-    _lmax = lmax;
-    _kwin = kwin;
 
     // The number of interpolators in the table depends on the error
     // in table lookup - more interpolators corresponds to less error.
@@ -487,6 +508,12 @@ public class SincInterpolator {
 
     // System.out.println(
     //   "emax="+_emax+" fmax="+_fmax+" lmax="+_lmax+" nsinc="+_nsinc);
+
+    // Save design parameters and Kaiser window, so we can build the table.
+    _emax = emax;
+    _fmax = fmax;
+    _lmax = lmax;
+    _kwin = kwin;
   }
 
   /**
@@ -531,8 +558,8 @@ public class SincInterpolator {
 
     // Which output samples are near beginning and end of input sequence?
     double dxout = dxin;
-    double xout1 = fxin+_lsinc/2;
-    double xout2 = lxin-_lsinc/2;
+    double xout1 = fxin+dxin*_lsinc/2;
+    double xout2 = lxin-dxin*_lsinc/2;
     double xout1n = (xout1-fxout)/dxout;
     double xout2n = (xout2-fxout)/dxout;
     int ixout1 = max(0,min(nxout,(int)xout1n)+1);
@@ -553,7 +580,7 @@ public class SincInterpolator {
     // Now we ignore the ends, and use a single sinc approximation.
 
     // Which input samples?
-    double xoutn = _xoutb+xout1*_xouts;
+    double xoutn = _xoutb+(fxout+ixout1*dxout)*_xouts;
     int ixoutn = (int)xoutn;
     int kyin = _ioutb+ixoutn;
 
