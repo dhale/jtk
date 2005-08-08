@@ -10,18 +10,23 @@ import edu.mines.jtk.util.Check;
 import static java.lang.Math.*;
 
 /**
- * A sinc interpolator for uniformly-sampled functions y(x). Interpolators
- * can be designed for two parameters: (1) a maximum error and (2) either 
- * a maximum frequency or a maximum length. The maximum frequency is that
- * frequency below which errors are guaranteed to be less than a specified
- * maximum error. The parameter not specified, either maximum frequency or
- * maximum length, is computed when an interpolator is designed.
+ * A sinc interpolator for bandlimited uniformly-sampled functions y(x). 
+ * Interpolators can be designed for any two of three parameters: maximum 
+ * error (emax), maximum frequency (fmax) and maximum length (lmax). The 
+ * one parameter not specified is computed when an interpolator is designed.
  * <p>
- * The length of an interpolator is the number of input samples required to
- * interpolate a single output sample. Ideally, the weights applied to each 
- * input sample are values of a sinc function. Although the ideal sinc 
- * function yields zero interpolation error for all frequencies up to the 
- * Nyquist frequency (0.5 cycles/sample), it has infinite length.
+ * Below the specified (or computed) maximum frequency fmax, the maximum 
+ * interpolation error approximately equals the specified (or computed) 
+ * maximum error (emax). For frequencies above fmax, interpolation error 
+ * may increase rapidly. Therefore, sequences to be interpolated should 
+ * be bandlimited to frequencies less than fmax.
+ * <p>
+ * The maximum length lmax of an interpolator is an even positive integer. 
+ * It is the number of input samples required to interpolate a single 
+ * output sample. Ideally, the weights applied to each input sample are 
+ * values of a sinc function. Although the ideal sinc function yields zero 
+ * interpolation error for all frequencies up to the Nyquist frequency 
+ * (0.5 cycles/sample), it has infinite length.
  * <p>
  * With recursive filtering, infinite-length approximations to the sinc
  * function are feasible and, in some applications, most efficient. When
@@ -38,12 +43,16 @@ import static java.lang.Math.*;
  * spikes, which affect only nearby samples.
  * <p>
  * Finite-length interpolators present a tradeoff between cost and accuracy.
- * Interpolators with small lengths are most efficient, and those with high 
- * maximum frequencies and small maximum errors are most accurate.
+ * Interpolators with small lmax are most efficient, and those with high 
+ * fmax and small emax are most accurate.
  * <p>
- * The default parameters are maximum error = 0.01 (1%) and maximum length
- * = 8 samples, which yields a maximum frequency greater than 0.325 
- * cycles/sample (65% of Nyquist).
+ * The relationship between the three parameters maximum error (emax), 
+ * maximum frequency (fmax), and maximum length (lmax) is approximately
+ * -20.0*log10(emax) = 7.95+14.36*(1-2*fmax)*lmax. Note that the left-hand
+ * side of this equation is simply the interpolation error in dB. This 
+ * equation is approximate. The actual interpolation errors may exceed the 
+ * specified or computed emax, (by only a small amount) for frequencies 
+ * less than fmax.
  * <p>
  * When interpolating multiple uniformly sampled functions y(x) that share 
  * a common sampling of x, some redundant computations can be eliminated by 
@@ -51,9 +60,8 @@ import static java.lang.Math.*;
  * The resulting performance increase may be especially significant when 
  * only a few (perhaps only one) output samples are interpolated for each 
  * sequence of input samples.
- *
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.08.01
+ * @version 2005.08.07
  */
 public class SincInterpolator {
 
@@ -116,6 +124,16 @@ public class SincInterpolator {
   }
 
   /**
+   * Constructs a default sinc interpolator. 
+   * The default design parameters are emax = 0.01 (1%) and lmax = 8 samples, 
+   * which yields a maximum frequency fmax greater than 0.325 cycles/sample 
+   * (65% of Nyquist).
+   */
+  public SincInterpolator() {
+    this(0.01,0.0,8);
+  }
+
+  /**
    * Gets the maximum error for this interpolator.
    * @return the maximum error.
    */
@@ -161,20 +179,20 @@ public class SincInterpolator {
    * In some applications, this sampling never changes, and this method 
    * may be called only once for this interpolator.
    * @param nxin the number of input samples.
-   * @param dxin the interval at which the input y(x) is sampled.
-   * @param fxin the first x at which the input y(x) is sampled.
+   * @param dxin the input sampling interval.
+   * @param fxin the value x for the first input sample yin[0].
    */
   public void setInputSampling(int nxin, double dxin, double fxin) {
-    if (_stab==null)
+    if (_asinc==null)
       makeTable();
     _nxin = nxin;
     _dxin = dxin;
     _fxin = fxin;
-    _ioutb = -_ltab-_ltab/2+1;
+    _ioutb = -_lsinc-_lsinc/2+1;
     _xoutf = fxin;
     _xouts = 1.0/dxin;
-    _xoutb = _ltab-_xoutf*_xouts;
-    _nxinm = nxin-_ltab;
+    _xoutb = _lsinc-_xoutf*_xouts;
+    _nxinm = nxin-_lsinc;
   }
 
   /**
@@ -194,8 +212,8 @@ public class SincInterpolator {
    * {@link #setInputSamples(float[])} 
    * with the specified parameters.
    * @param nxin the number of input samples.
-   * @param dxin the sampling interval for input y(x).
-   * @param fxin the first x value at which the input y(x) is sampled.
+   * @param dxin the input sampling interval.
+   * @param fxin the value x for the first input sample yin[0].
    * @param yin array of input samples of y(x).
    */
   public void setInput(int nxin, double dxin, double fxin, float[] yin) {
@@ -219,24 +237,24 @@ public class SincInterpolator {
     double frac = xoutn-ixoutn;
     if (frac<0.0)
       frac += 1.0;
-    int ktab = (int)(frac*_ntabm1+0.5);
-    float[] stab = _stab[ktab];
+    int ksinc = (int)(frac*_nsincm1+0.5);
+    float[] asinc = _asinc[ksinc];
 
     // If no extrapolation is necessary, use a fast loop.
       // Otherwise, extrapolate input samples, as necessary.
     float youtr = 0.0f;
     if (kyin>=0 && kyin<=_nxinm) {
-      for (int itab=0; itab<_ltab; ++itab,++kyin)
-        youtr += _yin[kyin]*stab[itab];
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyin)
+        youtr += _yin[kyin]*asinc[isinc];
     } else if (_extrap==Extrapolation.ZERO) {
-      for (int itab=0; itab<_ltab; ++itab,++kyin) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyin) {
         if (0<=kyin && kyin<_nxin)
-          youtr += _yin[kyin]*stab[itab];
+          youtr += _yin[kyin]*asinc[isinc];
       }
     } else if (_extrap==Extrapolation.CONSTANT) {
-      for (int itab=0; itab<_ltab; ++itab,++kyin) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyin) {
         int jyin = (kyin<0)?0:(_nxin<=kyin)?_nxin-1:kyin;
-        youtr += _yin[jyin]*stab[itab];
+        youtr += _yin[jyin]*asinc[isinc];
       }
     }
     return youtr;
@@ -244,53 +262,40 @@ public class SincInterpolator {
 
   /**
    * Interpolates the current input samples as real numbers.
-   * @param nxout the number of output samples to interpolate.
+   * @param nxout the number of output samples.
    * @param xout array of values x at which to interpolate output y(x).
    * @param yout array of interpolated output y(x).
    */
   public void interpolate(int nxout, float[] xout, float[] yout) {
+    for (int ixout=0;  ixout<nxout; ++ixout)
+      yout[ixout] = interpolate(xout[ixout]);
+  }
 
-    // Loop over all output samples.
-    for (int ixout=0;  ixout<nxout; ++ixout) {
-
-      // Which input samples?
-      double xoutn = _xoutb+xout[ixout]*_xouts;
-      int ixoutn = (int)xoutn;
-      int kyin = _ioutb+ixoutn;
-
-      // Which sinc approximation?
-      double frac = xoutn-ixoutn;
-      if (frac<0.0)
-        frac += 1.0;
-      int ktab = (int)(frac*_ntabm1+0.5);
-      float[] stab = _stab[ktab];
-
-      // If no extrapolation is necessary, use a fast loop.
-        // Otherwise, extrapolate input samples, as necessary.
-      float youtr = 0.0f;
-      if (kyin>=0 && kyin<=_nxinm) {
-        for (int itab=0; itab<_ltab; ++itab,++kyin)
-          youtr += _yin[kyin]*stab[itab];
-      } else if (_extrap==Extrapolation.ZERO) {
-        for (int itab=0; itab<_ltab; ++itab,++kyin) {
-          if (0<=kyin && kyin<_nxin)
-            youtr += _yin[kyin]*stab[itab];
-        }
-      } else if (_extrap==Extrapolation.CONSTANT) {
-        for (int itab=0; itab<_ltab; ++itab,++kyin) {
-          int jyin = (kyin<0)?0:(_nxin<=kyin)?_nxin-1:kyin;
-          youtr += _yin[jyin]*stab[itab];
-        }
-      }
-      yout[ixout] = youtr;
+  /**
+   * Interpolates the current input samples as real numbers. 
+   * <p>
+   * This method does not perform any anti-alias filtering, which may or 
+   * may not be necessary to avoid aliasing when the specified output
+   * sampling interval exceeds the input sampling interval.
+   * @param nxout the number of output samples.
+   * @param dxout the output sampling interval.
+   * @param fxout the value x for the first output sample yout[0].
+   * @param yout array of interpolated output y(x).
+   */
+  public void interpolate(int nxout, double dxout, double fxout, float[] yout) {
+    if (dxout==_dxin) {
+      shift(nxout,fxout,yout);
+    } else {
+      for (int ixout=0; ixout<nxout; ++ixout)
+        yout[ixout] = interpolate(fxout+ixout*dxout);
     }
   }
 
   /**
-   * Interpolates the current input samples as complex numbers. Complex 
-   * output samples are packed in the specified output array as real, 
-   * imaginary, real, imaginary, and so on.
-   * @param nxout the number of output samples to interpolate.
+   * Interpolates the current input samples as complex numbers. 
+   * Complex output samples are packed in the specified output array as 
+   * real, imaginary, real, imaginary, and so on.
+   * @param nxout the number of output samples.
    * @param xout array of values x at which to interpolate output y(x).
    * @param yout array of interpolated output y(x).
    */
@@ -308,34 +313,34 @@ public class SincInterpolator {
       double frac = xoutn-ixoutn;
       if (frac<0.0)
         frac += 1.0;
-      int ktab = (int)(frac*_ntabm1+0.5);
-      float[] stab = _stab[ktab];
+      int ksinc = (int)(frac*_nsincm1+0.5);
+      float[] asinc = _asinc[ksinc];
 
       // If no extrapolation is necessary, use a fast loop.
         // Otherwise, extrapolate input samples, as necessary.
       float youtr = 0.0f;
       float youti = 0.0f;
       if (kyin>=0 && kyin<=_nxinm) {
-        for (int itab=0,jyin=2*kyin; itab<_ltab; ++itab,jyin+=2) {
-          float stabi = stab[itab];
-          youtr += _yin[jyin  ]*stabi;
-          youti += _yin[jyin+1]*stabi;
+        for (int isinc=0,jyin=2*kyin; isinc<_lsinc; ++isinc,jyin+=2) {
+          float asinci = asinc[isinc];
+          youtr += _yin[jyin  ]*asinci;
+          youti += _yin[jyin+1]*asinci;
         }
       } else if (_extrap==Extrapolation.ZERO) {
-        for (int itab=0; itab<_ltab; ++itab,++kyin) {
+        for (int isinc=0; isinc<_lsinc; ++isinc,++kyin) {
           if (0<=kyin && kyin<_nxin) {
             int jyin = 2*kyin;
-            float stabi = stab[itab];
-            youtr += _yin[jyin  ]*stabi;
-            youti += _yin[jyin+1]*stabi;
+            float asinci = asinc[isinc];
+            youtr += _yin[jyin  ]*asinci;
+            youti += _yin[jyin+1]*asinci;
           }
         }
       } else if (_extrap==Extrapolation.CONSTANT) {
-        for (int itab=0; itab<_ltab; ++itab,++kyin) {
+        for (int isinc=0; isinc<_lsinc; ++isinc,++kyin) {
           int jyin = (kyin<0)?0:(_nxin<=kyin)?2*_nxin-2:2*kyin;
-          float stabi = stab[itab];
-          youtr += _yin[jyin  ]*stabi;
-          youti += _yin[jyin+1]*stabi;
+          float asinci = asinc[isinc];
+          youtr += _yin[jyin  ]*asinci;
+          youti += _yin[jyin+1]*asinci;
         }
       }
       int jxout = 2*ixout;
@@ -372,21 +377,17 @@ public class SincInterpolator {
   private double _xoutf;
   private double _xouts;
   private double _xoutb;
-  private double _ntabm1;
+  private double _nsincm1;
   private int _nxinm;
 
   // Current input samples.
   private float[] _yin; // real or complex samples
 
-  // Table of interpolation coefficients.
-  private int _ltab; // length of interpolators in table
-  private int _ntab; // number of interpolators in table
-  private double _dtab; // sampling interval in table
-  private float[][] _stab; // array[ntab][ltab] of sinc(x)
-
-  private SincInterpolator() {
-    this(0.01,0.0,8);
-  }
+  // Table of sinc interpolation coefficients.
+  private int _lsinc; // length of sinc approximations
+  private int _nsinc; // number of sinc approximations
+  private double _dsinc; // sampling interval in table
+  private float[][] _asinc; // array[nsinc][lsinc] of sinc approximations
 
   /**
    * Constructs a sinc interpolator with specified parameters.
@@ -475,17 +476,17 @@ public class SincInterpolator {
     // The number of interpolators is a power of two plus 1, so that table 
     // lookup error is zero when interpolating halfway between samples.
     double etab = emax-ewin;
-    _dtab = (fmax>0.0)?etab/(PI*fmax):1.0;
-    int ntabMin = 1+(int)ceil(1.0/_dtab);
-    _ntab = 2;
-    while (_ntab<ntabMin)
-      _ntab *= 2;
-    ++_ntab;
-    _dtab = 1.0/(_ntab-1);
-    _ltab = lmax;
+    _dsinc = (fmax>0.0)?etab/(PI*fmax):1.0;
+    int nsincMin = 1+(int)ceil(1.0/_dsinc);
+    _nsinc = 2;
+    while (_nsinc<nsincMin)
+      _nsinc *= 2;
+    ++_nsinc;
+    _dsinc = 1.0/(_nsinc-1);
+    _lsinc = lmax;
 
     // System.out.println(
-    //   "emax="+_emax+" fmax="+_fmax+" lmax="+_lmax+" ntab="+_ntab);
+    //   "emax="+_emax+" fmax="+_fmax+" lmax="+_lmax+" nsinc="+_nsinc);
   }
 
   /**
@@ -495,28 +496,80 @@ public class SincInterpolator {
    * optimal design parameters, without actually using all of them.
    */
   private void makeTable() {
-    _ntabm1 = _ntab-1;
-    _stab = new float[_ntab][_ltab];
+    _nsincm1 = _nsinc-1;
+    _asinc = new float[_nsinc][_lsinc];
 
     // The first and last interpolators are shifted unit impulses.
     // Handle these two cases exactly, with no rounding errors.
-    for (int j=0; j<_ltab; ++j) {
-      _stab[      0][j] = 0.0f;
-      _stab[_ntab-1][j] = 0.0f;
+    for (int j=0; j<_lsinc; ++j) {
+      _asinc[      0][j] = 0.0f;
+      _asinc[_nsinc-1][j] = 0.0f;
     }
-    _stab[      0][_ltab/2-1] = 1.0f;
-    _stab[_ntab-1][_ltab/2  ] = 1.0f;
+    _asinc[      0][_lsinc/2-1] = 1.0f;
+    _asinc[_nsinc-1][_lsinc/2  ] = 1.0f;
 
     // Other interpolators are sampled Kaiser-windowed sinc functions.
-    for (int itab=1; itab<_ntab-1; ++itab) {
-      double x = -_ltab/2+1-_dtab*itab;
-      for (int i=0; i<_ltab; ++i,x+=1.0) {
-        _stab[itab][i] = (float)(sinc(x)*_kwin.evaluate(x));
+    for (int isinc=1; isinc<_nsinc-1; ++isinc) {
+      double x = -_lsinc/2+1-_dsinc*isinc;
+      for (int i=0; i<_lsinc; ++i,x+=1.0) {
+        _asinc[isinc][i] = (float)(sinc(x)*_kwin.evaluate(x));
       }
     }
   }
 
   private static double sinc(double x) {
     return (x!=0.0)?sin(PI*x)/(PI*x):1.0;
+  }
+
+  private void shift(int nxout, double fxout, float[] yout) {
+
+    // Input sampling.
+    int nxin = _nxin;
+    double dxin = _dxin;
+    double fxin = _fxin;
+    double lxin = fxin+(nxin-1)*dxin;
+
+    // Which output samples are near beginning and end of input sequence?
+    double dxout = dxin;
+    double xout1 = fxin+_lsinc/2;
+    double xout2 = lxin-_lsinc/2;
+    double xout1n = (xout1-fxout)/dxout;
+    double xout2n = (xout2-fxout)/dxout;
+    int ixout1 = max(0,min(nxout,(int)xout1n)+1);
+    int ixout2 = max(0,min(nxout,(int)xout2n)-1);
+
+    // Interpolate output samples near beginning of input sequence.
+    for (int ixout=0; ixout<ixout1; ++ixout) {
+      double xout = fxout+ixout*dxout;
+      yout[ixout] = interpolate(xout);
+    }
+
+    // Interpolate output samples near end of input sequence.
+    for (int ixout=ixout2; ixout<nxout; ++ixout) {
+      double xout = fxout+ixout*dxout;
+      yout[ixout] = interpolate(xout);
+    }
+
+    // Now we ignore the ends, and use a single sinc approximation.
+
+    // Which input samples?
+    double xoutn = _xoutb+xout1*_xouts;
+    int ixoutn = (int)xoutn;
+    int kyin = _ioutb+ixoutn;
+
+    // Which sinc approximation?
+    double frac = xoutn-ixoutn;
+    if (frac<0.0)
+      frac += 1.0;
+    int ksinc = (int)(frac*_nsincm1+0.5);
+    float[] asinc = _asinc[ksinc];
+
+    // Interpolate for output indices ixout1 <= ixout <= ixout2.
+    for (int ixout=ixout1; ixout<ixout2; ++ixout,++kyin) {
+      float youtr = 0.0f;
+      for (int isinc=0,jyin=kyin; isinc<_lsinc; ++isinc,++jyin)
+        youtr += _yin[jyin]*asinc[isinc];
+      yout[ixout] = youtr;
+    }
   }
 }

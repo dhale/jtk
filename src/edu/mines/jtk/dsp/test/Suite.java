@@ -22,6 +22,7 @@ public class Suite extends TestSuite {
     suite.addTestSuite(FftRealTest.class);
     suite.addTestSuite(Real1Test.class);
     suite.addTestSuite(SamplingTest.class);
+    suite.addTestSuite(SincInterpolatorTest.class);
 
     return suite;
   }

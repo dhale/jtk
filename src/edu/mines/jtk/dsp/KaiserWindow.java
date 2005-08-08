@@ -10,10 +10,10 @@ import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * A Kaiser window is often used in FIR filter design. It is easy to use 
- * and exhibits near-optimal properties for many filter design problems.
- * The Kaiser window is defined by any two of three parameters: window 
- * length, transition width, and maximum absolute error.
+ * The Kaiser window is often used in FIR filter design. It is easy to 
+ * use and exhibits near-optimal properties for many filter design 
+ * problems. The window is defined by any two of three parameters: 
+ * window length, transition width, and maximum absolute error.
  * <p> 
  * For definiteness, assume that the Kaiser window is a function w(x) 
  * of argument x. Then, the window length is that range of x, centered 
@@ -46,7 +46,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * than one. When length*width is less than one, a useful upper bound for 
  * the maximum absolute error cannot be obtained from the Kaiser window 
  * design equations. However, in this case, the lower bound for maximum 
- * absolute error is nearly 10%, which is too large for most applications,
+ * absolute error is nearly 10%, which is too large for most applications
  * anyway. Therefore, in practice, this restriction seldom matters.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.08.04
