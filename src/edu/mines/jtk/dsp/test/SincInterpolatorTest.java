@@ -30,10 +30,47 @@ public class SincInterpolatorTest extends TestCase {
   private double[] _fmaxs = {0.10,0.30,0.40,0.45};
   private int[] _lmaxs = {8,10,12,14,16};
 
+  public void testExtrapolation() {
+    SincInterpolator si = new SincInterpolator();
+    Random random = new Random();
+    int lmax = si.getMaximumLength();
+    int nxin = 2*lmax;
+    int npad = lmax;
+    double dxin = 1.0;
+    double fxin = npad;
+    int nxout = npad+nxin+npad;
+    double dxout = 0.999;
+    double fxout = npad;
+    float[] yi = new float[nxin];
+    float[] yz = new float[nxout];
+    float[] yc = new float[nxout];
+    float[] yo = new float[nxout];
+    float[] yt = new float[nxout];
+    for (int ixin=0; ixin<nxin; ++ixin)
+      yi[ixin] = yz[ixin+npad] = yc[ixin+npad] = random.nextFloat();
+    for (int ipad=0; ipad<npad; ++ipad) {
+      yc[ipad] = yc[npad];
+      yc[npad+nxin+ipad] = yc[npad+nxin-1];
+    }
+    si.setExtrapolation(SincInterpolator.Extrapolation.ZERO);
+    si.setInput(nxin,dxin,fxin,yi);
+    si.interpolate(nxout,dxout,fxout,yo);
+    si.setInput(npad+nxin+npad,dxin,0.0,yz);
+    si.interpolate(nxout,dxout,fxout,yt);
+    for (int ixout=0; ixout<nxout; ++ixout)
+      assertEquals(yo[ixout],yt[ixout],0.0);
+    si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
+    si.setInput(nxin,dxin,fxin,yi);
+    si.interpolate(nxout,dxout,fxout,yo);
+    si.setInput(npad+nxin+npad,dxin,0.0,yc);
+    si.interpolate(nxout,dxout,fxout,yt);
+    for (int ixout=0; ixout<nxout; ++ixout)
+      assertEquals(yo[ixout],yt[ixout],0.0);
+  }
+
   public void testComplex() {
     SincInterpolator si = new SincInterpolator();
     Random random = new Random();
-
     int nxin = 100;
     double dxin = 3.14159;
     double fxin = 1.23456;
@@ -45,22 +82,30 @@ public class SincInterpolatorTest extends TestCase {
       yi[ixin] = yc[2*ixin+1] = random.nextFloat();
     }
     si.setInputSampling(nxin,dxin,fxin);
-
     int nxout = 200;
     double dxout = -0.9*dxin;
     double fxout = fxin+(nxin+30)*dxin;
     float[] zr = new float[nxout];
     float[] zi = new float[nxout];
     float[] zc = new float[2*nxout];
-
+    si.setExtrapolation(SincInterpolator.Extrapolation.ZERO);
     si.setInputSamples(yr);
     si.interpolate(nxout,dxout,fxout,zr);
     si.setInputSamples(yi);
     si.interpolate(nxout,dxout,fxout,zi);
-
     si.setInputSamples(yc);
     si.interpolateComplex(nxout,dxout,fxout,zc);
-
+    for (int ixout=0; ixout<nxout; ++ixout) {
+      assertEquals(zr[ixout],zc[2*ixout  ],0.0);
+      assertEquals(zi[ixout],zc[2*ixout+1],0.0);
+    }
+    si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
+    si.setInputSamples(yr);
+    si.interpolate(nxout,dxout,fxout,zr);
+    si.setInputSamples(yi);
+    si.interpolate(nxout,dxout,fxout,zi);
+    si.setInputSamples(yc);
+    si.interpolateComplex(nxout,dxout,fxout,zc);
     for (int ixout=0; ixout<nxout; ++ixout) {
       assertEquals(zr[ixout],zc[2*ixout  ],0.0);
       assertEquals(zi[ixout],zc[2*ixout+1],0.0);
