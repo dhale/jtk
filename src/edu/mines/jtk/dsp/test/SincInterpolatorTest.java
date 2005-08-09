@@ -52,17 +52,14 @@ public class SincInterpolatorTest extends TestCase {
     float[] zr = new float[nxout];
     float[] zi = new float[nxout];
     float[] zc = new float[2*nxout];
-    float[] xout = new float[nxout];
-    for (int ixout=0; ixout<nxout; ++ixout)
-      xout[ixout] = (float)(fxout+ixout*dxout);
 
     si.setInputSamples(yr);
-    si.interpolate(nxout,xout,zr);
+    si.interpolate(nxout,dxout,fxout,zr);
     si.setInputSamples(yi);
-    si.interpolate(nxout,xout,zi);
+    si.interpolate(nxout,dxout,fxout,zi);
 
     si.setInputSamples(yc);
-    si.interpolateComplex(nxout,xout,zc);
+    si.interpolateComplex(nxout,dxout,fxout,zc);
 
     for (int ixout=0; ixout<nxout; ++ixout) {
       assertEquals(zr[ixout],zc[2*ixout  ],0.0);

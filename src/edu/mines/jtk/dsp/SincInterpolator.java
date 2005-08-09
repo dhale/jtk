@@ -322,54 +322,24 @@ public class SincInterpolator {
    * @param yout array of interpolated output y(x).
    */
   public void interpolateComplex(int nxout, float[] xout, float[] yout) {
+    for (int ixout=0;  ixout<nxout; ++ixout)
+      interpolateComplex(ixout,xout[ixout],yout);
+  }
 
-    // Loop over all output samples.
-    for (int ixout=0;  ixout<nxout; ++ixout) {
-
-      // Which input samples?
-      double xoutn = _xoutb+xout[ixout]*_xouts;
-      int ixoutn = (int)xoutn;
-      int kyin = _ioutb+ixoutn;
-
-      // Which sinc approximation?
-      double frac = xoutn-ixoutn;
-      if (frac<0.0)
-        frac += 1.0;
-      int ksinc = (int)(frac*_nsincm1+0.5);
-      float[] asinc = _asinc[ksinc];
-
-      // If no extrapolation is necessary, use a fast loop.
-        // Otherwise, extrapolate input samples, as necessary.
-      float youtr = 0.0f;
-      float youti = 0.0f;
-      if (kyin>=0 && kyin<=_nxinm) {
-        for (int isinc=0; isinc<_lsinc; ++isinc,++kyin) {
-          int jyin = 2*kyin;
-          float asinci = asinc[isinc];
-          youtr += _yin[jyin  ]*asinci;
-          youti += _yin[jyin+1]*asinci;
-        }
-      } else if (_extrap==Extrapolation.ZERO) {
-        for (int isinc=0; isinc<_lsinc; ++isinc,++kyin) {
-          if (0<=kyin && kyin<_nxin) {
-            int jyin = 2*kyin;
-            float asinci = asinc[isinc];
-            youtr += _yin[jyin  ]*asinci;
-            youti += _yin[jyin+1]*asinci;
-          }
-        }
-      } else if (_extrap==Extrapolation.CONSTANT) {
-        for (int isinc=0; isinc<_lsinc; ++isinc,++kyin) {
-          int jyin = (kyin<0)?0:(_nxin<=kyin)?2*_nxin-2:2*kyin;
-          float asinci = asinc[isinc];
-          youtr += _yin[jyin  ]*asinci;
-          youti += _yin[jyin+1]*asinci;
-        }
-      }
-      int jxout = 2*ixout;
-      yout[jxout  ] = youtr;
-      yout[jxout+1] = youti;
-    }
+  /**
+   * Interpolates the current input samples as complex numbers. 
+   * Complex output samples are packed in the specified output array as 
+   * real, imaginary, real, imaginary, and so on.
+   * @param nxout the number of output samples.
+   * @param dxout the output sampling interval.
+   * @param fxout the value x for the first output sample (yout[0],yout[1]).
+   * @param yout array of interpolated output y(x).
+   */
+  public void interpolateComplex(
+    int nxout, double dxout, double fxout, float[] yout) 
+  {
+    for (int ixout=0;  ixout<nxout; ++ixout)
+      interpolateComplex(ixout,fxout+ixout*dxout,yout);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -547,6 +517,53 @@ public class SincInterpolator {
 
   private static double sinc(double x) {
     return (x!=0.0)?sin(PI*x)/(PI*x):1.0;
+  }
+
+  private void interpolateComplex(int ixout, double xout, float[] yout) {
+
+    // Which input samples?
+    double xoutn = _xoutb+xout*_xouts;
+    int ixoutn = (int)xoutn;
+    int kyin = _ioutb+ixoutn;
+
+    // Which sinc approximation?
+    double frac = xoutn-ixoutn;
+    if (frac<0.0)
+      frac += 1.0;
+    int ksinc = (int)(frac*_nsincm1+0.5);
+    float[] asinc = _asinc[ksinc];
+
+    // If no extrapolation is necessary, use a fast loop.
+      // Otherwise, extrapolate input samples, as necessary.
+    float youtr = 0.0f;
+    float youti = 0.0f;
+    if (kyin>=0 && kyin<=_nxinm) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyin) {
+        int jyin = 2*kyin;
+        float asinci = asinc[isinc];
+        youtr += _yin[jyin  ]*asinci;
+        youti += _yin[jyin+1]*asinci;
+      }
+    } else if (_extrap==Extrapolation.ZERO) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyin) {
+        if (0<=kyin && kyin<_nxin) {
+          int jyin = 2*kyin;
+          float asinci = asinc[isinc];
+          youtr += _yin[jyin  ]*asinci;
+          youti += _yin[jyin+1]*asinci;
+        }
+      }
+    } else if (_extrap==Extrapolation.CONSTANT) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyin) {
+        int jyin = (kyin<0)?0:(_nxin<=kyin)?2*_nxin-2:2*kyin;
+        float asinci = asinc[isinc];
+        youtr += _yin[jyin  ]*asinci;
+        youti += _yin[jyin+1]*asinci;
+      }
+    }
+    int jxout = 2*ixout;
+    yout[jxout  ] = youtr;
+    yout[jxout+1] = youti;
   }
 
   private void shift(int nxout, double fxout, float[] yout) {
