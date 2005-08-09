@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp.test;
 
 
+import java.util.Random;
 import static java.lang.Math.*;
 
 import junit.framework.*;
@@ -28,6 +29,46 @@ public class SincInterpolatorTest extends TestCase {
   private double[] _emaxs = {0.1,0.01,0.001};
   private double[] _fmaxs = {0.10,0.30,0.40,0.45};
   private int[] _lmaxs = {8,10,12,14,16};
+
+  public void testComplex() {
+    SincInterpolator si = new SincInterpolator();
+    Random random = new Random();
+
+    int nxin = 100;
+    double dxin = 3.14159;
+    double fxin = 1.23456;
+    float[] yr = new float[nxin];
+    float[] yi = new float[nxin];
+    float[] yc = new float[2*nxin];
+    for (int ixin=0; ixin<nxin; ++ixin) {
+      yr[ixin] = yc[2*ixin  ] = random.nextFloat();
+      yi[ixin] = yc[2*ixin+1] = random.nextFloat();
+    }
+    si.setInputSampling(nxin,dxin,fxin);
+
+    int nxout = 200;
+    double dxout = -0.9*dxin;
+    double fxout = fxin+(nxin+30)*dxin;
+    float[] zr = new float[nxout];
+    float[] zi = new float[nxout];
+    float[] zc = new float[2*nxout];
+    float[] xout = new float[nxout];
+    for (int ixout=0; ixout<nxout; ++ixout)
+      xout[ixout] = (float)(fxout+ixout*dxout);
+
+    si.setInputSamples(yr);
+    si.interpolate(nxout,xout,zr);
+    si.setInputSamples(yi);
+    si.interpolate(nxout,xout,zi);
+
+    si.setInputSamples(yc);
+    si.interpolateComplex(nxout,xout,zc);
+
+    for (int ixout=0; ixout<nxout; ++ixout) {
+      assertEquals(zr[ixout],zc[2*ixout  ],0.0);
+      assertEquals(zi[ixout],zc[2*ixout+1],0.0);
+    }
+  }
 
   public void testErrorAndFrequency() {
     for (int iemax=0; iemax<_emaxs.length; ++iemax) {

@@ -343,7 +343,8 @@ public class SincInterpolator {
       float youtr = 0.0f;
       float youti = 0.0f;
       if (kyin>=0 && kyin<=_nxinm) {
-        for (int isinc=0,jyin=2*kyin; isinc<_lsinc; ++isinc,jyin+=2) {
+        for (int isinc=0; isinc<_lsinc; ++isinc,++kyin) {
+          int jyin = 2*kyin;
           float asinci = asinc[isinc];
           youtr += _yin[jyin  ]*asinci;
           youti += _yin[jyin+1]*asinci;
