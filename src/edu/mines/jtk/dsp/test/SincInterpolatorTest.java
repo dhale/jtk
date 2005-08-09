@@ -75,6 +75,8 @@ public class SincInterpolatorTest extends TestCase {
     double emax = si.getMaximumError();
     double fmax = si.getMaximumFrequency();
     int lmax = si.getMaximumLength();
+    long nbytes = si.getTableBytes();
+    trace("lmax="+lmax+" fmax="+fmax+" emax="+emax+" nbytes="+nbytes);
     
     // Input signal is an up-down sweep. (See below.)
     int nmax = (int)(1000*fmax);
@@ -90,7 +92,7 @@ public class SincInterpolatorTest extends TestCase {
     }
     si.setInput(nxin,dxin,fxin,yin);
     si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
-    //System.out.println("xmax="+xmax+" nmax="+nmax+" nxin="+nxin);
+    trace("xmax="+xmax+" nmax="+nmax+" nxin="+nxin);
 
     // Interpolate.
     double dxout = 0.01*dxin;
@@ -108,19 +110,15 @@ public class SincInterpolatorTest extends TestCase {
       double ys = sweep(fmax,nmax,x);
       double ei = abs(yi-ys);
       if (ei>emax)
-        System.out.println("    x="+x+" ys="+ys+" yi="+yi);
+        trace("    x="+x+" ys="+ys+" yi="+yi);
       error = max(error,ei);
       assertEquals(ys,yi,emax);
     }
-    /*
-    System.out.println(
-      "lmax="+lmax+" fmax="+fmax+" emax="+emax+" error="+error);
-    System.out.println("  nbytes="+si.getTableBytes());
+    trace("  error="+error);
     if (error>emax)
-      System.out.println("  WARNING: error = "+error+" > emax = "+emax);
-    */
+      trace("  WARNING: error = "+error+" > emax = "+emax);
 
-    /*
+    // Repeat for a simple shift of 1/2 the input sampling interval.
     double shift = 0.5*dxin;
     nxout = nxin;
     dxout = dxin;
@@ -130,16 +128,14 @@ public class SincInterpolatorTest extends TestCase {
     for (int ixout=0; ixout<nxout; ++ixout) {
       double x = fxout+ixout*dxout;
       double yi = yout[ixout];
-      double ys = sweep(fmax,nmax,x+shift);
+      double ys = sweep(fmax,nmax,x);
       double ei = abs(yi-ys);
       if (ei>emax)
-        System.out.println("    x="+x+" ys="+ys+" yi="+yi);
+        trace("    x="+x+" ys="+ys+" yi="+yi);
       error = max(error,ei);
       assertEquals(ys,yi,emax);
     }
-    System.out.println(
-      "lmax="+lmax+" fmax="+fmax+" emax="+emax+" error="+error);
-    */
+    trace("  error="+error);
   }
 
   // An up-down sweep signal that begins with zero frequency, increases to
@@ -149,6 +145,10 @@ public class SincInterpolatorTest extends TestCase {
   // frequencies are highest, and where interpolation errors may be largest.
   private double sweep(double fmax, int nmax, double x) {
     return cos(2.0*PI*nmax*cos(x*fmax/nmax));
+  }
+
+  private static void trace(String s) {
+    //System.out.println(s);
   }
 
 
@@ -161,7 +161,7 @@ public class SincInterpolatorTest extends TestCase {
     int lmax = si.getMaximumLength();
     double fmax = si.getMaximumFrequency();
     double emax = si.getMaximumError();
-    System.out.println("lmax="+lmax+" fmax="+fmax+" emax="+emax);
+    trace("lmax="+lmax+" fmax="+fmax+" emax="+emax);
     if (fmax==0.0)
       return;
 
@@ -203,8 +203,8 @@ public class SincInterpolatorTest extends TestCase {
         float yi = yout[ixout];
         float ye = sine(k*x);
         if (abs(ye-yi)>emax)
-          System.out.println("k="+k+" x="+x+" ye="+ye+" yi="+yi);
-        //assertEquals(ye,yi,emax);
+          trace("k="+k+" x="+x+" ye="+ye+" yi="+yi);
+        assertEquals(ye,yi,emax);
       }
     }
   }
@@ -226,7 +226,7 @@ public class SincInterpolatorTest extends TestCase {
     double lwin = lsinc;
     KaiserWindow kwin = KaiserWindow.fromWidthAndLength(wwin,lwin);
     double ewin = kwin.getError();
-    System.out.println("wwin="+wwin+" lwin="+lwin+" ewin="+ewin);
+    trace("wwin="+wwin+" lwin="+lwin+" ewin="+ewin);
 
     int nx = m*lsinc;
     double dx = 1.0/m;
@@ -236,7 +236,7 @@ public class SincInterpolatorTest extends TestCase {
     double dk = 2.0*PI/(nxfft*dx);
     double fk = 0.0;
     FftReal fft = new FftReal(nxfft);
-    System.out.println("nxfft="+nxfft);
+    trace("nxfft="+nxfft);
 
     float[] sx = new float[nxfft];
     sx[0] = 1.0f;
@@ -244,7 +244,7 @@ public class SincInterpolatorTest extends TestCase {
       double x = fx+ix*dx;
       sx[ix] = (float)(x<=xmax?sinc(PI*x)*kwin.evaluate(x):0.0);
       sx[jx] = sx[ix];
-      //System.out.println("s("+x+") = "+sx[ix]);
+      trace("s("+x+") = "+sx[ix]);
     }
 
     float[] sk = new float[2*nk];
@@ -254,15 +254,15 @@ public class SincInterpolatorTest extends TestCase {
     for (int ik=0; ik<=nk/10; ++ik) {
       double k = (fk+ik*dk)/(2.0*PI);
       if (k<=kmax && abs(ak[ik]-1.0)>ewin)
-        System.out.println("a("+k+") = "+ak[ik]);
+        trace("a("+k+") = "+ak[ik]);
     }
 
     float[] tx = new float[nxfft];
     for (int ix=0,jx=m/2; ix<lsinc/2; ++ix,jx+=m) {
       tx[        ix] = sx[jx];
       tx[nxfft-1-ix] = sx[nxfft-jx];
-      System.out.println("tx["+ix+"] = "+          tx[ix]);
-      System.out.println("tx["+(nxfft-1-ix)+"] = "+tx[nxfft-1-ix]);
+      trace("tx["+ix+"] = "+          tx[ix]);
+      trace("tx["+(nxfft-1-ix)+"] = "+tx[nxfft-1-ix]);
     }
 
     float[] tk = new float[2*nk];
@@ -271,7 +271,7 @@ public class SincInterpolatorTest extends TestCase {
     for (int ik=0; ik<nk; ++ik) {
       double k = (fk+ik*dk)/(2.0*PI*m);
       if (k<=kmax && abs(ak[ik]-1.0)>2.0*ewin)
-        System.out.println("a("+k+") = "+ak[ik]);
+        trace("a("+k+") = "+ak[ik]);
     }
   }
 
