@@ -35,11 +35,10 @@ import static java.lang.Math.*;
  *   z[i-k] =  sum  x[j]*y[i-j] ; i = k, k+1, ..., k+lz-1
  *             j=jlo
  * </code></pre>
- * where <code>k = kz-kx-ky</code>, <code>jlo = max(0,i-ly+1)</code>,
- * and <code>jhi = min(lx-1,i)</code>. The summation limits <code>jlo</code>
- * and <code>jhi</code> ensure that array indices are always in bounds. The
- * effect of the three first-sample indices is encoded in the single shift 
- * <code>k</code>.
+ * where k = kz-kx-ky, jlo = max(0,i-ly+1), and jhi = min(lx-1,i). The 
+ * summation limits jlo and jhi ensure that array indices are always in 
+ * bounds. The effect of the three first-sample indices is encoded in the 
+ * single shift k.
  * <p>
  * For example, if sequence z is to be a weighted average of the nearest 
  * five samples of sequence y, one might use 
@@ -49,8 +48,8 @@ import static java.lang.Math.*;
  *   conv(5,-2,x,ly,0,y,ly,0,z);
  *   ...
  * </code></pre>
- * In this example, the sequence x is symmetric, with first-sample index
- * kx = -2.
+ * In this example, the sequence x is symmetric about the origin, with 
+ * first-sample index kx = -2.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.08.15
  */
@@ -76,9 +75,75 @@ public class Conv {
     convFast(lx,kx,x,ly,ky,y,lz,kz,z);
   }
 
+  public static void conv(
+    int lx1, int lx2, int kx1, int kx2, float[][] x,
+    int ly1, int ly2, int ky1, int ky2, float[][] y,
+    int lz1, int lz2, int kz1, int kz2, float[][] z)
+  {
+    zero(lz1,lz2,z);
+    int ilo = kz2-kx2-ky2;
+    int ihi = ilo+lz2-1;
+    for (int i2=ilo; i2<=ihi; ++i2) {
+      int jlo = max(0,i2-ly2+1);
+      int jhi = min(lx2-1,i2);
+      for (int j2=jlo; j2<=jhi; ++j2)
+        convSum(lx1,kx1,x[j2],ly1,ky1,y[i2-j2],lz1,kz1,z[i2-ilo]);
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  ///////////////////////////////////////////////////////////////////////////
+  // Convolution with only (slightly more than) one load per multiply-add. 
+  // Simpler and slower alternatives to this method require at least two 
+  // loads from memory per multiply-add.
+  // 
+  // Computes output samples z in up to five stages: (1) off left, 
+  // (2) rolling on, (3) middle, (4) rolling off, and (5) off right. In 
+  // stages 1 and 5, there is no overlap between the sequences x and y, 
+  // and the corresponding output samples z are zero. In stage 2, only 
+  // the first part of the sequence x overlaps the sequence y, and in 
+  // stage 4, only the last part of the sequence x overlaps the sequence 
+  // y. In the middle stage 3, the sequence x lies entirely within the 
+  // sequence y. Stages 2 and 4 with partial overlap are most complex.
+  // 
+  // The description above assumes that the input sequence x is shorter 
+  // than the input sequence y. If this is not true, we first swap x and 
+  // y so that x is shorter.
+  // 
+  // Note that not all five stages may be necessary to compute the output 
+  // sequence z. For example, it is possible for only stage 1 to apply,
+  // in which case all output samples are zero.
+  // 
+  // In stages 2, 3, and 4, output samples z are computed in pairs (a,b)
+  // so that, in inner loops, only one load is required per multiply-add.
+  // Note that iteration over indices i and j in stage 4 is backwards, as
+  // this stage is like a mirror image of stage 2.
+  // 
+  // Here is an example, for lx = 6 and ly = 7. Only stages 2, 3, and 4 
+  // are illustrated. Output samples are computed for a contiguous range 
+  // of indices i, but that range may be any subset of the range [0:11] 
+  // illustrated here.
+  //      i  y0  y1  y2  y3  y4  y5  y6
+  //     --  --  --  --  --  --  --  --
+  //  @   0  x0
+  //  @   1  x1  x0
+  //  @   2  x2  x1  x0
+  //  @   3  x3  x2  x1  x0
+  //  @   4  x4  x3  x2  x1  x0
+  //  #   5  x5  x4  x3  x2  x1  x0
+  //  #   6      x5  x4  x3  x2  x1  x0
+  //  %   7          x5  x4  x3  x2  x1
+  //  %   8              x5  x4  x3  x2
+  //  %   9                  x5  x4  x3
+  //  %  10                      x5  x4
+  //  %  11                          x5
+  //
+  //  @ - rolling on  :  0 <= i <=  4
+  //  # - middle      :  5 <= i <=  6
+  //  % - rolling off :  7 <= i <= 11
+  ///////////////////////////////////////////////////////////////////////////
   private static void convFast(
     int lx, int kx, float[] x,
     int ly, int ky, float[] y,
@@ -92,49 +157,11 @@ public class Conv {
       float[] t = x;  x = y;  y = t;
     }
 
-    // Output samples z are computed in up to five stages: (1) off left, 
-    // (2) rolling on, (3) middle, (4) rolling off, and (5) off right. In 
-    // stages 1 and 5, there is no overlap between the sequences x and y, 
-    // and the corresponding output samples z are zero. In stage 2, only 
-    // the first part of the sequence x overlaps the sequence y, and in 
-    // stage 4, only the last part of the sequence x overlaps the sequence 
-    // y. In the middle stage 3, the sequence x lies entirely within the 
-    // sequence y. Stages 2 and 4 with partial overlap are most complex.
-    // 
-    // Note that not all five stages are necessary to compute the output
-    // sequence z. For example, it is possible for only stage 1 to apply,
-    // in which case all output samples are zero.
-    // 
-    // In stages 2, 3, and 4, output samples z are computed in pairs (a,b)
-    // so that, in inner loops, only one load is required per multiply-add.
-    // Note that iteration over indices i and j in stage 4 is backwards, as
-    // this stage is like a mirror image of stage 2.
-    // 
-    // Here is an example, with lx = 6, ly = 7, and lz = 12. Only stages
-    // 2, 3, and 4 are illustrated. Output samples are computed for a
-    // contiguous range of indices i, but that range may be any subset of
-    // the range [0:11] illustrated here.
-    //
-    //      i  y0  y1  y2  y3  y4  y5  y6
-    //     --  --  --  --  --  --  --  --
-    //  @   0  x0
-    //  @   1  x1  x0
-    //  @   2  x2  x1  x0
-    //  @   3  x3  x2  x1  x0
-    //  @   4  x4  x3  x2  x1  x0
-    //  #   5  x5  x4  x3  x2  x1  x0
-    //  #   6      x5  x4  x3  x2  x1  x0
-    //  %   7          x5  x4  x3  x2  x1
-    //  %   8              x5  x4  x3  x2
-    //  %   9                  x5  x4  x3
-    //  %  10                      x5  x4
-    //  %  11                          x5
-    //
-    //  @ - rolling on  :  0 <= i <=  4
-    //  # - middle      :  5 <= i <=  6
-    //  % - rolling off :  7 <= i <= 11
+    // Bounds for index i.
     int imin = kz-kx-ky;
     int imax = imin+lz-1;
+
+    // Variables that we expect to reside in registers.
     int i,ilo,ihi,j,jlo,jhi,iz;
     float sa,sb,xa,xb,ya,yb;
 
@@ -262,5 +289,158 @@ public class Conv {
     ihi = imax;
     for (i=ilo,iz=i-imin; i<=ihi; ++i,++iz)
       z[iz] = 0.0f;
+  }
+
+  // Like convFast above, but accumulates the convolution sum, as in 
+  // z += x*y, ,where "*" denotes convolution. This method is used in 
+  // convolution of 2- and 3-dimensional sequences.
+  private static void convSum(
+    int lx, int kx, float[] x,
+    int ly, int ky, float[] y,
+    int lz, int kz, float[] z)
+  {
+    // If necessary, swap x and y so that x is the shorter sequence.
+    // This simplifies the logic below.
+    if (lx>ly) {
+      int lt = lx;  lx = ly;  ly = lt;
+      int kt = kx;  kx = ky;  ky = kt;
+      float[] t = x;  x = y;  y = t;
+    }
+
+    // Bounds for index i.
+    int imin = kz-kx-ky;
+    int imax = imin+lz-1;
+
+    // Variables that we expect to reside in registers.
+    int i,ilo,ihi,j,jlo,jhi,iz;
+    float sa,sb,xa,xb,ya,yb;
+
+    // ROLLING ON: 0 <= i <= lx-2 and 0 <= j <= i
+    ilo = max(0,imin);
+    ihi = min(lx-2,imax);
+    jlo = 0;
+    jhi = ilo;
+    for (i=ilo,iz=i-imin; i<ihi; i+=2,iz+=2,jhi+=2) {
+      sa = 0.0f;
+      sb = 0.0f;
+      yb = y[i-jlo+1];
+      for (j=jlo; j<jhi; j+=2) {
+        xa = x[j];
+        sb += xa*yb;
+        ya = y[i-j];
+        sa += xa*ya;
+        xb = x[j+1];
+        sb += xb*ya;
+        yb = y[i-j-1];
+        sa += xb*yb;
+      }
+      xa = x[j];
+      sb += xa*yb;
+      if (j==jhi) {
+        ya = y[i-j];
+        sa += xa*ya;
+        xb = x[j+1];
+        sb += xb*ya;
+      }
+      z[iz  ] += sa;
+      z[iz+1] += sb;
+    }
+    if (i==ihi) {
+      jlo = 0;
+      jhi = i;
+      sa = 0.0f;
+      for (j=jlo; j<=jhi; ++j)
+        sa += x[j]*y[i-j];
+      z[iz] += sa;
+    }
+
+    // MIDDLE: lx-1 <= i <= ly-1 and 0 <= j <= lx-1
+    ilo = max(lx-1,imin);
+    ihi = min(ly-1,imax);
+    jlo = 0;
+    jhi = lx-1;
+    for (i=ilo,iz=i-imin; i<ihi; i+=2,iz+=2) {
+      sa = 0.0f;
+      sb = 0.0f;
+      yb = y[i-jlo+1];
+      for (j=jlo; j<jhi; j+=2) {
+        xa = x[j];
+        sb += xa*yb;
+        ya = y[i-j];
+        sa += xa*ya;
+        xb = x[j+1];
+        sb += xb*ya;
+        yb = y[i-j-1];
+        sa += xb*yb;
+      }
+      if (j==jhi) {
+        xa = x[j];
+        sb += xa*yb;
+        ya = y[i-j];
+        sa += xa*ya;
+      }
+      z[iz  ] += sa;
+      z[iz+1] += sb;
+    }
+    if (i==ihi) {
+      sa = 0.0f;
+      for (j=jlo; j<=jhi; ++j)
+        sa += x[j]*y[i-j];
+      z[iz] += sa;
+    }
+
+    // ROLLING OFF: ly <= i <= lx+ly-2 and i-ly+1 <= j <= lx-1
+    ilo = max(ly,imin);
+    ihi = min(lx+ly-2,imax);
+    jlo = ihi-ly+1;
+    jhi = lx-1;
+    for (i=ihi,iz=i-imin; i>ilo; i-=2,iz-=2,jlo-=2) {
+      sa = 0.0f;
+      sb = 0.0f;
+      yb = y[i-jhi-1];
+      for (j=jhi; j>jlo; j-=2) {
+        xa = x[j];
+        sb += xa*yb;
+        ya = y[i-j];
+        sa += xa*ya;
+        xb = x[j-1];
+        sb += xb*ya;
+        yb = y[i-j+1];
+        sa += xb*yb;
+      }
+      xa = x[j];
+      sb += xa*yb;
+      if (j==jlo) {
+        ya = y[i-j];
+        sa += xa*ya;
+        xb = x[j-1];
+        sb += xb*ya;
+      }
+      z[iz  ] += sa;
+      z[iz-1] += sb;
+    }
+    if (i==ilo) {
+      jlo = i-ly+1;
+      jhi = lx-1;
+      sa = 0.0f;
+      for (j=jhi; j>=jlo; --j)
+    	sa += x[j]*y[i-j];
+      z[iz] += sa;
+    }
+  }
+
+  private static void zero(int n1, float[] z) {
+    for (int i1=0; i1<n1; ++i1)
+      z[i1] = 0.0f;
+  }
+
+  private static void zero(int n1, int n2, float[][] z) {
+    for (int i2=0; i2<n2; ++i2)
+      zero(n1,z[i2]);
+  }
+
+  private static void zero(int n1, int n2, int n3, float[][][] z) {
+    for (int i3=0; i3<n3; ++i3)
+      zero(n1,n2,z[i3]);
   }
 }

@@ -37,7 +37,7 @@ public class TraversalContext {
 
   /**
    * Gets the node in this traversal with specified index. If count is the 
-   * number of nodes returned by the method {@link countNodes()}, then the
+   * number of nodes returned by the method {@link #countNodes()}, then the
    * current node has index count-1, and the root node has index zero.
    * <p>
    * If the specified index is negative, then count is added to the index.

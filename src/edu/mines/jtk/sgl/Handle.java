@@ -52,7 +52,7 @@ public abstract class Handle extends Group {
    * Sets the size in pixels of all handles. Because handle size is not
    * associated with any particular handle or world, this method does
    * force a repaint of any view canvases in which handles appear.
-   * @param the size.
+   * @param size the size.
    */
   public static void setSize(double size) {
     _size = size;
