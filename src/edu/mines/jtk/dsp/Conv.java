@@ -97,7 +97,21 @@ public class Conv {
   ///////////////////////////////////////////////////////////////////////////
   // Convolution with only (slightly more than) one load per multiply-add. 
   // Simpler and slower alternatives to this method require at least two 
-  // loads from memory per multiply-add.
+  // loads from memory per multiply-add; here is an example:
+  // 
+  // int ilo = kz-kx-ky;
+  // int ihi = ilo+lz-1;
+  // for (int i=ilo; i<=ihi; ++i) {
+  //   int jlo = max(0,i-ly+1);
+  //   int jhi = min(lx-1,i);
+  //   float sum = 0.0f;
+  //   for (int j=jlo; j<=jhi; ++j)
+  //     sum += x[j]*y[i-j];
+  //   z[i-ilo] = sum;
+  // }
+  //
+  // The code above should yield, except for rounding errors, results
+  // that are the same as this more complicated and efficient method.
   // 
   // Computes output samples z in up to five stages: (1) off left, 
   // (2) rolling on, (3) middle, (4) rolling off, and (5) off right. In 

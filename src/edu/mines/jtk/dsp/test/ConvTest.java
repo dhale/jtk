@@ -54,12 +54,8 @@ public class ConvTest extends TestCase {
     int ilo = kz-kx-ky;
     int ihi = ilo+lz-1;
     for (int i=ilo; i<=ihi; ++i) {
-      int jlo = i-ly+1;
-      if (jlo<0)
-        jlo = 0;
-      int jhi = i;
-      if (jhi>=lx)
-        jhi = lx-1;
+      int jlo = max(0,i-ly+1);
+      int jhi = min(lx-1,i);
       float sum = 0.0f;
       for (int j=jlo; j<=jhi; ++j)
         sum += x[j]*y[i-j];
