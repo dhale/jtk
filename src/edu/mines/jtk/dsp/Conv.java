@@ -19,7 +19,7 @@ import static java.lang.Math.*;
  * </code></pre>
  * In practice, the sequences x, y, and z are non-zero for only finite 
  * ranges of sample indices i and j, and these ranges determine limits 
- * on the summation.
+ * on the summation index j.
  * <p>
  * Specifically, the sequences x, y, and z are stored in arrays with 
  * zero-based indexing; e.g., x[0], x[1], x[2], ..., x[lx-1], where lx
@@ -28,17 +28,17 @@ import static java.lang.Math.*;
  * <p>
  * Note that an array index need not equal its corresponding sample index. 
  * For each sequence, we must specify the sample index of the first sample 
- * in the array of sample values; e.g., ifx denotes the sample index of x[0]. 
+ * in the array of sample values; e.g., kx denotes the sample index of x[0]. 
  * In terms of arrays x, y, and z, the convolution sum may be rewritten as
  * <pre><code>
  *             jhi
  *   z[i-k] =  sum  x[j]*y[i-j] ; i = k, k+1, ..., k+lz-1
  *             j=jlo
  * </code></pre>
- * where <code>k = ifz-ifx-ify</code>, <code>jlo = max(0,i-ly+1)</code>,
+ * where <code>k = kz-kx-ky</code>, <code>jlo = max(0,i-ly+1)</code>,
  * and <code>jhi = min(lx-1,i)</code>. The summation limits <code>jlo</code>
  * and <code>jhi</code> ensure that array indices are always in bounds. The
- * effect of the three first sample indices is encoded in the single shift 
+ * effect of the three first-sample indices is encoded in the single shift 
  * <code>k</code>.
  * <p>
  * For example, if sequence z is to be a weighted average of the nearest 
@@ -49,8 +49,8 @@ import static java.lang.Math.*;
  *   conv(5,-2,x,ly,0,y,ly,0,z);
  *   ...
  * </code></pre>
- * In this example, the sequence x is symmetric, with index of first sample 
- * ifx = -2.
+ * In this example, the sequence x is symmetric, with first-sample index
+ * kx = -2.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.08.15
  */
@@ -59,36 +59,36 @@ public class Conv {
   /**
    * Computes the convolution of two specified sequences x and y.
    * @param lx the length of x.
-   * @param ifx the sample index of x[0].
+   * @param kx the sample index of x[0].
    * @param x array[lx] of x values.
    * @param ly the length of y.
-   * @param ify the sample index of y[0].
+   * @param ky the sample index of y[0].
    * @param y array[ly] of y values.
    * @param lz the length of z.
-   * @param ifz the sample index of z[0].
+   * @param kz the sample index of z[0].
    * @param z array[lz] of z values.
    */
   public static void conv(
-    int lx, int ifx, float[] x,
-    int ly, int ify, float[] y,
-    int lz, int ifz, float[] z)
+    int lx, int kx, float[] x,
+    int ly, int ky, float[] y,
+    int lz, int kz, float[] z)
   {
-    convFast(lx,ifx,x,ly,ify,y,lz,ifz,z);
+    convFast(lx,kx,x,ly,ky,y,lz,kz,z);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
   private static void convFast(
-    int lx, int ifx, float[] x,
-    int ly, int ify, float[] y,
-    int lz, int ifz, float[] z)
+    int lx, int kx, float[] x,
+    int ly, int ky, float[] y,
+    int lz, int kz, float[] z)
   {
     // If necessary, swap x and y so that x is the shorter sequence.
     // This simplifies the logic below.
     if (lx>ly) {
       int lt = lx;  lx = ly;  ly = lt;
-      int ift = ifx;  ifx = ify;  ify = ift;
+      int kt = kx;  kx = ky;  ky = kt;
       float[] t = x;  x = y;  y = t;
     }
 
@@ -133,24 +133,23 @@ public class Conv {
     //  @ - rolling on  :  0 <= i <=  4
     //  # - middle      :  5 <= i <=  6
     //  % - rolling off :  7 <= i <= 11
-    int imin = ifz-ifx-ify;
+    int imin = kz-kx-ky;
     int imax = imin+lz-1;
-    int i,ilo,ihi;
-    int j,jlo,jhi;
+    int i,ilo,ihi,j,jlo,jhi,iz;
     float sa,sb,xa,xb,ya,yb;
 
     // OFF LEFT: imin <= i <= -1
     ilo = imin;
     ihi = min(-1,imax);
-    for (i=ilo; i<=ihi; ++i)
-      z[i-imin] = 0.0f;
+    for (i=ilo,iz=i-imin; i<=ihi; ++i,++iz)
+      z[iz] = 0.0f;
 
     // ROLLING ON: 0 <= i <= lx-2 and 0 <= j <= i
     ilo = max(0,imin);
     ihi = min(lx-2,imax);
     jlo = 0;
     jhi = ilo;
-    for (i=ilo; i<ihi; i+=2,jhi+=2) {
+    for (i=ilo,iz=i-imin; i<ihi; i+=2,iz+=2,jhi+=2) {
       sa = 0.0f;
       sb = 0.0f;
       yb = y[i-jlo+1];
@@ -172,8 +171,8 @@ public class Conv {
         xb = x[j+1];
         sb += xb*ya;
       }
-      z[i-imin  ] = sa;
-      z[i-imin+1] = sb;
+      z[iz  ] = sa;
+      z[iz+1] = sb;
     }
     if (i==ihi) {
       jlo = 0;
@@ -181,7 +180,7 @@ public class Conv {
       sa = 0.0f;
       for (j=jlo; j<=jhi; ++j)
         sa += x[j]*y[i-j];
-      z[i-imin] = sa;
+      z[iz] = sa;
     }
 
     // MIDDLE: lx-1 <= i <= ly-1 and 0 <= j <= lx-1
@@ -189,7 +188,7 @@ public class Conv {
     ihi = min(ly-1,imax);
     jlo = 0;
     jhi = lx-1;
-    for (i=ilo; i<ihi; i+=2) {
+    for (i=ilo,iz=i-imin; i<ihi; i+=2,iz+=2) {
       sa = 0.0f;
       sb = 0.0f;
       yb = y[i-jlo+1];
@@ -209,14 +208,14 @@ public class Conv {
         ya = y[i-j];
         sa += xa*ya;
       }
-      z[i-imin  ] = sa;
-      z[i-imin+1] = sb;
+      z[iz  ] = sa;
+      z[iz+1] = sb;
     }
     if (i==ihi) {
       sa = 0.0f;
       for (j=jlo; j<=jhi; ++j)
         sa += x[j]*y[i-j];
-      z[i-imin] = sa;
+      z[iz] = sa;
     }
 
     // ROLLING OFF: ly <= i <= lx+ly-2 and i-ly+1 <= j <= lx-1
@@ -224,7 +223,7 @@ public class Conv {
     ihi = min(lx+ly-2,imax);
     jlo = ihi-ly+1;
     jhi = lx-1;
-    for (i=ihi; i>ilo; i-=2,jlo-=2) {
+    for (i=ihi,iz=i-imin; i>ilo; i-=2,iz-=2,jlo-=2) {
       sa = 0.0f;
       sb = 0.0f;
       yb = y[i-jhi-1];
@@ -246,8 +245,8 @@ public class Conv {
         xb = x[j-1];
         sb += xb*ya;
       }
-      z[i-imin  ] = sa;
-      z[i-imin-1] = sb;
+      z[iz  ] = sa;
+      z[iz-1] = sb;
     }
     if (i==ilo) {
       jlo = i-ly+1;
@@ -255,13 +254,13 @@ public class Conv {
       sa = 0.0f;
       for (j=jhi; j>=jlo; --j)
     	sa += x[j]*y[i-j];
-      z[i-imin] = sa;
+      z[iz] = sa;
     }
 	
     // OFF RIGHT: lx+ly-1 <= i <= imax
     ilo = max(lx+ly-1,imin);
     ihi = imax;
-    for (i=ilo; i<=ihi; ++i)
-      z[i-imin] = 0.0f;
+    for (i=ilo,iz=i-imin; i<=ihi; ++i,++iz)
+      z[iz] = 0.0f;
   }
 }
