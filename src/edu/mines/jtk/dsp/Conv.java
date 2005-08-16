@@ -53,14 +53,16 @@ import static java.lang.Math.*;
  * In this example, the sequence x is symmetric about the origin, with 
  * first-sample index kx = -2.
  * <p>
- * Cross-correlation is similar to convolution. The generic definition is
+ * Cross-correlation is similar to convolution. (Indeed, cross-correlation
+ * of x and y equals the convolution of x-reversed and y. The generic 
+ * definition of cross-correlation is
  * <pre><code>
  *   z[i] =  sum x[j]*y[i+j]
  *            j
  * </code></pre>
- * Note that cross-correlation, unlike convolution, is not commutative.
- * The cross-correlation of x and y does not equal the cross-correlation
- * of y and x.
+ * Unlike convolution, cross-correlation is not commutative. In other words,
+ * the cross-correlation of x and y does not equal the cross-correlation of 
+ * y and x.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.08.15
  */
@@ -352,7 +354,7 @@ public class Conv {
     int imax = imin+lz-1;
 
     // Variables that we expect to reside in registers.
-    int i,ilo,ihi,j,jlo,jhi,iz;
+    int i,ilo,ihi,j,jlo,jhi,iz,imj;
     float sa,sb,xa,xb,ya,yb;
 
     // Off left: imin <= i <= -1
@@ -370,14 +372,14 @@ public class Conv {
       sa = 0.0f;
       sb = 0.0f;
       yb = y[i-jlo+1];
-      for (j=jlo; j<jhi; j+=2) {
+      for (j=jlo,imj=i-j; j<jhi; j+=2,imj-=2) {
         xa = x[j];
         sb += xa*yb;
-        ya = y[i-j];
+        ya = y[imj];
         sa += xa*ya;
         xb = x[j+1];
         sb += xb*ya;
-        yb = y[i-j-1];
+        yb = y[imj-1];
         sa += xb*yb;
       }
       xa = x[j];
@@ -409,14 +411,14 @@ public class Conv {
       sa = 0.0f;
       sb = 0.0f;
       yb = y[i-jlo+1];
-      for (j=jlo; j<jhi; j+=2) {
+      for (j=jlo,imj=i-j; j<jhi; j+=2,imj-=2) {
         xa = x[j];
         sb += xa*yb;
-        ya = y[i-j];
+        ya = y[imj];
         sa += xa*ya;
         xb = x[j+1];
         sb += xb*ya;
-        yb = y[i-j-1];
+        yb = y[imj-1];
         sa += xb*yb;
       }
       if (j==jhi) {
@@ -444,14 +446,14 @@ public class Conv {
       sa = 0.0f;
       sb = 0.0f;
       yb = y[i-jhi-1];
-      for (j=jhi; j>jlo; j-=2) {
+      for (j=jhi,imj=i-j; j>jlo; j-=2,imj+=2) {
         xa = x[j];
         sb += xa*yb;
-        ya = y[i-j];
+        ya = y[imj];
         sa += xa*ya;
         xb = x[j-1];
         sb += xb*ya;
-        yb = y[i-j+1];
+        yb = y[imj+1];
         sa += xb*yb;
       }
       xa = x[j];
@@ -502,7 +504,7 @@ public class Conv {
     int imax = imin+lz-1;
 
     // Variables that we expect to reside in registers.
-    int i,ilo,ihi,j,jlo,jhi,iz;
+    int i,ilo,ihi,j,jlo,jhi,iz,imj;
     float sa,sb,xa,xb,ya,yb;
 
     // Rolling on: 0 <= i <= lx-2 and 0 <= j <= i
@@ -514,14 +516,14 @@ public class Conv {
       sa = z[iz  ];
       sb = z[iz+1];
       yb = y[i-jlo+1];
-      for (j=jlo; j<jhi; j+=2) {
+      for (j=jlo,imj=i-j; j<jhi; j+=2,imj-=2) {
         xa = x[j];
         sb += xa*yb;
-        ya = y[i-j];
+        ya = y[imj];
         sa += xa*ya;
         xb = x[j+1];
         sb += xb*ya;
-        yb = y[i-j-1];
+        yb = y[imj-1];
         sa += xb*yb;
       }
       xa = x[j];
@@ -553,14 +555,14 @@ public class Conv {
       sa = z[iz  ];
       sb = z[iz+1];
       yb = y[i-jlo+1];
-      for (j=jlo; j<jhi; j+=2) {
+      for (j=jlo,imj=i-j; j<jhi; j+=2,imj-=2) {
         xa = x[j];
         sb += xa*yb;
-        ya = y[i-j];
+        ya = y[imj];
         sa += xa*ya;
         xb = x[j+1];
         sb += xb*ya;
-        yb = y[i-j-1];
+        yb = y[imj-1];
         sa += xb*yb;
       }
       if (j==jhi) {
@@ -588,14 +590,14 @@ public class Conv {
       sa = z[iz  ];
       sb = z[iz-1];
       yb = y[i-jhi-1];
-      for (j=jhi; j>jlo; j-=2) {
+      for (j=jhi,imj=i-j; j>jlo; j-=2,imj+=2) {
         xa = x[j];
         sb += xa*yb;
-        ya = y[i-j];
+        ya = y[imj];
         sa += xa*ya;
         xb = x[j-1];
         sb += xb*ya;
-        yb = y[i-j+1];
+        yb = y[imj+1];
         sa += xb*yb;
       }
       xa = x[j];
