@@ -10,11 +10,12 @@ import edu.mines.jtk.util.Check;
 import static java.lang.Math.*;
 
 /**
- * Computes the convolution or cross-correlation of two sequences.
+ * Computes the convolution (or cross-correlation) of two sequences.
+ * <p>
  * Convolution of one-dimensional sequences x and y is defined generically 
  * by the following sum:
  * <pre><code>
- *   z[i] =  sum x[j]*y[i-j] ,
+ *   z[i] =  sum x[j]*y[i-j]
  *            j
  * </code></pre>
  * In practice, the sequences x, y, and z are non-zero for only finite 
@@ -29,7 +30,8 @@ import static java.lang.Math.*;
  * Note that an array index need not equal its corresponding sample index. 
  * For each sequence, we must specify the sample index of the first sample 
  * in the array of sample values; e.g., kx denotes the sample index of x[0]. 
- * In terms of arrays x, y, and z, the convolution sum may be rewritten as
+ * With this distinction between sample and array indices in mind, in terms 
+ * of arrays x, y, and z, the convolution sum may be rewritten as
  * <pre><code>
  *             jhi
  *   z[i-k] =  sum  x[j]*y[i-j] ; i = k, k+1, ..., k+lz-1
@@ -50,13 +52,22 @@ import static java.lang.Math.*;
  * </code></pre>
  * In this example, the sequence x is symmetric about the origin, with 
  * first-sample index kx = -2.
+ * <p>
+ * Cross-correlation is similar to convolution. The generic definition is
+ * <pre><code>
+ *   z[i] =  sum x[j]*y[i+j]
+ *            j
+ * </code></pre>
+ * Note that cross-correlation, unlike convolution, is not commutative.
+ * The cross-correlation of x and y does not equal the cross-correlation
+ * of y and x.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.08.15
  */
 public class Conv {
 
   /**
-   * Computes the convolution of two specified sequences x and y.
+   * Computes the 1-D convolution of specified sequences x and y.
    * @param lx the length of x.
    * @param kx the sample index of x[0].
    * @param x array[lx] of x values.
@@ -75,19 +86,111 @@ public class Conv {
     convFast(lx,kx,x,ly,ky,y,lz,kz,z);
   }
 
+  /**
+   * Computes the 1-D cross-correlation of specified sequences x and y.
+   * @param lx the length of x.
+   * @param kx the sample index of x[0].
+   * @param x array[lx] of x values.
+   * @param ly the length of y.
+   * @param ky the sample index of y[0].
+   * @param y array[ly] of y values.
+   * @param lz the length of z.
+   * @param kz the sample index of z[0].
+   * @param z array[lz] of z values.
+   */
+  public static void xcor(
+    int lx, int kx, float[] x,
+    int ly, int ky, float[] y,
+    int lz, int kz, float[] z)
+  {
+    reverse(lx,x);
+    convFast(lx,1-kx-lx,x,ly,ky,y,lz,kz,z);
+    reverse(lx,x);
+  }
+
+  /**
+   * Computes the 2-D convolution of specified sequences x and y.
+   * @param lx1 the length of x in 1st dimension.
+   * @param lx2 the length of x in 2nd dimension.
+   * @param kx1 the sample index in 1st dimension of x[0][0].
+   * @param kx2 the sample index in 2nd dimension of x[0][0].
+   * @param x array[lx2][lx1] of x values.
+   * @param ly1 the length of y in 1st dimension.
+   * @param ly2 the length of y in 2nd dimension.
+   * @param ky1 the sample index in 1st dimension of y[0][0].
+   * @param ky2 the sample index in 2nd dimension of y[0][0].
+   * @param y array[ly2][ly1] of y values.
+   * @param lz1 the length of z in 1st dimension.
+   * @param lz2 the length of z in 2nd dimension.
+   * @param kz1 the sample index in 1st dimension of z[0][0].
+   * @param kz2 the sample index in 2nd dimension of z[0][0].
+   * @param z array[lz2][lz1] of z values.
+   */
   public static void conv(
     int lx1, int lx2, int kx1, int kx2, float[][] x,
     int ly1, int ly2, int ky1, int ky2, float[][] y,
     int lz1, int lz2, int kz1, int kz2, float[][] z)
   {
     zero(lz1,lz2,z);
-    int ilo = kz2-kx2-ky2;
-    int ihi = ilo+lz2-1;
-    for (int i2=ilo; i2<=ihi; ++i2) {
-      int jlo = max(0,i2-ly2+1);
-      int jhi = min(lx2-1,i2);
-      for (int j2=jlo; j2<=jhi; ++j2)
-        convSum(lx1,kx1,x[j2],ly1,ky1,y[i2-j2],lz1,kz1,z[i2-ilo]);
+    int ilo2 = kz2-kx2-ky2;
+    int ihi2 = ilo2+lz2-1;
+    for (int i2=ilo2; i2<=ihi2; ++i2) {
+      int jlo2 = max(0,i2-ly2+1);
+      int jhi2 = min(lx2-1,i2);
+      for (int j2=jlo2; j2<=jhi2; ++j2) {
+        convSum(lx1,kx1,x[j2],ly1,ky1,y[i2-j2],lz1,kz1,z[i2-ilo2]);
+      }
+    }
+  }
+
+  /**
+   * Computes the 3-D convolution of specified sequences x and y.
+   * @param lx1 the length of x in 1st dimension.
+   * @param lx2 the length of x in 2nd dimension.
+   * @param lx3 the length of x in 3rd dimension.
+   * @param kx1 the sample index in 1st dimension of x[0][0][0].
+   * @param kx2 the sample index in 2nd dimension of x[0][0][0].
+   * @param kx3 the sample index in 3rd dimension of x[0][0][0].
+   * @param x array[lx3][lx2][lx1] of x values.
+   * @param ly1 the length of y in 1st dimension.
+   * @param ly2 the length of y in 2nd dimension.
+   * @param ly3 the length of y in 3rd dimension.
+   * @param ky1 the sample index in 1st dimension of y[0][0][0].
+   * @param ky2 the sample index in 2nd dimension of y[0][0][0].
+   * @param ky3 the sample index in 3rd dimension of y[0][0][0].
+   * @param y array[ly3][ly2][ly1] of y values.
+   * @param lz1 the length of z in 1st dimension.
+   * @param lz2 the length of z in 2nd dimension.
+   * @param lz3 the length of z in 3rd dimension.
+   * @param kz1 the sample index in 1st dimension of z[0][0][0].
+   * @param kz2 the sample index in 2nd dimension of z[0][0][0].
+   * @param kz3 the sample index in 3rd dimension of z[0][0][0].
+   * @param z array[lz3][lz2][lz1] of z values.
+   */
+  public static void conv(
+    int lx1, int lx2, int lx3, int kx1, int kx2, int kx3, float[][][] x,
+    int ly1, int ly2, int ly3, int ky1, int ky2, int ky3, float[][][] y,
+    int lz1, int lz2, int lz3, int kz1, int kz2, int kz3, float[][][] z)
+  {
+    zero(lz1,lz2,lz3,z);
+    int ilo3 = kz3-kx3-ky3;
+    int ihi3 = ilo3+lz3-1;
+    for (int i3=ilo3; i3<=ihi3; ++i3) {
+      int ilo2 = kz2-kx2-ky2;
+      int ihi2 = ilo2+lz2-1;
+      for (int i2=ilo2; i2<=ihi2; ++i2) {
+        int jlo3 = max(0,i3-ly3+1);
+        int jhi3 = min(lx3-1,i3);
+        for (int j3=jlo3; j3<=jhi3; ++j3) {
+          int jlo2 = max(0,i2-ly2+1);
+          int jhi2 = min(lx2-1,i2);
+          for (int j2=jlo2; j2<=jhi2; ++j2) {
+            convSum(lx1,kx1,x[j3][j2],
+                    ly1,ky1,y[i3-j3][i2-j2],
+                    lz1,kz1,z[i3-ilo3][i2-ilo2]);
+          }
+        }
+      }
     }
   }
 
@@ -110,12 +213,12 @@ public class Conv {
   //   z[i-ilo] = sum;
   // }
   //
-  // The code above should yield, except for rounding errors, results
-  // that are the same as this more complicated and efficient method.
+  // The code fragment above is equivalent to, except for rounding errors,
+  // this more complicated and efficient method.
   // 
-  // Computes output samples z in up to five stages: (1) off left, 
-  // (2) rolling on, (3) middle, (4) rolling off, and (5) off right. In 
-  // stages 1 and 5, there is no overlap between the sequences x and y, 
+  // This method computes output samples z in up to five stages: (1) off 
+  // left, (2) rolling on, (3) middle, (4) rolling off, and (5) off right. 
+  // In stages 1 and 5, there is no overlap between the sequences x and y, 
   // and the corresponding output samples z are zero. In stage 2, only 
   // the first part of the sequence x overlaps the sequence y, and in 
   // stage 4, only the last part of the sequence x overlaps the sequence 
@@ -179,13 +282,13 @@ public class Conv {
     int i,ilo,ihi,j,jlo,jhi,iz;
     float sa,sb,xa,xb,ya,yb;
 
-    // OFF LEFT: imin <= i <= -1
+    // Off left: imin <= i <= -1
     ilo = imin;
     ihi = min(-1,imax);
     for (i=ilo,iz=i-imin; i<=ihi; ++i,++iz)
       z[iz] = 0.0f;
 
-    // ROLLING ON: 0 <= i <= lx-2 and 0 <= j <= i
+    // Rolling on: 0 <= i <= lx-2 and 0 <= j <= i
     ilo = max(0,imin);
     ihi = min(lx-2,imax);
     jlo = 0;
@@ -224,7 +327,7 @@ public class Conv {
       z[iz] = sa;
     }
 
-    // MIDDLE: lx-1 <= i <= ly-1 and 0 <= j <= lx-1
+    // Middle: lx-1 <= i <= ly-1 and 0 <= j <= lx-1
     ilo = max(lx-1,imin);
     ihi = min(ly-1,imax);
     jlo = 0;
@@ -259,7 +362,7 @@ public class Conv {
       z[iz] = sa;
     }
 
-    // ROLLING OFF: ly <= i <= lx+ly-2 and i-ly+1 <= j <= lx-1
+    // Rolling off: ly <= i <= lx+ly-2 and i-ly+1 <= j <= lx-1
     ilo = max(ly,imin);
     ihi = min(lx+ly-2,imax);
     jlo = ihi-ly+1;
@@ -298,7 +401,7 @@ public class Conv {
       z[iz] = sa;
     }
 	
-    // OFF RIGHT: lx+ly-1 <= i <= imax
+    // Off right: lx+ly-1 <= i <= imax
     ilo = max(lx+ly-1,imin);
     ihi = imax;
     for (i=ilo,iz=i-imin; i<=ihi; ++i,++iz)
@@ -307,7 +410,7 @@ public class Conv {
 
   // Like convFast above, but accumulates the convolution sum, as in 
   // z += x*y, ,where "*" denotes convolution. This method is used in 
-  // convolution of 2- and 3-dimensional sequences.
+  // convolution of 2-D and 3-D sequences.
   private static void convSum(
     int lx, int kx, float[] x,
     int ly, int ky, float[] y,
@@ -329,7 +432,7 @@ public class Conv {
     int i,ilo,ihi,j,jlo,jhi,iz;
     float sa,sb,xa,xb,ya,yb;
 
-    // ROLLING ON: 0 <= i <= lx-2 and 0 <= j <= i
+    // Rolling on: 0 <= i <= lx-2 and 0 <= j <= i
     ilo = max(0,imin);
     ihi = min(lx-2,imax);
     jlo = 0;
@@ -368,7 +471,7 @@ public class Conv {
       z[iz] += sa;
     }
 
-    // MIDDLE: lx-1 <= i <= ly-1 and 0 <= j <= lx-1
+    // Middle: lx-1 <= i <= ly-1 and 0 <= j <= lx-1
     ilo = max(lx-1,imin);
     ihi = min(ly-1,imax);
     jlo = 0;
@@ -403,7 +506,7 @@ public class Conv {
       z[iz] += sa;
     }
 
-    // ROLLING OFF: ly <= i <= lx+ly-2 and i-ly+1 <= j <= lx-1
+    // Rolling off: ly <= i <= lx+ly-2 and i-ly+1 <= j <= lx-1
     ilo = max(ly,imin);
     ihi = min(lx+ly-2,imax);
     jlo = ihi-ly+1;
@@ -456,5 +559,13 @@ public class Conv {
   private static void zero(int n1, int n2, int n3, float[][][] z) {
     for (int i3=0; i3<n3; ++i3)
       zero(n1,n2,z[i3]);
+  }
+
+  private static void reverse(int n1, float[] z) {
+    for (int i1=0,j1=n1-1; i1<j1; ++i1,--j1) {
+      float zt = z[i1];
+      z[i1] = z[j1];
+      z[j1] = zt;
+    }
   }
 }

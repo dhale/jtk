@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp.test;
 
+import java.util.Random;
 import junit.framework.*;
 import edu.mines.jtk.dsp.*;
 import static edu.mines.jtk.util.Array.*;
@@ -22,20 +23,19 @@ public class ConvTest extends TestCase {
     junit.textui.TestRunner.run(suite);
   }
 
-  public void testRandom() {
-    java.util.Random random = new java.util.Random(314159);
+  public void test1Random() {
     int ntest = 1000;
-    int ifmin = -2;
-    int ifmax =  2;
+    int kmin = -2;
+    int kmax =  2;
     int lmin = 1;
     int lmax = 8;
     for (int itest=0; itest<ntest; ++itest) {
-      int lx = lmin+random.nextInt(1+lmax-lmin);
-      int ly = lmin+random.nextInt(1+lmax-lmin);
-      int lz = lmin+random.nextInt(1+lmax-lmin);
-      int kx = ifmin+random.nextInt(1+ifmax-ifmin);
-      int ky = ifmin+random.nextInt(1+ifmax-ifmin);
-      int kz = ifmin+random.nextInt(1+ifmax-ifmin);
+      int lx = lmin+_random.nextInt(1+lmax-lmin);
+      int ly = lmin+_random.nextInt(1+lmax-lmin);
+      int lz = lmin+_random.nextInt(1+lmax-lmin);
+      int kx = kmin+_random.nextInt(1+kmax-kmin);
+      int ky = kmin+_random.nextInt(1+kmax-kmin);
+      int kz = kmin+_random.nextInt(1+kmax-kmin);
       float[] x = new float[lx];
       float[] y = new float[ly];
       float[] zs = new float[lz];
@@ -45,6 +45,76 @@ public class ConvTest extends TestCase {
       assertEquals(zs,zf);
     }
   }
+
+  public void test2Random() {
+    int ntest = 1000;
+    int kmin = -2;
+    int kmax =  2;
+    int lmin = 1;
+    int lmax = 8;
+    for (int itest=0; itest<ntest; ++itest) {
+      int lx1 = lmin+_random.nextInt(1+lmax-lmin);
+      int lx2 = lmin+_random.nextInt(1+lmax-lmin);
+      int ly1 = lmin+_random.nextInt(1+lmax-lmin);
+      int ly2 = lmin+_random.nextInt(1+lmax-lmin);
+      int lz1 = lmin+_random.nextInt(1+lmax-lmin);
+      int lz2 = lmin+_random.nextInt(1+lmax-lmin);
+      int kx1 = kmin+_random.nextInt(1+kmax-kmin);
+      int kx2 = kmin+_random.nextInt(1+kmax-kmin);
+      int ky1 = kmin+_random.nextInt(1+kmax-kmin);
+      int ky2 = kmin+_random.nextInt(1+kmax-kmin);
+      int kz1 = kmin+_random.nextInt(1+kmax-kmin);
+      int kz2 = kmin+_random.nextInt(1+kmax-kmin);
+      float[][] x = new float[lx2][lx1];
+      float[][] y = new float[ly2][ly1];
+      float[][] zs = new float[lz2][lz1];
+      float[][] zf = new float[lz2][lz1];
+      convSimple(lx1,lx2,kx1,kx2,x,ly1,ly2,ky1,ky2,y,lz1,lz2,kz1,kz2,zs);
+      Conv.conv(lx1,lx2,kx1,kx2,x,ly1,ly2,ky1,ky2,y,lz1,lz2,kz1,kz2,zf);
+      assertEquals(zs,zf);
+    }
+  }
+
+  public void test3Random() {
+    int ntest = 100;
+    int kmin = -2;
+    int kmax =  2;
+    int lmin = 1;
+    int lmax = 8;
+    for (int itest=0; itest<ntest; ++itest) {
+      int lx1 = lmin+_random.nextInt(1+lmax-lmin);
+      int lx2 = lmin+_random.nextInt(1+lmax-lmin);
+      int lx3 = lmin+_random.nextInt(1+lmax-lmin);
+      int ly1 = lmin+_random.nextInt(1+lmax-lmin);
+      int ly2 = lmin+_random.nextInt(1+lmax-lmin);
+      int ly3 = lmin+_random.nextInt(1+lmax-lmin);
+      int lz1 = lmin+_random.nextInt(1+lmax-lmin);
+      int lz2 = lmin+_random.nextInt(1+lmax-lmin);
+      int lz3 = lmin+_random.nextInt(1+lmax-lmin);
+      int kx1 = kmin+_random.nextInt(1+kmax-kmin);
+      int kx2 = kmin+_random.nextInt(1+kmax-kmin);
+      int kx3 = kmin+_random.nextInt(1+kmax-kmin);
+      int ky1 = kmin+_random.nextInt(1+kmax-kmin);
+      int ky2 = kmin+_random.nextInt(1+kmax-kmin);
+      int ky3 = kmin+_random.nextInt(1+kmax-kmin);
+      int kz1 = kmin+_random.nextInt(1+kmax-kmin);
+      int kz2 = kmin+_random.nextInt(1+kmax-kmin);
+      int kz3 = kmin+_random.nextInt(1+kmax-kmin);
+      float[][][] x = new float[lx3][lx2][lx1];
+      float[][][] y = new float[ly3][ly2][ly1];
+      float[][][] zs = new float[lz3][lz2][lz1];
+      float[][][] zf = new float[lz3][lz2][lz1];
+      convSimple(lx1,lx2,lx3,kx1,kx2,kx3,x,
+                 ly1,ly2,ly3,ky1,ky2,ky3,y,
+                 lz1,lz2,lz3,kz1,kz2,kz3,zs);
+      Conv.conv(lx1,lx2,lx3,kx1,kx2,kx3,x,
+                ly1,ly2,ly3,ky1,ky2,ky3,y,
+                lz1,lz2,lz3,kz1,kz2,kz3,zs);
+      assertEquals(zs,zf);
+    }
+  }
+
+  private Random _random = new Random(314159);
 
   private static void convSimple(
     int lx, int kx, float[] x,
@@ -63,11 +133,83 @@ public class ConvTest extends TestCase {
     }
   }
 
+  private static void convSimple(
+    int lx1, int lx2, int kx1, int kx2, float[][] x,
+    int ly1, int ly2, int ky1, int ky2, float[][] y,
+    int lz1, int lz2, int kz1, int kz2, float[][] z)
+  {
+    int ilo1 = kz1-kx1-ky1;
+    int ihi1 = ilo1+lz1-1;
+    int ilo2 = kz2-kx2-ky2;
+    int ihi2 = ilo2+lz2-1;
+    for (int i2=ilo2; i2<=ihi2; ++i2) {
+      for (int i1=ilo1; i1<=ihi1; ++i1) {
+        int jlo1 = max(0,i1-ly1+1);
+        int jhi1 = min(lx1-1,i1);
+        int jlo2 = max(0,i2-ly2+1);
+        int jhi2 = min(lx2-1,i2);
+        float sum = 0.0f;
+        for (int j2=jlo2; j2<=jhi2; ++j2) {
+          for (int j1=jlo1; j1<=jhi1; ++j1) {
+            sum += x[j2][j1]*y[i2-j2][i1-j1];
+          }
+        }
+        z[i2-ilo2][i1-ilo1] = sum;
+      }
+    }
+  }
+
+  private static void convSimple(
+    int lx1, int lx2, int lx3, int kx1, int kx2, int kx3, float[][][] x,
+    int ly1, int ly2, int ly3, int ky1, int ky2, int ky3, float[][][] y,
+    int lz1, int lz2, int lz3, int kz1, int kz2, int kz3, float[][][] z)
+  {
+    int ilo1 = kz1-kx1-ky1;
+    int ihi1 = ilo1+lz1-1;
+    int ilo2 = kz2-kx2-ky2;
+    int ihi2 = ilo2+lz2-1;
+    int ilo3 = kz3-kx3-ky3;
+    int ihi3 = ilo3+lz3-1;
+    for (int i3=ilo3; i3<=ihi3; ++i3) {
+      for (int i2=ilo2; i2<=ihi2; ++i2) {
+        for (int i1=ilo1; i1<=ihi1; ++i1) {
+          int jlo1 = max(0,i1-ly1+1);
+          int jhi1 = min(lx1-1,i1);
+          int jlo2 = max(0,i2-ly2+1);
+          int jhi2 = min(lx2-1,i2);
+          int jlo3 = max(0,i3-ly3+1);
+          int jhi3 = min(lx3-1,i3);
+          float sum = 0.0f;
+          for (int j3=jlo3; j3<=jhi3; ++j3) {
+            for (int j2=jlo2; j2<=jhi2; ++j2) {
+              for (int j1=jlo1; j1<=jhi1; ++j1) {
+                sum += x[j3][j2][j1]*y[i3-j3][i2-j2][i1-j1];
+              }
+            }
+          }
+          z[i3-ilo3][i2-ilo2][i1-ilo1] = sum;
+        }
+      }
+    }
+  }
+
   private static final float TOLERANCE = 100.0f*FLT_EPSILON;
   private static void assertEquals(float[] a, float[] b) {
     int n = a.length;
     for (int i=0; i<n; ++i) {
       assertEquals(a[i],b[i],TOLERANCE);
+    }
+  }
+  private static void assertEquals(float[][] a, float[][] b) {
+    int n = a.length;
+    for (int i=0; i<n; ++i) {
+      assertEquals(a[i],b[i]);
+    }
+  }
+  private static void assertEquals(float[][][] a, float[][][] b) {
+    int n = a.length;
+    for (int i=0; i<n; ++i) {
+      assertEquals(a[i],b[i]);
     }
   }
 }
