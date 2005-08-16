@@ -87,28 +87,6 @@ public class Conv {
   }
 
   /**
-   * Computes the 1-D cross-correlation of specified sequences x and y.
-   * @param lx the length of x.
-   * @param kx the sample index of x[0].
-   * @param x array[lx] of x values.
-   * @param ly the length of y.
-   * @param ky the sample index of y[0].
-   * @param y array[ly] of y values.
-   * @param lz the length of z.
-   * @param kz the sample index of z[0].
-   * @param z array[lz] of z values.
-   */
-  public static void xcor(
-    int lx, int kx, float[] x,
-    int ly, int ky, float[] y,
-    int lz, int kz, float[] z)
-  {
-    reverse(lx,x);
-    convFast(lx,1-kx-lx,x,ly,ky,y,lz,kz,z);
-    reverse(lx,x);
-  }
-
-  /**
    * Computes the 2-D convolution of specified sequences x and y.
    * @param lx1 the length of x in 1st dimension.
    * @param lx2 the length of x in 2nd dimension.
@@ -173,15 +151,15 @@ public class Conv {
     int lz1, int lz2, int lz3, int kz1, int kz2, int kz3, float[][][] z)
   {
     zero(lz1,lz2,lz3,z);
+    int ilo2 = kz2-kx2-ky2;
     int ilo3 = kz3-kx3-ky3;
+    int ihi2 = ilo2+lz2-1;
     int ihi3 = ilo3+lz3-1;
     for (int i3=ilo3; i3<=ihi3; ++i3) {
-      int ilo2 = kz2-kx2-ky2;
-      int ihi2 = ilo2+lz2-1;
-      for (int i2=ilo2; i2<=ihi2; ++i2) {
-        int jlo3 = max(0,i3-ly3+1);
-        int jhi3 = min(lx3-1,i3);
-        for (int j3=jlo3; j3<=jhi3; ++j3) {
+      int jlo3 = max(0,i3-ly3+1);
+      int jhi3 = min(lx3-1,i3);
+      for (int j3=jlo3; j3<=jhi3; ++j3) {
+        for (int i2=ilo2; i2<=ihi2; ++i2) {
           int jlo2 = max(0,i2-ly2+1);
           int jhi2 = min(lx2-1,i2);
           for (int j2=jlo2; j2<=jhi2; ++j2) {
@@ -192,6 +170,98 @@ public class Conv {
         }
       }
     }
+  }
+
+  /**
+   * Computes the 1-D cross-correlation of specified sequences x and y.
+   * @param lx the length of x.
+   * @param kx the sample index of x[0].
+   * @param x array[lx] of x values.
+   * @param ly the length of y.
+   * @param ky the sample index of y[0].
+   * @param y array[ly] of y values.
+   * @param lz the length of z.
+   * @param kz the sample index of z[0].
+   * @param z array[lz] of z values.
+   */
+  public static void xcor(
+    int lx, int kx, float[] x,
+    int ly, int ky, float[] y,
+    int lz, int kz, float[] z)
+  {
+    reverse(lx,x);
+    kx = 1-kx-lx;
+    conv(lx,kx,x,ly,ky,y,lz,kz,z);
+    reverse(lx,x);
+  }
+
+  /**
+   * Computes the 2-D cross-correlation of specified sequences x and y.
+   * @param lx1 the length of x in 1st dimension.
+   * @param lx2 the length of x in 2nd dimension.
+   * @param kx1 the sample index in 1st dimension of x[0][0].
+   * @param kx2 the sample index in 2nd dimension of x[0][0].
+   * @param x array[lx2][lx1] of x values.
+   * @param ly1 the length of y in 1st dimension.
+   * @param ly2 the length of y in 2nd dimension.
+   * @param ky1 the sample index in 1st dimension of y[0][0].
+   * @param ky2 the sample index in 2nd dimension of y[0][0].
+   * @param y array[ly2][ly1] of y values.
+   * @param lz1 the length of z in 1st dimension.
+   * @param lz2 the length of z in 2nd dimension.
+   * @param kz1 the sample index in 1st dimension of z[0][0].
+   * @param kz2 the sample index in 2nd dimension of z[0][0].
+   * @param z array[lz2][lz1] of z values.
+   */
+  public static void xcor(
+    int lx1, int lx2, int kx1, int kx2, float[][] x,
+    int ly1, int ly2, int ky1, int ky2, float[][] y,
+    int lz1, int lz2, int kz1, int kz2, float[][] z)
+  {
+    reverse(lx1,lx2,x);
+    kx1 = 1-kx1-lx1;
+    kx2 = 1-kx2-lx2;
+    conv(lx1,lx2,kx1,kx2,x,ly1,ly2,ky1,ky2,y,lz1,lz2,kz1,kz2,z);
+    reverse(lx1,lx2,x);
+  }
+
+  /**
+   * Computes the 3-D cross-correlation of specified sequences x and y.
+   * @param lx1 the length of x in 1st dimension.
+   * @param lx2 the length of x in 2nd dimension.
+   * @param lx3 the length of x in 3rd dimension.
+   * @param kx1 the sample index in 1st dimension of x[0][0][0].
+   * @param kx2 the sample index in 2nd dimension of x[0][0][0].
+   * @param kx3 the sample index in 3rd dimension of x[0][0][0].
+   * @param x array[lx3][lx2][lx1] of x values.
+   * @param ly1 the length of y in 1st dimension.
+   * @param ly2 the length of y in 2nd dimension.
+   * @param ly3 the length of y in 3rd dimension.
+   * @param ky1 the sample index in 1st dimension of y[0][0][0].
+   * @param ky2 the sample index in 2nd dimension of y[0][0][0].
+   * @param ky3 the sample index in 3rd dimension of y[0][0][0].
+   * @param y array[ly3][ly2][ly1] of y values.
+   * @param lz1 the length of z in 1st dimension.
+   * @param lz2 the length of z in 2nd dimension.
+   * @param lz3 the length of z in 3rd dimension.
+   * @param kz1 the sample index in 1st dimension of z[0][0][0].
+   * @param kz2 the sample index in 2nd dimension of z[0][0][0].
+   * @param kz3 the sample index in 3rd dimension of z[0][0][0].
+   * @param z array[lz3][lz2][lz1] of z values.
+   */
+  public static void xcor(
+    int lx1, int lx2, int lx3, int kx1, int kx2, int kx3, float[][][] x,
+    int ly1, int ly2, int ly3, int ky1, int ky2, int ky3, float[][][] y,
+    int lz1, int lz2, int lz3, int kz1, int kz2, int kz3, float[][][] z)
+  {
+    reverse(lx1,lx2,lx3,x);
+    kx1 = 1-kx1-lx1;
+    kx2 = 1-kx2-lx2;
+    kx3 = 1-kx3-lx3;
+    conv(lx1,lx2,lx3,kx1,kx2,kx3,x,
+         ly1,ly2,ly3,ky1,ky2,ky3,y,
+         lz1,lz2,lz3,kz1,kz2,kz3,z);
+    reverse(lx1,lx2,lx3,x);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -213,8 +283,9 @@ public class Conv {
   //   z[i-ilo] = sum;
   // }
   //
-  // The code fragment above is equivalent to, except for rounding errors,
-  // this more complicated and efficient method.
+  // The code fragment above performs the same operations, but in a
+  // different order and with different rounding errors, as this more
+  // complicated and efficient method.
   // 
   // This method computes output samples z in up to five stages: (1) off 
   // left, (2) rolling on, (3) middle, (4) rolling off, and (5) off right. 
@@ -235,31 +306,33 @@ public class Conv {
   // 
   // In stages 2, 3, and 4, output samples z are computed in pairs (a,b)
   // so that, in inner loops, only one load is required per multiply-add.
-  // Note that iteration over indices i and j in stage 4 is backwards, as
-  // this stage is like a mirror image of stage 2.
+  // In stage 4, iteration over indices i and j is backwards; stage 4 is 
+  // like a mirror image of stage 2.
   // 
   // Here is an example, for lx = 6 and ly = 7. Only stages 2, 3, and 4 
   // are illustrated. Output samples are computed for a contiguous range 
   // of indices i, but that range may be any subset of the range [0:11] 
   // illustrated here.
-  //      i  y0  y1  y2  y3  y4  y5  y6
-  //     --  --  --  --  --  --  --  --
-  //  @   0  x0
-  //  @   1  x1  x0
-  //  @   2  x2  x1  x0
-  //  @   3  x3  x2  x1  x0
-  //  @   4  x4  x3  x2  x1  x0
-  //  #   5  x5  x4  x3  x2  x1  x0
-  //  #   6      x5  x4  x3  x2  x1  x0
-  //  %   7          x5  x4  x3  x2  x1
-  //  %   8              x5  x4  x3  x2
-  //  %   9                  x5  x4  x3
-  //  %  10                      x5  x4
-  //  %  11                          x5
+  //   r   s   i  y0  y1  y2  y3  y4  y5  y6
+  //  --  --  --  --  --  --  --  --  --  --
+  //   a   @   0  x0
+  //   b   @   1  x1  x0
+  //   a   @   2  x2  x1  x0
+  //   b   @   3  x3  x2  x1  x0
+  //   a   @   4  x4  x3  x2  x1  x0
+  //   a   #   5  x5  x4  x3  x2  x1  x0
+  //   b   #   6      x5  x4  x3  x2  x1  x0
+  //   a   %   7          x5  x4  x3  x2  x1
+  //   b   %   8              x5  x4  x3  x2
+  //   a   %   9                  x5  x4  x3
+  //   b   %  10                      x5  x4
+  //   a   %  11                          x5
   //
-  //  @ - rolling on  :  0 <= i <=  4
-  //  # - middle      :  5 <= i <=  6
-  //  % - rolling off :  7 <= i <= 11
+  //  r - register (a or b)
+  //  s - stage (2, 3, or 4):
+  //    @ - rolling on  :  0 <= i <=  4
+  //    # - middle      :  5 <= i <=  6
+  //    % - rolling off :  7 <= i <= 11
   ///////////////////////////////////////////////////////////////////////////
   private static void convFast(
     int lx, int kx, float[] x,
@@ -438,8 +511,8 @@ public class Conv {
     jlo = 0;
     jhi = ilo;
     for (i=ilo,iz=i-imin; i<ihi; i+=2,iz+=2,jhi+=2) {
-      sa = 0.0f;
-      sb = 0.0f;
+      sa = z[iz  ];
+      sb = z[iz+1];
       yb = y[i-jlo+1];
       for (j=jlo; j<jhi; j+=2) {
         xa = x[j];
@@ -459,16 +532,16 @@ public class Conv {
         xb = x[j+1];
         sb += xb*ya;
       }
-      z[iz  ] += sa;
-      z[iz+1] += sb;
+      z[iz  ] = sa;
+      z[iz+1] = sb;
     }
     if (i==ihi) {
       jlo = 0;
       jhi = i;
-      sa = 0.0f;
+      sa = z[iz];
       for (j=jlo; j<=jhi; ++j)
         sa += x[j]*y[i-j];
-      z[iz] += sa;
+      z[iz] = sa;
     }
 
     // Middle: lx-1 <= i <= ly-1 and 0 <= j <= lx-1
@@ -477,8 +550,8 @@ public class Conv {
     jlo = 0;
     jhi = lx-1;
     for (i=ilo,iz=i-imin; i<ihi; i+=2,iz+=2) {
-      sa = 0.0f;
-      sb = 0.0f;
+      sa = z[iz  ];
+      sb = z[iz+1];
       yb = y[i-jlo+1];
       for (j=jlo; j<jhi; j+=2) {
         xa = x[j];
@@ -496,14 +569,14 @@ public class Conv {
         ya = y[i-j];
         sa += xa*ya;
       }
-      z[iz  ] += sa;
-      z[iz+1] += sb;
+      z[iz  ] = sa;
+      z[iz+1] = sb;
     }
     if (i==ihi) {
-      sa = 0.0f;
+      sa = z[iz];
       for (j=jlo; j<=jhi; ++j)
         sa += x[j]*y[i-j];
-      z[iz] += sa;
+      z[iz] = sa;
     }
 
     // Rolling off: ly <= i <= lx+ly-2 and i-ly+1 <= j <= lx-1
@@ -512,8 +585,8 @@ public class Conv {
     jlo = ihi-ly+1;
     jhi = lx-1;
     for (i=ihi,iz=i-imin; i>ilo; i-=2,iz-=2,jlo-=2) {
-      sa = 0.0f;
-      sb = 0.0f;
+      sa = z[iz  ];
+      sb = z[iz-1];
       yb = y[i-jhi-1];
       for (j=jhi; j>jlo; j-=2) {
         xa = x[j];
@@ -533,16 +606,16 @@ public class Conv {
         xb = x[j-1];
         sb += xb*ya;
       }
-      z[iz  ] += sa;
-      z[iz-1] += sb;
+      z[iz  ] = sa;
+      z[iz-1] = sb;
     }
     if (i==ilo) {
       jlo = i-ly+1;
       jhi = lx-1;
-      sa = 0.0f;
+      sa = z[iz];
       for (j=jhi; j>=jlo; --j)
     	sa += x[j]*y[i-j];
-      z[iz] += sa;
+      z[iz] = sa;
     }
   }
 
@@ -567,5 +640,25 @@ public class Conv {
       z[i1] = z[j1];
       z[j1] = zt;
     }
+  }
+
+  private static void reverse(int n1, int n2, float[][] z) {
+    for (int i2=0,j2=n2-1; i2<j2; ++i2,--j2) {
+      float[] zt = z[i2];
+      z[i2] = z[j2];
+      z[j2] = zt;
+    }
+    for (int i2=0; i2<n2; ++i2)
+      reverse(n1,z[i2]);
+  }
+
+  private static void reverse(int n1, int n2, int n3, float[][][] z) {
+    for (int i3=0,j3=n3-1; i3<j3; ++i3,--j3) {
+      float[][] zt = z[i3];
+      z[i3] = z[j3];
+      z[j3] = zt;
+    }
+    for (int i3=0; i3<n3; ++i3)
+      reverse(n1,n2,z[i3]);
   }
 }
