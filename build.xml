@@ -260,9 +260,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <copy todir="${dist}/lib">
       <fileset dir="${lib}/linux/x86"/>
     </copy>
-    <copy todir="${dist}/jar">
-      <fileset dir="${jar}/linux/x86"/>
-    </copy>
     <tar destfile="${dist}/${title}_${DSTAMP}_${TSTAMP}.tar.gz"
          compression="gzip">
       <tarfileset dir="${dist}" prefix="${title}"/>
@@ -274,9 +271,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     </copy>
     <copy todir="${dist}/lib">
       <fileset dir="${lib}/windows/x86"/>
-    </copy>
-    <copy todir="${dist}/jar">
-      <fileset dir="${jar}/windows/x86"/>
     </copy>
     <zip destfile="${dist}/${title}_${DSTAMP}_${TSTAMP}.zip">
       <zipfileset dir="${dist}" prefix="${title}"/>
