@@ -266,6 +266,60 @@ public class Sampling {
   }
 
   /**
+   * Determines whether this sampling is compatible with the specified sampling.
+   * Two samplings are incompatible if their ranges of sample values overlap, 
+   * but not all values in the overlapping parts are equivalent. Otherwise,
+   * they are compatible.
+   * @param s the sampling to compare to this sampling.
+   * @return true, if compatible; false, otherwise.
+   */
+  public boolean isCompatible(Sampling s) {
+    Sampling t = this;
+    int nt = t.getCount();
+    int ns = s.getCount();
+    double tf = t.getFirst();
+    double sf = s.getFirst();
+    double tl = t.getLast();
+    double sl = s.getLast();
+    int it = 0;
+    int is = 0;
+    int jt = nt-1;
+    int js = ns-1;
+    if (tl<sf) {
+      return true;
+    } else if (sl<tf) {
+      return true;
+    } else {
+      if (tf<sf) {
+        it = t.indexOf(sf);
+      } else {
+        is = s.indexOf(tf);
+      }
+      if (it<0 || is<0)
+        return false;
+      if (tl<sl) {
+        js = s.indexOf(tl);
+      } else {
+        jt = t.indexOf(sl);
+      }
+      if (jt<0 || js<0)
+        return false;
+      int mt = 1+jt-it;
+      int ms = 1+js-is;
+      if (mt!=ms)
+        return false;
+      if (!t.isUniform() || !s.isUniform()) {
+        double tiny = tinyWith(s);
+        for (jt=it,js=is; jt!=mt; ++jt,++js) {
+          if (!almostEqual(t.value(jt),s.value(js),tiny))
+            return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  /**
    * Returns the index of the sample with specified value. If this 
    * sampling has a sample value that equals (to within the sampling 
    * tolerance) the specified value, then this method returns the 

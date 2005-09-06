@@ -9,7 +9,12 @@ package edu.mines.jtk.mosaic;
 import static java.lang.Math.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
+import java.io.*;
 import java.util.*;
+import javax.imageio.*;
+import javax.imageio.metadata.*;
+import javax.imageio.stream.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import edu.mines.jtk.gui.ModeManager;
@@ -308,6 +313,111 @@ public class Mosaic extends JPanel {
    */
   public ModeManager getModeManager() {
     return _modeManager;
+  }
+
+  /**
+   * Paints this mosaic to an image with specified width in pixels.
+   * The image height is computed so that the image has the same aspect 
+   * ratio as this mosaic.
+   * @param width the image width, in pixels.
+   * @return the image.
+   */
+  public BufferedImage paintToImage(int width) {
+    int wpixels = getWidth();
+    int hpixels = getHeight();
+    double scale = (double)width/(double)wpixels;
+    int wimage = (int)(scale*(wpixels-1)+1.5);
+    int himage = (int)(scale*(hpixels-1)+1.5);
+    int type = BufferedImage.TYPE_INT_RGB;
+    BufferedImage bi = new BufferedImage(wimage,himage,type);
+    Graphics2D g2d = (Graphics2D)bi.getGraphics();
+    g2d.setRenderingHint(
+      RenderingHints.KEY_ANTIALIASING,
+      RenderingHints.VALUE_ANTIALIAS_ON);
+    Color fg = getForeground();
+    g2d.setColor(getBackground());
+    g2d.fillRect(0,0,wimage,himage);
+    g2d.setColor(fg);
+    g2d.scale(scale,scale);
+    paintComponent(g2d);
+    for (int irow=0; irow<_nrow; ++irow) {
+      for (int icol=0; icol<_ncol; ++icol) {
+        Tile tile = _tiles[irow][icol];
+        int x = tile.getX();
+        int y = tile.getY();
+        g2d.translate(x,y);
+        tile.paintComponent(g2d);
+        g2d.translate(-x,-y);
+      }
+    }
+    if (_axesTop!=null) {
+      for (int icol=0; icol<_ncol; ++icol)
+        paintAxis(_axesTop[icol],g2d);
+    }
+    if (_axesLeft!=null) {
+      for (int irow=0; irow<_nrow; ++irow)
+        paintAxis(_axesLeft[irow],g2d);
+    }
+    if (_axesBottom!=null) {
+      for (int icol=0; icol<_ncol; ++icol)
+        paintAxis(_axesBottom[icol],g2d);
+    }
+    if (_axesRight!=null) {
+      for (int irow=0; irow<_nrow; ++irow)
+        paintAxis(_axesRight[irow],g2d);
+    }
+    g2d.dispose();
+    return bi;
+  }
+  private void paintAxis(TileAxis axis, Graphics2D g2d) {
+    int x = axis.getX();
+    int y = axis.getY();
+    g2d.translate(x,y);
+    axis.paintComponent(g2d);
+    g2d.translate(-x,-y);
+  }
+
+  /**
+   * Paints this mosaic to a PNG image with specified resolution and width.
+   * The image height is computed so that the image has the same aspect 
+   * ratio as this mosaic.
+   * @param dpi the image resolution, in dots per inch.
+   * @param win the image width, in inches.
+   * @param fileName the name of the file to contain the PNG image.  
+   */
+  public void paintToPng(double dpi, double win, String fileName) 
+    throws IOException 
+  {
+    BufferedImage image = paintToImage((int)ceil(dpi*win));
+    // The two lines of code below are simple, but will not write resolution 
+    // info to the PNG file. We want that, especially for high-res images.
+    //File file = new File(fileName);
+    //ImageIO.write(image,"png",file);
+    Iterator i = ImageIO.getImageWritersBySuffix("png");
+    if (!i.hasNext())
+      throw new IOException("cannot get a PNG image writer");
+    ImageWriter iw = (ImageWriter)i.next();
+    FileOutputStream fos = new FileOutputStream(fileName);
+    ImageOutputStream ios = ImageIO.createImageOutputStream(fos);
+    iw.setOutput(ios);
+    ImageWriteParam iwp = iw.getDefaultWriteParam();
+    ImageTypeSpecifier its = new ImageTypeSpecifier(image);
+    IIOMetadata imd = iw.getDefaultImageMetadata(its,iwp);
+    String format = "javax_imageio_png_1.0";
+    IIOMetadataNode tree = (IIOMetadataNode)imd.getAsTree(format);
+    IIOMetadataNode node = new IIOMetadataNode("pHYs");
+    String dpm = Integer.toString((int)ceil(dpi/0.0254));
+    node.setAttribute("pixelsPerUnitXAxis",dpm);
+    node.setAttribute("pixelsPerUnitYAxis",dpm);
+    node.setAttribute("unitSpecifier","meter");
+    tree.appendChild(node);
+    imd.setFromTree(format,tree);
+    iw.write(new IIOImage(image,null,imd));
+    ios.flush();
+    ios.close();
+    fos.flush();
+    fos.close();
+    iw.dispose();
   }
 
   // Override base class implementation.
