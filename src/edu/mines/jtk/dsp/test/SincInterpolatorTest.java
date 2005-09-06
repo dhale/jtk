@@ -30,6 +30,14 @@ public class SincInterpolatorTest extends TestCase {
   private double[] _fmaxs = {0.10,0.30,0.40,0.45};
   private int[] _lmaxs = {8,10,12,14,16};
 
+  public void testKenLarner() {
+    for (int lmax=8; lmax<=16; lmax+=2) {
+      trace("testKenLarner: lmax="+lmax);
+      SincInterpolator si = SincInterpolator.fromKenLarner(lmax);
+      testInterpolator(si);
+    }
+  }
+
   public void testExtrapolation() {
     SincInterpolator si = new SincInterpolator();
     Random random = new Random();

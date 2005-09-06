@@ -128,6 +128,33 @@ public class SincInterpolator {
   }
 
   /**
+   * Returns a sinc interpolator using Ken Larner's least-squares method.
+   * <p>
+   * The product (1-2*fmax)*lmax must be greater than one. For when this 
+   * product is less than one, a useful upper bound on interpolation error 
+   * cannot be computed.
+   * @param fmax the maximum frequency, in cycles per sample. 
+   *  Must be greater than 0.0 and less than 0.5*(1.0-1.0/lmax).
+   * @param lmax the maximum interpolator length, in samples. 
+   *  Must be an even integer not less than 8 and greater than 
+   *  1.0/(1.0-2.0*fmax).
+   * @return the sinc interpolator.
+   */
+  public static SincInterpolator fromKenLarner(int lmax) {
+    return new SincInterpolator(lmax);
+  }
+  private SincInterpolator(int lmax) {
+    Check.argument(lmax>=4,"lmax>=4");
+    _emax = 0.01; // ???
+    _fmax = 0.5*(0.066+0.265*log(lmax));
+    _lmax = lmax;
+    _nsinc = 8193;
+    _dsinc = 1.0/(_nsinc-1);
+    _lsinc = lmax;
+    makeTableKenLarner();
+  }
+
+  /**
    * Constructs a default sinc interpolator. The default design parameters 
    * are fmax = 0.3 cycles/sample (60% of Nyquist) and lmax = 8 samples.
    * For these parameters, the computed maximum error is less than 0.007
@@ -477,9 +504,6 @@ public class SincInterpolator {
     _dsinc = 1.0/(_nsinc-1);
     _lsinc = lmax;
 
-    // System.out.println(
-    //   "emax="+_emax+" fmax="+_fmax+" lmax="+_lmax+" nsinc="+_nsinc);
-
     // Save design parameters and Kaiser window, so we can build the table.
     _emax = emax;
     _fmax = fmax;
@@ -500,10 +524,10 @@ public class SincInterpolator {
     // The first and last interpolators are shifted unit impulses.
     // Handle these two cases exactly, with no rounding errors.
     for (int j=0; j<_lsinc; ++j) {
-      _asinc[      0][j] = 0.0f;
+      _asinc[       0][j] = 0.0f;
       _asinc[_nsinc-1][j] = 0.0f;
     }
-    _asinc[      0][_lsinc/2-1] = 1.0f;
+    _asinc[       0][_lsinc/2-1] = 1.0f;
     _asinc[_nsinc-1][_lsinc/2  ] = 1.0f;
 
     // Other interpolators are sampled Kaiser-windowed sinc functions.
@@ -615,6 +639,76 @@ public class SincInterpolator {
       for (int isinc=0,jyin=kyin; isinc<_lsinc; ++isinc,++jyin)
         youtr += _yin[jyin]*asinc[isinc];
       yout[ixout] = youtr;
+    }
+  }
+
+  /**
+   * Builds the table of interpolators using Ken Larner's old method. 
+   * This method exists for comparison with the Kaiser window method.
+   * Ken's method is the one that has been in SU and ProMAX for years.
+   */
+  private void makeTableKenLarner() {
+    _nsincm1 = _nsinc-1;
+    _asinc = new float[_nsinc][_lsinc];
+
+    // The first and last interpolators are shifted unit impulses.
+    // Handle these two cases exactly, with no rounding errors.
+    for (int j=0; j<_lsinc; ++j) {
+      _asinc[       0][j] = 0.0f;
+      _asinc[_nsinc-1][j] = 0.0f;
+    }
+    _asinc[       0][_lsinc/2-1] = 1.0f;
+    _asinc[_nsinc-1][_lsinc/2  ] = 1.0f;
+
+    // Other interpolators are least-squares approximations to sincs.
+    for (int isinc=1; isinc<_nsinc-1; ++isinc) {
+      double frac = (double)isinc/(double)(_nsinc-1);
+      mksinc(frac,_lsinc,_asinc[isinc]);
+    }
+  }
+  private static void mksinc(double d, int lsinc, float[] sinc) {
+    double[] s = new double[lsinc];
+    double[] a = new double[lsinc];
+    double[] c = new double[lsinc];
+    double[] w = new double[lsinc];
+    double fmax = 0.066+0.265*log(lsinc);
+    if (fmax>1.0)
+      fmax = 1.0;
+    for (int j=0; j<lsinc; ++j) {
+      a[j] = sinc(fmax*j);
+      c[j] = sinc(fmax*(lsinc/2-j-1+d));
+    }
+    stoepd(lsinc,a,c,s,w);
+    for (int j=0; j<lsinc; ++j)
+      sinc[j] = (float)s[j];
+  }
+  private static void stoepd (
+    int n, double[] r, double[] g, double[] f, double[] a)
+  {
+    if (r[0]==0.0) 
+      return;
+    a[0] = 1.0;
+    double v = r[0];
+    f[0] = g[0]/r[0];
+    for (int j=1; j<n; j++) {
+      a[j] = 0.0;
+      f[j] = 0.0;
+      double e = 0.0;
+      for (int i=0; i<j; i++)
+        e += a[i]*r[j-i];
+      double c = e/v;
+      v -= c*e;
+      for (int i=0; i<=j/2; i++) {
+        double bot = a[j-i]-c*a[i];
+        a[i] -= c*a[j-i];
+        a[j-i] = bot;
+      }
+      double w = 0.0;
+      for (int i=0; i<j; i++)
+        w += f[i]*r[j-i];
+      c = (w-g[j])/v;
+      for (int i=0; i<=j; i++)
+        f[i] -= c*a[j-i];
     }
   }
 }
