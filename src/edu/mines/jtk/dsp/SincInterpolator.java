@@ -132,8 +132,8 @@ public class SincInterpolator {
    * This interpolator is based on a Technical Memorandum written in 1980
    * by Ken Larner while at Western Geophysical. It is included here only
    * for historical purposes and comparison. It is less flexible and yields 
-   * more interpolation error than the other interpolators constructed by 
-   * this class.
+   * more interpolation error than other interpolators constructed by this
+   * class.
    * @param lmax the maximum interpolator length, in samples. 
    *  Must be an even integer between 8 and 16, inclusive.
    * @return the sinc interpolator.
@@ -143,10 +143,10 @@ public class SincInterpolator {
   }
   private SincInterpolator(int lmax) {
     Check.argument(lmax%2==0,"lmax is even");
-    Check.argument(lmax>=4,"lmax>=4");
+    Check.argument(lmax>=8,"lmax>=8");
     Check.argument(lmax<=16,"lmax<=16");
     _emax = 0.01;
-    _fmax = 0.033+0.132*log(lmax);
+    _fmax = 0.033+0.132*log(lmax); // Ken's empirical relationship
     _lmax = lmax;
     _nsinc = 16385;
     _dsinc = 1.0/(_nsinc-1);
