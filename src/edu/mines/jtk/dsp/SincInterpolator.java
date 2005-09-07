@@ -131,7 +131,7 @@ public class SincInterpolator {
    * Returns a sinc interpolator using Ken Larner's least-squares method.
    * This interpolator is based on a Technical Memorandum written in 1980
    * by Ken Larner while at Western Geophysical. It is included here only
-   * for historical purposes and comparison. It is less flexible and yields 
+   * for historical and testing purposes. It is less flexible and yields 
    * more interpolation error than other interpolators constructed by this
    * class.
    * @param lmax the maximum interpolator length, in samples. 
