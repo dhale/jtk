@@ -11,7 +11,7 @@ ncol = 1
 axesPlacement = EnumSet.of(
   Mosaic.AxesPlacement.LEFT,
   Mosaic.AxesPlacement.BOTTOM)
-borderStyle = Mosaic.BorderStyle.SHADOW
+borderStyle = Mosaic.BorderStyle.FLAT
 mosaic = Mosaic(nrow,ncol,axesPlacement,borderStyle)
 mosaic.setPreferredSize(Dimension(950,400))
 tileA = mosaic.getTile(0,0)

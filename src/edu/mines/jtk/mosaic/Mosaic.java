@@ -389,8 +389,8 @@ public class Mosaic extends JPanel {
     throws IOException 
   {
     BufferedImage image = paintToImage((int)ceil(dpi*win));
-    // The two lines of code below are simple, but will not write resolution 
-    // info to the PNG file. We want that, especially for high-res images.
+    // The two lines below are simple, but do not write resolution info to 
+    // the PNG file. We want that info, especially for high-res images.
     //File file = new File(fileName);
     //ImageIO.write(image,"png",file);
     Iterator i = ImageIO.getImageWritersBySuffix("png");

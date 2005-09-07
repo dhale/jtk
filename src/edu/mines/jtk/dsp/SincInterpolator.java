@@ -129,26 +129,26 @@ public class SincInterpolator {
 
   /**
    * Returns a sinc interpolator using Ken Larner's least-squares method.
-   * <p>
-   * The product (1-2*fmax)*lmax must be greater than one. For when this 
-   * product is less than one, a useful upper bound on interpolation error 
-   * cannot be computed.
-   * @param fmax the maximum frequency, in cycles per sample. 
-   *  Must be greater than 0.0 and less than 0.5*(1.0-1.0/lmax).
+   * This interpolator is based on a Technical Memorandum written in 1980
+   * by Ken Larner while at Western Geophysical. It is included here only
+   * for historical purposes and comparison. It is less flexible and yields 
+   * more interpolation error than the other interpolators constructed by 
+   * this class.
    * @param lmax the maximum interpolator length, in samples. 
-   *  Must be an even integer not less than 8 and greater than 
-   *  1.0/(1.0-2.0*fmax).
+   *  Must be an even integer between 8 and 16, inclusive.
    * @return the sinc interpolator.
    */
   public static SincInterpolator fromKenLarner(int lmax) {
     return new SincInterpolator(lmax);
   }
   private SincInterpolator(int lmax) {
+    Check.argument(lmax%2==0,"lmax is even");
     Check.argument(lmax>=4,"lmax>=4");
-    _emax = 0.01; // ???
-    _fmax = 0.5*(0.066+0.265*log(lmax));
+    Check.argument(lmax<=16,"lmax<=16");
+    _emax = 0.01;
+    _fmax = 0.033+0.132*log(lmax);
     _lmax = lmax;
-    _nsinc = 8193;
+    _nsinc = 16385;
     _dsinc = 1.0/(_nsinc-1);
     _lsinc = lmax;
     makeTableKenLarner();
@@ -671,12 +671,12 @@ public class SincInterpolator {
     double[] a = new double[lsinc];
     double[] c = new double[lsinc];
     double[] w = new double[lsinc];
-    double fmax = 0.066+0.265*log(lsinc);
-    if (fmax>1.0)
-      fmax = 1.0;
+    double fmax = 0.033+0.132*log(lsinc);
+    if (fmax>0.5)
+      fmax = 0.5;
     for (int j=0; j<lsinc; ++j) {
-      a[j] = sinc(fmax*j);
-      c[j] = sinc(fmax*(lsinc/2-j-1+d));
+      a[j] = sinc(2.0*fmax*j);
+      c[j] = sinc(2.0*fmax*(lsinc/2-j-1+d));
     }
     stoepd(lsinc,a,c,s,w);
     for (int j=0; j<lsinc; ++j)
