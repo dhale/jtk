@@ -148,7 +148,7 @@ public class SincInterpolator {
     _emax = 0.01;
     _fmax = 0.033+0.132*log(lmax); // Ken's empirical relationship
     _lmax = lmax;
-    _nsinc = 16385;
+    _nsinc = 2049;
     _dsinc = 1.0/(_nsinc-1);
     _lsinc = lmax;
     makeTableKenLarner();

@@ -339,6 +339,7 @@ public class Mosaic extends JPanel {
     g2d.fillRect(0,0,wimage,himage);
     g2d.setColor(fg);
     g2d.scale(scale,scale);
+    g2d.setFont(getFont());
     paintComponent(g2d);
     for (int irow=0; irow<_nrow; ++irow) {
       for (int icol=0; icol<_ncol; ++icol) {

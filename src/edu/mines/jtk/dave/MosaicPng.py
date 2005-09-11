@@ -19,7 +19,7 @@ tileB = mosaic.getTile(1,0)
 nx = 101
 dx = 0.1
 fx = 0.0
-y = Array.sin(Array.rampfloat(fx,dx,nx));
+y = Array.sin(Array.rampfloat(fx,dx,nx))
 x = Sampling(nx,dx,fx)
 lv = LollipopView(x,y)
 tileA.addTiledView(lv)

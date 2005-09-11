@@ -35,6 +35,9 @@ public class SincInterpolatorTest extends TestCase {
       trace("testKenLarner: lmax="+lmax);
       SincInterpolator si = SincInterpolator.fromKenLarner(lmax);
       testInterpolator(si);
+      double fmax = si.getMaximumFrequency();
+      si = SincInterpolator.fromFrequencyAndLength(fmax,lmax);
+      testInterpolator(si);
     }
   }
 
@@ -183,7 +186,7 @@ public class SincInterpolatorTest extends TestCase {
     }
     si.setInput(nxin,dxin,fxin,yin);
     si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
-    trace("xmax="+xmax+" nmax="+nmax+" nxin="+nxin);
+    //trace("xmax="+xmax+" nmax="+nmax+" nxin="+nxin);
 
     // Interpolate.
     double dxout = 0.01*dxin;
