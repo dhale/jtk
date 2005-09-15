@@ -24,9 +24,9 @@ public class ArrayTest extends TestCase {
   }
 
   public void testFloat1() {
-    int n1 = 5;
-    int n2 = 4;
-    int n3 = 3;
+    int n1 = 8;
+    int n2 = 6;
+    int n3 = 4;
     float[] a1 = rampfloat(0,1,n1);
     float[][] a2 = rampfloat(0,1,10,n1,n2);
     float[][][] a3 = rampfloat(0,1,10,100,n1,n2,n3);
@@ -76,6 +76,13 @@ public class ArrayTest extends TestCase {
     assertEqual(b2,rampfloat(12,1,10,n1-1,n2-1));
     assertEqual(b3,rampfloat(123,1,10,100,n1-1,n2-1,n3-1));
 
+    b1 = copy(n1/2,0,2,a1);
+    b2 = copy(n1/2,n2/2,0,0,2,2,a2);
+    b3 = copy(n1/2,n2/2,n3/2,0,0,0,2,2,2,a3);
+    assertEqual(b1,rampfloat(0,2,n1/2));
+    assertEqual(b2,rampfloat(0,2,20,n1/2,n2/2));
+    assertEqual(b3,rampfloat(0,2,20,200,n1/2,n2/2,n3/2));
+
     b1 = copy(a1);
     b2 = copy(a2);
     b3 = copy(a3);
@@ -85,6 +92,9 @@ public class ArrayTest extends TestCase {
     assertEqual(b1,rampfloat(0,1,n1));
     assertEqual(b2,rampfloat(0,1,10,n1,n2));
     assertEqual(b3,rampfloat(0,1,10,100,n1,n2,n3));
+
+    b1 = reverse(reverse(a1));
+    assertEqual(b1,a1);
 
     b2 = reshape(n1,n2,flatten(a2));
     b3 = reshape(n1,n2,n3,flatten(a3));
@@ -172,15 +182,18 @@ public class ArrayTest extends TestCase {
   }
 
   public void testCfloat1() {
-    int n1 = 5;
-    int n2 = 4;
-    int n3 = 3;
+    int n1 = 8;
+    int n2 = 6;
+    int n3 = 4;
     Cfloat c0 = new Cfloat(0.0f,0.0f);
     Cfloat c1 = new Cfloat(1.0f,0.0f);
+    Cfloat c2 = new Cfloat(2.0f,0.0f);
     Cfloat c10 = new Cfloat(10.0f,0.0f);
     Cfloat c12 = new Cfloat(12.0f,0.0f);
+    Cfloat c20 = new Cfloat(20.0f,0.0f);
     Cfloat c100 = new Cfloat(100.0f,0.0f);
     Cfloat c123 = new Cfloat(123.0f,0.0f);
+    Cfloat c200 = new Cfloat(200.0f,0.0f);
     float[] a1 = crampfloat(c0,c1,n1);
     float[][] a2 = crampfloat(c0,c1,c10,n1,n2);
     float[][][] a3 = crampfloat(c0,c1,c10,c100,n1,n2,n3);
@@ -230,6 +243,13 @@ public class ArrayTest extends TestCase {
     assertEqual(b2,crampfloat(c12,c1,c10,n1-1,n2-1));
     assertEqual(b3,crampfloat(c123,c1,c10,c100,n1-1,n2-1,n3-1));
 
+    b1 = ccopy(n1/2,0,2,a1);
+    b2 = ccopy(n1/2,n2/2,0,0,2,2,a2);
+    b3 = ccopy(n1/2,n2/2,n3/2,0,0,0,2,2,2,a3);
+    assertEqual(b1,crampfloat(c0,c2,n1/2));
+    assertEqual(b2,crampfloat(c0,c2,c20,n1/2,n2/2));
+    assertEqual(b3,crampfloat(c0,c2,c20,c200,n1/2,n2/2,n3/2));
+
     b1 = ccopy(a1);
     b2 = ccopy(a2);
     b3 = ccopy(a3);
@@ -239,6 +259,9 @@ public class ArrayTest extends TestCase {
     assertEqual(b1,crampfloat(c0,c1,n1));
     assertEqual(b2,crampfloat(c0,c1,c10,n1,n2));
     assertEqual(b3,crampfloat(c0,c1,c10,c100,n1,n2,n3));
+
+    b1 = creverse(creverse(a1));
+    assertEqual(b1,a1);
 
     b2 = creshape(n1,n2,cflatten(a2));
     b3 = creshape(n1,n2,n3,cflatten(a3));

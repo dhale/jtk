@@ -2742,6 +2742,63 @@ public class Array {
   }
 
   /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static byte[] copy(
+    int n1,
+    int j1, int k1, byte[] rx) {
+    byte[] ry = new byte[n1];
+    copy(n1,j1,k1,rx,0,1,ry);
+    return ry;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param j2 offset in 2nd dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param k2 stride in 2nd dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static byte[][] copy(
+    int n1, int n2,
+    int j1, int j2, int k1, int k2, byte[][] rx) {
+    byte[][] ry = new byte[n2][n1];
+    copy(n1,n2,j1,j2,k1,k2,rx,0,0,1,1,ry);
+    return ry;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param j2 offset in 2nd dimension of rx.
+   * @param j3 offset in 3rd dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param k2 stride in 2nd dimension of rx.
+   * @param k3 stride in 3rd dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static byte[][][] copy(
+    int n1, int n2, int n3, 
+    int j1, int j2, int j3, int k1, int k2, int k3, byte[][][] rx) {
+    byte[][][] ry = new byte[n3][n2][n1];
+    copy(n1,n2,n3,j1,j2,j3,k1,k2,k3,rx,0,0,0,1,1,1,ry);
+    return ry;
+  }
+
+  /**
    * Copies elements from one specified array to another.
    * @param n1 number of elements to copy in 1st dimension.
    * @param j1x offset in 1st dimension of rx.
@@ -2796,6 +2853,75 @@ public class Array {
     int j1y, int j2y, int j3y, byte[][][] ry) {
     for (int i3=0; i3<n3; ++i3)
       copy(n1,n2,j1x,j2x,rx[j3x+i3],j1y,j2y,ry[j3y+i3]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, 
+    int j1x, int k1x, byte[] rx, 
+    int j1y, int k1y, byte[] ry) {
+    for (int i1=0,ix=j1x,iy=j1y; i1<n1; ++i1,ix+=k1x,iy+=k1y)
+      ry[iy] = rx[ix];
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param j2x offset in 2nd dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param k2x stride in 2nd dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param j2y offset in 2nd dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param k2y stride in 2nd dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, int n2, 
+    int j1x, int j2x, int k1x, int k2x, byte[][] rx, 
+    int j1y, int j2y, int k1y, int k2y, byte[][] ry) {
+    for (int i2=0; i2<n2; ++i2)
+      copy(n1,j1x,k1x,rx[j2x+i2*k2x],j1y,k1y,ry[j2y+i2*k2y]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param j2x offset in 2nd dimension of rx.
+   * @param j3x offset in 3rd dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param k2x stride in 2nd dimension of rx.
+   * @param k3x stride in 3rd dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param j2y offset in 2nd dimension of ry.
+   * @param j3y offset in 3rd dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param k2y stride in 2nd dimension of ry.
+   * @param k3y stride in 3rd dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, int n2, int n3,
+    int j1x, int j2x, int j3x, int k1x, int k2x, int k3x, byte[][][] rx, 
+    int j1y, int j2y, int j3y, int k1y, int k2y, int k3y, byte[][][] ry) {
+    for (int i3=0; i3<n3; ++i3)
+      copy(n1,n2,j1x,j2x,k1x,k2x,rx[j3x+i3*k3x],j1y,j2y,k1y,k2y,ry[j3y+i3*k3y]);
   }
 
   /**
@@ -2992,6 +3118,63 @@ public class Array {
   }
 
   /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static short[] copy(
+    int n1,
+    int j1, int k1, short[] rx) {
+    short[] ry = new short[n1];
+    copy(n1,j1,k1,rx,0,1,ry);
+    return ry;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param j2 offset in 2nd dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param k2 stride in 2nd dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static short[][] copy(
+    int n1, int n2,
+    int j1, int j2, int k1, int k2, short[][] rx) {
+    short[][] ry = new short[n2][n1];
+    copy(n1,n2,j1,j2,k1,k2,rx,0,0,1,1,ry);
+    return ry;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param j2 offset in 2nd dimension of rx.
+   * @param j3 offset in 3rd dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param k2 stride in 2nd dimension of rx.
+   * @param k3 stride in 3rd dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static short[][][] copy(
+    int n1, int n2, int n3, 
+    int j1, int j2, int j3, int k1, int k2, int k3, short[][][] rx) {
+    short[][][] ry = new short[n3][n2][n1];
+    copy(n1,n2,n3,j1,j2,j3,k1,k2,k3,rx,0,0,0,1,1,1,ry);
+    return ry;
+  }
+
+  /**
    * Copies elements from one specified array to another.
    * @param n1 number of elements to copy in 1st dimension.
    * @param j1x offset in 1st dimension of rx.
@@ -3046,6 +3229,75 @@ public class Array {
     int j1y, int j2y, int j3y, short[][][] ry) {
     for (int i3=0; i3<n3; ++i3)
       copy(n1,n2,j1x,j2x,rx[j3x+i3],j1y,j2y,ry[j3y+i3]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, 
+    int j1x, int k1x, short[] rx, 
+    int j1y, int k1y, short[] ry) {
+    for (int i1=0,ix=j1x,iy=j1y; i1<n1; ++i1,ix+=k1x,iy+=k1y)
+      ry[iy] = rx[ix];
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param j2x offset in 2nd dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param k2x stride in 2nd dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param j2y offset in 2nd dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param k2y stride in 2nd dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, int n2, 
+    int j1x, int j2x, int k1x, int k2x, short[][] rx, 
+    int j1y, int j2y, int k1y, int k2y, short[][] ry) {
+    for (int i2=0; i2<n2; ++i2)
+      copy(n1,j1x,k1x,rx[j2x+i2*k2x],j1y,k1y,ry[j2y+i2*k2y]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param j2x offset in 2nd dimension of rx.
+   * @param j3x offset in 3rd dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param k2x stride in 2nd dimension of rx.
+   * @param k3x stride in 3rd dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param j2y offset in 2nd dimension of ry.
+   * @param j3y offset in 3rd dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param k2y stride in 2nd dimension of ry.
+   * @param k3y stride in 3rd dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, int n2, int n3,
+    int j1x, int j2x, int j3x, int k1x, int k2x, int k3x, short[][][] rx, 
+    int j1y, int j2y, int j3y, int k1y, int k2y, int k3y, short[][][] ry) {
+    for (int i3=0; i3<n3; ++i3)
+      copy(n1,n2,j1x,j2x,k1x,k2x,rx[j3x+i3*k3x],j1y,j2y,k1y,k2y,ry[j3y+i3*k3y]);
   }
 
   /**
@@ -3242,6 +3494,63 @@ public class Array {
   }
 
   /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static int[] copy(
+    int n1,
+    int j1, int k1, int[] rx) {
+    int[] ry = new int[n1];
+    copy(n1,j1,k1,rx,0,1,ry);
+    return ry;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param j2 offset in 2nd dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param k2 stride in 2nd dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static int[][] copy(
+    int n1, int n2,
+    int j1, int j2, int k1, int k2, int[][] rx) {
+    int[][] ry = new int[n2][n1];
+    copy(n1,n2,j1,j2,k1,k2,rx,0,0,1,1,ry);
+    return ry;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param j2 offset in 2nd dimension of rx.
+   * @param j3 offset in 3rd dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param k2 stride in 2nd dimension of rx.
+   * @param k3 stride in 3rd dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static int[][][] copy(
+    int n1, int n2, int n3, 
+    int j1, int j2, int j3, int k1, int k2, int k3, int[][][] rx) {
+    int[][][] ry = new int[n3][n2][n1];
+    copy(n1,n2,n3,j1,j2,j3,k1,k2,k3,rx,0,0,0,1,1,1,ry);
+    return ry;
+  }
+
+  /**
    * Copies elements from one specified array to another.
    * @param n1 number of elements to copy in 1st dimension.
    * @param j1x offset in 1st dimension of rx.
@@ -3296,6 +3605,75 @@ public class Array {
     int j1y, int j2y, int j3y, int[][][] ry) {
     for (int i3=0; i3<n3; ++i3)
       copy(n1,n2,j1x,j2x,rx[j3x+i3],j1y,j2y,ry[j3y+i3]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, 
+    int j1x, int k1x, int[] rx, 
+    int j1y, int k1y, int[] ry) {
+    for (int i1=0,ix=j1x,iy=j1y; i1<n1; ++i1,ix+=k1x,iy+=k1y)
+      ry[iy] = rx[ix];
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param j2x offset in 2nd dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param k2x stride in 2nd dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param j2y offset in 2nd dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param k2y stride in 2nd dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, int n2, 
+    int j1x, int j2x, int k1x, int k2x, int[][] rx, 
+    int j1y, int j2y, int k1y, int k2y, int[][] ry) {
+    for (int i2=0; i2<n2; ++i2)
+      copy(n1,j1x,k1x,rx[j2x+i2*k2x],j1y,k1y,ry[j2y+i2*k2y]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param j2x offset in 2nd dimension of rx.
+   * @param j3x offset in 3rd dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param k2x stride in 2nd dimension of rx.
+   * @param k3x stride in 3rd dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param j2y offset in 2nd dimension of ry.
+   * @param j3y offset in 3rd dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param k2y stride in 2nd dimension of ry.
+   * @param k3y stride in 3rd dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, int n2, int n3,
+    int j1x, int j2x, int j3x, int k1x, int k2x, int k3x, int[][][] rx, 
+    int j1y, int j2y, int j3y, int k1y, int k2y, int k3y, int[][][] ry) {
+    for (int i3=0; i3<n3; ++i3)
+      copy(n1,n2,j1x,j2x,k1x,k2x,rx[j3x+i3*k3x],j1y,j2y,k1y,k2y,ry[j3y+i3*k3y]);
   }
 
   /**
@@ -3492,6 +3870,63 @@ public class Array {
   }
 
   /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static long[] copy(
+    int n1,
+    int j1, int k1, long[] rx) {
+    long[] ry = new long[n1];
+    copy(n1,j1,k1,rx,0,1,ry);
+    return ry;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param j2 offset in 2nd dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param k2 stride in 2nd dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static long[][] copy(
+    int n1, int n2,
+    int j1, int j2, int k1, int k2, long[][] rx) {
+    long[][] ry = new long[n2][n1];
+    copy(n1,n2,j1,j2,k1,k2,rx,0,0,1,1,ry);
+    return ry;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param j2 offset in 2nd dimension of rx.
+   * @param j3 offset in 3rd dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param k2 stride in 2nd dimension of rx.
+   * @param k3 stride in 3rd dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static long[][][] copy(
+    int n1, int n2, int n3, 
+    int j1, int j2, int j3, int k1, int k2, int k3, long[][][] rx) {
+    long[][][] ry = new long[n3][n2][n1];
+    copy(n1,n2,n3,j1,j2,j3,k1,k2,k3,rx,0,0,0,1,1,1,ry);
+    return ry;
+  }
+
+  /**
    * Copies elements from one specified array to another.
    * @param n1 number of elements to copy in 1st dimension.
    * @param j1x offset in 1st dimension of rx.
@@ -3546,6 +3981,75 @@ public class Array {
     int j1y, int j2y, int j3y, long[][][] ry) {
     for (int i3=0; i3<n3; ++i3)
       copy(n1,n2,j1x,j2x,rx[j3x+i3],j1y,j2y,ry[j3y+i3]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, 
+    int j1x, int k1x, long[] rx, 
+    int j1y, int k1y, long[] ry) {
+    for (int i1=0,ix=j1x,iy=j1y; i1<n1; ++i1,ix+=k1x,iy+=k1y)
+      ry[iy] = rx[ix];
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param j2x offset in 2nd dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param k2x stride in 2nd dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param j2y offset in 2nd dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param k2y stride in 2nd dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, int n2, 
+    int j1x, int j2x, int k1x, int k2x, long[][] rx, 
+    int j1y, int j2y, int k1y, int k2y, long[][] ry) {
+    for (int i2=0; i2<n2; ++i2)
+      copy(n1,j1x,k1x,rx[j2x+i2*k2x],j1y,k1y,ry[j2y+i2*k2y]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param j2x offset in 2nd dimension of rx.
+   * @param j3x offset in 3rd dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param k2x stride in 2nd dimension of rx.
+   * @param k3x stride in 3rd dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param j2y offset in 2nd dimension of ry.
+   * @param j3y offset in 3rd dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param k2y stride in 2nd dimension of ry.
+   * @param k3y stride in 3rd dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, int n2, int n3,
+    int j1x, int j2x, int j3x, int k1x, int k2x, int k3x, long[][][] rx, 
+    int j1y, int j2y, int j3y, int k1y, int k2y, int k3y, long[][][] ry) {
+    for (int i3=0; i3<n3; ++i3)
+      copy(n1,n2,j1x,j2x,k1x,k2x,rx[j3x+i3*k3x],j1y,j2y,k1y,k2y,ry[j3y+i3*k3y]);
   }
 
   /**
@@ -3742,6 +4246,63 @@ public class Array {
   }
 
   /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static float[] copy(
+    int n1,
+    int j1, int k1, float[] rx) {
+    float[] ry = new float[n1];
+    copy(n1,j1,k1,rx,0,1,ry);
+    return ry;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param j2 offset in 2nd dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param k2 stride in 2nd dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static float[][] copy(
+    int n1, int n2,
+    int j1, int j2, int k1, int k2, float[][] rx) {
+    float[][] ry = new float[n2][n1];
+    copy(n1,n2,j1,j2,k1,k2,rx,0,0,1,1,ry);
+    return ry;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param j2 offset in 2nd dimension of rx.
+   * @param j3 offset in 3rd dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param k2 stride in 2nd dimension of rx.
+   * @param k3 stride in 3rd dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static float[][][] copy(
+    int n1, int n2, int n3, 
+    int j1, int j2, int j3, int k1, int k2, int k3, float[][][] rx) {
+    float[][][] ry = new float[n3][n2][n1];
+    copy(n1,n2,n3,j1,j2,j3,k1,k2,k3,rx,0,0,0,1,1,1,ry);
+    return ry;
+  }
+
+  /**
    * Copies elements from one specified array to another.
    * @param n1 number of elements to copy in 1st dimension.
    * @param j1x offset in 1st dimension of rx.
@@ -3796,6 +4357,75 @@ public class Array {
     int j1y, int j2y, int j3y, float[][][] ry) {
     for (int i3=0; i3<n3; ++i3)
       copy(n1,n2,j1x,j2x,rx[j3x+i3],j1y,j2y,ry[j3y+i3]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, 
+    int j1x, int k1x, float[] rx, 
+    int j1y, int k1y, float[] ry) {
+    for (int i1=0,ix=j1x,iy=j1y; i1<n1; ++i1,ix+=k1x,iy+=k1y)
+      ry[iy] = rx[ix];
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param j2x offset in 2nd dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param k2x stride in 2nd dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param j2y offset in 2nd dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param k2y stride in 2nd dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, int n2, 
+    int j1x, int j2x, int k1x, int k2x, float[][] rx, 
+    int j1y, int j2y, int k1y, int k2y, float[][] ry) {
+    for (int i2=0; i2<n2; ++i2)
+      copy(n1,j1x,k1x,rx[j2x+i2*k2x],j1y,k1y,ry[j2y+i2*k2y]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param j2x offset in 2nd dimension of rx.
+   * @param j3x offset in 3rd dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param k2x stride in 2nd dimension of rx.
+   * @param k3x stride in 3rd dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param j2y offset in 2nd dimension of ry.
+   * @param j3y offset in 3rd dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param k2y stride in 2nd dimension of ry.
+   * @param k3y stride in 3rd dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, int n2, int n3,
+    int j1x, int j2x, int j3x, int k1x, int k2x, int k3x, float[][][] rx, 
+    int j1y, int j2y, int j3y, int k1y, int k2y, int k3y, float[][][] ry) {
+    for (int i3=0; i3<n3; ++i3)
+      copy(n1,n2,j1x,j2x,k1x,k2x,rx[j3x+i3*k3x],j1y,j2y,k1y,k2y,ry[j3y+i3*k3y]);
   }
 
   /**
@@ -3991,6 +4621,63 @@ public class Array {
   }
 
   /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1 offset in 1st dimension of cx.
+   * @param k1 stride in 1st dimension of cx.
+   * @param cx source array.
+   * @return array copy
+   */
+  public static float[] ccopy(
+    int n1,
+    int j1, int k1, float[] cx) {
+    float[] cy = new float[2*n1];
+    ccopy(n1,j1,k1,cx,0,1,cy);
+    return cy;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1 offset in 1st dimension of cx.
+   * @param j2 offset in 2nd dimension of cx.
+   * @param k1 stride in 1st dimension of cx.
+   * @param k2 stride in 2nd dimension of cx.
+   * @param cx source array.
+   * @return array copy
+   */
+  public static float[][] ccopy(
+    int n1, int n2,
+    int j1, int j2, int k1, int k2, float[][] cx) {
+    float[][] cy = new float[n2][2*n1];
+    ccopy(n1,n2,j1,j2,k1,k2,cx,0,0,1,1,cy);
+    return cy;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1 offset in 1st dimension of cx.
+   * @param j2 offset in 2nd dimension of cx.
+   * @param j3 offset in 3rd dimension of cx.
+   * @param k1 stride in 1st dimension of cx.
+   * @param k2 stride in 2nd dimension of cx.
+   * @param k3 stride in 3rd dimension of cx.
+   * @param cx source array.
+   * @return array copy
+   */
+  public static float[][][] ccopy(
+    int n1, int n2, int n3, 
+    int j1, int j2, int j3, int k1, int k2, int k3, float[][][] cx) {
+    float[][][] cy = new float[n3][n2][2*n1];
+    ccopy(n1,n2,n3,j1,j2,j3,k1,k2,k3,cx,0,0,0,1,1,1,cy);
+    return cy;
+  }
+
+  /**
    * Copies elements from one specified array to another.
    * @param n1 number of elements to copy in 1st dimension.
    * @param j1x offset in 1st dimension of cx.
@@ -4047,6 +4734,81 @@ public class Array {
     int j1y, int j2y, int j3y, float[][][] cy) {
     for (int i3=0; i3<n3; ++i3)
       ccopy(n1,n2,j1x,j2x,cx[j3x+i3],j1y,j2y,cy[j3y+i3]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1x offset in 1st dimension of cx.
+   * @param k1x stride in 1st dimension of cx.
+   * @param cx source array.
+   * @param j1y offset in 1st dimension of cy.
+   * @param k1y stride in 1st dimension of cy.
+   * @param cy destination array.
+   */
+  public static void ccopy(
+    int n1, 
+    int j1x, int k1x, float[] cx, 
+    int j1y, int k1y, float[] cy) {
+    int k1x2 = k1x*2;
+    int k1y2 = k1y*2;
+    for (int i1=0,ix=2*j1x,iy=2*j1y; i1<n1; ++i1,ix+=k1x2,iy+=k1y2) {
+      cy[iy  ] = cx[ix  ];
+      cy[iy+1] = cx[ix+1];
+    }
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1x offset in 1st dimension of cx.
+   * @param j2x offset in 2nd dimension of cx.
+   * @param k1x stride in 1st dimension of cx.
+   * @param k2x stride in 2nd dimension of cx.
+   * @param cx source array.
+   * @param j1y offset in 1st dimension of cy.
+   * @param j2y offset in 2nd dimension of cy.
+   * @param k1y stride in 1st dimension of cy.
+   * @param k2y stride in 2nd dimension of cy.
+   * @param cy destination array.
+   */
+  public static void ccopy(
+    int n1, int n2, 
+    int j1x, int j2x, int k1x, int k2x, float[][] cx, 
+    int j1y, int j2y, int k1y, int k2y, float[][] cy) {
+    for (int i2=0; i2<n2; ++i2)
+      ccopy(n1,j1x,k1x,cx[j2x+i2*k2x],j1y,k1y,cy[j2y+i2*k2y]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1x offset in 1st dimension of cx.
+   * @param j2x offset in 2nd dimension of cx.
+   * @param j3x offset in 3rd dimension of cx.
+   * @param k1x stride in 1st dimension of cx.
+   * @param k2x stride in 2nd dimension of cx.
+   * @param k3x stride in 3rd dimension of cx.
+   * @param cx source array.
+   * @param j1y offset in 1st dimension of cy.
+   * @param j2y offset in 2nd dimension of cy.
+   * @param j3y offset in 3rd dimension of cy.
+   * @param k1y stride in 1st dimension of cy.
+   * @param k2y stride in 2nd dimension of cy.
+   * @param k3y stride in 3rd dimension of cy.
+   * @param cy destination array.
+   */
+  public static void ccopy(
+    int n1, int n2, int n3,
+    int j1x, int j2x, int j3x, int k1x, int k2x, int k3x, float[][][] cx, 
+    int j1y, int j2y, int j3y, int k1y, int k2y, int k3y, float[][][] cy) {
+    for (int i3=0; i3<n3; ++i3)
+      ccopy(n1,n2,
+        j1x,j2x,k1x,k2x,cx[j3x+i3*k3x],
+        j1y,j2y,k1y,k2y,cy[j3y+i3*k3y]);
   }
 
   /**
@@ -4243,6 +5005,63 @@ public class Array {
   }
 
   /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static double[] copy(
+    int n1,
+    int j1, int k1, double[] rx) {
+    double[] ry = new double[n1];
+    copy(n1,j1,k1,rx,0,1,ry);
+    return ry;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param j2 offset in 2nd dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param k2 stride in 2nd dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static double[][] copy(
+    int n1, int n2,
+    int j1, int j2, int k1, int k2, double[][] rx) {
+    double[][] ry = new double[n2][n1];
+    copy(n1,n2,j1,j2,k1,k2,rx,0,0,1,1,ry);
+    return ry;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1 offset in 1st dimension of rx.
+   * @param j2 offset in 2nd dimension of rx.
+   * @param j3 offset in 3rd dimension of rx.
+   * @param k1 stride in 1st dimension of rx.
+   * @param k2 stride in 2nd dimension of rx.
+   * @param k3 stride in 3rd dimension of rx.
+   * @param rx source array.
+   * @return array copy
+   */
+  public static double[][][] copy(
+    int n1, int n2, int n3, 
+    int j1, int j2, int j3, int k1, int k2, int k3, double[][][] rx) {
+    double[][][] ry = new double[n3][n2][n1];
+    copy(n1,n2,n3,j1,j2,j3,k1,k2,k3,rx,0,0,0,1,1,1,ry);
+    return ry;
+  }
+
+  /**
    * Copies elements from one specified array to another.
    * @param n1 number of elements to copy in 1st dimension.
    * @param j1x offset in 1st dimension of rx.
@@ -4297,6 +5116,75 @@ public class Array {
     int j1y, int j2y, int j3y, double[][][] ry) {
     for (int i3=0; i3<n3; ++i3)
       copy(n1,n2,j1x,j2x,rx[j3x+i3],j1y,j2y,ry[j3y+i3]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, 
+    int j1x, int k1x, double[] rx, 
+    int j1y, int k1y, double[] ry) {
+    for (int i1=0,ix=j1x,iy=j1y; i1<n1; ++i1,ix+=k1x,iy+=k1y)
+      ry[iy] = rx[ix];
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param j2x offset in 2nd dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param k2x stride in 2nd dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param j2y offset in 2nd dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param k2y stride in 2nd dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, int n2, 
+    int j1x, int j2x, int k1x, int k2x, double[][] rx, 
+    int j1y, int j2y, int k1y, int k2y, double[][] ry) {
+    for (int i2=0; i2<n2; ++i2)
+      copy(n1,j1x,k1x,rx[j2x+i2*k2x],j1y,k1y,ry[j2y+i2*k2y]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1x offset in 1st dimension of rx.
+   * @param j2x offset in 2nd dimension of rx.
+   * @param j3x offset in 3rd dimension of rx.
+   * @param k1x stride in 1st dimension of rx.
+   * @param k2x stride in 2nd dimension of rx.
+   * @param k3x stride in 3rd dimension of rx.
+   * @param rx source array.
+   * @param j1y offset in 1st dimension of ry.
+   * @param j2y offset in 2nd dimension of ry.
+   * @param j3y offset in 3rd dimension of ry.
+   * @param k1y stride in 1st dimension of ry.
+   * @param k2y stride in 2nd dimension of ry.
+   * @param k3y stride in 3rd dimension of ry.
+   * @param ry destination array.
+   */
+  public static void copy(
+    int n1, int n2, int n3,
+    int j1x, int j2x, int j3x, int k1x, int k2x, int k3x, double[][][] rx, 
+    int j1y, int j2y, int j3y, int k1y, int k2y, int k3y, double[][][] ry) {
+    for (int i3=0; i3<n3; ++i3)
+      copy(n1,n2,j1x,j2x,k1x,k2x,rx[j3x+i3*k3x],j1y,j2y,k1y,k2y,ry[j3y+i3*k3y]);
   }
 
   /**
@@ -4492,6 +5380,63 @@ public class Array {
   }
 
   /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1 offset in 1st dimension of cx.
+   * @param k1 stride in 1st dimension of cx.
+   * @param cx source array.
+   * @return array copy
+   */
+  public static double[] ccopy(
+    int n1,
+    int j1, int k1, double[] cx) {
+    double[] cy = new double[2*n1];
+    ccopy(n1,j1,k1,cx,0,1,cy);
+    return cy;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1 offset in 1st dimension of cx.
+   * @param j2 offset in 2nd dimension of cx.
+   * @param k1 stride in 1st dimension of cx.
+   * @param k2 stride in 2nd dimension of cx.
+   * @param cx source array.
+   * @return array copy
+   */
+  public static double[][] ccopy(
+    int n1, int n2,
+    int j1, int j2, int k1, int k2, double[][] cx) {
+    double[][] cy = new double[n2][2*n1];
+    ccopy(n1,n2,j1,j2,k1,k2,cx,0,0,1,1,cy);
+    return cy;
+  }
+
+  /**
+   * Returns array copy of elements from the specified array.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1 offset in 1st dimension of cx.
+   * @param j2 offset in 2nd dimension of cx.
+   * @param j3 offset in 3rd dimension of cx.
+   * @param k1 stride in 1st dimension of cx.
+   * @param k2 stride in 2nd dimension of cx.
+   * @param k3 stride in 3rd dimension of cx.
+   * @param cx source array.
+   * @return array copy
+   */
+  public static double[][][] ccopy(
+    int n1, int n2, int n3, 
+    int j1, int j2, int j3, int k1, int k2, int k3, double[][][] cx) {
+    double[][][] cy = new double[n3][n2][2*n1];
+    ccopy(n1,n2,n3,j1,j2,j3,k1,k2,k3,cx,0,0,0,1,1,1,cy);
+    return cy;
+  }
+
+  /**
    * Copies elements from one specified array to another.
    * @param n1 number of elements to copy in 1st dimension.
    * @param j1x offset in 1st dimension of cx.
@@ -4548,6 +5493,184 @@ public class Array {
     int j1y, int j2y, int j3y, double[][][] cy) {
     for (int i3=0; i3<n3; ++i3)
       ccopy(n1,n2,j1x,j2x,cx[j3x+i3],j1y,j2y,cy[j3y+i3]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param j1x offset in 1st dimension of cx.
+   * @param k1x stride in 1st dimension of cx.
+   * @param cx source array.
+   * @param j1y offset in 1st dimension of cy.
+   * @param k1y stride in 1st dimension of cy.
+   * @param cy destination array.
+   */
+  public static void ccopy(
+    int n1, 
+    int j1x, int k1x, double[] cx, 
+    int j1y, int k1y, double[] cy) {
+    int k1x2 = k1x*2;
+    int k1y2 = k1y*2;
+    for (int i1=0,ix=2*j1x,iy=2*j1y; i1<n1; ++i1,ix+=k1x2,iy+=k1y2) {
+      cy[iy  ] = cx[ix  ];
+      cy[iy+1] = cx[ix+1];
+    }
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param j1x offset in 1st dimension of cx.
+   * @param j2x offset in 2nd dimension of cx.
+   * @param k1x stride in 1st dimension of cx.
+   * @param k2x stride in 2nd dimension of cx.
+   * @param cx source array.
+   * @param j1y offset in 1st dimension of cy.
+   * @param j2y offset in 2nd dimension of cy.
+   * @param k1y stride in 1st dimension of cy.
+   * @param k2y stride in 2nd dimension of cy.
+   * @param cy destination array.
+   */
+  public static void ccopy(
+    int n1, int n2, 
+    int j1x, int j2x, int k1x, int k2x, double[][] cx, 
+    int j1y, int j2y, int k1y, int k2y, double[][] cy) {
+    for (int i2=0; i2<n2; ++i2)
+      ccopy(n1,j1x,k1x,cx[j2x+i2*k2x],j1y,k1y,cy[j2y+i2*k2y]);
+  }
+
+  /**
+   * Copies elements from one specified array to another.
+   * @param n1 number of elements to copy in 1st dimension.
+   * @param n2 number of elements to copy in 2nd dimension.
+   * @param n3 number of elements to copy in 3rd dimension.
+   * @param j1x offset in 1st dimension of cx.
+   * @param j2x offset in 2nd dimension of cx.
+   * @param j3x offset in 3rd dimension of cx.
+   * @param k1x stride in 1st dimension of cx.
+   * @param k2x stride in 2nd dimension of cx.
+   * @param k3x stride in 3rd dimension of cx.
+   * @param cx source array.
+   * @param j1y offset in 1st dimension of cy.
+   * @param j2y offset in 2nd dimension of cy.
+   * @param j3y offset in 3rd dimension of cy.
+   * @param k1y stride in 1st dimension of cy.
+   * @param k2y stride in 2nd dimension of cy.
+   * @param k3y stride in 3rd dimension of cy.
+   * @param cy destination array.
+   */
+  public static void ccopy(
+    int n1, int n2, int n3,
+    int j1x, int j2x, int j3x, int k1x, int k2x, int k3x, double[][][] cx, 
+    int j1y, int j2y, int j3y, int k1y, int k2y, int k3y, double[][][] cy) {
+    for (int i3=0; i3<n3; ++i3)
+      ccopy(n1,n2,
+        j1x,j2x,k1x,k2x,cx[j3x+i3*k3x],
+        j1y,j2y,k1y,k2y,cy[j3y+i3*k3y]);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // reverse
+
+  public static byte[] reverse(byte[] rx) {
+    byte[] ry = new byte[rx.length];
+    reverse(rx,ry);
+    return ry;
+  }
+
+  public static void reverse(byte[] rx, byte[] ry) {
+    int n1 = rx.length;
+    for (int i1=0,j1=n1-1; i1<n1; ++i1,--j1)
+      ry[j1] = rx[i1];
+  }
+
+  public static short[] reverse(short[] rx) {
+    short[] ry = new short[rx.length];
+    reverse(rx,ry);
+    return ry;
+  }
+
+  public static void reverse(short[] rx, short[] ry) {
+    int n1 = rx.length;
+    for (int i1=0,j1=n1-1; i1<n1; ++i1,--j1)
+      ry[j1] = rx[i1];
+  }
+
+  public static int[] reverse(int[] rx) {
+    int[] ry = new int[rx.length];
+    reverse(rx,ry);
+    return ry;
+  }
+
+  public static void reverse(int[] rx, int[] ry) {
+    int n1 = rx.length;
+    for (int i1=0,j1=n1-1; i1<n1; ++i1,--j1)
+      ry[j1] = rx[i1];
+  }
+
+  public static long[] reverse(long[] rx) {
+    long[] ry = new long[rx.length];
+    reverse(rx,ry);
+    return ry;
+  }
+
+  public static void reverse(long[] rx, long[] ry) {
+    int n1 = rx.length;
+    for (int i1=0,j1=n1-1; i1<n1; ++i1,--j1)
+      ry[j1] = rx[i1];
+  }
+
+  public static float[] reverse(float[] rx) {
+    float[] ry = new float[rx.length];
+    reverse(rx,ry);
+    return ry;
+  }
+
+  public static void reverse(float[] rx, float[] ry) {
+    int n1 = rx.length;
+    for (int i1=0,j1=n1-1; i1<n1; ++i1,--j1)
+      ry[j1] = rx[i1];
+  }
+
+  public static float[] creverse(float[] rx) {
+    float[] ry = new float[rx.length];
+    reverse(rx,ry);
+    return ry;
+  }
+
+  public static void creverse(float[] rx, float[] ry) {
+    int n1 = rx.length/2;
+    for (int i1=0,j1=2*n1-2; i1<n1; i1+=2,j1-=2) {
+      ry[j1  ] = rx[i1  ];
+      ry[j1+1] = rx[i1+1];
+    }
+  }
+
+  public static double[] reverse(double[] rx) {
+    double[] ry = new double[rx.length];
+    reverse(rx,ry);
+    return ry;
+  }
+
+  public static void reverse(double[] rx, double[] ry) {
+    int n1 = rx.length;
+    for (int i1=0,j1=n1-1; i1<n1; ++i1,--j1)
+      ry[j1] = rx[i1];
+  }
+
+  public static double[] creverse(double[] rx) {
+    double[] ry = new double[rx.length];
+    reverse(rx,ry);
+    return ry;
+  }
+
+  public static void creverse(double[] rx, double[] ry) {
+    int n1 = rx.length/2;
+    for (int i1=0,j1=2*n1-2; i1<n1; i1+=2,j1-=2) {
+      ry[j1  ] = rx[i1  ];
+      ry[j1+1] = rx[i1+1];
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
