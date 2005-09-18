@@ -7,7 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp;
 
 import edu.mines.jtk.util.Check;
-import edu.mines.jtk.util.Complex;
+import edu.mines.jtk.util.Cdouble;
 
 /**
  * Recursive 2nd-order filter. This filter solves a linear, 2nd-order, 
@@ -49,10 +49,10 @@ public class Recursive2ndOrderFilter extends RecursiveFilter {
    * @param zero the zero.
    * @param gain the filter gain.
    */
-  public Recursive2ndOrderFilter(float pole, float zero, float gain) {
-    _b0 = gain;
-    _b1 = -gain*zero;
-    _a1 = -pole;
+  public Recursive2ndOrderFilter(double pole, double zero, double gain) {
+    _b0 = (float)(gain);
+    _b1 = (float)(-gain*zero);
+    _a1 = (float)(-pole);
   }
 
   /**
@@ -65,21 +65,21 @@ public class Recursive2ndOrderFilter extends RecursiveFilter {
    * @param gain the filter gain.
    */
   public Recursive2ndOrderFilter(
-    Complex pole1, Complex pole2,
-    Complex zero1, Complex zero2,
-    float gain)
+    Cdouble pole1, Cdouble pole2,
+    Cdouble zero1, Cdouble zero2,
+    double gain)
   {
-    Check.argument(pole1.i==0.0f    &&  pole2.i==0.0f ||
+    Check.argument(pole1.i==0.0     &&  pole2.i==0.0 ||
                    pole2.r==pole1.r && -pole2.i==pole1.i,
                    "poles are real or conjugate pair");
-    Check.argument(zero1.i==0.0f    &&  zero2.i==0.0f ||
+    Check.argument(zero1.i==0.0     &&  zero2.i==0.0 ||
                    zero2.r==zero1.r && -zero2.i==zero1.i,
                    "zeros are real or conjugate pair");
-    _b0 = gain;
-    _b1 = -(zero1.r+zero2.r)*gain;
-    _b2 = (zero1.times(zero2)).r*gain;
-    _a1 = -(pole1.r+pole2.r);
-    _a2 = (pole1.times(pole2)).r;
+    _b0 = (float)(gain);
+    _b1 = (float)(-(zero1.r+zero2.r)*gain);
+    _b2 = (float)((zero1.times(zero2)).r*gain);
+    _a1 = (float)(-(pole1.r+pole2.r));
+    _a2 = (float)((pole1.times(pole2)).r);
   }
 
   /**

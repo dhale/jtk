@@ -22,7 +22,7 @@ public class RecursiveParallelFilter extends RecursiveFilter {
    * @param gain the filter gain.
    */
   public RecursiveParallelFilter(
-    Complex[] poles, Complex[] zeros, float gain) 
+    Cdouble[] poles, Cdouble[] zeros, double gain) 
   {
     init(poles,zeros,gain);
   }
@@ -85,7 +85,7 @@ public class RecursiveParallelFilter extends RecursiveFilter {
   protected RecursiveParallelFilter() {
   }
 
-  protected void init(Complex[] poles, Complex[] zeros, float gain) {
+  protected void init(Cdouble[] poles, Cdouble[] zeros, double gain) {
 
     // Ensure that the number of zeros must not exceed the number of poles.
     // Here (and only here), we count any conjugate zeros and poles.
@@ -115,11 +115,11 @@ public class RecursiveParallelFilter extends RecursiveFilter {
 
     // Filter coefficients for real poles.
     for (int jp=0; jp<_nr; ++jp) {
-      Complex hj = Hj(jp,poles,zeros,gain);
-      Complex pj = poles[jp];
-      _b[jp][0] = hj.r;
-      _a[jp][0] = 1.0f;
-      _a[jp][1] = -pj.r;
+      Cdouble hj = Hj(jp,poles,zeros,gain);
+      Cdouble pj = poles[jp];
+      _b[jp][0] = (float)(hj.r);
+      _a[jp][0] = (float)(1.0);
+      _a[jp][1] = (float)(-pj.r);
       System.out.println("hj="+hj);
       System.out.println("pj="+pj);
       System.out.println("b0="+_b[jp][0]);
@@ -129,15 +129,15 @@ public class RecursiveParallelFilter extends RecursiveFilter {
 
     // Filter coefficients for complex poles and their conjugates.
     for (int jp=_nr; jp<_np; ++jp) {
-      Complex hj = Hj(jp,poles,zeros,gain);
-      Complex pj = poles[jp];
-      Complex qj = pj.inv();
-      float b0 = hj.r-hj.i*qj.r/qj.i;
-      _b[jp][0] = b0;
-      _b[jp][1] = hj.i/qj.i;
-      _a[jp][0] = 1.0f;
-      _a[jp][1] = 2.0f*pj.r;
-      _a[jp][2] = -pj.norm();
+      Cdouble hj = Hj(jp,poles,zeros,gain);
+      Cdouble pj = poles[jp];
+      Cdouble qj = pj.inv();
+      double b0 = hj.r-hj.i*qj.r/qj.i;
+      _b[jp][0] = (float)(b0);
+      _b[jp][1] = (float)(hj.i/qj.i);
+      _a[jp][0] = (float)(1.0);
+      _a[jp][1] = (float)(2.0*pj.r);
+      _a[jp][2] = (float)(-pj.norm());
       System.out.println("pj="+pj);
       System.out.println("qj="+qj);
       System.out.println("b0="+_b[jp][0]);
@@ -149,12 +149,13 @@ public class RecursiveParallelFilter extends RecursiveFilter {
 
     // Constant factor; non-zero only if the total number of zeros 
     // equals the total number of poles.
-    _c = 0.0f;
+    double c = 0.0;
     if (nzt==npt) {
-      _c = gain;
+      c = gain;
       for (int jp=0; jp<np; ++jp)
-        _c -= _b[jp][0];
+        c -= _b[jp][0];
     }
+    _c = (float)c;
     System.out.println("c="+_c);
   }
 
@@ -174,28 +175,28 @@ public class RecursiveParallelFilter extends RecursiveFilter {
    * imaginary part), then division by the factor corresponding to its 
    * conjugate is omitted as well.
    */
-  private static Complex Hj(
-    int jp, Complex[] poles, Complex[] zeros, float gain) 
+  private static Cdouble Hj(
+    int jp, Cdouble[] poles, Cdouble[] zeros, double gain) 
   {
-    Complex pj = poles[jp];
-    Complex qj = pj.inv();
-    Complex c1 = new Complex(1.0f,0.0f);
-    Complex hz = new Complex(c1);
+    Cdouble pj = poles[jp];
+    Cdouble qj = pj.inv();
+    Cdouble c1 = new Cdouble(1.0,0.0);
+    Cdouble hz = new Cdouble(c1);
     int nz = zeros.length;
     for (int iz=0; iz<nz; ++iz) {
-      Complex zi = zeros[iz];
+      Cdouble zi = zeros[iz];
       hz.timesEquals(c1.minus(zi.times(qj)));
-      if (zi.i!=0.0f)
+      if (zi.i!=0.0)
         hz.timesEquals(c1.minus(zi.conj().times(qj)));
     }
-    Complex hp = new Complex(c1);
+    Cdouble hp = new Cdouble(c1);
     int np = poles.length;
     for (int ip=0; ip<np; ++ip) {
       if (ip==jp)
         continue;
-      Complex pi = poles[ip];
+      Cdouble pi = poles[ip];
       hp.timesEquals(c1.minus(pi.times(qj)));
-      if (pi.i!=0.0f)
+      if (pi.i!=0.0)
         hz.timesEquals(c1.minus(pi.conj().times(qj)));
     }
     return hz.over(hp).times(gain);
@@ -205,11 +206,11 @@ public class RecursiveParallelFilter extends RecursiveFilter {
    * Returns count of real numbers in array of complex numbers.
    * @return count of real numbers.
    */
-  private static int countReal(Complex[] c) {
+  private static int countReal(Cdouble[] c) {
     int nc = c.length;
     int nr = 0;
     for (int ic=0; ic<nc; ++ic) {
-      if (c[ic].i==0.0f)
+      if (c[ic].i==0.0)
         ++nr;
     }
     return nr;
@@ -220,13 +221,13 @@ public class RecursiveParallelFilter extends RecursiveFilter {
    * @param zeros array of zeros.
    * @return array of zeros, sorted.
    */
-  private static Complex[] sortZeros(Complex[] zeros) {
+  private static Cdouble[] sortZeros(Cdouble[] zeros) {
     int nz = zeros.length;
     int nr = 0;
-    Complex[] zcopy = new Complex[nz];
+    Cdouble[] zcopy = new Cdouble[nz];
     for (int iz=0; iz<nz; ++iz) {
-      Complex zi = zcopy[iz] = new Complex(zeros[iz]);
-      if (zi.i==0.0f) {
+      Cdouble zi = zcopy[iz] = new Cdouble(zeros[iz]);
+      if (zi.i==0.0) {
         zcopy[iz] = zcopy[nr];
         zcopy[nr] = zi;
         ++nr;
@@ -242,22 +243,22 @@ public class RecursiveParallelFilter extends RecursiveFilter {
    * @param poles array of poles.
    * @return array of poles, sorted.
    */
-  private static Complex[] sortPoles(Complex[] poles) {
+  private static Cdouble[] sortPoles(Cdouble[] poles) {
     int np = poles.length;
     for (int ip=0; ip<np; ++ip) {
-      Complex pi = poles[ip];
-      Complex qi = pi.conj();
+      Cdouble pi = poles[ip];
+      Cdouble qi = pi.conj();
       for (int jp=0; jp<ip; ++jp) {
-        Complex pj = poles[jp];
+        Cdouble pj = poles[jp];
         Check.argument(!pj.equals(pi),"poles not equal");
         Check.argument(!pj.equals(qi),"poles not equal");
       }
     }
     int nr = 0;
-    Complex[] pcopy = new Complex[np];
+    Cdouble[] pcopy = new Cdouble[np];
     for (int ip=0; ip<np; ++ip) {
-      Complex pi = pcopy[ip] = new Complex(poles[ip]);
-      if (pi.i==0.0f) {
+      Cdouble pi = pcopy[ip] = new Cdouble(poles[ip]);
+      if (pi.i==0.0) {
         pcopy[ip] = pcopy[nr];
         pcopy[nr] = pi;
         ++nr;

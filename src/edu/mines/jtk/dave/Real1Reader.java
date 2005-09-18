@@ -27,11 +27,11 @@ public class Real1Reader {
     //Real1 x = readData("data/matt1.txt",2);
     //Real1 x = readData("data/dylan1.txt");
     Real1 x = readData("data/emily1.txt",5);
-    Sampling x1 = x.getX1();
-    int nx1 = x1.getCount();
-    double dx1 = x1.getDelta();
-    double fx1 = x1.getFirst();
-    System.out.println("nx1="+nx1+" dx1="+dx1+" fx1="+fx1);
+    Sampling st = x.getT();
+    int nt = st.getCount();
+    double dt = st.getDelta();
+    double ft = st.getFirst();
+    System.out.println("nt="+nt+" dt="+dt+" ft="+ft);
   }
 
   public static Real1 readData(String fileName) {
@@ -48,22 +48,22 @@ public class Real1Reader {
     try {
       Scanner s = new Scanner(br);
       s.findWithinHorizon("nx1=",0);
-      int nx1 = s.nextInt();
+      int nt = s.nextInt();
       s.findWithinHorizon("dx1=",0);
-      double dx1 = s.nextDouble();
+      double dt = s.nextDouble();
       s.findWithinHorizon("fx1=",0);
-      double fx1 = s.nextDouble();
+      double ft = s.nextDouble();
       s.findWithinHorizon("f=",0);
       s.nextLine();
-      float[] f = new float[nx1];
-      for (int ix1=0; ix1<nx1; ++ix1) {
+      float[] x = new float[nt];
+      for (int it=0; it<nt; ++it) {
         for (int skip=1; skip<column; ++skip)
           s.next();
-        f[ix1] = s.nextFloat();
+        x[it] = s.nextFloat();
         s.nextLine();
       }
       s.close();
-      return new Real1(nx1,dx1,fx1,f);
+      return new Real1(nt,dt,ft,x);
     } catch (InputMismatchException ime) {
       throw new RuntimeException("Unknown format of file: "+fileName);
     }

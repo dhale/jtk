@@ -7,7 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp;
 
 import edu.mines.jtk.util.Check;
-import edu.mines.jtk.util.Complex;
+import edu.mines.jtk.util.Cdouble;
 import static edu.mines.jtk.util.MathPlus.*;
 
 
@@ -27,7 +27,7 @@ public class RecursiveCascadeFilter extends RecursiveFilter {
    * @param gain the filter gain.
    */
   public RecursiveCascadeFilter(
-    Complex[] poles, Complex[] zeros, float gain) {
+    Cdouble[] poles, Cdouble[] zeros, double gain) {
     init(poles,zeros,gain);
   }
 
@@ -43,7 +43,7 @@ public class RecursiveCascadeFilter extends RecursiveFilter {
   protected RecursiveCascadeFilter() {
   }
 
-  protected void init(Complex[] poles, Complex[] zeros, float gain) {
+  protected void init(Cdouble[] poles, Cdouble[] zeros, double gain) {
     Check.argument(poles.length>0 || zeros.length>0,
       "at least one pole or zero is specified");
 
@@ -56,13 +56,13 @@ public class RecursiveCascadeFilter extends RecursiveFilter {
     int nz = zeros.length;
     _n2 = max((np+1)/2,(nz+1)/2);
     _f2 = new Recursive2ndOrderFilter[_n2];
-    gain = pow(gain,1.0f/_n2);
-    Complex c0 = new Complex(0.0f,0.0f);
+    gain = pow(gain,1.0/_n2);
+    Cdouble c0 = new Cdouble(0.0,0.0);
     for (int i2=0,ip=0,iz=0; i2<_n2; ++i2) {
-      Complex pole1 = (ip<np)?poles[ip++]:c0;
-      Complex pole2 = (ip<np)?poles[ip++]:c0;
-      Complex zero1 = (iz<nz)?zeros[iz++]:c0;
-      Complex zero2 = (iz<nz)?zeros[iz++]:c0;
+      Cdouble pole1 = (ip<np)?poles[ip++]:c0;
+      Cdouble pole2 = (ip<np)?poles[ip++]:c0;
+      Cdouble zero1 = (iz<nz)?zeros[iz++]:c0;
+      Cdouble zero2 = (iz<nz)?zeros[iz++]:c0;
       _f2[i2] = new Recursive2ndOrderFilter(pole1,pole2,zero1,zero2,gain);
     }
   }
@@ -79,13 +79,13 @@ public class RecursiveCascadeFilter extends RecursiveFilter {
    * Also ensures that any complex poles or zeros have conjugate mates.
    * @return array of sorted 
    */
-  private static Complex[] sortPolesOrZeros(Complex[] c) {
+  private static Cdouble[] sortPolesOrZeros(Cdouble[] c) {
     int n = c.length;
-    Complex[] cs = new Complex[n];
+    Cdouble[] cs = new Cdouble[n];
     int ns = 0;
     for (int i=0; i<n; ++i) {
       if (!c[i].isReal()) {
-        Complex cc = c[i].conj();
+        Cdouble cc = c[i].conj();
         int j = 0;
         while (j<n && !cc.equals(c[j]))
           ++j;

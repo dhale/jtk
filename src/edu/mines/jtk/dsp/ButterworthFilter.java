@@ -90,28 +90,28 @@ public class ButterworthFilter extends RecursiveCascadeFilter {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private Complex[] _poles;
-  private Complex[] _zeros;
-  private float _gain;
+  private Cdouble[] _poles;
+  private Cdouble[] _zeros;
+  private double _gain;
 
   private void makePolesZerosGain(double fc, int np, Type type) {
     boolean lowpass = type==Type.LOW_PASS;
-    float omegac = (float)(2.0f*tan(DBL_PI*fc));
-    float dtheta = FLT_PI/(float)np;
-    float ftheta = 0.5f*dtheta*(float)(np+1);
-    _poles = new Complex[np];
-    _zeros = new Complex[np];
-    Complex c1 = new Complex(1.0f,0.0f);
-    Complex c2 = new Complex(2.0f,0.0f);
-    Complex zj = (lowpass)?c1.neg():c1;
-    Complex gain = new Complex(c1);
+    double omegac = 2.0*tan(DBL_PI*fc);
+    double dtheta = DBL_PI/np;
+    double ftheta = 0.5*dtheta*(np+1);
+    _poles = new Cdouble[np];
+    _zeros = new Cdouble[np];
+    Cdouble c1 = new Cdouble(1.0,0.0);
+    Cdouble c2 = new Cdouble(2.0,0.0);
+    Cdouble zj = (lowpass)?c1.neg():c1;
+    Cdouble gain = new Cdouble(c1);
     for (int j=0,k=np-1; j<np; ++j,--k) {
-      float theta = ftheta+(float)j*dtheta;
-      Complex sj = Complex.polar(omegac,theta);
+      double theta = ftheta+j*dtheta;
+      Cdouble sj = Cdouble.polar(omegac,theta);
       _zeros[j] = zj;
       if (j==k) {
         _poles[j] = (c2.plus(sj)).over(c2.minus(sj));
-        _poles[j].i = 0.0f;
+        _poles[j].i = 0.0;
       } else if (j<k) {
         _poles[j] = (c2.plus(sj)).over(c2.minus(sj));
         _poles[k] = _poles[j].conj();

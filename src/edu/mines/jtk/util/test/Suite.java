@@ -20,7 +20,8 @@ public class Suite extends TestSuite {
 
     suite.addTestSuite(ArrayTest.class);
     suite.addTestSuite(AxisTicsTest.class);
-    suite.addTestSuite(ComplexTest.class);
+    suite.addTestSuite(BrentMinFinderTest.class);
+    suite.addTestSuite(CfloatTest.class);
     suite.addTestSuite(MathPlusTest.class);
     suite.addTestSuite(StopwatchTest.class);
 

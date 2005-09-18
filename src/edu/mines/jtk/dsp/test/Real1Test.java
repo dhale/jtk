@@ -23,10 +23,10 @@ public class Real1Test extends TestCase {
 
   static final int N = 100;
   static final double TINY = N*10*FLT_EPSILON;
-  static final Real1 FILL1 = Real1.fill(N,1.0);
-  static final Real1 FILL2 = Real1.fill(N,2.0);
-  static final Real1 RAMP1 = Real1.ramp(N,1.0,0.0);
-  static final Real1 RAMP2 = Real1.ramp(N,2.0,0.0);
+  static final Real1 FILL1 = Real1.fill(1.0,N);
+  static final Real1 FILL2 = Real1.fill(2.0,N);
+  static final Real1 RAMP1 = Real1.ramp(0.0,1.0,N);
+  static final Real1 RAMP2 = Real1.ramp(0.0,2.0,N);
 
   public void testMath() {
     Real1 ra = RAMP1;
@@ -38,34 +38,36 @@ public class Real1Test extends TestCase {
 
   public void testResample() {
     Real1 ra = FILL1;
-    Sampling sa = ra.getSampling();
+    Sampling sa = ra.getT();
     int n1 = sa.getCount();
     double d1 = sa.getDelta();
 
     int m1 = n1/3;
     Sampling sb = sa.shift(-m1*d1);
     Real1 rb = ra.resample(sb);
+    float[] xb = rb.getX();
     for (int i1=0; i1<m1; ++i1)
-      assertEquals(0.0,rb.getF(i1),0.0);
+      assertEquals(0.0,xb[i1],0.0);
     for (int i1=m1; i1<n1; ++i1)
-      assertEquals(1.0,rb.getF(i1),0.0);
+      assertEquals(1.0,xb[i1],0.0);
 
     Sampling sc = sa.shift(m1*d1);
     Real1 rc = ra.resample(sc);
+    float[] xc = rc.getX();
     for (int i1=0; i1<n1-m1; ++i1)
-      assertEquals(1.0,rc.getF(i1),0.0);
+      assertEquals(1.0,xc[i1],0.0);
     for (int i1=n1-m1; i1<n1; ++i1)
-      assertEquals(0.0,rc.getF(i1),0.0);
+      assertEquals(0.0,xc[i1],0.0);
   }
 
   void assertEquals(Real1 e, Real1 a) {
-    Sampling se = e.getX1();
-    Sampling sa = a.getX1();
+    Sampling se = e.getT();
+    Sampling sa = a.getT();
     assertTrue(sa.isEquivalentTo(se));
-    float[] fe = e.getValues();
-    float[] fa = a.getValues();
-    int n = fe.length;
+    float[] xe = e.getX();
+    float[] xa = a.getX();
+    int n = xe.length;
     for (int i=0; i<n; ++i)
-      assertEquals(fe[i],fa[i],TINY);
+      assertEquals(xe[i],xa[i],TINY);
   }
 }
