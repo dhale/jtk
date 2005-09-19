@@ -27,7 +27,7 @@ public class Real1Reader {
     //Real1 x = readData("data/matt1.txt",2);
     //Real1 x = readData("data/dylan1.txt");
     Real1 x = readData("data/emily1.txt",5);
-    Sampling st = x.getT();
+    Sampling st = x.getSampling();
     int nt = st.getCount();
     double dt = st.getDelta();
     double ft = st.getFirst();

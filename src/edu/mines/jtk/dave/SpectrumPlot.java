@@ -60,7 +60,7 @@ public class SpectrumPlot extends JFrame {
      * @param db true, to plot amplitude spectrum in dB.
      */
     public SpectrumPlot(Real1 x, boolean db) {
-      Check.argument(x.getT().isUniform(),"time sampling of x is uniform");
+      Check.argument(x.getSampling().isUniform(),"sampling of x is uniform");
 
     // Amplitude and phase spectra.
     Real1[] ap = computeSpectra(x,db);
@@ -73,7 +73,7 @@ public class SpectrumPlot extends JFrame {
     mosaicX.setFont(FONT);
     mosaicX.setPreferredSize(new Dimension(WIDTH,1*HEIGHT/3));
     Tile tileX = mosaicX.getTile(0,0);
-    LollipopView xv = new LollipopView(x.getT(),x.getX());
+    LollipopView xv = new LollipopView(x.getSampling(),x.getValues());
     tileX.addTiledView(xv);
     TileAxis axisXT = mosaicX.getTileAxisBottom(0);
     TileAxis axisXA = mosaicX.getTileAxisLeft(0);
@@ -88,8 +88,8 @@ public class SpectrumPlot extends JFrame {
     mosaicS.setPreferredSize(new Dimension(WIDTH,2*HEIGHT/3));
     Tile tileA = mosaicS.getTile(0,0);
     Tile tileP = mosaicS.getTile(1,0);
-    MarkLineView av = new MarkLineView(a.getT(),a.getX());
-    MarkLineView pv = new MarkLineView(p.getT(),p.getX());
+    MarkLineView av = new MarkLineView(a.getSampling(),a.getValues());
+    MarkLineView pv = new MarkLineView(p.getSampling(),p.getValues());
     tileA.addTiledView(av);
     tileP.addTiledView(pv);
     tileP.setBestVerticalProjector(new Projector(0.5,-0.5));
@@ -155,11 +155,11 @@ public class SpectrumPlot extends JFrame {
   }
 
   private Real1[] computeSpectra(Real1 x, boolean db) {
-    Sampling st = x.getT();
+    Sampling st = x.getSampling();
     int nt = st.getCount();
     double dt = st.getDelta();
     double ft = st.getFirst();
-    float[] xt = x.getX();
+    float[] xt = x.getValues();
     int nfft = FftReal.nfftSmall(5*nt);
     FftReal fft = new FftReal(nfft);
     int nf = nfft/2+1;

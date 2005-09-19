@@ -38,36 +38,36 @@ public class Real1Test extends TestCase {
 
   public void testResample() {
     Real1 ra = FILL1;
-    Sampling sa = ra.getT();
+    Sampling sa = ra.getSampling();
     int n1 = sa.getCount();
     double d1 = sa.getDelta();
 
     int m1 = n1/3;
     Sampling sb = sa.shift(-m1*d1);
     Real1 rb = ra.resample(sb);
-    float[] xb = rb.getX();
+    float[] vb = rb.getValues();
     for (int i1=0; i1<m1; ++i1)
-      assertEquals(0.0,xb[i1],0.0);
+      assertEquals(0.0,vb[i1],0.0);
     for (int i1=m1; i1<n1; ++i1)
-      assertEquals(1.0,xb[i1],0.0);
+      assertEquals(1.0,vb[i1],0.0);
 
     Sampling sc = sa.shift(m1*d1);
     Real1 rc = ra.resample(sc);
-    float[] xc = rc.getX();
+    float[] vc = rc.getValues();
     for (int i1=0; i1<n1-m1; ++i1)
-      assertEquals(1.0,xc[i1],0.0);
+      assertEquals(1.0,vc[i1],0.0);
     for (int i1=n1-m1; i1<n1; ++i1)
-      assertEquals(0.0,xc[i1],0.0);
+      assertEquals(0.0,vc[i1],0.0);
   }
 
   void assertEquals(Real1 e, Real1 a) {
-    Sampling se = e.getT();
-    Sampling sa = a.getT();
+    Sampling se = e.getSampling();
+    Sampling sa = a.getSampling();
     assertTrue(sa.isEquivalentTo(se));
-    float[] xe = e.getX();
-    float[] xa = a.getX();
-    int n = xe.length;
+    float[] ve = e.getValues();
+    float[] va = a.getValues();
+    int n = ve.length;
     for (int i=0; i<n; ++i)
-      assertEquals(xe[i],xa[i],TINY);
+      assertEquals(ve[i],va[i],TINY);
   }
 }

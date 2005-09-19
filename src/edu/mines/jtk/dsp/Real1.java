@@ -6,146 +6,141 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.Array.*;
+import edu.mines.jtk.util.Check;
+import edu.mines.jtk.util.Array;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * A real-valued sequence of samples of a function x(t) of one variable t. 
- * For definiteness, we may think of the variable t as having dimensions
- * of time, but x(t) could be a function of some variable with other 
- * dimensions. For consistency, we may think of the Fourier transform 
- * X(f) of x(t) as a function of frequency.
- * <p>
- * A {@link Real1} combines a {@link Sampling} t with a reference to an
+ * A real-valued sampled function of one variable.
+ * A {@link Real1} combines a {@link Sampling} with a reference to an
  * an array of function values. In this way, a {@link Real1} <em>wraps</em> 
  * an array of function values. Because array values are referenced (not 
  * copied), the cost of wrapping any array with a {@link Real1} is small.
  * <p> 
  * One consequence of referencing the array of function values is that 
  * changes to elements in such an array are reflected in <em>all</em> 
- * {@link Real1}s that reference that array. One should be aware of this
- * behavior, and may use {@link Real1#Real1(Real1)} when it is unwanted.
+ * {@link Real1}s that reference that array. If this behavior is not
+ * desired, the copy constructor {@link Real1#Real1(Real1)} creates a 
+ * new array copy of function values.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.08.25
  */
 public class Real1 {
 
   /**
-   * Constructs a sequence with specified sampling and values zero.
-   * @param t the sampling.
+   * Constructs a function with specified sampling and values zero.
+   * @param s the sampling.
    */
-  public Real1(Sampling t) {
-    _t = t;
-    _x = new float[t.getCount()];
+  public Real1(Sampling s) {
+    _s = s;
+    _v = new float[s.getCount()];
   }
 
   /**
-   * Constructs a sequence with specified values and default sampling.
-   * The default sampling has number (count) of samples = x.length, sampling 
+   * Constructs a function with specified values and default sampling.
+   * The default sampling has number (count) of samples = v.length, sampling 
    * interval (delta) = 1.0 and first sample value (first) = 0.0.
-   * @param x array of function values x(t); referenced, not copied.
+   * @param v array of function values; referenced, not copied.
    */
-  public Real1(float[] x) {
-    _t = new Sampling(x.length,1.0,0.0);
-    _x = x;
+  public Real1(float[] v) {
+    _s = new Sampling(v.length,1.0,0.0);
+    _v = v;
   }
 
   /**
-   * Constructs a sequence with specified sampling and values.
-   * @param t the sampling.
-   * @param x array of function values x(t); referenced, not copied.
-   *  The array length x.length must equal the number of samples in t.
+   * Constructs a function with specified sampling and values.
+   * @param s the sampling.
+   * @param v array of function values; referenced, not copied.
+   *  The array length v.length must equal the number of samples in s.
    */
-  public Real1(Sampling t, float[] x) {
-    Check.argument(t.getCount()==x.length,
-      "x.length equals the number of samples in t");
-    _t = t;
-    _x = x;
+  public Real1(Sampling s, float[] v) {
+    Check.argument(s.getCount()==v.length,
+      "v.length equals the number of samples in s");
+    _s = s;
+    _v = v;
   }
 
   /**
-   * Constructs a sequence with specified sampling and values zero.
-   * @param nt the number (count) of samples.
-   * @param dt the sampling interval (delta).
-   * @param ft the value t of the first sample.
+   * Constructs a function with specified sampling and values zero.
+   * @param n the number (count) of samples.
+   * @param d the sampling interval (delta).
+   * @param f the value of the first sample.
    */
-  public Real1(int nt, double dt, double ft) {
-    this(new Sampling(nt,dt,ft));
+  public Real1(int n, double d, double f) {
+    this(new Sampling(n,d,f));
   }
 
   /**
-   * Constructs a sequence with specified sampling and values.
-   * @param nt the number (count) of time samples.
-   * @param dt the sampling interval (delta).
-   * @param ft the value t of the first sample.
-   * @param x array of function values x(t); referenced, not copied. 
-   *  The array length x.length must equal nt.
+   * Constructs a function with specified sampling and values.
+   * @param n the number (count) of time samples.
+   * @param d the sampling interval (delta).
+   * @param f the value of the first sample.
+   * @param v array of function values; referenced, not copied. 
+   *  The array length v.length must equal n.
    */
-  public Real1(int nt, double dt, double ft, float[] x) {
-    this(new Sampling(nt,dt,ft),x);
+  public Real1(int n, double d, double f, float[] v) {
+    this(new Sampling(n,d,f),v);
   }
 
   /**
-   * Constructs a copy of the specified sequence. This constructor 
-   * <em>copies</em> (does not reference) the array of function values 
-   * from the specified sequence.
-   * @param r the sequence to copy.
+   * Constructs a copy of the specified sampled function. This constructor 
+   * <em>copies</em> (does not reference) the array of function values from 
+   * the specified sampled function.
+   * @param r the function to copy.
    */
   public Real1(Real1 r) {
-    this(r._t,copy(r._x));
+    this(r._s,Array.copy(r._v));
   }
 
   /**
-   * Gets the sampling of t for this sequence.
-   * @return the sampling t.
+   * Gets the sampling for this function.
+   * @return the sampling.
    */
-  public Sampling getT() {
-    return _t;
+  public Sampling getSampling() {
+    return _s;
   }
 
   /**
-   * Gets the array of function values x(t) for this sequence.
+   * Gets the array of function values for this function.
    * @return the array of function values; by reference, not by copy.
    */
-  public float[] getX() {
-    return _x;
+  public float[] getValues() {
+    return _v;
   }
 
   /**
-   * Returns this sequence resampled to have the specified sampling.
+   * Returns this function resampled to have the specified sampling.
    * <p>
    * If the specified sampling is compatible with the sampling of this
-   * sequence, this method copies the function values in the overlap 
+   * function, this method copies the function values in the overlap 
    * between the two samplings, and assigns zero values to the function 
    * values where the two samplings do not overlap.
    * <p>
    * If the specified sampling is incompatible with the sampling of this
-   * sequence, then this method must interpolate or decimate this sequence 
+   * function, then this method must interpolate or decimate this function 
    * Neither interpolation or decimation is supported, yet.
    * @param t the sampling.
-   * @return the resampled sequence.
+   * @return the resampled function.
    * @exception UnsupportedOperationException if the specified sampling is 
    *  incompatible with this sampling.
    */
-  public Real1 resample(Sampling t) {
+  public Real1 resample(Sampling s) {
+    Sampling t = _s;
 
     // Overlap between this and that sampling.
-    Sampling r = _t;
-    Sampling s =  t;
-    int[] overlap = r.overlapWith(s);
+    int[] overlap = t.overlapWith(s);
 
     // If samplings are compatible, ...
     if (overlap!=null) {
       int ni = overlap[0];
-      int ir = overlap[1];
+      int it = overlap[1];
       int is = overlap[2];
-      Real1 rr = this;
+      Real1 rt = this;
       Real1 rs = new Real1(s);
-      float[] xr = rr.getX();
-      float[] xs = rs.getX();
+      float[] xt = rt.getValues();
+      float[] xs = rs.getValues();
       while (--ni>=0)
-        xs[is++] = xr[ir++];
+        xs[is++] = xt[it++];
       return rs;
     }
 
@@ -154,9 +149,9 @@ public class Real1 {
   }
 
   /**
-   * Returns the sum this + ra of sequences this and ra.
+   * Returns the sum this + ra of functions this and ra.
    * The samplings of this and ra must be equivalent.
-   * @param ra a sequence.
+   * @param ra a function.
    * @return the sum.
    */
   public Real1 plus(Real1 ra) {
@@ -164,7 +159,7 @@ public class Real1 {
   }
 
   /**
-   * Returns the sum this + ar of this sequence and constant ar.
+   * Returns the sum this + ar of this function and constant ar.
    * @param ar a constant.
    * @return the sum.
    */
@@ -173,27 +168,27 @@ public class Real1 {
   }
 
   /**
-   * Convolves this sequence with the specified sequence. The two sequences 
+   * Convolves this function with the specified function. The two functions 
    * must be uniformly sampled with equal sampling intervals.
-   * @param ra the sequence with which to convolve.
-   * @return the convolution sequence.
+   * @param ra the function with which to convolve.
+   * @return the convolution function.
    */
   public Real1 convolve(Real1 ra) {
     Real1 rx = this;
     Real1 ry = ra;
-    Sampling tx = rx.getT();
-    Sampling ty = ry.getT();
-    double dx = tx.getDelta();
-    double dy = ty.getDelta();
-    Check.state(tx.isUniform(),"sampling is uniform");
-    Check.argument(ty.isUniform(),"sampling is uniform");
+    Sampling sx = rx.getSampling();
+    Sampling sy = ry.getSampling();
+    double dx = sx.getDelta();
+    double dy = sy.getDelta();
+    Check.state(sx.isUniform(),"sampling is uniform");
+    Check.argument(sy.isUniform(),"sampling is uniform");
     Check.argument(dx==dy,"sampling intervals are equal");
-    int lx = tx.getCount();
-    int ly = ty.getCount();
-    double fx = tx.getFirst();
-    double fy = ty.getFirst();
-    float[] x = rx.getX();
-    float[] y = ry.getX();
+    int lx = sx.getCount();
+    int ly = sy.getCount();
+    double fx = sx.getFirst();
+    double fy = sy.getFirst();
+    float[] x = rx.getValues();
+    float[] y = ry.getValues();
     int lz = lx+ly-1;
     double dz = dx;
     double fz = fx+fy;
@@ -203,41 +198,42 @@ public class Real1 {
   }
 
   /**
-   * Filters this sequence with the specified recursive filter.
+   * Filters this function with the specified recursive filter.
    * Applies the filter in the forward direction. Makes the sampling of 
-   * the filtered sequence equal to the the sampling of this sequence.
+   * the filtered function equal to the the sampling of this function.
    * @param rf the recursive filter.
-   * @return the filtered sequence.
+   * @return the filtered function.
    */
   public Real1 filterForward(RecursiveFilter rf) {
-    float[] y = new float[_x.length];
-    rf.applyForward(_x,y);
-    return new Real1(_t,y);
+    float[] y = new float[_v.length];
+    rf.applyForward(_v,y);
+    return new Real1(_s,y);
   }
 
   /* *
-   * Filters this sequence with the specified recursive filter.
+   * Filters this function with the specified recursive filter.
    * Applies the filter in the reverse direction. Makes the sampling of 
-   * the filtered sequence equal to the the sampling of this sequence.
+   * the filtered function equal to the the sampling of this function.
    * @param rf the recursive filter.
-   * @return the filtered sequence.
+   * @return the filtered function.
    */
   //public Real1 filterReverse(RecursiveFilter rf);
 
   /**
-   * Gets frequency sampling corresponding to the sampling of this sequence.
-   * The frequency of the first sample will be zero, because the Fourier
-   * transform of a real sequence has conjugate-symmetry.
+   * Gets sampling for the Fourier transform of this function. The first 
+   * sample value will be zero, because the Fourier transform of a real 
+   * function has conjugate-symmetry.
    * <p>
-   * A minimum number of frequency samples must be specified, and the
-   * returned frequency sampling will not be less than the larger of
-   * that specified minimum and the number of samples in this sequence.
-   * @param nmin the minimum number of frequency samples.
-   * @return the frequency sampling.
+   * A minimum number of Fourier transform samples must be specified, and 
+   * the number of samlpes in the returned sampling will not be less than 
+   * the larger of that specified minimum and the number of samples in this 
+   * function.
+   * @param nmin the minimum number of samples after Fourier transform.
+   * @return the Fourier transform sampling.
    */
-  public Sampling getFrequencySampling(int nmin) {
-    int nt = _t.getCount();
-    double dt = _t.getDelta();
+  public Sampling getFourierSampling(int nmin) {
+    int nt = _s.getCount();
+    double dt = _s.getDelta();
     int nfft = FftReal.nfftSmall(max(nmin,nt));
     int nf = nfft/2+1;
     double df = 1.0/(nfft*dt);
@@ -246,7 +242,7 @@ public class Real1 {
   }
 
   /* *
-   * Computes the Fourier transform of this sequence.
+   * Computes the Fourier transform of this function.
    * @param f the frequency sampling.
    * @return the Fourier transform.
    */
@@ -256,109 +252,109 @@ public class Real1 {
   // public static
 
   /**
-   * Returns a sequence with value zero.
-   * @param nt the number of samples.
-   * @return the sequence.
+   * Returns a sampled function with values zero.
+   * @param n the number of samples.
+   * @return the function.
    */
-  public static Real1 zero(int nt) {
-    return new Real1(new Sampling(nt));
+  public static Real1 zero(int n) {
+    return new Real1(new Sampling(n));
   }
 
   /**
-   * Returns a sequence with value zero.
-   * @param t the sampling.
-   * @return the sequence.
+   * Returns a sampled function with values zero.
+   * @param s the sampling.
+   * @return the function.
    */
-  public static Real1 zero(Sampling t) {
-    return new Real1(t);
+  public static Real1 zero(Sampling s) {
+    return new Real1(s);
   }
 
   /**
-   * Returns a sequence with constant value.
+   * Returns a function with constant values.
    * @param ar the constant.
-   * @param nt the number of samples.
-   * @return the sequence.
+   * @param n the number of samples.
+   * @return the function.
    */
-  public static Real1 fill(double ar, int nt) {
-    return Real1.fill(ar,new Sampling(nt));
+  public static Real1 fill(double ar, int n) {
+    return Real1.fill(ar,new Sampling(n));
   }
 
   /**
-   * Returns a sequence with constant value.
+   * Returns a function with constant values.
    * @param ar the constant.
-   * @param t the sampling.
-   * @return the sequence.
+   * @param s the sampling.
+   * @return the function.
    */
-  public static Real1 fill(double ar, Sampling t) {
-    int nt = t.getCount();
-    return new Real1(t,fillfloat((float)ar,nt));
+  public static Real1 fill(double ar, Sampling s) {
+    int n = s.getCount();
+    return new Real1(s,Array.fillfloat((float)ar,n));
   }
 
   /**
-   * Returns a sampled linear (ramp) sequence.
-   * The function values are fx+i*dx, for i in [0:nt).
-   * @param fx the first function value.
-   * @param dx the function value delta.
-   * @param nt the number of samples
-   * @return the sequence.
+   * Returns a sampled linear (ramp) function.
+   * The function values are fv+iv*dv, for iv in [0:nv).
+   * @param fv the first function value.
+   * @param dv the function value delta.
+   * @param nv the number of values.
+   * @return the function.
    */
-  public static Real1 ramp(double fx, double dx, int nt) {
-    return Real1.ramp(fx,dx,new Sampling(nt));
+  public static Real1 ramp(double fv, double dv, int nv) {
+    return Real1.ramp(fv,dv,new Sampling(nv));
   }
 
   /**
-   * Returns a sampled linear (ramp) sequence.
-   * The function values are fx+(t-ft)*dx, 
-   * for t = ft, ft+dt, ..., ft+(nt-1)*dt.
-   * @param fx the first function value.
-   * @param dx the function value delta.
-   * @param t the sampling.
-   * @return the sequence.
+   * Returns a sampled linear (ramp) function.
+   * The function values are fv+dv*(s-f), for s = f, f+d, ..., f+d*(n-1),
+   * where n, d, and f are the sampling count, delta, and first value.
+   * @param fv the first function value.
+   * @param dv the function value delta.
+   * @param s the sampling.
+   * @return the function.
    */
-  public static Real1 ramp(double fx, double dx, Sampling t) {
-    int nt = t.getCount();
-    double dt = t.getDelta();
-    double ft = t.getFirst();
-    return new Real1(t,rampfloat((float)(fx-ft*dx),(float)(dt*dx),nt));
+  public static Real1 ramp(double fv, double dv, Sampling s) {
+    int n = s.getCount();
+    double d = s.getDelta();
+    double f = s.getFirst();
+    return new Real1(s,Array.rampfloat((float)(fv-f*dv),(float)(d*dv),n));
   }
 
   /**
-   * Returns the sum ra + rb of two sequences ra and rb.
+   * Returns the sum ra + rb of two functions ra and rb.
    * The samplings of ra and rb must be equivalent.
-   * @param ra a sequence.
-   * @param rb a sequence.
+   * @param ra a function.
+   * @param rb a function.
    * @return the sum.
    */
   public static Real1 add(Real1 ra, Real1 rb) {
     ensureSamplingEquivalent(ra,rb);
-    return new Real1(ra._t,Array.add(ra._x,rb._x));
+    return new Real1(ra._s,Array.add(ra._v,rb._v));
   }
 
   /**
-   * Returns the sum ar + rb of constant ar and sequence rb.
+   * Returns the sum ar + rb of constant ar and function rb.
    * @param ar a constant.
-   * @param rb a sequence.
+   * @param rb a function.
    * @return the sum.
    */
   public static Real1 add(float ar, Real1 rb) {
-    return new Real1(rb._t,Array.add(ar,rb._x));
+    return new Real1(rb._s,Array.add(ar,rb._v));
   }
 
   /**
-   * Returns the sum ra + br of sequence ra and constant br.
-   * @param ra a sequence.
+   * Returns the sum ra + br of function ra and constant br.
+   * @param ra a function.
    * @param br a constant.
    * @return the sum.
    */
   public static Real1 add(Real1 ra, float br) {
-    return new Real1(ra._t,Array.add(ra._x,br));
+    return new Real1(ra._s,Array.add(ra._v,br));
   }
 
   /**
-   * Returns the difference ra - rb of two sequences ra and rb.
+   * Returns the difference ra - rb of two functions ra and rb.
    * The samplings of ra and rb must be equivalent.
-   * @param ra a sequence.
-   * @param rb a sequence.
+   * @param ra a function.
+   * @param rb a function.
    * @return the difference.
    */
   public static Real1 sub(Real1 ra, Real1 rb) {
@@ -366,9 +362,9 @@ public class Real1 {
   }
 
   /**
-   * Returns the difference ar - rb of constant ar and sequence rb.
+   * Returns the difference ar - rb of constant ar and function rb.
    * @param ar a constant.
-   * @param rb a sequence.
+   * @param rb a function.
    * @return the sum.
    */
   public static Real1 sub(float ar, Real1 rb) {
@@ -376,8 +372,8 @@ public class Real1 {
   }
 
   /**
-   * Returns the difference ra - br of sequence ra and constant br.
-   * @param ra a sequence.
+   * Returns the difference ra - br of function ra and constant br.
+   * @param ra a function.
    * @param br a constant.
    * @return the sum.
    */
@@ -386,10 +382,10 @@ public class Real1 {
   }
 
   /**
-   * Returns the product ra * rb of two sequences ra and rb.
+   * Returns the product ra * rb of two functions ra and rb.
    * The samplings of ra and rb must be equivalent.
-   * @param ra a sequence.
-   * @param rb a sequence.
+   * @param ra a function.
+   * @param rb a function.
    * @return the difference.
    */
   public static Real1 mul(Real1 ra, Real1 rb) {
@@ -397,9 +393,9 @@ public class Real1 {
   }
 
   /**
-   * Returns the product ar * rb of constant ar and sequence rb.
+   * Returns the product ar * rb of constant ar and function rb.
    * @param ar a constant.
-   * @param rb a sequence.
+   * @param rb a function.
    * @return the sum.
    */
   public static Real1 mul(float ar, Real1 rb) {
@@ -407,8 +403,8 @@ public class Real1 {
   }
 
   /**
-   * Returns the product ra * br of sequence ra and constant br.
-   * @param ra a sequence.
+   * Returns the product ra * br of function ra and constant br.
+   * @param ra a function.
    * @param br a constant.
    * @return the sum.
    */
@@ -417,10 +413,10 @@ public class Real1 {
   }
 
   /**
-   * Returns the quotient ra / rb of two sequences ra and rb.
+   * Returns the quotient ra / rb of two functions ra and rb.
    * The samplings of ra and rb must be equivalent.
-   * @param ra a sequence.
-   * @param rb a sequence.
+   * @param ra a function.
+   * @param rb a function.
    * @return the difference.
    */
   public static Real1 div(Real1 ra, Real1 rb) {
@@ -428,9 +424,9 @@ public class Real1 {
   }
 
   /**
-   * Returns the quotient ar / rb of constant ar and sequence rb.
+   * Returns the quotient ar / rb of constant ar and function rb.
    * @param ar a constant.
-   * @param rb a sequence.
+   * @param rb a function.
    * @return the sum.
    */
   public static Real1 div(float ar, Real1 rb) {
@@ -438,8 +434,8 @@ public class Real1 {
   }
 
   /**
-   * Returns the quotient ra / br of sequence ra and constant br.
-   * @param ra a sequence.
+   * Returns the quotient ra / br of function ra and constant br.
+   * @param ra a function.
    * @param br a constant.
    * @return the sum.
    */
@@ -450,48 +446,48 @@ public class Real1 {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  Sampling _t; // sampling of variable t
-  float[] _x; // array of function values x(t)
+  Sampling _s; // sampling of one independent variable
+  float[] _v; // array of function values
 
   private static void ensureSamplingEquivalent(Real1 ra, Real1 rb) {
-    ensureSamplingEquivalent(ra.getT(),rb.getT());
+    ensureSamplingEquivalent(ra.getSampling(),rb.getSampling());
   }
 
-  private static void ensureSamplingEquivalent(Sampling ta, Sampling tb) {
-    Check.argument(ta.isEquivalentTo(tb),"samplings equivalent");
+  private static void ensureSamplingEquivalent(Sampling sa, Sampling sb) {
+    Check.argument(sa.isEquivalentTo(sb),"samplings equivalent");
   }
 
 
   ///////////////////////////////////////////////////////////////////////////
   // Binary operations made generic to reduce code bloat.
   private static Real1 binaryOp(Real1 ra, Real1 rb, Binary ab) {
-    Sampling ta = ra.getT();
-    Sampling tb = rb.getT();
-    Check.argument(ta.isEquivalentTo(tb),"samplings equivalent");
-    Sampling tc = ta;
-    Real1 rc = new Real1(tc);
-    float[] xa = ra.getX();
-    float[] xb = rb.getX();
-    float[] xc = rc.getX();
-    ab.apply(xc.length,xa,0,xb,0,xc,0);
+    Sampling sa = ra.getSampling();
+    Sampling sb = rb.getSampling();
+    Check.argument(sa.isEquivalentTo(sb),"samplings equivalent");
+    Sampling sc = sa;
+    Real1 rc = new Real1(sc);
+    float[] va = ra.getValues();
+    float[] vb = rb.getValues();
+    float[] vc = rc.getValues();
+    ab.apply(vc.length,va,0,vb,0,vc,0);
     return rc;
   }
   private static Real1 binaryOp(float ar, Real1 rb, Binary ab) {
-    Sampling tb = rb.getT();
-    Sampling tc = tb;
-    Real1 rc = new Real1(tc);
-    float[] fb = rb.getX();
-    float[] fc = rc.getX();
-    ab.apply(fc.length,ar,fb,0,fc,0);
+    Sampling sb = rb.getSampling();
+    Sampling sc = sb;
+    Real1 rc = new Real1(sc);
+    float[] vb = rb.getValues();
+    float[] vc = rc.getValues();
+    ab.apply(vc.length,ar,vb,0,vc,0);
     return rc;
   }
   private static Real1 binaryOp(Real1 ra, float br, Binary ab) {
-    Sampling ta = ra.getT();
-    Sampling tc = ta;
-    Real1 rc = new Real1(tc);
-    float[] fa = ra.getX();
-    float[] fc = rc.getX();
-    ab.apply(fc.length,fa,0,br,fc,0);
+    Sampling sa = ra.getSampling();
+    Sampling sc = sa;
+    Real1 rc = new Real1(sc);
+    float[] va = ra.getValues();
+    float[] vc = rc.getValues();
+    ab.apply(vc.length,va,0,br,vc,0);
     return rc;
   }
   private interface Binary {
