@@ -6894,6 +6894,43 @@ public class Array {
   }
 
   ///////////////////////////////////////////////////////////////////////////
+  // isRegular
+
+  /**
+   * Determines whether the specified array of arrays is regular. The array 
+   * is regular if each of its elements, which are arrays, have the same 
+   * length.
+   * @param a the array.
+   * @return true, if regular; false, otherwise.
+   */
+  public static boolean isRegular(float[][] a) {
+    int n2 = a.length;
+    int n1 = a[0].length;
+    for (int i2=1; i2<n2; ++i2) {
+      if (a[i2].length!=n1)
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the specified array of arrays of arrays is regular. 
+   * The array is regular if each of its elements, which are arrays of arrays,
+   * has the same length and is regular.
+   * @param a the array.
+   * @return true, if regular; false, otherwise.
+   */
+  public static boolean isRegular(float[][][] a) {
+    int n3 = a.length;
+    int n2 = a[0].length;
+    for (int i3=1; i3<n3; ++i3) {
+      if (a[i3].length!=n2 || !isRegular(a[i3]))
+        return false;
+    }
+    return true;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
   // isIncreasing, isDecreasing, isMonotonic
 
   /**
