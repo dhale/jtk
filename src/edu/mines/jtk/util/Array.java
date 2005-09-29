@@ -7354,22 +7354,60 @@ public class Array {
   ///////////////////////////////////////////////////////////////////////////
   // sorting
 
+  /**
+   * Sorts the elements of the specified array in ascending order.
+   * @param a the array.
+   */
   public static void quickSort(float[] a) {
     int n = a.length;
-    if (n<7) {
+    if (n<NSMALL_SORT) {
       insertionSort(a,0,n-1);
     } else {
       int[] m = new int[2];
       quickSort(a,0,n-1,m);
     }
   }
+
+  /**
+   * Partially sorts the elements of the specified array in ascending order.
+   * After partial sorting, the element with specified index k will be in
+   * the correct location. That is, all elements with smaller indices will
+   * not be greater than a[k], and all elements with larger indices will not
+   * be less than a[k].
+   * @param k the index.
+   * @param a the array.
+   */
+  public static void quickPartialSort(int k, float[] a) {
+    int n = a.length;
+    int p = 0;
+    int q = n-1;
+    int[] m = (n>NSMALL_SORT)?new int[2]:null;
+    while (q-p>=NSMALL_SORT) {
+      m[0] = p;
+      m[1] = q;
+      quickPartition(a,m);
+      if (k<m[0]) {
+        q = m[0]-1;
+      } else if (k>m[1]) {
+        p = m[1]+1;
+      } else {
+        return;
+      }
+    }
+    insertionSort(a,p,q);
+  }
+
+  // Adapted from Bentley, J.L., and McIlroy, M.D., 1993, Engineering a sort
+  // function, Software -- Practice and Experience, v. 23(11), p. 1249-1265.
+  private static final int NSMALL_SORT =  7;
+  private static final int NLARGE_SORT = 40;
   private static void insertionSort(float[] a, int p, int q) {
     for (int i=p; i<=q; ++i)
       for (int j=i; j>p && a[j-1]>a[j]; --j)
         swap(a,j,j-1);
   }
   private static void quickSort(float[] a, int p, int q, int[] m) {
-    if (q<=p+7) {
+    if (q-p<=NSMALL_SORT) {
       insertionSort(a,p,q);
     } else {
       m[0] = p;
@@ -7406,10 +7444,10 @@ public class Array {
     int q = m[1];
     int n = q-p+1;
     int j = (p+q)/2;
-    if (n>7) {
+    if (n>NSMALL_SORT) {
       int i = p;
       int k = q;
-      if (n>40) {
+      if (n>NLARGE_SORT) {
         int s = n/8;
         i = med3(x,i,i+s,i+2*s);
         j = med3(x,j-s,j,j+s);
@@ -7417,7 +7455,7 @@ public class Array {
       }
       j = med3(x,i,j,k);
     }
-    float y = x[j];
+    float y = x[j]; // will partition around pivot y
     int a=p,b=p;
     int c=q,d=q;
     while (true) {
@@ -7442,8 +7480,8 @@ public class Array {
     int t = q+1;
     swap(x,p,b-r,r);
     swap(x,b,t-s,s);
-    m[0] = p+(b-a);
-    m[1] = q-(d-c);
+    m[0] = p+(b-a); // p --- m[0]-1 | m[0] --- m[1] | m[1]+1 --- q
+    m[1] = q-(d-c); //   x<y               x=y               x>y
   }
 
   ///////////////////////////////////////////////////////////////////////////

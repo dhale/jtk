@@ -24,19 +24,79 @@ public class ArrayTest extends TestCase {
     junit.textui.TestRunner.run(suite);
   }
 
+  // Adapted from Bentley, J.L., and McIlroy, M.D., 1993, Engineering a sort
+  // function, Software -- Practice and Experience, v. 23(11), p. 1249-1265.
+  private static final int sawtooth=0,rand=1,stagger=2,plateau=3,shuffle=4;
+  private static final int copy=0,rev=1,revhalf1=2,revhalf2=3,sort=4,dither=5;
   public void testSort() {
     Random r = new Random(314159);
-    int ntest = 10;
-    int n = 1000;
-    float[] a = new float[n];
-    for (int itest=0; itest<ntest; ++itest) {
-      for (int i=0; i<n; ++i) {
-         a[i] = (float)((int)(10*r.nextFloat()));
+    int[] ntest = {100,1023,1024,1025};
+    for (int itest=0; itest<ntest.length; ++itest) {
+      int n = ntest[itest];
+      float[] x = new float[n];
+      for (int m = 1; m<2*n; m*=2) {
+        for (int dist=0; dist<5; ++dist) {
+          for (int i=0,j=0,k=1; i<n; ++i) {
+            int ix = 0;
+            switch(dist) {
+              case sawtooth: ix = i%m; break;
+              case rand:     ix = r.nextInt()%m; break;
+              case stagger:  ix = (i*m+i)%n; break;
+              case plateau:  ix = min(i,m); break;
+              case shuffle:  ix = r.nextInt()%m!=0?(j+=2):(k+=2); break;
+            }
+            x[i] = (float)ix;
+          }
+          for (int order=0; order<6; ++order) {
+            float[] y = null;
+            float[] z = null;
+            switch(order) {
+            case copy:
+              y = copy(x);
+              break;
+            case rev:
+              y = reverse(x);
+              break;
+            case revhalf1:
+              y = copy(x);
+              z = reverse(copy(n/2,x));
+              copy(n/2,0,z,0,y);
+              break;
+            case revhalf2:
+              y = copy(x);
+              z = reverse(copy(n/2,n/2,x));
+              copy(n/2,0,z,n/2,y);
+              break;
+            case sort:
+              y = copy(x);
+              java.util.Arrays.sort(y);
+              break;
+            case dither:
+              y = copy(x);
+              for (int i=0; i<n; ++i)
+                y[i] += (float)(i%5);
+              break;
+            }
+            sortAndCheck(y);
+          }
+        }
       }
-      quickSort(a);
-      for (int i=1; i<n; ++i) {
-        assertTrue(a[i-1]<=a[i]);
+    }
+  }
+  private void sortAndCheck(float[] x) {
+    int n = x.length;
+    int k = n/2;
+    quickPartialSort(k,x);
+    for (int i=0; i<n; ++i) {
+      if (i<k) {
+        assertTrue(x[i]<=x[k]);
+      } else if (i>k) {
+        assertTrue(x[k]<=x[i]);
       }
+    }
+    quickSort(x);
+    for (int i=1; i<n; ++i) {
+      assertTrue(x[i-1]<=x[i]);
     }
   }
 
