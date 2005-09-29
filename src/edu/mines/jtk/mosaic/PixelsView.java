@@ -25,7 +25,8 @@ public class PixelsView extends TiledView {
   /**
    * Orientation of sample axes x1 and x2. For example, the orientation 
    * X1RIGHT_X2UP corresponds to x1 increasing horizontally from left to 
-   * right, and x2 increasing vertically from bottom to top.
+   * right, and x2 increasing vertically from bottom to top. The default
+   * is X1RIGHT_X2UP.
    */
   public enum Orientation {
     X1RIGHT_X2UP,
@@ -58,6 +59,7 @@ public class PixelsView extends TiledView {
     _s1 = s1;
     _s2 = s2;
     _f = f;
+    updateClips();
     updateSampling();
   }
 
@@ -81,13 +83,86 @@ public class PixelsView extends TiledView {
     return _orientation;
   }
 
+  /**
+   * Sets the clips for this view. A pixels view maps values of the sampled 
+   * function f(x1,x2) to bytes, which are then used as indices into a 
+   * specified colormap. This mapping from sample values to byte indices is 
+   * linear, and so depends on only these two clip values. The minimum clip 
+   * value corresponds to byte index 0, and the maximum clip value corresponds 
+   * to byte index 255. Sample values outside of the range (clipMin,clipMax)
+   * are clipped to lie inside this range.
+   * <p>
+   * By default, minimum and maximum clip values are computed from
+   * percentiles. If clip values are set explicitly, then percentiles
+   * are ignored, and the specified clip values are used.
+   * @param clipMin the sample value corresponding to colormap byte index 0.
+   * @param clipMax the sample value corresponding to colormap byte index 255.
+   */
   public void setClips(float clipMin, float clipMax) {
     Check.argument(clipMin<clipMax,"clipMin<clipMax");
     if (_clipMin!=clipMin || _clipMax!=clipMax) {
       _clipMin = clipMin;
       _clipMax = clipMax;
+      _usePercentiles = false;
       repaint();
     }
+  }
+
+  /**
+   * Gets the minimum clip value.
+   * @return the minimum clip value.
+   */
+  public float getClipMin() {
+    return _clipMin;
+  }
+
+  /**
+   * Gets the maximum clip value.
+   * @return the maximum clip value.
+   */
+  public float getClipMax() {
+    return _clipMax;
+  }
+
+  /**
+   * Sets the percentiles used to compute clips for this view. The default 
+   * percentiles are 0 and 100, which correspond to the minimum and maximum 
+   * values of the sampled function f(x1,x2).
+   * <p>
+   * By default, minimum and maximum clip values are computed from
+   * percentiles. If clip values are set explicitly, then percentiles
+   * are ignored, and the specified clip values are used. If percentiles
+   * are set once again, the clip values will be recomputed.
+   * @param percMin the percentile corresponding to clipMin.
+   * @param percMax the percentile corresponding to clipMax.
+   */
+  public void setPercentiles(float percMin, float percMax) {
+    Check.argument(0.0f<=percMin,"0<=percMin");
+    Check.argument(percMin<percMax,"percMin<percMax");
+    Check.argument(percMax<=100.0f,"percMax<=100");
+    if (_percMin!=percMin || _percMax!=percMax) {
+      _percMin = percMin;
+      _percMax = percMax;
+      _usePercentiles = true;
+      updateClips();
+      repaint();
+    }
+  }
+
+  /**
+   * Gets the minimum percentile.
+   * @return the minimum percentile.
+   */
+  public float getPercentileMin() {
+    return _percMin;
+  }
+
+  /**
+   * Gets the maximum percentile.
+   * @return the maximum percentile.
+   */
+  public float getPercentileMax() {
+    return _percMax;
   }
 
   public void paint(Graphics2D g2d) {
@@ -153,12 +228,18 @@ public class PixelsView extends TiledView {
   Sampling _s2;
   float[][] _f;
 
-  // The view orientation.
-  Orientation _orientation = Orientation.X1DOWN_X2RIGHT;
+  // View orientation.
+  Orientation _orientation = Orientation.X1RIGHT_X2UP;
 
-  // Clips.
-  float _clipMin; // mapped to byte index 0
-  float _clipMax; // mapped to byte index 255
+  // Interpolation method.
+  Interpolation _interpolation = Interpolation.LINEAR;
+
+  // Clips and percentiles.
+  float _clipMin; // mapped to colormap byte index 0
+  float _clipMax; // mapped to colormap byte index 255
+  float _percMin = 0.0f; // may be used to compute _clipMin
+  float _percMax = 100.0f; // may be used to compute _clipMax
+  boolean _usePercentiles = true; // true, if using percentiles
 
   // Sampling of the function f(x1,x2) in the pixel (x,y) coordinate system. 
   boolean _transposed;
@@ -168,6 +249,30 @@ public class PixelsView extends TiledView {
   int _ny;
   double _dy;
   double _fy;
+
+  /**
+   * If using percentiles, computes corresponding clip values.
+   */
+  private void updateClips() {
+    if (_usePercentiles) {
+      float[] a = (_percMin!=0.0f || _percMax!=0.0f)?Array.flatten(_f):null;
+      int n = (a!=null)?a.length:0;
+      if (_percMin==0.0f) {
+        _clipMin = Array.min(_f);
+      } else {
+        int k = (int)rint(_percMin*(n-1));
+        Array.quickPartialSort(k,a);
+        _clipMin = a[k];
+      }
+      if (_percMax==100.0f) {
+        _clipMax = Array.max(_f);
+      } else {
+        int k = (int)rint(_percMax*(n-1));
+        Array.quickPartialSort(k,a);
+        _clipMax = a[k];
+      }
+    }
+  }
 
   /**
    * Updates the (x,y) sampling for this view. This sampling corresponds to
@@ -360,8 +465,7 @@ public class PixelsView extends TiledView {
         _f[i2][i1] = (float)(i1+i2)/(float)(n2+n1-2);
       }
     }
-    _clipMin = 0.0f;
-    _clipMax = 1.0f;
+    updateClips();
     updateSampling();
   }
   public static void main(String[] args) {
