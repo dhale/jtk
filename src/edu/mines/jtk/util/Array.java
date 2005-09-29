@@ -6903,6 +6903,108 @@ public class Array {
    * @param a the array.
    * @return true, if regular; false, otherwise.
    */
+  public static boolean isRegular(byte[][] a) {
+    int n2 = a.length;
+    int n1 = a[0].length;
+    for (int i2=1; i2<n2; ++i2) {
+      if (a[i2].length!=n1)
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the specified array of arrays of arrays is regular. 
+   * The array is regular if each of its elements, which are arrays of arrays,
+   * has the same length and is regular.
+   * @param a the array.
+   * @return true, if regular; false, otherwise.
+   */
+  public static boolean isRegular(byte[][][] a) {
+    int n3 = a.length;
+    int n2 = a[0].length;
+    for (int i3=0; i3<n3; ++i3) {
+      if (a[i3].length!=n2 || !isRegular(a[i3]))
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the specified array of arrays is regular. The array 
+   * is regular if each of its elements, which are arrays, have the same 
+   * length.
+   * @param a the array.
+   * @return true, if regular; false, otherwise.
+   */
+  public static boolean isRegular(short[][] a) {
+    int n2 = a.length;
+    int n1 = a[0].length;
+    for (int i2=1; i2<n2; ++i2) {
+      if (a[i2].length!=n1)
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the specified array of arrays of arrays is regular. 
+   * The array is regular if each of its elements, which are arrays of arrays,
+   * has the same length and is regular.
+   * @param a the array.
+   * @return true, if regular; false, otherwise.
+   */
+  public static boolean isRegular(short[][][] a) {
+    int n3 = a.length;
+    int n2 = a[0].length;
+    for (int i3=0; i3<n3; ++i3) {
+      if (a[i3].length!=n2 || !isRegular(a[i3]))
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the specified array of arrays is regular. The array 
+   * is regular if each of its elements, which are arrays, have the same 
+   * length.
+   * @param a the array.
+   * @return true, if regular; false, otherwise.
+   */
+  public static boolean isRegular(int[][] a) {
+    int n2 = a.length;
+    int n1 = a[0].length;
+    for (int i2=1; i2<n2; ++i2) {
+      if (a[i2].length!=n1)
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the specified array of arrays of arrays is regular. 
+   * The array is regular if each of its elements, which are arrays of arrays,
+   * has the same length and is regular.
+   * @param a the array.
+   * @return true, if regular; false, otherwise.
+   */
+  public static boolean isRegular(int[][][] a) {
+    int n3 = a.length;
+    int n2 = a[0].length;
+    for (int i3=0; i3<n3; ++i3) {
+      if (a[i3].length!=n2 || !isRegular(a[i3]))
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the specified array of arrays is regular. The array 
+   * is regular if each of its elements, which are arrays, have the same 
+   * length.
+   * @param a the array.
+   * @return true, if regular; false, otherwise.
+   */
   public static boolean isRegular(float[][] a) {
     int n2 = a.length;
     int n1 = a[0].length;
@@ -6923,7 +7025,41 @@ public class Array {
   public static boolean isRegular(float[][][] a) {
     int n3 = a.length;
     int n2 = a[0].length;
-    for (int i3=1; i3<n3; ++i3) {
+    for (int i3=0; i3<n3; ++i3) {
+      if (a[i3].length!=n2 || !isRegular(a[i3]))
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the specified array of arrays is regular. The array 
+   * is regular if each of its elements, which are arrays, have the same 
+   * length.
+   * @param a the array.
+   * @return true, if regular; false, otherwise.
+   */
+  public static boolean isRegular(double[][] a) {
+    int n2 = a.length;
+    int n1 = a[0].length;
+    for (int i2=1; i2<n2; ++i2) {
+      if (a[i2].length!=n1)
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Determines whether the specified array of arrays of arrays is regular. 
+   * The array is regular if each of its elements, which are arrays of arrays,
+   * has the same length and is regular.
+   * @param a the array.
+   * @return true, if regular; false, otherwise.
+   */
+  public static boolean isRegular(double[][][] a) {
+    int n3 = a.length;
+    int n2 = a[0].length;
+    for (int i3=0; i3<n3; ++i3) {
       if (a[i3].length!=n2 || !isRegular(a[i3]))
         return false;
     }
@@ -7213,6 +7349,101 @@ public class Array {
    */
   public static boolean isMonotonic(double[] a) {
     return isIncreasing(a) || isDecreasing(a);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // sorting
+
+  public static void quickSort(float[] a) {
+    int n = a.length;
+    if (n<7) {
+      insertionSort(a,0,n-1);
+    } else {
+      int[] m = new int[2];
+      quickSort(a,0,n-1,m);
+    }
+  }
+  private static void insertionSort(float[] a, int p, int q) {
+    for (int i=p; i<=q; ++i)
+      for (int j=i; j>p && a[j-1]>a[j]; --j)
+        swap(a,j,j-1);
+  }
+  private static void quickSort(float[] a, int p, int q, int[] m) {
+    if (q<=p+7) {
+      insertionSort(a,p,q);
+    } else {
+      m[0] = p;
+      m[1] = q;
+      quickPartition(a,m);
+      int r = m[0];
+      int s = m[1];
+      if (p<r-1)
+        quickSort(a,p,r-1,m);
+      if (q>s+1)
+        quickSort(a,s+1,q,m);
+    }
+  }
+  private static int med3(float[] a, int i, int j, int k) {
+    return a[i]<a[j] ? 
+           (a[j]<a[k] ? j : a[i]<a[k] ? k : i) :
+           (a[j]>a[k] ? j : a[i]>a[k] ? k : i);
+  }
+  private static void swap(float[] a, int i, int j) {
+    float ai = a[i];
+    a[i] = a[j];
+    a[j] = ai;
+  }
+  private static void swap(float[] a, int i, int j, int n) {
+    while (n>0) {
+      float ai = a[i];
+      a[i++] = a[j];
+      a[j++] = ai;
+      --n;
+    }
+  }
+  private static void quickPartition(float[] x, int[] m) {
+    int p = m[0];
+    int q = m[1];
+    int n = q-p+1;
+    int j = (p+q)/2;
+    if (n>7) {
+      int i = p;
+      int k = q;
+      if (n>40) {
+        int s = n/8;
+        i = med3(x,i,i+s,i+2*s);
+        j = med3(x,j-s,j,j+s);
+        k = med3(x,k-2*s,k-s,k);
+      }
+      j = med3(x,i,j,k);
+    }
+    float y = x[j];
+    int a=p,b=p;
+    int c=q,d=q;
+    while (true) {
+      while (b<=c && x[b]<=y) {
+        if (x[b]==y) 
+          swap(x,a++,b);
+        ++b;
+      }
+      while (c>=b && x[c]>=y) {
+        if (x[c]==y)
+          swap(x,c,d--);
+        --c;
+      }
+      if (b>c)
+        break;
+      swap(x,b,c);
+      ++b;
+      --c;
+    }
+    int r = Math.min(a-p,b-a); 
+    int s = Math.min(d-c,q-d); 
+    int t = q+1;
+    swap(x,p,b-r,r);
+    swap(x,b,t-s,s);
+    m[0] = p+(b-a);
+    m[1] = q-(d-c);
   }
 
   ///////////////////////////////////////////////////////////////////////////

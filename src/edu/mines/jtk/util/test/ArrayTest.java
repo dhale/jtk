@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util.test;
 
+import java.util.Random;
 import junit.framework.*;
 import edu.mines.jtk.util.Cfloat;
 import edu.mines.jtk.util.Cdouble;
@@ -21,6 +22,22 @@ public class ArrayTest extends TestCase {
   public static void main(String[] args) {
     TestSuite suite = new TestSuite(ArrayTest.class);
     junit.textui.TestRunner.run(suite);
+  }
+
+  public void testSort() {
+    Random r = new Random(314159);
+    int ntest = 10;
+    int n = 1000;
+    float[] a = new float[n];
+    for (int itest=0; itest<ntest; ++itest) {
+      for (int i=0; i<n; ++i) {
+         a[i] = (float)((int)(10*r.nextFloat()));
+      }
+      quickSort(a);
+      for (int i=1; i<n; ++i) {
+        assertTrue(a[i-1]<=a[i]);
+      }
+    }
   }
 
   public void testFloat1() {
