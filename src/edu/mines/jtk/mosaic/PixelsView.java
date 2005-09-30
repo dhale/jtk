@@ -16,7 +16,27 @@ import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * A view of a sampled function f(x1,x2), displayed as a 2-D array of pixels.
- * <em>Not yet fully implemented!</em>
+ * Sample values are converted to pixel colors in two steps. In the first
+ * step, sample values are converted to unsigned bytes in the range [0,255].
+ * In the second, step, these bytes are converted to pixel colors, through
+ * a specified colormap.
+ * <p>
+ * The first mapping from sample values to unsigned byte indices is linear,
+ * except for clipping that ensures no byte index lies outside the range 
+ * [0,255]. This mapping is defined by two clip values, clipMin and clipMax. 
+ * The minimum clip value clipMin corresponds to byte index 0, and the 
+ * maximum clip value clipMax corresponds to byte index 255. Sample values 
+ * less than clipMin are mapped to byte index 0; sample values greater than 
+ * clipMax are mapped to byte index 255.
+ * <p>
+ * One byte index is computed for each pixel displayed by this view. The 
+ * view typically contains more (or fewer) pixels than samples, so this 
+ * first mapping often requires interpolation between sampled values of 
+ * the function f(x1,x2).
+ * <p>
+ * The second mapping is merely a table lookup. It uses the pixel bytes
+ * computed in the first mapping as indices in a colormap. The colormap 
+ * is an array of 256 colors, one for each of the 256 possible indices.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.09.27
  */
@@ -46,13 +66,15 @@ public class PixelsView extends TiledView {
 
   /**
    * Constructs a pixels view of the specified sampled function f(x1,x2).
-   * @param s1 the sampling of the variable x1.
-   * @param s2 the sampling of the variable x2.
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
    * @param f array[n2][n1] of sampled function values f(x1,x2), where
    *  n1 and n2 denote the number of samples in s1 and s2, respectively.
    *  This array is referenced, not copied.
    */
   public PixelsView(Sampling s1, Sampling s2, float[][] f) {
+    Check.argument(s1.isUniform(),"s1 is uniform");
+    Check.argument(s2.isUniform(),"s2 is uniform");
     Check.argument(Array.isRegular(f),"f is regular");
     Check.argument(s1.getCount()==f[0].length,"s1 consistent with f");
     Check.argument(s2.getCount()==f.length,"s2 consistent with f");
@@ -92,9 +114,8 @@ public class PixelsView extends TiledView {
    * to byte index 255. Sample values outside of the range (clipMin,clipMax)
    * are clipped to lie inside this range.
    * <p>
-   * By default, minimum and maximum clip values are computed from
-   * percentiles. If clip values are set explicitly, then percentiles
-   * are ignored, and the specified clip values are used.
+   * Calling this method disables the computation of clips from percentiles.
+   * Any clip values computed or specified previously will be forgotten.
    * @param clipMin the sample value corresponding to colormap byte index 0.
    * @param clipMax the sample value corresponding to colormap byte index 255.
    */
@@ -129,10 +150,8 @@ public class PixelsView extends TiledView {
    * percentiles are 0 and 100, which correspond to the minimum and maximum 
    * values of the sampled function f(x1,x2).
    * <p>
-   * By default, minimum and maximum clip values are computed from
-   * percentiles. If clip values are set explicitly, then percentiles
-   * are ignored, and the specified clip values are used. If percentiles
-   * are set once again, the clip values will be recomputed.
+   * Calling this method enables the computation of clips from percentiles.
+   * Any clip values specified or computed previously will be forgotten.
    * @param percMin the percentile corresponding to clipMin.
    * @param percMax the percentile corresponding to clipMax.
    */
@@ -260,14 +279,14 @@ public class PixelsView extends TiledView {
       if (_percMin==0.0f) {
         _clipMin = Array.min(_f);
       } else {
-        int k = (int)rint(_percMin*(n-1));
+        int k = (int)rint(_percMin*0.01*(n-1));
         Array.quickPartialSort(k,a);
         _clipMin = a[k];
       }
       if (_percMax==100.0f) {
         _clipMax = Array.max(_f);
       } else {
-        int k = (int)rint(_percMax*(n-1));
+        int k = (int)rint(_percMax*0.01*(n-1));
         Array.quickPartialSort(k,a);
         _clipMax = a[k];
       }
