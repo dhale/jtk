@@ -72,8 +72,8 @@ public class AxisTics {
   public AxisTics(double x1, double x2, int ntic) {
     double xmin = _xmin = min(x1,x2);
     double xmax = _xmax = max(x1,x2);
-    xmin -= (xmax-xmin)*100*DBL_EPSILON;
-    xmax += (xmax-xmin)*100*DBL_EPSILON;
+    xmin -= (xmax-xmin)*FLT_EPSILON;
+    xmax += (xmax-xmin)*FLT_EPSILON;
     int nmax = (ntic>=2)?ntic:2;
     double dmax = (xmax-xmin)/(nmax-1);
     int nmult = _mult.length;

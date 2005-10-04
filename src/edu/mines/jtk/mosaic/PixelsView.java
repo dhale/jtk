@@ -9,7 +9,6 @@ package edu.mines.jtk.mosaic;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
-import javax.swing.*;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
@@ -240,9 +239,35 @@ public class PixelsView extends TiledView {
     Projector hp = getHorizontalProjector();
     Projector vp = getVerticalProjector();
     Transcaler ts = getTranscaler();
+
+    // Bounding rectangle in pixels (device coordinates) for this view.
+    // This view should never draw outside of this rectangle.
+    double vx0 = _fx;
+    double vx1 = _fx+_dx*(_nx-1);
+    double vy0 = _fy;
+    double vy1 = _fy+_dy*(_ny-1);
+    double ux0 = hp.u(vx0);
+    double ux1 = hp.u(vx1);
+    double uy0 = vp.u(vy0);
+    double uy1 = vp.u(vy1);
+    double uxmin = min(ux0,ux1)-_uxMargin;
+    double uxmax = max(ux0,ux1)+_uxMargin;
+    double uymin = min(uy0,uy1)-_uyMargin;
+    double uymax = max(uy0,uy1)+_uyMargin;
+    int xd = ts.x(uxmin);
+    int yd = ts.y(uymin);
+    int wd = ts.width(uxmax-uxmin);
+    int hd = ts.height(uymax-uymin);
+    //Rectangle viewRect = new Rectangle(xd-1,yd-1,wd+2,hd+2);
+    Rectangle viewRect = new Rectangle(xd,yd,wd,hd);
+
+    // Restrict drawing to intersection of view and clip rectangles.
+    Rectangle clipRect = g2d.getClipBounds();
+    clipRect = clipRect.intersection(viewRect);
+    if (clipRect.isEmpty())
+      return;
     
     // Sample coordinates corresponding to the clip rectangle.
-    Rectangle clipRect = g2d.getClipBounds();
     int xc = clipRect.x;
     int yc = clipRect.y;
     int wc = clipRect.width;
@@ -259,8 +284,8 @@ public class PixelsView extends TiledView {
     // Image pixel sampling.
     int nx = wc;
     int ny = hc;
-    double dx = (x1-x0)/nx;
-    double dy = (y1-y0)/ny;
+    double dx = (x1-x0)/max(1,nx-1);
+    double dy = (y1-y0)/max(1,ny-1);
     double fx = x0;
     double fy = y0;
 
@@ -286,36 +311,42 @@ public class PixelsView extends TiledView {
   // private
 
   // The specified sampled floats are simply referenced, not copied.
-  Sampling _s1;
-  Sampling _s2;
-  float[][] _f;
+  private Sampling _s1;
+  private Sampling _s2;
+  private float[][] _f;
 
   // Color model.
-  ByteIndexColorModel _colorModel = ByteIndexColorModel.linearGray(0,1);
+  private ByteIndexColorModel _colorModel = 
+    ByteIndexColorModel.linearGray(0,1);
 
   // View orientation.
-  Orientation _orientation = Orientation.X1RIGHT_X2UP;
+  private Orientation _orientation = Orientation.X1RIGHT_X2UP;
 
   // Interpolation method.
-  Interpolation _interpolation = Interpolation.LINEAR;
+  private Interpolation _interpolation = Interpolation.LINEAR;
 
   // Clips and percentiles.
-  float _clipMin; // mapped to colormap byte index 0
-  float _clipMax; // mapped to colormap byte index 255
-  float _percMin = 0.0f; // may be used to compute _clipMin
-  float _percMax = 100.0f; // may be used to compute _clipMax
-  boolean _usePercentiles = true; // true, if using percentiles
+  private float _clipMin; // mapped to colormap byte index 0
+  private float _clipMax; // mapped to colormap byte index 255
+  private float _percMin = 0.0f; // may be used to compute _clipMin
+  private float _percMax = 100.0f; // may be used to compute _clipMax
+  private boolean _usePercentiles = true; // true, if using percentiles
 
   // Sampling of the function f(x1,x2) in the pixel (x,y) coordinate system. 
-  boolean _transposed;
-  boolean _xflipped;
-  boolean _yflipped;
-  int _nx;
-  double _dx;
-  double _fx;
-  int _ny;
-  double _dy;
-  double _fy;
+  private boolean _transposed;
+  private boolean _xflipped;
+  private boolean _yflipped;
+  private int _nx;
+  private double _dx;
+  private double _fx;
+  private int _ny;
+  private double _dy;
+  private double _fy;
+
+  // Margins in normalized coordinates.
+  private double _uxMargin;
+  private double _uyMargin;
+
 
   /**
    * If using percentiles, computes corresponding clip values.
@@ -384,6 +415,9 @@ public class PixelsView extends TiledView {
    * Called when we might need realignment.
    */
   private void updateBestProjectors() {
+
+    // (x0,y0) = sample coordinates for (left,top) of view.
+    // (x1,y1) = sample coordinates for (right,bottom) of view.
     double x0 = _fx;
     double x1 = _fx+_dx*(_nx-1);
     double y0 = _fy;
@@ -398,14 +432,35 @@ public class PixelsView extends TiledView {
       y0 = y1;
       y1 = yt;
     }
-    double ux0 = 0.0;
-    double uy0 = 0.0;
-    if (_interpolation==Interpolation.NEAREST) {
-      ux0 = 0.5/max(_nx,1.001);
-      uy0 = 0.5/max(_ny,1.001);
+
+    // Special handling for x0 == x1 or y0 == y1.
+    if (x0==x1) {
+      double tiny = FLT_EPSILON*max(1.0,x0);
+      x0 -= tiny;
+      x1 += tiny;
     }
-    double ux1 = 1.0-ux0;
-    double uy1 = 1.0-ux0;
+    if (y0==y1) {
+      double tiny = FLT_EPSILON*max(1.0,y0);
+      y0 -= tiny;
+      y1 += tiny;
+    }
+
+    // Margins in normalized coordinates.
+    _uxMargin = 0.0;
+    _uyMargin = 0.0;
+    if (_interpolation==Interpolation.NEAREST) {
+      _uxMargin = 0.5/max(_nx,1.001);
+      _uyMargin = 0.5/max(_ny,1.001);
+    }
+
+    // (ux0,uy0) = normalized coordinates for (left,top) of view.
+    // (ux1,uy1) = normalized coordinates for (right,bottom) of view.
+    double ux0 = _uxMargin;
+    double uy0 = _uyMargin;
+    double ux1 = 1.0-_uxMargin;
+    double uy1 = 1.0-_uyMargin;
+
+    // Best projectors.
     Projector bhp = new Projector(x0,x1,ux0,ux1);
     Projector bvp = new Projector(y0,y1,uy0,uy1);
     setBestProjectors(bhp,bvp);
@@ -467,7 +522,7 @@ public class PixelsView extends TiledView {
           float[] temp = temp1;
           temp1 = temp2;
           temp2 = temp;
-          interpx(jy+1,nx,kf,wf,temp2);
+          interpx(min(jy+1,_ny-1),nx,kf,wf,temp2);
         }
 
         // Else if temp1 is still useful, make it temp2 and compute temp1.
@@ -481,7 +536,7 @@ public class PixelsView extends TiledView {
         // Else compute both temp1 and temp2. */
         else {
           interpx(jy  ,nx,kf,wf,temp1);
-          interpx(jy+1,nx,kf,wf,temp2);
+          interpx(min(jy+1,_ny-1),nx,kf,wf,temp2);
         }                 
 
         // Remember index jy1 corresponding to temp1.

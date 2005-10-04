@@ -6,6 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
+import edu.mines.jtk.util.Check;
+
 /**
  * Translates and scales (maps) user coordinates to/from device coordinates.
  * The mapping is specified by two rectangles, one in user coordinates and 
@@ -22,7 +24,7 @@ package edu.mines.jtk.mosaic;
  * <p>
  * Conversion from/to user coordinates to/from device coordinates behaves 
  * robustly in the cases where the mapping is degenerate. For example, if
- * the device coordinate rectangle has zero width, then conversion from 
+ * the device coordinate rectangle has width one, then conversion from 
  * any device x-coordinate to user x-coordinate yields the average of the 
  * user x-coordinate bounds. Likewise, if the user coordinate rectangle 
  * has zero width, then conversion from any user x-coordinate to device 
@@ -51,6 +53,8 @@ public class Transcaler {
    */
   public Transcaler(int width, int height) {
     this(0.0,0.0,1.0,1.0,0,0,width-1,height-1);
+    Check.argument(width>0,"width>0");
+    Check.argument(height>0,"height>0");
   }
 
   /**
@@ -121,6 +125,8 @@ public class Transcaler {
    * (x2u,y2u) to device coordinates (width-1,height-1).
    */
   public void setMapping(int width, int height) {
+    Check.argument(width>0,"width>0");
+    Check.argument(height>0,"height>0");
     setMapping(0,0,width-1,height-1);
   }
 
@@ -136,7 +142,7 @@ public class Transcaler {
     } else if (xd>DMAX) {
       xd = DMAX;
     }
-    return (int)xd;
+    return (int)(xd);
   }
 
   /**
@@ -151,7 +157,7 @@ public class Transcaler {
     } else if (yd>DMAX) {
       yd = DMAX;
     }
-    return (int)yd;
+    return (int)(yd);
   }
 
   /**
@@ -166,7 +172,7 @@ public class Transcaler {
     } else if (wd>DMAX) {
       wd = DMAX;
     }
-    return (int)wd;
+    return (int)(wd+1.5);
   }
 
   /**
@@ -181,7 +187,7 @@ public class Transcaler {
     } else if (hd>DMAX) {
       hd = DMAX;
     }
-    return (int)hd;
+    return (int)(hd+1.5);
   }
 
   /**

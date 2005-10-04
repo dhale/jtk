@@ -37,8 +37,8 @@ public class PixelsViewTest {
 
     int n1 = 11;
     int n2 = 11;
-    float d1 = 1.0f/(float)(n1-1);
-    float d2 = 1.0f/(float)(n2-1);
+    float d1 = 1.0f/(float)max(1,n1-1);
+    float d2 = 1.0f/(float)max(1,n2-1);
     float[][] f = Array.rampfloat(0.0f,d1,d2,n1,n2);
 
     PixelsView pv0 = new PixelsView(f);
