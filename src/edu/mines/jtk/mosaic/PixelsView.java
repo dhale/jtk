@@ -19,24 +19,27 @@ import static edu.mines.jtk.util.MathPlus.*;
  * Sample values are converted to pixel colors in two steps. In the first
  * step, sample values are converted to unsigned bytes in the range [0,255].
  * In the second, step, these bytes are converted to pixel colors, through
- * a specified colormap.
+ * a specified color model.
  * <p>
- * The first mapping from sample values to unsigned byte indices is linear,
- * except for clipping that ensures no byte index lies outside the range 
- * [0,255]. This mapping is defined by two clip values, clipMin and clipMax. 
- * The minimum clip value clipMin corresponds to byte index 0, and the 
- * maximum clip value clipMax corresponds to byte index 255. Sample values 
- * less than clipMin are mapped to byte index 0; sample values greater than 
- * clipMax are mapped to byte index 255.
+ * The first step is a mapping from sample values to unsigned byte indices.
+ * This mapping is linear, except for clipping, which ensures that no byte 
+ * index lies outside the range [0,255]. The linear mapping is defined by 
+ * two clip values, clipMin and clipMax. The minimum clip value clipMin 
+ * corresponds to byte index 0, and the maximum clip value clipMax 
+ * corresponds to byte index 255. Sample values less than clipMin are 
+ * mapped to byte index 0; sample values greater than clipMax are mapped 
+ * to byte index 255.
  * <p>
- * One byte index is computed for each pixel displayed by this view. The 
- * view typically contains more (or fewer) pixels than samples, so this 
- * first mapping often requires interpolation between sampled values of 
- * the function f(x1,x2).
+ * One byte index is computed for each pixel displayed by this view. 
+ * Because the view typically contains more (or fewer) pixels than samples, 
+ * this first mapping often requires interpolation between sampled values of 
+ * the function f(x1,x2). Either linear or nearest-neighbor interpolation
+ * may be specified for this first step.
  * <p>
- * The second mapping is merely a table lookup. It uses the pixel bytes
- * computed in the first mapping as indices in a colormap. The colormap 
- * is an array of 256 colors, one for each of the 256 possible indices.
+ * The second step is a table lookup. It uses the pixel bytes computed in 
+ * the first mapping as indices in a specified colormap. The colormap is 
+ * an array of 256 colors, one for each of the 256 possible byte indices. 
+ * See {@link edu.mine.jtk.util.ByteIndexColorModel} for more details.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.09.27
  */
@@ -66,6 +69,15 @@ public class PixelsView extends TiledView {
 
   /**
    * Constructs a pixels view of the specified sampled function f(x1,x2).
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where n1 = 
+   *  f[0].length and n2 = f.length. This array is referenced, not copied.
+   */
+  public PixelsView(float[][] f) {
+    this(new Sampling(f[0].length),new Sampling(f.length),f);
+  }
+
+  /**
+   * Constructs a pixels view of the specified sampled function f(x1,x2).
    * @param s1 the sampling of the variable x1; must be uniform.
    * @param s2 the sampling of the variable x2; must be uniform.
    * @param f array[n2][n1] of sampled function values f(x1,x2), where
@@ -86,7 +98,25 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Set orientation of sample axes x1 and x2.
+   * Sets the byte index color model for this view.
+   * The default color model is a linear gray map.
+   * @param cm the color model.
+   */
+  public void setColorModel(ByteIndexColorModel colorModel) {
+    _colorModel = colorModel;
+    repaint();
+  }
+
+  /**
+   * Gets the byte index color model for this view.
+   * @return the color model.
+   */
+  public ByteIndexColorModel getColorModel() {
+    return _colorModel;
+  }
+
+  /**
+   * Sets the orientation of sample axes.
    * @param orientation the orientation.
    */
   public void setOrientation(Orientation orientation) {
@@ -98,11 +128,31 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Get orientation of sample axes x1 and x2.
+   * Gets the orientation of sample axes.
    * @return the orientation.
    */
   public Orientation getOrientation() {
     return _orientation;
+  }
+
+  /**
+   * Sets the method for interpolation between samples.
+   * @param interpolation the interpolation method.
+   */
+  public void setInterpolation(Interpolation interpolation) {
+    if (_interpolation!=interpolation) {
+      _interpolation = interpolation;
+      updateBestProjectors();
+      repaint();
+    }
+  }
+
+  /**
+   * Gets the method for interpolation between samples.
+   * @return the interpolation method.
+   */
+  public Interpolation getInterpolation() {
+    return _interpolation;
   }
 
   /**
@@ -209,34 +259,27 @@ public class PixelsView extends TiledView {
     // Image pixel sampling.
     int nx = wc;
     int ny = hc;
-    double dx = abs(x1-x0)/nx;
-    double dy = abs(y1-y0)/ny;
-    double fx = min(x0,x1);
-    double fy = min(y0,y1);
+    double dx = (x1-x0)/nx;
+    double dy = (y1-y0)/ny;
+    double fx = x0;
+    double fy = y0;
 
     // Interpolate samples f(x1,x2) to obtain image bytes.
-    byte[] b = interpolateImageBytes(nx,dx,fx,ny,dy,fy);
+    byte[] b;
+    if (_interpolation==Interpolation.LINEAR) {
+      b = interpolateImageBytesLinear(nx,dx,fx,ny,dy,fy);
+    } else {
+      b = interpolateImageBytesNearest(nx,dx,fx,ny,dy,fy);
+    }
 
     // Draw image.
     DataBuffer db = new DataBufferByte(b,nx*ny,0);
-    ColorModel cm = makeColorModel();
-    int[] bm = new int[]{0xff};
-    SampleModel sm = new SinglePixelPackedSampleModel(
-      DataBuffer.TYPE_BYTE,nx,ny,bm);
+    int dataType = DataBuffer.TYPE_BYTE;
+    int[] bitMasks = new int[]{0xff};
+    SampleModel sm = new SinglePixelPackedSampleModel(dataType,nx,ny,bitMasks);
     WritableRaster wr = Raster.createWritableRaster(sm,db,null);
-    BufferedImage bi = new BufferedImage(cm,wr,false,null);
+    BufferedImage bi = new BufferedImage(_colorModel,wr,false,null);
     g2d.drawImage(bi,xc,yc,null);
-  }
-  private ColorModel makeColorModel() {
-    byte[] r = new byte[256];
-    byte[] g = new byte[256];
-    byte[] b = new byte[256];
-    for (int i=0; i<256; ++i) {
-      r[i] = (byte)i;
-      g[i] = (byte)i;
-      b[i] = (byte)i;
-    }
-    return new IndexColorModel(8,256,r,g,b);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -246,6 +289,9 @@ public class PixelsView extends TiledView {
   Sampling _s1;
   Sampling _s2;
   float[][] _f;
+
+  // Color model.
+  ByteIndexColorModel _colorModel = ByteIndexColorModel.linearGray(0,1);
 
   // View orientation.
   Orientation _orientation = Orientation.X1RIGHT_X2UP;
@@ -262,6 +308,8 @@ public class PixelsView extends TiledView {
 
   // Sampling of the function f(x1,x2) in the pixel (x,y) coordinate system. 
   boolean _transposed;
+  boolean _xflipped;
+  boolean _yflipped;
   int _nx;
   double _dx;
   double _fx;
@@ -295,10 +343,11 @@ public class PixelsView extends TiledView {
 
   /**
    * Updates the (x,y) sampling for this view. This sampling corresponds to
-   * the (x,y) coordinate system, with origin in the top-left corner, and it
-   * depends on the pixel view orientation. If this sampling is transposed, 
-   * then x1 corresponds to y and x2 corresponds to x; otherwise, x1 
-   * corresponds to x and x2 corresponds to y.
+   * the pixel (x,y) coordinate system, and it depends on the pixel view 
+   * orientation. If this sampling is transposed, then x1 corresponds to y 
+   * and x2 corresponds to x; otherwise, x1 corresponds to x and x2 
+   * corresponds to y. In either case, the coordinates (_fx,_fy) correspond
+   * to the sampled function value _f[0][0].
    */
   private void updateSampling() {
     int n1 = _s1.getCount();
@@ -309,6 +358,8 @@ public class PixelsView extends TiledView {
     double f2 = _s2.getFirst();
     if (_orientation==Orientation.X1DOWN_X2RIGHT) {
       _transposed = true;
+      _xflipped = false;
+      _yflipped = false;
       _nx = n2;
       _dx = d2;
       _fx = f2;
@@ -317,12 +368,14 @@ public class PixelsView extends TiledView {
       _fy = f1;
     } else if (_orientation==Orientation.X1RIGHT_X2UP) {
       _transposed = false;
+      _xflipped = false;
+      _yflipped = true;
       _nx = n1;
       _dx = d1;
       _fx = f1;
       _ny = n2;
-      _dy = -d2;
-      _fy = f2+d2*(n2-1);
+      _dy = d2;
+      _fy = f2;
     }
     updateBestProjectors();
   }
@@ -335,16 +388,35 @@ public class PixelsView extends TiledView {
     double x1 = _fx+_dx*(_nx-1);
     double y0 = _fy;
     double y1 = _fy+_dy*(_ny-1);
-    Projector bhp = new Projector(x0,x1,0.0,1.0);
-    Projector bvp = new Projector(y0,y1,0.0,1.0);
+    if (_xflipped) {
+      double xt = y0;
+      x0 = x1;
+      x1 = xt;
+    }
+    if (_yflipped) {
+      double yt = y0;
+      y0 = y1;
+      y1 = yt;
+    }
+    double ux0 = 0.0;
+    double uy0 = 0.0;
+    if (_interpolation==Interpolation.NEAREST) {
+      ux0 = 0.5/max(_nx,1.001);
+      uy0 = 0.5/max(_ny,1.001);
+    }
+    double ux1 = 1.0-ux0;
+    double uy1 = 1.0-ux0;
+    Projector bhp = new Projector(x0,x1,ux0,ux1);
+    Projector bvp = new Projector(y0,y1,uy0,uy1);
     setBestProjectors(bhp,bvp);
   }
 
   /**
-   * Interpolates sampled floats to image bytes. The bytes in the returned 
-   * array[nx*ny] will be used as indices in a colormapped buffered image.
+   * Linear interpolation of sampled floats to image bytes. The bytes in 
+   * the returned array[nx*ny] will be used as indices in a colormapped 
+   * buffered image.
    */
-  private byte[] interpolateImageBytes(
+  private byte[] interpolateImageBytesLinear(
     int nx, double dx, double fx,
     int ny, double dy, double fy)
   {
@@ -425,7 +497,7 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Interpolates one row of sampled floats to pixel resolution.
+   * Linear interpolation of one row of sampled floats to pixel resolution.
    * Also maps _clipMin to 0.0f, and _clipMax to 255.0f.
    */
   private void interpx(int jy, int nx, int[] kf, float[] wf, float[] t) {
@@ -452,7 +524,7 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Interpolates one row of bytes between temp1 and temp2.
+   * Linear interpolation of one row of bytes between temp1 and temp2.
    */
   private void interpy(
     int nx, double frac, float[] temp1, float[] temp2, int kb, byte[] b)
@@ -469,40 +541,88 @@ public class PixelsView extends TiledView {
     }
   }
 
+  /**
+   * Nearest-neighbor interpolation of sampled floats to image bytes. The 
+   * bytes in the returned array[nx*ny] will be used as indices in a 
+   * colormapped buffered image.
+   */
+  private byte[] interpolateImageBytesNearest(
+    int nx, double dx, double fx,
+    int ny, double dy, double fy)
+  {
+    // Array of bytes.
+    byte[] b = new byte[nx*ny];
 
-  ///////////////////////////////////////////////////////////////////////////
-  // Temporary, during development only.
+    // Array temp will contain one row of bytes interpolated to pixel 
+    // resolution. The index jytemp is the row index of the sampled 
+    // floats that correspond to the array temp. Initially, jytemp is 
+    // garbage, because we have no values in temp.
+    byte[] temp = new byte[nx];
+    int jytemp = -1;
 
-  public PixelsView() {
-    int n1 = 11;
-    int n2 = 11;
-    _s1 = new Sampling(n1);
-    _s2 = new Sampling(n2);
-    _f = new float[n2][n1];
-    for (int i2=0; i2<n2; ++i2) {
-      for (int i1=0; i1<n1; ++i1) {
-        _f[i2][i1] = (float)(i1+i2)/(float)(n2+n1-2);
+    // Precomputed indices for fast interpolation in x direction.
+    int[] kf = new int[nx];
+    for (int ix=0; ix<nx; ++ix) {
+      double xi = fx+ix*dx;
+      double xn = (xi-_fx)/_dx;
+      if (xn<=0.0) {
+        kf[ix] = 0;
+      } else if (xn>=_nx-1) {
+        kf[ix] = _nx-1;
+      } else {
+        kf[ix] = (int)(xn+0.5);
       }
     }
-    updateClips();
-    updateSampling();
+
+    // For all pixel y, ...
+    for (int iy=0; iy<ny; ++iy) {
+      double yi = fy+iy*dy;
+
+      // Index of sample y.
+      double yn = max(0.0,min(_ny-1,(yi-_fy)/_dy));
+      int jy = max(0,min(_ny-1,(int)(yn+0.5)));
+
+      // If necessary, interpolate a new row of bytes.
+      if (jy!=jytemp) {
+        interpx(jy,nx,kf,temp);
+        jytemp = jy;
+      }
+
+      // Copy bytes to byte array.
+      for (int i=0,j=iy*nx; i<nx; ++i,++j)
+        b[j] = temp[i];
+    }
+
+    return b;
   }
-  public static void main(String[] args) {
-    Set<Mosaic.AxesPlacement> axesPlacement = EnumSet.of(
-      Mosaic.AxesPlacement.LEFT,
-      Mosaic.AxesPlacement.TOP
-    );
-    Mosaic.BorderStyle borderStyle = Mosaic.BorderStyle.FLAT;
-    Mosaic mosaic = new Mosaic(1,1,axesPlacement,borderStyle);
-    mosaic.setPreferredSize(new Dimension(300,300));
-    Tile tile = mosaic.getTile(0,0);
-    tile.addTiledView(new PixelsView());
-    TileZoomMode zoomMode = new TileZoomMode(mosaic.getModeManager());
-    zoomMode.setActive(true);
-    JFrame frame = new JFrame();
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.add(mosaic,BorderLayout.CENTER);
-    frame.pack();
-    frame.setVisible(true);
+
+  /**
+   * Nearest-neighbor interpolation of one row of sampled floats to pixels.
+   */
+  private void interpx(int jy, int nx, int[] kf, byte[] b) {
+    float fscale = 255.0f/(float)(_clipMax-_clipMin);
+    float fshift = (float)_clipMin;
+    if (_transposed) {
+      for (int ix=0; ix<nx; ++ix) {
+        int kx = kf[ix];
+        float fi = (_f[kx][jy]-fshift)*fscale;
+        if (fi<0.0f)
+          fi = 0.0f;
+        if (fi>255.0f)
+          fi = 255.0f;
+        b[ix] = (byte)(fi+0.5f);
+      }
+    } else {
+      float[] fjy = _f[jy];
+      for (int ix=0; ix<nx; ++ix) {
+        int kx = kf[ix];
+        float fi = (fjy[kx]-fshift)*fscale;
+        if (fi<0.0f)
+          fi = 0.0f;
+        if (fi>255.0f)
+          fi = 255.0f;
+        b[ix] = (byte)(fi+0.5f);
+      }
+    }
   }
 }
