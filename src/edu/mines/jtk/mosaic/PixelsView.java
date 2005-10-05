@@ -258,7 +258,6 @@ public class PixelsView extends TiledView {
     int yd = ts.y(uymin);
     int wd = ts.width(uxmax-uxmin);
     int hd = ts.height(uymax-uymin);
-    //Rectangle viewRect = new Rectangle(xd-1,yd-1,wd+2,hd+2);
     Rectangle viewRect = new Rectangle(xd,yd,wd,hd);
 
     // Restrict drawing to intersection of view and clip rectangles.

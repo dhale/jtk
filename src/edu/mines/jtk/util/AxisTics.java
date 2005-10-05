@@ -49,6 +49,8 @@ public class AxisTics {
   public AxisTics(double x1, double x2, double dtic) {
     double xmin = min(x1,x2);
     double xmax = max(x1,x2);
+    xmin -= (xmax-xmin)*FLT_EPSILON;
+    xmax += (xmax-xmin)*FLT_EPSILON;
     double d = abs(dtic);
     double f = ((int)(xmin/d)-1)*d;
     while (f<xmin)

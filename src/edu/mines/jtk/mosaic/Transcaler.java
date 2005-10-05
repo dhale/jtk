@@ -214,7 +214,7 @@ public class Transcaler {
    * @return the user-coordinate width.
    */
   public double width(int wd) {
-    return _xdscale*wd;
+    return _xdscale*(wd-1);
   }
 
   /**
@@ -223,7 +223,7 @@ public class Transcaler {
    * @return the user-coordinate height.
    */
   public double height(int hd) {
-    return _ydscale*hd;
+    return _ydscale*(hd-1);
   }
 
   ///////////////////////////////////////////////////////////////////////////

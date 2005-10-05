@@ -35,8 +35,8 @@ public class PixelsViewTest {
     mosaic.setFont(new Font("SansSerif",Font.PLAIN,12));
     mosaic.setPreferredSize(new Dimension(950,400));
 
-    int n1 = 11;
-    int n2 = 11;
+    int n1 = 5;
+    int n2 = 5;
     float d1 = 1.0f/(float)max(1,n1-1);
     float d2 = 1.0f/(float)max(1,n2-1);
     float[][] f = Array.rampfloat(0.0f,d1,d2,n1,n2);

@@ -207,14 +207,24 @@ public class TileAxis extends JPanel {
     double vmax = max(p.v0(),p.v1());
     if (isHorizontal) {
       int nmax = 2+w/maxTicStringWidth(fm);
-      double v0 = max(vmin,min(vmax,p.v(t.x(0))));
-      double v1 = max(vmin,min(vmax,p.v(t.x(w-1))));
-      at = new AxisTics(v0,v1,nmax);
+      double u0 = t.x(0);
+      double u1 = t.x(w-1);
+      double v0 = max(vmin,min(vmax,p.v(u0)));
+      double v1 = max(vmin,min(vmax,p.v(u1)));
+      double du = t.width(w-1);
+      double dv = p.v(u0+du)-p.v(u0);
+      at = new AxisTics(vmin,vmin+dv,nmax);
+      at = new AxisTics(v0,v1,at.getDeltaMajor());
     } else {
       int nmax = 2+h/(4*fh);
-      double v0 = max(vmin,min(vmax,p.v(t.y(0))));
-      double v1 = max(vmin,min(vmax,p.v(t.y(h-1))));
-      at = new AxisTics(v0,v1,nmax);
+      double u0 = t.y(0);
+      double u1 = t.y(h-1);
+      double v0 = max(vmin,min(vmax,p.v(u0)));
+      double v1 = max(vmin,min(vmax,p.v(u1)));
+      double du = t.height(h-1);
+      double dv = p.v(u0+du)-p.v(u0);
+      at = new AxisTics(vmin,vmin+dv,nmax);
+      at = new AxisTics(v0,v1,at.getDeltaMajor());
     }
     int nticMajor = at.getCountMajor();
     double dticMajor = at.getDeltaMajor();
