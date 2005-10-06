@@ -448,8 +448,8 @@ public class PixelsView extends TiledView {
     _uxMargin = 0.0;
     _uyMargin = 0.0;
     if (_interpolation==Interpolation.NEAREST) {
-      _uxMargin = 0.5/max(_nx,1.001);
-      _uyMargin = 0.5/max(_ny,1.001);
+      _uxMargin = 0.5/max(_nx,1.0+FLT_EPSILON);
+      _uyMargin = 0.5/max(_ny,1.0+FLT_EPSILON);
     }
 
     // (ux0,uy0) = normalized coordinates for (left,top) of view.

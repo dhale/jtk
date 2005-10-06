@@ -354,7 +354,7 @@ public class Conv {
     int imax = imin+lz-1;
 
     // Variables that we expect to reside in registers.
-    int i,ilo,ihi,j,jlo,jhi,iz,imj;
+    int i,ilo,ihi,j,jlo,jhi,iz;
     float sa,sb,xa,xb,ya,yb;
 
     // Off left: imin <= i <= -1
@@ -372,14 +372,14 @@ public class Conv {
       sa = 0.0f;
       sb = 0.0f;
       yb = y[i-jlo+1];
-      for (j=jlo,imj=i-j; j<jhi; j+=2,imj-=2) {
+      for (j=jlo; j<jhi; j+=2) {
         xa = x[j];
         sb += xa*yb;
-        ya = y[imj];
+        ya = y[i-j];
         sa += xa*ya;
         xb = x[j+1];
         sb += xb*ya;
-        yb = y[imj-1];
+        yb = y[i-j-1];
         sa += xb*yb;
       }
       xa = x[j];
@@ -411,14 +411,14 @@ public class Conv {
       sa = 0.0f;
       sb = 0.0f;
       yb = y[i-jlo+1];
-      for (j=jlo,imj=i-j; j<jhi; j+=2,imj-=2) {
+      for (j=jlo; j<jhi; j+=2) {
         xa = x[j];
         sb += xa*yb;
-        ya = y[imj];
+        ya = y[i-j];
         sa += xa*ya;
         xb = x[j+1];
         sb += xb*ya;
-        yb = y[imj-1];
+        yb = y[i-j-1];
         sa += xb*yb;
       }
       if (j==jhi) {
@@ -446,14 +446,14 @@ public class Conv {
       sa = 0.0f;
       sb = 0.0f;
       yb = y[i-jhi-1];
-      for (j=jhi,imj=i-j; j>jlo; j-=2,imj+=2) {
+      for (j=jhi; j>jlo; j-=2) {
         xa = x[j];
         sb += xa*yb;
-        ya = y[imj];
+        ya = y[i-j];
         sa += xa*ya;
         xb = x[j-1];
         sb += xb*ya;
-        yb = y[imj+1];
+        yb = y[i-j+1];
         sa += xb*yb;
       }
       xa = x[j];
@@ -504,7 +504,7 @@ public class Conv {
     int imax = imin+lz-1;
 
     // Variables that we expect to reside in registers.
-    int i,ilo,ihi,j,jlo,jhi,iz,imj;
+    int i,ilo,ihi,j,jlo,jhi,iz;
     float sa,sb,xa,xb,ya,yb;
 
     // Rolling on: 0 <= i <= lx-2 and 0 <= j <= i
@@ -516,14 +516,14 @@ public class Conv {
       sa = z[iz  ];
       sb = z[iz+1];
       yb = y[i-jlo+1];
-      for (j=jlo,imj=i-j; j<jhi; j+=2,imj-=2) {
+      for (j=jlo; j<jhi; j+=2) {
         xa = x[j];
         sb += xa*yb;
-        ya = y[imj];
+        ya = y[i-j];
         sa += xa*ya;
         xb = x[j+1];
         sb += xb*ya;
-        yb = y[imj-1];
+        yb = y[i-j-1];
         sa += xb*yb;
       }
       xa = x[j];
@@ -555,14 +555,14 @@ public class Conv {
       sa = z[iz  ];
       sb = z[iz+1];
       yb = y[i-jlo+1];
-      for (j=jlo,imj=i-j; j<jhi; j+=2,imj-=2) {
+      for (j=jlo; j<jhi; j+=2) {
         xa = x[j];
         sb += xa*yb;
-        ya = y[imj];
+        ya = y[i-j];
         sa += xa*ya;
         xb = x[j+1];
         sb += xb*ya;
-        yb = y[imj-1];
+        yb = y[i-j-1];
         sa += xb*yb;
       }
       if (j==jhi) {
@@ -590,14 +590,14 @@ public class Conv {
       sa = z[iz  ];
       sb = z[iz-1];
       yb = y[i-jhi-1];
-      for (j=jhi,imj=i-j; j>jlo; j-=2,imj+=2) {
+      for (j=jhi; j>jlo; j-=2) {
         xa = x[j];
         sb += xa*yb;
-        ya = y[imj];
+        ya = y[i-j];
         sa += xa*ya;
         xb = x[j-1];
         sb += xb*ya;
-        yb = y[imj+1];
+        yb = y[i-j+1];
         sa += xb*yb;
       }
       xa = x[j];
