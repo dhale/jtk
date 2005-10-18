@@ -18,11 +18,11 @@ import edu.mines.jtk.util.*;
 import edu.mines.jtk.mosaic.*;
 
 /**
- * Test {@link edu.mines.jtk.mosaic.LollipopView} and associates.
+ * Test {@link edu.mines.jtk.mosaic.SequenceView} and associates.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.01.01
  */
-public class LollipopViewTest {
+public class SequenceViewTest {
 
   public static void main(String[] args) {
     int nrow = 2;
@@ -76,14 +76,14 @@ public class LollipopViewTest {
     frame.setVisible(true);
   }
 
-  private static LollipopView makeView(
+  private static SequenceView makeView(
     int nx, double dx, double fx, float[] f) 
   {
     Sampling sx = new Sampling(nx,dx,fx);
-    LollipopView lv = new LollipopView(sx,f);
-    lv.setLollipopColor(Color.BLUE);
-    lv.setShowZero(LollipopView.ShowZero.MIDDLE);
-    return lv;
+    SequenceView sv = new SequenceView(sx,f);
+    sv.setSequenceColor(Color.BLUE);
+    sv.setShowZero(SequenceView.ShowZero.MIDDLE);
+    return sv;
   }
   private static void filter1(float a, float[] x, float[] y) {
     int n = x.length;

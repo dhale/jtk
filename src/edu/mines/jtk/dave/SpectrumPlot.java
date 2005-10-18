@@ -73,7 +73,7 @@ public class SpectrumPlot extends JFrame {
     mosaicX.setFont(FONT);
     mosaicX.setPreferredSize(new Dimension(WIDTH,1*HEIGHT/3));
     Tile tileX = mosaicX.getTile(0,0);
-    LollipopView xv = new LollipopView(x.getSampling(),x.getValues());
+    SequenceView xv = new SequenceView(x.getSampling(),x.getValues());
     tileX.addTiledView(xv);
     TileAxis axisXT = mosaicX.getTileAxisBottom(0);
     TileAxis axisXA = mosaicX.getTileAxisLeft(0);
@@ -146,12 +146,12 @@ public class SpectrumPlot extends JFrame {
     return mlv;
   }
 
-  private static LollipopView makeLollipopView(
+  private static SequenceView makeSequenceView(
     int nx, double dx, double fx, float[] f) 
   {
     Sampling sx = new Sampling(nx,dx,fx);
-    LollipopView lv = new LollipopView(sx,f);
-    return lv;
+    SequenceView sv = new SequenceView(sx,f);
+    return sv;
   }
 
   private Real1[] computeSpectra(Real1 x, boolean db) {

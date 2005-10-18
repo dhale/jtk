@@ -21,7 +21,7 @@ dx = 0.1
 fx = 0.0
 y = Array.sin(Array.rampfloat(fx,dx,nx))
 x = Sampling(nx,dx,fx)
-lv = LollipopView(x,y)
+lv = SequenceView(x,y)
 tileA.addTiledView(lv)
 tileB.addTiledView(lv)
 frame = JFrame()

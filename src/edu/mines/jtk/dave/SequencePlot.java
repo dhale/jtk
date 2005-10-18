@@ -140,7 +140,7 @@ public class SequencePlot {
       float[] v = av[iv];
       String l = al[iv];
       mosaic.getTileAxisLeft(iv).setLabel(l);
-      mosaic.getTile(iv,0).addTiledView(new LollipopView(s,v));
+      mosaic.getTile(iv,0).addTiledView(new SequenceView(s,v));
     }
     frame.add(mosaic,BorderLayout.CENTER);
 

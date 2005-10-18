@@ -51,9 +51,9 @@ public class MarkLineViewTest {
     //filter3(0.8f,x,y);
 
     tileA.addTiledView(makeMarkLineView(n,d,f,x));
-    tileA.addTiledView(makeLollipopView(n,d,f,x));
+    tileA.addTiledView(makeSequenceView(n,d,f,x));
     tileB.addTiledView(makeMarkLineView(n,d,f,y));
-    tileB.addTiledView(makeLollipopView(n,d,f,y));
+    tileB.addTiledView(makeSequenceView(n,d,f,y));
 
     ModeManager modeManager = mosaic.getModeManager();
     TileZoomMode zoomMode = new TileZoomMode(modeManager);
@@ -88,14 +88,14 @@ public class MarkLineViewTest {
     return mlv;
   }
 
-  private static LollipopView makeLollipopView(
+  private static SequenceView makeSequenceView(
     int nx, double dx, double fx, float[] f) 
   {
     Sampling sx = new Sampling(nx,dx,fx);
-    LollipopView lv = new LollipopView(sx,f);
-    lv.setLollipopColor(Color.BLUE);
-    lv.setShowZero(LollipopView.ShowZero.MIDDLE);
-    return lv;
+    SequenceView sv = new SequenceView(sx,f);
+    sv.setSequenceColor(Color.BLUE);
+    sv.setShowZero(SequenceView.ShowZero.MIDDLE);
+    return sv;
   }
 
   private static void filter1(float a, float[] x, float[] y) {

@@ -35,8 +35,8 @@ public class PixelsViewTest {
     mosaic.setFont(new Font("SansSerif",Font.PLAIN,12));
     mosaic.setPreferredSize(new Dimension(950,400));
 
-    int n1 = 1;
-    int n2 = 5;
+    int n1 = 11;
+    int n2 = 11;
     float d1 = 1.0f/(float)max(1,n1-1);
     float d2 = 1.0f/(float)max(1,n2-1);
     float[][] f = Array.rampfloat(0.0f,d1,d2,n1,n2);
@@ -44,18 +44,33 @@ public class PixelsViewTest {
     PixelsView pv0 = new PixelsView(f);
     pv0.setInterpolation(PixelsView.Interpolation.NEAREST);
     pv0.setColorModel(ByteIndexColorModel.linearHue(0.0,1.0));
-    pv0.setClips(0.0f,2.0f);
+    pv0.setPercentiles(0.0f,100.0f);
+
+    Sampling s1 = new Sampling(n1,0.5,0.25*(n1-1));
+    Sampling s2 = new Sampling(n2,0.5,0.25*(n2-1));
+
+    PixelsView pv0b = new PixelsView(s1,s2,f);
+    pv0b.setInterpolation(PixelsView.Interpolation.LINEAR);
+    pv0b.setColorModel(ByteIndexColorModel.linearGray(0.0,1.0));
+    pv0b.setPercentiles(0.0f,100.0f);
 
     PixelsView pv1 = new PixelsView(f);
     pv1.setInterpolation(PixelsView.Interpolation.LINEAR);
     pv1.setColorModel(ByteIndexColorModel.linearGray(0.0,1.0));
-    pv1.setPercentiles(5.0f,95.0f);
+    pv1.setPercentiles(0.0f,100.0f);
+
+    PixelsView pv1b = new PixelsView(s1,s2,f);
+    pv1b.setInterpolation(PixelsView.Interpolation.NEAREST);
+    pv1b.setColorModel(ByteIndexColorModel.linearHue(0.0,1.0));
+    pv1b.setPercentiles(0.0f,100.0f);
 
     Tile tile0 = mosaic.getTile(0,0);
     Tile tile1 = mosaic.getTile(0,1);
 
     tile0.addTiledView(pv0);
+    tile0.addTiledView(pv0b);
     tile1.addTiledView(pv1);
+    tile1.addTiledView(pv1b);
 
     ModeManager modeManager = mosaic.getModeManager();
     TileZoomMode zoomMode = new TileZoomMode(modeManager);

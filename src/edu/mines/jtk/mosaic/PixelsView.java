@@ -240,20 +240,23 @@ public class PixelsView extends TiledView {
     Projector vp = getVerticalProjector();
     Transcaler ts = getTranscaler();
 
-    // Bounding rectangle in pixels (device coordinates) for this view.
-    // This view should never draw outside of this rectangle.
-    double vx0 = _fx;
-    double vx1 = _fx+_dx*(_nx-1);
-    double vy0 = _fy;
-    double vy1 = _fy+_dy*(_ny-1);
+    // Compute the view rectangle in pixels (device coordinates). Each sample 
+    // contributes a rectangle of pixels that corresponds to an area _dx*_dy 
+    // in sampling coordinates. The view rectangle for all _nx*_ny samples is 
+    // then _nx*_dx*_ny*_dy. Projectors and transcaler map this rectangle to
+    // pixel coordinates.
+    double vx0 = _fx-0.5*_dx;
+    double vx1 = _fx+_dx*(_nx-0.5);
+    double vy0 = _fy-0.5*_dy;
+    double vy1 = _fy+_dy*(_ny-0.5);
     double ux0 = hp.u(vx0);
     double ux1 = hp.u(vx1);
     double uy0 = vp.u(vy0);
     double uy1 = vp.u(vy1);
-    double uxmin = min(ux0,ux1)-_uxMargin;
-    double uxmax = max(ux0,ux1)+_uxMargin;
-    double uymin = min(uy0,uy1)-_uyMargin;
-    double uymax = max(uy0,uy1)+_uyMargin;
+    double uxmin = min(ux0,ux1);
+    double uxmax = max(ux0,ux1);
+    double uymin = min(uy0,uy1);
+    double uymax = max(uy0,uy1);
     int xd = ts.x(uxmin);
     int yd = ts.y(uymin);
     int wd = ts.width(uxmax-uxmin);
@@ -342,11 +345,6 @@ public class PixelsView extends TiledView {
   private double _dy;
   private double _fy;
 
-  // Margins in normalized coordinates.
-  private double _uxMargin;
-  private double _uyMargin;
-
-
   /**
    * If using percentiles, computes corresponding clip values.
    */
@@ -354,19 +352,19 @@ public class PixelsView extends TiledView {
     if (_usePercentiles) {
       float[] a = (_percMin!=0.0f || _percMax!=0.0f)?Array.flatten(_f):null;
       int n = (a!=null)?a.length:0;
-      if (_percMin==0.0f) {
+      int kmin = (int)rint(_percMin*0.01*(n-1));
+      if (kmin<=0) {
         _clipMin = Array.min(_f);
       } else {
-        int k = (int)rint(_percMin*0.01*(n-1));
-        Array.quickPartialSort(k,a);
-        _clipMin = a[k];
+        Array.quickPartialSort(kmin,a);
+        _clipMin = a[kmin];
       }
-      if (_percMax==100.0f) {
+      int kmax = (int)rint(_percMax*0.01*(n-1));
+      if (kmax>=n-1) {
         _clipMax = Array.max(_f);
       } else {
-        int k = (int)rint(_percMax*0.01*(n-1));
-        Array.quickPartialSort(k,a);
-        _clipMax = a[k];
+        Array.quickPartialSort(kmax,a);
+        _clipMax = a[kmax];
       }
     }
   }
@@ -434,30 +432,26 @@ public class PixelsView extends TiledView {
 
     // Special handling for x0 == x1 or y0 == y1.
     if (x0==x1) {
-      double tiny = FLT_EPSILON*max(1.0,x0);
+      double tiny = max(0.5,FLT_EPSILON*abs(x0));
       x0 -= tiny;
       x1 += tiny;
     }
     if (y0==y1) {
-      double tiny = FLT_EPSILON*max(1.0,y0);
+      double tiny = max(0.5,FLT_EPSILON*abs(y0));
       y0 -= tiny;
       y1 += tiny;
     }
 
     // Margins in normalized coordinates.
-    _uxMargin = 0.0;
-    _uyMargin = 0.0;
-    if (_interpolation==Interpolation.NEAREST) {
-      _uxMargin = 0.5/max(_nx,1.0+FLT_EPSILON);
-      _uyMargin = 0.5/max(_ny,1.0+FLT_EPSILON);
-    }
+    double uxMargin = (_nx>1)?0.5/_nx:0.0;
+    double uyMargin = (_ny>1)?0.5/_ny:0.0;
 
     // (ux0,uy0) = normalized coordinates for (left,top) of view.
     // (ux1,uy1) = normalized coordinates for (right,bottom) of view.
-    double ux0 = _uxMargin;
-    double uy0 = _uyMargin;
-    double ux1 = 1.0-_uxMargin;
-    double uy1 = 1.0-_uyMargin;
+    double ux0 = uxMargin;
+    double uy0 = uyMargin;
+    double ux1 = 1.0-uxMargin;
+    double uy1 = 1.0-uyMargin;
 
     // Best projectors.
     Projector bhp = new Projector(x0,x1,ux0,ux1);
@@ -546,7 +540,6 @@ public class PixelsView extends TiledView {
       double frac = yn-jy;
       interpy(nx,frac,temp1,temp2,iy*nx,b);
     }                         
-
     return b;
   }
 
@@ -558,21 +551,33 @@ public class PixelsView extends TiledView {
     float fscale = 255.0f/(float)(_clipMax-_clipMin);
     float fshift = (float)_clipMin;
     if (_transposed) {
-      for (int ix=0; ix<nx; ++ix) {
-        int kx = kf[ix];
-        float wx = wf[ix];
-        float f1 = (_f[kx  ][jy]-fshift)*fscale;
-        float f2 = (_f[kx+1][jy]-fshift)*fscale;
-        t[ix] = (1.0f-wx)*f1+wx*f2;
+      if (_nx==1) {
+        float fc = (_f[0][jy]-fshift)*fscale;
+        for (int ix=0; ix<nx; ++ix)
+          t[ix] = fc;
+      } else {
+        for (int ix=0; ix<nx; ++ix) {
+          int kx = kf[ix];
+          float wx = wf[ix];
+          float f1 = (_f[kx  ][jy]-fshift)*fscale;
+          float f2 = (_f[kx+1][jy]-fshift)*fscale;
+          t[ix] = (1.0f-wx)*f1+wx*f2;
+        }
       }
     } else {
       float[] fjy = _f[jy];
-      for (int ix=0; ix<nx; ++ix) {
-        int kx = kf[ix];
-        float wx = wf[ix];
-        float f1 = (fjy[kx  ]-fshift)*fscale;
-        float f2 = (fjy[kx+1]-fshift)*fscale;
-        t[ix] = (1.0f-wx)*f1+wx*f2;
+      if (_nx==1) {
+        float fc = (fjy[0]-fshift)*fscale;
+        for (int ix=0; ix<nx; ++ix)
+          t[ix] = fc;
+      } else {
+        for (int ix=0; ix<nx; ++ix) {
+          int kx = kf[ix];
+          float wx = wf[ix];
+          float f1 = (fjy[kx  ]-fshift)*fscale;
+          float f2 = (fjy[kx+1]-fshift)*fscale;
+          t[ix] = (1.0f-wx)*f1+wx*f2;
+        }
       }
     }
   }

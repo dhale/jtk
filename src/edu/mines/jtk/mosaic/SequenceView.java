@@ -12,11 +12,15 @@ import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * A lollipop view of a sampled function f(x) of one variable x.
+ * A view of a sequence of samples of a function f(x) of one variable x.
+ * This view renders each sample with a filled circle centered on the
+ * sample value and a vertical line drawn from that sample value to the 
+ * origin. In other words, this view draws a sequence as lollipops with 
+ * different heights that correspond to sample values.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.01.01
  */
-public class LollipopView extends TiledView {
+public class SequenceView extends TiledView {
 
   /**
    * The visibility of function value zero in the view. To understand these 
@@ -43,11 +47,11 @@ public class LollipopView extends TiledView {
   }
 
   /**
-   * Constructs a lollipop view.
+   * Constructs a sequence view.
    * @param sx the sampling of the variable x; by reference, not copied.
    * @param f the sampled function f(x); by reference, not copied.
    */
-  public LollipopView(Sampling sx, float[] f) {
+  public SequenceView(Sampling sx, float[] f) {
     Check.argument(sx.getCount()==f.length,"sx count equals length of f");
     set(sx,f);
   }
@@ -96,14 +100,14 @@ public class LollipopView extends TiledView {
   }
 
   /**
-   * Sets the color used to paint the lollipops. 
+   * Sets the color used to paint the sequence. 
    * The default color is the tile foreground color. 
    * That default is used if the specified color is null.
-   * @param color the lollipop color; null, for tile foreground color.
+   * @param color the sequence color; null, for tile foreground color.
    */
-  public void setLollipopColor(Color color) {
-    if (!equalColors(_lollipopColor,color)) {
-      _lollipopColor = color;
+  public void setSequenceColor(Color color) {
+    if (!equalColors(_sequenceColor,color)) {
+      _sequenceColor = color;
       repaint();
     }
   }
@@ -113,7 +117,7 @@ public class LollipopView extends TiledView {
       RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);
 
-    // Lollipop sampling.
+    // Sequence sampling.
     int nx = _sx.getCount();
     double dx = _sx.getDelta();
     double fx = _sx.getFirst();
@@ -138,9 +142,9 @@ public class LollipopView extends TiledView {
     int ry = ts.height(rby);
     int rb = min(rx,ry);
 
-    // Lollipop color, if specified.
-    if (_lollipopColor!=null) 
-      g2d.setColor(_lollipopColor);
+    // Sequence color, if specified.
+    if (_sequenceColor!=null) 
+      g2d.setColor(_sequenceColor);
 
     // Horizontal line for function value 0.0.
     int xf = ts.x(hp.u(fx));
@@ -166,7 +170,7 @@ public class LollipopView extends TiledView {
 
   Sampling _sx;
   float[] _f;
-  private Color _lollipopColor = null;
+  private Color _sequenceColor = null;
   private ShowZero _showZero = ShowZero.ALWAYS;
 
   // Called when we might need realignment.
@@ -179,7 +183,7 @@ public class LollipopView extends TiledView {
     double xmin = min(xf,xl);
     double xmax = max(xf,xl);
     if (xmin==xmax) {
-      double tiny = 100.0*DBL_EPSILON*max(1.0,xmin);
+      double tiny = max(1.0,FLT_EPSILON*abs(xmin));
       xmin -= tiny;
       xmax += tiny;
     }
@@ -203,7 +207,7 @@ public class LollipopView extends TiledView {
       fmin = -fmax;
     }
     if (fmin==fmax) {
-      double tiny = 100.0*DBL_EPSILON*max(1.0,fmin);
+      double tiny = max(1.0,FLT_EPSILON*abs(fmin));
       fmin -= tiny;
       fmax += tiny;
     }
