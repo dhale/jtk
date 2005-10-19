@@ -350,6 +350,33 @@ public class Sampling {
   }
 
   /**
+   * Returns the index of the sample nearest to the specified value.
+   * @param x the value.
+   * @return the index of the nearest sample.
+   */
+  public int indexOfNearest(double x) {
+    int i = -1;
+    if (isUniform()) {
+      i = (int)Math.round((x-_f)/_d);
+      if (i<0)
+        i = 0;
+      if (i>=_n)
+        i = _n-1;
+    } else {
+      i = Array.binarySearch(_v,x);
+      if (i<0) {
+        i = -(i+1);
+        if (i==_n) {
+          i = _n-1;
+        } else if (i>0 && Math.abs(x-_v[i-1])<Math.abs(x-_v[i])) {
+          --i;
+        }
+      }
+    }
+    return i;
+  }
+
+  /**
    * Determines the overlap between this sampling and the specified sampling.
    * Both the specified sampling and this sampling represent a first-to-last
    * range of sample values. The overlap is a contiguous set of samples that 
