@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import edu.mines.jtk.util.BrentMinFinder;
 import edu.mines.jtk.util.Check;
 import static java.lang.Math.*;
 
@@ -368,6 +369,22 @@ public class SincInterpolator {
     for (int ixout=0;  ixout<nxout; ++ixout)
       interpolateComplex(ixout,fxout+ixout*dxout,yout);
   }
+
+  public float interpolateMax(double x) {
+    double a = x-0.5*_dxin;
+    double b = x+0.5*_dxin;
+    double tol = _dsinc*_dxin;
+    //System.out.println("interpolateMax: x="+x);
+    double xmax = _maxFinder.findMin(a,b,tol);
+    return interpolate(xmax);
+  }
+  private BrentMinFinder _maxFinder = new BrentMinFinder(
+    new BrentMinFinder.Function(){
+      public double evaluate(double x) {
+        //System.out.println("evaluate: x="+x);
+        return -interpolate(x);
+      }
+    });
 
   ///////////////////////////////////////////////////////////////////////////
   // private

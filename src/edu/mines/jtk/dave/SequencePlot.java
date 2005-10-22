@@ -110,6 +110,14 @@ public class SequencePlot {
   }
 
   /**
+   * Sets the axis bottom label.
+   * @param label the label.
+   */
+  public void setAxisBottomLabel(String label) {
+    _mosaic.getTileAxisBottom(0).setLabel(label);
+  }
+
+  /**
    * Constructs a plot for multiple sampled sequences.
    * @param al array of sequence labels.
    * @param as array of sequence samplings.
@@ -126,34 +134,36 @@ public class SequencePlot {
       AxesPlacement.LEFT,
       AxesPlacement.BOTTOM);
     BorderStyle borderStyle = BorderStyle.FLAT;
-    final Mosaic mosaic = new Mosaic(nv,1,axesPlacement,borderStyle);
-    mosaic.setPreferredSize(new Dimension(850,min(nv*200,700)));
-    mosaic.setFont(new Font("SansSerif",Font.PLAIN,18));
-    mosaic.setBackground(Color.WHITE);
-    mosaic.getTileAxisBottom(0).setLabel("sample index");
+    _mosaic = new Mosaic(nv,1,axesPlacement,borderStyle);
+    _mosaic.setPreferredSize(new Dimension(850,min(nv*200,700)));
+    _mosaic.setFont(new Font("SansSerif",Font.PLAIN,18));
+    _mosaic.setBackground(Color.WHITE);
+    _mosaic.getTileAxisBottom(0).setLabel("sample index");
     ModeManager modeManager = new ModeManager();
-    mosaic.setModeManager(modeManager);
+    _mosaic.setModeManager(modeManager);
     TileZoomMode tileZoomMode = new TileZoomMode(modeManager);
     tileZoomMode.setActive(true);
     for (int iv=0; iv<nv; ++iv) {
       Sampling s = as[iv];
       float[] v = av[iv];
       String l = al[iv];
-      mosaic.getTileAxisLeft(iv).setLabel(l);
-      mosaic.getTile(iv,0).addTiledView(new SequenceView(s,v));
+      _mosaic.getTileAxisLeft(iv).setLabel(l);
+      _mosaic.getTile(iv,0).addTiledView(new SequenceView(s,v));
     }
-    frame.add(mosaic,BorderLayout.CENTER);
+    frame.add(_mosaic,BorderLayout.CENTER);
 
     Action saveAction = new AbstractAction("Save PNG image") {
       public void actionPerformed(ActionEvent event) {
         JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
         fc.showSaveDialog(frame);
         File file = fc.getSelectedFile();
-        String filename = file.getAbsolutePath();
-        try {
-          mosaic.paintToPng(200,6,filename);
-        } catch (IOException ioe) {
-          System.out.println("Cannot write image to file: "+filename);
+        if (file!=null) {
+          String filename = file.getAbsolutePath();
+          try {
+            _mosaic.paintToPng(200,6,filename);
+          } catch (IOException ioe) {
+            System.out.println("Cannot write image to file: "+filename);
+          }
         }
       }
     };
@@ -165,4 +175,5 @@ public class SequencePlot {
     frame.pack();
     frame.setVisible(true);
   }
+  private Mosaic _mosaic;
 }
