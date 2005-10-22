@@ -104,6 +104,9 @@ public class AmplitudeTest {
       r2[i] = amp2(t2)/amp2(t1);
       rm[i] = ampm(t2)/ampm(t1);
     }
+    System.out.println("abs: mean="+mean(r1)+" dev="+dev(r1));
+    System.out.println("rms: mean="+mean(r2)+" dev="+dev(r2));
+    System.out.println("max: mean="+mean(rm)+" dev="+dev(rm));
     Histogram h1 = new Histogram(r1,100);
     Histogram h2 = new Histogram(r2,100);
     Histogram hm = new Histogram(rm,100);
@@ -115,17 +118,30 @@ public class AmplitudeTest {
                      
   }
 
+  private static float mean(float[] t) {
+    int n = t.length;
+    double s = 0.0;
+    for (int i=0; i<n; ++i) {
+      s += t[i];
+    }
+    s /= n;
+    return (float)s;
+  }
+
+  private static float dev(float[] t) {
+    int n = t.length;
+    double s = 0.0;
+    double ss = 0.0;
+    for (int i=0; i<n; ++i) {
+      s += t[i];
+      ss += t[i]*t[i];
+    }
+    s /= n;
+    ss /= n;
+    return (float)sqrt(ss-s*s);
+  }
+
   public static void main(String[] args) {
     runTest();
-    /*
-    float[] s = makeSignal();
-    int nt = s.length;
-    double dt = 1.0;
-    double ft = -(nt/2)*dt;
-    Sampling st = new Sampling(nt,dt,ft);
-    Real1 r = new Real1(st,s);
-    new SequencePlot("signal",st,s);
-    new SpectrumPlot(r);
-    */
   }
 }
