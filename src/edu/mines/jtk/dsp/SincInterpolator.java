@@ -370,18 +370,26 @@ public class SincInterpolator {
       interpolateComplex(ixout,fxout+ixout*dxout,yout);
   }
 
-  public float interpolateMax(double x) {
+  /**
+   * Finds a local maximum of the function y(x) near the specified value x.
+   * The search for the maximum is restricted to an interval centered at the 
+   * specified x and with width equal to the current input sampling interval.
+   * <p>
+   * Typically, the specified x corresponds to an input sample for which the 
+   * value y(x) of that sample is not less than the values of the two nearest 
+   * neighboring samples.
+   * @param x the sample value near that for which y(x) is a maximum.
+   * @return the sample value xmax for which y(xmax) is a local maximum.
+   */
+  public double findMax(double x) {
     double a = x-0.5*_dxin;
     double b = x+0.5*_dxin;
     double tol = _dsinc*_dxin;
-    //System.out.println("interpolateMax: x="+x);
-    double xmax = _maxFinder.findMin(a,b,tol);
-    return interpolate(xmax);
+    return _maxFinder.findMin(a,b,tol);
   }
   private BrentMinFinder _maxFinder = new BrentMinFinder(
     new BrentMinFinder.Function(){
       public double evaluate(double x) {
-        //System.out.println("evaluate: x="+x);
         return -interpolate(x);
       }
     });

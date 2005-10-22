@@ -68,7 +68,8 @@ public class AmplitudeTest {
     int[] imax = new int[1];
     Array.max(t,imax);
     _si.setInput(n,1.0,0.0,t);
-    return _si.interpolateMax(imax[0]);
+    double xmax = _si.findMax(imax[0]);
+    return _si.interpolate(xmax);
   }
   private static SincInterpolator _si = new SincInterpolator();
 
