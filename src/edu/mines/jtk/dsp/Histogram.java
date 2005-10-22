@@ -32,7 +32,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * <p>
  * Minimum and maximum values (vmin and vmax) may also be specified or
  * computed automatically. If specified, then only values in the range 
- * [vmin,vmax] are binned.
+ * [vmin,vmax] are binned, and values outside this range are ignored.
  * <p>
  * Reference: Izenman, A. J., 1991, Recent developments in nonparametric 
  * density estimation: Journal of the American Statistical Association, 
