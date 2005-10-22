@@ -23,27 +23,104 @@ public class HistogramTest extends TestCase {
     junit.textui.TestRunner.run(suite);
   }
 
-  public void testRamp() {
-    int n = 5000;
-    float[] v = Array.rampfloat(-0.5f,1.0f,n);
-    Histogram h = new Histogram(v,1.0);
-    assertEquals(n-1,h.getBinCount());
-    assertEquals(1.0,h.getBinDelta());
-    assertEquals(0.0,h.getBinFirst());
+  public void testConstant() {
+    int n = 1001;
+    float vfill = 2.0f;
+    float[] v = Array.fillfloat(vfill,n);
+
+    // Test with default range and number of bins.
+    float vmin = vfill;
+    float vmax = vfill;
+    int nbin = 1;
+    double dbin = 1.0f;
+    double fbin = vmin+0.5*dbin;
+    Histogram h = new Histogram(v);
+    assertEquals(vmin,h.getMinValue());
+    assertEquals(vmax,h.getMaxValue());
+    assertEquals(nbin,h.getBinCount());
+    assertEquals(dbin,h.getBinDelta());
+    assertEquals(fbin,h.getBinFirst());
+    assertEquals(0,h.getLowCount());
+    assertEquals(n,h.getInCount());
+    assertEquals(0,h.getHighCount());
+
+    // Test with specified number of bins.
+    vmin = vfill;
+    vmax = vfill;
+    nbin = 3;
+    dbin = 1.0;
+    fbin = vmin+0.5*dbin;
+    h = new Histogram(v,nbin);
+    assertEquals(vmin,h.getMinValue());
+    assertEquals(vmax,h.getMaxValue());
+    assertEquals(nbin,h.getBinCount());
+    assertEquals(dbin,h.getBinDelta());
+    assertEquals(fbin,h.getBinFirst());
+    assertEquals(0,h.getLowCount());
+    assertEquals(n,h.getInCount());
+    assertEquals(0,h.getHighCount());
+
+    // Test with specified range too low.
+    vmin = vfill-2.0f;
+    vmax = vfill-1.0f;
+    nbin = 1;
+    dbin = vmax-vmin;
+    fbin = 0.5*(vmin+vmax);
+    h = new Histogram(v,vmin,vmax);
+    assertEquals(vmin,h.getMinValue());
+    assertEquals(vmax,h.getMaxValue());
+    assertEquals(nbin,h.getBinCount());
+    assertEquals(dbin,h.getBinDelta());
+    assertEquals(fbin,h.getBinFirst());
+    assertEquals(0,h.getLowCount());
+    assertEquals(0,h.getInCount());
+    assertEquals(n,h.getHighCount());
+
+    // Test with specified range too high.
+    vmin = vfill+1.0f;
+    vmax = vfill+2.0f;
+    nbin = 1;
+    dbin = vmax-vmin;
+    fbin = 0.5*(vmin+vmax);
+    h = new Histogram(v,vmin,vmax);
+    assertEquals(vmin,h.getMinValue());
+    assertEquals(vmax,h.getMaxValue());
+    assertEquals(nbin,h.getBinCount());
+    assertEquals(dbin,h.getBinDelta());
+    assertEquals(fbin,h.getBinFirst());
+    assertEquals(n,h.getLowCount());
+    assertEquals(0,h.getInCount());
+    assertEquals(0,h.getHighCount());
   }
 
-  public void xtestGaussian() {
+  public void testRamp() {
+    int n = 1001;
+    float[] v = Array.rampfloat(0.0f,1.0f,n);
+    float vmin = Array.min(v);
+    float vmax = Array.max(v);
+    int nbin = 10;
+    double dbin = (vmax-vmin)/nbin;
+    double fbin = vmin+0.5*dbin;
+    Histogram h = new Histogram(v,nbin);
+    assertEquals(nbin,h.getBinCount());
+    assertEquals(dbin,h.getBinDelta());
+    assertEquals(fbin,h.getBinFirst());
+    assertEquals(n,h.getInCount());
+    assertEquals(0,h.getLowCount());
+    assertEquals(0,h.getHighCount());
+  }
+
+  public void testGaussian() {
     Random r = new Random();
-    int n = 100000;
+    int n = 1000;
     float[] v = new float[n];
     for (int i=0; i<n; ++i)
       v[i] = (float)r.nextGaussian();
     Histogram h = new Histogram(v);
-    double dbin = h.getBinDelta();
-    System.out.println("dbin="+dbin);
+    //Array.dump(h.getDensities());
     int nbin = h.getBinCount();
-    float[] c = new float[nbin];
-    h.getCounts(c);
-    Array.dump(c);
+    double dbin = h.getBinDelta();
+    double fbin = h.getBinFirst();
+    //System.out.println("nbin="+nbin+" dbin="+dbin+" fbin="+fbin);
   }
 }
