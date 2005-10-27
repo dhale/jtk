@@ -48,8 +48,8 @@ public class SequenceView extends TiledView {
 
   /**
    * Constructs a sequence view.
-   * @param sx the sampling of the variable x; by reference, not copied.
-   * @param f the sampled function f(x); by reference, not copied.
+   * @param sx the sampling of the variable x.
+   * @param f array of sampled function values f(x).
    */
   public SequenceView(Sampling sx, float[] f) {
     Check.argument(sx.getCount()==f.length,"sx count equals length of f");
@@ -57,20 +57,19 @@ public class SequenceView extends TiledView {
   }
   
   /**
-   * Sets the sampling and function values. Sets these values by reference,
-   * not by copy. Changes to these values are not
-   * @param sx the sampling of the variable x; by reference, not copied.
-   * @param f the sampled function f(x); by reference, not copied.
+   * Sets the sampling and function values.
+   * @param sx the sampling of the variable x.
+   * @param f array of sampled function values f(x).
    */
   public void set(Sampling sx, float[] f) {
     _sx = sx;
-    _f = f;
+    _f = Array.copy(f);
     updateBestProjectors();
     repaint();
   }
 
   /**
-   * Gets the sampling. Returns the sampling by reference, not by copy.
+   * Gets the sampling.
    * @return the sampling.
    */
   public Sampling getSampling() {
@@ -78,11 +77,11 @@ public class SequenceView extends TiledView {
   }
 
   /**
-   * Gets the function values. Returns the values by reference, not by copy.
-   * @return the function values.
+   * Gets a copy of the array of function values.
+   * @return array of sampled function values f(x).
    */
   public float[] getFunction() {
-    return _f;
+    return Array.copy(_f);
   }
 
 
@@ -140,7 +139,7 @@ public class SequenceView extends TiledView {
     // Radius of lollipop balls, in pixels.
     int rx = ts.width(rbx);
     int ry = ts.height(rby);
-    int rb = min(rx,ry);
+    int rb = max(0,min(rx,ry)-1);
 
     // Sequence color, if specified.
     if (_sequenceColor!=null) 
@@ -226,7 +225,7 @@ public class SequenceView extends TiledView {
   }
 
   private double ballRadiusY() {
-    return 1.0/20.0;
+    return 1.0/25.0;
   }
 
   private boolean equalColors(Color ca, Color cb) {

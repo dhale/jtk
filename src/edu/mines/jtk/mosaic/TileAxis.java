@@ -203,26 +203,28 @@ public class TileAxis extends JPanel {
 
     // Axis tics.
     AxisTics at;
+    double umin = p.u0();
+    double umax = p.u1();
     double vmin = min(p.v0(),p.v1());
     double vmax = max(p.v0(),p.v1());
     if (isHorizontal) {
       int nmax = 2+w/maxTicStringWidth(fm);
-      double u0 = t.x(0);
-      double u1 = t.x(w-1);
+      double u0 = max(umin,t.x(0));
+      double u1 = min(umax,t.x(w-1));
       double v0 = max(vmin,min(vmax,p.v(u0)));
       double v1 = max(vmin,min(vmax,p.v(u1)));
-      double du = t.width(w-1);
-      double dv = p.v(u0+du)-p.v(u0);
+      double du = min(umax-umin,t.width(w));
+      double dv = abs(p.v(u0+du)-p.v(u0));
       at = new AxisTics(vmin,vmin+dv,nmax);
       at = new AxisTics(v0,v1,at.getDeltaMajor());
     } else {
       int nmax = 2+h/(4*fh);
-      double u0 = t.y(0);
-      double u1 = t.y(h-1);
+      double u0 = max(umin,t.y(0));
+      double u1 = min(umax,t.y(h-1));
       double v0 = max(vmin,min(vmax,p.v(u0)));
       double v1 = max(vmin,min(vmax,p.v(u1)));
-      double du = t.height(h-1);
-      double dv = p.v(u0+du)-p.v(u0);
+      double du = min(umax-umin,t.height(h));
+      double dv = abs(p.v(u0+du)-p.v(u0));
       at = new AxisTics(vmin,vmin+dv,nmax);
       at = new AxisTics(v0,v1,at.getDeltaMajor());
     }

@@ -69,7 +69,7 @@ public class PixelsView extends TiledView {
   /**
    * Constructs a pixels view of the specified sampled function f(x1,x2).
    * @param f array[n2][n1] of sampled function values f(x1,x2), where n1 = 
-   *  f[0].length and n2 = f.length. This array is referenced, not copied.
+   *  f[0].length and n2 = f.length.
    */
   public PixelsView(float[][] f) {
     this(new Sampling(f[0].length),new Sampling(f.length),f);
@@ -81,7 +81,6 @@ public class PixelsView extends TiledView {
    * @param s2 the sampling of the variable x2; must be uniform.
    * @param f array[n2][n1] of sampled function values f(x1,x2), where
    *  n1 and n2 denote the number of samples in s1 and s2, respectively.
-   *  This array is referenced, not copied.
    */
   public PixelsView(Sampling s1, Sampling s2, float[][] f) {
     Check.argument(s1.isUniform(),"s1 is uniform");
@@ -91,7 +90,7 @@ public class PixelsView extends TiledView {
     Check.argument(s2.getCount()==f.length,"s2 consistent with f");
     _s1 = s1;
     _s2 = s2;
-    _f = f;
+    _f = Array.copy(f);
     updateClips();
     updateSampling();
   }
@@ -312,10 +311,10 @@ public class PixelsView extends TiledView {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  // The specified sampled floats are simply referenced, not copied.
-  private Sampling _s1;
-  private Sampling _s2;
-  private float[][] _f;
+  // The sampled floats.
+  private Sampling _s1; // sampling of 1st dimension
+  private Sampling _s2; // sampling of 2nd dimension
+  private float[][] _f; // copy of array of floats
 
   // Color model.
   private ByteIndexColorModel _colorModel = 

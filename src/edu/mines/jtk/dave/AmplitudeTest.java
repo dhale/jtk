@@ -40,6 +40,7 @@ public class AmplitudeTest {
       float shi = fhi*sinc(fhi*t);
       s[i] = w*(shi-slo);
     }
+    s = Array.mul(1.0f/Array.max(s),s);
     return s;
     //return Array.copy(n/4*2+1,n/4,s);
     //return Array.copy(n/6*2+1,n/3,s);
@@ -74,28 +75,6 @@ public class AmplitudeTest {
     return _si.interpolate(xmax);
   }
   private static SincInterpolator _si = new SincInterpolator();
-  private static float amp3(float[] t) {
-    int n = t.length;
-    int[] imax = new int[1];
-    Array.max(t,imax);
-    int i = max(1,min(n-2,imax[0]));
-    float sm1 = t[i-1]*t[i-1];
-    float s00 = t[i  ]*t[i  ];
-    float sp1 = t[i+1]*t[i+1];
-    return (float)sqrt((sm1+s00+sp1)/3.0);
-  }
-  private static float amp5(float[] t) {
-    int n = t.length;
-    int[] imax = new int[1];
-    Array.max(t,imax);
-    int i = max(2,min(n-3,imax[0]));
-    float sm2 = t[i-2]*t[i-2];
-    float sm1 = t[i-1]*t[i-1];
-    float s00 = t[i  ]*t[i  ];
-    float sp1 = t[i+1]*t[i+1];
-    float sp2 = t[i+2]*t[i+2];
-    return (float)sqrt((sm2+sm1+s00+sp1+sp2)/5.0);
-  }
 
   private static void runTest() {
     float[] s = makeSignal();

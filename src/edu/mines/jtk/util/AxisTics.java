@@ -88,11 +88,11 @@ public class AxisTics {
       int l = (int)floor(log10(dmax/m));
       double d = m*pow(10.0,l);
       double f = ceil(xmin/d)*d;
-      int n = 1+(int)((xmax-xmin)/d);
+      int n = 1+(int)((xmax-f)/d);
       if (n>nmax) {
         d *= 10;
         f = ceil(xmin/d)*d;
-        n = 1+(int)((xmax-xmin)/d);
+        n = 1+(int)((xmax-f)/d);
       }
       if (nbest<n && n<=ntic) {
         nbest = n;
