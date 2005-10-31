@@ -264,6 +264,8 @@ public class PixelsView extends TiledView {
 
     // Restrict drawing to intersection of view and clip rectangles.
     Rectangle clipRect = g2d.getClipBounds();
+    if (clipRect==null)
+      clipRect = viewRect;
     clipRect = clipRect.intersection(viewRect);
     if (clipRect.isEmpty())
       return;

@@ -151,6 +151,46 @@ public class Recursive2ndOrderFilter extends RecursiveFilter {
     }
   }
 
+  public void applyReverse(float[] x, float[] y) {
+    int n = y.length;
+    float xip1 = 0.0f;
+    float xip2 = 0.0f;
+    float yip1 = 0.0f;
+    float yip2 = 0.0f;
+    for (int i=n-1; i>=0; --i) {
+      float xi = x[i];
+      float yi = _b0*xi+_b1*xip1+_b2*xip2-_a1*yip1-_a2*yip2;
+      y[i] = yi;
+      yip2 = yip1;
+      yip1 = yi;
+      xip2 = xip1;
+      xip1 = xi;
+    }
+  }
+
+  public void applyForwardReverse(float[] x, float[] y) {
+    applyForward(x,y);
+    int n = y.length;
+    float s = 1.0f/((1.0f-_a2)*((1.0f+_a2)*(1.0f+_a2)-_a1*_a1));
+    float m10 = s*((1.0f+_a2)*_b1-_a1*(_b0+_b2));
+    float m11 = s*((1.0f-_a1*_a1+_a2)*_b0-_a2*((1.0f+_a2)*_b2-_a1*_b1));
+    float m20 = s*((1.0f+_a2)*_b0-_a1*_b1+_a1*_a1*_b2-_a2*(1.0f+_a2)*_b2);
+    float m21 = s*(_a2*(_a1*(_b0+_b2)-(1.0f+_a2)*_b1));
+    float uip1 = _b1*x[n-1]+_b2*x[n-2]-_a1*y[n-1]-_a2*y[n-2];
+    float uip2 = _b2*x[n-1]-_a1*uip1-_a2*y[n-1];
+    float yip1 = m10*uip2+m11*uip1;
+    float yip2 = m20*uip2+m21*uip1;
+    for (int i=n-1; i>=0; --i) {
+      float ui = y[i];
+      float yi = _b0*ui+_b1*uip1+_b2*uip2-_a1*yip1-_a2*yip2;
+      y[i] = yi;
+      yip2 = yip1;
+      yip1 = yi;
+      uip2 = uip1;
+      uip1 = ui;
+    }
+  }
+
   /**
    * Applies this filter in the forward direction, accumulating the output. 
    * This method filters the input, and adds the result to the output; it

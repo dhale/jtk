@@ -27,10 +27,10 @@ import static edu.mines.jtk.mosaic.Mosaic.*;
 public class AmplitudeTest {
 
   private static float[] makeSignal() {
-    float flo = 0.021f;
+    float flo = 0.020f;
     float fhi = 0.400f;
     int m = 25;
-    KaiserWindow kw = KaiserWindow.fromWidthAndLength(flo,2*m);
+    KaiserWindow kw = KaiserWindow.fromWidthAndLength(1.0/m,2*m);
     int n = 2*m+1;
     float[] s = new float[n];
     for (int i=0; i<n; ++i) {
@@ -102,6 +102,7 @@ public class AmplitudeTest {
         SequencePlot sp = new SequencePlot("s",st,s,
                                            "t1",st,t1,
                                            "t2",st,t2);
+        sp.saveToPng("SignalsWithNoise.png");
       }
       r1[i] = amp1(t2)/amp1(t1);
       r2[i] = amp2(t2)/amp2(t1);
@@ -114,10 +115,11 @@ public class AmplitudeTest {
     Histogram h2 = new Histogram(r2,100);
     Histogram hm = new Histogram(rm,100);
     SequencePlot sp = new SequencePlot(
-      "abs",h1.getBinSampling(),h1.getDensities(),
-      "rms",h2.getBinSampling(),h2.getDensities(),
-      "max",hm.getBinSampling(),hm.getDensities());
+      "frequency",h1.getBinSampling(),h1.getDensities(),
+      "frequency",h2.getBinSampling(),h2.getDensities(),
+      "frequency",hm.getBinSampling(),hm.getDensities());
     sp.setAxisBottomLabel("amplitude ratio");
+    sp.saveToPng("AmplitudeRatios.png");
                      
   }
 

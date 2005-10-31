@@ -110,14 +110,6 @@ public class SequencePlot {
   }
 
   /**
-   * Sets the axis bottom label.
-   * @param label the label.
-   */
-  public void setAxisBottomLabel(String label) {
-    _mosaic.getTileAxisBottom(0).setLabel(label);
-  }
-
-  /**
    * Constructs a plot for multiple sampled sequences.
    * @param al array of sequence labels.
    * @param as array of sequence samplings.
@@ -159,11 +151,7 @@ public class SequencePlot {
         File file = fc.getSelectedFile();
         if (file!=null) {
           String filename = file.getAbsolutePath();
-          try {
-            _mosaic.paintToPng(200,6,filename);
-          } catch (IOException ioe) {
-            System.out.println("Cannot write image to file: "+filename);
-          }
+          saveToPng(filename);
         }
       }
     };
@@ -175,5 +163,26 @@ public class SequencePlot {
     frame.pack();
     frame.setVisible(true);
   }
+
+  /**
+   * Sets the axis bottom label.
+   * @param label the label.
+   */
+  public void setAxisBottomLabel(String label) {
+    _mosaic.getTileAxisBottom(0).setLabel(label);
+  }
+
+  /**
+   * Save plot as PNG image in specified file.
+   * @param filename the file name.
+   */
+  public void saveToPng(String filename) {
+    try {
+      _mosaic.paintToPng(300,6,filename);
+    } catch (IOException ioe) {
+      System.out.println("Cannot write image to file: "+filename);
+    }
+  }
+
   private Mosaic _mosaic;
 }
