@@ -41,14 +41,33 @@ public class RecursiveParallelFilter extends RecursiveFilter {
     Check.argument(x!=y,"x!=y");
     Check.argument(x.length>=y.length,"x.length>=y.length");
     int n = y.length;
-
-    // Constant scale factor (could be zero).
     for (int i=0; i<n; ++i)
       y[i] = _c*x[i];
+    for (int i1=0; i1<_n1; ++i1)
+      _f1[i1].accumulateForward(x,y);
+  }
 
-    // Apply 2nd-order filters.
-    for (int i2=0; i2<_n2; ++i2)
-      _f2[i2].accumulateForward(x,y);
+  public void applyReverse(float[] x, float[] y) {
+    Check.argument(x!=y,"x!=y");
+    Check.argument(x.length>=y.length,"x.length>=y.length");
+    int n = y.length;
+    for (int i=0; i<n; ++i)
+      y[i] = _c*x[i];
+    for (int i1=0; i1<_n1; ++i1)
+      _f1[i1].accumulateReverse(x,y);
+  }
+
+  public void applyForwardReverse(float[] x, float[] y) {
+    Check.argument(x!=y,"x!=y");
+    Check.argument(x.length>=y.length,"x.length>=y.length");
+    int n = y.length;
+    float cg = _c*_g;
+    for (int i=0; i<n; ++i)
+      y[i] = cg*x[i];
+    for (int i2=0; i2<_n2; i2+=2) {
+      _f2[i2  ].accumulateForward(x,y);
+      _f2[i2+1].accumulateReverse(x,y);
+    }
   }
 
   public void accumulateForward(float[] x, float[] y) {
@@ -94,35 +113,61 @@ public class RecursiveParallelFilter extends RecursiveFilter {
       }
     }
 
-    // Construct 2nd-order filters and constant scale factor c.
-    _n2 = _nr+_nc/2;
+    // Construct 2nd-order filters and constant scale factor c. One-way 
+    // forward or reverse filters consist of n1 2nd-order filters. Two-way 
+    // forward-and-reverse filters consist of n2 = 2*n1 2nd-order filters.
+    _n1 = _nr+_nc/2;
+    _n2 = 2*_n1;
+    _f1 = new Recursive2ndOrderFilter[_n1];
     _f2 = new Recursive2ndOrderFilter[_n2];
     double c = (_nz==_np)?gain:0.0;
-    for (int i2=0,jp=0; i2<_n2; ++i2,++jp) {
-      Cdouble hj = Hj(jp,poles,zeros,gain);
-      double b0,b1,b2,a1,a2;
-      if (poles[jp].i!=0.0) {
-        Cdouble pj = poles[jp++];
-        Cdouble qj = pj.inv();
-        b0 = hj.r-hj.i*qj.r/qj.i;
-        b1 = hj.i/qj.i;
-        b2 = 0.0;
-        a1 = -2.0*pj.r;
-        a2 = pj.norm();
-      } else {
-        Cdouble pj = poles[jp];
+    for (int i1=0,i2=0,jp=0; i1<_n1; ++jp) {
+      Cdouble pj = poles[jp];
+      Cdouble hz = h(pj,poles,zeros,gain);
+      Cdouble hj = hr(pj,poles,zeros,gain);
+      Cdouble hhj = hz.times(hj);
+      double fb0,fb1,fb2,rb0,rb1,rb2,b0,b1,b2,a1,a2;
+      if (pj.i==0.0) { // if pole is real, ...
+        a1 = -pj.r;
+        a2 = 0.0;
         b0 = hj.r;
         b1 = 0.0;
         b2 = 0.0;
-        a1 = -pj.r;
-        a2 = 0.0;
+        fb0 = hhj.r;
+        fb1 = 0.0;
+        fb2 = 0.0;
+        rb0 = 0.0;
+        rb1 = -fb0*a1;
+        rb2 = 0.0;
+      } else { // else if pole is complex, ...
+        ++jp; // skip its conjugate mate
+        Cdouble qj = pj.inv();
+        a1 = -2.0*pj.r;
+        a2 = pj.norm();
+        b0 = hj.r-hj.i*qj.r/qj.i;
+        b1 = hj.i/qj.i;
+        b2 = 0.0;
+        fb0 = hhj.r-hhj.i*qj.r/qj.i;
+        fb1 = hhj.i/qj.i;
+        fb2 = 0.0;
+        rb0 = 0.0;
+        rb1 = fb1-fb0*a1;
+        rb2 = -fb0*a2;
       }
-      _f2[i2] = new Recursive2ndOrderFilter(
-        (float)b0,(float)b1,(float)b2,(float)a1,(float)a2);
+      _f1[i1++] = makeFilter(b0,b1,b2,a1,a2);
+      _f2[i2++] = makeFilter(fb0,fb1,fb2,a1,a2);
+      _f2[i2++] = makeFilter(rb0,rb1,rb2,a1,a2);
       if (_nz==_np)
-        c -= b0;
+        c -= fb0;
     }
     _c = (float)c;
+    _g = (float)gain;
+  }
+  private static Recursive2ndOrderFilter makeFilter(
+    double b0, double b1, double b2, double a1, double a2)
+  {
+    return new Recursive2ndOrderFilter(
+      (float)b0,(float)b1,(float)b2,(float)a1,(float)a2);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -133,20 +178,43 @@ public class RecursiveParallelFilter extends RecursiveFilter {
   private int _nc; // number of complex poles (must be even)
   private int _nr; // number of real poles
   private float _c; // constant scale factor
-  private int _n2; // number of recursive 2nd-order filters
-  private Recursive2ndOrderFilter[] _f2; // the filters
+  private float _g; // filter gain
+  private int _n1; // number of 2nd-order filters for one-way filtering
+  private int _n2; // number of 2nd-order filters for two-way filtering
+  private Recursive2ndOrderFilter[] _f1; // for one-way filtering
+  private Recursive2ndOrderFilter[] _f2; // for two-way filtering
 
   /**
-   * Evaluates residue of H(z) for the jp'th pole. The residue is H(z) 
-   * evaluated without division by the factor corresponding to the jp'th 
-   * pole, which would be zero. If that pole is complex (has a non-zero 
-   * imaginary part), then division by the factor corresponding to its 
-   * conjugate is omitted as well.
+   * Evaluates H(z).
    */
-  private Cdouble Hj(
-    int jp, Cdouble[] poles, Cdouble[] zeros, double gain) 
+  private Cdouble h(
+    Cdouble z, Cdouble[] poles, Cdouble[] zeros, double gain) 
   {
-    Cdouble pj = poles[jp];
+    Cdouble c1 = new Cdouble(1.0,0.0);
+    Cdouble hz = new Cdouble(c1);
+    for (int iz=0; iz<_nz; ++iz) {
+      Cdouble zi = zeros[iz];
+      hz.timesEquals(c1.minus(zi.times(z)));
+    }
+    Cdouble hp = new Cdouble(c1);
+    for (int ip=0; ip<_np; ++ip) {
+      Cdouble pi = poles[ip];
+      hp.timesEquals(c1.minus(pi.times(z)));
+    }
+    return hz.over(hp).times(gain);
+  }
+
+  /**
+   * Evaluates residue of H(z) for the j'th pole. The residue is H(z) 
+   * evaluated without division by the factor corresponding to the j'th 
+   * pole of H(z), which would be zero. If that pole is complex (has a 
+   * non-zero imaginary part), then division by the factor corresponding 
+   * to its conjugate mate pole is omitted as well.
+   */
+  private Cdouble hr(
+    Cdouble polej, Cdouble[] poles, Cdouble[] zeros, double gain) 
+  {
+    Cdouble pj = polej;
     Cdouble pc = pj.conj();
     Cdouble qj = pj.inv();
     Cdouble c1 = new Cdouble(1.0,0.0);

@@ -127,7 +127,7 @@ public class SequencePlot {
       AxesPlacement.BOTTOM);
     BorderStyle borderStyle = BorderStyle.FLAT;
     _mosaic = new Mosaic(nv,1,axesPlacement,borderStyle);
-    _mosaic.setPreferredSize(new Dimension(850,min(nv*200,700)));
+    _mosaic.setPreferredSize(new Dimension(850,min(nv*250,700)));
     _mosaic.setFont(new Font("SansSerif",Font.PLAIN,18));
     _mosaic.setBackground(Color.WHITE);
     _mosaic.getTileAxisBottom(0).setLabel("sample index");

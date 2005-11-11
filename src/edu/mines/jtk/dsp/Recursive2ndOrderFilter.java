@@ -168,6 +168,23 @@ public class Recursive2ndOrderFilter extends RecursiveFilter {
     }
   }
 
+  public void accumulateReverse(float[] x, float[] y) {
+    int n = y.length;
+    float xip1 = 0.0f;
+    float xip2 = 0.0f;
+    float yip1 = 0.0f;
+    float yip2 = 0.0f;
+    for (int i=n-1; i>=0; --i) {
+      float xi = x[i];
+      float yi = _b0*xi+_b1*xip1+_b2*xip2-_a1*yip1-_a2*yip2;
+      y[i] += yi;
+      yip2 = yip1;
+      yip1 = yi;
+      xip2 = xip1;
+      xip1 = xi;
+    }
+  }
+
   public void applyForwardReverse(float[] x, float[] y) {
     applyForward(x,y);
     int n = y.length;

@@ -37,6 +37,21 @@ public class RecursiveCascadeFilter extends RecursiveFilter {
       _f2[i2].applyForward(y,y);
   }
 
+  public void applyReverse(float[] x, float[] y) {
+    _f2[0].applyReverse(x,y);
+    for (int i2=1; i2<_n2; ++i2)
+      _f2[i2].applyReverse(y,y);
+  }
+
+  public void applyForwardReverse(float[] x, float[] y) {
+    _f2[0].applyForward(x,y);
+    _f2[0].applyReverse(y,y);
+    for (int i2=1; i2<_n2; ++i2) {
+      _f2[i2].applyForward(y,y);
+      _f2[i2].applyReverse(y,y);
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
 
