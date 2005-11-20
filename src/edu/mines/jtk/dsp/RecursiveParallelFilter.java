@@ -9,11 +9,22 @@ package edu.mines.jtk.dsp;
 import edu.mines.jtk.util.*;
 
 /**
- * Recursive parallel filter.
+ * A recursive parallel filter is implemented as a sum of 2nd-order filters.
+ * In other words, the output of a recursive parallel filter is the sum of 
+ * the outputs of 2nd-order recursive filters applied to the same input.
+ * <p>
+ * An advantage of recursive parallel filters is that they can be applied
+ * in both forward and reverse directions to obtain symmetric zero-phase 
+ * filters, without end effects. The 2nd-order filters applied in this
+ * two-way forward-and-reverse application are not the same as those 
+ * applied in one-way forward or reverse applications.
+ * <p>
+ * A disadvantage of recursive parallel filters is that they cannot be
+ * applied in-place; input and output arrays must be distinct arrays.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.04.19
  */
-public class RecursiveParallelFilter extends RecursiveFilter {
+public class RecursiveParallelFilter {
 
   /**
    * Constructs a recursive filter with specified poles, zeros, and gain.
@@ -31,15 +42,14 @@ public class RecursiveParallelFilter extends RecursiveFilter {
   }
 
   /**
-   * Applies this filter. The input and output arrays must be distinct,
-   * and the length of the output array must not exceed the length of the
-   * input array.
+   * Applies this filter in the forward direction. 
+   * Input and output arrays must be distinct arrays.
+   * Lengths of the input and output arrays must be equal.
    * @param x the input array.
    * @param y the output array.
    */
   public void applyForward(float[] x, float[] y) {
-    Check.argument(x!=y,"x!=y");
-    Check.argument(x.length>=y.length,"x.length>=y.length");
+    checkArrays(x,y);
     int n = y.length;
     for (int i=0; i<n; ++i)
       y[i] = _c*x[i];
@@ -47,9 +57,15 @@ public class RecursiveParallelFilter extends RecursiveFilter {
       _f1[i1].accumulateForward(x,y);
   }
 
+  /**
+   * Applies this filter in the reverse direction. 
+   * Input and output arrays must be distinct arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
   public void applyReverse(float[] x, float[] y) {
-    Check.argument(x!=y,"x!=y");
-    Check.argument(x.length>=y.length,"x.length>=y.length");
+    checkArrays(x,y);
     int n = y.length;
     for (int i=0; i<n; ++i)
       y[i] = _c*x[i];
@@ -57,9 +73,18 @@ public class RecursiveParallelFilter extends RecursiveFilter {
       _f1[i1].accumulateReverse(x,y);
   }
 
+  /**
+   * Applies this filter in the forward and reverse directions.
+   * Note that this method does not simply call the methods
+   * {@link #applyForward(float[],float[])} and
+   * {@link #applyReverse(float[],float[])} in sequence.
+   * Input and output arrays must be distinct arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
   public void applyForwardReverse(float[] x, float[] y) {
-    Check.argument(x!=y,"x!=y");
-    Check.argument(x.length>=y.length,"x.length>=y.length");
+    checkArrays(x,y);
     int n = y.length;
     float cg = _c*_g;
     for (int i=0; i<n; ++i)
@@ -70,8 +95,117 @@ public class RecursiveParallelFilter extends RecursiveFilter {
     }
   }
 
-  public void accumulateForward(float[] x, float[] y) {
-    // TODO: implement this method.
+  /**
+   * Applies this filter along the 1st dimension in the forward direction. 
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1Forward(float[][] x, float[][] y) {
+    checkArrays(x,y);
+    int n2 = y.length;
+    for (int i2=0; i2<n2; ++i2) {
+      applyForward(x[i2],y[i2]);
+    }
+  }
+
+  /**
+   * Applies this filter along the 1st dimension in the reverse direction. 
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1Reverse(float[][] x, float[][] y) {
+    checkArrays(x,y);
+    int n2 = y.length;
+    for (int i2=0; i2<n2; ++i2) {
+      applyReverse(x[i2],y[i2]);
+    }
+  }
+
+  /**
+   * Applies this filter along the 1st dimension in the forward and 
+   * reverse directions.
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1ForwardReverse(float[][] x, float[][] y) {
+    checkArrays(x,y);
+    int n2 = y.length;
+    for (int i2=0; i2<n2; ++i2) {
+      applyForwardReverse(x[i2],y[i2]);
+    }
+  }
+
+  /**
+   * Applies this filter along the 2nd dimension in the forward direction.
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2Forward(float[][] x, float[][] y) {
+    checkArrays(x,y);
+    int n2 = y.length;
+    int n1 = y[0].length;
+    float[] xt = new float[n2];
+    float[] yt = new float[n2];
+    for (int i1=0; i1<n1; ++i1) {
+      for (int i2=0; i2<n2; ++i2)
+        xt[i2] = x[i2][i1];
+      applyForward(xt,yt);
+      for (int i2=0; i2<n2; ++i2)
+        y[i2][i1] = yt[i2];
+    }
+  }
+
+  /**
+   * Applies this filter along the 2nd dimension in the reverse direction.
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2Reverse(float[][] x, float[][] y) {
+    checkArrays(x,y);
+    int n2 = y.length;
+    int n1 = y[0].length;
+    float[] xt = new float[n2];
+    float[] yt = new float[n2];
+    for (int i1=0; i1<n1; ++i1) {
+      for (int i2=0; i2<n2; ++i2)
+        xt[i2] = x[i2][i1];
+      applyReverse(xt,yt);
+      for (int i2=0; i2<n2; ++i2)
+        y[i2][i1] = yt[i2];
+    }
+  }
+
+  /**
+   * Applies this filter along the 2nd dimension in the forward and 
+   * reverse directions.
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2ForwardReverse(float[][] x, float[][] y) {
+    checkArrays(x,y);
+    int n2 = y.length;
+    int n1 = y[0].length;
+    float[] xt = new float[n2];
+    float[] yt = new float[n2];
+    for (int i1=0; i1<n1; ++i1) {
+      for (int i2=0; i2<n2; ++i2)
+        xt[i2] = x[i2][i1];
+      applyForwardReverse(xt,yt);
+      for (int i2=0; i2<n2; ++i2)
+        y[i2][i1] = yt[i2];
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -295,5 +429,28 @@ public class RecursiveParallelFilter extends RecursiveFilter {
         cs[ns++] = c[i];
     }
     return cs;
+  }
+
+  private static void checkArrays(float[] x, float[] y) {
+    Check.argument(x!=y,"x!=y");
+    Check.argument(x.length==y.length,"x.length==y.length");
+  }
+
+  private static void checkArrays(float[][] x, float[][] y) {
+    Check.argument(x.length==y.length,"x.length==y.length");
+    Check.argument(Array.isRegular(x),"x is regular");
+    Check.argument(Array.isRegular(y),"y is regular");
+    int n2 = y.length;
+    for (int i2=0; i2<n2; ++i2)
+      checkArrays(x[i2],y[i2]);
+  }
+
+  private static void checkArrays(float[][][] x, float[][][] y) {
+    Check.argument(x.length==y.length,"x.length==y.length");
+    Check.argument(Array.isRegular(x),"x is regular");
+    Check.argument(Array.isRegular(y),"y is regular");
+    int n3 = y.length;
+    for (int i3=0; i3<n3; ++i3)
+      checkArrays(x[i3],y[i3]);
   }
 }

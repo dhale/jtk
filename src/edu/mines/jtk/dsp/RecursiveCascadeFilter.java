@@ -13,10 +13,20 @@ import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * A recursive filter implemented as a cascade of 2nd-order filters.
+ * The output of each 2nd-order recursive filter becomes the input to
+ * the next 2nd-order recursive filter in the cascade.
+ * <p>
+ * An advantage of recursive cascade filters is that they can be
+ * applied in-place; input and output arrays may be the same arrays.
+ * <p>
+ * A disadvantage of recursive cascade filters is that a forward-reverse
+ * application yields only an approximation to a symmetric zero-phase 
+ * impulse response. This approximation is worst at array ends where the
+ * output of each 2nd-order filter truncated.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.04.19
  */
-public class RecursiveCascadeFilter extends RecursiveFilter {
+public class RecursiveCascadeFilter {
 
   /**
    * Constructs a recursive filter with specified poles, zeros, and gain.
@@ -31,18 +41,39 @@ public class RecursiveCascadeFilter extends RecursiveFilter {
     init(poles,zeros,gain);
   }
 
+  /**
+   * Applies this filter in the forward direction.
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
   public void applyForward(float[] x, float[] y) {
     _f2[0].applyForward(x,y);
     for (int i2=1; i2<_n2; ++i2)
       _f2[i2].applyForward(y,y);
   }
 
+  /**
+   * Applies this filter in the reverse direction.
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
   public void applyReverse(float[] x, float[] y) {
     _f2[0].applyReverse(x,y);
     for (int i2=1; i2<_n2; ++i2)
       _f2[i2].applyReverse(y,y);
   }
 
+  /**
+   * Applies this filter in the forward and reverse directions.
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
   public void applyForwardReverse(float[] x, float[] y) {
     _f2[0].applyForward(x,y);
     _f2[0].applyReverse(y,y);

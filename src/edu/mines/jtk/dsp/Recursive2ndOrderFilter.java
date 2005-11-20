@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Check;
 import edu.mines.jtk.util.Cdouble;
 
@@ -19,7 +20,7 @@ import edu.mines.jtk.util.Cdouble;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.04.19
  */
-public class Recursive2ndOrderFilter extends RecursiveFilter {
+public class Recursive2ndOrderFilter {
 
   /**
    * Constructs a recursive 2nd-order filter with specified coefficients.
@@ -85,13 +86,13 @@ public class Recursive2ndOrderFilter extends RecursiveFilter {
   /**
    * Applies this filter in the forward direction. 
    * <p>
-   * The input and output arrays may be the same. The length of the 
-   * input array must not be less than the length of the output array.
+   * Input and output arrays may be the same array, but must have equal
+   * lengths.
    * @param x the input array.
    * @param y the output array.
    */
   public void applyForward(float[] x, float[] y) {
-    Check.argument(x.length>=y.length,"x.length>=y.length");
+    checkArrays(x,y);
     int n = y.length;
 
     // Special case b1 = b2 = a2 = 0.
@@ -133,6 +134,20 @@ public class Recursive2ndOrderFilter extends RecursiveFilter {
       }
     }
 
+    // Special case b0 = 0.
+    else if (_b0==0.0f) {
+      float yim2 = 0.0f;
+      float yim1 = 0.0f;
+      float xim1 = 0.0f;
+      for (int i=0; i<n; ++i) {
+        float yi = _b1*xim1-_a1*yim1-_a2*yim2;
+        y[i] = yi;
+        yim2 = yim1;
+        yim1 = yi;
+        xim1 = x[i];
+      }
+    }
+
     // General case.
     else { 
       float yim2 = 0.0f;
@@ -151,60 +166,88 @@ public class Recursive2ndOrderFilter extends RecursiveFilter {
     }
   }
 
+  /**
+   * Applies this filter in the reverse direction. 
+   * <p>
+   * Input and output arrays may be the same array, but must have equal
+   * lengths.
+   * @param x the input array.
+   * @param y the output array.
+   */
   public void applyReverse(float[] x, float[] y) {
+    checkArrays(x,y);
     int n = y.length;
-    float xip1 = 0.0f;
-    float xip2 = 0.0f;
-    float yip1 = 0.0f;
-    float yip2 = 0.0f;
-    for (int i=n-1; i>=0; --i) {
-      float xi = x[i];
-      float yi = _b0*xi+_b1*xip1+_b2*xip2-_a1*yip1-_a2*yip2;
-      y[i] = yi;
-      yip2 = yip1;
-      yip1 = yi;
-      xip2 = xip1;
-      xip1 = xi;
-    }
-  }
 
-  public void accumulateReverse(float[] x, float[] y) {
-    int n = y.length;
-    float xip1 = 0.0f;
-    float xip2 = 0.0f;
-    float yip1 = 0.0f;
-    float yip2 = 0.0f;
-    for (int i=n-1; i>=0; --i) {
-      float xi = x[i];
-      float yi = _b0*xi+_b1*xip1+_b2*xip2-_a1*yip1-_a2*yip2;
-      y[i] += yi;
-      yip2 = yip1;
-      yip1 = yi;
-      xip2 = xip1;
-      xip1 = xi;
+    // Special case b1 = b2 = a2 = 0.
+    if (_b1==0.0f && _b2==0.0f && _a2==0.0f) {
+      float yip1 = 0.0f;
+      for (int i=n-1; i>=0; --i) {
+        float xi = x[i];
+        float yi = _b0*xi-_a1*yip1;
+        y[i] = yi;
+        yip1 = yi;
+      }
     }
-  }
 
-  public void applyForwardReverse(float[] x, float[] y) {
-    applyForward(x,y);
-    int n = y.length;
-    float s = 1.0f/((1.0f-_a2)*((1.0f+_a2)*(1.0f+_a2)-_a1*_a1));
-    float m10 = s*((1.0f+_a2)*_b1-_a1*(_b0+_b2));
-    float m11 = s*((1.0f-_a1*_a1+_a2)*_b0-_a2*((1.0f+_a2)*_b2-_a1*_b1));
-    float m20 = s*((1.0f+_a2)*_b0-_a1*_b1+_a1*_a1*_b2-_a2*(1.0f+_a2)*_b2);
-    float m21 = s*(_a2*(_a1*(_b0+_b2)-(1.0f+_a2)*_b1));
-    float uip1 = _b1*x[n-1]+_b2*x[n-2]-_a1*y[n-1]-_a2*y[n-2];
-    float uip2 = _b2*x[n-1]-_a1*uip1-_a2*y[n-1];
-    float yip1 = m10*uip2+m11*uip1;
-    float yip2 = m20*uip2+m21*uip1;
-    for (int i=n-1; i>=0; --i) {
-      float ui = y[i];
-      float yi = _b0*ui+_b1*uip1+_b2*uip2-_a1*yip1-_a2*yip2;
-      y[i] = yi;
-      yip2 = yip1;
-      yip1 = yi;
-      uip2 = uip1;
-      uip1 = ui;
+    // Special case b2 = a2 = 0.
+    else if (_b2==0.0f && _a2==0.0f) {
+      float xip1 = 0.0f;
+      float yip1 = 0.0f;
+      for (int i=n-1; i>=0; --i) {
+        float xi = x[i];
+        float yi = _b0*xi+_b1*xip1-_a1*yip1;
+        y[i] = yi;
+        yip1 = yi;
+        xip1 = xi;
+      }
+    }
+
+    // Special case b2 = 0.
+    else if (_b2==0.0f) {
+      float xip1 = 0.0f;
+      float yip1 = 0.0f;
+      float yip2 = 0.0f;
+      for (int i=n-1; i>=0; --i) {
+        float xi = x[i];
+        float yi = _b0*xi+_b1*xip1-_a1*yip1-_a2*yip2;
+        y[i] = yi;
+        yip2 = yip1;
+        yip1 = yi;
+        xip1 = xi;
+      }
+    }
+
+    // Special case b0 = 0.
+    else if (_b0==0.0f) {
+      float xip1 = 0.0f;
+      float xip2 = 0.0f;
+      float yip1 = 0.0f;
+      float yip2 = 0.0f;
+      for (int i=n-1; i>=0; --i) {
+        float yi = _b1*xip1+_b2*xip2-_a1*yip1-_a2*yip2;
+        y[i] = yi;
+        yip2 = yip1;
+        yip1 = yi;
+        xip2 = xip1;
+        xip1 = x[i];
+      }
+    }
+
+    // General case.
+    else { 
+      float xip1 = 0.0f;
+      float xip2 = 0.0f;
+      float yip1 = 0.0f;
+      float yip2 = 0.0f;
+      for (int i=n-1; i>=0; --i) {
+        float xi = x[i];
+        float yi = _b0*xi+_b1*xip1+_b2*xip2-_a1*yip1-_a2*yip2;
+        y[i] = yi;
+        yip2 = yip1;
+        yip1 = yi;
+        xip2 = xip1;
+        xip1 = xi;
+      }
     }
   }
 
@@ -213,13 +256,13 @@ public class Recursive2ndOrderFilter extends RecursiveFilter {
    * This method filters the input, and adds the result to the output; it
    * is most useful when implementing parallel forms of recursive filters.
    * <p>
-   * The input and output arrays may be the same. The length of the 
-   * input array must not be less than the length of the output array.
+   * Input and output arrays may be the same array, but must have equal
+   * lengths.
    * @param x the input array.
    * @param y the output array.
    */
   public void accumulateForward(float[] x, float[] y) {
-    Check.argument(x.length>=y.length,"x.length>=y.length");
+    checkArrays(x,y);
     int n = y.length;
 
     // Special case b1 = b2 = a2 = 0.
@@ -261,6 +304,20 @@ public class Recursive2ndOrderFilter extends RecursiveFilter {
       }
     }
 
+    // Special case b0 = 0.
+    else if (_b0==0.0f) {
+      float yim2 = 0.0f;
+      float yim1 = 0.0f;
+      float xim1 = 0.0f;
+      for (int i=0; i<n; ++i) {
+        float yi = _b1*xim1-_a1*yim1-_a2*yim2;
+        y[i] += yi;
+        yim2 = yim1;
+        yim1 = yi;
+        xim1 = x[i];
+      }
+    }
+
     // General case.
     else { 
       float yim2 = 0.0f;
@@ -279,8 +336,250 @@ public class Recursive2ndOrderFilter extends RecursiveFilter {
     }
   }
 
+  /**
+   * Applies this filter in the reverse direction, accumulating the output. 
+   * This method filters the input, and adds the result to the output; it
+   * is most useful when implementing parallel forms of recursive filters.
+   * <p>
+   * Input and output arrays may be the same array, but must have equal
+   * lengths.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void accumulateReverse(float[] x, float[] y) {
+    checkArrays(x,y);
+    int n = y.length;
+
+    // Special case b1 = b2 = a2 = 0.
+    if (_b1==0.0f && _b2==0.0f && _a2==0.0f) {
+      float yip1 = 0.0f;
+      for (int i=n-1; i>=0; --i) {
+        float xi = x[i];
+        float yi = _b0*xi-_a1*yip1;
+        y[i] += yi;
+        yip1 = yi;
+      }
+    }
+
+    // Special case b2 = a2 = 0.
+    else if (_b2==0.0f && _a2==0.0f) {
+      float xip1 = 0.0f;
+      float yip1 = 0.0f;
+      for (int i=n-1; i>=0; --i) {
+        float xi = x[i];
+        float yi = _b0*xi+_b1*xip1-_a1*yip1;
+        y[i] += yi;
+        yip1 = yi;
+        xip1 = xi;
+      }
+    }
+
+    // Special case b2 = 0.
+    else if (_b2==0.0f) {
+      float xip1 = 0.0f;
+      float yip1 = 0.0f;
+      float yip2 = 0.0f;
+      for (int i=n-1; i>=0; --i) {
+        float xi = x[i];
+        float yi = _b0*xi+_b1*xip1-_a1*yip1-_a2*yip2;
+        y[i] += yi;
+        yip2 = yip1;
+        yip1 = yi;
+        xip1 = xi;
+      }
+    }
+
+    // Special case b0 = 0.
+    else if (_b0==0.0f) {
+      float xip1 = 0.0f;
+      float xip2 = 0.0f;
+      float yip1 = 0.0f;
+      float yip2 = 0.0f;
+      for (int i=n-1; i>=0; --i) {
+        float yi = _b1*xip1+_b2*xip2-_a1*yip1-_a2*yip2;
+        y[i] += yi;
+        yip2 = yip1;
+        yip1 = yi;
+        xip2 = xip1;
+        xip1 = x[i];
+      }
+    }
+
+    // General case.
+    else { 
+      float xip1 = 0.0f;
+      float xip2 = 0.0f;
+      float yip1 = 0.0f;
+      float yip2 = 0.0f;
+      for (int i=n-1; i>=0; --i) {
+        float xi = x[i];
+        float yi = _b0*xi+_b1*xip1+_b2*xip2-_a1*yip1-_a2*yip2;
+        y[i] += yi;
+        yip2 = yip1;
+        yip1 = yi;
+        xip2 = xip1;
+        xip1 = xi;
+      }
+    }
+  }
+
+  /**
+   * Applies this filter in 1st dimension in the forward direction. 
+   * <p>
+   * Input and output arrays may be the same array, but must be
+   * regular and have equal lengths.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1Forward(float[][] x, float[][] y) {
+    checkArrays(x,y);
+    int n2 = y.length;
+    int n1 = y[0].length;
+    for (int i2=0; i2<n2; ++i2) {
+      applyForward(x[i2],y[i2]);
+    }
+  }
+
+  /**
+   * Applies this filter in 2nd dimension in the forward direction. 
+   * <p>
+   * Input and output arrays may be the same array, but must be
+   * regular and have equal lengths.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2Forward(float[][] x, float[][] y) {
+    checkArrays(x,y);
+    int n2 = y.length;
+    int n1 = y[0].length;
+
+    // Special case b1 = b2 = a2 = 0.
+    if (_b1==0.0f && _b2==0.0f && _a2==0.0f) {
+      float[] yim1 = new float[n1];
+      for (int i2=0; i2<n2; ++i2) {
+        float[] xi = x[i2];
+        float[] yi = y[i2];
+        for (int i1=0; i1<n1; ++i1) {
+          yi[i1] = _b0*xi[i1]-
+                              _a1*yim1[i1];
+        }
+        yim1 = yi;
+      }
+    }
+
+    // Special case b2 = a2 = 0.
+    else if (_b2==0.0f && _a2==0.0f) {
+      float[] yim1 = new float[n1];
+      float[] xim1 = new float[n1];
+      float[] xi = new float[n1];
+      for (int i2=0; i2<n2; ++i2) {
+        float[] x2 = x[i2];
+        float[] yi = y[i2];
+        for (int i1=0; i1<n1; ++i1) {
+          xi[i1] = x2[i1];
+          yi[i1] = _b0*xi[i1]+_b1*xim1[i1]-
+                              _a1*yim1[i1];
+        }
+        yim1 = yi;
+        float[] xt = xim1;
+        xim1 = xi;
+        xi = xt;
+      }
+    }
+
+    // Special case b2 = 0.
+    else if (_b2==0.0f) {
+      float[] yim2 = new float[n1];
+      float[] yim1 = new float[n1];
+      float[] xim1 = new float[n1];
+      float[] xi = new float[n1];
+      for (int i2=0; i2<n2; ++i2) {
+        float[] x2 = x[i2];
+        float[] yi = y[i2];
+        for (int i1=0; i1<n1; ++i1) {
+          xi[i1] = x2[i1];
+          yi[i1] = _b0*xi[i1]+_b1*xim1[i1]-
+                              _a1*yim1[i1]-_a2*yim2[i1];
+        }
+        yim2 = yim1;
+        yim1 = yi;
+        float[] xt = xim1;
+        xim1 = xi;
+        xi = xt;
+      }
+    }
+
+    // Special case b0 = 0.
+    else if (_b0==0.0f) {
+      float[] yim2 = new float[n1];
+      float[] yim1 = new float[n1];
+      float[] xim2 = new float[n1];
+      float[] xim1 = new float[n1];
+      float[] xi = new float[n1];
+      for (int i2=0; i2<n2; ++i2) {
+        float[] x2 = x[i2];
+        float[] yi = y[i2];
+        for (int i1=0; i1<n1; ++i1) {
+          xi[i1] = x2[i1];
+          yi[i1] = _b1*xim1[i1]+_b2*xim2[i1]-
+                   _a1*yim1[i1]-_a2*yim2[i1];
+        }
+        yim2 = yim1;
+        yim1 = yi;
+        float[] xt = xim2;
+        xim2 = xim1;
+        xim1 = xi;
+        xi = xt;
+      }
+    }
+
+    // General case.
+    else {
+      float[] yim2 = new float[n1];
+      float[] yim1 = new float[n1];
+      float[] xim2 = new float[n1];
+      float[] xim1 = new float[n1];
+      float[] xi = new float[n1];
+      for (int i2=0; i2<n2; ++i2) {
+        float[] x2 = x[i2];
+        float[] yi = y[i2];
+        for (int i1=0; i1<n1; ++i1) {
+          xi[i1] = x2[i1];
+          yi[i1] = _b0*xi[i1]+_b1*xim1[i1]+_b2*xim2[i1]-
+                              _a1*yim1[i1]-_a2*yim2[i1];
+        }
+        yim2 = yim1;
+        yim1 = yi;
+        float[] xt = xim2;
+        xim2 = xim1;
+        xim1 = xi;
+        xi = xt;
+      }
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  float _b0,_b1,_b2,_a1,_a2; // filter coefficients
+  private float _b0,_b1,_b2,_a1,_a2; // filter coefficients
+
+  private static void checkArrays(float[] x, float[] y) {
+    Check.argument(x.length==y.length,"x.length==y.length");
+  }
+
+  private static void checkArrays(float[][] x, float[][] y) {
+    Check.argument(x.length==y.length,"x.length==y.length");
+    Check.argument(x[0].length==y[0].length,"x[0].length==y[0].length");
+    Check.argument(Array.isRegular(x),"x is regular");
+    Check.argument(Array.isRegular(y),"y is regular");
+  }
+
+  private static void checkArrays(float[][][] x, float[][][] y) {
+    Check.argument(x.length==y.length,"x.length==y.length");
+    Check.argument(x[0].length==y[0].length,"x[0].length==y[0].length");
+    Check.argument(x[0][0].length==y[0][0].length,
+      "x[0][0].length==y[0][0].length");
+    Check.argument(Array.isRegular(x),"x is regular");
+    Check.argument(Array.isRegular(y),"y is regular");
+  }
 }
