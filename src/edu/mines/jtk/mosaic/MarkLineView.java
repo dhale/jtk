@@ -57,7 +57,7 @@ public class MarkLineView extends TiledView {
 
   /**
    * Sets the line width.
-   * The default line is zero, for the smallest lines.
+   * The default line is zero, for the thinnest lines.
    * @param lineWidth the line width.
    */
   public void setLineWidth(float lineWidth) {
@@ -80,19 +80,23 @@ public class MarkLineView extends TiledView {
     Projector hp = getHorizontalProjector();
     Projector vp = getVerticalProjector();
     Transcaler ts = getTranscaler();
+    double resolution = ts.getResolution();
 
     // Color, if not null.
     if (_lineColor!=null) 
       g2d.setColor(_lineColor);
 
-    // Line width, if not zero.
-    if (_lineWidth!=0)
-      g2d.setStroke(new BasicStroke(_lineWidth));
+    // Line width, if not zero or if resolution not one.
+    if (_lineWidth!=0.0f || resolution!=1.0) {
+      float lineWidth = (float)(max(_lineWidth,1.0)*resolution);
+      g2d.setStroke(new BasicStroke(lineWidth));
+    }
 
-    // For all segments, ...
+    // For all line segments, ...
     for (int is=0; is<_ns; ++is) {
 
-      // Draw segment. TODO: draw marks.
+      // Draw line segment.
+      // TODO: draw marks, too.
       int nxy = _nxy.get(is);
       float[] x = _x.get(is);
       float[] y = _y.get(is);

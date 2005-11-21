@@ -338,17 +338,21 @@ public class Mosaic extends JPanel {
     g2d.setColor(getBackground());
     g2d.fillRect(0,0,wimage,himage);
     g2d.setColor(fg);
-    g2d.scale(scale,scale);
     g2d.setFont(getFont());
+    g2d.scale(scale,scale);
     paintComponent(g2d);
     for (int irow=0; irow<_nrow; ++irow) {
       for (int icol=0; icol<_ncol; ++icol) {
         Tile tile = _tiles[irow][icol];
-        int x = tile.getX();
-        int y = tile.getY();
-        g2d.translate(x,y);
-        tile.paintComponent(g2d);
-        g2d.translate(-x,-y);
+        int xt = tile.getX();
+        int yt = tile.getY();
+        g2d.translate(xt,yt); // translate to tile origin
+        g2d.scale(1.0/scale,1.0/scale); // undo scaling, temporarily
+        tile.setResolution(scale); // paint with image resolution
+        tile.paintComponent(g2d); // paint the tile
+        tile.setResolution(1.0); // paint with screen resolution
+        g2d.scale(scale,scale); // restore scaling
+        g2d.translate(-xt,-yt); // untranslate from tile origin
       }
     }
     if (_axesTop!=null) {

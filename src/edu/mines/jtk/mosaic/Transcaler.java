@@ -131,6 +131,30 @@ public class Transcaler {
   }
 
   /**
+   * Sets the resolution, the number of device pixels per screen pixel. 
+   * Line widths, font sizes, and other resolution-dependent parameters 
+   * should be multiplied by this factor.
+   * <p>
+   * When the device is the screen, this factor should be one, the default. 
+   * However, when the device is a high-resolution image, this factor may 
+   * be significantly greater than one. Line widths not multiplied by 
+   * this scale factor may appear too thin in a high-resolution image. 
+   * Likewise, fonts may appear too small.
+   * @param resolution the resolution.
+   */
+  public void setResolution(double resolution) {
+    _resolution = resolution;
+  }
+
+  /**
+   * Gets the resolution, the number of device pixels per screen pixel. 
+   * @return the resolution.
+   */
+  public double getResolution() {
+    return _resolution;
+  }
+
+  /**
    * Converts the specified user x-coordinate to device x-coordinate.
    * @param xu the user x-coordinate.
    * @return the device x-coordinate.
@@ -236,6 +260,7 @@ public class Transcaler {
   private int    _x1d,_y1d,_x2d,_y2d;
   private double _xushift,_xuscale,_yushift,_yuscale;
   private double _xdshift,_xdscale,_ydshift,_ydscale;
+  private double _resolution = 1.0;
 
   private void computeShiftAndScale() {
     if (_x1u!=_x2u) {

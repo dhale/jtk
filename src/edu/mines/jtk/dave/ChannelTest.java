@@ -38,8 +38,8 @@ public class ChannelTest {
     double by = 0.25*(ymax-ymin)/xmax;
     double cy = 4.0*DBL_PI/xmax;
     double az = 1000.0;
-    double bz = 1.0/xmax;
-    double cz = 1.0;
+    double bz = 0.0/xmax;
+    double cz = 2.0;
     double dz = -0.5/32.0;
     float[][] z = new float[nx][ny];
     for (int ix=0; ix<nx; ++ix) {

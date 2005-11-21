@@ -322,6 +322,22 @@ public class Tile extends JPanel {
     repaint();
   }
 
+  /**
+   * Called by this tile's mosaic when painting to an image.
+   */
+  void setResolution(double resolution) {
+    _ts.setResolution(resolution);
+    int wtile = getWidth();
+    int htile = getHeight();
+    if (resolution==1.0) {
+      _ts.setMapping(wtile,htile);
+    } else {
+      int wimage = (int)(resolution*(wtile-1)+1.5);
+      int himage = (int)(resolution*(htile-1)+1.5);
+      _ts.setMapping(wimage,himage);
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
