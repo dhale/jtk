@@ -38,7 +38,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * The second step is a table lookup. It uses the pixel bytes computed in 
  * the first mapping as indices in a specified colormap. The colormap is 
  * an array of 256 colors, one for each of the 256 possible byte indices. 
- * See {@link edu.mine.jtk.util.ByteIndexColorModel} for more details.
+ * See {@link edu.mines.jtk.util.ByteIndexColorModel} for more details.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.09.27
  */
@@ -98,7 +98,7 @@ public class PixelsView extends TiledView {
   /**
    * Sets the byte index color model for this view.
    * The default color model is a linear gray map.
-   * @param cm the color model.
+   * @param colorModel the color model.
    */
   public void setColorModel(ByteIndexColorModel colorModel) {
     _colorModel = colorModel;

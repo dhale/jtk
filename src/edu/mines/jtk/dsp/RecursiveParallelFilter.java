@@ -21,6 +21,9 @@ import edu.mines.jtk.util.*;
  * <p>
  * A disadvantage of recursive parallel filters is that they cannot be
  * applied in-place; input and output arrays must be distinct arrays.
+ * Also, in the current implementation, the number of non-zero zeros
+ * cannot exceed the number of non-zero poles, and all poles must be
+ * unique.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.04.19
  */
@@ -49,10 +52,7 @@ public class RecursiveParallelFilter {
    * @param y the output array.
    */
   public void applyForward(float[] x, float[] y) {
-    checkArrays(x,y);
-    int n = y.length;
-    for (int i=0; i<n; ++i)
-      y[i] = _c*x[i];
+    scale(_c,x,y);
     for (int i1=0; i1<_n1; ++i1)
       _f1[i1].accumulateForward(x,y);
   }
@@ -65,10 +65,7 @@ public class RecursiveParallelFilter {
    * @param y the output array.
    */
   public void applyReverse(float[] x, float[] y) {
-    checkArrays(x,y);
-    int n = y.length;
-    for (int i=0; i<n; ++i)
-      y[i] = _c*x[i];
+    scale(_c,x,y);
     for (int i1=0; i1<_n1; ++i1)
       _f1[i1].accumulateReverse(x,y);
   }
@@ -84,11 +81,7 @@ public class RecursiveParallelFilter {
    * @param y the output array.
    */
   public void applyForwardReverse(float[] x, float[] y) {
-    checkArrays(x,y);
-    int n = y.length;
-    float cg = _c*_g;
-    for (int i=0; i<n; ++i)
-      y[i] = cg*x[i];
+    scale(_c*_g,x,y);
     for (int i2=0; i2<_n2; i2+=2) {
       _f2[i2  ].accumulateForward(x,y);
       _f2[i2+1].accumulateReverse(x,y);
@@ -103,11 +96,9 @@ public class RecursiveParallelFilter {
    * @param y the output array.
    */
   public void apply1Forward(float[][] x, float[][] y) {
-    checkArrays(x,y);
-    int n2 = y.length;
-    for (int i2=0; i2<n2; ++i2) {
-      applyForward(x[i2],y[i2]);
-    }
+    scale(_c,x,y);
+    for (int i1=0; i1<_n1; ++i1)
+      _f1[i1].accumulate1Forward(x,y);
   }
 
   /**
@@ -118,11 +109,9 @@ public class RecursiveParallelFilter {
    * @param y the output array.
    */
   public void apply1Reverse(float[][] x, float[][] y) {
-    checkArrays(x,y);
-    int n2 = y.length;
-    for (int i2=0; i2<n2; ++i2) {
-      applyReverse(x[i2],y[i2]);
-    }
+    scale(_c,x,y);
+    for (int i1=0; i1<_n1; ++i1)
+      _f1[i1].accumulate1Reverse(x,y);
   }
 
   /**
@@ -134,10 +123,10 @@ public class RecursiveParallelFilter {
    * @param y the output array.
    */
   public void apply1ForwardReverse(float[][] x, float[][] y) {
-    checkArrays(x,y);
-    int n2 = y.length;
-    for (int i2=0; i2<n2; ++i2) {
-      applyForwardReverse(x[i2],y[i2]);
+    scale(_c*_g,x,y);
+    for (int i2=0; i2<_n2; i2+=2) {
+      _f2[i2  ].accumulate1Forward(x,y);
+      _f2[i2+1].accumulate1Reverse(x,y);
     }
   }
 
@@ -149,18 +138,9 @@ public class RecursiveParallelFilter {
    * @param y the output array.
    */
   public void apply2Forward(float[][] x, float[][] y) {
-    checkArrays(x,y);
-    int n2 = y.length;
-    int n1 = y[0].length;
-    float[] xt = new float[n2];
-    float[] yt = new float[n2];
-    for (int i1=0; i1<n1; ++i1) {
-      for (int i2=0; i2<n2; ++i2)
-        xt[i2] = x[i2][i1];
-      applyForward(xt,yt);
-      for (int i2=0; i2<n2; ++i2)
-        y[i2][i1] = yt[i2];
-    }
+    scale(_c,x,y);
+    for (int i1=0; i1<_n1; ++i1)
+      _f1[i1].accumulate2Forward(x,y);
   }
 
   /**
@@ -171,18 +151,9 @@ public class RecursiveParallelFilter {
    * @param y the output array.
    */
   public void apply2Reverse(float[][] x, float[][] y) {
-    checkArrays(x,y);
-    int n2 = y.length;
-    int n1 = y[0].length;
-    float[] xt = new float[n2];
-    float[] yt = new float[n2];
-    for (int i1=0; i1<n1; ++i1) {
-      for (int i2=0; i2<n2; ++i2)
-        xt[i2] = x[i2][i1];
-      applyReverse(xt,yt);
-      for (int i2=0; i2<n2; ++i2)
-        y[i2][i1] = yt[i2];
-    }
+    scale(_c,x,y);
+    for (int i1=0; i1<_n1; ++i1)
+      _f1[i1].accumulate2Reverse(x,y);
   }
 
   /**
@@ -194,17 +165,136 @@ public class RecursiveParallelFilter {
    * @param y the output array.
    */
   public void apply2ForwardReverse(float[][] x, float[][] y) {
-    checkArrays(x,y);
-    int n2 = y.length;
-    int n1 = y[0].length;
-    float[] xt = new float[n2];
-    float[] yt = new float[n2];
-    for (int i1=0; i1<n1; ++i1) {
-      for (int i2=0; i2<n2; ++i2)
-        xt[i2] = x[i2][i1];
-      applyForwardReverse(xt,yt);
-      for (int i2=0; i2<n2; ++i2)
-        y[i2][i1] = yt[i2];
+    scale(_c*_g,x,y);
+    for (int i2=0; i2<_n2; i2+=2) {
+      _f2[i2  ].accumulate2Forward(x,y);
+      _f2[i2+1].accumulate2Reverse(x,y);
+    }
+  }
+
+  /**
+   * Applies this filter along the 1st dimension in the forward direction. 
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1Forward(float[][][] x, float[][][] y) {
+    scale(_c,x,y);
+    for (int i1=0; i1<_n1; ++i1)
+      _f1[i1].accumulate1Forward(x,y);
+  }
+
+  /**
+   * Applies this filter along the 1st dimension in the reverse direction. 
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1Reverse(float[][][] x, float[][][] y) {
+    scale(_c,x,y);
+    for (int i1=0; i1<_n1; ++i1)
+      _f1[i1].accumulate1Reverse(x,y);
+  }
+
+  /**
+   * Applies this filter along the 1st dimension in the forward and 
+   * reverse directions.
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1ForwardReverse(float[][][] x, float[][][] y) {
+    scale(_c*_g,x,y);
+    for (int i2=0; i2<_n2; i2+=2) {
+      _f2[i2  ].accumulate1Forward(x,y);
+      _f2[i2+1].accumulate1Reverse(x,y);
+    }
+  }
+
+  /**
+   * Applies this filter along the 2nd dimension in the forward direction.
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2Forward(float[][][] x, float[][][] y) {
+    scale(_c,x,y);
+    for (int i1=0; i1<_n1; ++i1)
+      _f1[i1].accumulate2Forward(x,y);
+  }
+
+  /**
+   * Applies this filter along the 2nd dimension in the reverse direction.
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2Reverse(float[][][] x, float[][][] y) {
+    scale(_c,x,y);
+    for (int i1=0; i1<_n1; ++i1)
+      _f1[i1].accumulate2Reverse(x,y);
+  }
+
+  /**
+   * Applies this filter along the 2nd dimension in the forward and 
+   * reverse directions.
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2ForwardReverse(float[][][] x, float[][][] y) {
+    scale(_c*_g,x,y);
+    for (int i2=0; i2<_n2; i2+=2) {
+      _f2[i2  ].accumulate2Forward(x,y);
+      _f2[i2+1].accumulate2Reverse(x,y);
+    }
+  }
+
+  /**
+   * Applies this filter along the 3rd dimension in the forward direction.
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply3Forward(float[][][] x, float[][][] y) {
+    scale(_c,x,y);
+    for (int i1=0; i1<_n1; ++i1)
+      _f1[i1].accumulate3Forward(x,y);
+  }
+
+  /**
+   * Applies this filter along the 3rd dimension in the reverse direction.
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply3Reverse(float[][][] x, float[][][] y) {
+    scale(_c,x,y);
+    for (int i1=0; i1<_n1; ++i1)
+      _f1[i1].accumulate3Reverse(x,y);
+  }
+
+  /**
+   * Applies this filter along the 3rd dimension in the forward and 
+   * reverse directions.
+   * Input and output arrays must be distinct regular arrays.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply3ForwardReverse(float[][][] x, float[][][] y) {
+    scale(_c*_g,x,y);
+    for (int i2=0; i2<_n2; i2+=2) {
+      _f2[i2  ].accumulate3Forward(x,y);
+      _f2[i2+1].accumulate3Reverse(x,y);
     }
   }
 
@@ -431,26 +521,36 @@ public class RecursiveParallelFilter {
     return cs;
   }
 
-  private static void checkArrays(float[] x, float[] y) {
-    Check.argument(x!=y,"x!=y");
-    Check.argument(x.length==y.length,"x.length==y.length");
+  private static void scale(float s, float[] x, float[] y) {
+    int n1 = y.length;
+    for (int i1=0; i1<n1; ++i1)
+      y[i1] = s*x[i1];
   }
 
-  private static void checkArrays(float[][] x, float[][] y) {
-    Check.argument(x.length==y.length,"x.length==y.length");
-    Check.argument(Array.isRegular(x),"x is regular");
-    Check.argument(Array.isRegular(y),"y is regular");
+  private static void scale(float s, float[][] x, float[][] y) {
     int n2 = y.length;
-    for (int i2=0; i2<n2; ++i2)
-      checkArrays(x[i2],y[i2]);
+    int n1 = y[0].length;
+    for (int i2=0; i2<n2; ++i2) {
+      float[] x2 = x[i2];
+      float[] y2 = y[i2];
+      for (int i1=0; i1<n1; ++i1)
+        y2[i1] = s*x2[i1];
+    }
   }
 
-  private static void checkArrays(float[][][] x, float[][][] y) {
-    Check.argument(x.length==y.length,"x.length==y.length");
-    Check.argument(Array.isRegular(x),"x is regular");
-    Check.argument(Array.isRegular(y),"y is regular");
+  private static void scale(float s, float[][][] x, float[][][] y) {
     int n3 = y.length;
-    for (int i3=0; i3<n3; ++i3)
-      checkArrays(x[i3],y[i3]);
+    int n2 = y[0].length;
+    int n1 = y[0][0].length;
+    for (int i3=0; i3<n3; ++i3) {
+      float[][] x3 = x[i3];
+      float[][] y3 = y[i3];
+      for (int i2=0; i2<n2; ++i2) {
+        float[] x32 = x3[i2];
+        float[] y32 = y3[i2];
+        for (int i1=0; i1<n1; ++i1)
+          y32[i1] = s*x32[i1];
+      }
+    }
   }
 }

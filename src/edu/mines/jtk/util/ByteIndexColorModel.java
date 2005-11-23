@@ -38,8 +38,8 @@ public class ByteIndexColorModel extends IndexColorModel {
    * Returns a linear hue colormap for the specified gray levels. Hues 
    * equal to 0.00, 0.33, and 0.67, and 1.00 correspond approximately to 
    * the colors red, green, blue, and red, respectively.
-   * @param g0 the gray level corresponding to byte value 0.
-   * @param g255 the gray level corresponding to byte value 255.
+   * @param h0 the hue corresponding to byte value 0.
+   * @param h255 the hue corresponding to byte value 255.
    */
   public static ByteIndexColorModel linearHue(double h0, double h255) {
     Color[] c = new Color[256];

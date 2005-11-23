@@ -49,9 +49,9 @@ public class RecursiveCascadeFilter {
    * @param y the output array.
    */
   public void applyForward(float[] x, float[] y) {
-    _f2[0].applyForward(x,y);
-    for (int i2=1; i2<_n2; ++i2)
-      _f2[i2].applyForward(y,y);
+    _f1[0].applyForward(x,y);
+    for (int i1=1; i1<_n1; ++i1)
+      _f1[i1].applyForward(y,y);
   }
 
   /**
@@ -62,9 +62,9 @@ public class RecursiveCascadeFilter {
    * @param y the output array.
    */
   public void applyReverse(float[] x, float[] y) {
-    _f2[0].applyReverse(x,y);
-    for (int i2=1; i2<_n2; ++i2)
-      _f2[i2].applyReverse(y,y);
+    _f1[0].applyReverse(x,y);
+    for (int i1=1; i1<_n1; ++i1)
+      _f1[i1].applyReverse(y,y);
   }
 
   /**
@@ -75,11 +75,226 @@ public class RecursiveCascadeFilter {
    * @param y the output array.
    */
   public void applyForwardReverse(float[] x, float[] y) {
-    _f2[0].applyForward(x,y);
-    _f2[0].applyReverse(y,y);
-    for (int i2=1; i2<_n2; ++i2) {
-      _f2[i2].applyForward(y,y);
-      _f2[i2].applyReverse(y,y);
+    _f1[0].applyForward(x,y);
+    _f1[0].applyReverse(y,y);
+    for (int i1=1; i1<_n1; ++i1) {
+      _f1[i1].applyForward(y,y);
+      _f1[i1].applyReverse(y,y);
+    }
+  }
+
+  /**
+   * Applies this filter along the 1st dimension in the forward direction. 
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1Forward(float[][] x, float[][] y) {
+    _f1[0].apply1Forward(x,y);
+    for (int i1=1; i1<_n1; ++i1)
+      _f1[i1].apply1Forward(y,y);
+  }
+
+  /**
+   * Applies this filter along the 1st dimension in the reverse direction. 
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1Reverse(float[][] x, float[][] y) {
+    _f1[0].apply1Reverse(x,y);
+    for (int i1=1; i1<_n1; ++i1)
+      _f1[i1].apply1Reverse(y,y);
+  }
+
+  /**
+   * Applies this filter along the 1st dimension in the forward and 
+   * reverse directions.
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1ForwardReverse(float[][] x, float[][] y) {
+    _f1[0].apply1Forward(x,y);
+    _f1[0].apply1Reverse(y,y);
+    for (int i1=1; i1<_n1; ++i1) {
+      _f1[i1].apply1Forward(y,y);
+      _f1[i1].apply1Reverse(y,y);
+    }
+  }
+
+  /**
+   * Applies this filter along the 2nd dimension in the forward direction. 
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2Forward(float[][] x, float[][] y) {
+    _f1[0].apply2Forward(x,y);
+    for (int i1=1; i1<_n1; ++i1)
+      _f1[i1].apply2Forward(y,y);
+  }
+
+  /**
+   * Applies this filter along the 2nd dimension in the reverse direction. 
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2Reverse(float[][] x, float[][] y) {
+    _f1[0].apply2Reverse(x,y);
+    for (int i1=1; i1<_n1; ++i1)
+      _f1[i1].apply2Reverse(y,y);
+  }
+
+  /**
+   * Applies this filter along the 2nd dimension in the forward and 
+   * reverse directions.
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2ForwardReverse(float[][] x, float[][] y) {
+    _f1[0].apply2Forward(x,y);
+    _f1[0].apply2Reverse(y,y);
+    for (int i1=1; i1<_n1; ++i1) {
+      _f1[i1].apply2Forward(y,y);
+      _f1[i1].apply2Reverse(y,y);
+    }
+  }
+
+  /**
+   * Applies this filter along the 1st dimension in the forward direction. 
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1Forward(float[][][] x, float[][][] y) {
+    _f1[0].apply1Forward(x,y);
+    for (int i1=1; i1<_n1; ++i1)
+      _f1[i1].apply1Forward(y,y);
+  }
+
+  /**
+   * Applies this filter along the 1st dimension in the reverse direction. 
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1Reverse(float[][][] x, float[][][] y) {
+    _f1[0].apply1Reverse(x,y);
+    for (int i1=1; i1<_n1; ++i1)
+      _f1[i1].apply1Reverse(y,y);
+  }
+
+  /**
+   * Applies this filter along the 1st dimension in the forward and 
+   * reverse directions.
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply1ForwardReverse(float[][][] x, float[][][] y) {
+    _f1[0].apply1Forward(x,y);
+    _f1[0].apply1Reverse(y,y);
+    for (int i1=1; i1<_n1; ++i1) {
+      _f1[i1].apply1Forward(y,y);
+      _f1[i1].apply1Reverse(y,y);
+    }
+  }
+
+  /**
+   * Applies this filter along the 2nd dimension in the forward direction. 
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2Forward(float[][][] x, float[][][] y) {
+    _f1[0].apply2Forward(x,y);
+    for (int i1=1; i1<_n1; ++i1)
+      _f1[i1].apply2Forward(y,y);
+  }
+
+  /**
+   * Applies this filter along the 2nd dimension in the reverse direction. 
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2Reverse(float[][][] x, float[][][] y) {
+    _f1[0].apply2Reverse(x,y);
+    for (int i1=1; i1<_n1; ++i1)
+      _f1[i1].apply2Reverse(y,y);
+  }
+
+  /**
+   * Applies this filter along the 2nd dimension in the forward and 
+   * reverse directions.
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply2ForwardReverse(float[][][] x, float[][][] y) {
+    _f1[0].apply2Forward(x,y);
+    _f1[0].apply2Reverse(y,y);
+    for (int i1=1; i1<_n1; ++i1) {
+      _f1[i1].apply2Forward(y,y);
+      _f1[i1].apply2Reverse(y,y);
+    }
+  }
+
+  /**
+   * Applies this filter along the 3rd dimension in the forward direction. 
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply3Forward(float[][][] x, float[][][] y) {
+    _f1[0].apply3Forward(x,y);
+    for (int i1=1; i1<_n1; ++i1)
+      _f1[i1].apply3Forward(y,y);
+  }
+
+  /**
+   * Applies this filter along the 3rd dimension in the reverse direction. 
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply3Reverse(float[][][] x, float[][][] y) {
+    _f1[0].apply3Reverse(x,y);
+    for (int i1=1; i1<_n1; ++i1)
+      _f1[i1].apply3Reverse(y,y);
+  }
+
+  /**
+   * Applies this filter along the 3rd dimension in the forward and 
+   * reverse directions.
+   * Input and output arrays may be the same array.
+   * Lengths of the input and output arrays must be equal.
+   * @param x the input array.
+   * @param y the output array.
+   */
+  public void apply3ForwardReverse(float[][][] x, float[][][] y) {
+    _f1[0].apply3Forward(x,y);
+    _f1[0].apply3Reverse(y,y);
+    for (int i1=1; i1<_n1; ++i1) {
+      _f1[i1].apply3Forward(y,y);
+      _f1[i1].apply3Reverse(y,y);
     }
   }
 
@@ -100,24 +315,24 @@ public class RecursiveCascadeFilter {
     // Construct 2nd-order filters.
     int np = poles.length;
     int nz = zeros.length;
-    _n2 = max((np+1)/2,(nz+1)/2);
-    _f2 = new Recursive2ndOrderFilter[_n2];
-    gain = pow(gain,1.0/_n2);
+    _n1 = max((np+1)/2,(nz+1)/2);
+    _f1 = new Recursive2ndOrderFilter[_n1];
+    gain = pow(gain,1.0/_n1);
     Cdouble c0 = new Cdouble(0.0,0.0);
-    for (int i2=0,ip=0,iz=0; i2<_n2; ++i2) {
+    for (int i1=0,ip=0,iz=0; i1<_n1; ++i1) {
       Cdouble pole1 = (ip<np)?poles[ip++]:c0;
       Cdouble pole2 = (ip<np)?poles[ip++]:c0;
       Cdouble zero1 = (iz<nz)?zeros[iz++]:c0;
       Cdouble zero2 = (iz<nz)?zeros[iz++]:c0;
-      _f2[i2] = new Recursive2ndOrderFilter(pole1,pole2,zero1,zero2,gain);
+      _f1[i1] = new Recursive2ndOrderFilter(pole1,pole2,zero1,zero2,gain);
     }
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private int _n2;
-  private Recursive2ndOrderFilter[] _f2;
+  private int _n1; // number of 2nd-order one-way filters
+  private Recursive2ndOrderFilter[] _f1; // array of filters
 
   /**
    * Sorts array of poles or zeros. After sorting, any complex conjugate 

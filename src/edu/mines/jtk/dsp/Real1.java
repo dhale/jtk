@@ -119,7 +119,7 @@ public class Real1 {
    * If the specified sampling is incompatible with the sampling of this
    * function, then this method must interpolate or decimate this function 
    * Neither interpolation or decimation is supported, yet.
-   * @param t the sampling.
+   * @param s the sampling.
    * @return the resampled function.
    * @exception UnsupportedOperationException if the specified sampling is 
    *  incompatible with this sampling.
