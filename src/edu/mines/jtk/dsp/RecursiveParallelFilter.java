@@ -347,9 +347,9 @@ public class RecursiveParallelFilter {
     double c = (_nz==_np)?gain:0.0;
     for (int i1=0,i2=0,jp=0; i1<_n1; ++jp) {
       Cdouble pj = poles[jp];
-      Cdouble hz = h(pj,poles,zeros,gain);
+      Cdouble hi = hi(pj,poles,zeros,gain);
       Cdouble hj = hr(pj,poles,zeros,gain);
-      Cdouble hhj = hz.times(hj);
+      Cdouble hihj = hi.times(hj);
       double fb0,fb1,fb2,rb0,rb1,rb2,b0,b1,b2,a1,a2;
       if (pj.i==0.0) { // if pole is real, ...
         a1 = -pj.r;
@@ -357,12 +357,14 @@ public class RecursiveParallelFilter {
         b0 = hj.r;
         b1 = 0.0;
         b2 = 0.0;
-        fb0 = hhj.r;
+        fb0 = hihj.r;
         fb1 = 0.0;
         fb2 = 0.0;
         rb0 = 0.0;
         rb1 = -fb0*a1;
         rb2 = 0.0;
+        System.out.println("pj="+pj);
+        System.out.println("  b0="+b0+" fb0="+fb0+" rb1="+rb1);
       } else { // else if pole is complex, ...
         ++jp; // skip its conjugate mate
         Cdouble qj = pj.inv();
@@ -371,8 +373,8 @@ public class RecursiveParallelFilter {
         b0 = hj.r-hj.i*qj.r/qj.i;
         b1 = hj.i/qj.i;
         b2 = 0.0;
-        fb0 = hhj.r-hhj.i*qj.r/qj.i;
-        fb1 = hhj.i/qj.i;
+        fb0 = hihj.r-hihj.i*qj.r/qj.i;
+        fb1 = hihj.i/qj.i;
         fb2 = 0.0;
         rb0 = 0.0;
         rb1 = fb1-fb0*a1;
@@ -382,10 +384,11 @@ public class RecursiveParallelFilter {
       _f2[i2++] = makeFilter(fb0,fb1,fb2,a1,a2);
       _f2[i2++] = makeFilter(rb0,rb1,rb2,a1,a2);
       if (_nz==_np)
-        c -= fb0;
+        c -= b0;
     }
     _c = (float)c;
     _g = (float)gain;
+    System.out.println("c="+_c+" g="+_g);
   }
   private static Recursive2ndOrderFilter makeFilter(
     double b0, double b1, double b2, double a1, double a2)
@@ -409,9 +412,9 @@ public class RecursiveParallelFilter {
   private Recursive2ndOrderFilter[] _f2; // for two-way filtering
 
   /**
-   * Evaluates H(z).
+   * Evaluates H(1/z).
    */
-  private Cdouble h(
+  private Cdouble hi(
     Cdouble z, Cdouble[] poles, Cdouble[] zeros, double gain) 
   {
     Cdouble c1 = new Cdouble(1.0,0.0);
@@ -439,7 +442,6 @@ public class RecursiveParallelFilter {
     Cdouble polej, Cdouble[] poles, Cdouble[] zeros, double gain) 
   {
     Cdouble pj = polej;
-    Cdouble pc = pj.conj();
     Cdouble qj = pj.inv();
     Cdouble c1 = new Cdouble(1.0,0.0);
     Cdouble hz = new Cdouble(c1);
@@ -450,7 +452,7 @@ public class RecursiveParallelFilter {
     Cdouble hp = new Cdouble(c1);
     for (int ip=0; ip<_np; ++ip) {
       Cdouble pi = poles[ip];
-      if (pi.r!=pj.r && pi.i!=pj.i && -pi.i!=pj.i)
+      if (!pi.equals(pj) && !pi.equals(pj.conj()))
         hp.timesEquals(c1.minus(pi.times(qj)));
     }
     return hz.over(hp).times(gain);
