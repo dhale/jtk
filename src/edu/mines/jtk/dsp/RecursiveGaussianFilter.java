@@ -463,15 +463,6 @@ public class RecursiveGaussianFilter {
       double d3 = -2.0*exp(-(b0[i]+2.0*b1[i])/sigma)*cos(w0[i]/sigma) -
                    2.0*exp(-(b1[i]+2.0*b0[i])/sigma)*cos(w1[i]/sigma);
       double d4 = exp(-2.0*(b0[i]+b1[i])/sigma);
-      /*
-      double scale = 1.0/(sqrt(2.0*PI)*sigma);
-      if (i>0)
-        scale /= sigma*sigma;
-      n0 *= scale;
-      n1 *= scale;
-      n2 *= scale;
-      n3 *= scale;
-      */
       _n0[i] = (float)n0;
       _n1[i] = (float)n1;
       _n2[i] = (float)n2;
@@ -484,8 +475,14 @@ public class RecursiveGaussianFilter {
     scaleN(sigma);
   }
 
+  /**
+   * Scales numerator filter coefficients to normalize the filters.
+   * For example, the sum of the 0th-derivative filter coefficients
+   * should be 1.0. The scale factors are computed from finite-length
+   * approximations to the impulse responses of the three filters.
+   */
   private void scaleN(double sigma) {
-    int n = 1+2*(int)(20.0*sigma);
+    int n = 1+2*(int)(10.0*sigma);
     float[] x = new float[n];
     float[] y0 = new float[n];
     float[] y1 = new float[n];

@@ -42,9 +42,9 @@ public class Burg2dTest {
     float[][] f1 = burg2d1(m,x);
     System.out.println("f1min="+Array.min(f1)+" f1max="+Array.max(f1));
     plotImage(-clip,clip,f1);
-    float[][] f14 = burg2d4(m,f1);
-    System.out.println("f14min="+Array.min(f14)+" f14max="+Array.max(f14));
-    plotImage(-clip,clip,f14);
+    float[][] f4 = burg2d4(m,f1);
+    System.out.println("f4min="+Array.min(f4)+" f4max="+Array.max(f4));
+    plotImage(-clip,clip,f4);
   }
 
   private static float[][] burg2d1(int m, float[][] x) {
@@ -127,7 +127,7 @@ public class Burg2dTest {
 
   private static float[][] makeImage(int n1, int n2, double theta) {
     int nk = 10;
-    double dk = 0.5*DBL_PI/nk;
+    double dk = 0.4*DBL_PI/nk;
     double fk = dk;
     double ct = cos(theta*DBL_PI/180.);
     double st = sin(theta*DBL_PI/180.);
@@ -136,6 +136,7 @@ public class Burg2dTest {
       double x2 = i2-n2/2;
       for (int i1=0; i1<n1; ++i1) {
         double x1 = i1-n1/2;
+        if (x2>0.0) x1 += 1.0;
         for (int ik=0; ik<nk; ++ik) {
           double k = fk+ik*dk;
           double fi = cos(k*(ct*x1+st*x2));
