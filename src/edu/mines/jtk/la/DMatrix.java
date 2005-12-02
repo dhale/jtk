@@ -16,8 +16,10 @@ import static java.lang.Math.*;
  * such that array element a[i][j] corresponds to the i'th row and the
  * j'th column of the m-by-n matrix.
  * <p>
- * Adapted from the package Jama, which was written by The MathWorks, Inc. 
- * and the National Institute of Standards and Technology.
+ * This class was adapted from the package Jama, which was developed by 
+ * Joe Hicklin, Cleve Moler, and Peter Webb of The MathWorks, Inc., and by
+ * Ronald Boisvert, Bruce Miller, Roldan Pozo, and Karin Remington of the
+ * National Institue of Standards and Technology.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.12.01
  */
