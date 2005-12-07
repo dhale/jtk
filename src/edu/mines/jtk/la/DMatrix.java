@@ -26,30 +26,14 @@ import static java.lang.Math.*;
 public class DMatrix {
 
   /**
-   * The number of rows.
-   */
-  public int m;
-
-  /**
-   * The number of columns.
-   */
-  public int n;
-
-  /**
-   * The m-by-n array of matrix elements. The array element a[i][j] 
-   * corresponds to the i'th row and the j'th column of the matrix.
-   */
-  public double[][] a;
-
-  /**
    * Constructs an m-by-n matrix of zeros.
    * @param m the number of rows.
    * @param n the number of columns.
    */
   public DMatrix(int m, int n) {
-    this.m = m;
-    this.n = n;
-    this.a = new double[m][n];
+    _m = m;
+    _n = n;
+    _a = new double[m][n];
   }
 
   /**
@@ -60,68 +44,110 @@ public class DMatrix {
    */
   public DMatrix(int m, int n, double v) {
     this(m,n);
-    Array.fill(v,a);
+    Array.fill(v,_a);
   }
 
   /**
    * Constructs a matrix from the specified array. Does not copy array
    * elements into a new array. Rather, the new matrix simply references 
    * the specified array.
+   * <p>
+   * The specified array must be regular. That is, each row much contain
+   * the same number of columns, and each column must contain the same
+   * number of rows.
    * @param a the array.
    */
   public DMatrix(double[][] a) {
-    this(a,false);
-  }
-
-  /**
-   * Constructs a matrix from the specified array, with optional copying.
-   * @param a the array.
-   * @param copy true, to copy elements into a new array;
-   *  false, to simply reference the the specified array.
-   */
-  public DMatrix(double[][] a, boolean copy) {
     Check.argument(Array.isRegular(a),"array a is regular");
-    this.m = a.length;
-    this.n = a[0].length;
-    this.a = (copy)?Array.copy(a):a;
+    _m = a.length;
+    _n = a[0].length;
+    _a = a;
   }
 
   /**
-   * Constructs a matrix quickly without checking arguments. Does not
-   * copy array elements into a new array. Rather, the new matrix simply 
-   * references the specified array.
-   * @param m the number of rows.
-   * @param n the number of columns.
+   * Constructs a copy of the specified matrix.
+   * @param a the matrix.
+   */
+  public DMatrix(DMatrix a) {
+    this(a._m,a._n,Array.copy(a._a));
+  }
+
+  /**
+   * Gets the number of rows in this matrix.
+   * @return the number of rows.
+   */
+  public int getM() {
+    return _m;
+  }
+
+  /**
+   * Gets the number of rows in this matrix.
+   * @return the number of rows.
+   */
+  public int getRowCount() {
+    return _m;
+  }
+
+  /**
+   * Gets the number of columns in this matrix.
+   * @return the number of columns.
+   */
+  public int getN() {
+    return _n;
+  }
+
+  /**
+   * Gets the number of columns in this matrix.
+   * @return the number of columns.
+   */
+  public int getColumnCount() {
+    return _n;
+  }
+
+  /**
+   * Gets the array in which matrix elements are stored.
+   * @return the array; by reference, not by copy.
+   */
+  public double[][] getArray() {
+    return _a;
+  }
+
+  /**
+   * Determines whether this matrix is square.
+   * @return true, if square; false, otherwise.
+   */
+  public boolean isSquare() {
+    return _m==_n;
+  }
+
+  /**
+   * Determines whether this matrix is symmetric (and square).
+   * @return true, if symmetric (and square); false, otherwise.
+   */
+  public boolean isSymmetric() {
+    if (!isSquare())
+      return false;
+    for (int i=0; i<_n; ++i)
+      for (int j=i; j<_n; ++j)
+        if (_a[i][j]!=_a[j][i])
+          return false;
+    return true;
+  }
+
+  /**
+   * Gets all elements of this matrix into a new array.
+   * @return the array.
+   */
+  public double[][] get() {
+    return Array.copy(_a);
+  }
+
+  /**
+   * Gets all elements of this matrix into the specified array.
    * @param a the array.
    */
-  public DMatrix(int m, int n, double[][] a) {
-    this.m = m;
-    this.n = n;
-    this.a = a;
-  }
-
-  /**
-   * Returns the elements of this matrix packed by columns.
-   * @return the packed columns.
-   */
-  public double[] packColumns() {
-    double[] c = new double[m*n];
-    for (int i=0; i<m; ++i)
-      for (int j=0; j<n; ++j)
-        c[i+j*m] = a[i][j];
-    return c;
-  }
-
-  /**
-   * Returns the elements of this matrix packed by rows.
-   * @return the packed rows.
-   */
-  public double[] packRows() {
-    double[] r = new double[m*n];
-    for (int i=0; i<m; ++i)
-      for (int j=0; j<n; ++j)
-        r[i*n+j] = a[i][j];
-    return r;
+  public void get(double[][] a) {
+    Array.copy(_a,a);
   }
 
   /**
@@ -131,7 +157,7 @@ public class DMatrix {
    * @return the element.
    */
   public double get(int i, int j) {
-    return a[i][j];
+    return _a[i][j];
   }
 
   /**
@@ -145,34 +171,34 @@ public class DMatrix {
     int m = i1-i0+1;
     int n = j1-j0+1;
     DMatrix x = new DMatrix(m,n);
-    Array.copy(n,m,j0,i0,a,0,0,x.a);
+    Array.copy(n,m,j0,i0,_a,0,0,x._a);
     return x;
   }
 
   /**
-   * Gets a matrix from the specified rows and columns of this matrix.
+   * Gets a new matrix from the specified rows and columns of this matrix.
    * @param r the array of row indices; null, for all rows.
    * @param c the array of column indices; null, for all columns.
    */
   public DMatrix get(int[] r, int[] c) {
     if (r==null && c==null) {
-      return new DMatrix(m,n,a);
+      return new DMatrix(_m,_n,Array.copy(_a));
     } else {
-      int m = (r!=null)?r.length:this.m;
-      int n = (c!=null)?c.length:this.n;
+      int m = (r!=null)?r.length:_m;
+      int n = (c!=null)?c.length:_n;
       double[][] b = new double[m][n];
       if (r==null) {
         for (int i=0; i<m; ++i)
           for (int j=0; j<n; ++j)
-            b[i][j] = a[i][c[j]];
+            b[i][j] = _a[i][c[j]];
       } else if (c==null) {
         for (int i=0; i<m; ++i)
           for (int j=0; j<n; ++j)
-            b[i][j] = a[r[i]][j];
+            b[i][j] = _a[r[i]][j];
       } else {
         for (int i=0; i<m; ++i)
           for (int j=0; j<n; ++j)
-            b[i][j] = a[r[i]][c[j]];
+            b[i][j] = _a[r[i]][c[j]];
       }
       return new DMatrix(m,n,b);
     }
@@ -204,13 +230,14 @@ public class DMatrix {
    */
   public DMatrix get(int i0, int i1, int[] c) {
     if (c==null) {
-      return get(i0,i1,0,n-1);
+      return get(i0,i1,0,_n-1);
     } else {
+      int m = i1-i0+1;
       int n = c.length;
       double[][] b = new double[m][n];
       for (int i=i0; i<=i1; ++i1) {
         for (int j=0; j<n; ++j) {
-          b[i][j] = a[i][c[j]];
+          b[i-i0][j] = _a[i][c[j]];
         }
       }
       return new DMatrix(m,n,b);
@@ -225,17 +252,53 @@ public class DMatrix {
    */
   public DMatrix get(int[] r, int j0, int j1) {
     if (r==null) {
-      return get(0,m-1,j0,j1);
+      return get(0,_m-1,j0,j1);
     } else {
       int m = r.length;
+      int n = j1-j0+1;
       double[][] b = new double[m][n];
       for (int i=0; i<m; ++i) {
         for (int j=j0; j<=j1; ++j) {
-          b[i][j] = a[r[i]][j];
+          b[i][j-j0] = _a[r[i]][j];
         }
       }
       return new DMatrix(m,n,b);
     }
+  }
+
+  /**
+   * Gets the elements of this matrix packed by columns.
+   * @return the packed columns.
+   */
+  public double[] getPackedColumns() {
+    double[] c = new double[_m*_n];
+    for (int i=0; i<_m; ++i)
+      for (int j=0; j<_n; ++j)
+        c[i+j*_m] = _a[i][j];
+    return c;
+  }
+
+  /**
+   *Gets the elements of this matrix packed by rows.
+   * @return the packed rows.
+   */
+  public double[] getPackedRows() {
+    double[] r = new double[_m*_n];
+    for (int i=0; i<_m; ++i)
+      for (int j=0; j<_n; ++j)
+        r[i*_n+j] = _a[i][j];
+    return r;
+  }
+
+  /**
+   * Sets all elements of this matrix from the specified array.
+   * Copies each array element into this matrix.
+   * @param a the array.
+   */
+  public void set(double[][] a) {
+    for (int i=0; i<_m; ++i)
+      for (int j=0; j<_n; ++j)
+        _a[i][j] = a[i][j];
   }
 
   /**
@@ -245,7 +308,7 @@ public class DMatrix {
    * @param v the element value.
    */
   public void set(int i, int j, double v) {
-    a[i][j] = v;
+    _a[i][j] = v;
   }
 
   /**
@@ -259,7 +322,9 @@ public class DMatrix {
   public void set(int i0, int i1, int j0, int j1, DMatrix x) {
     int m = i1-i0+1;
     int n = j1-j0+1;
-    Array.copy(n,m,0,0,x.a,j0,i0,a);
+    Check.argument(m==x._m,"i1-i0+1 equals number of rows in x");
+    Check.argument(n==x._n,"j1-j0+1 equals number of columns in x");
+    Array.copy(n,m,0,0,x._a,j0,i0,_a);
   }
 
   /**
@@ -269,24 +334,34 @@ public class DMatrix {
    * @param x the matrix from which to copy elements.
    */
   public void set(int[] r, int[] c, DMatrix x) {
-    if (r==null && c==null) {
-      Array.copy(x.a,a);
+    if (r==null) {
+      Check.argument(_m==x._m,"number of rows equal in this and x");
     } else {
-      int m = (r!=null)?r.length:this.m;
-      int n = (c!=null)?c.length:this.n;
-      double[][] b = x.a;
+      Check.argument(r.length==x._m,"r.length equals number of rows in x");
+    }
+    if (c==null) {
+      Check.argument(_n==x._n,"number of columns equal in this and x");
+    } else {
+      Check.argument(c.length==x._n,"c.length equals number of columns in x");
+    }
+    if (r==null && c==null) {
+      Array.copy(x._a,_a);
+    } else {
+      int m = (r!=null)?r.length:_m;
+      int n = (c!=null)?c.length:_n;
+      double[][] b = x._a;
       if (r==null) {
         for (int i=0; i<m; ++i)
           for (int j=0; j<n; ++j)
-            a[i][c[j]] = b[i][j];
+            _a[i][c[j]] = b[i][j];
       } else if (c==null) {
         for (int i=0; i<m; ++i)
           for (int j=0; j<n; ++j)
-            a[r[i]][j] = b[i][j];
+            _a[r[i]][j] = b[i][j];
       } else {
         for (int i=0; i<m; ++i)
           for (int j=0; j<n; ++j)
-            a[r[i]][c[j]] = b[i][j];
+            _a[r[i]][c[j]] = b[i][j];
       }
     }
   }
@@ -319,14 +394,15 @@ public class DMatrix {
    * @param x the matrix from which to copy elements.
    */
   public void set(int i0, int i1, int[] c, DMatrix x) {
+    Check.argument(i1-i0+1==x._m,"i1-i0+1 equals number of rows in x");
     if (c==null) {
-      set(i0,i1,0,n-1,x);
+      set(i0,i1,0,_n-1,x);
     } else {
       int n = c.length;
-      double[][] b = x.a;
+      double[][] b = x._a;
       for (int i=i0; i<=i1; ++i1) {
         for (int j=0; j<n; ++j) {
-          a[i][c[j]] = b[i][j];
+          _a[i][c[j]] = b[i-i0][j];
         }
       }
     }
@@ -340,17 +416,38 @@ public class DMatrix {
    * @param x the matrix from which to copy elements.
    */
   public void set(int[] r, int j0, int j1, DMatrix x) {
+    Check.argument(j1-j0+1==x._m,"j1-j0+1 equals number of columns in x");
     if (r==null) {
-      set(0,m-1,j0,j1,x);
+      set(0,_m-1,j0,j1,x);
     } else {
       int m = r.length;
-      double[][] b = x.a;
+      double[][] b = x._a;
       for (int i=0; i<m; ++i) {
         for (int j=j0; j<=j1; ++j) {
-          a[r[i]][j] = b[i][j];
+          _a[r[i]][j] = b[i][j-j0];
         }
       }
     }
+  }
+
+  /**
+   * Sets the elements of this matrix from an array packed by columns.
+   * @param c the array packed by columns.
+   */
+  public void setPackedColumns(double[] c) {
+    for (int i=0; i<_m; ++i)
+      for (int j=0; j<_n; ++j)
+        _a[i][j] = c[i+j*_m];
+  }
+
+  /**
+   * Sets the elements of this matrix from an array packed by rows.
+   * @param r the array packed by rows.
+   */
+  public void setPackedRows(double[] r) {
+    for (int i=0; i<_m; ++i)
+      for (int j=0; j<_n; ++j)
+        _a[i][j] = r[i*_n+j];
   }
 
   /**
@@ -358,11 +455,11 @@ public class DMatrix {
    * @return the transpose.
    */
   public DMatrix transpose() {
-    DMatrix x = new DMatrix(n,m);
-    double[][] b = x.a;
-    for (int i=0; i<m; ++i) {
-      for (int j=0; j<n; ++j) {
-        b[j][i] = a[i][j];
+    DMatrix x = new DMatrix(_n,_m);
+    double[][] b = x._a;
+    for (int i=0; i<_m; ++i) {
+      for (int j=0; j<_n; ++j) {
+        b[j][i] = _a[i][j];
       }
     }
     return x;
@@ -374,10 +471,10 @@ public class DMatrix {
    */
   public double norm1() {
     double f = 0.0;
-    for (int j=0; j<n; ++j) {
+    for (int j=0; j<_n; ++j) {
       double s = 0.0;
-      for (int i=0; i<m; ++i)
-        s += abs(a[i][j]);
+      for (int i=0; i<_m; ++i)
+        s += abs(_a[i][j]);
       f = max(f,s);
     }
     return f;
@@ -397,10 +494,10 @@ public class DMatrix {
    */
   public double normI() {
     double f = 0.0;
-    for (int i=0; i<m; ++i) {
+    for (int i=0; i<_m; ++i) {
       double s = 0.0;
-      for (int j=0; j<n; ++j)
-        s += abs(a[i][j]);
+      for (int j=0; j<_n; ++j)
+        s += abs(_a[i][j]);
       f = max(f,s);
     }
     return f;
@@ -412,9 +509,9 @@ public class DMatrix {
    */
   public double normF() {
     double f = 0.0;
-    for (int i=0; i<m; ++i) {
-      for (int j=0; j<n; ++j) {
-        f = hypot(f,a[i][j]);
+    for (int i=0; i<_m; ++i) {
+      for (int j=0; j<_n; ++j) {
+        f = hypot(f,_a[i][j]);
       }
     }
     return f;
@@ -425,8 +522,8 @@ public class DMatrix {
    * @return C = -A.
    */
   public DMatrix negate() {
-    DMatrix c = new DMatrix(m,n);
-    Array.neg(a,c.a);
+    DMatrix c = new DMatrix(_m,_n);
+    Array.neg(_a,c._a);
     return c;
   }
 
@@ -436,8 +533,8 @@ public class DMatrix {
    * @return C = A + B.
    */
   public DMatrix plus(DMatrix b) {
-    DMatrix c = new DMatrix(m,n);
-    Array.add(a,b.a,c.a);
+    DMatrix c = new DMatrix(_m,_n);
+    Array.add(_a,b._a,c._a);
     return c;
   }
 
@@ -447,7 +544,7 @@ public class DMatrix {
    * @return A = A + B.
    */
   public DMatrix plusEquals(DMatrix b) {
-    Array.add(a,b.a,a);
+    Array.add(_a,b._a,_a);
     return this;
   }
 
@@ -457,8 +554,8 @@ public class DMatrix {
    * @return C = A - B.
    */
   public DMatrix minus(DMatrix b) {
-    DMatrix c = new DMatrix(m,n);
-    Array.sub(a,b.a,c.a);
+    DMatrix c = new DMatrix(_m,_n);
+    Array.sub(_a,b._a,c._a);
     return c;
   }
 
@@ -468,7 +565,7 @@ public class DMatrix {
    * @return A = A - B.
    */
   public DMatrix minusEquals(DMatrix b) {
-    Array.sub(a,b.a,a);
+    Array.sub(_a,b._a,_a);
     return this;
   }
 
@@ -479,8 +576,8 @@ public class DMatrix {
    * @return C = A .* B.
    */
   public DMatrix arrayTimes(DMatrix b) {
-    DMatrix c = new DMatrix(m,n);
-    Array.mul(a,b.a,c.a);
+    DMatrix c = new DMatrix(_m,_n);
+    Array.mul(_a,b._a,c._a);
     return c;
   }
 
@@ -491,7 +588,7 @@ public class DMatrix {
    * @return A = A .* B.
    */
   public DMatrix arrayTimesEquals(DMatrix b) {
-    Array.mul(a,b.a,a);
+    Array.mul(_a,b._a,_a);
     return this;
   }
 
@@ -502,8 +599,8 @@ public class DMatrix {
    * @return C = A ./ B.
    */
   public DMatrix arrayRightDivide(DMatrix b) {
-    DMatrix c = new DMatrix(m,n);
-    Array.div(a,b.a,c.a);
+    DMatrix c = new DMatrix(_m,_n);
+    Array.div(_a,b._a,c._a);
     return c;
   }
 
@@ -514,7 +611,7 @@ public class DMatrix {
    * @return A = A ./ B.
    */
   public DMatrix arrayRightDivideEquals(DMatrix b) {
-    Array.div(a,b.a,a);
+    Array.div(_a,b._a,_a);
     return this;
   }
 
@@ -525,8 +622,8 @@ public class DMatrix {
    * @return C = A .\ B.
    */
   public DMatrix arrayLeftDivide(DMatrix b) {
-    DMatrix c = new DMatrix(m,n);
-    Array.div(b.a,a,c.a);
+    DMatrix c = new DMatrix(_m,_n);
+    Array.div(b._a,_a,c._a);
     return c;
   }
 
@@ -537,7 +634,7 @@ public class DMatrix {
    * @return A = A .\ B.
    */
   public DMatrix arrayLeftDivideEquals(DMatrix b) {
-    Array.div(b.a,a,a);
+    Array.div(b._a,_a,_a);
     return this;
   }
 
@@ -547,8 +644,8 @@ public class DMatrix {
    * @return C = A * s.
    */
   public DMatrix times(double s) {
-    DMatrix c = new DMatrix(m,n);
-    Array.mul(a,s,c.a);
+    DMatrix c = new DMatrix(_m,_n);
+    Array.mul(_a,s,c._a);
     return c;
   }
 
@@ -558,7 +655,7 @@ public class DMatrix {
    * @return A = A * s.
    */
   public DMatrix timesEquals(double s) {
-    Array.mul(a,s,a);
+    Array.mul(_a,s,_a);
     return this;
   }
 
@@ -569,19 +666,20 @@ public class DMatrix {
    * @return C = A * B.
    */
   public DMatrix times(DMatrix b) {
-    Check.argument(n==b.m,"number of columns in A equals number of rows in B");
-    DMatrix c = new DMatrix(m,b.n);
-    double[][] aa = a;
-    double[][] ba = b.a;
-    double[][] ca = c.a;
-    double[] bj = new double[n];
-    for (int j=0; j<b.n; ++j) {
-      for (int k=0; k<n; ++k)
+    Check.argument(_n==b._m,
+      "number of columns in A equals number of rows in B");
+    DMatrix c = new DMatrix(_m,b._n);
+    double[][] aa = _a;
+    double[][] ba = b._a;
+    double[][] ca = c._a;
+    double[] bj = new double[_n];
+    for (int j=0; j<b._n; ++j) {
+      for (int k=0; k<_n; ++k)
         bj[k] = ba[k][j];
-      for (int i=0; i<m; ++i) {
+      for (int i=0; i<_m; ++i) {
         double[] ai = aa[i];
         double s = 0.0;
-        for (int k=0; k<n; ++k)
+        for (int k=0; k<_n; ++k)
           s += ai[k]*bj[k];
         ca[i][j] = s;
       }
@@ -594,10 +692,10 @@ public class DMatrix {
    * @return the trace.
    */
   public double trace() {
-    int mn = min(m,n);
+    int mn = min(_m,_n);
     double t = 0.0;
     for (int i=0; i<mn; ++i)
-      t += a[i][i];
+      t += _a[i][i];
     return t;
   }
 
@@ -610,7 +708,7 @@ public class DMatrix {
    */
   public static DMatrix random(int m, int n) {
     DMatrix x = new DMatrix(m,n);
-    Array.rand(x.a);
+    Array.rand(x._a);
     return x;
   }
 
@@ -622,10 +720,34 @@ public class DMatrix {
    */
   public static DMatrix identity(int m, int n) {
     DMatrix x = new DMatrix(m,n);
-    double[][] xa = x.a;
+    double[][] xa = x._a;
     int mn = min(m,n);
     for (int i=0; i<mn; ++i)
       xa[i][i] = 1.0;
     return x;
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // package
+
+  /**
+   * Constructs a matrix quickly without checking arguments. Does not
+   * copy array elements into a new array. Rather, the new matrix simply 
+   * references the specified array.
+   * @param m the number of rows.
+   * @param n the number of columns.
+   * @param a the array.
+   */
+  DMatrix(int m, int n, double[][] a) {
+    _m = m;
+    _n = n;
+    _a = a;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // private
+
+  private int _m; // number of rows
+  private int _n; // number of columns
+  private double[][] _a; // array[_m][_n] of matrix elements
 }

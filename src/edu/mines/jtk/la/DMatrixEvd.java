@@ -38,20 +38,14 @@ public class DMatrixEvd {
    * @return the decomposition.
    */
   public DMatrixEvd(DMatrix a) {
-    Check.argument(a.m==a.n,"matrix is square");
-    double[][] aa = a.a;
-    int n = a.n;
+    Check.argument(a.isSquare(),"matrix a is square");
+    double[][] aa = a.getArray();
+    int n = a.getN();
     _n = n;
     _v = new double[n][n];
     _d = new double[n];
     _e = new double[n];
-    _symmetric = true;
-    for (int j=0; j<n && _symmetric; ++j) {
-      for (int i = 0; i<n && _symmetric; ++i) {
-        _symmetric = aa[i][j]==aa[j][i];
-      }
-    }
-    if (_symmetric) {
+    if (a.isSymmetric()) {
       for (int i=0; i<n; ++i) {
         for (int j=0; j<n; ++j) {
           _v[i][j] = aa[i][j];
@@ -85,7 +79,7 @@ public class DMatrixEvd {
    */
   public DMatrix getD() {
     DMatrix d = new DMatrix(_n,_n);
-    double[][] da = d.a;
+    double[][] da = d.getArray();
     for (int i=0; i<_n; ++i) {
       for (int j=0; j<_n; ++j) {
         da[i][j] = 0.0;
@@ -119,7 +113,6 @@ public class DMatrixEvd {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private boolean _symmetric; // true if symmetric matrix
   private int _n; // row and column dimensions for square matrix V
   private double[][] _v; // eigenvectors V
   private double[] _d, _e; // eigenvalues
