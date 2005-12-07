@@ -87,7 +87,9 @@ public class DMatrix {
   }
 
   /**
-   * Constructs a matrix quickly without checking arguments.
+   * Constructs a matrix quickly without checking arguments. Does not
+   * copy array elements into a new array. Rather, the new matrix simply 
+   * references the specified array.
    * @param m the number of rows.
    * @param n the number of columns.
    * @param a the array.
@@ -301,8 +303,8 @@ public class DMatrix {
 
   /**
    * Sets the specified rows and one column of this matrix.
-   * @param i the row index.
-   * @param c the array of column indices; null, for all columns.
+   * @param r the array of row indices; null, for all rows.
+   * @param j the column index.
    * @param x the matrix from which to copy elements.
    */
   public void set(int[] r, int j, DMatrix x) {
@@ -412,14 +414,7 @@ public class DMatrix {
     double f = 0.0;
     for (int i=0; i<m; ++i) {
       for (int j=0; j<n; ++j) {
-        double g = abs(a[i][j]);
-        if (f>g) {
-          f = g/f;
-          f = f*sqrt(1.0+f*f);
-        } else if (g>0.0) {
-          f = f/g;
-          f = g*sqrt(1.0+f*f);
-        }
+        f = hypot(f,a[i][j]);
       }
     }
     return f;
@@ -633,7 +628,4 @@ public class DMatrix {
       xa[i][i] = 1.0;
     return x;
   }
-
-  ///////////////////////////////////////////////////////////////////////
-
 }
