@@ -128,7 +128,7 @@ public class DMatrix {
     if (!isSquare())
       return false;
     for (int i=0; i<_n; ++i)
-      for (int j=i; j<_n; ++j)
+      for (int j=i+1; j<_n; ++j)
         if (_a[i][j]!=_a[j][i])
           return false;
     return true;
@@ -168,6 +168,8 @@ public class DMatrix {
    * @param j1 the index of last column.
    */
   public DMatrix get(int i0, int i1, int j0, int j1) {
+    checkI(i0,i1);
+    checkJ(j0,j1);
     int m = i1-i0+1;
     int n = j1-j0+1;
     DMatrix x = new DMatrix(m,n);
@@ -229,13 +231,14 @@ public class DMatrix {
    * @param c the array of column indices; null, for all columns.
    */
   public DMatrix get(int i0, int i1, int[] c) {
+    checkI(i0,i1);
     if (c==null) {
       return get(i0,i1,0,_n-1);
     } else {
       int m = i1-i0+1;
       int n = c.length;
       double[][] b = new double[m][n];
-      for (int i=i0; i<=i1; ++i1) {
+      for (int i=i0; i<=i1; ++i) {
         for (int j=0; j<n; ++j) {
           b[i-i0][j] = _a[i][c[j]];
         }
@@ -251,6 +254,7 @@ public class DMatrix {
    * @param j1 the index of the last column.
    */
   public DMatrix get(int[] r, int j0, int j1) {
+    checkJ(j0,j1);
     if (r==null) {
       return get(0,_m-1,j0,j1);
     } else {
@@ -268,7 +272,7 @@ public class DMatrix {
 
   /**
    * Gets the elements of this matrix packed by columns.
-   * @return the packed columns.
+   * @return the array of matrix elements packed by columns.
    */
   public double[] getPackedColumns() {
     double[] c = new double[_m*_n];
@@ -280,7 +284,7 @@ public class DMatrix {
 
   /**
    *Gets the elements of this matrix packed by rows.
-   * @return the packed rows.
+   * @return the array of matrix elements packed by rows.
    */
   public double[] getPackedRows() {
     double[] r = new double[_m*_n];
@@ -320,6 +324,8 @@ public class DMatrix {
    * @param x the matrix from which to copy elements.
    */
   public void set(int i0, int i1, int j0, int j1, DMatrix x) {
+    checkI(i0,i1);
+    checkJ(j0,j1);
     int m = i1-i0+1;
     int n = j1-j0+1;
     Check.argument(m==x._m,"i1-i0+1 equals number of rows in x");
@@ -394,13 +400,14 @@ public class DMatrix {
    * @param x the matrix from which to copy elements.
    */
   public void set(int i0, int i1, int[] c, DMatrix x) {
+    checkI(i0,i1);
     Check.argument(i1-i0+1==x._m,"i1-i0+1 equals number of rows in x");
     if (c==null) {
       set(i0,i1,0,_n-1,x);
     } else {
       int n = c.length;
       double[][] b = x._a;
-      for (int i=i0; i<=i1; ++i1) {
+      for (int i=i0; i<=i1; ++i) {
         for (int j=0; j<n; ++j) {
           _a[i][c[j]] = b[i-i0][j];
         }
@@ -416,7 +423,8 @@ public class DMatrix {
    * @param x the matrix from which to copy elements.
    */
   public void set(int[] r, int j0, int j1, DMatrix x) {
-    Check.argument(j1-j0+1==x._m,"j1-j0+1 equals number of columns in x");
+    checkJ(j0,j1);
+    Check.argument(j1-j0+1==x._n,"j1-j0+1 equals number of columns in x");
     if (r==null) {
       set(0,_m-1,j0,j1,x);
     } else {
@@ -432,7 +440,7 @@ public class DMatrix {
 
   /**
    * Sets the elements of this matrix from an array packed by columns.
-   * @param c the array packed by columns.
+   * @param c the array of matrix elements packed by columns.
    */
   public void setPackedColumns(double[] c) {
     for (int i=0; i<_m; ++i)
@@ -442,7 +450,7 @@ public class DMatrix {
 
   /**
    * Sets the elements of this matrix from an array packed by rows.
-   * @param r the array packed by rows.
+   * @param r the array of matrix elements packed by rows.
    */
   public void setPackedRows(double[] r) {
     for (int i=0; i<_m; ++i)
@@ -727,6 +735,73 @@ public class DMatrix {
     return x;
   }
 
+  public boolean equals(Object obj) {
+    if (this==obj)
+      return true;
+    if (obj==null || this.getClass()!=obj.getClass())
+      return false;
+    DMatrix that = (DMatrix)obj;
+    if (this._m!=that._m ||  this._n!=that._n)
+      return false;
+    double[][] a = this._a;
+    double[][] b = that._a;
+    for  (int i=0; i<_m; ++i) {
+      for  (int j=0; j<_n; ++j) {
+        if (a[i][j]!=b[i][j])
+          return false;
+      }
+    }
+    return true;
+  }
+
+  public int hashCode() {
+    int h = _m^_n;
+    for  (int i=0; i<_m; ++i) {
+      for  (int j=0; j<_n; ++j) {
+        long bits = Double.doubleToLongBits(_a[i][j]);
+        h ^= (int)(bits^(bits>>>32)); 
+      }
+    }
+    return h;
+  }
+
+  public String toString() {
+    String ls = System.getProperty("line.separator");
+    StringBuffer sb = new StringBuffer();
+    String[][] s = format(_a);
+    int max = maxlen(s);
+    String format = "%"+max+"s";
+    sb.append("[[");
+    int ncol = 77/(max+2);
+    if (ncol>=5)
+      ncol = (ncol/5)*5;
+    for (int i=0; i<_m; ++i) {
+      int nrow = 1+(_n-1)/ncol;
+      if (i>0)
+        sb.append(" [");
+      for (int irow=0,j=0; irow<nrow; ++irow) {
+        for (int icol=0; icol<ncol && j<_n; ++icol,++j) {
+          sb.append(String.format(format,s[i][j]));
+          if (j<_n-1)
+            sb.append(", ");
+        }
+        if (j<_n) {
+          sb.append(ls);
+          sb.append("  ");
+        } else { 
+          if (i<_m-1) {
+            sb.append("],");
+            sb.append(ls);
+          } else {
+            sb.append("]]");
+            sb.append(ls);
+          }
+        }
+      }
+    }
+    return sb.toString();
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // package
 
@@ -750,4 +825,99 @@ public class DMatrix {
   private int _m; // number of rows
   private int _n; // number of columns
   private double[][] _a; // array[_m][_n] of matrix elements
+
+  private void checkI(int i) {
+    if (i<0 || i>=_m)
+      Check.argument(0<=i && i<_m,"row index i="+i+" is in bounds");
+  }
+
+  private void checkJ(int j) {
+    if (j<0 || j>=_n)
+      Check.argument(0<=j && j<_n,"column index j="+j+" is in bounds");
+  }
+
+  private void checkI(int i0, int i1) {
+    checkI(i0);  checkI(i1);  Check.argument(i0<=i1,"i0<=i1");
+  }
+
+  private void checkJ(int j0, int j1) {
+    checkJ(j0);  checkJ(j1);  Check.argument(j0<=j1,"j0<=j1");
+  }
+
+  // Used in implementation of toString() above.
+  private static String[][] format(double[][] d) {
+    int m = d.length;
+    int n = d[0].length;
+    int pg = 6;
+    String fg = "% ."+pg+"g";
+    int pemax = -1;
+    int pfmax = -1;
+    for (int i=0; i<m; ++i) {
+      for (int j=0; j<n; ++j) {
+        String s = String.format(fg,d[i][j]);
+        s = clean(s);
+        int ls = s.length();
+        if (s.contains("e")) {
+          int pe = (ls>7)?ls-7:0;
+          if (pemax<pe)
+            pemax = pe;
+        } else {
+          int ip = s.indexOf('.');
+          int pf = (ip>=0)?ls-1-ip:0;
+          if (pfmax<pf)
+            pfmax = pf;
+        }
+      }
+    }
+    String[][] s = new String[m][n];
+    String f;
+    if (pemax>=0) {
+      if (pfmax>pg-1)
+        pfmax = pg-1;
+      int pe = (pemax>pfmax)?pemax:pfmax;
+      f = "% ."+pe+"e";
+    } else {
+      int pf = pfmax;
+      f = "% ."+pf+"f";
+    }
+    for (int i=0; i<m; ++i) {
+      for (int j=0; j<n; ++j) {
+        s[i][j] = String.format(f,d[i][j]);
+      }
+    }
+    return s;
+  }
+  private static String clean(String s) {
+    int len = s.length();
+    int iend = s.indexOf('e');
+    if (iend<0)
+      iend = s.indexOf('E');
+    if (iend<0)
+      iend = len;
+    int ibeg = iend;
+    if (s.indexOf('.')>0) {
+      while (ibeg>0 && s.charAt(ibeg-1)=='0')
+        --ibeg;
+      if (ibeg>0 && s.charAt(ibeg-1)=='.')
+        --ibeg;
+    }
+    if (ibeg<iend) {
+      String sb = s.substring(0,ibeg);
+      s = (iend<len)?sb+s.substring(iend,len):sb;
+    }
+    return s;
+  }
+  private static int maxlen(String[][] s) {
+    int max = 0;
+    int m = s.length;
+    int n = s[0].length;
+    for (int i=0; i<m; ++i) {
+      for (int j=0; j<n; ++j) {
+        int len = s[i][j].length();
+        if (max<len) 
+          max = len;
+      }
+    }
+    return max;
+  }
 }
