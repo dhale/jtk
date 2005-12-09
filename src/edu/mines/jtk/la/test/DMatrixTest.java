@@ -106,7 +106,7 @@ public class DMatrixTest extends TestCase {
     assertEqualExact(r,s);
   }
 
-  public void testMath() {
+  public void testOther() {
     int m = 3;
     int n = 4;
 
@@ -132,25 +132,26 @@ public class DMatrixTest extends TestCase {
     assertTrue(t.isSymmetric());
 
     n = t.getN();
+    double[][] a = t.getArray();
     double trace = 0.0;
     for (int i=0; i<n; ++i)
-      trace += t.get(i,i);
+      trace += a[i][i];
     assertTrue(trace==t.trace());
   }
 
 
   ///////////////////////////////////////////////////////////////////////////
-  // private
+  // package
 
-  private static void assertEqualExact(DMatrix a, DMatrix b) {
+  static void assertEqualExact(DMatrix a, DMatrix b) {
     assertEqual(a,b,false);
   }
 
-  private static void assertEqualFuzzy(DMatrix a, DMatrix b) {
+  static void assertEqualFuzzy(DMatrix a, DMatrix b) {
     assertEqual(a,b,true);
   }
 
-  private static void assertEqual(DMatrix a, DMatrix b, boolean fuzzy) {
+  static void assertEqual(DMatrix a, DMatrix b, boolean fuzzy) {
     assertEquals(a.getM(),b.getM());
     assertEquals(a.getN(),b.getN());
     int m = a.getM();

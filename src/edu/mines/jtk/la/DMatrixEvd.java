@@ -35,7 +35,6 @@ public class DMatrixEvd {
   /** 
    * Constructs an eigenvalue decomposition for the specified square matrix.
    * @param a the square matrix
-   * @return the decomposition.
    */
   public DMatrixEvd(DMatrix a) {
     Check.argument(a.isSquare(),"matrix a is square");

@@ -18,8 +18,8 @@ public class Suite extends TestSuite {
   public static Test suite() {
     TestSuite suite = new TestSuite();
 
-    //suite.addTestSuite(DMatrixTest.class);
-    //suite.addTestSuite(DMatrixEvdTest.class);
+    suite.addTestSuite(DMatrixTest.class);
+    suite.addTestSuite(DMatrixEvdTest.class);
 
     return suite;
   }
