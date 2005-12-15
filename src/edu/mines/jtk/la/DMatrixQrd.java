@@ -11,15 +11,15 @@ import edu.mines.jtk.util.Array;
 import static java.lang.Math.*;
 
 /**
- * QR decomposition of an m-by-n matrix A. If m&gt;=n, then the QR
- * decomposition is A = Q*R, where Q is an m-by-n orthogonal matrix,
- * and R is an n-by-n upper-triangular matrix.
+ * QR decomposition of a matrix A. 
+ * For an m-by-n matrix A, with m&gt;=n, the QR decomposition is A = Q*R, 
+ * where Q is an m-by-n orthogonal matrix, and R is an n-by-n upper-triangular 
+ * matrix.
  * <p>
- * The QR decomposition always exists, even if the matrix A does not
- * have full rank. Therefore, the constructor never fails. However, the 
- * primary use of the QR decomposition is for least-squares solutions 
- * of non-square systems of linear equations, and such solutions are 
- * feasible only if A has full rank.
+ * The QR decomposition is constructed even if the matrix A is rank
+ * deficient. However, the primary use of the QR decomposition is for 
+ * least-squares solutions of non-square systems of linear equations, 
+ * and such solutions are feasible only if the matrix A is of full rank.
  * <p>
  * This class was adapted from the package Jama, which was developed by 
  * Joe Hicklin, Cleve Moler, and Peter Webb of The MathWorks, Inc., and by
@@ -31,10 +31,13 @@ import static java.lang.Math.*;
 public class DMatrixQrd {
 
   /** 
-   * Constructs an eigenvalue decomposition for the specified square matrix.
-   * @param a the square matrix
+   * Constructs an QR decomposition for the specified matrix A.
+   * The matrix A must not have more columns than rows. 
+   * If A is m-by-n, then, m&gt;=n is required.
+   * @param a the matrix A.
    */
   public DMatrixQrd(DMatrix a) {
+    Check.argument(a.getM()>=a.getN(),"m >= n");
     int m = _m = a.getM();
     int n = _n = a.getN();
     double[][] qr = _qr = a.get();
@@ -72,10 +75,10 @@ public class DMatrixQrd {
   }
 
   /**
-   * Determines whether the matrix A = Q*R has full rank?
+   * Determines whether the matrix A = Q*R is of full rank.
    * @return true, if full rank; false, otherwise.
    */
-  public boolean hasFullRank() {
+  public boolean isFullRank() {
     for (int j=0; j<_n; ++j) {
       if (_rdiag[j]==0.0)
         return false;
@@ -84,49 +87,11 @@ public class DMatrixQrd {
   }
 
   /** 
-   * Gets the Householder vectors. These vectors define the reflections, the 
-   * Householder transformations, used to construct this QR decomposition.
-   * @return the lower trapezoidal matrix whose columns are the vectors.
-  */
-  public DMatrix getH() {
-    DMatrix x = new DMatrix(_m,_n);
-    double[][] h = x.getArray();
-    for (int i=0; i<_m; ++i) {
-      for (int j=0; j<_n; ++j) {
-        h[i][j] = (i>=j)?_qr[i][j]:0.0;
-      }
-    }
-    return x;
-   }
-
-  /** 
-   * Gets the upper triangular matrix factor R.
-   * @return the matrix factor R.
-   */
-  public DMatrix getR() {
-    DMatrix x = new DMatrix(_n,_n);
-    double[][] r = x.getArray();
-    for (int i=0; i<_n; ++i) {
-      for (int j=0; j<_n; ++j) {
-        if (i<j) {
-          r[i][j] = _qr[i][j];
-        } else if (i==j) {
-          r[i][j] = _rdiag[i];
-        } else {
-          r[i][j] = 0.0;
-        }
-      }
-    }
-    return x;
-  }
-
-  /** 
-   * Gets the matrix factor Q.
-   * @return the matrix factor Q.
+   * Gets the m-by-n matrix factor Q.
+   * @return the m-by-n matrix factor Q.
    */
   public DMatrix getQ() {
-    DMatrix x = new DMatrix(_m,_n);
-    double[][] q = x.getArray();
+    double[][] q = new double[_m][_n];
     for (int k=_n-1; k>=0; --k) {
       for (int i=0; i<_m; ++i) {
         q[i][k] = 0.0;
@@ -145,21 +110,36 @@ public class DMatrixQrd {
         }
       }
     }
-    return x;
+    return new DMatrix(_m,_n,q);
+  }
+
+  /** 
+   * Gets the n-by-n upper triangular matrix factor R.
+   * @return the n-by-n matrix factor R.
+   */
+  public DMatrix getR() {
+    double[][] r = new double[_n][_n];
+    for (int i=0; i<_n; ++i) {
+      r[i][i] = _rdiag[i];
+      for (int j=i+1; j<_n; ++j) {
+        r[i][j] = _qr[i][j];
+      }
+    }
+    return new DMatrix(_n,_n,r);
   }
 
   /**
    * Returns the least-squares solution X of the system A*X = B.
-   * This solution is possible only if the matrix A has full rank.
+   * This solution exists only if the matrix A is of full rank.
    * @param b a matrix of right-hand-side vectors. This matrix must
-   *  have the same number (m) of rows as the matrix A, and may have
+   *  have the same number (m) of rows as the matrix A, but may have
    *  any number of columns.
    * @return the matrix X that minimizes the two-norm of A*X-B.
-   * @exception IllegalStateException if this matrix is rank-deficient.
+   * @exception IllegalStateException if A is rank-deficient.
    */
   public DMatrix solve(DMatrix b) {
     Check.argument(b.getM()==_m,"A and B have the same number of rows");
-    Check.state(this.hasFullRank(),"this QR decomposition has full rank");
+    Check.state(this.isFullRank(),"A is of full rank");
       
     // Copy the right hand side.
     int nx = b.getN();
@@ -189,7 +169,7 @@ public class DMatrixQrd {
         }
       }
     }
-    return new DMatrix(_n,nx,x);
+    return new DMatrix(_m,nx,x).get(0,_n-1,null);
   }
 
   ///////////////////////////////////////////////////////////////////////////
