@@ -8,6 +8,7 @@ package edu.mines.jtk.mosaic.test;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import edu.mines.jtk.gui.*;
@@ -61,5 +62,10 @@ public class MosaicTest {
     frame.add(mosaic,BorderLayout.CENTER);
     frame.pack();
     frame.setVisible(true);
+    try {
+      mosaic.paintToPng(800,3,"junk.png");
+    } catch (IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
   }
 }

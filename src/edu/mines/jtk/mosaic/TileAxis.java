@@ -184,7 +184,7 @@ public class TileAxis extends JPanel {
     int h = getHeight();
 
     // Font dimensions.
-    Font font = getFont();
+    Font font = g.getFont();
     FontMetrics fm = g.getFontMetrics();
     FontRenderContext frc = g2d.getFontRenderContext();
     LineMetrics lm = font.getLineMetrics("0.123456789",frc);
