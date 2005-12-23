@@ -22,6 +22,15 @@ public class DMatrixQrdTest extends TestCase {
     junit.textui.TestRunner.run(suite);
   }
 
+  public void testRankDeficient() {
+    DMatrix a = new DMatrix(new double[][]{
+      {0.0,  0.0},
+      {3.0,  4.0},
+    });
+    DMatrixQrd qrd = new DMatrixQrd(a);
+    assertFalse(qrd.isFullRank());
+  }
+
   public void testSimple() {
     test(new DMatrix(new double[][]{
       {0.0,  2.0},

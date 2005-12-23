@@ -20,6 +20,7 @@ public class Suite extends TestSuite {
 
     suite.addTestSuite(DMatrixTest.class);
     suite.addTestSuite(DMatrixEvdTest.class);
+    suite.addTestSuite(DMatrixQrdTest.class);
 
     return suite;
   }
