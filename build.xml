@@ -12,11 +12,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   </description>
 
   <!-- Project directories -->
-  <property name="bin" value="bin"/>
-  <property name="jar" value="jar"/>
-  <property name="lib" value="lib"/>
-  <property name="src" value="src"/>
-  <property name="build" value="build"/>
+  <property name="bin" value="${basedir}/bin"/>
+  <property name="jar" value="${basedir}/jar"/>
+  <property name="lib" value="${basedir}/lib"/>
+  <property name="src" value="${basedir}/src"/>
+  <property name="build" value="${basedir}/build"/>
   <property name="build.cls" value="${build}/cls"/>
   <property name="build.doc" value="${build}/doc"/>
   <property name="build.jar" value="${build}/jar"/>
@@ -25,7 +25,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <property name="build.src" value="${build}/src"/>
   <property name="obj.jtk" value="${build.obj}/edu/mines/jtk"/>
   <property name="src.jtk" value="${src}/edu/mines/jtk"/>
-  <property name="dist" value="dist"/>
+  <property name="dist" value="${basedir}/dist"/>
 
   <!-- Other global settings -->
   <property name="title" value="MinesJTK"/>
@@ -121,6 +121,21 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <libarg arg="-ljawt"/>
     </jnicpp>
     <jnicpp 
+        srcdir="${src.jtk}/lapack" 
+        objdir="${obj.jtk}/lapack"
+        jnidir="${build.lib}" 
+        jniname="edu_mines_jtk_lapack">
+      <incarg arg="-I${jdk.include}"/>
+      <incarg arg="-I${jdk.include}/linux"/>
+      <libarg arg="-L${lib}/linux/x86"/>
+      <libarg arg="-llapack"/>
+      <libarg arg="-lcblaswr"/>
+      <libarg arg="-lcblas"/>
+      <libarg arg="-latlas"/>
+      <libarg arg="-lI77"/>
+      <libarg arg="-lF77"/>
+    </jnicpp>
+    <jnicpp 
         srcdir="${src.jtk}/opengl" 
         objdir="${obj.jtk}/opengl"
         jnidir="${build.lib}" 
@@ -138,25 +153,40 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <!-- Build JNI libraries for Windows (using MinGW) -->
   <target name="jni-windows" if="windows">
     <property name="jdk.home" value="${env.JDK_HOME}"/>
-    <property name="jdk.include" value="${jdk.home}/include"/>
+    <property name="jdk.include" value="${jdk.home}\include"/>
     <property name="jdk.lib" value="${jdk.home}\lib"/>
     <jnicpp 
-        srcdir="${src.jtk}/bench" 
-        objdir="${obj.jtk}/bench"
+        srcdir="${src.jtk}\bench" 
+        objdir="${obj.jtk}\bench"
         jnidir="${build.lib}" 
         jniname="edu_mines_jtk_bench">
       <incarg arg="-I${jdk.include}"/>
-      <incarg arg="-I${jdk.include}/win32"/>
+      <incarg arg="-I${jdk.include}\win32"/>
       <libarg arg="-lopengl32"/>
       <libarg arg="${jdk.lib}\jawt.lib"/>
     </jnicpp>
     <jnicpp 
-        srcdir="${src.jtk}/opengl" 
-        objdir="${obj.jtk}/opengl"
+        srcdir="${src.jtk}\lapack" 
+        objdir="${obj.jtk}\lapack"
+        jnidir="${build.lib}" 
+        jniname="edu_mines_jtk_lapack">
+      <incarg arg="-I${jdk.include}"/>
+      <incarg arg="-I${jdk.include}\win32"/>
+      <libarg arg="-L${lib}\windows\x86"/>
+      <libarg arg="-llapack"/>
+      <libarg arg="-lcblaswr"/>
+      <libarg arg="-lcblas"/>
+      <libarg arg="-latlas"/>
+      <libarg arg="-lI77"/>
+      <libarg arg="-lF77"/>
+    </jnicpp>
+    <jnicpp 
+        srcdir="${src.jtk}\opengl" 
+        objdir="${obj.jtk}\opengl"
         jnidir="${build.lib}" 
         jniname="edu_mines_jtk_opengl">
       <incarg arg="-I${jdk.include}"/>
-      <incarg arg="-I${jdk.include}/win32"/>
+      <incarg arg="-I${jdk.include}\win32"/>
       <libarg arg="-lopengl32"/>
       <libarg arg="-lglu32"/>
       <libarg arg="-lgdi32"/>
