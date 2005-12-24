@@ -30,8 +30,7 @@ public class MosaicTest {
       Mosaic.AxesPlacement.BOTTOM,
       Mosaic.AxesPlacement.RIGHT
     );
-    Mosaic.BorderStyle borderStyle = Mosaic.BorderStyle.FLAT;
-    Mosaic mosaic = new Mosaic(nrow,ncol,axesPlacement,borderStyle);
+    Mosaic mosaic = new Mosaic(nrow,ncol,axesPlacement);
     mosaic.setBackground(Color.WHITE);
     mosaic.setFont(new Font("SansSerif",Font.PLAIN,12));
     mosaic.setWidthMinimum(1,200);
@@ -63,7 +62,7 @@ public class MosaicTest {
     frame.pack();
     frame.setVisible(true);
     try {
-      mosaic.paintToPng(800,3,"junk.png");
+      mosaic.paintToPng(300,6,"junk.png");
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }

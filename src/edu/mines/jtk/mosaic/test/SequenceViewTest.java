@@ -31,8 +31,7 @@ public class SequenceViewTest {
       Mosaic.AxesPlacement.LEFT,
       Mosaic.AxesPlacement.BOTTOM
     );
-    Mosaic.BorderStyle borderStyle = Mosaic.BorderStyle.FLAT;
-    Mosaic mosaic = new Mosaic(nrow,ncol,axesPlacement,borderStyle);
+    Mosaic mosaic = new Mosaic(nrow,ncol,axesPlacement);
     mosaic.setBackground(Color.WHITE);
     mosaic.setFont(new Font("SansSerif",Font.PLAIN,12));
     mosaic.setPreferredSize(new Dimension(950,400));

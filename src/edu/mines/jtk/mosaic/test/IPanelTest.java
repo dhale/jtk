@@ -27,17 +27,15 @@ public class IPanelTest {
     Title(String text) {
       super();
       _text = text;
+      Font font = getFont();
+      setFont(font.deriveFont(2.0f*font.getSize()));
     }
-    public void paintToRect(Graphics2D g2d, Rectangle rg) {
-      g2d = (Graphics2D)g2d.create();
+    public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
+      g2d = createGraphics(g2d,x,y,w,h);
       g2d.setRenderingHint(
         RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
       Font font = g2d.getFont();
-      float fontSize = font.getSize();
-      fontSize *= 2.0f;
-      font = font.deriveFont(fontSize);
-      g2d.setFont(font);
       FontMetrics fm = g2d.getFontMetrics();
       FontRenderContext frc = g2d.getFontRenderContext();
       LineMetrics lm = font.getLineMetrics("GgYy",frc);
@@ -45,18 +43,15 @@ public class IPanelTest {
       int fa = round(lm.getAscent());
       int fd = round(lm.getDescent());
       int fl = round(lm.getLeading());
-      int w = rg.width;
-      int h = rg.height;
       int wt = fm.stringWidth(_text);
       int xt = max(0,min(w-wt,(w-wt)/2));
       int yt = h/2;
       g2d.drawString(_text,xt,yt);
+      g2d.dispose();
     }
     protected void paintComponent(Graphics g) {
       super.paintComponent(g);
-      Graphics2D g2d = (Graphics2D)g;
-      Rectangle rg = new Rectangle(0,0,getWidth(),getHeight());
-      paintToRect(g2d,rg);
+      paintToRect((Graphics2D)g,0,0,getWidth(),getHeight());
     }
     private String _text;
   }
@@ -66,21 +61,21 @@ public class IPanelTest {
       super();
       _cycles = cycles;
     }
-    public void paintToRect(Graphics2D g2d, Rectangle rg) {
-      g2d = (Graphics2D)g2d.create();
-      g2d.setRenderingHint(
-        RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
+    public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
+      g2d = createGraphics(g2d,x,y,w,h);
+      //g2d.setRenderingHint(
+      //  RenderingHints.KEY_ANTIALIASING,
+      //  RenderingHints.VALUE_ANTIALIAS_ON);
       double x1u = 0.0;
       double y1u = 1.0;
       double x2u = 2.0*PI*_cycles;
       double y2u = -1.0;
       int x1d = 0;
       int y1d = 0;
-      int x2d = rg.width-1;
-      int y2d = rg.height-1;
+      int x2d = w-1;
+      int y2d = h-1;
       Transcaler ts = new Transcaler(x1u,y1u,x2u,y2u,x1d,y1d,x2d,y2d);
-      int nx = 1000;
+      int nx = 10000;
       double dx = (x2u-x1u)/(nx-1);
       double fx = 0.0;
       int x1 = ts.x(fx);
@@ -93,12 +88,11 @@ public class IPanelTest {
         x1 = x2;
         y1 = y2;
       }
+      g2d.dispose();
     }
     protected void paintComponent(Graphics g) {
       super.paintComponent(g);
-      Graphics2D g2d = (Graphics2D)g;
-      Rectangle rg = new Rectangle(0,0,getWidth(),getHeight());
-      paintToRect(g2d,rg);
+      paintToRect((Graphics2D)g,0,0,getWidth(),getHeight());
     }
     private double _cycles;
   }
@@ -106,10 +100,8 @@ public class IPanelTest {
   public static void main(String[] args) {
     IPanel mosaic = new IPanel();
     mosaic.setLayout(new GridLayout(2,1));
-    Title title = new Title("A Sine Wave");
-    Wave wave = new Wave(5.0);
-    mosaic.add(title);
-    mosaic.add(wave);
+    mosaic.add(new Title("A Sine Wave"));
+    mosaic.add(new Wave(5.0));
     mosaic.setPreferredSize(new Dimension(800,500));
 
     JFrame frame = new JFrame();

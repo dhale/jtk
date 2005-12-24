@@ -43,7 +43,6 @@ public class SpectrumPlot extends JFrame {
     AxesPlacement.LEFT,
     AxesPlacement.BOTTOM
   );
-  private static BorderStyle BORDER_STYLE = BorderStyle.FLAT;
   private static Font FONT = new Font("SansSerif",Font.PLAIN,12);
   private static Color BACKGROUND_COLOR = Color.WHITE;
 
@@ -70,7 +69,7 @@ public class SpectrumPlot extends JFrame {
     Real1 p = ap[1];
 
     // Mosaic for sampled sequence x(t).
-    _mosaicX = new Mosaic(1,1,AXES_PLACEMENT,BORDER_STYLE);
+    _mosaicX = new Mosaic(1,1,AXES_PLACEMENT);
     _mosaicX.setBackground(BACKGROUND_COLOR);
     _mosaicX.setFont(FONT);
     _mosaicX.setPreferredSize(new Dimension(WIDTH,1*HEIGHT/3));
@@ -84,7 +83,7 @@ public class SpectrumPlot extends JFrame {
     axisXT.setFormat("%1.6G");
     
     // Mosaic for amplitude A(f) and phase P(f).
-    _mosaicS = new Mosaic(2,1,AXES_PLACEMENT,BORDER_STYLE);
+    _mosaicS = new Mosaic(2,1,AXES_PLACEMENT);
     _mosaicS.setBackground(BACKGROUND_COLOR);
     _mosaicS.setFont(FONT);
     _mosaicS.setPreferredSize(new Dimension(WIDTH,2*HEIGHT/3));
@@ -93,6 +92,7 @@ public class SpectrumPlot extends JFrame {
     MarkLineView av = makeMarkLineView(a.getSampling(),a.getValues());
     MarkLineView pv = makeMarkLineView(p.getSampling(),p.getValues());
     tileA.addTiledView(av);
+    //tileA.setBestVerticalProjector(new Projector(1.1,0.0));
     tileP.addTiledView(pv);
     tileP.setBestVerticalProjector(new Projector(0.5,-0.5));
     TileAxis axisSA = _mosaicS.getTileAxisLeft(0);

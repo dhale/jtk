@@ -38,7 +38,7 @@ import javax.swing.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.27
  */
-public class Tile extends JPanel {
+public class Tile extends IPanel {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -223,31 +223,49 @@ public class Tile extends JPanel {
     _ts.setMapping(width,height);
   }
 
+  public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
+    g2d = createGraphics(g2d,x,y,w,h);
+
+    // Save transcaler for this panel.
+    Transcaler tsPanel = _ts;
+
+    // Set transcaler for the graphics rectangle.
+    _ts = getTranscaler(w,h);
+
+    // Paint zero lines.
+    if (_zeroLinePaintX) {
+      int x0 = _ts.x(_hp.u(0.0));
+      if (_zeroLineColorX!=null)
+        g2d.setColor(_zeroLineColorX);
+      g2d.drawLine(x0,0,x0,h-1);
+    }
+    if (_zeroLinePaintY) {
+      int y0 = _ts.y(_vp.u(0.0));
+      if (_zeroLineColorY!=null)
+        g2d.setColor(_zeroLineColorY);
+      g2d.drawLine(0,y0,w-1,y0);
+    }
+    g2d.setColor(getForeground());
+
+    // Paint tiles.
+    for (TiledView tv : _tvs) {
+      Graphics2D gtv = (Graphics2D)g2d.create();
+      tv.paint(gtv);
+      gtv.dispose();
+    }
+
+    // Restore transcaler for this panel.
+    _ts = tsPanel;
+
+    g2d.dispose();
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
 
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
-    if (_zeroLinePaintX) {
-      int x = _ts.x(_hp.u(0.0));
-      int y = getHeight()-1;
-      if (_zeroLineColorX!=null)
-        g.setColor(_zeroLineColorX);
-      g.drawLine(x,0,x,y);
-    }
-    if (_zeroLinePaintY) {
-      int x = getWidth()-1;
-      int y = _ts.y(_vp.u(0.0));
-      if (_zeroLineColorY!=null)
-        g.setColor(_zeroLineColorY);
-      g.drawLine(0,y,x,y);
-    }
-    g.setColor(getForeground());
-    for (TiledView tv : _tvs) {
-      Graphics2D g2d = (Graphics2D)g.create();
-      tv.paint(g2d);
-      g2d.dispose();
-    }
+    paintToRect((Graphics2D)g,0,0,getWidth(),getHeight());
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -323,19 +341,12 @@ public class Tile extends JPanel {
   }
 
   /**
-   * Called by this tile's mosaic when painting to an image.
+   * Called by tile axes adjacent to this tile.
+   * Also used internally, for consistency.
    */
-  void setResolution(double resolution) {
-    _ts.setResolution(resolution);
-    int wtile = getWidth();
-    int htile = getHeight();
-    if (resolution==1.0) {
-      _ts.setMapping(wtile,htile);
-    } else {
-      int wimage = (int)(resolution*(wtile-1)+1.5);
-      int himage = (int)(resolution*(htile-1)+1.5);
-      _ts.setMapping(wimage,himage);
-    }
+  Transcaler getTranscaler(int w, int h) {
+    return new Transcaler(
+      _vr.x,_vr.y,_vr.x+_vr.width,_vr.y+_vr.height,0,0,w-1,h-1);
   }
 
   ///////////////////////////////////////////////////////////////////////////

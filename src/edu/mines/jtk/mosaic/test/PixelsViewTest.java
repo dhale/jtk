@@ -29,11 +29,10 @@ public class PixelsViewTest {
       Mosaic.AxesPlacement.LEFT,
       Mosaic.AxesPlacement.BOTTOM
     );
-    Mosaic.BorderStyle borderStyle = Mosaic.BorderStyle.FLAT;
-    Mosaic mosaic = new Mosaic(1,2,axesPlacement,borderStyle);
+    Mosaic mosaic = new Mosaic(1,2,axesPlacement);
     mosaic.setBackground(Color.WHITE);
     mosaic.setFont(new Font("SansSerif",Font.PLAIN,12));
-    mosaic.setPreferredSize(new Dimension(950,400));
+    mosaic.setPreferredSize(new Dimension(600,300));
 
     int n1 = 11;
     int n2 = 11;
@@ -81,5 +80,10 @@ public class PixelsViewTest {
     frame.add(mosaic,BorderLayout.CENTER);
     frame.pack();
     frame.setVisible(true);
+    try {
+      mosaic.paintToPng(300,6,"junk.png");
+    } catch (java.io.IOException ioe) {
+      throw new RuntimeException(ioe);
+    }
   }
 }

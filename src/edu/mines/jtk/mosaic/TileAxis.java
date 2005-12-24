@@ -24,7 +24,7 @@ import edu.mines.jtk.util.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.27
  */
-public class TileAxis extends JPanel {
+public class TileAxis extends IPanel {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -160,12 +160,8 @@ public class TileAxis extends JPanel {
       _mosaic.validate();
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  // protected
-
-  protected void paintComponent(Graphics g) {
-    super.paintComponent(g);
-    Graphics2D g2d = (Graphics2D)g;
+  public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
+    g2d = createGraphics(g2d,x,y,w,h);
     g2d.setRenderingHint(
       RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);
@@ -175,17 +171,15 @@ public class TileAxis extends JPanel {
     if (tile==null)
       return;
 
-    // Projector and transcaler of adjacent tile.
-    Projector p = getProjector();
-    Transcaler t = getTranscaler();
-
-    // Axis size.
-    int w = getWidth();
-    int h = getHeight();
+    // Projector and transcaler from adjacent tile.
+    Projector p = (isHorizontal()) ?
+      tile.getHorizontalProjector() :
+      tile.getVerticalProjector();
+    Transcaler t = tile.getTranscaler(w,h);
 
     // Font dimensions.
-    Font font = g.getFont();
-    FontMetrics fm = g.getFontMetrics();
+    Font font = g2d.getFont();
+    FontMetrics fm = g2d.getFontMetrics();
     FontRenderContext frc = g2d.getFontRenderContext();
     LineMetrics lm = font.getLineMetrics("0.123456789",frc);
     int fh = round(lm.getHeight());
@@ -245,14 +239,14 @@ public class TileAxis extends JPanel {
         double vtic = fticMinor+itic*dticMinor;
         double utic = p.u(vtic);
         if (isHorizontal) {
-          int x = t.x(utic);
+          x = t.x(utic);
           if (isTop) {
             g2d.drawLine(x,h-1,x,h-1-tl/2);
           } else {
             g2d.drawLine(x,0,x,tl/2);
           }
         } else {
-          int y = t.y(utic);
+          y = t.y(utic);
           if (isLeft) {
             g2d.drawLine(w-1,y,w-1-tl/2,y);
           } else {
@@ -272,8 +266,7 @@ public class TileAxis extends JPanel {
         vtic = 0.0;
       String stic = formatTic(vtic);
       if (isHorizontal) {
-        int x = t.x(utic);
-        int y;
+        x = t.x(utic);
         if (isTop) {
           y = h-1;
           g2d.drawLine(x,y,x,y-tl);
@@ -288,8 +281,7 @@ public class TileAxis extends JPanel {
         int ys = y;
         g2d.drawString(stic,xs,ys);
       } else {
-        int x;
-        int y = t.y(utic);
+        y = t.y(utic);
         if (isLeft) {
           x = w-1;
           g2d.drawLine(x,y,x-tl,y);
@@ -328,6 +320,16 @@ public class TileAxis extends JPanel {
         g2d.translate(-xl,-yl);
       }
     }
+
+    g2d.dispose();
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // protected
+
+  protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    paintToRect((Graphics2D)g,0,0,getWidth(),getHeight());
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -414,15 +416,5 @@ public class TileAxis extends JPanel {
       s = (iend<len)?sb+s.substring(iend,len):sb;
     }
     return s;
-  }
-  
-  private Projector getProjector() {
-    return (isHorizontal()) ?
-      getTile().getHorizontalProjector() :
-      getTile().getVerticalProjector();
-  }
-  
-  private Transcaler getTranscaler() {
-    return getTile().getTranscaler();
   }
 }

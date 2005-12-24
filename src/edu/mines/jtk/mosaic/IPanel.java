@@ -17,12 +17,101 @@ import javax.imageio.stream.*;
 import javax.swing.*;
 
 /**
- * A panel that can paint itself to fit an image.
+ * A panel that can paint itself to fit an image. 
+ * Some components in this package, such as mosaics, tiles, and tile axes,
+ * must be able to render themselves to images as well as on screen. For
+ * various reasons, those images often have resolution that is higher 
+ * than that of a display screen. Simply scaling an on-screen rendering
+ * does not exploit this higher resolution, because screen coordinates 
+ * are typically specified as integers. Rounding to the nearest integer
+ * screen coordinates and then scaling to a high resolution image yields
+ * visual artifacts, such as curves that appear jagged in the image.
+ * <p>
+ * Classes that extend this base class work differently. They paint
+ * themselves to fit any specified rectangle of a specified graphics 
+ * context. When painting to a display screen, that graphics rectangle 
+ * is simply the panel's rectangle, in screen coordinates. However, when 
+ * painting to an image, the dimensions of that rectangle may be much 
+ * larger, corresponding to the higher resolution of the image. When
+ * painting, these panels round coordinates to the nearest pixel of that 
+ * graphics rectangle, not the panel's on-screen rectangle. In this way, 
+ * panels can paint themselves with any desired resolution.
+ * <p>
+ * One complication is font size. Another is line width. Such properties
+ * are typically specified in points, which are roughly equivalant to 
+ * on-screen pixels. Therefore, when drawing to a high-resolution image, 
+ * font sizes and line widths must be increased. This base class provides 
+ * methods that panels in this package use to properly scale font sizes, 
+ * line widths, and other resolution-dependent properties.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.12.19
+ * @version 2005.12.21
  */
 public class IPanel extends JPanel {
   private static final long serialVersionUID = 1L;
+
+  /**
+   * Paints this panel to a specified rectangle of a graphics context.
+   * This implementation simply paints any IPanel children of this panel. 
+   * It ignores and does not draw any children that are not IPanels.
+   * <p>
+   * Classes that extend this base class typically override this method
+   * to draw something besides children of this panel. When appropriate,
+   * those extensions may also call this method.
+   * @param g2d the graphics context.
+   * @param x the x-coordinate of the graphics rectangle.
+   * @param y the y-coordinate of the graphics rectangle.
+   * @param w the width of the graphics rectangle.
+   * @param h the height of the graphics rectangle.
+   */
+  public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
+    g2d = createGraphics(g2d,x,y,w,h);
+
+    // Paint any IPanel children.
+    double ws = (double)w/(double)getWidth();
+    double hs = (double)h/(double)getHeight();
+    int nc = getComponentCount();
+    for (int ic=0; ic<nc; ++ic) {
+      Component c = getComponent(ic);
+      int xc = c.getX();
+      int yc = c.getY();
+      int wc = c.getWidth();
+      int hc = c.getHeight();
+      xc = (int)(xc*ws);
+      yc = (int)(yc*hs);
+      wc = (int)(wc*ws);
+      hc = (int)(hc*hs);
+      if (c instanceof IPanel) {
+        IPanel ip = (IPanel)c;
+        ip.paintToRect(g2d,xc,yc,wc,hc);
+      }
+    }
+
+    g2d.dispose();
+  }
+
+  /**
+   * Paints this panel to fit the specified image.
+   * @param image the image.
+   */
+  public void paintToImage(BufferedImage image) {
+    Graphics2D g2d = image.createGraphics();
+
+    // Set panel properties.
+    g2d.setColor(getBackground());
+    g2d.fillRect(0,0,image.getWidth(),image.getHeight());
+    g2d.setColor(getForeground());
+    g2d.setFont(getFont());
+
+    // Turn on anti-aliasing.
+    g2d.setRenderingHint(
+      RenderingHints.KEY_ANTIALIASING,
+      RenderingHints.VALUE_ANTIALIAS_ON);
+
+    // Paint this panel to fit the image.
+    paintToRect(g2d,0,0,image.getWidth(),image.getHeight());
+
+    g2d.dispose();
+  }
 
   /**
    * Paints this panel to fit a new image with specified width in pixels.
@@ -35,65 +124,13 @@ public class IPanel extends JPanel {
     int wpanel = getWidth();
     int hpanel = getHeight();
     double scale = (double)width/(double)wpanel;
-    int wimage = (int)(scale*(wpanel-1)+1.5);
-    int himage = (int)(scale*(hpanel-1)+1.5);
+    System.out.println("scale="+scale);
+    int wimage = (int)(scale*wpanel+0.5);
+    int himage = (int)(scale*hpanel+0.5);
     int type = BufferedImage.TYPE_INT_RGB;
     BufferedImage image = new BufferedImage(wimage,himage,type);
     paintToImage(image);
     return image;
-  }
-
-  /**
-   * Paints this panel to fit the specified image.
-   * @param image the image.
-   */
-  public void paintToImage(BufferedImage image) {
-    Rectangle rp = new Rectangle(0,0,getWidth(),getHeight());
-    paintToImage(rp,image);
-  }
-
-  /**
-   * Paints the specified rectangle of this panel to fit the specified image.
-   * @param rp the rectangle of this panel to be painted.
-   * @param image the image.
-   */
-  public void paintToImage(Rectangle rp, BufferedImage image) {
-    int wpanel = rp.width;
-    int hpanel = rp.height;
-    int wimage = image.getWidth();
-    int himage = image.getHeight();
-
-    // Graphics context with scaled font and line width.
-    double wscale = (double)wimage/(double)wpanel;
-    double hscale = (double)himage/(double)hpanel;
-    double scale = min(wscale,hscale);
-    Graphics2D g2d = createGraphics(image,scale);
-
-    // Clear the image.
-    g2d.setColor(getBackground());
-    g2d.fillRect(0,0,wimage,himage);
-    g2d.setColor(getForeground());
-
-    // Paint this panel to the entire image.
-    Rectangle rg = new Rectangle(0,0,wimage,himage);
-    paintToRect(g2d,rp,rg);
-  }
-
-  /**
-   * Paints this panel to a rectangle of a graphics context.
-   * Clips painting to the intersection of the current clip rectangle
-   * and the specified rectangle of the graphics context.
-   * <p>
-   * Classes that extend this base class typically override this method.
-   * <p>
-   * This implementation simply paints any children of this panel. It paints 
-   * nothing itself and restores any changes to the graphics context.
-   * @param g2d the graphics context.
-   * @param rg the graphics rectangle.
-   */
-  public void paintToRect(Graphics2D g2d, Rectangle rg) {
-    Rectangle rp = new Rectangle(0,0,getWidth(),getHeight());
-    paintToRect(g2d,rp,rg);
   }
 
   /**
@@ -143,83 +180,103 @@ public class IPanel extends JPanel {
   // protected
 
   /**
-   * Creates a new graphics context for the specified image.
-   * Sets the font and line width for the specified scale factor.
-   * @param image the image.
-   * @param scale the scale factor.
+   * Returns a scale factor for painting this panel to fit a rectangle.
+   * The scale factor depends on the specified width and height and the
+   * corresponding width and height of this panel.
+   * @param w the rectangle width.
+   * @param h the rectangle height.
+   * @return the scale factor.
    */
-  protected Graphics2D createGraphics(BufferedImage image, double scale) {
-    int wimage = image.getWidth();
-    int himage = image.getHeight();
+  protected double computeScale(int w, int h) {
+    double wscale = (double)w/(double)getWidth();
+    double hscale = (double)h/(double)getHeight();
+    double scale = min(wscale,hscale);
+    return scale;
+  }
 
-    // Turn on anti-aliasing.
-    Graphics2D g2d = image.createGraphics();
-    g2d.setRenderingHint(
-      RenderingHints.KEY_ANTIALIASING,
-      RenderingHints.VALUE_ANTIALIAS_ON);
+  /**
+   * Creates a graphics context for the specified graphics rectangle.
+   * First computes a scale factor from the dimensions of this panel 
+   * and those of the specified graphics rectangle. Then 
+   * (1) sets the clip rectangle using the specified graphics rectangle,
+   * (2) translates the coordinate system by the specified (x,y), 
+   * (3) sets the line width, and 
+   * (4) sets the font to be a scaled version of this panel's font.
+   * <p>
+   * Classes that extend this base class typically call this method in their 
+   * implementation of {@link #paintToRect(Graphics2d,int,int,int,int)}.
+   * When painting to a high-resolution image, this method makes lines 
+   * and text appear as they would on screen, neither too thin nor too 
+   * small.
+   * <p>
+   * When the returned graphics context is no longer needed, it should
+   * be disposed.
+   * @param g2d the graphics context.
+   * @param x the x-coordinate of the graphics rectangle.
+   * @param y the y-coordinate of the graphics rectangle.
+   * @param w the width of the graphics rectangle.
+   * @param h the height of the graphics rectangle.
+   */
+  protected Graphics2D createGraphics(
+    Graphics2D g2d, int x, int y, int w, int h) 
+  {
+    g2d = (Graphics2D)g2d.create();
 
-    // Scaled line width rounded to an odd number of pixels.
-    float lineWidth = 1.0f+(float)(2.0*(int)(scale/2.0));
+    // Scale factor.
+    double scale = computeScale(w,h);
+
+    // Clip rectangle.
+    Rectangle clipRect = g2d.getClipBounds();
+    Rectangle g2dRect = new Rectangle(x,y,w,h);
+    g2d.setClip((clipRect==null)?g2dRect:clipRect.intersection(g2dRect));
+
+    // Translate.
+    g2d.translate(x,y);
+
+    // Scaled line width.
+    //float lineWidth = 1.0f+(float)(2.0*(int)(scale/2.0));
+    float lineWidth = (float)scale;
     g2d.setStroke(new BasicStroke(lineWidth));
 
-    // Scale the font size.
+    // Scaled font.
     Font font = getFont();
-    float fontSize = font.getSize2D();
-    fontSize *= (float)scale;
-    font = font.deriveFont(fontSize);
-    g2d.setFont(font);
+    float fontSize = (float)scale*font.getSize2D();
+    g2d.setFont(font.deriveFont(fontSize));
 
     return g2d;
   }
 
   /**
-   * Paints a rectangle of this panel to a rectangle of a graphics context.
-   * Clips painting to the intersection of the current clip rectangle
-   * and the specified rectangle of the graphics context.
-   * <p>
-   * This implementation simply paints any children of this panel. It paints 
-   * nothing itself and restores any changes to the graphics context.
+   * Gets the line width for the specified graphics context.
    * @param g2d the graphics context.
-   * @param rp the panel rectangle.
-   * @param rg the graphics rectangle.
+   * @return the line width.
    */
-  protected void paintToRect(Graphics2D g2d, Rectangle rp, Rectangle rg) {
-    Rectangle clipRect = g2d.getClipBounds();
-    g2d.setClip((clipRect==null)?rg:clipRect.intersection(rg));
-    int xp = rp.x;
-    int yp = rp.y;
-    int wp = rp.width;
-    int hp = rp.height;
-    int xg = rg.x;
-    int yg = rg.y;
-    int wg = rg.width;
-    int hg = rg.height;
-    g2d.translate(xg-xp,yg-yp);
-    double ws = (double)wg/(double)wp;
-    double hs = (double)hg/(double)hp;
-    int nc = getComponentCount();
-    for (int ic=0; ic<nc; ++ic) {
-      Component c = getComponent(ic);
-      int xc = c.getX();
-      int yc = c.getY();
-      int wc = c.getWidth();
-      int hc = c.getHeight();
-      xc = (int)round(xc*ws);
-      yc = (int)round(yc*hs);
-      wc = (int)round(wc*ws);
-      hc = (int)round(hc*hs);
-      g2d.translate(xc,yc);
-      if (c instanceof IPanel) {
-        Rectangle rc = new Rectangle(xc,yc,wc,hc);
-        ((IPanel)c).paintToRect(g2d,rc);
-      } else {
-        g2d.scale(ws,hs);
-        c.paint(g2d);
-        g2d.scale(1.0/ws,1.0/hs);
-      }
-      g2d.translate(-xc,-yc);
+  protected float getLineWidth(Graphics2D g2d) {
+    float lineWidth = 1.0f;
+    Stroke stroke = g2d.getStroke();
+    if (stroke instanceof BasicStroke) {
+      BasicStroke bs = (BasicStroke)stroke;
+      lineWidth = bs.getLineWidth();
     }
-    g2d.translate(xp-xg,yp-yg);
-    g2d.setClip(clipRect);
+    return lineWidth;
+  }
+
+  /**
+   * Scales the line width for the specified graphics context.
+   * Classes that extend this base class should not assume that the
+   * current line width is one, because the line width may have been
+   * set to a larger value in any graphics context created by 
+   * {@link #createGraphics(Graphics2d,int,int,int,int)}.
+   * @param g2d the graphics context.
+   * @param scale the scale factor.
+   */
+  protected void scaleLineWidth(Graphics2D g2d, double scale) {
+    float lineWidth = getLineWidth(g2d);
+    if (lineWidth==1.0f) {
+      lineWidth = 1.0f+(float)(2.0*(int)(scale/2.0));
+    } else {
+      lineWidth *= scale;
+    }
+    g2d.setStroke(new BasicStroke(lineWidth));
   }
 }
