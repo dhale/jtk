@@ -506,10 +506,10 @@ public class Mosaic extends IPanel {
       int yc = c.getY();
       int wc = c.getWidth();
       int hc = c.getHeight();
-      xc = (int)(xc*ws);
-      yc = (int)(yc*hs);
-      wc = (int)(wc*ws);
-      hc = (int)(hc*hs);
+      xc = (int)round(xc*ws);
+      yc = (int)round(yc*hs);
+      wc = (int)round(wc*ws);
+      hc = (int)round(hc*hs);
       if (c instanceof IPanel) {
         IPanel ip = (IPanel)c;
         ip.paintToRect(g2d,xc,yc,wc,hc);
