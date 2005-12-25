@@ -52,7 +52,6 @@ public class SequenceView extends TiledView {
    * @param f array of sampled function values f(x).
    */
   public SequenceView(Sampling sx, float[] f) {
-    Check.argument(sx.getCount()==f.length,"sx count equals length of f");
     set(sx,f);
   }
   
@@ -62,6 +61,7 @@ public class SequenceView extends TiledView {
    * @param f array of sampled function values f(x).
    */
   public void set(Sampling sx, float[] f) {
+    Check.argument(sx.getCount()==f.length,"sx count equals length of f");
     _sx = sx;
     _f = Array.copy(f);
     updateBestProjectors();

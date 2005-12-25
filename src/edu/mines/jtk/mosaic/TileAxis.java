@@ -23,6 +23,7 @@ import edu.mines.jtk.util.*;
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.27
+ * @version 2005.12.23
  */
 public class TileAxis extends IPanel {
   private static final long serialVersionUID = 1L;

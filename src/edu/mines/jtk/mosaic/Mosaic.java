@@ -9,12 +9,7 @@ package edu.mines.jtk.mosaic;
 import static java.lang.Math.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.*;
-import java.io.*;
 import java.util.*;
-import javax.imageio.*;
-import javax.imageio.metadata.*;
-import javax.imageio.stream.*;
 import javax.swing.*;
 import edu.mines.jtk.gui.ModeManager;
 
@@ -41,6 +36,7 @@ import edu.mines.jtk.gui.ModeManager;
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.27
+ * @version 2005.12.23
  */
 public class Mosaic extends IPanel {
   private static final long serialVersionUID = 1L;
@@ -299,6 +295,7 @@ public class Mosaic extends IPanel {
       for (TileAxis axis : _axisList)
         axis.setFont(font);
     }
+    revalidate();
   }
 
   // Override base class implementation.

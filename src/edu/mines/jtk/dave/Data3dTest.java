@@ -128,8 +128,7 @@ public class Data3dTest {
     Set<Mosaic.AxesPlacement> axesPlacement = EnumSet.noneOf(
       Mosaic.AxesPlacement.class
     );
-    Mosaic.BorderStyle borderStyle = Mosaic.BorderStyle.FLAT;
-    Mosaic mosaic = new Mosaic(1,1,axesPlacement,borderStyle);
+    Mosaic mosaic = new Mosaic(1,1,axesPlacement);
     mosaic.setBackground(Color.WHITE);
     mosaic.setFont(new Font("SansSerif",Font.PLAIN,18));
     mosaic.setPreferredSize(new Dimension(550,500));

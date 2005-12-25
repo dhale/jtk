@@ -76,10 +76,10 @@ public class IPanel extends JPanel {
       int yc = c.getY();
       int wc = c.getWidth();
       int hc = c.getHeight();
-      xc = (int)(xc*ws);
-      yc = (int)(yc*hs);
-      wc = (int)(wc*ws);
-      hc = (int)(hc*hs);
+      xc = (int)round(xc*ws);
+      yc = (int)round(yc*hs);
+      wc = (int)round(wc*ws);
+      hc = (int)round(hc*hs);
       if (c instanceof IPanel) {
         IPanel ip = (IPanel)c;
         ip.paintToRect(g2d,xc,yc,wc,hc);
@@ -124,7 +124,6 @@ public class IPanel extends JPanel {
     int wpanel = getWidth();
     int hpanel = getHeight();
     double scale = (double)width/(double)wpanel;
-    System.out.println("scale="+scale);
     int wimage = (int)(scale*wpanel+0.5);
     int himage = (int)(scale*hpanel+0.5);
     int type = BufferedImage.TYPE_INT_RGB;
@@ -203,8 +202,9 @@ public class IPanel extends JPanel {
    * (3) sets the line width, and 
    * (4) sets the font to be a scaled version of this panel's font.
    * <p>
-   * Classes that extend this base class typically call this method in their 
-   * implementation of {@link #paintToRect(Graphics2d,int,int,int,int)}.
+   * Classes that extend this base class typically call this method in 
+   * their implementation of 
+   * {@link #paintToRect(java.awt.Graphics2D,int,int,int,int)}.
    * When painting to a high-resolution image, this method makes lines 
    * and text appear as they would on screen, neither too thin nor too 
    * small.
@@ -266,7 +266,7 @@ public class IPanel extends JPanel {
    * Classes that extend this base class should not assume that the
    * current line width is one, because the line width may have been
    * set to a larger value in any graphics context created by 
-   * {@link #createGraphics(Graphics2d,int,int,int,int)}.
+   * {@link #createGraphics(java.awt.Graphics2D,int,int,int,int)}.
    * @param g2d the graphics context.
    * @param scale the scale factor.
    */

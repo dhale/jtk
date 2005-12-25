@@ -9,6 +9,7 @@ package edu.mines.jtk.mosaic;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
+import javax.swing.event.EventListenerList;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
@@ -68,11 +69,12 @@ public class PixelsView extends TiledView {
 
   /**
    * Constructs a pixels view of the specified sampled function f(x1,x2).
-   * @param f array[n2][n1] of sampled function values f(x1,x2), where n1 = 
-   *  f[0].length and n2 = f.length.
+   * Assumes zero first sample values and unit sampling intervals.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
+   *  n1 = f[0].length and n2 = f.length.
    */
   public PixelsView(float[][] f) {
-    this(new Sampling(f[0].length),new Sampling(f.length),f);
+    set(f);
   }
 
   /**
@@ -83,6 +85,27 @@ public class PixelsView extends TiledView {
    *  n1 and n2 denote the number of samples in s1 and s2, respectively.
    */
   public PixelsView(Sampling s1, Sampling s2, float[][] f) {
+    set(s1,s2,f);
+  }
+
+  /**
+   * Sets the sampled function f(x1,x2) for this view.
+   * Assumes zero first sample values and unit sampling intervals.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
+   *  n1 = f[0].length and n2 = f.length.
+   */
+  public void set(float[][] f) {
+    set(new Sampling(f[0].length),new Sampling(f.length),f);
+  }
+
+  /**
+   * Sets the sampled function f(x1,x2) for this view.
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where
+   *  n1 and n2 denote the number of samples in s1 and s2, respectively.
+   */
+  public void set(Sampling s1, Sampling s2, float[][] f) {
     Check.argument(s1.isUniform(),"s1 is uniform");
     Check.argument(s2.isUniform(),"s2 is uniform");
     Check.argument(Array.isRegular(f),"f is regular");
@@ -102,6 +125,7 @@ public class PixelsView extends TiledView {
    */
   public void setColorModel(ByteIndexColorModel colorModel) {
     _colorModel = colorModel;
+    fireColorMapChanged();
     repaint();
   }
 
@@ -173,6 +197,7 @@ public class PixelsView extends TiledView {
       _clipMin = clipMin;
       _clipMax = clipMax;
       _usePercentiles = false;
+      fireColorMapChanged();
       repaint();
     }
   }
@@ -230,6 +255,23 @@ public class PixelsView extends TiledView {
    */
   public float getPercentileMax() {
     return _percMax;
+  }
+
+  /**
+   * Adds the specified color map listener.
+   * @param cml the listener.
+   */
+  public void addColorMapListener(ColorMapListener cml) {
+    _colorMapListeners.add(ColorMapListener.class,cml);
+    cml.colorMapChanged(_colorMap);
+  }
+
+  /**
+   * Removes the specified color map listener.
+   * @param cml the listener.
+   */
+  public void removeColorMapListener(ColorMapListener cml) {
+    _colorMapListeners.remove(ColorMapListener.class,cml);
   }
 
   public void paint(Graphics2D g2d) {
@@ -346,6 +388,35 @@ public class PixelsView extends TiledView {
   private double _dy;
   private double _fy;
 
+  // List of color map listeners.
+  private EventListenerList _colorMapListeners = new EventListenerList();
+
+  // Color map for color map listeners.
+  private ColorMap _colorMap = new ColorMap() {
+    public float getMinValue() {
+      return _clipMin;
+    }
+    public float getMaxValue() {
+      return _clipMax;
+    }
+    public Color getColor(float value) {
+      value = max(_clipMin,min(_clipMax,value));
+      int index = (int)round(255.0*(value-_clipMin)/(_clipMax-_clipMin));
+      return new Color(_colorModel.getRGB(index));
+    }
+  };
+
+  /**
+   * Notifies listeners of any colormap changes.
+   */
+  private void fireColorMapChanged() {
+    Object[] listeners = _colorMapListeners.getListenerList();
+    for (int i=listeners.length-2; i>=0; i-=2) {
+      ColorMapListener cml = (ColorMapListener)listeners[i+1];
+      cml.colorMapChanged(_colorMap);
+    }
+  }
+
   /**
    * If using percentiles, computes corresponding clip values.
    */
@@ -367,6 +438,7 @@ public class PixelsView extends TiledView {
         Array.quickPartialSort(kmax,a);
         _clipMax = a[kmax];
       }
+      fireColorMapChanged();
     }
   }
 
