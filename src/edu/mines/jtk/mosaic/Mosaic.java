@@ -600,6 +600,22 @@ public class Mosaic extends IPanel {
       validate();
   }
 
+  int getHeightAxesTop() {
+    return heightMinimumAxesTop();
+  }
+
+  int getHeightAxesBottom() {
+    return heightMinimumAxesBottom();
+  }
+
+  int getWidthAxesLeft() {
+    return widthMinimumAxesLeft();
+  }
+
+  int getWidthAxesRight() {
+    return widthMinimumAxesRight();
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 

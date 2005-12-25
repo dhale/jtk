@@ -296,7 +296,7 @@ public class TileAxis extends IPanel {
         if (ws>wsmax)
           wsmax = ws;
         int xs = (isLeft)?x-ws:x;
-        int ys = max(fa,min(h-1,y+fa/2));
+        int ys = max(fa,min(h-1,y+fa/3));
         g2d.drawString(stic,xs,ys);
       }
     }
