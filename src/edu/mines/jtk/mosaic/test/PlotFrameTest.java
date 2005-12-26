@@ -28,26 +28,25 @@ public class PlotFrameTest {
 
     int n1 = 101;
     int n2 = 101;
-    float d1 = 1.0f/(float)max(1,n1-1);
-    float d2 = 1.0f/(float)max(1,n2-1);
-    float[][] f = Array.rampfloat(0.0f,d1,d2,n1,n2);
-    f = Array.sin(Array.mul(10.0f,f));
+    float d1 = 0.1f;
+    float d2 = 0.1f;
+    float[][] f = Array.sin(Array.rampfloat(0.0f,d1,d2,n1,n2));
 
     PlotFrame.Orientation orientation = PlotFrame.Orientation.X1DOWN_X2RIGHT;
-    PlotFrame plotFrame = new PlotFrame(1,2,orientation);
-    PixelsView pv0 = plotFrame.addPixels(0,0,f);
-    PixelsView pv1 = plotFrame.addPixels(0,1,f);
+    PlotFrame pf = new PlotFrame(1,2,orientation);
+    PixelsView pv0 = pf.addPixels(0,0,f);
+    PixelsView pv1 = pf.addPixels(0,1,f);
     pv0.setColorModel(ByteIndexColorModel.linearGray(0.0,1.0));
     pv1.setColorModel(ByteIndexColorModel.linearHue(0.0,0.67));
-    plotFrame.addColorBar("amplitude");
-    plotFrame.setTitle("A Test of PlotFrame");
-    plotFrame.setX1Label("depth (km)");
-    plotFrame.setX2Label(0,"offset (km)");
-    plotFrame.setX2Label(1,"velocity (km/s)");
-    plotFrame.setVisible(true);
+    pf.addColorBar("amplitude");
+    pf.setTitle("A Test of PlotFrame");
+    pf.setX1Label("depth (km)");
+    pf.setX2Label(0,"offset (km)");
+    pf.setX2Label(1,"velocity (km/s)");
+    pf.setVisible(true);
 
     try {
-      plotFrame.paintToPng(300,6,"junk.png");
+      pf.paintToPng(300,6,"junk.png");
     } catch (java.io.IOException ioe) {
       throw new RuntimeException(ioe);
     }

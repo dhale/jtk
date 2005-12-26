@@ -41,7 +41,8 @@ public class ColorBar extends IPanel implements ColorMapListener {
     _mosaic.setWidthMinimum(0,25);
     _mosaic.setWidthElastic(0,0);
     _tile = _mosaic.getTile(0,0);
-    this.setPreferredSize(new Dimension(75,100));
+    int war = _mosaic.getWidthAxesRight();
+    this.setPreferredSize(new Dimension(25+2+war,100));
     this.setLayout(new BorderLayout());
     this.add(_mosaic,BorderLayout.CENTER);
   }

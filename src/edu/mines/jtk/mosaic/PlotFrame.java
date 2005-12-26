@@ -44,6 +44,7 @@ public class PlotFrame extends JFrame {
 
   /**
    * Constructs a new plot frame with a mosaic of one tile.
+   * Uses the default orientation X1RIGHT_X2UP.
    */
   public PlotFrame() {
     this(1,1,Orientation.X1RIGHT_X2UP);
@@ -51,6 +52,7 @@ public class PlotFrame extends JFrame {
 
   /**
    * Constructs a new plot frame with a mosaic of nrow by ncol tiles.
+   * Uses the default orientation X1RIGHT_X2UP.
    * @param nrow the number of rows.
    * @param ncol the number of columns.
    */
