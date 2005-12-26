@@ -597,7 +597,7 @@ public class Mosaic extends IPanel {
     _hsb[jcol].update();
     _vsb[jrow].update();
     if (wvsb!=widthVScrollBars() || hhsb!=heightHScrollBars())
-      validate();
+      revalidate();
   }
 
   int getHeightAxesTop() {

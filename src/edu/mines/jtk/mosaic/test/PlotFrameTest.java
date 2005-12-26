@@ -39,7 +39,7 @@ public class PlotFrameTest {
     PixelsView pv1 = plotFrame.addPixels(0,1,f);
     pv0.setColorModel(ByteIndexColorModel.linearGray(0.0,1.0));
     pv1.setColorModel(ByteIndexColorModel.linearHue(0.0,0.67));
-    plotFrame.addColorBar();
+    plotFrame.addColorBar("amplitude");
     plotFrame.setTitle("A Test of PlotFrame");
     plotFrame.setX1Label("depth (km)");
     plotFrame.setX2Label(0,"offset (km)");

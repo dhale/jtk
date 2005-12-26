@@ -135,7 +135,7 @@ public class TileAxis extends IPanel {
    */
   public void setLabel(String label) {
     _label = label;
-    _mosaic.validate();
+    _mosaic.revalidate();
     repaint();
   }
 
@@ -148,17 +148,17 @@ public class TileAxis extends IPanel {
    */
   public void setFormat(String format) {
     _format = format;
-    _mosaic.validate();
+    _mosaic.revalidate();
     repaint();
   }
 
-  // Override base class, so we can validate the mosaic layout. Must check 
+  // Override base class, so we can revalidate the mosaic layout. Must check 
   // for a null mosaic, because this method is called by the base class 
   // constructor, before our constructor sets the (non-null) mosaic.
   public void setFont(Font font) {
     super.setFont(font);
     if (_mosaic!=null)
-      _mosaic.validate();
+      _mosaic.revalidate();
   }
 
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {

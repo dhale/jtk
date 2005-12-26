@@ -110,13 +110,23 @@ public class PlotFrame extends JFrame {
   }
 
   /**
-   * Adds the color bar. The color bar paints the color map of the most 
-   * recently added pixels view. To avoid confusion, a color bar should
-   * not be added when this plot frame contains more than one pixels view.
+   * Adds the color bar with no label. The color bar paints the color map 
+   * of the most recently added pixels view. To avoid confusion, a color 
+   * bar should not be added when this plot frame contains more than one 
+   * pixels view.
    */
-  public void addColorBar() {
+  public ColorBar addColorBar() {
+    return addColorBar(null);
+  }
+
+  /**
+   * Adds the color bar with specified label.
+   * @param label the label; null, if none.
+   */
+  public ColorBar addColorBar(String label) {
+    _colorBarLabel = label;
     if (_colorBar==null) {
-      _colorBar = new ColorBar();
+      _colorBar = new ColorBar(label);
       if (_pixelsView!=null) {
         _pixelsView.addColorMapListener(_colorBar);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -136,7 +146,10 @@ public class PlotFrame extends JFrame {
         _plot.add(_colorBar,gbc);
         _plot.revalidate();
       }
+    } else {
+      _colorBar.setLabel(label);
     }
+    return _colorBar;
   }
 
   /**
@@ -151,29 +164,50 @@ public class PlotFrame extends JFrame {
   }
 
   /**
+   * Adds the plot title.
+   * @param title the title; null, if none.
+   */
+  public void addTitle(String title) {
+    setTitle(title);
+  }
+
+  /**
    * Sets the plot title.
-   * @param title the title.
+   * @param title the title; null, if none.
    */
   public void setTitle(String title) {
-    if (_title==null) {
-      _title = new Title(title);
-      GridBagConstraints gbc = new GridBagConstraints();
-      gbc.gridx = 0;
-      gbc.gridy = 0;
-      gbc.gridwidth = 1;
-      gbc.gridheight = 1;
-      gbc.weightx = 0;
-      gbc.weighty = 0;
-      gbc.fill = GridBagConstraints.BOTH;
-      int top = 0;
-      int left = _mosaic.getWidthAxesLeft();
-      int bottom = 0;
-      int right = _mosaic.getWidthAxesRight();
-      gbc.insets = new Insets(top,left,bottom,right);
-      _plot.add(_title,gbc);
+    if (title!=null) {
+      if (_title==null) {
+        _title = new Title(title);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+        gbc.weightx = 0;
+        gbc.weighty = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        int top = 0;
+        int left = _mosaic.getWidthAxesLeft();
+        int bottom = 0;
+        int right = _mosaic.getWidthAxesRight();
+        gbc.insets = new Insets(top,left,bottom,right);
+        _plot.add(_title,gbc);
+        _plot.revalidate();
+      } else {
+        _title.set(title);
+      }
+    } else if (_title!=null) {
+      _plot.remove(_title);
       _plot.revalidate();
     }
-    _title.set(title);
+  }
+
+  /**
+   * Removes the plot title.
+   */
+  public void removeTitle() {
+    setTitle(null);
   }
 
   /**
@@ -205,7 +239,7 @@ public class PlotFrame extends JFrame {
     }
     if (_colorBar!=null) {
       removeColorBar();
-      addColorBar();
+      addColorBar(_colorBarLabel);
     }
   }
 
@@ -313,6 +347,7 @@ public class PlotFrame extends JFrame {
   private Mosaic _mosaic;
   private PixelsView _pixelsView;
   private ColorBar _colorBar;
+  private String _colorBarLabel;
   private Title _title;
   private IPanel _plot;
   private Orientation _orientation;

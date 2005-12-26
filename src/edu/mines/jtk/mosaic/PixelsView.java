@@ -37,7 +37,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * may be specified for this first step.
  * <p>
  * The second step is a table lookup. It uses the pixel bytes computed in 
- * the first mapping as indices in a specified colormap. The colormap is 
+ * the first mapping as indices in a specified color map. The color map is 
  * an array of 256 colors, one for each of the 256 possible byte indices. 
  * See {@link edu.mines.jtk.util.ByteIndexColorModel} for more details.
  * @author Dave Hale, Colorado School of Mines
@@ -180,7 +180,7 @@ public class PixelsView extends TiledView {
   /**
    * Sets the clips for this view. A pixels view maps values of the sampled 
    * function f(x1,x2) to bytes, which are then used as indices into a 
-   * specified colormap. This mapping from sample values to byte indices is 
+   * specified color map. This mapping from sample values to byte indices is 
    * linear, and so depends on only these two clip values. The minimum clip 
    * value corresponds to byte index 0, and the maximum clip value corresponds 
    * to byte index 255. Sample values outside of the range (clipMin,clipMax)
@@ -188,8 +188,8 @@ public class PixelsView extends TiledView {
    * <p>
    * Calling this method disables the computation of clips from percentiles.
    * Any clip values computed or specified previously will be forgotten.
-   * @param clipMin the sample value corresponding to colormap byte index 0.
-   * @param clipMax the sample value corresponding to colormap byte index 255.
+   * @param clipMin the sample value corresponding to color map byte index 0.
+   * @param clipMax the sample value corresponding to color map byte index 255.
    */
   public void setClips(float clipMin, float clipMax) {
     Check.argument(clipMin<clipMax,"clipMin<clipMax");
@@ -371,8 +371,8 @@ public class PixelsView extends TiledView {
   private Interpolation _interpolation = Interpolation.LINEAR;
 
   // Clips and percentiles.
-  private float _clipMin; // mapped to colormap byte index 0
-  private float _clipMax; // mapped to colormap byte index 255
+  private float _clipMin; // mapped to color map byte index 0
+  private float _clipMax; // mapped to color map byte index 255
   private float _percMin = 0.0f; // may be used to compute _clipMin
   private float _percMax = 100.0f; // may be used to compute _clipMax
   private boolean _usePercentiles = true; // true, if using percentiles
@@ -407,7 +407,7 @@ public class PixelsView extends TiledView {
   };
 
   /**
-   * Notifies listeners of any colormap changes.
+   * Notifies listeners of any color map changes.
    */
   private void fireColorMapChanged() {
     Object[] listeners = _colorMapListeners.getListenerList();
@@ -534,7 +534,7 @@ public class PixelsView extends TiledView {
 
   /**
    * Linear interpolation of sampled floats to image bytes. The bytes in 
-   * the returned array[nx*ny] will be used as indices in a colormapped 
+   * the returned array[nx*ny] will be used as indices in a color-mapped 
    * buffered image.
    */
   private byte[] interpolateImageBytesLinear(
@@ -676,7 +676,7 @@ public class PixelsView extends TiledView {
   /**
    * Nearest-neighbor interpolation of sampled floats to image bytes. The 
    * bytes in the returned array[nx*ny] will be used as indices in a 
-   * colormapped buffered image.
+   * color-mapped buffered image.
    */
   private byte[] interpolateImageBytesNearest(
     int nx, double dx, double fx,
