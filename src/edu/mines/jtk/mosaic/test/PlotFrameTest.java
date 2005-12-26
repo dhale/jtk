@@ -35,7 +35,7 @@ public class PlotFrameTest {
 
     PlotFrame.Orientation orientation = PlotFrame.Orientation.X1DOWN_X2RIGHT;
     PlotFrame plotFrame = new PlotFrame(1,2,orientation);
-    PixelsView pv0 = plotFrame.addPixels(f);
+    PixelsView pv0 = plotFrame.addPixels(0,0,f);
     PixelsView pv1 = plotFrame.addPixels(0,1,f);
     pv0.setColorModel(ByteIndexColorModel.linearGray(0.0,1.0));
     pv1.setColorModel(ByteIndexColorModel.linearHue(0.0,0.67));
@@ -44,6 +44,7 @@ public class PlotFrameTest {
     plotFrame.setX1Label("depth (km)");
     plotFrame.setX2Label(0,"offset (km)");
     plotFrame.setX2Label(1,"velocity (km/s)");
+    plotFrame.setVisible(true);
 
     try {
       plotFrame.paintToPng(300,6,"junk.png");

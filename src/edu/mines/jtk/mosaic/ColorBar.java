@@ -51,8 +51,7 @@ public class ColorBar extends IPanel implements ColorMapListener {
    * @param label the label; null, if none.
    */
   public void setLabel(String label) {
-    if (label!=null)
-      _mosaic.getTileAxisRight(0).setLabel(label);
+    _mosaic.getTileAxisRight(0).setLabel(label);
   }
 
   public void colorMapChanged(ColorMap cm) {

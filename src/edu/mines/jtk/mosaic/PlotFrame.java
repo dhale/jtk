@@ -100,13 +100,13 @@ public class PlotFrame extends JFrame {
     gbc.fill = GridBagConstraints.BOTH;
     _plot.add(_mosaic,gbc);
     _plot.revalidate();
-    this.setLayout(new BorderLayout());
-    this.add(_plot,BorderLayout.CENTER);
-    this.setSize(200+300*ncol,100+300*nrow);
-    this.setVisible(true);
     ModeManager modeManager = _mosaic.getModeManager();
     TileZoomMode zoomMode = new TileZoomMode(modeManager);
     zoomMode.setActive(true);
+    this.setLayout(new BorderLayout());
+    this.add(_plot,BorderLayout.CENTER);
+    this.setSize(200+300*ncol,100+300*nrow);
+    //this.setVisible(true);
   }
 
   /**
