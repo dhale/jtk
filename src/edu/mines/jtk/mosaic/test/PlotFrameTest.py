@@ -2,6 +2,9 @@ from edu.mines.jtk.dsp import *
 from edu.mines.jtk.mosaic import *
 from edu.mines.jtk.util import *
 
+True = 1
+False = 0
+
 n1 = 101;  d1 = 0.1;  f1 = 0.0
 n2 = 101;  d2 = 0.1;  f2 = 0.0
 f = Array.sin(Array.rampfloat(0.0,d1,d2,n1,n2))
@@ -29,5 +32,5 @@ pf.title = "A Test of PlotFrame"
 pf.setVLabel("depth (km)")
 pf.setHLabel(0,"offset (km)")
 pf.setHLabel(1,"velocity (km/s)")
-pf.setVisible(1)
+pf.setVisible(True)
 pf.paintToPng(300,6,"junk.png")
