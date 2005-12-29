@@ -42,7 +42,7 @@ public class PixelsViewTest {
 
     PixelsView pv0 = new PixelsView(f);
     pv0.setInterpolation(PixelsView.Interpolation.NEAREST);
-    pv0.setColorModel(ByteIndexColorModel.linearHue(0.0,1.0));
+    pv0.setColorMap(PixelsView.ColorMap.JET);
     pv0.setPercentiles(0.0f,100.0f);
 
     Sampling s1 = new Sampling(n1,0.5,0.25*(n1-1));
@@ -50,17 +50,17 @@ public class PixelsViewTest {
 
     PixelsView pv0b = new PixelsView(s1,s2,f);
     pv0b.setInterpolation(PixelsView.Interpolation.LINEAR);
-    pv0b.setColorModel(ByteIndexColorModel.linearGray(0.0,1.0));
+    pv0b.setColorMap(PixelsView.ColorMap.GRAY);
     pv0b.setPercentiles(0.0f,100.0f);
 
     PixelsView pv1 = new PixelsView(f);
     pv1.setInterpolation(PixelsView.Interpolation.LINEAR);
-    pv1.setColorModel(ByteIndexColorModel.linearGray(0.0,1.0));
+    pv1.setColorMap(PixelsView.ColorMap.GRAY);
     pv1.setPercentiles(0.0f,100.0f);
 
     PixelsView pv1b = new PixelsView(s1,s2,f);
     pv1b.setInterpolation(PixelsView.Interpolation.NEAREST);
-    pv1b.setColorModel(ByteIndexColorModel.linearHue(0.0,1.0));
+    pv1b.setColorMap(PixelsView.ColorMap.JET);
     pv1b.setPercentiles(0.0f,100.0f);
 
     Tile tile0 = mosaic.getTile(0,0);

@@ -131,11 +131,6 @@ public class SequenceView extends TiledView {
     Projector vp = getVerticalProjector();
     Transcaler ts = getTranscaler();
 
-    // Line width, if resolution not 1.0.
-    double resolution = ts.getResolution();
-    if (resolution!=1.0)
-      g2d.setStroke(new BasicStroke((float)resolution));
-
     // Radius of lollipop balls, in normalized coordinates. 
     // Must compensate for projector merging.
     double rbx = ballRadiusX()*hp.getScaleRatio(bhp);

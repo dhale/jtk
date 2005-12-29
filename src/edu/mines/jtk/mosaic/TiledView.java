@@ -115,6 +115,21 @@ public abstract class TiledView {
       _tile.repaint();
   }
 
+  /**
+   * Gets the line width for the specified graphics context.
+   * @param g2d the graphics context.
+   * @return the line width.
+   */
+  protected float getLineWidth(Graphics2D g2d) {
+    float lineWidth = 1.0f;
+    Stroke stroke = g2d.getStroke();
+    if (stroke instanceof BasicStroke) {
+      BasicStroke bs = (BasicStroke)stroke;
+      lineWidth = bs.getLineWidth();
+    }
+    return lineWidth;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // package
 

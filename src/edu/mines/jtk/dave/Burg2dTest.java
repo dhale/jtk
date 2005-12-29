@@ -169,7 +169,7 @@ public class Burg2dTest {
     PixelsView pv = new PixelsView(f);
     pv.setOrientation(PixelsView.Orientation.X1DOWN_X2RIGHT);
     pv.setInterpolation(PixelsView.Interpolation.NEAREST);
-    pv.setColorModel(ByteIndexColorModel.linearGray(0.0,1.0));
+    pv.setColorMap(PixelsView.ColorMap.GRAY);
     //pv.setClips(fmin,fmax);
 
     Tile tile = mosaic.getTile(0,0);

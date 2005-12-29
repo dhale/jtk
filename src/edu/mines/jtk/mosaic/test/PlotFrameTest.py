@@ -1,21 +1,33 @@
+from edu.mines.jtk.dsp import *
 from edu.mines.jtk.mosaic import *
 from edu.mines.jtk.util import *
 
-n1 = 101
-n2 = 101
-f = Array.rampfloat(0.0,0.1,0.1,n1,n2)
-f = Array.sin(f)
+n1 = 101;  d1 = 0.1;  f1 = 0.0
+n2 = 101;  d2 = 0.1;  f2 = 0.0
+f = Array.sin(Array.rampfloat(0.0,d1,d2,n1,n2))
+s1 = Sampling(n1,d1,f1)
+s2 = Sampling(n2,d2,f2)
 
-orientation = PlotFrame.Orientation.X1DOWN_X2RIGHT
-pf = PlotFrame(1,2,orientation)
-pv0 = pf.addPixels(0,0,f)
-pv1 = pf.addPixels(0,1,f)
-pv0.setColorModel(ByteIndexColorModel.linearGray(0.0,1.0))
-pv1.setColorModel(ByteIndexColorModel.linearHue(0.0,0.67))
+ax = 0.5*d2*(n2-1);
+x1 = Array.rampfloat(f1,d1,n1);
+x2 = Array.add(ax,Array.mul(ax,Array.sin(x1)));
+
+pf = PlotFrame(1,2,PlotFrame.Orientation.X1DOWN_X2RIGHT)
+
+pxv0 = pf.addPixels(0,0,s1,s2,f)
+pxv1 = pf.addPixels(0,1,s1,s2,f)
+pxv0.setColorMap(PixelsView.ColorMap.GRAY)
+pxv1.setColorMap(PixelsView.ColorMap.JET)
+
+ptv0 = pf.addPoints(0,0,s1,x2);
+ptv1 = pf.addPoints(0,1,x1,x2);
+ptv0.setStyle("r--.");
+ptv1.setStyle("k-o");
+
 pf.addColorBar("amplitude")
 pf.title = "A Test of PlotFrame"
-pf.setX1Label("depth (km)")
-pf.setX2Label(0,"offset (km)")
-pf.setX2Label(1,"velocity (km/s)")
+pf.setVLabel("depth (km)")
+pf.setHLabel(0,"offset (km)")
+pf.setHLabel(1,"velocity (km/s)")
 pf.setVisible(1)
 pf.paintToPng(300,6,"junk.png")

@@ -46,10 +46,9 @@ import static edu.mines.jtk.util.MathPlus.*;
 public class PixelsView extends TiledView {
 
   /**
-   * Orientation of sample axes x1 and x2. For example, the orientation 
-   * X1RIGHT_X2UP corresponds to x1 increasing horizontally from left to 
-   * right, and x2 increasing vertically from bottom to top. The default
-   * is X1RIGHT_X2UP.
+   * Orientation of sample axes x1 and x2. For example, the default 
+   * orientation X1RIGHT_X2UP corresponds to x1 increasing horizontally 
+   * from left to right, and x2 increasing vertically from bottom to top.
    */
   public enum Orientation {
     X1RIGHT_X2UP,
@@ -65,6 +64,18 @@ public class PixelsView extends TiledView {
   public enum Interpolation {
     NEAREST,
     LINEAR
+  }
+
+  /**
+   * Commonly used color maps. Each of these color maps corresponds to 
+   * a pre-computed {@link edu.mines.jtk.util.ByteIndexColorModel}.
+   */
+  public enum ColorMap {
+    GRAY,
+    JET,
+    HUE,
+    PRISM,
+    RED_WHITE_BLUE,
   }
 
   /**
@@ -116,6 +127,24 @@ public class PixelsView extends TiledView {
     _f = Array.copy(f);
     updateClips();
     updateSampling();
+  }
+
+  /**
+   * Sets the color model for this view to the specified color map.
+   * @param colorMap the color map.
+   */
+  public void setColorMap(ColorMap colorMap) {
+    if (colorMap==ColorMap.GRAY) {
+      setColorModel(ByteIndexColorModel.GRAY);
+    } else if (colorMap==ColorMap.JET) {
+      setColorModel(ByteIndexColorModel.JET);
+    } else if (colorMap==ColorMap.HUE) {
+      setColorModel(ByteIndexColorModel.HUE);
+    } else if (colorMap==ColorMap.PRISM) {
+      setColorModel(ByteIndexColorModel.PRISM);
+    } else if (colorMap==ColorMap.RED_WHITE_BLUE) {
+      setColorModel(ByteIndexColorModel.RED_WHITE_BLUE);
+    }
   }
 
   /**
@@ -361,8 +390,7 @@ public class PixelsView extends TiledView {
   private float[][] _f; // copy of array of floats
 
   // Color model.
-  private ByteIndexColorModel _colorModel = 
-    ByteIndexColorModel.linearGray(0,1);
+  private ByteIndexColorModel _colorModel = ByteIndexColorModel.getGray();
 
   // View orientation.
   private Orientation _orientation = Orientation.X1RIGHT_X2UP;
@@ -392,7 +420,8 @@ public class PixelsView extends TiledView {
   private EventListenerList _colorMapListeners = new EventListenerList();
 
   // Color map for color map listeners.
-  private ColorMap _colorMap = new ColorMap() {
+  private edu.mines.jtk.mosaic.ColorMap _colorMap = 
+  new edu.mines.jtk.mosaic.ColorMap() {
     public float getMinValue() {
       return _clipMin;
     }

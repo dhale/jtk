@@ -234,7 +234,6 @@ public class IPanel extends JPanel {
     g2d.translate(x,y);
 
     // Scaled line width.
-    //float lineWidth = 1.0f+(float)(2.0*(int)(scale/2.0));
     float lineWidth = (float)scale;
     g2d.setStroke(new BasicStroke(lineWidth));
 
@@ -272,11 +271,7 @@ public class IPanel extends JPanel {
    */
   protected void scaleLineWidth(Graphics2D g2d, double scale) {
     float lineWidth = getLineWidth(g2d);
-    if (lineWidth==1.0f) {
-      lineWidth = 1.0f+(float)(2.0*(int)(scale/2.0));
-    } else {
-      lineWidth *= scale;
-    }
+    lineWidth *= scale;
     g2d.setStroke(new BasicStroke(lineWidth));
   }
 }

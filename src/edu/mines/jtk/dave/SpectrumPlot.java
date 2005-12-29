@@ -89,8 +89,8 @@ public class SpectrumPlot extends JFrame {
     _mosaicS.setPreferredSize(new Dimension(WIDTH,2*HEIGHT/3));
     Tile tileA = _mosaicS.getTile(0,0);
     Tile tileP = _mosaicS.getTile(1,0);
-    MarkLineView av = makeMarkLineView(a.getSampling(),a.getValues());
-    MarkLineView pv = makeMarkLineView(p.getSampling(),p.getValues());
+    PointsView av = makePointsView(a.getSampling(),a.getValues());
+    PointsView pv = makePointsView(p.getSampling(),p.getValues());
     tileA.addTiledView(av);
     //tileA.setBestVerticalProjector(new Projector(1.1,0.0));
     tileP.addTiledView(pv);
@@ -186,10 +186,10 @@ public class SpectrumPlot extends JFrame {
   private Mosaic _mosaicS;
   private Mosaic _mosaicX;
 
-  private static MarkLineView makeMarkLineView(Sampling sx, float[] f) {
-    MarkLineView mlv = new MarkLineView(sx,f);
-    mlv.setLineWidth(1.0f);
-    return mlv;
+  private static PointsView makePointsView(Sampling sx, float[] f) {
+    PointsView pv = new PointsView(sx,f);
+    pv.setLineWidth(1.0f);
+    return pv;
   }
 
   private static SequenceView makeSequenceView(Sampling sx, float[] f) {

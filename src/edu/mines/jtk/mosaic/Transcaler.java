@@ -131,27 +131,19 @@ public class Transcaler {
   }
 
   /**
-   * Sets the resolution, the number of device pixels per screen pixel. 
-   * Line widths, font sizes, and other resolution-dependent parameters 
-   * should be multiplied by this factor.
-   * <p>
-   * When the device is the screen, this factor should be one, the default. 
-   * However, when the device is a high-resolution image, this factor may 
-   * be significantly greater than one. Line widths not multiplied by 
-   * this scale factor may appear too thin in a high-resolution image. 
-   * Likewise, fonts may appear too small.
-   * @param resolution the resolution.
+   * Returns a new transcaler that combines this transcaler with projectors.
+   * The returned transcaler includes the transforms of the projectors.
+   * Does not change this transcaler.
+   * @param xp the projector for x coordinates.
+   * @param yp the projector for y coordinates.
+   * @return the new transcaler.
    */
-  public void setResolution(double resolution) {
-    _resolution = resolution;
-  }
-
-  /**
-   * Gets the resolution, the number of device pixels per screen pixel. 
-   * @return the resolution.
-   */
-  public double getResolution() {
-    return _resolution;
+  public Transcaler combineWith(Projector xp, Projector yp) {
+    double x1v = xp.v(_x1u);
+    double y1v = yp.v(_y1u);
+    double x2v = xp.v(_x2u);
+    double y2v = yp.v(_y2u);
+    return new Transcaler(x1v,y1v,x2v,y2v,_x1d,_y1d,_x2d,_y2d);
   }
 
   /**
@@ -260,7 +252,6 @@ public class Transcaler {
   private int    _x1d,_y1d,_x2d,_y2d;
   private double _xushift,_xuscale,_yushift,_yuscale;
   private double _xdshift,_xdscale,_ydshift,_ydscale;
-  private double _resolution = 1.0;
 
   private void computeShiftAndScale() {
     if (_x1u!=_x2u) {

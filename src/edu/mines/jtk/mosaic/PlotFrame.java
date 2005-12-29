@@ -16,10 +16,24 @@ import edu.mines.jtk.gui.*;
 import static java.lang.Math.*;
 
 /**
- * A plot frame contains a mosaic and optional color bar and/or title.
- * The plot frame's mosaic may contain any number or rows and columns of 
- * tiles. Each tile may contain any number of tiled views.
+ * A plot frame is a window containing a mosaic of 2-D graphical views.
+ * A plot frame may also contain a color bar and/or title. The plot frame's
+ * mosaic may contain any number or rows and columns of tiles. Each tile 
+ * may contain any number of tiled graphical views.
  * <p>
+ * The primary purpose of this class is ease-of-use. A plot frame handles
+ * most of the work of constructing a mosaic of tiled graphical views and
+ * the modes, menus, and toolbars commonly used to manipulate those views.
+ * <p>
+ * One consequence of ease-of-use is that some of the methods provided 
+ * by this class are redundant. For example, some methods have (irow,icol) 
+ * parameters that specify the row and column indices of a tile. These 
+ * parameters are useful for mosaics with more than one tile. However, the 
+ * most common case is a mosaic with only one tile; and, for this case, a 
+ * corresponding method without (irow,icol) parameters is provided as well. 
+ * The latter method simply calls the former with (irow,icol) = (0,0).
+ * <p>
+ * An important property of a plot frame is the orientation of its axes.
  * Tiles have axes x1 and x2. By default, the x1 axis increases toward
  * the right and the x2 axis increases toward the top of each tile in a
  * mosaic. In this default X1RIGHT_X2UP orientation, the coordinates 
@@ -108,14 +122,23 @@ public class PlotFrame extends JFrame {
     this.setLayout(new BorderLayout());
     this.add(_plot,BorderLayout.CENTER);
     this.setSize(200+300*ncol,100+300*nrow);
-    //this.setVisible(true);
+  }
+
+  /**
+   * Gets the tile with specified row and column indices.
+   * @param irow the row index.
+   * @param icol the column index.
+   * @return the tile.
+   */
+  public Tile getTile(int irow, int icol) {
+    return _mosaic.getTile(irow,icol);
   }
 
   /**
    * Adds the color bar with no label. The color bar paints the color map 
    * of the most recently added pixels view. To avoid confusion, a color 
-   * bar should not be added when this plot frame contains more than one 
-   * pixels view.
+   * bar should perhaps not be added when this plot frame contains more 
+   * than one pixels view.
    */
   public ColorBar addColorBar() {
     return addColorBar(null);
@@ -129,8 +152,8 @@ public class PlotFrame extends JFrame {
     _colorBarLabel = label;
     if (_colorBar==null) {
       _colorBar = new ColorBar(label);
-      if (_pixelsView!=null) {
-        _pixelsView.addColorMapListener(_colorBar);
+      if (_colorBarPixelsView!=null) {
+        _colorBarPixelsView.addColorMapListener(_colorBar);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 1;
@@ -150,6 +173,7 @@ public class PlotFrame extends JFrame {
       }
     } else {
       _colorBar.setLabel(label);
+      _plot.revalidate();
     }
     return _colorBar;
   }
@@ -159,6 +183,8 @@ public class PlotFrame extends JFrame {
    */
   public void removeColorBar() {
     if (_colorBar!=null) {
+      if (_colorBarPixelsView!=null)
+        _colorBarPixelsView.removeColorMapListener(_colorBar);
       _plot.remove(_colorBar);
       _plot.revalidate();
       _colorBar = null;
@@ -301,6 +327,7 @@ public class PlotFrame extends JFrame {
    * Assumes zero first sample values and unit sampling intervals.
    * @param f array[n2][n1] of sampled function values f(x1,x2), where 
    *  n1 = f[0].length and n2 = f.length.
+   * @return the pixels view.
    */
   public PixelsView addPixels(float[][] f) {
     return addPixels(0,0,f);
@@ -308,25 +335,109 @@ public class PlotFrame extends JFrame {
 
   /**
    * Adds a pixels view of the specified sampled function f(x1,x2).
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
+   *  n1 = f[0].length and n2 = f.length.
+   * @return the pixels view.
+   */
+  public PixelsView addPixels(Sampling s1, Sampling s2, float[][] f) {
+    return addPixels(0,0,s1,s2,f);
+  }
+
+  /**
+   * Adds a pixels view of the specified sampled function f(x1,x2).
    * Assumes zero first sample values and unit sampling intervals.
    * @param irow the tile row index.
    * @param icol the tile column index.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
-   *  n1 = f[0].length and n2 = f.length.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), 
+   *  where n1 = f[0].length and n2 = f.length.
+   * @return the pixels view.
    */
   public PixelsView addPixels(int irow, int icol, float[][] f) {
-    if (_colorBar!=null && _pixelsView!=null)
-      _pixelsView.removeColorMapListener(_colorBar);
-    _pixelsView = new PixelsView(f);
-    if (_orientation==Orientation.X1RIGHT_X2UP) {
-      _pixelsView.setOrientation(PixelsView.Orientation.X1RIGHT_X2UP);
-    } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      _pixelsView.setOrientation(PixelsView.Orientation.X1DOWN_X2RIGHT);
-    }
-    if (_colorBar!=null)
-      _pixelsView.addColorMapListener(_colorBar);
-    _mosaic.getTile(irow,icol).addTiledView(_pixelsView);
-    return _pixelsView;
+    PixelsView pv = new PixelsView(f);
+    return addPixelsView(irow,icol,pv);
+  }
+
+  /**
+   * Adds a pixels view of the specified sampled function f(x1,x2).
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), 
+   *  where n1 = f[0].length and n2 = f.length.
+   * @return the pixels view.
+   */
+  public PixelsView addPixels(
+    int irow, int icol, Sampling s1, Sampling s2, float[][] f) {
+    PixelsView pv = new PixelsView(s1,s2,f);
+    return addPixelsView(irow,icol,pv);
+  }
+
+  /**
+   * Adds a points view of the arrays x1 and x2 of point (x1,x2) coordinates.
+   * @param x1 array of x1 coordinates.
+   * @param x2 array of x2 coordinates.
+   * @return the points view.
+   */
+  public PointsView addPoints(float[] x1, float[] x2) {
+    return addPoints(0,0,x1,x2);
+  }
+
+  /**
+   * Adds a points view of (x1,x2) with specified x2 coordinates.
+   * The corresponding coordinates x1 are assumed to be 0, 1, 2, ....
+   * @param x2 array of x2 coordinates.
+   */
+  public PointsView addPoints(float[] x2) {
+    return addPoints(0,0,x2);
+  }
+
+  /**
+   * Constructs a view of points (x1,x2) for a sampled function x2(x1).
+   * @param s1 the sampling of x1 coordinates.
+   * @param x2 array of x2 coordinates.
+   */
+  public PointsView addPoints(Sampling s1, float[] x2) {
+    return addPoints(0,0,s1,x2);
+  }
+
+  /**
+   * Adds a points view of the arrays x1 and x2 of point (x1,x2) coordinates.
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param x1 array of x1 coordinates.
+   * @param x2 array of x2 coordinates.
+   * @return the points view.
+   */
+  public PointsView addPoints(int irow, int icol, float[] x1, float[] x2) {
+    PointsView pv = new PointsView(x1,x2);
+    return addPointsView(irow,icol,pv);
+  }
+
+  /**
+   * Adds a points view of (x1,x2) with specified x2 coordinates.
+   * The corresponding coordinates x1 are assumed to be 0, 1, 2, ....
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param x2 array of x2 coordinates.
+   */
+  public PointsView addPoints(int irow, int icol, float[] x2) {
+    PointsView pv = new PointsView(x2);
+    return addPointsView(irow,icol,pv);
+  }
+
+  /**
+   * Constructs a view of points (x1,x2) for a sampled function x2(x1).
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param s1 the sampling of x1 coordinates.
+   * @param x2 array of x2 coordinates.
+   */
+  public PointsView addPoints(int irow, int icol, Sampling s1, float[] x2) {
+    PointsView pv = new PointsView(s1,x2);
+    return addPointsView(irow,icol,pv);
   }
 
   /**
@@ -347,9 +458,9 @@ public class PlotFrame extends JFrame {
   // private
 
   private Mosaic _mosaic;
-  private PixelsView _pixelsView;
   private ColorBar _colorBar;
   private String _colorBarLabel;
+  private PixelsView _colorBarPixelsView;
   private Title _title;
   private IPanel _plot;
   private Orientation _orientation;
@@ -418,5 +529,30 @@ public class PlotFrame extends JFrame {
         return getMinimumSize();
       }
     }
+  }
+
+  private PixelsView addPixelsView(int irow, int icol, PixelsView pv) {
+    if (_colorBar!=null && _colorBarPixelsView!=null)
+      _colorBarPixelsView.removeColorMapListener(_colorBar);
+    _colorBarPixelsView = pv;
+    if (_orientation==Orientation.X1RIGHT_X2UP) {
+      _colorBarPixelsView.setOrientation(PixelsView.Orientation.X1RIGHT_X2UP);
+    } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
+      _colorBarPixelsView.setOrientation(PixelsView.Orientation.X1DOWN_X2RIGHT);
+    }
+    if (_colorBar!=null)
+      _colorBarPixelsView.addColorMapListener(_colorBar);
+    _mosaic.getTile(irow,icol).addTiledView(_colorBarPixelsView);
+    return _colorBarPixelsView;
+  }
+
+  private PointsView addPointsView(int irow, int icol, PointsView pv) {
+    if (_orientation==Orientation.X1RIGHT_X2UP) {
+      pv.setOrientation(PointsView.Orientation.X1RIGHT_X2UP);
+    } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
+      pv.setOrientation(PointsView.Orientation.X1DOWN_X2RIGHT);
+    }
+    _mosaic.getTile(irow,icol).addTiledView(pv);
+    return pv;
   }
 }

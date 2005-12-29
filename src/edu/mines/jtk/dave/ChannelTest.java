@@ -183,7 +183,7 @@ public class ChannelTest {
     PixelsView pv = new PixelsView(f);
     pv.setOrientation(PixelsView.Orientation.X1DOWN_X2RIGHT);
     pv.setInterpolation(PixelsView.Interpolation.LINEAR);
-    pv.setColorModel(ByteIndexColorModel.linearHue(0.0,0.7));
+    pv.setColorMap(PixelsView.ColorMap.JET);
     pv.setClips(fmin,fmax);
 
     Tile tile = mosaic.getTile(0,0);
