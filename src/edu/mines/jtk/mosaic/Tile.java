@@ -34,7 +34,6 @@ import javax.swing.*;
  * normalized coordinates (1.0,1.0) to device coordinates (width-1,height-1),
  * where width and height represent the size of the tile. The transcaler
  * changes when either its size or its view rectangle is changed.
- * 
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.27
  * @version 2005.12.23
@@ -373,21 +372,27 @@ public class Tile extends IPanel {
   private void updateBestProjectors() {
     Projector bhp = null;
     Projector bvp = null;
-    if (_shp==null || _svp==null) {
-      int ntv = _tvs.size();
-      if (ntv>0) {
-        TiledView tv = _tvs.get(ntv-1);
-        if (_shp==null)
-          bhp = tv.getBestHorizontalProjector();
-        if (_svp==null)
-          bvp = tv.getBestVerticalProjector();
-        for (int itv=ntv-2; itv>=0; --itv) {
-          tv = _tvs.get(itv);
-          if (_shp==null)
-            bhp.merge(tv.getBestHorizontalProjector());
-          if (_svp==null)
-            bvp.merge(tv.getBestVerticalProjector());
-        }
+    int ntv = _tvs.size();
+    if (_shp==null) {
+      int itv = ntv-1;
+      for (; bhp==null && itv>=0; --itv) {
+        TiledView tv = _tvs.get(itv);
+        bhp = tv.getBestHorizontalProjector();
+      }
+      for (; itv>=0; --itv) {
+        TiledView tv = _tvs.get(itv);
+        bhp.merge(tv.getBestHorizontalProjector());
+      }
+    }
+    if (_svp==null) {
+      int itv = ntv-1;
+      for (; bvp==null && itv>=0; --itv) {
+        TiledView tv = _tvs.get(itv);
+        bvp = tv.getBestVerticalProjector();
+      }
+      for (; itv>=0; --itv) {
+        TiledView tv = _tvs.get(itv);
+        bvp.merge(tv.getBestVerticalProjector());
       }
     }
     _bhp = (_shp!=null)?_shp:bhp;

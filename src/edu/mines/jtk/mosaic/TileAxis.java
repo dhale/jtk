@@ -161,6 +161,73 @@ public class TileAxis extends IPanel {
       _mosaic.revalidate();
   }
 
+  /**
+   * Gets the axis tics painted by this tile axis. Axis tics depend on
+   * the graphics context in which the axis will be painted. For example,
+   * the font size in the graphics context font used to ensure that the
+   * labels of major tics can be painted without overlap.
+   * <p>
+   * The axis tics depend also on the projectors and transcaler of the
+   * tile adjacent to this axis. These attributes are assumed to be valid
+   * when this method is called.
+   * @param g2d the graphics context.
+   * @param w the width of the graphics rectangle.
+   * @param h the height of the graphics rectangle.
+   * @return the axis tics.
+   */
+  public AxisTics getAxisTics(Graphics2D g2d, int w, int h) {
+
+    // Adjacent tile.
+    Tile tile = getTile();
+    if (tile==null)
+      return null;
+
+    // Projector and transcaler from adjacent tile.
+    Projector p = (isHorizontal()) ?
+      tile.getHorizontalProjector() :
+      tile.getVerticalProjector();
+    Transcaler t = tile.getTranscaler(w,h);
+
+    // Font height.
+    Font font = g2d.getFont();
+    FontMetrics fm = g2d.getFontMetrics();
+    FontRenderContext frc = g2d.getFontRenderContext();
+    LineMetrics lm = font.getLineMetrics("0.123456789",frc);
+    int fh = round(lm.getHeight());
+
+    // Axis placement.
+    boolean isHorizontal = isHorizontal();
+
+    // Axis tics.
+    AxisTics at;
+    double umin = p.u0();
+    double umax = p.u1();
+    double vmin = min(p.v0(),p.v1());
+    double vmax = max(p.v0(),p.v1());
+    if (isHorizontal) {
+      int nmax = 2+w/maxTicStringWidth(fm);
+      double u0 = max(umin,t.x(0));
+      double u1 = min(umax,t.x(w-1));
+      double v0 = max(vmin,min(vmax,p.v(u0)));
+      double v1 = max(vmin,min(vmax,p.v(u1)));
+      double du = min(umax-umin,t.width(w));
+      double dv = abs(p.v(u0+du)-p.v(u0));
+      at = new AxisTics(vmin,vmin+dv,nmax);
+      at = new AxisTics(v0,v1,at.getDeltaMajor());
+    } else {
+      int nmax = 2+h/(4*fh);
+      double u0 = max(umin,t.y(0));
+      double u1 = min(umax,t.y(h-1));
+      double v0 = max(vmin,min(vmax,p.v(u0)));
+      double v1 = max(vmin,min(vmax,p.v(u1)));
+      double du = min(umax-umin,t.height(h));
+      double dv = abs(p.v(u0+du)-p.v(u0));
+      at = new AxisTics(vmin,vmin+dv,nmax);
+      at = new AxisTics(v0,v1,at.getDeltaMajor());
+    }
+    return at;
+  }
+
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
     g2d = createGraphics(g2d,x,y,w,h);
     g2d.setRenderingHint(
@@ -197,32 +264,7 @@ public class TileAxis extends IPanel {
     boolean isLeft = isLeft();
 
     // Axis tics.
-    AxisTics at;
-    double umin = p.u0();
-    double umax = p.u1();
-    double vmin = min(p.v0(),p.v1());
-    double vmax = max(p.v0(),p.v1());
-    if (isHorizontal) {
-      int nmax = 2+w/maxTicStringWidth(fm);
-      double u0 = max(umin,t.x(0));
-      double u1 = min(umax,t.x(w-1));
-      double v0 = max(vmin,min(vmax,p.v(u0)));
-      double v1 = max(vmin,min(vmax,p.v(u1)));
-      double du = min(umax-umin,t.width(w));
-      double dv = abs(p.v(u0+du)-p.v(u0));
-      at = new AxisTics(vmin,vmin+dv,nmax);
-      at = new AxisTics(v0,v1,at.getDeltaMajor());
-    } else {
-      int nmax = 2+h/(4*fh);
-      double u0 = max(umin,t.y(0));
-      double u1 = min(umax,t.y(h-1));
-      double v0 = max(vmin,min(vmax,p.v(u0)));
-      double v1 = max(vmin,min(vmax,p.v(u1)));
-      double du = min(umax-umin,t.height(h));
-      double dv = abs(p.v(u0+du)-p.v(u0));
-      at = new AxisTics(vmin,vmin+dv,nmax);
-      at = new AxisTics(v0,v1,at.getDeltaMajor());
-    }
+    AxisTics at = getAxisTics(g2d,w,h);
     int nticMajor = at.getCountMajor();
     double dticMajor = at.getDeltaMajor();
     double fticMajor = at.getFirstMajor();

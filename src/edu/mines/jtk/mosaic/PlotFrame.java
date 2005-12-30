@@ -323,6 +323,50 @@ public class PlotFrame extends JFrame {
   }
 
   /**
+   * Adds a grid view.
+   * @return the grid view.
+   */
+  public GridView addGrid() {
+    return addGrid(0,0);
+  }
+
+  /**
+   * Adds a grid view with specified parameters string. 
+   * For the format of the parameters string, see 
+   * {@link edu.mines.jtk.mosaic.GridView#set(String)}.
+   * @param parameters the parameters string.
+   * @return the grid view.
+   */
+  public GridView addGrid(String parameters) {
+    return addGrid(0,0,parameters);
+  }
+
+  /**
+   * Adds a grid view.
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @return the grid view.
+   */
+  public GridView addGrid(int irow, int icol) {
+    GridView gv = new GridView();
+    return addGridView(irow,icol,gv);
+  }
+
+  /**
+   * Adds a grid view with specified parameters string.
+   * For the format of the parameters string, see 
+   * {@link edu.mines.jtk.mosaic.GridView#set(String)}.
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param parameters the parameters string.
+   * @return the grid view.
+   */
+  public GridView addGrid(int irow, int icol, String parameters) {
+    GridView gv = new GridView(parameters);
+    return addGridView(irow,icol,gv);
+  }
+
+  /**
    * Adds a pixels view of the specified sampled function f(x1,x2).
    * Assumes zero first sample values and unit sampling intervals.
    * @param f array[n2][n1] of sampled function values f(x1,x2), where 
@@ -554,5 +598,10 @@ public class PlotFrame extends JFrame {
     }
     _mosaic.getTile(irow,icol).addTiledView(pv);
     return pv;
+  }
+
+  private GridView addGridView(int irow, int icol, GridView gv) {
+    _mosaic.getTile(irow,icol).addTiledView(gv);
+    return gv;
   }
 }

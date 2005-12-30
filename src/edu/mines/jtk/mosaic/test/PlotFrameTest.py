@@ -22,6 +22,9 @@ pxv1 = pf.addPixels(0,1,s1,s2,f)
 pxv0.setColorMap(PixelsView.ColorMap.GRAY)
 pxv1.setColorMap(PixelsView.ColorMap.JET)
 
+gv0 = pf.addGrid(0,0,"hc-");
+gv1 = pf.addGrid(0,1,"hvw-.");
+
 ptv0 = pf.addPoints(0,0,s1,x2);
 ptv1 = pf.addPoints(0,1,x1,x2);
 ptv0.setStyle("r--.");
