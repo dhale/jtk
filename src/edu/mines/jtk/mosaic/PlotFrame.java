@@ -7,39 +7,19 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic;
 
 import java.awt.*;
-import java.awt.font.*;
 import java.io.*;
-import java.util.*;
 import javax.swing.*;
-import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.gui.*;
 import static java.lang.Math.*;
 
 /**
- * A plot frame is a window containing a mosaic of 2-D graphical views.
- * A plot frame may also contain a color bar and/or title. The plot frame's
- * mosaic may contain any number or rows and columns of tiles. Each tile 
- * may contain any number of tiled graphical views.
+ * A plot frame is a window containing one or two plot panels. 
+ * A plot frame may also contain menu and tool bars.
  * <p>
- * The primary purpose of this class is ease-of-use. A plot frame handles
- * most of the work of constructing a mosaic of tiled graphical views and
- * the modes, menus, and toolbars commonly used to manipulate those views.
- * <p>
- * One consequence of ease-of-use is that some of the methods provided 
- * by this class are redundant. For example, some methods have (irow,icol) 
- * parameters that specify the row and column indices of a tile. These 
- * parameters are useful for mosaics with more than one tile. However, the 
- * most common case is a mosaic with only one tile; and, for this case, a 
- * corresponding method without (irow,icol) parameters is provided as well. 
- * The latter method simply calls the former with (irow,icol) = (0,0).
- * <p>
- * An important property of a plot frame is the orientation of its axes.
- * Tiles have axes x1 and x2. By default, the x1 axis increases toward
- * the right and the x2 axis increases toward the top of each tile in a
- * mosaic. In this default X1RIGHT_X2UP orientation, the coordinates 
- * (x1,x2) correspond to conventional (x,y) coordinates. An alternative
- * orientation is X1DOWN_X2RIGHT, which is useful when the x1 axis 
- * corresponds to, say, a depth coordinate z.
+ * Plot frames that contain two plot panels also contain a split pane
+ * with either a horizontal (size-by-side) or vertical (above-and-below)
+ * orientation. The split pane enables interactive resizing of the plot 
+ * panels.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.12.25
  */
@@ -47,441 +27,98 @@ public class PlotFrame extends JFrame {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Orientation of axes x1 and x2. For example, the default orientation 
-   * X1RIGHT_X2UP corresponds to x1 increasing horizontally from left to 
-   * right, and x2 increasing vertically from bottom to top.
+   * Orientation of the split pane (if any) containing two plot panels.
    */
-  public enum Orientation {
-    X1RIGHT_X2UP,
-    X1DOWN_X2RIGHT
+  public enum Split {
+    HORIZONTAL,
+    VERTICAL
   }
 
   /**
-   * Constructs a new plot frame with a mosaic of one tile.
-   * Uses the default orientation X1RIGHT_X2UP.
+   * Constructs a plot frame for the specified plot panel.
+   * @param panel
    */
-  public PlotFrame() {
-    this(1,1,Orientation.X1RIGHT_X2UP);
-  }
-
-  /**
-   * Constructs a new plot frame with a mosaic of nrow by ncol tiles.
-   * Uses the default orientation X1RIGHT_X2UP.
-   * @param nrow the number of rows.
-   * @param ncol the number of columns.
-   */
-  public PlotFrame(int nrow, int ncol) {
-    this(nrow,ncol,Orientation.X1RIGHT_X2UP);
-  }
-
-  /**
-   * Constructs a new plot frame with a mosaic of one tile.
-   * @param orientation the plot orientation.
-   */
-  public PlotFrame(Orientation orientation) {
-    this(1,1,orientation);
-  }
-
-  /**
-   * Constructs a new plot frame with a mosaic of nrow by ncol tiles.
-   * @param nrow the number of rows.
-   * @param ncol the number of columns.
-   * @param orientation the plot orientation.
-   */
-  public PlotFrame(int nrow, int ncol, Orientation orientation) {
-    super();
-    _orientation = orientation;
-    _plot = new IPanel();
-    _plot.setLayout(new GridBagLayout());
-    Set<Mosaic.AxesPlacement> axesPlacement;
-    if (orientation==Orientation.X1DOWN_X2RIGHT) {
-      axesPlacement = EnumSet.of(
-        Mosaic.AxesPlacement.LEFT,
-        Mosaic.AxesPlacement.TOP
-      );
-    } else {
-      axesPlacement = EnumSet.of(
-        Mosaic.AxesPlacement.LEFT,
-        Mosaic.AxesPlacement.BOTTOM
-      );
-    }
-    _mosaic = new Mosaic(nrow,ncol,axesPlacement);
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.gridx = 0;
-    gbc.gridy = 1;
-    gbc.gridwidth = 1;
-    gbc.gridheight = 1;
-    gbc.weightx = 100;
-    gbc.weighty = 100;
-    gbc.fill = GridBagConstraints.BOTH;
-    _plot.add(_mosaic,gbc);
-    _plot.revalidate();
-    ModeManager modeManager = _mosaic.getModeManager();
-    TileZoomMode zoomMode = new TileZoomMode(modeManager);
-    zoomMode.setActive(true);
+  public PlotFrame(PlotPanel panel) {
+    _panelTL = panel;
+    _panelMain = new MainPanel();
+    _panelMain.setLayout(new BorderLayout());
+    _panelMain.add(_panelTL,BorderLayout.CENTER);
     this.setLayout(new BorderLayout());
-    this.add(_plot,BorderLayout.CENTER);
-    this.setSize(200+300*ncol,100+300*nrow);
+    this.add(_panelMain,BorderLayout.CENTER);
+    Mosaic mosaic = _panelTL.getMosaic();
+    int nrow = mosaic.countRows();
+    int ncol = mosaic.countColumns();
+    int width = 200+300*ncol;
+    int height = 100+300*nrow;
+    this.setSize(width,height);
   }
 
   /**
-   * Gets the tile with specified row and column indices.
-   * @param irow the row index.
-   * @param icol the column index.
-   * @return the tile.
+   * Constructs a plot frame with two plot panels in a split pane.
+   * @param panelTL the top-left panel.
+   * @param panelBR the bottom-right panel.
+   * @param split the split pane orientation.
    */
-  public Tile getTile(int irow, int icol) {
-    return _mosaic.getTile(irow,icol);
-  }
-
-  /**
-   * Adds the color bar with no label. The color bar paints the color map 
-   * of the most recently added pixels view. To avoid confusion, a color 
-   * bar should perhaps not be added when this plot frame contains more 
-   * than one pixels view.
-   */
-  public ColorBar addColorBar() {
-    return addColorBar(null);
-  }
-
-  /**
-   * Adds the color bar with specified label.
-   * @param label the label; null, if none.
-   */
-  public ColorBar addColorBar(String label) {
-    _colorBarLabel = label;
-    if (_colorBar==null) {
-      _colorBar = new ColorBar(label);
-      if (_colorBarPixelsView!=null) {
-        _colorBarPixelsView.addColorMapListener(_colorBar);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.weightx = 0;
-        gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.VERTICAL;
-        gbc.anchor = GridBagConstraints.EAST;
-        int top = _mosaic.getHeightAxesTop();
-        int left = 25;
-        int bottom = _mosaic.getHeightAxesBottom();
-        int right = 0;
-        gbc.insets = new Insets(top,left,bottom,right);
-        _plot.add(_colorBar,gbc);
-        _plot.revalidate();
-      }
+  public PlotFrame(PlotPanel panelTL, PlotPanel panelBR, Split split) {
+    _panelTL = panelTL;
+    _panelBR = panelBR;
+    _split = split;
+    _panelMain = new MainPanel();
+    _panelMain.setLayout(new BorderLayout());
+    if (_split==Split.HORIZONTAL) {
+      _splitPane = new JSplitPane(
+        JSplitPane.HORIZONTAL_SPLIT,_panelTL,_panelBR);
     } else {
-      _colorBar.setLabel(label);
-      _plot.revalidate();
+      _splitPane = new JSplitPane(
+        JSplitPane.VERTICAL_SPLIT,_panelTL,_panelBR);
     }
-    return _colorBar;
-  }
-
-  /**
-   * Removes the color bar.
-   */
-  public void removeColorBar() {
-    if (_colorBar!=null) {
-      if (_colorBarPixelsView!=null)
-        _colorBarPixelsView.removeColorMapListener(_colorBar);
-      _plot.remove(_colorBar);
-      _plot.revalidate();
-      _colorBar = null;
-    }
-  }
-
-  /**
-   * Adds the plot title.
-   * @param title the title; null, if none.
-   */
-  public void addTitle(String title) {
-    setTitle(title);
-  }
-
-  /**
-   * Sets the plot title.
-   * @param title the title; null, if none.
-   */
-  public void setTitle(String title) {
-    if (title!=null) {
-      if (_title==null) {
-        _title = new Title(title);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.weightx = 0;
-        gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.BOTH;
-        int top = 0;
-        int left = _mosaic.getWidthAxesLeft();
-        int bottom = 0;
-        int right = _mosaic.getWidthAxesRight();
-        gbc.insets = new Insets(top,left,bottom,right);
-        _plot.add(_title,gbc);
-        _plot.revalidate();
-      } else {
-        _title.set(title);
-      }
-    } else if (_title!=null) {
-      _plot.remove(_title);
-      _plot.revalidate();
-    }
-  }
-
-  /**
-   * Removes the plot title.
-   */
-  public void removeTitle() {
-    setTitle(null);
-  }
-
-  /**
-   * Sets the label for the horizontal axis.
-   * @param label the label.
-   */
-  public void setHLabel(String label) {
-    setHLabel(0,label);
-  }
-
-  /**
-   * Sets the label for the vertical axis.
-   * @param label the label.
-   */
-  public void setVLabel(String label) {
-    setVLabel(0,label);
-  }
-
-  /**
-   * Sets the label for the horizontal axis in the specified column.
-   * @param icol the column index.
-   * @param label the label.
-   */
-  public void setHLabel(int icol, String label) {
-    if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      _mosaic.getTileAxisTop(icol).setLabel(label);
+    _splitPane.setOneTouchExpandable(true);
+    _splitPane.setResizeWeight(0.5);
+    _panelMain.add(_splitPane,BorderLayout.CENTER);
+    this.add(_panelMain,BorderLayout.CENTER);
+    Mosaic mosaicTL = _panelTL.getMosaic();
+    Mosaic mosaicBR = _panelBR.getMosaic();
+    int nrowTL = mosaicTL.countRows();
+    int ncolTL = mosaicTL.countColumns();
+    int nrowBR = mosaicBR.countRows();
+    int ncolBR = mosaicBR.countColumns();
+    int width = 0;
+    int height = 0;
+    if (_split==Split.HORIZONTAL) {
+      width += 400+300*(ncolTL+ncolBR);
+      height += 200+300*max(nrowTL,nrowBR);
     } else {
-      _mosaic.getTileAxisBottom(icol).setLabel(label);
+      width += 400+300*max(ncolTL,ncolBR);
+      height += 200+300*(nrowTL+nrowBR);
     }
-    if (_colorBar!=null) {
-      removeColorBar();
-      addColorBar(_colorBarLabel);
-    }
+    this.setSize(width,height);
   }
 
   /**
-   * Sets the label for the vertical axis in the specified row.
-   * @param irow the row index.
-   * @param label the label.
+   * Gets the plot panel in this frame. If this frame contains more 
+   * than one plot panel, this method returns the top-left panel.
+   * @return the plot panel.
    */
-  public void setVLabel(int irow, String label) {
-    _mosaic.getTileAxisLeft(irow).setLabel(label);
+  public PlotPanel getPlotPanel() {
+    return _panelTL;
   }
 
   /**
-   * Sets the label for the X1 axis.
-   * @param label the label.
+   * Gets the top-left plot panel in this frame. If this panel contains only 
+   * one panel, then the top-left and bottom-right panels are the same.
+   * @return the top-left plot panel.
    */
-  public void setX1Label(String label) {
-    setX1Label(0,label);
+  public PlotPanel getPlotPanelTopLeft() {
+    return _panelTL;
   }
 
   /**
-   * Sets the label for the X2 axis.
-   * @param label the label.
+   * Gets the bottom-right plot panel in this frame. If this panel contains 
+   * only one panel, then the top-left and bottom-right panels are the same.
+   * @return the bottom-right plot panel.
    */
-  public void setX2Label(String label) {
-    setX2Label(0,label);
-  }
-
-  /**
-   * Sets the label for X1 axis with specified index.
-   * @param index the row or column index.
-   * @param label the label.
-   */
-  public void setX1Label(int index, String label) {
-    if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      setVLabel(index,label);
-    } else {
-      setHLabel(index,label);
-    }
-  }
-
-  /**
-   * Sets the label for X1 axis with specified index.
-   * @param index the row or column index.
-   * @param label the label.
-   */
-  public void setX2Label(int index, String label) {
-    if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      setHLabel(index,label);
-    } else {
-      setVLabel(index,label);
-    }
-  }
-
-  /**
-   * Adds a grid view.
-   * @return the grid view.
-   */
-  public GridView addGrid() {
-    return addGrid(0,0);
-  }
-
-  /**
-   * Adds a grid view with specified parameters string. 
-   * For the format of the parameters string, see 
-   * {@link edu.mines.jtk.mosaic.GridView#set(String)}.
-   * @param parameters the parameters string.
-   * @return the grid view.
-   */
-  public GridView addGrid(String parameters) {
-    return addGrid(0,0,parameters);
-  }
-
-  /**
-   * Adds a grid view.
-   * @param irow the tile row index.
-   * @param icol the tile column index.
-   * @return the grid view.
-   */
-  public GridView addGrid(int irow, int icol) {
-    GridView gv = new GridView();
-    return addGridView(irow,icol,gv);
-  }
-
-  /**
-   * Adds a grid view with specified parameters string.
-   * For the format of the parameters string, see 
-   * {@link edu.mines.jtk.mosaic.GridView#set(String)}.
-   * @param irow the tile row index.
-   * @param icol the tile column index.
-   * @param parameters the parameters string.
-   * @return the grid view.
-   */
-  public GridView addGrid(int irow, int icol, String parameters) {
-    GridView gv = new GridView(parameters);
-    return addGridView(irow,icol,gv);
-  }
-
-  /**
-   * Adds a pixels view of the specified sampled function f(x1,x2).
-   * Assumes zero first sample values and unit sampling intervals.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
-   *  n1 = f[0].length and n2 = f.length.
-   * @return the pixels view.
-   */
-  public PixelsView addPixels(float[][] f) {
-    return addPixels(0,0,f);
-  }
-
-  /**
-   * Adds a pixels view of the specified sampled function f(x1,x2).
-   * @param s1 the sampling of the variable x1; must be uniform.
-   * @param s2 the sampling of the variable x2; must be uniform.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
-   *  n1 = f[0].length and n2 = f.length.
-   * @return the pixels view.
-   */
-  public PixelsView addPixels(Sampling s1, Sampling s2, float[][] f) {
-    return addPixels(0,0,s1,s2,f);
-  }
-
-  /**
-   * Adds a pixels view of the specified sampled function f(x1,x2).
-   * Assumes zero first sample values and unit sampling intervals.
-   * @param irow the tile row index.
-   * @param icol the tile column index.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), 
-   *  where n1 = f[0].length and n2 = f.length.
-   * @return the pixels view.
-   */
-  public PixelsView addPixels(int irow, int icol, float[][] f) {
-    PixelsView pv = new PixelsView(f);
-    return addPixelsView(irow,icol,pv);
-  }
-
-  /**
-   * Adds a pixels view of the specified sampled function f(x1,x2).
-   * @param irow the tile row index.
-   * @param icol the tile column index.
-   * @param s1 the sampling of the variable x1; must be uniform.
-   * @param s2 the sampling of the variable x2; must be uniform.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), 
-   *  where n1 = f[0].length and n2 = f.length.
-   * @return the pixels view.
-   */
-  public PixelsView addPixels(
-    int irow, int icol, Sampling s1, Sampling s2, float[][] f) {
-    PixelsView pv = new PixelsView(s1,s2,f);
-    return addPixelsView(irow,icol,pv);
-  }
-
-  /**
-   * Adds a points view of the arrays x1 and x2 of point (x1,x2) coordinates.
-   * @param x1 array of x1 coordinates.
-   * @param x2 array of x2 coordinates.
-   * @return the points view.
-   */
-  public PointsView addPoints(float[] x1, float[] x2) {
-    return addPoints(0,0,x1,x2);
-  }
-
-  /**
-   * Adds a points view of (x1,x2) with specified x2 coordinates.
-   * The corresponding coordinates x1 are assumed to be 0, 1, 2, ....
-   * @param x2 array of x2 coordinates.
-   */
-  public PointsView addPoints(float[] x2) {
-    return addPoints(0,0,x2);
-  }
-
-  /**
-   * Constructs a view of points (x1,x2) for a sampled function x2(x1).
-   * @param s1 the sampling of x1 coordinates.
-   * @param x2 array of x2 coordinates.
-   */
-  public PointsView addPoints(Sampling s1, float[] x2) {
-    return addPoints(0,0,s1,x2);
-  }
-
-  /**
-   * Adds a points view of the arrays x1 and x2 of point (x1,x2) coordinates.
-   * @param irow the tile row index.
-   * @param icol the tile column index.
-   * @param x1 array of x1 coordinates.
-   * @param x2 array of x2 coordinates.
-   * @return the points view.
-   */
-  public PointsView addPoints(int irow, int icol, float[] x1, float[] x2) {
-    PointsView pv = new PointsView(x1,x2);
-    return addPointsView(irow,icol,pv);
-  }
-
-  /**
-   * Adds a points view of (x1,x2) with specified x2 coordinates.
-   * The corresponding coordinates x1 are assumed to be 0, 1, 2, ....
-   * @param irow the tile row index.
-   * @param icol the tile column index.
-   * @param x2 array of x2 coordinates.
-   */
-  public PointsView addPoints(int irow, int icol, float[] x2) {
-    PointsView pv = new PointsView(x2);
-    return addPointsView(irow,icol,pv);
-  }
-
-  /**
-   * Constructs a view of points (x1,x2) for a sampled function x2(x1).
-   * @param irow the tile row index.
-   * @param icol the tile column index.
-   * @param s1 the sampling of x1 coordinates.
-   * @param x2 array of x2 coordinates.
-   */
-  public PointsView addPoints(int irow, int icol, Sampling s1, float[] x2) {
-    PointsView pv = new PointsView(s1,x2);
-    return addPointsView(irow,icol,pv);
+  public PlotPanel getPlotPanelBottomRight() {
+    return (_panelBR!=null)?_panelBR:_panelTL;
   }
 
   /**
@@ -495,113 +132,49 @@ public class PlotFrame extends JFrame {
   public void paintToPng(double dpi, double win, String fileName) 
     throws IOException 
   {
-    _plot.paintToPng(dpi,win,fileName);
+    _panelMain.paintToPng(dpi,win,fileName);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private Mosaic _mosaic;
-  private ColorBar _colorBar;
-  private String _colorBarLabel;
-  private PixelsView _colorBarPixelsView;
-  private Title _title;
-  private IPanel _plot;
-  private Orientation _orientation;
+  private Split _split;
+  private PlotPanel _panelTL;
+  private PlotPanel _panelBR;
+  private JSplitPane _splitPane;
+  private MainPanel _panelMain;
+  private ModeManager _modeManager;
 
   /**
-   * Internal class for plot title.
+   * A main panel contains either a plot panel or a split pane that
+   * contains two plot panels. Note that a JSplitPane is not an IPanel.
+   * This class exists to override the method paintToRect of IPanel, so 
+   * that the IPanel children of any JSplitPane are painted.
    */
-  private class Title extends IPanel {
-    String text;
-
-    Title(String text) {
-      this.text = text;
-      Font font = getFont();
-      font = font.deriveFont(1.5f*font.getSize());
-      setFont(font);
-    }
-
-    void set(String text) {
-      this.text = text;
-      repaint();
-    }
-
+  private class MainPanel extends IPanel {
     public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
-      g2d = createGraphics(g2d,x,y,w,h);
-      g2d.setRenderingHint(
-        RenderingHints.KEY_ANTIALIASING,
-        RenderingHints.VALUE_ANTIALIAS_ON);
-
-      Font font = g2d.getFont();
-      FontMetrics fm = g2d.getFontMetrics();
-      FontRenderContext frc = g2d.getFontRenderContext();
-      LineMetrics lm = font.getLineMetrics(text,frc);
-      int fh = round(lm.getHeight());
-      int fa = round(lm.getAscent());
-      int fd = round(lm.getDescent());
-
-      int wt = fm.stringWidth(text);
-      int xt = max(0,min(w-wt,(w-wt)/2));
-      int yt = h-1-2*fd;
-      g2d.drawString(text,xt,yt);
-      
-      g2d.dispose();
-    }
-
-    protected void paintComponent(Graphics g) {
-      super.paintComponent(g);
-      paintToRect((Graphics2D)g,0,0,getWidth(),getHeight());
-    }
-
-    public Dimension getMinimumSize() {
-      if (isMinimumSizeSet()) {
-        return super.getMinimumSize();
+      if (_split==null) {
+        _panelTL.paintToRect(g2d,x,y,w,h);
       } else {
-        Font font = getFont();
-        FontMetrics fm = getFontMetrics(font);
-        int fh = fm.getHeight();
-        int fd = fm.getDescent();
-        int wt = fm.stringWidth(text);
-        return new Dimension(wt,fd+fh);
+        double ws = (double)w/(double)_splitPane.getWidth();
+        double hs = (double)h/(double)_splitPane.getHeight();
+        int nc = _splitPane.getComponentCount();
+        for (int ic=0; ic<nc; ++ic) {
+          Component c = _splitPane.getComponent(ic);
+          int xc = c.getX();
+          int yc = c.getY();
+          int wc = c.getWidth();
+          int hc = c.getHeight();
+          xc = (int)round(xc*ws);
+          yc = (int)round(yc*hs);
+          wc = (int)round(wc*ws);
+          hc = (int)round(hc*hs);
+          if (c instanceof IPanel) {
+            IPanel ip = (IPanel)c;
+            ip.paintToRect(g2d,xc,yc,wc,hc);
+          }
+        }
       }
     }
-    public Dimension getPreferredSize() {
-      if (isPreferredSizeSet()) {
-        return super.getPreferredSize();
-      } else {
-        return getMinimumSize();
-      }
-    }
-  }
-
-  private PixelsView addPixelsView(int irow, int icol, PixelsView pv) {
-    if (_colorBar!=null && _colorBarPixelsView!=null)
-      _colorBarPixelsView.removeColorMapListener(_colorBar);
-    _colorBarPixelsView = pv;
-    if (_orientation==Orientation.X1RIGHT_X2UP) {
-      _colorBarPixelsView.setOrientation(PixelsView.Orientation.X1RIGHT_X2UP);
-    } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      _colorBarPixelsView.setOrientation(PixelsView.Orientation.X1DOWN_X2RIGHT);
-    }
-    if (_colorBar!=null)
-      _colorBarPixelsView.addColorMapListener(_colorBar);
-    _mosaic.getTile(irow,icol).addTiledView(_colorBarPixelsView);
-    return _colorBarPixelsView;
-  }
-
-  private PointsView addPointsView(int irow, int icol, PointsView pv) {
-    if (_orientation==Orientation.X1RIGHT_X2UP) {
-      pv.setOrientation(PointsView.Orientation.X1RIGHT_X2UP);
-    } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      pv.setOrientation(PointsView.Orientation.X1DOWN_X2RIGHT);
-    }
-    _mosaic.getTile(irow,icol).addTiledView(pv);
-    return pv;
-  }
-
-  private GridView addGridView(int irow, int icol, GridView gv) {
-    _mosaic.getTile(irow,icol).addTiledView(gv);
-    return gv;
   }
 }
