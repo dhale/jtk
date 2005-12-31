@@ -184,37 +184,6 @@ public class Tile extends IPanel {
     _mosaic.setViewRect(this,vr);
   }
 
-  /**
-   * Sets the option to paint lines at world coordinates x=0 and y=0.
-   * When painting zero lines, the tile paints lines before painting its 
-   * tiled views. The defaults are false.
-   * @param px true, to paint vertical zero line at x=0; false, otherwise.
-   * @param py true, to paint horizontal zero line at y=0; false, otherwise.
-   */
-  public void setZeroLinePaint(boolean px, boolean py) {
-    if (_zeroLinePaintX!=px || _zeroLinePaintY!=py) {
-      _zeroLinePaintX = px;
-      _zeroLinePaintY = py;
-      repaint();
-    }
-  }
-
-  /**
-   * Sets colors of lines painted at world coordinates x=0 and y=0.
-   * When painting zero lines, the tile paints lines with the specified 
-   * colors before painting its tiled views. If null (the default),
-   * the tile foreground is used.
-   * @param cx the color of the vertical line drawn at x=0.
-   * @param cy the color of the horizontal line drawn at y=0.
-   */
-  public void setZeroLineColor(Color cx, Color cy) {
-    if (_zeroLineColorX!=cx || _zeroLineColorY!=cy) {
-      _zeroLineColorX = cx;
-      _zeroLineColorY = cy;
-      repaint();
-    }
-  }
-
   // We override this method so that we can update our transcaler. We assume 
   // that this is the *only* way that our size changes. Also, we assume that 
   // a repaint is already pending, so we need not request one here.
@@ -231,21 +200,6 @@ public class Tile extends IPanel {
 
     // Set transcaler for the graphics rectangle.
     _ts = getTranscaler(w,h);
-
-    // Paint zero lines.
-    if (_zeroLinePaintX) {
-      int x0 = _ts.x(_hp.u(0.0));
-      if (_zeroLineColorX!=null)
-        g2d.setColor(_zeroLineColorX);
-      g2d.drawLine(x0,0,x0,h-1);
-    }
-    if (_zeroLinePaintY) {
-      int y0 = _ts.y(_vp.u(0.0));
-      if (_zeroLineColorY!=null)
-        g2d.setColor(_zeroLineColorY);
-      g2d.drawLine(0,y0,w-1,y0);
-    }
-    g2d.setColor(getForeground());
 
     // Paint tiles.
     for (TiledView tv : _tvs) {
@@ -364,10 +318,6 @@ public class Tile extends IPanel {
   private Projector _svp; // specified best vertical projector; or null
   private Transcaler _ts = new Transcaler();
   private DRectangle _vr = new DRectangle(0.0,0.0,1.0,1.0);
-  private boolean _zeroLinePaintX;
-  private boolean _zeroLinePaintY;
-  private Color _zeroLineColorX;
-  private Color _zeroLineColorY;
 
   private void updateBestProjectors() {
     Projector bhp = null;

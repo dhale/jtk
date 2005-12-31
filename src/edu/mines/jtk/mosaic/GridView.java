@@ -16,20 +16,34 @@ import static edu.mines.jtk.util.MathPlus.*;
  * Grid lines that extend tics in tile axes into tiles. Grid lines can be 
  * painted above or below other tiled views in a tile, simply by adding 
  * a grid view before or after those other tiled views.
+ *
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.12.29
  */
 public class GridView extends TiledView {
 
   /**
-   * The grid direction.
-   * The default direction is both (horizontal and vertical).
+   * The grid horizontal type. The type can be none for no horizontal
+   * grid lines, zero for one horizontal grid line at value zero, and
+   * major for horizontal grid lines at all values of major axis tics.
+   * The default type is major.
    */
-  public enum Direction {
+  public enum Horizontal {
     NONE,
-    HORIZONTAL,
-    VERTICAL,
-    BOTH,
+    ZERO,
+    MAJOR,
+  }
+
+  /**
+   * The grid vertical type. The type can be none for no horizontal
+   * grid lines, zero for one vertical grid line at value zero, and
+   * major for vertical grid lines at all values of major axis tics.
+   * The default type is major.
+   */
+  public enum Vertical {
+    NONE,
+    ZERO,
+    MAJOR
   }
 
   /**
@@ -45,17 +59,19 @@ public class GridView extends TiledView {
   }
 
   /**
-   * Constructs a grid view with default direction, style, and color.
+   * Constructs a grid view with default types, style, and color.
    */
   public GridView() {
   }
 
   /**
-   * Constructs a grid view with specified direction.
-   * @param direction the grid direction.
+   * Constructs a grid view with specified types.
+   * @param horizontal the grid horizontal type.
+   * @param vertical the grid vertical type.
    */
-  public GridView(Direction direction) {
-    setDirection(direction);
+  public GridView(Horizontal horizontal, Vertical vertical) {
+    setHorizontal(horizontal);
+    setVertical(vertical);
   }
 
   /**
@@ -75,23 +91,29 @@ public class GridView extends TiledView {
   }
 
   /**
-   * Constructs a grid view with specified direction and color.
-   * @param direction the grid direction.
+   * Constructs a grid view with specified types and color.
+   * @param horizontal the grid horizontal type.
+   * @param vertical the grid vertical type.
    * @param color the grid color.
    */
-  public GridView(Direction direction, Color color) {
-    setDirection(direction);
+  public GridView(Horizontal horizontal, Vertical vertical, Color color) {
+    setHorizontal(horizontal);
+    setVertical(vertical);
     setColor(color);
   }
 
   /**
-   * Constructs a grid view with specified direction, style, and color.
-   * @param direction the grid direction.
+   * Constructs a grid view with specified types, style, and color.
+   * @param horizontal the grid horizontal type.
+   * @param vertical the grid vertical type.
    * @param color the grid color.
    * @param style the grid style.
    */
-  public GridView(Direction direction, Color color, Style style) {
-    setDirection(direction);
+  public GridView(
+    Horizontal horizontal, Vertical vertical, Color color, Style style) 
+  {
+    setHorizontal(horizontal);
+    setVertical(vertical);
     setColor(color);
     setStyle(style);
   }
@@ -102,17 +124,29 @@ public class GridView extends TiledView {
    * @param parameters the color and style of grid lines.
    */
   public GridView(String parameters) {
-    set(parameters);
+    setParameters(parameters);
   }
 
   /**
-   * Sets the grid direction.
-   * The default grid direction is both (horizontal and vertical).
-   * @param direction the direction.
+   * Sets the grid horizontal type.
+   * The default grid horizontal type is major.
+   * @param horizontal the grid horizontal type
    */
-  public void setDirection(Direction direction) {
-    if (_direction!=direction) {
-      _direction = direction;
+  public void setHorizontal(Horizontal horizontal) {
+    if (_horizontal!=horizontal) {
+      _horizontal = horizontal;
+      repaint();
+    }
+  }
+
+  /**
+   * Sets the grid vertical type.
+   * The default grid vertical type is major.
+   * @param vertical the grid vertical type
+   */
+  public void setVertical(Vertical vertical) {
+    if (_vertical!=vertical) {
+      _vertical = vertical;
       repaint();
     }
   }
@@ -143,15 +177,17 @@ public class GridView extends TiledView {
   }
 
   /**
-   * Sets the grid direction, color, and style from a parameter string.
-   * This method provides a convenient way to set the direction, color,
-   * and style of grid lines painted by this view.
+   * Sets the grid types, color, and style parameters from a string.
+   * This method provides a convenient way to set the grid horizontal
+   * and vertical types, color, and style of grid lines for this view.
    * <p>
-   * To specify a grid direction the parameters string may contain "h"
-   * for horizontal grid lines, "v" for vertical grid lines, or both
-   * "h" and "v" for both horizontal and vertical grid lines. If the
-   * parameters string contains neither of these directions, then no
-   * grid lines are painted.
+   * To specify grid horizontal type, the parameters string may contain 
+   * "H0" for grid horizontal type zero, or simply "H" for grid horizontal
+   * type major. Otherwise, the grid horizontal type is none.
+   * <p>
+   * To specify grid vertical type, the parameters string may contain 
+   * "V0" for grid vertical type zero, or simply "V" for grid vertical
+   * type major. Otherwise, the grid vertical type is none.
    * <p>
    * To specify a grid color, the parameters string may contain one of "r" 
    * for red, "g" for green, "b" for blue, "c" for cyan, "m" for magenta, 
@@ -164,17 +200,24 @@ public class GridView extends TiledView {
    * line styles, then no grid lines are painted.
    * @param parameters the grid parameters string.
    */
-  public void set(String parameters) {
+  public void setParameters(String parameters) {
 
-    // Direction.
-    if (parameters.contains("h") && parameters.contains("v")) {
-      setDirection(Direction.BOTH);
-    } else if (parameters.contains("h")) {
-      setDirection(Direction.HORIZONTAL);
-    } else if (parameters.contains("v")) {
-      setDirection(Direction.VERTICAL);
+    // Horizontal.
+    if (parameters.contains("H0")) {
+      setHorizontal(Horizontal.ZERO);
+    } else if (parameters.contains("H")) {
+      setHorizontal(Horizontal.MAJOR);
     } else {
-      setDirection(Direction.NONE);
+      setHorizontal(Horizontal.NONE);
+    }
+
+    // Vertical.
+    if (parameters.contains("V0")) {
+      setVertical(Vertical.ZERO);
+    } else if (parameters.contains("V")) {
+      setVertical(Vertical.MAJOR);
+    } else {
+      setVertical(Vertical.NONE);
     }
 
     // Color.
@@ -215,7 +258,9 @@ public class GridView extends TiledView {
   public void paint(Graphics2D g2d) {
 
     // If no lines, then paint nothing.
-    if (_direction==Direction.NONE || _style==Style.NONE)
+    if (_horizontal==Horizontal.NONE && _vertical==Vertical.NONE) 
+      return;
+    if (_style==Style.NONE)
       return;
 
     // Tile and mosaic. If no mosaic, paint nothing.
@@ -289,10 +334,10 @@ public class GridView extends TiledView {
     int h = ts.height(vr.height);
     
     // Horizontal grid lines.
-    boolean horizontal = 
-      _direction==Direction.HORIZONTAL ||
-      _direction==Direction.BOTH;
-    if (horizontal && axisLeftRight!=null) {
+    if (_horizontal==Horizontal.ZERO) {
+      int y = ts.y(vp.u(0.0));
+      g2d.drawLine(0,y,w-1,y);
+    } else if (_horizontal==Horizontal.MAJOR && axisLeftRight!=null) {
       AxisTics at = axisLeftRight.getAxisTics(g2d,w,h);
       int nticMajor = at.getCountMajor();
       double dticMajor = at.getDeltaMajor();
@@ -306,10 +351,10 @@ public class GridView extends TiledView {
     }
     
     // Vertical grid lines.
-    boolean vertical = 
-      _direction==Direction.VERTICAL ||
-      _direction==Direction.BOTH;
-    if (vertical && axisTopBottom!=null) {
+    if (_vertical==Vertical.ZERO) {
+      int x = ts.x(hp.u(0.0));
+      g2d.drawLine(x,0,x,h-1);
+    } else if (_vertical==Vertical.MAJOR && axisTopBottom!=null) {
       AxisTics at = axisTopBottom.getAxisTics(g2d,w,h);
       int nticMajor = at.getCountMajor();
       double dticMajor = at.getDeltaMajor();
@@ -328,7 +373,8 @@ public class GridView extends TiledView {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private Direction _direction = Direction.BOTH;
+  private Horizontal _horizontal = Horizontal.MAJOR;
+  private Vertical _vertical = Vertical.MAJOR;
   private Style _style = Style.SOLID;
   private Color _color = null;
 

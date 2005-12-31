@@ -1,3 +1,4 @@
+from java.awt import Color
 from edu.mines.jtk.dsp import *
 from edu.mines.jtk.mosaic import *
 from edu.mines.jtk.util import *
@@ -22,8 +23,11 @@ pxv1 = pf.addPixels(0,1,s1,s2,f)
 pxv0.setColorMap(PixelsView.ColorMap.GRAY)
 pxv1.setColorMap(PixelsView.ColorMap.JET)
 
-gv0 = pf.addGrid(0,0,"hc-");
-gv1 = pf.addGrid(0,1,"hvw-.");
+gv0 = pf.addGrid(0,0)
+gv1 = pf.addGrid(0,1)
+gv0.setVertical(GridView.Vertical.ZERO);
+gv0.setColor(Color.YELLOW);
+gv1.setParameters("HVw-.");
 
 ptv0 = pf.addPoints(0,0,s1,x2);
 ptv1 = pf.addPoints(0,1,x1,x2);
@@ -32,8 +36,8 @@ ptv1.setStyle("k-o");
 
 pf.addColorBar("amplitude")
 pf.title = "A Test of PlotFrame"
-pf.setVLabel("depth (km)")
 pf.setHLabel(0,"offset (km)")
 pf.setHLabel(1,"velocity (km/s)")
+pf.setVLabel("depth (km)")
 pf.setVisible(True)
 pf.paintToPng(300,6,"junk.png")
