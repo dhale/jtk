@@ -485,6 +485,7 @@ public class PlotPanel extends IPanel {
     return addPointsView(irow,icol,pv);
   }
 
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 

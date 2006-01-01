@@ -16,8 +16,9 @@ ax = 0.5*d2*(n2-1);
 x1 = Array.rampfloat(f1,d1,n1);
 x2 = Array.add(ax,Array.mul(ax,Array.sin(x1)));
 
-def makePlotPanel():
-  pp = PlotPanel(1,2,PlotPanel.Orientation.X1DOWN_X2RIGHT)
+# For testing below.
+def makePlotPanel(orientation):
+  pp = PlotPanel(1,2,orientation)
 
   pxv0 = pp.addPixels(0,0,s1,s2,f)
   pxv1 = pp.addPixels(0,1,s1,s2,f)
@@ -43,8 +44,14 @@ def makePlotPanel():
 
   return pp
 
-pp1 = makePlotPanel()
-pp2 = makePlotPanel()
-pf = PlotFrame(pp1,pp2,PlotFrame.Split.VERTICAL)
+# One plot panel.
+#pp = makePlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
+#pf = PlotFrame(pp)
+
+# Two plot panels.
+pp1 = makePlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
+pp2 = makePlotPanel(PlotPanel.Orientation.X1RIGHT_X2UP)
+pf = PlotFrame(pp1,pp2,PlotFrame.Split.HORIZONTAL)
+
 pf.setVisible(True)
 pf.paintToPng(300,6,"junk.png")

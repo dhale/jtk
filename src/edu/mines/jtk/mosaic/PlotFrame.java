@@ -14,20 +14,32 @@ import static java.lang.Math.*;
 
 /**
  * A plot frame is a window containing one or two plot panels. 
- * A plot frame may also contain menu and tool bars.
+ * A plot frame (like any JFrame) has a content pane with a border layout, 
+ * and it adds a panel (JPanel) containing its plot panel(s) to the center 
+ * of that content pane. Menu and tool bars can be added as for any other 
+ * JFrame.
  * <p>
  * Plot frames that contain two plot panels also contain a split pane
- * with either a horizontal (size-by-side) or vertical (above-and-below)
+ * with either a horizontal (side by side) or vertical (above and below)
  * orientation. The split pane enables interactive resizing of the plot 
  * panels.
+ * <p>
+ * A plot frame has a single mode manager 
+ * ({@link edu.mines.jtk.gui.ModeManager}).
+ * When constructed, a plot frame adds and sets active a tile zoom mode 
+ * ({@link edu.mines.jtk.mosaic.TileZoomMode}) to that mode manager. Of
+ * course, additional modes of interaction can be added as well.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.12.25
+ * @version 2005.12.31
  */
 public class PlotFrame extends JFrame {
   private static final long serialVersionUID = 1L;
 
   /**
    * Orientation of the split pane (if any) containing two plot panels.
+   * If horizontal, two panels are placed side by side. If vertical,
+   * two panels are place one above the other. This orientation is
+   * unused for plot frames with only one plot panel.
    */
   public enum Split {
     HORIZONTAL,
@@ -40,17 +52,13 @@ public class PlotFrame extends JFrame {
    */
   public PlotFrame(PlotPanel panel) {
     _panelTL = panel;
+    _panelBR = panel;
     _panelMain = new MainPanel();
     _panelMain.setLayout(new BorderLayout());
     _panelMain.add(_panelTL,BorderLayout.CENTER);
-    this.setLayout(new BorderLayout());
+    this.setSize(_panelMain.getPreferredSize());
     this.add(_panelMain,BorderLayout.CENTER);
-    Mosaic mosaic = _panelTL.getMosaic();
-    int nrow = mosaic.countRows();
-    int ncol = mosaic.countColumns();
-    int width = 200+300*ncol;
-    int height = 100+300*nrow;
-    this.setSize(width,height);
+    addModeManager();
   }
 
   /**
@@ -75,23 +83,9 @@ public class PlotFrame extends JFrame {
     _splitPane.setOneTouchExpandable(true);
     _splitPane.setResizeWeight(0.5);
     _panelMain.add(_splitPane,BorderLayout.CENTER);
+    this.setSize(_panelMain.getPreferredSize());
     this.add(_panelMain,BorderLayout.CENTER);
-    Mosaic mosaicTL = _panelTL.getMosaic();
-    Mosaic mosaicBR = _panelBR.getMosaic();
-    int nrowTL = mosaicTL.countRows();
-    int ncolTL = mosaicTL.countColumns();
-    int nrowBR = mosaicBR.countRows();
-    int ncolBR = mosaicBR.countColumns();
-    int width = 0;
-    int height = 0;
-    if (_split==Split.HORIZONTAL) {
-      width += 400+300*(ncolTL+ncolBR);
-      height += 200+300*max(nrowTL,nrowBR);
-    } else {
-      width += 400+300*max(ncolTL,ncolBR);
-      height += 200+300*(nrowTL+nrowBR);
-    }
-    this.setSize(width,height);
+    addModeManager();
   }
 
   /**
@@ -118,7 +112,15 @@ public class PlotFrame extends JFrame {
    * @return the bottom-right plot panel.
    */
   public PlotPanel getPlotPanelBottomRight() {
-    return (_panelBR!=null)?_panelBR:_panelTL;
+    return _panelBR;
+  }
+
+  /**
+   * Gets the mode manager for this plot frame.
+   * @return the mode manager.
+   */
+  public ModeManager getModeManager() {
+    return _modeManager;
   }
 
   /**
@@ -138,12 +140,12 @@ public class PlotFrame extends JFrame {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private Split _split;
-  private PlotPanel _panelTL;
-  private PlotPanel _panelBR;
-  private JSplitPane _splitPane;
-  private MainPanel _panelMain;
-  private ModeManager _modeManager;
+  private PlotPanel _panelTL; // top-left panel
+  private PlotPanel _panelBR; // bottom-right panel
+  private Split _split; // orientation of split pane; null, if one plot panel
+  private JSplitPane _splitPane; // null, if only one plot panel
+  private MainPanel _panelMain; // main panel may contain split pane
+  private ModeManager _modeManager; // mode manager for this plot frame
 
   /**
    * A main panel contains either a plot panel or a split pane that
@@ -176,5 +178,14 @@ public class PlotFrame extends JFrame {
         }
       }
     }
+  }
+
+  private void addModeManager() {
+    _modeManager = new ModeManager();
+    _panelTL.getMosaic().setModeManager(_modeManager);
+    if (_panelBR!=_panelTL)
+      _panelBR.getMosaic().setModeManager(_modeManager);
+    TileZoomMode zoomMode = new TileZoomMode(_modeManager);
+    zoomMode.setActive(true);
   }
 }
