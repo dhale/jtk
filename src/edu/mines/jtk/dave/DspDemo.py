@@ -128,26 +128,26 @@ HP = ButterworthFilter.Type.HIGH_PASS
 LP = ButterworthFilter.Type.LOW_PASS
 
 def filterReal1X(r,fl,al,fh,ah):
-  n1 = r.x1.count
-  d1 = r.x1.delta
-  f1 = r.x1.first
+  n1 = r.sampling.count
+  d1 = r.sampling.delta
+  f1 = r.sampling.first
   fl *= d1
   fh *= d1
   bf = ButterworthFilter(fl,al,fh,ah)
-  x = r.f
+  x = r.values
   y = zerofloat(n1)
   bf.apply(x,y)
   return Real1(n1,d1,f1,y)
 
 def filterReal1(r,f3db,npole,type):
-  n1 = r.x1.count
-  d1 = r.x1.delta
-  f1 = r.x1.first
+  n1 = r.sampling.count
+  d1 = r.sampling.delta
+  f1 = r.sampling.first
   f3db *= d1
   bf = ButterworthFilter(f3db,npole,type)
-  x = r.f
+  x = r.values
   y = zerofloat(n1)
-  bf.apply(x,y)
+  bf.applyForward(x,y)
   return Real1(n1,d1,f1,y)
 
 def makeImpulse(n,m=0):

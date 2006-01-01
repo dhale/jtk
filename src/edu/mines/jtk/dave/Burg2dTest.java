@@ -13,11 +13,9 @@ import java.util.*;
 import javax.swing.*;
 
 import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.gui.*;
 import edu.mines.jtk.mosaic.*;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
-import static edu.mines.jtk.mosaic.Mosaic.*;
 
 /**
  * Test Burg's algorithm for 2-D images.
@@ -38,13 +36,13 @@ public class Burg2dTest {
     float[][] x = makeImage(n1,n2,theta);
     float clip = max(abs(Array.min(x)),abs(Array.max(x)));
     System.out.println("xmin="+Array.min(x)+" xmax="+Array.max(x));
-    plotImage(-clip,clip,x);
+    plot(-clip,clip,x);
     float[][] f1 = burg2d1(m,x);
     System.out.println("f1min="+Array.min(f1)+" f1max="+Array.max(f1));
-    plotImage(-clip,clip,f1);
+    plot(-clip,clip,f1);
     float[][] f4 = burg2d4(m,f1);
     System.out.println("f4min="+Array.min(f4)+" f4max="+Array.max(f4));
-    plotImage(-clip,clip,f4);
+    plot(-clip,clip,f4);
   }
 
   private static float[][] burg2d1(int m, float[][] x) {
@@ -147,51 +145,33 @@ public class Burg2dTest {
     return f;
   }
 
-  private static void plotImage(float[][] f) {
-    plotImage(Array.min(f),Array.max(f),f);
+  private static void plot(float[][] f) {
+    plot(Array.min(f),Array.max(f),f);
   }
-  private static void plotImage(String filename, float[][] f) {
-    plotImage(filename,Array.min(f),Array.max(f),f);
+  private static void plot(String filename, float[][] f) {
+    plot(filename,Array.min(f),Array.max(f),f);
   }
-  private static Mosaic plotImage(
+  private static PlotFrame plot(
     float fmin, float fmax, float[][] f) 
   {
-    int n2 = f.length;
-    int n1 = f[0].length;
-    Set<Mosaic.AxesPlacement> axesPlacement = EnumSet.noneOf(
-      Mosaic.AxesPlacement.class
-    );
-    Mosaic mosaic = new Mosaic(1,1,axesPlacement);
-    mosaic.setBackground(Color.WHITE);
-    mosaic.setFont(new Font("SansSerif",Font.PLAIN,18));
-    mosaic.setPreferredSize(new Dimension(550,500));
-
-    PixelsView pv = new PixelsView(f);
-    pv.setOrientation(PixelsView.Orientation.X1DOWN_X2RIGHT);
+    PlotPanel panel = new PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT);
+    PixelsView pv = panel.addPixels(f);
     pv.setInterpolation(PixelsView.Interpolation.NEAREST);
     pv.setColorMap(PixelsView.ColorMap.GRAY);
     //pv.setClips(fmin,fmax);
 
-    Tile tile = mosaic.getTile(0,0);
-    tile.addTiledView(pv);
-
-    ModeManager modeManager = mosaic.getModeManager();
-    TileZoomMode zoomMode = new TileZoomMode(modeManager);
-    zoomMode.setActive(true);
-
-    JFrame frame = new JFrame();
+    PlotFrame frame = new PlotFrame(panel);
+    frame.setSize(550,500);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.add(mosaic,BorderLayout.CENTER);
-    frame.pack();
     frame.setVisible(true);
-    return mosaic;
+    return frame;
   }
-  private static void plotImage(
+  private static void plot(
     String filename, float fmin, float fmax, float[][] f) 
   {
-    Mosaic mosaic = plotImage(fmin,fmax,f);
+    PlotFrame frame = plot(fmin,fmax,f);
     try {
-      mosaic.paintToPng(300,6,filename+"Flat.png");
+      frame.paintToPng(300,6,filename+".png");
     } catch (IOException ioe) {
       System.out.println("Cannot write image to file: "+filename);
     }

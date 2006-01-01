@@ -13,11 +13,9 @@ import java.util.*;
 import javax.swing.*;
 
 import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.gui.*;
 import edu.mines.jtk.mosaic.*;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
-import static edu.mines.jtk.mosaic.Mosaic.*;
 
 /**
  * Test recursive Gaussian filter for 2-D images.
@@ -27,7 +25,7 @@ import static edu.mines.jtk.mosaic.Mosaic.*;
 public class RgfTest {
 
   public static void main(String[] args) {
-    double sigma = 2.0;
+    double sigma = 4.0;
     if (args.length>0)
       sigma = Double.valueOf(args[0]);
     int n1 = 101;
@@ -35,70 +33,53 @@ public class RgfTest {
     float[][] x = new float[n2][n1];
     float[][] y = new float[n2][n1];
     x[3][3] = x[3][n1-4] = x[n2-4][3] = x[n2-4][n1-4] = x[n2/2][n1/2] = 1.0f;
-    plotImage(x);
+    plot(x);
     RecursiveGaussianFilter rgf = new RecursiveGaussianFilter(sigma);
 
     rgf.apply00(x,y);
-    plotImage(y);
+    plot(y);
 
     rgf.apply10(x,y);
-    plotImage(y);
+    plot(y);
     rgf.apply01(x,y);
-    plotImage(y);
+    plot(y);
 
     rgf.apply11(x,y);
-    plotImage(y);
+    plot(y);
     rgf.apply20(x,y);
-    plotImage(y);
+    plot(y);
     rgf.apply02(x,y);
-    plotImage(y);
+    plot(y);
   }
     
 
-  private static void plotImage(float[][] f) {
-    plotImage(Array.min(f),Array.max(f),f);
+  private static void plot(float[][] f) {
+    plot(Array.min(f),Array.max(f),f);
   }
-  private static void plotImage(String filename, float[][] f) {
-    plotImage(filename,Array.min(f),Array.max(f),f);
+  private static void plot(String filename, float[][] f) {
+    plot(filename,Array.min(f),Array.max(f),f);
   }
-  private static Mosaic plotImage(
+  private static PlotFrame plot(
     float fmin, float fmax, float[][] f) 
   {
-    int n2 = f.length;
-    int n1 = f[0].length;
-    Set<Mosaic.AxesPlacement> axesPlacement = EnumSet.noneOf(
-      Mosaic.AxesPlacement.class
-    );
-    Mosaic mosaic = new Mosaic(1,1,axesPlacement);
-    mosaic.setBackground(Color.WHITE);
-    mosaic.setFont(new Font("SansSerif",Font.PLAIN,18));
-    mosaic.setPreferredSize(new Dimension(550,500));
-
-    PixelsView pv = new PixelsView(f);
-    pv.setOrientation(PixelsView.Orientation.X1DOWN_X2RIGHT);
+    PlotPanel panel = new PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT);
+    PixelsView pv = panel.addPixels(f);
     pv.setInterpolation(PixelsView.Interpolation.LINEAR);
     pv.setColorMap(PixelsView.ColorMap.GRAY);
+    //pv.setClips(fmin,fmax);
 
-    Tile tile = mosaic.getTile(0,0);
-    tile.addTiledView(pv);
-
-    ModeManager modeManager = mosaic.getModeManager();
-    TileZoomMode zoomMode = new TileZoomMode(modeManager);
-    zoomMode.setActive(true);
-
-    JFrame frame = new JFrame();
+    PlotFrame frame = new PlotFrame(panel);
+    frame.setSize(550,500);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.add(mosaic,BorderLayout.CENTER);
-    frame.pack();
     frame.setVisible(true);
-    return mosaic;
+    return frame;
   }
-  private static void plotImage(
+  private static void plot(
     String filename, float fmin, float fmax, float[][] f) 
   {
-    Mosaic mosaic = plotImage(fmin,fmax,f);
+    PlotFrame frame = plot(fmin,fmax,f);
     try {
-      mosaic.paintToPng(300,6,filename+"Flat.png");
+      frame.paintToPng(300,6,filename+".png");
     } catch (IOException ioe) {
       System.out.println("Cannot write image to file: "+filename);
     }
