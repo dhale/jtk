@@ -13,11 +13,9 @@ import java.util.*;
 import javax.swing.*;
 
 import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.gui.*;
 import edu.mines.jtk.mosaic.*;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
-import static edu.mines.jtk.mosaic.Mosaic.*;
 
 /**
  * Peak interpolation errors for channel model.
@@ -55,7 +53,7 @@ public class ChannelTest {
     float zmin = Array.min(z);
     float zmax = Array.max(z);
     System.out.println("zmin="+zmin+" zmax="+zmax);
-    plotImage("Depth",z);
+    plot("Depth",z);
     return z;
   }
 
@@ -88,8 +86,8 @@ public class ChannelTest {
     float dmin = Array.min(d);
     float dmax = Array.max(d);
     System.out.println("dmin="+dmin+" dmax="+dmax);
-    plotImage("DataYZ",d[nx/2]);
-    plotImage("DataXY",dxy);
+    plot("DataYZ",d[nx/2]);
+    plot("DataXY",dxy);
     return d;
   }
   private static double sinc(double x) {
@@ -110,11 +108,11 @@ public class ChannelTest {
     float aemin = Array.min(ae);
     float aemax = Array.max(ae);
     System.out.println("sinc: aemin="+aemin+" aemax="+aemax);
-    plotImage("SincA",0.95f,1.00f,ae);
+    plot("SincA",0.95f,1.00f,ae);
     float zemin = Array.min(ze);
     float zemax = Array.max(ze);
     System.out.println("sinc: zemin="+zemin+" zemax="+zemax);
-    plotImage("SincZ",ze);
+    plot("SincZ",ze);
   }
 
   private static void testPar(float[][] zc, float[][][] d) {
@@ -131,11 +129,11 @@ public class ChannelTest {
     float aemin = Array.min(ae);
     float aemax = Array.max(ae);
     System.out.println("par: aemin="+aemin+" aemax="+aemax);
-    plotImage("ParA",0.95f,1.00f,ae);
+    plot("ParA",0.95f,1.00f,ae);
     float zemin = Array.min(ze);
     float zemax = Array.max(ze);
     System.out.println("par: zemin="+zemin+" zemax="+zemax);
-    plotImage("ParZ",ze);
+    plot("ParZ",ze);
   }
 
   private static float depSinc(int nz, double dz, double fz, float[] p) {
@@ -164,48 +162,31 @@ public class ChannelTest {
   }
   private static ParabolicInterpolator _pi = new ParabolicInterpolator();
 
-  private static void plotImage(String filename, float[][] f) {
-    plotImage(filename,Array.min(f),Array.max(f),f);
+  private static void plot(String filename, float[][] f) {
+    plot(filename,Array.min(f),Array.max(f),f);
   }
-  private static Mosaic plotImage(
+  private static PlotFrame plot(
     float fmin, float fmax, float[][] f) 
   {
-    int n2 = f.length;
-    int n1 = f[0].length;
-    Set<Mosaic.AxesPlacement> axesPlacement = EnumSet.noneOf(
-      Mosaic.AxesPlacement.class
-    );
-    Mosaic mosaic = new Mosaic(1,1,axesPlacement);
-    mosaic.setBackground(Color.WHITE);
-    mosaic.setFont(new Font("SansSerif",Font.PLAIN,18));
-    mosaic.setPreferredSize(new Dimension(550,500));
-
-    PixelsView pv = new PixelsView(f);
-    pv.setOrientation(PixelsView.Orientation.X1DOWN_X2RIGHT);
+    PlotPanel panel = new PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT);
+    PixelsView pv = panel.addPixels(f);
     pv.setInterpolation(PixelsView.Interpolation.LINEAR);
     pv.setColorMap(PixelsView.ColorMap.JET);
     pv.setClips(fmin,fmax);
+    panel.addColorBar();
 
-    Tile tile = mosaic.getTile(0,0);
-    tile.addTiledView(pv);
-
-    ModeManager modeManager = mosaic.getModeManager();
-    TileZoomMode zoomMode = new TileZoomMode(modeManager);
-    zoomMode.setActive(true);
-
-    JFrame frame = new JFrame();
+    PlotFrame frame = new PlotFrame(panel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.add(mosaic,BorderLayout.CENTER);
-    frame.pack();
+    frame.setSize(750,600);
     frame.setVisible(true);
-    return mosaic;
+    return frame;
   }
-  private static void plotImage(
+  private static void plot(
     String filename, float fmin, float fmax, float[][] f) 
   {
-    Mosaic mosaic = plotImage(fmin,fmax,f);
+    PlotFrame frame = plot(fmin,fmax,f);
     try {
-      mosaic.paintToPng(300,6,filename+"Flat.png");
+      frame.paintToPng(300,6,filename+"Flat.png");
     } catch (IOException ioe) {
       System.out.println("Cannot write image to file: "+filename);
     }

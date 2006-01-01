@@ -6,10 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
+import static java.lang.Math.*;
+
 import java.awt.*;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * A view of a sequence of samples of a function f(x) of one variable x.
@@ -35,6 +36,7 @@ public class SequenceView extends TiledView {
    * If fmin &lt;= 0 &lt;= fmax, then this options behaves like NORMAL.
    * If 0 &lt; fmin, then value zero corresponds to the bottom of the view. 
    * If fmax &lt; 0, then value zero corresponds to the top of the view.
+   * This option is the default.
    * <p>
    * If MIDDLE, the function value zero corresponds to the <em>middle</em>
    * of the the view, halfway between the top and bottom. The function 
@@ -42,12 +44,21 @@ public class SequenceView extends TiledView {
    * respectively, where ftop is the maximum of the absolute values of
    * fmin and fmax.
    */
-  public enum ShowZero {
+  public enum Zero {
     NORMAL, ALWAYS, MIDDLE
   }
 
   /**
-   * Constructs a sequence view.
+   * Constructs a sequence view with specified values f(x).
+   * Uses default sampling of x = 0, 1, 2, ....
+   * @param f array of sampled function values f(x).
+   */
+  public SequenceView(float[] f) {
+    set(f);
+  }
+
+  /**
+   * Constructs a sequence view with specified sampling and values f(x).
    * @param sx the sampling of the variable x.
    * @param f array of sampled function values f(x).
    */
@@ -56,7 +67,16 @@ public class SequenceView extends TiledView {
   }
   
   /**
-   * Sets the sampling and function values.
+   * Sets default sampling and specified function values f(x).
+   * The default sampling is x = 0, 1, 2, ....
+   * @param f array of sampled function values f(x).
+   */
+  public void set(float[] f) {
+    set(new Sampling(f.length),f);
+  }
+  
+  /**
+   * Sets specified sampling and function values.
    * @param sx the sampling of the variable x.
    * @param f array of sampled function values f(x).
    */
@@ -88,11 +108,11 @@ public class SequenceView extends TiledView {
   /**
    * Sets the visibility of function value zero in this view.
    * The default visibility is ALWAYS.
-   * @param showZero the visibility of function value zero.
+   * @param zero the visibility of function value zero.
    */
-  public void setShowZero(ShowZero showZero) {
-    if (_showZero!=showZero) {
-      _showZero = showZero;
+  public void setZero(Zero zero) {
+    if (_zero!=zero) {
+      _zero = zero;
       updateBestProjectors();
       repaint();
     }
@@ -102,11 +122,11 @@ public class SequenceView extends TiledView {
    * Sets the color used to paint the sequence. 
    * The default color is the tile foreground color. 
    * That default is used if the specified color is null.
-   * @param color the sequence color; null, for tile foreground color.
+   * @param color the color; null, for tile foreground color.
    */
-  public void setSequenceColor(Color color) {
-    if (!equalColors(_sequenceColor,color)) {
-      _sequenceColor = color;
+  public void setColor(Color color) {
+    if (!equalColors(_color,color)) {
+      _color = color;
       repaint();
     }
   }
@@ -141,9 +161,9 @@ public class SequenceView extends TiledView {
     int ry = ts.height(rby);
     int rb = max(0,min(rx,ry)-1);
 
-    // Sequence color, if specified.
-    if (_sequenceColor!=null) 
-      g2d.setColor(_sequenceColor);
+    // Color, if specified.
+    if (_color!=null) 
+      g2d.setColor(_color);
 
     // Horizontal line for function value 0.0.
     int xf = ts.x(hp.u(fx));
@@ -169,8 +189,8 @@ public class SequenceView extends TiledView {
 
   Sampling _sx;
   float[] _f;
-  private Color _sequenceColor = null;
-  private ShowZero _showZero = ShowZero.ALWAYS;
+  private Color _color = null;
+  private Zero _zero = Zero.ALWAYS;
 
   // Called when we might need realignment.
   private void updateBestProjectors() {
@@ -182,7 +202,7 @@ public class SequenceView extends TiledView {
     double xmin = min(xf,xl);
     double xmax = max(xf,xl);
     if (xmin==xmax) {
-      double tiny = max(1.0,FLT_EPSILON*abs(xmin));
+      double tiny = max(1.0,ulp(1.0f)*abs(xmin));
       xmin -= tiny;
       xmax += tiny;
     }
@@ -198,15 +218,15 @@ public class SequenceView extends TiledView {
     }
 
     // Adjust for visibility of function value zero.
-    if (_showZero==ShowZero.ALWAYS) {
+    if (_zero==Zero.ALWAYS) {
       fmin = min(0.0,fmin);
       fmax = max(0.0,fmax);
-    } else if (_showZero==ShowZero.MIDDLE) {
+    } else if (_zero==Zero.MIDDLE) {
       fmax = max(abs(fmin),abs(fmax));
       fmin = -fmax;
     }
     if (fmin==fmax) {
-      double tiny = max(1.0,FLT_EPSILON*abs(fmin));
+      double tiny = max(1.0,ulp(1.0f)*abs(fmin));
       fmin -= tiny;
       fmax += tiny;
     }

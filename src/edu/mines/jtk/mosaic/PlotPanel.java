@@ -8,12 +8,12 @@ package edu.mines.jtk.mosaic;
 
 import java.awt.*;
 import java.awt.font.*;
-import java.io.*;
 import java.util.*;
 import javax.swing.*;
+import static java.lang.Math.*;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.gui.*;
-import static java.lang.Math.*;
+import edu.mines.jtk.util.*;
 
 /**
  * A plot panel is a panel that contains a mosaic of 2-D graphical views.
@@ -22,7 +22,7 @@ import static java.lang.Math.*;
  * may contain any number of tiled graphical views.
  * <p>
  * The primary purpose of this class is ease-of-use. A plot panel handles
- * most of the work of constructing a mosaic of tiled graphical views.
+ * much of the work of constructing a mosaic of tiled graphical views.
  * <p>
  * One consequence of ease-of-use is that some of the methods provided 
  * by this class are redundant. For example, some methods have (irow,icol) 
@@ -240,6 +240,84 @@ public class PlotPanel extends IPanel {
   }
 
   /**
+   * Sets limits for the horizontal axis.
+   * @param hmin the minimum value.
+   * @param hmax the maximum value.
+   */
+  public void setHLimits(double hmin, double hmax) {
+    setHLimits(0,hmin,hmax);
+  }
+
+  /**
+   * Sets limits for the vertical axis.
+   * @param vmin the minimum value.
+   * @param vmax the maximum value.
+   */
+  public void setVLimits(double vmin, double vmax) {
+    setVLimits(0,vmin,vmax);
+  }
+
+  /**
+   * Sets limits for the horizontal axis in the specified column.
+   * @param icol the column index.
+   * @param hmin the minimum value.
+   * @param hmax the maximum value.
+   */
+  public void setHLimits(int icol, double hmin, double hmax) {
+    Check.argument(hmin<hmax,"hmin<hmax");
+    setBestHorizontalProjector(icol,new Projector(hmin,hmax));
+  }
+
+  /**
+   * Sets limits for the vertical axis in the specified row.
+   * @param irow the row index.
+   * @param vmin the minimum value.
+   * @param vmax the maximum value.
+   */
+  public void setVLimits(int irow, double vmin, double vmax) {
+    Check.argument(vmin<vmax,"vmin<vmax");
+    if (_orientation==Orientation.X1RIGHT_X2UP) {
+      setBestVerticalProjector(irow,new Projector(vmax,vmin));
+    } else {
+      setBestVerticalProjector(irow,new Projector(vmin,vmax));
+    }
+  }
+
+  /**
+   * Sets default limits for the horizontal axis.
+   * Default limits are computed automatically by tiled graphical views.
+   */
+  public void setHLimitsDefault() {
+    setHLimitsDefault(0);
+  }
+
+  /**
+   * Sets default limits for the vertical axis.
+   * Default limits are computed automatically by tiled graphical views.
+   */
+  public void setVLimitsDefault() {
+    setVLimitsDefault(0);
+  }
+
+  /**
+   * Sets default limits for the horizontal axis in the specified column.
+   * Default limits are computed automatically by tiled graphical views.
+   * @param icol the column index.
+   */
+  public void setHLimitsDefault(int icol) {
+    setBestHorizontalProjector(icol,null);
+  }
+
+  /**
+   * Sets default limits for the vertical axis in the specified column.
+   * Default limits are computed automatically by tiled graphical views.
+   * @param irow the row index.
+   */
+  public void setVLimitsDefault(int irow) {
+    setBestVerticalProjector(irow,null);
+  }
+
+  /**
    * Sets the label for the horizontal axis.
    * @param label the label.
    */
@@ -266,6 +344,10 @@ public class PlotPanel extends IPanel {
     } else {
       _mosaic.getTileAxisBottom(icol).setLabel(label);
     }
+
+    // Axis height may have changed, so may need to resize the color bar 
+    // to align with the mosaic. Easiest way to do this is to simply 
+    // remove and add the current color bar, if it exists.
     if (_colorBar!=null) {
       removeColorBar();
       addColorBar(_colorBarLabel);
@@ -282,45 +364,41 @@ public class PlotPanel extends IPanel {
   }
 
   /**
-   * Sets the label for the X1 axis.
-   * @param label the label.
+   * Sets the format for the horizontal axis.
+   * @param format the format.
    */
-  public void setX1Label(String label) {
-    setX1Label(0,label);
+  public void setHFormat(String format) {
+    setHFormat(0,format);
   }
 
   /**
-   * Sets the label for the X2 axis.
-   * @param label the label.
+   * Sets the format for the vertical axis.
+   * @param format the format.
    */
-  public void setX2Label(String label) {
-    setX2Label(0,label);
+  public void setVFormat(String format) {
+    setVFormat(0,format);
   }
 
   /**
-   * Sets the label for X1 axis with specified index.
-   * @param index the row or column index.
-   * @param label the label.
+   * Sets the format for the horizontal axis in the specified column.
+   * @param icol the column index.
+   * @param format the format.
    */
-  public void setX1Label(int index, String label) {
+  public void setHFormat(int icol, String format) {
     if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      setVLabel(index,label);
+      _mosaic.getTileAxisTop(icol).setFormat(format);
     } else {
-      setHLabel(index,label);
+      _mosaic.getTileAxisBottom(icol).setFormat(format);
     }
   }
 
   /**
-   * Sets the label for X1 axis with specified index.
-   * @param index the row or column index.
-   * @param label the label.
+   * Sets the format for the vertical axis in the specified row.
+   * @param irow the row index.
+   * @param format the format.
    */
-  public void setX2Label(int index, String label) {
-    if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      setHLabel(index,label);
-    } else {
-      setVLabel(index,label);
-    }
+  public void setVFormat(int irow, String format) {
+    _mosaic.getTileAxisLeft(irow).setFormat(format);
   }
 
   /**
@@ -440,7 +518,7 @@ public class PlotPanel extends IPanel {
   }
 
   /**
-   * Constructs a view of points (x1,x2) for a sampled function x2(x1).
+   * Adds a view of points (x1,x2) for a sampled function x2(x1).
    * @param s1 the sampling of x1 coordinates.
    * @param x2 array of x2 coordinates.
    */
@@ -474,7 +552,7 @@ public class PlotPanel extends IPanel {
   }
 
   /**
-   * Constructs a view of points (x1,x2) for a sampled function x2(x1).
+   * Adds a view of points (x1,x2) for a sampled function x2(x1).
    * @param irow the tile row index.
    * @param icol the tile column index.
    * @param s1 the sampling of x1 coordinates.
@@ -483,6 +561,48 @@ public class PlotPanel extends IPanel {
   public PointsView addPoints(int irow, int icol, Sampling s1, float[] x2) {
     PointsView pv = new PointsView(s1,x2);
     return addPointsView(irow,icol,pv);
+  }
+
+  /**
+   * Adds a sequence view with specified values f(x).
+   * Uses default sampling of x = 0, 1, 2, ....
+   * @param f array of sampled function values f(x).
+   */
+  public SequenceView addSequence(float[] f) {
+    return addSequence(0,0,f);
+  }
+
+  /**
+   * Adds a sequence view with specified sampling and values f(x).
+   * @param sx the sampling of the variable x.
+   * @param f array of sampled function values f(x).
+   */
+  public SequenceView addSequence(Sampling sx, float[] f) {
+    return addSequence(0,0,sx,f);
+  }
+
+  /**
+   * Adds a sequence view with specified values f(x).
+   * Uses default sampling of x = 0, 1, 2, ....
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param f array of sampled function values f(x).
+   */
+  public SequenceView addSequence(int irow, int icol, float[] f) {
+    SequenceView sv = new SequenceView(f);
+    return addSequenceView(irow,icol,sv);
+  }
+
+  /**
+   * Adds a sequence view with specified sampling and values f(x).
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param sx the sampling of the variable x.
+   * @param f array of sampled function values f(x).
+   */
+  public SequenceView addSequence(int irow, int icol, Sampling sx, float[] f) {
+    SequenceView sv = new SequenceView(sx,f);
+    return addSequenceView(irow,icol,sv);
   }
 
 
@@ -562,6 +682,11 @@ public class PlotPanel extends IPanel {
     }
   }
 
+  private GridView addGridView(int irow, int icol, GridView gv) {
+    _mosaic.getTile(irow,icol).addTiledView(gv);
+    return gv;
+  }
+
   private PixelsView addPixelsView(int irow, int icol, PixelsView pv) {
     if (_colorBar!=null && _colorBarPixelsView!=null)
       _colorBarPixelsView.removeColorMapListener(_colorBar);
@@ -587,8 +712,20 @@ public class PlotPanel extends IPanel {
     return pv;
   }
 
-  private GridView addGridView(int irow, int icol, GridView gv) {
-    _mosaic.getTile(irow,icol).addTiledView(gv);
-    return gv;
+  private SequenceView addSequenceView(int irow, int icol, SequenceView sv) {
+    _mosaic.getTile(irow,icol).addTiledView(sv);
+    return sv;
+  }
+
+  private void setBestHorizontalProjector(int icol, Projector p) {
+    int nrow = getMosaic().countRows();
+    for (int irow=0; irow<nrow; ++irow)
+      getTile(irow,icol).setBestHorizontalProjector(p);
+  }
+
+  private void setBestVerticalProjector(int irow, Projector p) {
+    int ncol = getMosaic().countColumns();
+    for (int icol=0; icol<ncol; ++icol)
+      getTile(irow,icol).setBestVerticalProjector(p);
   }
 }

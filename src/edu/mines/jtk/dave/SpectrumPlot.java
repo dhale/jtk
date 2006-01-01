@@ -13,38 +13,17 @@ import java.util.*;
 import javax.swing.*;
 
 import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.gui.*;
 import edu.mines.jtk.mosaic.*;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.Array.*;
 import static edu.mines.jtk.util.MathPlus.*;
-import static edu.mines.jtk.mosaic.Mosaic.*;
 
 /**
  * A plot of a sampled sequence x(t) and its amplitude and phase spectra.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.03.25
  */
-public class SpectrumPlot extends JFrame {
-
-  /**
-   * Plot width, in pixels.
-   */
-  public static int WIDTH = 950;
-
-  /**
-   * Plot height, in pixels.
-   */
-  public static int HEIGHT = 600;
-
-  // Attributes shared by all mosaics in plot.
-  private static Set<AxesPlacement> AXES_PLACEMENT = EnumSet.of(
-    AxesPlacement.LEFT,
-    AxesPlacement.BOTTOM
-  );
-  private static Font FONT = new Font("SansSerif",Font.PLAIN,12);
-  private static Color BACKGROUND_COLOR = Color.WHITE;
+public class SpectrumPlot extends PlotFrame {
 
   /**
    * Constructs a new spectrum plot for the specified sampled sequence.
@@ -60,144 +39,69 @@ public class SpectrumPlot extends JFrame {
    * @param db true, to plot amplitude spectrum in dB.
    */
   public SpectrumPlot(Real1 x, boolean db) {
-    Check.argument(x.getSampling().isUniform(),"sampling of x is uniform");
-    _frame = this;
-
-    // Amplitude and phase spectra.
-    Real1[] ap = computeSpectra(x,db);
-    Real1 a = ap[0];
-    Real1 p = ap[1];
-
-    // Mosaic for sampled sequence x(t).
-    _mosaicX = new Mosaic(1,1,AXES_PLACEMENT);
-    _mosaicX.setBackground(BACKGROUND_COLOR);
-    _mosaicX.setFont(FONT);
-    _mosaicX.setPreferredSize(new Dimension(WIDTH,1*HEIGHT/3));
-    Tile tileX = _mosaicX.getTile(0,0);
-    SequenceView xv = makeSequenceView(x.getSampling(),x.getValues());
-    tileX.addTiledView(xv);
-    TileAxis axisXT = _mosaicX.getTileAxisBottom(0);
-    TileAxis axisXA = _mosaicX.getTileAxisLeft(0);
-    axisXA.setLabel("Amplitude");
-    axisXT.setLabel("Time (s)");
-    axisXT.setFormat("%1.6G");
-    
-    // Mosaic for amplitude A(f) and phase P(f).
-    _mosaicS = new Mosaic(2,1,AXES_PLACEMENT);
-    _mosaicS.setBackground(BACKGROUND_COLOR);
-    _mosaicS.setFont(FONT);
-    _mosaicS.setPreferredSize(new Dimension(WIDTH,2*HEIGHT/3));
-    Tile tileA = _mosaicS.getTile(0,0);
-    Tile tileP = _mosaicS.getTile(1,0);
-    PointsView av = makePointsView(a.getSampling(),a.getValues());
-    PointsView pv = makePointsView(p.getSampling(),p.getValues());
-    tileA.addTiledView(av);
-    //tileA.setBestVerticalProjector(new Projector(1.1,0.0));
-    tileP.addTiledView(pv);
-    tileP.setBestVerticalProjector(new Projector(0.5,-0.5));
-    TileAxis axisSA = _mosaicS.getTileAxisLeft(0);
-    TileAxis axisSP = _mosaicS.getTileAxisLeft(1);
-    TileAxis axisSF = _mosaicS.getTileAxisBottom(0);
-    if (db) {
-      axisSA.setLabel("Amplitude (dB)");
-    } else {
-      axisSA.setLabel("Amplitude");
-    }
-    axisSP.setLabel("Phase (cycles)");
-    axisSF.setLabel("Frequency (Hz)");
-
-    // Modes.
-    ModeManager modeManager = new ModeManager();
-    _mosaicX.setModeManager(modeManager);
-    _mosaicS.setModeManager(modeManager);
-    TileZoomMode zoomMode = new TileZoomMode(modeManager);
-    zoomMode.setActive(true);
-
-    JSplitPane jsp = new JSplitPane(
-      JSplitPane.VERTICAL_SPLIT,_mosaicS,_mosaicX);
-    jsp.setOneTouchExpandable(true);
-    jsp.setResizeWeight(0.7);
-
-    Action saveSpectraAction = new AbstractAction("Save spectra to PNG") {
-      public void actionPerformed(ActionEvent event) {
-        JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
-        fc.showSaveDialog(_frame);
-        File file = fc.getSelectedFile();
-        if (file!=null) {
-          String filename = file.getAbsolutePath();
-          saveSpectraToPng(filename);
-        }
-      }
-    };
-    Action saveSequenceAction = new AbstractAction("Save sequence to PNG") {
-      public void actionPerformed(ActionEvent event) {
-        JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
-        fc.showSaveDialog(_frame);
-        File file = fc.getSelectedFile();
-        if (file!=null) {
-          String filename = file.getAbsolutePath();
-          saveSequenceToPng(filename);
-        }
-      }
-    };
-    JButton saveSpectraButton = new JButton(saveSpectraAction);
-    JButton saveSequenceButton = new JButton(saveSequenceAction);
-    JToolBar toolBar = new JToolBar();
-    toolBar.add(saveSpectraButton);
-    toolBar.add(saveSequenceButton);
-    this.add(toolBar,BorderLayout.NORTH);
-
-    this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    //this.setJMenuBar(menuBar);
-    //this.add(toolBar,BorderLayout.WEST);
-    this.add(jsp,BorderLayout.CENTER);
-    this.pack();
+    super(makePanelX(x),makePanelAP(x,db),PlotFrame.Split.VERTICAL);
+    this.addButtons();
+    this.setSize(950,600);
+    this.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
     this.setVisible(true);
   }
 
-  /**
-   * Save sequence as PNG image in specified file.
-   * @param filename the file name.
-   */
-  public void saveSequenceToPng(String filename) {
-    try {
-      _mosaicX.paintToPng(300,6,filename);
-    } catch (IOException ioe) {
-      System.out.println("Cannot write image to file: "+filename);
+  private static PlotPanel makePanelX(Real1 x) {
+    Check.argument(x.getSampling().isUniform(),"sampling of x is uniform");
+    PlotPanel panel = new PlotPanel();
+    panel.addSequence(x.getSampling(),x.getValues());
+    panel.setHFormat("%1.6G");
+    panel.setHLabel("time (s)");
+    panel.setVLabel("amplitude");
+    return panel;
+  }
+    
+  private static PlotPanel makePanelAP(Real1 x, boolean db) {
+    Real1[] ap = computeSpectra(x,db);
+    Real1 a = ap[0];
+    Real1 p = ap[1];
+    PlotPanel panel = new PlotPanel(2,1);
+    panel.addPoints(0,0,a.getSampling(),a.getValues());
+    panel.addPoints(1,0,p.getSampling(),p.getValues());
+    panel.setVLimits(1,-0.5,0.5);
+    if (db) {
+      panel.setVLabel(0,"amplitude (dB)");
+    } else {
+      panel.setVLabel(0,"amplitude");
     }
+    panel.setVLabel(1,"phase (cycles)");
+    panel.setHLabel("frequency (Hz)");
+    return panel;
   }
 
-  /**
-   * Save spectra as PNG image in specified file.
-   * @param filename the file name.
-   */
-  public void saveSpectraToPng(String filename) {
-    try {
-      _mosaicS.paintToPng(300,6,filename);
-    } catch (IOException ioe) {
-      System.out.println("Cannot write image to file: "+filename);
-    }
+  private void addButtons() {
+    Action saveToPngAction = new AbstractAction("Save to PNG") {
+      public void actionPerformed(ActionEvent event) {
+        JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
+        fc.showSaveDialog(_frame);
+        File file = fc.getSelectedFile();
+        if (file!=null) {
+          String filename = file.getAbsolutePath();
+          try {
+            _frame.paintToPng(300,6,filename);
+          } catch (IOException ioe) {
+            System.out.println("Cannot write image to file: "+filename);
+          }
+        }
+      }
+    };
+    JButton saveToPngButton = new JButton(saveToPngAction);
+    JToolBar toolBar = new JToolBar();
+    toolBar.add(saveToPngButton);
+    this.add(toolBar,BorderLayout.NORTH);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private JFrame _frame;
-  private Mosaic _mosaicS;
-  private Mosaic _mosaicX;
+  private PlotFrame _frame = this;
 
-  private static PointsView makePointsView(Sampling sx, float[] f) {
-    PointsView pv = new PointsView(sx,f);
-    pv.setLineWidth(1.0f);
-    return pv;
-  }
-
-  private static SequenceView makeSequenceView(Sampling sx, float[] f) {
-    SequenceView sv = new SequenceView(sx,f);
-    return sv;
-  }
-
-  private Real1[] computeSpectra(Real1 x, boolean db) {
+  private static Real1[] computeSpectra(Real1 x, boolean db) {
     Sampling st = x.getSampling();
     int nt = st.getCount();
     double dt = st.getDelta();

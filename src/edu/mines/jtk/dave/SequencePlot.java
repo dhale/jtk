@@ -13,18 +13,16 @@ import java.util.*;
 import javax.swing.*;
 
 import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.gui.*;
 import edu.mines.jtk.mosaic.*;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
-import static edu.mines.jtk.mosaic.Mosaic.*;
 
 /**
  * A plot of one or more sampled sequences.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.09.19
  */
-public class SequencePlot {
+public class SequencePlot extends PlotFrame {
 
   /**
    * Constructs a plot for one sampled sequence.
@@ -116,72 +114,71 @@ public class SequencePlot {
    * @param av array of arrays of sequence values.
    */
   public SequencePlot(String[] al, Sampling[] as, float[][] av) {
+    super(makePanel(al,as,av));
+    this.addButtons();
+    this.setSize(950,200*av.length);
+    this.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
+    this.setVisible(true);
+  }
+
+  /**
+   * Paints this panel to a PNG image with specified resolution and width.
+   * The image height is computed so that the image has the same aspect 
+   * ratio as this panel.
+   * @param dpi the image resolution, in dots per inch.
+   * @param win the image width, in inches.
+   * @param fileName the name of the file to contain the PNG image.  
+   */
+  public void paintToPng(double dpi, double win, String fileName) {
+    try {
+      super.paintToPng(dpi,win,fileName);
+    } catch (IOException ioe) {
+      System.out.println("Cannot write image to file: "+fileName);
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // private
+
+  private PlotFrame _frame = this;
+
+  private static PlotPanel makePanel(
+    String[] al, Sampling[] as, float[][] av) 
+  {
+    Check.argument(al.length==av.length,"al.length==av.length");
     Check.argument(as.length==av.length,"as.length==av.length");
-
-    final JFrame frame = new JFrame();
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
     int nv = av.length;
-    Set<AxesPlacement> axesPlacement = EnumSet.of(
-      AxesPlacement.LEFT,
-      AxesPlacement.BOTTOM);
-    _mosaic = new Mosaic(nv,1,axesPlacement);
-    _mosaic.setPreferredSize(new Dimension(850,min(nv*250,700)));
-    _mosaic.setFont(new Font("SansSerif",Font.PLAIN,18));
-    _mosaic.setBackground(Color.WHITE);
-    _mosaic.getTileAxisBottom(0).setLabel("sample index");
-    ModeManager modeManager = new ModeManager();
-    _mosaic.setModeManager(modeManager);
-    TileZoomMode tileZoomMode = new TileZoomMode(modeManager);
-    tileZoomMode.setActive(true);
+    PlotPanel panel = new PlotPanel(nv,1);
+    panel.setHLabel("sample index");
     for (int iv=0; iv<nv; ++iv) {
       Sampling s = as[iv];
       float[] v = av[iv];
       String l = al[iv];
-      _mosaic.getTileAxisLeft(iv).setLabel(l);
-      _mosaic.getTile(iv,0).addTiledView(new SequenceView(s,v));
+      panel.setVLabel(iv,l);
+      panel.addSequence(iv,0,s,v);
     }
-    frame.add(_mosaic,BorderLayout.CENTER);
+    return panel;
+  }
 
-    Action saveAction = new AbstractAction("Save PNG image") {
+  private void addButtons() {
+    Action saveToPngAction = new AbstractAction("Save to PNG") {
       public void actionPerformed(ActionEvent event) {
         JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
-        fc.showSaveDialog(frame);
+        fc.showSaveDialog(_frame);
         File file = fc.getSelectedFile();
         if (file!=null) {
           String filename = file.getAbsolutePath();
-          saveToPng(filename);
+          try {
+            _frame.paintToPng(300,6,filename);
+          } catch (IOException ioe) {
+            System.out.println("Cannot write image to file: "+filename);
+          }
         }
       }
     };
-    JButton saveButton = new JButton(saveAction);
+    JButton saveToPngButton = new JButton(saveToPngAction);
     JToolBar toolBar = new JToolBar();
-    toolBar.add(saveButton);
-    frame.add(toolBar,BorderLayout.NORTH);
-
-    frame.pack();
-    frame.setVisible(true);
+    toolBar.add(saveToPngButton);
+    this.add(toolBar,BorderLayout.NORTH);
   }
-
-  /**
-   * Sets the axis bottom label.
-   * @param label the label.
-   */
-  public void setAxisBottomLabel(String label) {
-    _mosaic.getTileAxisBottom(0).setLabel(label);
-  }
-
-  /**
-   * Save plot as PNG image in specified file.
-   * @param filename the file name.
-   */
-  public void saveToPng(String filename) {
-    try {
-      _mosaic.paintToPng(300,6,filename);
-    } catch (IOException ioe) {
-      System.out.println("Cannot write image to file: "+filename);
-    }
-  }
-
-  private Mosaic _mosaic;
 }

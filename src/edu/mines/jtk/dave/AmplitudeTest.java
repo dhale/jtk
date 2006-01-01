@@ -102,7 +102,7 @@ public class AmplitudeTest {
         SequencePlot sp = new SequencePlot("s",st,s,
                                            "t1",st,t1,
                                            "t2",st,t2);
-        sp.saveToPng("SignalsWithNoise.png");
+        sp.paintToPng(300,6,"SignalsWithNoise.png");
       }
       r1[i] = amp1(t2)/amp1(t1);
       r2[i] = amp2(t2)/amp2(t1);
@@ -118,8 +118,8 @@ public class AmplitudeTest {
       "frequency",h1.getBinSampling(),h1.getDensities(),
       "frequency",h2.getBinSampling(),h2.getDensities(),
       "frequency",hm.getBinSampling(),hm.getDensities());
-    sp.setAxisBottomLabel("amplitude ratio");
-    sp.saveToPng("AmplitudeRatios.png");
+    sp.getPlotPanel().setHLabel("amplitude ratio");
+    sp.paintToPng(300,6,"AmplitudeRatios.png");
                      
   }
 

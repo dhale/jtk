@@ -73,15 +73,22 @@ public class PlotFrame extends JFrame {
     _split = split;
     _panelMain = new MainPanel();
     _panelMain.setLayout(new BorderLayout());
+    double resizeWeight = 0.5;
     if (_split==Split.HORIZONTAL) {
       _splitPane = new JSplitPane(
         JSplitPane.HORIZONTAL_SPLIT,_panelTL,_panelBR);
+      double colTL = _panelTL.getMosaic().countColumns();
+      double colBR = _panelBR.getMosaic().countColumns();
+      resizeWeight = colTL/(colTL+colBR);
     } else {
       _splitPane = new JSplitPane(
         JSplitPane.VERTICAL_SPLIT,_panelTL,_panelBR);
+      double rowTL = _panelTL.getMosaic().countRows();
+      double rowBR = _panelBR.getMosaic().countRows();
+      resizeWeight = rowTL/(rowTL+rowBR);
     }
+    _splitPane.setResizeWeight(resizeWeight);
     _splitPane.setOneTouchExpandable(true);
-    _splitPane.setResizeWeight(0.5);
     _panelMain.add(_splitPane,BorderLayout.CENTER);
     this.setSize(_panelMain.getPreferredSize());
     this.add(_panelMain,BorderLayout.CENTER);

@@ -26,29 +26,30 @@ public class PlotFrameTest {
     float[] x2 = Array.add(ax,Array.mul(ax,Array.sin(Array.mul(0.1f,x1))));
 
     PlotPanel.Orientation orientation = PlotPanel.Orientation.X1DOWN_X2RIGHT;
-    PlotPanel pp = new PlotPanel(1,2,orientation);
+    PlotPanel panel = new PlotPanel(1,2,orientation);
 
-    PixelsView pxv0 = pp.addPixels(0,0,f);
-    PixelsView pxv1 = pp.addPixels(0,1,f);
+    PixelsView pxv0 = panel.addPixels(0,0,f);
+    PixelsView pxv1 = panel.addPixels(0,1,f);
     pxv0.setColorMap(PixelsView.ColorMap.GRAY);
     pxv1.setColorMap(PixelsView.ColorMap.JET);
 
-    PointsView ptv0 = pp.addPoints(0,0,x1,x2);
-    PointsView ptv1 = pp.addPoints(0,1,x1,x2);
+    PointsView ptv0 = panel.addPoints(0,0,x1,x2);
+    PointsView ptv1 = panel.addPoints(0,1,x1,x2);
     ptv0.setStyle("r--.");
     ptv1.setStyle("k-o");
 
-    pp.addColorBar("amplitude");
-    pp.setTitle("A Test of PlotFrame");
-    pp.setX1Label("depth (km)");
-    pp.setX2Label(0,"offset (km)");
-    pp.setX2Label(1,"velocity (km/s)");
+    panel.addColorBar("amplitude");
+    panel.setTitle("A Test of PlotFrame");
+    panel.setVLabel("depth (km)");
+    panel.setHLabel(0,"offset (km)");
+    panel.setHLabel(1,"velocity (km/s)");
 
-    PlotFrame pf = new PlotFrame(pp);
-    pf.setVisible(true);
+    PlotFrame frame = new PlotFrame(panel);
+    frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
+    frame.setVisible(true);
 
     try {
-      pf.paintToPng(300,6,"junk.png");
+      frame.paintToPng(300,6,"junk.png");
     } catch (java.io.IOException ioe) {
       throw new RuntimeException(ioe);
     }
