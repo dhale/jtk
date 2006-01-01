@@ -193,6 +193,8 @@ public class PlotFrame extends JFrame {
     if (_panelBR!=_panelTL)
       _panelBR.getMosaic().setModeManager(_modeManager);
     TileZoomMode zoomMode = new TileZoomMode(_modeManager);
+    MouseTrackMode trackMode = new MouseTrackMode(_modeManager);
     zoomMode.setActive(true);
+    trackMode.setActive(true);
   }
 }

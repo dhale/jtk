@@ -372,6 +372,7 @@ public class TileAxis extends IPanel {
 
   protected void paintComponent(Graphics g) {
     super.paintComponent(g);
+    endTracking();
     paintToRect((Graphics2D)g,0,0,getWidth(),getHeight());
   }
 
@@ -423,6 +424,43 @@ public class TileAxis extends IPanel {
     return height;
   }
 
+  // Tracking methods called by MouseTrackMode.
+  void beginTracking(int x, int y) {
+    if (!_tracking) {
+      _xtrack = x;
+      _ytrack = y;
+      _tracking = true;
+      paintTrack(x,y);
+    }
+  }
+  void duringTracking(int x, int y) {
+    if (_tracking)
+      paintTrack(_xtrack,_ytrack);
+    _xtrack = x;
+    _ytrack = y;
+    _tracking = true;
+    paintTrack(_xtrack,_ytrack);
+  }
+  void endTracking() {
+    if (_tracking) {
+      paintTrack(_xtrack,_ytrack);
+      _tracking = false;
+    }
+  }
+  private void paintTrack(int x, int y) {
+    int w = this.getWidth();
+    int h = this.getHeight();
+    Graphics g = this.getGraphics();
+    g.setColor(Color.BLUE);
+    g.setXORMode(this.getBackground());
+    if (this.isHorizontal()) {
+      g.drawLine(x,-1,x,h);
+    } else {
+      g.drawLine(-1,y,w,y);
+    }
+    g.dispose();
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -431,6 +469,8 @@ public class TileAxis extends IPanel {
   private int _index;
   private String _label;
   private String _format = "%1.4G";
+  private int _xtrack,_ytrack;
+  private boolean _tracking;
 
   // Returns the maximum width of a formatted tic string.
   private int maxTicStringWidth(FontMetrics fm) {

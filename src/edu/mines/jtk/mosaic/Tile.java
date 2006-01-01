@@ -192,6 +192,38 @@ public class Tile extends IPanel {
     _ts.setMapping(width,height);
   }
 
+  /**
+   * Gets the top tile axis for this tile.
+   * @return the axis; null, if none.
+   */
+  public TileAxis getTileAxisTop() {
+    return _mosaic.getTileAxisTop(_icol);
+  }
+
+  /**
+   * Gets the left tile axis for this tile.
+   * @return the axis; null, if none.
+   */
+  public TileAxis getTileAxisLeft() {
+    return _mosaic.getTileAxisLeft(_irow);
+  }
+
+  /**
+   * Gets the bottom tile axis for this tile.
+   * @return the axis; null, if none.
+   */
+  public TileAxis getTileAxisBottom() {
+    return _mosaic.getTileAxisBottom(_icol);
+  }
+
+  /**
+   * Gets the right tile axis for this tile.
+   * @return the axis; null, if none.
+   */
+  public TileAxis getTileAxisRight() {
+    return _mosaic.getTileAxisRight(_irow);
+  }
+
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
     g2d = createGraphics(g2d,x,y,w,h);
 

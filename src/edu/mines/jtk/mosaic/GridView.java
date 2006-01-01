@@ -263,19 +263,12 @@ public class GridView extends TiledView {
     if (_style==Style.NONE)
       return;
 
-    // Tile and mosaic. If no mosaic, paint nothing.
-    Tile tile = getTile();
-    Mosaic mosaic = tile.getMosaic();
-    if (mosaic==null)
-      return;
-
     // Tile axes. If no axes, paint nothing.
-    int irow = tile.getRowIndex();
-    int icol = tile.getColumnIndex();
-    TileAxis axisTop = mosaic.getTileAxisTop(icol);
-    TileAxis axisLeft = mosaic.getTileAxisLeft(irow);
-    TileAxis axisBottom = mosaic.getTileAxisBottom(icol);
-    TileAxis axisRight = mosaic.getTileAxisRight(irow);
+    Tile tile = getTile();
+    TileAxis axisTop = tile.getTileAxisTop();
+    TileAxis axisLeft = tile.getTileAxisLeft();
+    TileAxis axisBottom = tile.getTileAxisBottom();
+    TileAxis axisRight = tile.getTileAxisRight();
     TileAxis axisLeftRight = (axisLeft!=null)?axisLeft:axisRight;
     TileAxis axisTopBottom = (axisTop!=null)?axisTop:axisBottom;
     if (axisLeftRight==null && axisTopBottom==null)

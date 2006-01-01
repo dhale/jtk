@@ -27,7 +27,7 @@ public class TileZoomMode extends Mode {
   public TileZoomMode(ModeManager modeManager) {
     super(modeManager);
     setName("Zoom");
-    setIcon(loadIcon(TileZoomMode.class,"resources/Zoom24.gif"));
+    setIcon(loadIcon(TileZoomMode.class,"resources/ZoomIn16.gif"));
     setMnemonicKey(KeyEvent.VK_Z);
     setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_Z,0));
     setShortDescription("Zoom in tile or axis");
