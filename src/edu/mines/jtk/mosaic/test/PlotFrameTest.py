@@ -35,6 +35,7 @@ def makePlotPanel(orientation):
   ptv1 = pp.addPoints(0,1,x1,x2);
   ptv0.setStyle("r--.");
   ptv1.setStyle("k-o");
+  ptv0.setLineWidth(3);
 
   pp.addColorBar("amplitude")
   pp.title = "A Test of PlotFrame"
@@ -51,7 +52,7 @@ def makePlotPanel(orientation):
 # Two plot panels.
 pp1 = makePlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
 pp2 = makePlotPanel(PlotPanel.Orientation.X1RIGHT_X2UP)
-pf = PlotFrame(pp1,pp2,PlotFrame.Split.HORIZONTAL)
+pf = PlotFrame(pp1,pp2,PlotFrame.Split.VERTICAL)
 
 pf.setVisible(True)
 pf.paintToPng(300,6,"junk.png")
