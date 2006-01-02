@@ -12,9 +12,9 @@ f = Array.sin(Array.rampfloat(0.0,d1,d2,n1,n2))
 s1 = Sampling(n1,d1,f1)
 s2 = Sampling(n2,d2,f2)
 
-ax = 0.5*d2*(n2-1);
-x1 = Array.rampfloat(f1,d1,n1);
-x2 = Array.add(ax,Array.mul(ax,Array.sin(x1)));
+ax = 0.5*d2*(n2-1)
+x1 = Array.rampfloat(f1,d1,n1)
+x2 = Array.add(ax,Array.mul(ax,Array.sin(x1)))
 
 # For testing below.
 def makePlotPanel(orientation):
@@ -27,15 +27,15 @@ def makePlotPanel(orientation):
 
   gv0 = pp.addGrid(0,0)
   gv1 = pp.addGrid(0,1)
-  gv0.setVertical(GridView.Vertical.ZERO);
-  gv0.setColor(Color.YELLOW);
-  gv1.setParameters("HVw-.");
+  gv0.setVertical(GridView.Vertical.ZERO)
+  gv0.setColor(Color.YELLOW)
+  gv1.setParameters("HVw-.")
 
-  ptv0 = pp.addPoints(0,0,s1,x2);
-  ptv1 = pp.addPoints(0,1,x1,x2);
-  ptv0.setStyle("r--.");
-  ptv1.setStyle("k-o");
-  ptv0.setLineWidth(3);
+  ptv0 = pp.addPoints(0,0,s1,x2)
+  ptv1 = pp.addPoints(0,1,x1,x2)
+  ptv0.setStyle("r--.")
+  ptv1.setStyle("k-o")
+  ptv0.setLineWidth(3)
 
   pp.addColorBar("amplitude")
   pp.title = "A Test of PlotFrame"
