@@ -1,4 +1,4 @@
-from java.awt import Color
+from java.awt import *
 from edu.mines.jtk.dsp import *
 from edu.mines.jtk.mosaic import *
 from edu.mines.jtk.util import *
@@ -53,6 +53,9 @@ def makePlotPanel(orientation):
 pp1 = makePlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
 pp2 = makePlotPanel(PlotPanel.Orientation.X1RIGHT_X2UP)
 pf = PlotFrame(pp1,pp2,PlotFrame.Split.VERTICAL)
+
+#pf.setBackground(Color.MAGENTA)
+#pf.setFontSize(18))
 
 pf.setVisible(True)
 pf.paintToPng(300,6,"junk.png")

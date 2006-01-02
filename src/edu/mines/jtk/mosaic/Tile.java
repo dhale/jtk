@@ -119,24 +119,31 @@ public class Tile extends IPanel {
    * Adds the specified tiled view to this tile. If the tiled view is
    * already in this tile, it is first removed, before adding it again.
    * @param tv the tiled view.
+   * @return true, if this tile did not already contain the specified
+   *  tiled view; false, otherwise.
    */
-  public void addTiledView(TiledView tv) {
-    _tvs.remove(tv);
+  public boolean addTiledView(TiledView tv) {
+    boolean removed = _tvs.remove(tv);
     _tvs.add(tv);
     tv.setTile(this);
     alignProjectors();
+    return !removed;
   }
 
   /**
    * Removes the specified tiled view from this tile. If the tiled view
    * is not in this tile, this method does nothing.
    * @param tv the tiled view.
+   * @return true, if this tile contained the specified tiled view;
+   *  false, otherwise.
    */
-  public void removeTiledView(TiledView tv) {
+  public boolean removeTiledView(TiledView tv) {
     if (_tvs.remove(tv)) {
       tv.setTile(null);
       alignProjectors();
+      return true;
     }
+    return false;
   }
 
   /**

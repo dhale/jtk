@@ -26,9 +26,19 @@ import static java.lang.Math.*;
  * <p>
  * A plot frame has a single mode manager 
  * ({@link edu.mines.jtk.gui.ModeManager}).
- * When constructed, a plot frame adds and sets active a tile zoom mode 
- * ({@link edu.mines.jtk.mosaic.TileZoomMode}) to that mode manager. Of
- * course, additional modes of interaction can be added as well.
+ * When constructed, a plot frame adds and sets active (1) a tile zoom mode 
+ * ({@link edu.mines.jtk.mosaic.TileZoomMode}) and (2) a mouse track mode
+ * ({@link edu.mines.jtk.mosaic.MouseTrackMode}) to that mode manager. Of
+ * course, other modes of interaction can be added as well.
+ * <p>
+ * The default font and background and foreground colors for a plot frame
+ * depend on the Java Swing look-and-feel installed when the plot frame 
+ * is constructed. Any of these attributes can be changed. For both 
+ * simplicity and consistency, when any of these attributes are set for 
+ * this frame, they are set for all components in this frame as well. For 
+ * example, calling the method {@link #setFont(java.awt.Font)} will set 
+ * the font for all panels and, in turn, all mosaics, tiles, tile axes, 
+ * color bars, and titles in this frame.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.12.31
  */
@@ -144,6 +154,58 @@ public class PlotFrame extends JFrame {
     _panelMain.paintToPng(dpi,win,fileName);
   }
 
+  /**
+   * Sets the font size (in points) for all panels in this frame.
+   * @param size the size.
+   */
+  public void setFontSize(int size) {
+    Font font = getFont();
+    font = font.deriveFont((float)size);
+    setFont(font);
+  }
+
+  /**
+   * Sets the font in all panels in this frame.
+   * @param font the font.
+   */
+  public void setFont(Font font) {
+    super.setFont(font);
+    if (_panelMain!=null)
+      _panelMain.setFont(font);
+    if (_panelTL!=null)
+      _panelTL.setFont(font);
+    if (_panelBR!=null && _panelBR!=_panelTL)
+      _panelBR.setFont(font);
+  }
+
+  /**
+   * Sets the foreground color in all panels in this frame.
+   * @param color the foreground color.
+   */
+  public void setForeground(Color color) {
+    super.setForeground(color);
+    if (_panelMain!=null)
+      _panelMain.setForeground(color);
+    if (_panelTL!=null)
+      _panelTL.setForeground(color);
+    if (_panelBR!=null && _panelBR!=_panelTL)
+      _panelBR.setForeground(color);
+  }
+
+  /**
+   * Sets the background color in all components of this panel.
+   * @param color the background color.
+   */
+  public void setBackground(Color color) {
+    super.setBackground(color);
+    if (_panelMain!=null)
+      _panelMain.setBackground(color);
+    if (_panelTL!=null)
+      _panelTL.setBackground(color);
+    if (_panelBR!=null && _panelBR!=_panelTL)
+      _panelBR.setBackground(color);
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -187,6 +249,9 @@ public class PlotFrame extends JFrame {
     }
   }
 
+  /**
+   * Adds the mode manager to this frame and activates some modes.
+   */
   private void addModeManager() {
     _modeManager = new ModeManager();
     _panelTL.getMosaic().setModeManager(_modeManager);

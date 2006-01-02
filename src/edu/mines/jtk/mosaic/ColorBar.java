@@ -87,6 +87,28 @@ public class ColorBar extends IPanel implements ColorMapListener {
     _mosaic.paintToRect(g2d,x,y,w,h);
   }
 
+  // Override base class implementation.
+  public void setFont(Font font) {
+    super.setFont(font);
+    if (_mosaic!=null)
+      _mosaic.setFont(font);
+    revalidate();
+  }
+
+  // Override base class implementation.
+  public void setForeground(Color color) {
+    super.setForeground(color);
+    if (_mosaic!=null)
+      _mosaic.setForeground(color);
+  }
+
+  // Override base class implementation.
+  public void setBackground(Color color) {
+    super.setBackground(color);
+    if (_mosaic!=null)
+      _mosaic.setBackground(color);
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
 

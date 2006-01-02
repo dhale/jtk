@@ -28,7 +28,7 @@ public class IPanelTest {
       super();
       _text = text;
       Font font = getFont();
-      setFont(font.deriveFont(2.0f*font.getSize()));
+      setFont(font.deriveFont(2.0f*font.getSize2D()));
     }
     public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
       g2d = createGraphics(g2d,x,y,w,h);

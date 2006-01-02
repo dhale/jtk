@@ -291,7 +291,9 @@ public class Mosaic extends IPanel {
   // Override base class implementation.
   public void setFont(Font font) {
     super.setFont(font);
-    if (_axisList!=null) {
+    if (_tileList!=null) {
+      for (Tile tile : _tileList)
+        tile.setFont(font);
       for (TileAxis axis : _axisList)
         axis.setFont(font);
     }

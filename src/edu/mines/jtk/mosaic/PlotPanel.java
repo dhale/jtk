@@ -153,6 +153,9 @@ public class PlotPanel extends IPanel {
     _colorBarLabel = label;
     if (_colorBar==null) {
       _colorBar = new ColorBar(label);
+      _colorBar.setFont(getFont());
+      _colorBar.setForeground(getForeground());
+      _colorBar.setBackground(getBackground());
       if (_colorBarPixelsView!=null) {
         _colorBarPixelsView.addColorMapListener(_colorBar);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -193,7 +196,8 @@ public class PlotPanel extends IPanel {
   }
 
   /**
-   * Adds the plot title.
+   * Adds the plot title. Equivalent to {@link #setTitle(String)}.
+   * The title font is 1.5 times larger than the font of this panel.
    * @param title the title; null, if none.
    */
   public void addTitle(String title) {
@@ -201,13 +205,18 @@ public class PlotPanel extends IPanel {
   }
 
   /**
-   * Sets the plot title.
-   * @param title the title; null, if none.
+   * Sets the plot title. Equivalent to {@link #addTitle(String)}.
+   * @param title the title; null, for no title.
    */
   public void setTitle(String title) {
     if (title!=null) {
       if (_title==null) {
         _title = new Title(title);
+        Font font = getFont();
+        font = font.deriveFont(1.5f*font.getSize2D());
+        _title.setFont(getFont());
+        _title.setForeground(getForeground());
+        _title.setBackground(getBackground());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -229,11 +238,13 @@ public class PlotPanel extends IPanel {
     } else if (_title!=null) {
       this.remove(_title);
       this.revalidate();
+      _title = null;
     }
   }
 
   /**
-   * Removes the plot title.
+   * Removes the plot title. Equivalent to calling the method
+   * {@link #setTitle(String)} with a null title.
    */
   public void removeTitle() {
     setTitle(null);
@@ -241,6 +252,8 @@ public class PlotPanel extends IPanel {
 
   /**
    * Sets limits for the horizontal axis.
+   * By default, limits are computed automatically by tiled graphical views.
+   * This method can be used to override those default limits.
    * @param hmin the minimum value.
    * @param hmax the maximum value.
    */
@@ -250,6 +263,8 @@ public class PlotPanel extends IPanel {
 
   /**
    * Sets limits for the vertical axis.
+   * By default, limits are computed automatically by tiled graphical views.
+   * This method can be used to override those default limits.
    * @param vmin the minimum value.
    * @param vmax the maximum value.
    */
@@ -259,6 +274,8 @@ public class PlotPanel extends IPanel {
 
   /**
    * Sets limits for the horizontal axis in the specified column.
+   * By default, limits are computed automatically by tiled graphical views.
+   * This method can be used to override those default limits.
    * @param icol the column index.
    * @param hmin the minimum value.
    * @param hmax the maximum value.
@@ -270,6 +287,8 @@ public class PlotPanel extends IPanel {
 
   /**
    * Sets limits for the vertical axis in the specified row.
+   * By default, limits are computed automatically by tiled graphical views.
+   * This method can be used to override those default limits.
    * @param irow the row index.
    * @param vmin the minimum value.
    * @param vmax the maximum value.
@@ -284,16 +303,16 @@ public class PlotPanel extends IPanel {
   }
 
   /**
-   * Sets default limits for the horizontal axis.
-   * Default limits are computed automatically by tiled graphical views.
+   * Sets default limits for the horizontal axis. This method may be used 
+   * to restore default limits after they have been set explicitly.
    */
   public void setHLimitsDefault() {
     setHLimitsDefault(0);
   }
 
   /**
-   * Sets default limits for the vertical axis.
-   * Default limits are computed automatically by tiled graphical views.
+   * Sets default limits for the vertical axis. This method may be used 
+   * to restore default limits after they have been set explicitly.
    */
   public void setVLimitsDefault() {
     setVLimitsDefault(0);
@@ -301,7 +320,8 @@ public class PlotPanel extends IPanel {
 
   /**
    * Sets default limits for the horizontal axis in the specified column.
-   * Default limits are computed automatically by tiled graphical views.
+   * This method may be used to restore default limits after they have 
+   * been set explicitly.
    * @param icol the column index.
    */
   public void setHLimitsDefault(int icol) {
@@ -310,7 +330,8 @@ public class PlotPanel extends IPanel {
 
   /**
    * Sets default limits for the vertical axis in the specified column.
-   * Default limits are computed automatically by tiled graphical views.
+   * This method may be used to restore default limits after they have 
+   * been set explicitly.
    * @param irow the row index.
    */
   public void setVLimitsDefault(int irow) {
@@ -344,14 +365,7 @@ public class PlotPanel extends IPanel {
     } else {
       _mosaic.getTileAxisBottom(icol).setLabel(label);
     }
-
-    // Axis height may have changed, so may need to resize the color bar 
-    // to align with the mosaic. Easiest way to do this is to simply 
-    // remove and add the current color bar, if it exists.
-    if (_colorBar!=null) {
-      removeColorBar();
-      addColorBar(_colorBarLabel);
-    }
+    adjustColorBar();
   }
 
   /**
@@ -605,6 +619,68 @@ public class PlotPanel extends IPanel {
     return addSequenceView(irow,icol,sv);
   }
 
+  /**
+   * Removes the specified tiled view from this plot panel.
+   * @param tv the tiled view.
+   * @return true, if this panel contained the specified tiled view; 
+   *  false, otherwise.
+   */
+  public boolean remove(TiledView tv) {
+    int nrow = _mosaic.countRows();
+    int ncol = _mosaic.countColumns();
+    for (int irow=0; irow<nrow; ++irow) {
+      for (int icol=0; icol<ncol; ++icol) {
+        if (getTile(irow,icol).removeTiledView(tv))
+          return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Sets the font in all components of this panel.
+   * Sets the title font to be 1.5 times larger than the specified font.
+   * @param font the font.
+   */
+  public void setFont(Font font) {
+    super.setFont(font);
+    if (_mosaic!=null)
+      _mosaic.setFont(font);
+    if (_colorBar!=null)
+      _colorBar.setFont(font);
+    if (_title!=null)
+      _title.setFont(font.deriveFont(1.5f*font.getSize2D()));
+    adjustColorBar();
+    revalidate();
+  }
+
+  /**
+   * Sets the foreground color in all components of this panel.
+   * @param color the foreground color.
+   */
+  public void setForeground(Color color) {
+    super.setForeground(color);
+    if (_mosaic!=null)
+      _mosaic.setForeground(color);
+    if (_colorBar!=null)
+      _colorBar.setForeground(color);
+    if (_title!=null)
+      _title.setForeground(color);
+  }
+
+  /**
+   * Sets the background color in all components of this panel.
+   * @param color the background color.
+   */
+  public void setBackground(Color color) {
+    super.setBackground(color);
+    if (_mosaic!=null)
+      _mosaic.setBackground(color);
+    if (_colorBar!=null)
+      _colorBar.setBackground(color);
+    if (_title!=null)
+      _title.setBackground(color);
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
@@ -624,9 +700,6 @@ public class PlotPanel extends IPanel {
 
     Title(String text) {
       this.text = text;
-      Font font = getFont();
-      font = font.deriveFont(1.5f*font.getSize());
-      setFont(font);
     }
 
     void set(String text) {
@@ -727,5 +800,16 @@ public class PlotPanel extends IPanel {
     int ncol = getMosaic().countColumns();
     for (int icol=0; icol<ncol; ++icol)
       getTile(irow,icol).setBestVerticalProjector(p);
+  }
+
+  /**
+   * Called when the color bar in this panel may need resizing.
+   * This implementation simply removes and adds any existing color bar.
+   */
+  private void adjustColorBar() {
+    if (_colorBar!=null) {
+      removeColorBar();
+      addColorBar(_colorBarLabel);
+    }
   }
 }
