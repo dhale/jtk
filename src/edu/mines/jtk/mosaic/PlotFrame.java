@@ -165,7 +165,7 @@ public class PlotFrame extends JFrame {
   }
 
   /**
-   * Sets the font in all panels in this frame.
+   * Sets the font in all components in this frame.
    * @param font the font.
    */
   public void setFont(Font font) {
@@ -179,7 +179,7 @@ public class PlotFrame extends JFrame {
   }
 
   /**
-   * Sets the foreground color in all panels in this frame.
+   * Sets the foreground color in all components in this frame.
    * @param color the foreground color.
    */
   public void setForeground(Color color) {
@@ -193,7 +193,7 @@ public class PlotFrame extends JFrame {
   }
 
   /**
-   * Sets the background color in all components of this panel.
+   * Sets the background color in all components in this frame.
    * @param color the background color.
    */
   public void setBackground(Color color) {
