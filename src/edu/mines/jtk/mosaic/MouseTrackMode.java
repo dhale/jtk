@@ -15,7 +15,7 @@ import edu.mines.jtk.gui.*;
 /**
  * A mode for tracking the mouse location. When this mode is active,
  * then mouse movement within any tile is highlighted in any tile axes
- * in the that tile's row and column. This mode is not exclusive.
+ * in that tile's row and column. This mode is not exclusive.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.01.01
  */

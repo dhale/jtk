@@ -120,7 +120,7 @@ public class GridView extends TiledView {
 
   /**
    * Constructs a grid view with specified parameters string. See the method 
-   * {@link #set(String)} for the format of the parameters string.
+   * {@link #setParameters(String)} for the format of the parameters string.
    * @param parameters the color and style of grid lines.
    */
   public GridView(String parameters) {

@@ -28,6 +28,7 @@ public class ArrayListBench {
           t[i] = a[i];
         a = t;
       }
+      a[n++] = f;
     }
     public float[] trim() {
       float[] t = new float[n];

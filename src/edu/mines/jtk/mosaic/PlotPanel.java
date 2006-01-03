@@ -426,7 +426,7 @@ public class PlotPanel extends IPanel {
   /**
    * Adds a grid view with specified parameters string. 
    * For the format of the parameters string, see 
-   * {@link edu.mines.jtk.mosaic.GridView#set(String)}.
+   * {@link edu.mines.jtk.mosaic.GridView#setParameters(String)}.
    * @param parameters the parameters string.
    * @return the grid view.
    */
@@ -448,7 +448,7 @@ public class PlotPanel extends IPanel {
   /**
    * Adds a grid view with specified parameters string.
    * For the format of the parameters string, see 
-   * {@link edu.mines.jtk.mosaic.GridView#set(String)}.
+   * {@link edu.mines.jtk.mosaic.GridView#setParameters(String)}.
    * @param irow the tile row index.
    * @param icol the tile column index.
    * @param parameters the parameters string.
