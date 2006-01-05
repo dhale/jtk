@@ -244,10 +244,10 @@ public class ContoursView extends TiledView {
   // private
 
   private static class Contour {
-    float fc;
-    int ns = 0;
-    ArrayList<float[]> x1 = new ArrayList<float[]>();
-    ArrayList<float[]> x2 = new ArrayList<float[]>();
+    float fc; // contoured function value
+    int ns = 0; // number of segments
+    ArrayList<float[]> x1 = new ArrayList<float[]>(); // x1[] per segment
+    ArrayList<float[]> x2 = new ArrayList<float[]>(); // x2[] per segment
     Contour (float fc) {
       this.fc = fc;
     }
@@ -304,7 +304,7 @@ public class ContoursView extends TiledView {
   private double _dy;
   private double _fy;
 
-  // Contour sampling and contours list.
+  // Contour sampling and corresponding list of contours.
   private Sampling _cs;
   private ArrayList<Contour> _cl;
 
@@ -492,7 +492,6 @@ public class ContoursView extends TiledView {
         x1.add(f1+(i1+d)*d1);
         x2.add(f2+(i2  )*d2);
         clrs(i1,i2,flags);
-        --ni;
         for (i=is-n1; i>=0; i=connect(i,fc,n1,d1,f1,n2,d2,f2,f,flags,x1,x2))
           --ni;
         c.append(x1,x2);
@@ -509,7 +508,6 @@ public class ContoursView extends TiledView {
         x1.add(f1+(i1  )*d1);
         x2.add(f2+(i2+d)*d2);
         clrw(i1,i2,flags);
-        --ni;
         for (i=is-1; i>=0; i=connect(i,fc,n1,d1,f1,n2,d2,f2,f,flags,x1,x2))
           --ni;
         c.append(x1,x2);
@@ -526,7 +524,6 @@ public class ContoursView extends TiledView {
         x1.add(f1+(i1+d)*d1);
         x2.add(f2+(i2  )*d2);
         clrs(i1,i2,flags);
-        --ni;
         for (i=is; i>=0; i=connect(i,fc,n1,d1,f1,n2,d2,f2,f,flags,x1,x2))
           --ni;
         c.append(x1,x2);
@@ -543,7 +540,6 @@ public class ContoursView extends TiledView {
         x1.add(f1+(i1  )*d1);
         x2.add(f2+(i2+d)*d2);
         clrw(i1,i2,flags);
-        --ni;
         for (i=is; i>=0; i=connect(i,fc,n1,d1,f1,n2,d2,f2,f,flags,x1,x2))
           --ni;
         c.append(x1,x2);
@@ -560,7 +556,6 @@ public class ContoursView extends TiledView {
           x1.add(f1+(i1+d)*d1);
           x2.add(f2+(i2  )*d2);
           clrs(i1,i2,flags);
-          --ni;
           for (i=is; i>=0; i=connect(i,fc,n1,d1,f1,n2,d2,f2,f,flags,x1,x2))
             --ni;
           c.append(x1,x2);
