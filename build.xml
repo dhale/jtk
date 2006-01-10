@@ -288,7 +288,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <fileset dir="${bin}" includes="javarun.sh"/>
     </copy>
     <copy todir="${dist}/lib">
-      <fileset dir="${lib}/linux/x86"/>
+      <fileset dir="${lib}/linux/x86" includes="*.so"/>
     </copy>
     <tar destfile="${dist}/${title}_${DSTAMP}_${TSTAMP}.tar.gz"
          compression="gzip">
@@ -300,7 +300,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <fileset dir="${bin}" includes="javarun.bat"/>
     </copy>
     <copy todir="${dist}/lib">
-      <fileset dir="${lib}/windows/x86"/>
+      <fileset dir="${lib}/windows/x86" includes="*.dll"/>
     </copy>
     <zip destfile="${dist}/${title}_${DSTAMP}_${TSTAMP}.zip">
       <zipfileset dir="${dist}" prefix="${title}"/>
