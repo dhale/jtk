@@ -11,6 +11,7 @@ import static edu.mines.jtk.opengl.Gl.*;
 
 /**
  * Simple OpenGL program.
+ * Requires OpenGL version 1.2 or above.
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.02
  */
@@ -18,6 +19,8 @@ public class Hello {
   private static GlPainter painter = new GlPainter() {
     public void glInit() {
       glClearColor(0.0f,0.0f,0.0f,0.0f);
+      System.out.println("OpenGL version="+glGetString(GL_VERSION));
+      System.out.println("OpenGL vendor="+glGetString(GL_VENDOR));
     }
     public void glResize(int width, int height, int widthOld, int heightOld) {
       glViewport(0,0,width,height);
