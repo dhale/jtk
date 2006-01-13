@@ -148,10 +148,18 @@ public class PlotFrame extends JFrame {
    * @param win the image width, in inches.
    * @param fileName the name of the file to contain the PNG image.  
    */
-  public void paintToPng(double dpi, double win, String fileName) 
-    throws IOException 
+  public void paintToPng(
+    final double dpi, final double win, final String fileName) 
   {
-    _panelMain.paintToPng(dpi,win,fileName);
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        try {
+          _panelMain.paintToPng(dpi,win,fileName);
+        } catch (IOException ioe) {
+          throw new RuntimeException(ioe);
+        }
+      }
+    });
   }
 
   /**
@@ -160,8 +168,10 @@ public class PlotFrame extends JFrame {
    */
   public void setFontSize(int size) {
     Font font = getFont();
-    font = font.deriveFont((float)size);
-    setFont(font);
+    if (font==null)
+      font = UIManager.getFont("Panel.font");
+    if (font!=null)
+      setFont(font.deriveFont((float)size));
   }
 
   /**

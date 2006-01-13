@@ -538,15 +538,21 @@ public class Mosaic extends IPanel {
   void alignProjectors(Tile tile) {
     int jrow = tile.getRowIndex();
     int jcol = tile.getColumnIndex();
-    Projector bhp = new Projector(tile.getBestHorizontalProjector());
-    for (int irow=0; irow<_nrow; ++irow) {
-      if (irow!=jrow)
-        bhp.merge(_tiles[irow][jcol].getBestHorizontalProjector());
+    Projector bhp = tile.getBestHorizontalProjector();
+    if (bhp!=null) {
+      bhp = new Projector(bhp);
+      for (int irow=0; irow<_nrow; ++irow) {
+        if (irow!=jrow)
+          bhp.merge(_tiles[irow][jcol].getBestHorizontalProjector());
+      }
     }
-    Projector bvp = new Projector(tile.getBestVerticalProjector());
-    for (int icol=0; icol<_ncol; ++icol) {
-      if (icol!=jcol)
-        bvp.merge(_tiles[jrow][icol].getBestVerticalProjector());
+    Projector bvp = tile.getBestVerticalProjector();
+    if (bvp!=null) {
+      bvp = new Projector(bvp);
+      for (int icol=0; icol<_ncol; ++icol) {
+        if (icol!=jcol)
+          bvp.merge(_tiles[jrow][icol].getBestVerticalProjector());
+      }
     }
     tile.setProjectors(bhp,bvp);
     for (int irow=0; irow<_nrow; ++irow) {
