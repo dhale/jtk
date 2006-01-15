@@ -24,16 +24,16 @@ public class DataFileTest extends TestCase {
   }
 
   public void test() throws IOException {
-    int n = 100000;
+    int n = 10000;
     float[] af = Array.randfloat(n);
     float[] bf = Array.zerofloat(n);
     double[] ad = Array.randdouble(n);
     double[] bd = Array.zerodouble(n);
-    for (int itest=0; itest<4; ++itest) {
+    for (int itest=0; itest<2; ++itest) {
       DataFile.ByteOrder order = (itest%2==0) ?
         DataFile.ByteOrder.BIG_ENDIAN :
         DataFile.ByteOrder.LITTLE_ENDIAN;
-      System.out.println("byte order="+order);
+      //System.out.println("byte order="+order);
       DataFile df = new DataFile("junk.dat","rw",order);
       testFloat(df,af,bf);
       testDouble(df,ad,bd);
@@ -47,10 +47,11 @@ public class DataFileTest extends TestCase {
     int n = a.length;
     int nio;
     double rate;
+    double maxtime = 0.1;
     Stopwatch sw = new Stopwatch();
 
     sw.restart();
-    for (nio=0; sw.time()<1.0; ++nio) {
+    for (nio=0; sw.time()<maxtime; ++nio) {
       df.seek(0);
       df.writeFloats(a);
       df.seek(0);
@@ -58,12 +59,12 @@ public class DataFileTest extends TestCase {
     }
     sw.stop();
     rate = 2.0*4.0*1.0e-6*n*nio/sw.time();
-    System.out.println("testFloat: fast rate="+rate+" MB/s");
+    //System.out.println("testFloat: fast rate="+rate+" MB/s");
     for (int i=0; i<n; ++i)
       assertEquals(a[i],b[i]);
 
     sw.restart();
-    for (nio=0; sw.time()<1.0; ++nio) {
+    for (nio=0; sw.time()<maxtime; ++nio) {
       df.seek(0);
       for (int i=0; i<n; ++i)
         df.writeFloat(a[i]);
@@ -72,7 +73,7 @@ public class DataFileTest extends TestCase {
         b[i] = df.readFloat();
     }
     rate = 2.0*4.0*1.0e-6*n*nio/sw.time();
-    System.out.println("testFloat: slow rate="+rate+" MB/s");
+    //System.out.println("testFloat: slow rate="+rate+" MB/s");
     for (int i=0; i<n; ++i)
       assertEquals(a[i],b[i]);
 
@@ -95,10 +96,11 @@ public class DataFileTest extends TestCase {
     int n = a.length;
     int nio;
     double rate;
+    double maxtime = 0.1;
     Stopwatch sw = new Stopwatch();
 
     sw.restart();
-    for (nio=0; sw.time()<1.0; ++nio) {
+    for (nio=0; sw.time()<maxtime; ++nio) {
       df.seek(0);
       df.writeDoubles(a);
       df.seek(0);
@@ -106,12 +108,12 @@ public class DataFileTest extends TestCase {
     }
     sw.stop();
     rate = 2.0*8.0*1.0e-6*n*nio/sw.time();
-    System.out.println("testDouble: fast rate="+rate+" MB/s");
+    //System.out.println("testDouble: fast rate="+rate+" MB/s");
     for (int i=0; i<n; ++i)
       assertEquals(a[i],b[i]);
 
     sw.restart();
-    for (nio=0; sw.time()<1.0; ++nio) {
+    for (nio=0; sw.time()<maxtime; ++nio) {
       df.seek(0);
       for (int i=0; i<n; ++i)
         df.writeDouble(a[i]);
@@ -120,7 +122,7 @@ public class DataFileTest extends TestCase {
         b[i] = df.readDouble();
     }
     rate = 2.0*8.0*1.0e-6*n*nio/sw.time();
-    System.out.println("testDouble: slow rate="+rate+" MB/s");
+    //System.out.println("testDouble: slow rate="+rate+" MB/s");
     for (int i=0; i<n; ++i)
       assertEquals(a[i],b[i]);
 
