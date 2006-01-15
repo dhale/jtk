@@ -445,12 +445,12 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public void readChars(char[] v, int k, int n) throws IOException {
     int m = _cb.capacity();
-    for (int j=k; j<n; j+=m) {
+    for (int j=0; j<n; j+=m) {
       int l = min(n-j,m);
       _bb.position(0).limit(l*2);
       _fc.read(_bb);
       _cb.position(0).limit(l);
-      _cb.get(v,j,l);
+      _cb.get(v,k+j,l);
     }
   }
 
@@ -491,12 +491,12 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public void readShorts(short[] v, int k, int n) throws IOException {
     int m = _sb.capacity();
-    for (int j=k; j<n; j+=m) {
+    for (int j=0; j<n; j+=m) {
       int l = min(n-j,m);
       _bb.position(0).limit(l*2);
       _fc.read(_bb);
       _sb.position(0).limit(l);
-      _sb.get(v,j,l);
+      _sb.get(v,k+j,l);
     }
   }
 
@@ -537,12 +537,12 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public void readInts(int[] v, int k, int n) throws IOException {
     int m = _ib.capacity();
-    for (int j=k; j<n; j+=m) {
+    for (int j=0; j<n; j+=m) {
       int l = min(n-j,m);
       _bb.position(0).limit(l*4);
       _fc.read(_bb);
       _ib.position(0).limit(l);
-      _ib.get(v,j,l);
+      _ib.get(v,k+j,l);
     }
   }
 
@@ -583,12 +583,12 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public void readLongs(long[] v, int k, int n) throws IOException {
     int m = _lb.capacity();
-    for (int j=k; j<n; j+=m) {
+    for (int j=0; j<n; j+=m) {
       int l = min(n-j,m);
       _bb.position(0).limit(l*8);
       _fc.read(_bb);
       _lb.position(0).limit(l);
-      _lb.get(v,j,l);
+      _lb.get(v,k+j,l);
     }
   }
 
@@ -629,12 +629,12 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public void readFloats(float[] v, int k, int n) throws IOException {
     int m = _fb.capacity();
-    for (int j=k; j<n; j+=m) {
+    for (int j=0; j<n; j+=m) {
       int l = min(n-j,m);
       _bb.position(0).limit(l*4);
       _fc.read(_bb);
       _fb.position(0).limit(l);
-      _fb.get(v,j,l);
+      _fb.get(v,k+j,l);
     }
   }
 
@@ -675,12 +675,12 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public void readDoubles(double[] v, int k, int n) throws IOException {
     int m = _db.capacity();
-    for (int j=k; j<n; j+=m) {
+    for (int j=0; j<n; j+=m) {
       int l = min(n-j,m);
       _bb.position(0).limit(l*8);
       _fc.read(_bb);
       _db.position(0).limit(l);
-      _db.get(v,j,l);
+      _db.get(v,k+j,l);
     }
   }
 
@@ -758,10 +758,10 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public void writeChars(char[] v, int k, int n) throws IOException {
     int m = _cb.capacity();
-    for (int j=k; j<n; j+=m) {
+    for (int j=0; j<n; j+=m) {
       int l = min(n-j,m);
       _cb.position(0).limit(l);
-      _cb.put(v,j,l);
+      _cb.put(v,k+j,l);
       _bb.position(0).limit(l*2);
       _fc.write(_bb);
     }
@@ -802,10 +802,10 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public void writeShorts(short[] v, int k, int n) throws IOException {
     int m = _sb.capacity();
-    for (int j=k; j<n; j+=m) {
+    for (int j=0; j<n; j+=m) {
       int l = min(n-j,m);
       _sb.position(0).limit(l);
-      _sb.put(v,j,l);
+      _sb.put(v,k+j,l);
       _bb.position(0).limit(l*2);
       _fc.write(_bb);
     }
@@ -846,10 +846,10 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public void writeInts(int[] v, int k, int n) throws IOException {
     int m = _ib.capacity();
-    for (int j=k; j<n; j+=m) {
+    for (int j=0; j<n; j+=m) {
       int l = min(n-j,m);
       _ib.position(0).limit(l);
-      _ib.put(v,j,l);
+      _ib.put(v,k+j,l);
       _bb.position(0).limit(l*4);
       _fc.write(_bb);
     }
@@ -890,10 +890,10 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public void writeLongs(long[] v, int k, int n) throws IOException {
     int m = _lb.capacity();
-    for (int j=k; j<n; j+=m) {
+    for (int j=0; j<n; j+=m) {
       int l = min(n-j,m);
       _lb.position(0).limit(l);
-      _lb.put(v,j,l);
+      _lb.put(v,k+j,l);
       _bb.position(0).limit(l*8);
       _fc.write(_bb);
     }
@@ -934,10 +934,10 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public void writeFloats(float[] v, int k, int n) throws IOException {
     int m = _fb.capacity();
-    for (int j=k; j<n; j+=m) {
+    for (int j=0; j<n; j+=m) {
       int l = min(n-j,m);
       _fb.position(0).limit(l);
-      _fb.put(v,j,l);
+      _fb.put(v,k+j,l);
       _bb.position(0).limit(l*4);
       _fc.write(_bb);
     }
@@ -978,10 +978,10 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public void writeDoubles(double[] v, int k, int n) throws IOException {
     int m = _db.capacity();
-    for (int j=k; j<n; j+=m) {
+    for (int j=0; j<n; j+=m) {
       int l = min(n-j,m);
       _db.position(0).limit(l);
-      _db.put(v,j,l);
+      _db.put(v,k+j,l);
       _bb.position(0).limit(l*8);
       _fc.write(_bb);
     }

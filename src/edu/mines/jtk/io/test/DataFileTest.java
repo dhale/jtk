@@ -7,10 +7,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.io.test;
 
 import junit.framework.*;
+import java.io.File;
 import java.io.IOException;
 import edu.mines.jtk.io.DataFile;
 import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Stopwatch;
+import static java.lang.Math.min;
 
 /**
  * Tests {@link edu.mines.jtk.io.DataFile}.
@@ -23,57 +25,52 @@ public class DataFileTest extends TestCase {
     junit.textui.TestRunner.run(suite);
   }
 
-  public void test() throws IOException {
+  public void testBigEndian() throws IOException {
+    test(DataFile.ByteOrder.BIG_ENDIAN);
+  }
+
+  public void testLittleEndian() throws IOException {
+    test(DataFile.ByteOrder.LITTLE_ENDIAN);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // private
+
+  private static void test(DataFile.ByteOrder order) throws IOException {
     int n = 10000;
-    float[] af = Array.randfloat(n);
-    float[] bf = Array.zerofloat(n);
-    double[] ad = Array.randdouble(n);
-    double[] bd = Array.zerodouble(n);
-    for (int itest=0; itest<2; ++itest) {
-      DataFile.ByteOrder order = (itest%2==0) ?
-        DataFile.ByteOrder.BIG_ENDIAN :
-        DataFile.ByteOrder.LITTLE_ENDIAN;
-      //System.out.println("byte order="+order);
-      DataFile df = new DataFile("junk.dat","rw",order);
-      testFloat(df,af,bf);
-      testDouble(df,ad,bd);
-      df.close();
+    File file = null;
+    DataFile df = null;
+    try {
+      file = File.createTempFile("junk","dat");
+      df = new DataFile(file,"rw",order);
+      testFloat(df,n);
+      testDouble(df,n);
+    } finally {
+      if (df!=null)
+        df.close();
+      if (file!=null)
+        file.delete();
     }
   }
 
-  private void testFloat(
-    DataFile df, float[] a, float[] b) throws IOException 
-  {
-    int n = a.length;
-    int nio;
-    double rate;
-    double maxtime = 0.1;
-    Stopwatch sw = new Stopwatch();
+  private static void testFloat(DataFile df, int n) throws IOException {
+    float[] a = Array.randfloat(n);
+    float[] b = Array.zerofloat(n);
 
-    sw.restart();
-    for (nio=0; sw.time()<maxtime; ++nio) {
-      df.seek(0);
-      df.writeFloats(a);
-      df.seek(0);
-      df.readFloats(b);
-    }
-    sw.stop();
-    rate = 2.0*4.0*1.0e-6*n*nio/sw.time();
-    //System.out.println("testFloat: fast rate="+rate+" MB/s");
+    df.seek(0);
+    df.writeFloats(a);
+    df.seek(0);
+    df.readFloats(b);
     for (int i=0; i<n; ++i)
       assertEquals(a[i],b[i]);
 
-    sw.restart();
-    for (nio=0; sw.time()<maxtime; ++nio) {
-      df.seek(0);
-      for (int i=0; i<n; ++i)
-        df.writeFloat(a[i]);
-      df.seek(0);
-      for (int i=0; i<n; ++i)
-        b[i] = df.readFloat();
-    }
-    rate = 2.0*4.0*1.0e-6*n*nio/sw.time();
-    //System.out.println("testFloat: slow rate="+rate+" MB/s");
+    Array.zero(b);
+    df.seek(0);
+    for (int i=0; i<n; ++i)
+      df.writeFloat(a[i]);
+    df.seek(0);
+    for (int i=0; i<n; ++i)
+      b[i] = df.readFloat();
     for (int i=0; i<n; ++i)
       assertEquals(a[i],b[i]);
 
@@ -84,45 +81,43 @@ public class DataFileTest extends TestCase {
     df.seek(0);
     for (int i=0; i<n; ++i)
       df.writeFloat(a[i]);
+    Array.zero(b);
     df.seek(0);
     df.readFloats(b);
     for (int i=0; i<n; ++i)
       assertEquals(a[i],b[i]);
+
+    int mw = 3141;
+    df.seek(0);
+    for (int j=0; j<n; j+=mw)
+      df.writeFloats(a,j,min(n-j,mw));
+    Array.zero(b);
+    df.seek(0);
+    int mr = 2739;
+    for (int j=0; j<n; j+=mr)
+      df.readFloats(b,j,min(n-j,mr));
+    for (int i=0; i<n; ++i)
+      assertEquals(a[i],b[i]);
   }
 
-  private void testDouble(
-    DataFile df, double[] a, double[] b) throws IOException 
-  {
-    int n = a.length;
-    int nio;
-    double rate;
-    double maxtime = 0.1;
-    Stopwatch sw = new Stopwatch();
+  private static void testDouble(DataFile df, int n) throws IOException {
+    double[] a = Array.randdouble(n);
+    double[] b = Array.zerodouble(n);
 
-    sw.restart();
-    for (nio=0; sw.time()<maxtime; ++nio) {
-      df.seek(0);
-      df.writeDoubles(a);
-      df.seek(0);
-      df.readDoubles(b);
-    }
-    sw.stop();
-    rate = 2.0*8.0*1.0e-6*n*nio/sw.time();
-    //System.out.println("testDouble: fast rate="+rate+" MB/s");
+    df.seek(0);
+    df.writeDoubles(a);
+    df.seek(0);
+    df.readDoubles(b);
     for (int i=0; i<n; ++i)
       assertEquals(a[i],b[i]);
 
-    sw.restart();
-    for (nio=0; sw.time()<maxtime; ++nio) {
-      df.seek(0);
-      for (int i=0; i<n; ++i)
-        df.writeDouble(a[i]);
-      df.seek(0);
-      for (int i=0; i<n; ++i)
-        b[i] = df.readDouble();
-    }
-    rate = 2.0*8.0*1.0e-6*n*nio/sw.time();
-    //System.out.println("testDouble: slow rate="+rate+" MB/s");
+    Array.zero(b);
+    df.seek(0);
+    for (int i=0; i<n; ++i)
+      df.writeDouble(a[i]);
+    df.seek(0);
+    for (int i=0; i<n; ++i)
+      b[i] = df.readDouble();
     for (int i=0; i<n; ++i)
       assertEquals(a[i],b[i]);
 
@@ -133,8 +128,21 @@ public class DataFileTest extends TestCase {
     df.seek(0);
     for (int i=0; i<n; ++i)
       df.writeDouble(a[i]);
+    Array.zero(b);
     df.seek(0);
     df.readDoubles(b);
+    for (int i=0; i<n; ++i)
+      assertEquals(a[i],b[i]);
+
+    int mw = 3141;
+    df.seek(0);
+    for (int j=0; j<n; j+=mw)
+      df.writeDoubles(a,j,min(n-j,mw));
+    Array.zero(b);
+    df.seek(0);
+    int mr = 2739;
+    for (int j=0; j<n; j+=mr)
+      df.readDoubles(b,j,min(n-j,mr));
     for (int i=0; i<n; ++i)
       assertEquals(a[i],b[i]);
   }
