@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import edu.mines.jtk.io.DataFile;
 import edu.mines.jtk.util.Array;
-import edu.mines.jtk.util.Stopwatch;
 import static java.lang.Math.min;
 
 /**
