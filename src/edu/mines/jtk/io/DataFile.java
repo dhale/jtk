@@ -103,7 +103,7 @@ public class DataFile implements DataInput, DataOutput, Closeable {
     _raf = new RandomAccessFile(file,mode);
     _fc = _raf.getChannel();
     _bo = order;
-    _bb = ByteBuffer.allocate(4096);
+    _bb = ByteBuffer.allocateDirect(4096);
     if (order==ByteOrder.BIG_ENDIAN) {
       _bb.order(java.nio.ByteOrder.BIG_ENDIAN);
     } else {
@@ -241,12 +241,13 @@ public class DataFile implements DataInput, DataOutput, Closeable {
   }
 
   /**
-   * Closes this data file, releasing any associatd system resources.
+   * Closes this data file, releasing any associated system resources.
    */
   public void close() throws IOException {
     _raf.close();
     _raf = null;
     _fc = null;
+    _bb = null;
   }
 
   public final boolean readBoolean() throws IOException {

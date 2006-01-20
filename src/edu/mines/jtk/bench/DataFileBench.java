@@ -71,7 +71,8 @@ public class DataFileBench extends TestCase {
     for (int i=0; i<n; ++i)
       if (a[i]!=b[i])
         throw new RuntimeException(" float: i/o failure");
-    double rate = 2.0*4.0*nio*n/sw.time();
+    double time = sw.time();
+    double rate = 2.0*4.0e-6*nio*n/time;
     System.out.println(" float: rate="+rate+" MB/s");
   }
 
@@ -91,7 +92,8 @@ public class DataFileBench extends TestCase {
     for (int i=0; i<n; ++i)
       if (a[i]!=b[i])
         throw new RuntimeException("double: i/o failure");
-    double rate = 2.0*4.0*nio*n/sw.time();
+    double time = sw.time();
+    double rate = 2.0*8.0e-6*nio*n/time;
     System.out.println("double: rate="+rate+" MB/s");
   }
 }

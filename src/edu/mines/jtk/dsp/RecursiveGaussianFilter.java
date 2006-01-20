@@ -23,13 +23,13 @@ import static edu.mines.jtk.util.MathPlus.*;
  * required by convolution. In other words, for sigma &gt; 2, this
  * recursive implementation should be more efficient than convolution.
  * <p>
- * This implementation is based on the design by Deriche, R., 1993,
- * Recursively implementing the Gaussian and its derivatives: INRIA
- * Research Report, number 1893.
- * <p>
  * For any application of this filter, input and output arrays may be the 
  * same array. When the filter cannot be applied in-place, intermediate
  * arrays are constructed internally.
+ * <p>
+ * This implementation is based on the design by Deriche, R., 1993,
+ * Recursively implementing the Gaussian and its derivatives: INRIA
+ * Research Report, number 1893.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.11.25
  */
@@ -677,6 +677,11 @@ public class RecursiveGaussianFilter {
     }
   }
 
+  private static void checkDelay(float d) {
+    Check.argument(0.0f<=d,"0.0f<=d");
+    Check.argument(d<=1.0f,"d<=1.0f");
+  }
+
   private static void checkArrays(float[] x, float[] y) {
     Check.argument(x.length==y.length,"x.length==y.length");
   }
@@ -695,6 +700,65 @@ public class RecursiveGaussianFilter {
       "x[0][0].length==y[0][0].length");
     Check.argument(Array.isRegular(x),"x is regular");
     Check.argument(Array.isRegular(y),"y is regular");
+  }
+
+  // Not sure yet whether we want this. The parameter d is a
+  // fractional delay between 0.0f and 1.0f samples. The idea
+  // is a Gaussian filter delayed by d is approximately equal to
+  // a linear interpolation (weighted sum) of two Gaussian filters.
+  // The approximation should be good if the paramater sigma is
+  // large, which makes linear interpolation of the Gaussian a
+  // good approximation.
+  private void applyN(int nd, float d, float[] x, float[] y) {
+    if (d==0.0f) {
+      applyN(nd,x,y);
+    } else {
+      checkDelay(d);
+      checkArrays(x,y);
+      if (x==y)
+        x = Array.copy(x);
+      int m = y.length;
+      float n0 = _n0[nd],  n1 = _n1[nd],  n2 = _n2[nd],  n3 = _n3[nd];
+      float d1 = _d1[nd],  d2 = _d2[nd],  d3 = _d3[nd],  d4 = _d4[nd];
+      float e = 1.0f-d;
+      float f0 = e*n0;
+      float f1 = e*n1+d*n0;
+      float f2 = e*n2+d*n1;
+      float f3 = e*n3+d*n2;
+      float f4 = d*n3;
+      float yim4 = 0.0f,  yim3 = 0.0f,  yim2 = 0.0f,  yim1 = 0.0f;
+      float xim4 = 0.0f,  xim3 = 0.0f,  xim2 = 0.0f,  xim1 = 0.0f;
+      for (int i=0; i<m; ++i) {
+        float xi = x[i];
+        float yi = f0*xi+f1*xim1+f2*xim2+f3*xim3+f4*xim4 -
+                         d1*yim1-d2*yim2-d3*yim3-d4*yim4;
+        y[i] = yi;
+        yim4 = yim3;  yim3 = yim2;  yim2 = yim1;  yim1 = yi;
+        xim4 = xim3;  xim3 = xim2;  xim2 = xim1;  xim1 = xi;
+      }
+      n1 = n1-d1*n0;
+      n2 = n2-d2*n0;
+      n3 = n3-d3*n0;
+      float n4 = -d4*n0;
+      float b0 = d*n1;
+      float b1 = e*n1+d*n2;
+      float b2 = e*n2+d*n3;
+      float b3 = e*n3+d*n4;
+      float b4 = e*n4;
+      if (nd%2!=0) {
+        n1 = -n1;  n2 = -n2;  n3 = -n3;  n4 = -n4;
+      }
+      float yip4 = 0.0f,  yip3 = 0.0f,  yip2 = 0.0f,  yip1 = 0.0f;
+      float xip4 = 0.0f,  xip3 = 0.0f,  xip2 = 0.0f,  xip1 = 0.0f;
+      for (int i=m-1; i>=0; --i) {
+        float xi = x[i];
+        float yi = b0*xi+b1*xip1+b2*xip2+b3*xip3+b4*xip4 -
+                         d1*yip1-d2*yip2-d3*yip3-d4*yip4;
+        y[i] += yi;
+        yip4 = yip3;  yip3 = yip2;  yip2 = yip1;  yip1 = yi;
+        xip4 = xip3;  xip3 = xip2;  xip2 = xip1;  xip1 = xi;
+      }
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
