@@ -82,11 +82,7 @@ public class SpectrumPlot extends PlotFrame {
         File file = fc.getSelectedFile();
         if (file!=null) {
           String filename = file.getAbsolutePath();
-          try {
-            _frame.paintToPng(300,6,filename);
-          } catch (IOException ioe) {
-            System.out.println("Cannot write image to file: "+filename);
-          }
+          _frame.paintToPng(300,6,filename);
         }
       }
     };

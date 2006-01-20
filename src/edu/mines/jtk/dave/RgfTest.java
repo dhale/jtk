@@ -78,10 +78,6 @@ public class RgfTest {
     String filename, float fmin, float fmax, float[][] f) 
   {
     PlotFrame frame = plot(fmin,fmax,f);
-    try {
-      frame.paintToPng(300,6,filename+".png");
-    } catch (IOException ioe) {
-      System.out.println("Cannot write image to file: "+filename);
-    }
+    frame.paintToPng(300,6,filename+".png");
   }
 }

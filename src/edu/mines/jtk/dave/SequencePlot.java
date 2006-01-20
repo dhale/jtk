@@ -130,11 +130,7 @@ public class SequencePlot extends PlotFrame {
    * @param fileName the name of the file to contain the PNG image.  
    */
   public void paintToPng(double dpi, double win, String fileName) {
-    try {
-      super.paintToPng(dpi,win,fileName);
-    } catch (IOException ioe) {
-      System.out.println("Cannot write image to file: "+fileName);
-    }
+    super.paintToPng(dpi,win,fileName);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -168,11 +164,7 @@ public class SequencePlot extends PlotFrame {
         File file = fc.getSelectedFile();
         if (file!=null) {
           String filename = file.getAbsolutePath();
-          try {
-            _frame.paintToPng(300,6,filename);
-          } catch (IOException ioe) {
-            System.out.println("Cannot write image to file: "+filename);
-          }
+          _frame.paintToPng(300,6,filename);
         }
       }
     };

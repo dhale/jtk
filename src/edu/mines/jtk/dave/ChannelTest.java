@@ -185,11 +185,7 @@ public class ChannelTest {
     String filename, float fmin, float fmax, float[][] f) 
   {
     PlotFrame frame = plot(fmin,fmax,f);
-    try {
-      frame.paintToPng(300,6,filename+"Flat.png");
-    } catch (IOException ioe) {
-      System.out.println("Cannot write image to file: "+filename);
-    }
+    frame.paintToPng(300,6,filename+"Flat.png");
   }
 
   // Do not use this elsewhere; it does not handle ends correctly.

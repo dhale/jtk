@@ -53,10 +53,6 @@ public class PixelsViewTest {
     PlotFrame frame = new PlotFrame(panel);
     frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
     frame.setVisible(true);
-    try {
-      frame.paintToPng(300,6,"junk.png");
-    } catch (java.io.IOException ioe) {
-      throw new RuntimeException(ioe);
-    }
+    frame.paintToPng(300,6,"junk.png");
   }
 }
