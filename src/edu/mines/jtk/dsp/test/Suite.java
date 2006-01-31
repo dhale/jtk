@@ -18,6 +18,7 @@ public class Suite extends TestSuite {
   public static Test suite() {
     TestSuite suite = new TestSuite();
 
+    suite.addTestSuite(EigenTest.class);
     suite.addTestSuite(FftComplexTest.class);
     suite.addTestSuite(FftRealTest.class);
     suite.addTestSuite(HistogramTest.class);

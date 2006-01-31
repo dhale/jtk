@@ -10,7 +10,14 @@ import edu.mines.jtk.util.*;
 import static java.lang.Math.*;
 
 /**
- * Cross-correlation of two signals with overlapping Gaussian windows.
+ * Cross-correlation of two arrays with overlapping Gaussian windows.
+ * Given two input arrays f and g and a specified lag, this filter computes 
+ * an output array r of local cross-correlation coefficients. The output 
+ * coefficients are local in that each sample in the array r contains the 
+ * cross-correlation of the arrays f and g multiplied by a Gaussian window
+ * that is centered at that sample. In other words, for each sample in the
+ * input arrays f and g, this filter computes an output local cross-correlation
+ * coefficient r.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.01.22
  */
@@ -26,6 +33,13 @@ public class CorrelationFilter {
     _sigma = sigma;
   }
 
+  /**
+   * Applies this correlation filter for the specified lag.
+   * @param lag the lag.
+   * @param f the 1st input array; can be the same as g.
+   * @param g the 2nd input array; can be the same as f.
+   * @param r the output array; cannot be the same as f or g.
+   */
   public void apply(int lag, float[] f, float[] g, float[] r) {
     Check.argument(f!=r,"f!=r");
     Check.argument(g!=r,"g!=r");
