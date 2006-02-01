@@ -198,28 +198,6 @@ public class Real1 {
   }
 
   /**
-   * Filters this function with the specified recursive filter.
-   * Applies the filter in the forward direction. Makes the sampling of 
-   * the filtered function equal to the the sampling of this function.
-   * @param rf the recursive filter.
-   * @return the filtered function.
-   */
-  public Real1 filterForward(RecursiveFilter rf) {
-    float[] y = new float[_v.length];
-    rf.applyForward(_v,y);
-    return new Real1(_s,y);
-  }
-
-  /* *
-   * Filters this function with the specified recursive filter.
-   * Applies the filter in the reverse direction. Makes the sampling of 
-   * the filtered function equal to the the sampling of this function.
-   * @param rf the recursive filter.
-   * @return the filtered function.
-   */
-  //public Real1 filterReverse(RecursiveFilter rf);
-
-  /**
    * Gets sampling for the Fourier transform of this function. The first 
    * sample value will be zero, because the Fourier transform of a real 
    * function has conjugate-symmetry.
