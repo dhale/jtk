@@ -17,6 +17,74 @@ import static edu.mines.jtk.util.MathPlus.*;
 public class Eigen {
 
   /**
+   * Computes eigenvalues and eigenvectors for a symmetric 2x2 matrix A.
+   * If the eigenvectors are placed in columns in a matrix V, and the 
+   * eigenvalues are placed in corresponding columns of a diagonal 
+   * matrix D, then AV = VD.
+   * @param a the symmetric matrix A.
+   * @param v the array of eigenvectors v[0] and v[1].
+   * @param d the array of eigenvalues d[0] and d[1].
+   */
+  public static void solveSymmetric22(float[][] a, float[][] v, float[] d) {
+
+    // Copy matrix to local variables.
+    float a00 = a[0][0];
+    float a01 = a[0][1],  a11 = a[1][1];
+
+    // Initialize eigenvalues and eigenvectors. 
+    float  d0 = a00,       d1 = a11;
+    float v00 = 1.0f,     v01 = 0.0f;
+    float v10 = 0.0f,     v11 = 1.0f;
+    float g,h,hh,c,s,t,tau,theta;
+
+    // Jacobi rotation only if off-diagonal element is non-zero.
+    if (a01!=0.0f) {
+      g = 100.0f*abs(a01);
+      h = d1-d0;
+      hh = abs(h);
+      if (hh+g==hh) {
+        t = a01/h;
+      } else {
+        theta = 0.5f*h/a01;
+        t = (theta>=0.0f) ?
+           1.0f/(theta+sqrt(1.0f+theta*theta)) :
+           1.0f/(theta-sqrt(1.0f+theta*theta));
+      }
+      c = 1.0f/sqrt(1.0f+t*t);
+      s = t*c;
+      tau = s/(1.0f+c);
+      h = t*a01;
+      d0 -= h;
+      d1 += h;
+      a01 = 0.0f;
+      g = v00;
+      h = v10;
+      v00 = g-s*(h+g*tau);
+      v10 = h+s*(g-h*tau);
+      g = v01;
+      h = v11;
+      v01 = g-s*(h+g*tau);
+      v11 = h+s*(g-h*tau);
+    }
+
+    // Copy eigenvalues and eigenvectors to output arrays.
+    d[0] = d0;
+    d[1] = d1;
+    v[0][0] = v00;  v[0][1] = v01;
+    v[1][0] = v10;  v[1][1] = v11;
+
+    // Sort eigenvalues (and eigenvectors) in descending order.
+    if (d[0]<d[1]) {
+      float dt = d[1];
+      d[1] = d[0];
+      d[0] = dt;
+      float[] vt = v[1];
+      v[1] = v[0];
+      v[0] = vt;
+    }
+  }
+
+  /**
    * Computes eigenvalues and eigenvectors for a symmetric 3x3 matrix A.
    * If the eigenvectors are placed in columns in a matrix V, and the 
    * eigenvalues are placed in corresponding columns of a diagonal 

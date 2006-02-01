@@ -23,7 +23,19 @@ public class EigenTest extends TestCase {
     junit.textui.TestRunner.run(suite);
   }
 
-  public void testRandom() {
+  public void testSymmetric22() {
+    int nrand = 10;
+    for (int irand=0; irand<nrand; ++irand) {
+      float[][] a = Array.randfloat(2,2);
+      a = Array.add(a,Array.transpose(a));
+      float[][] v = new float[2][2];
+      float[] d = new float[2];
+      Eigen.solveSymmetric22(a,v,d);
+      check(a,v,d);
+    }
+  }
+
+  public void testSymmetric33() {
     int nrand = 10;
     for (int irand=0; irand<nrand; ++irand) {
       float[][] a = Array.randfloat(3,3);
@@ -38,8 +50,7 @@ public class EigenTest extends TestCase {
   private void check(float[][] a, float[][] v, float[] d) {
     int n = a.length;
     for (int k=0; k<n; ++k) {
-      if (k>0)
-        assertTrue(d[k-1]>=d[k]);
+      assertTrue(k==0 || d[k-1]>=d[k]);
       for (int i=0; i<n; ++i) {
         float av = 0.0f;
         for (int j=0; j<n; ++j) {
