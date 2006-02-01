@@ -30,7 +30,7 @@ public class EigenTest extends TestCase {
       a = Array.add(a,Array.transpose(a));
       float[][] v = new float[3][3];
       float[] d = new float[3];
-      Eigen.solve33(a,v,d);
+      Eigen.solveSymmetric33(a,v,d);
       check(a,v,d);
     }
   }
@@ -38,6 +38,8 @@ public class EigenTest extends TestCase {
   private void check(float[][] a, float[][] v, float[] d) {
     int n = a.length;
     for (int k=0; k<n; ++k) {
+      if (k>0)
+        assertTrue(d[k-1]>=d[k]);
       for (int i=0; i<n; ++i) {
         float av = 0.0f;
         for (int j=0; j<n; ++j) {
