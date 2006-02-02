@@ -22,7 +22,7 @@ public class StopwatchTest extends TestCase {
 
   public void test() {
     double sleepTime = 0.1;  // time to sleep in seconds
-    double smallTime = 0.01; // time errors less than this are ignored
+    double smallTime = 0.02; // time errors less than this are ignored
     Stopwatch sw = new Stopwatch();
 
     // Start and check time (while running).

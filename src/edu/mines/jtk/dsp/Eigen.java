@@ -36,7 +36,7 @@ public class Eigen {
     float v00 = 1.0f,     v01 = 0.0f;
     float v10 = 0.0f,     v11 = 1.0f;
 
-    // Jacobi rotation only if off-diagonal element is non-zero.
+    // If off-diagonal element is non-zero, zero it with a Jacobi rotation.
     if (a01!=0.0f) {
       float tiny = 0.1f*sqrt(FLT_EPSILON); // avoid overflow in r*r below
       float c,r,s,t,u,vpr,vqr;
