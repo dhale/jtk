@@ -10,7 +10,8 @@ import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * Special-purpose eigensolvers.
+ * Special-purpose eigensolvers for digital signal processing.
+ * Methods of this class solve small eigen-problems efficiently.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.01.31
  */
@@ -31,45 +32,41 @@ public class Eigen {
     float a00 = a[0][0];
     float a01 = a[0][1],  a11 = a[1][1];
 
-    // Initialize eigenvalues and eigenvectors. 
-    float  d0 = a00,       d1 = a11;
+    // Initial eigenvectors. 
     float v00 = 1.0f,     v01 = 0.0f;
     float v10 = 0.0f,     v11 = 1.0f;
-    float g,h,hh,c,s,t,tau,theta;
 
     // Jacobi rotation only if off-diagonal element is non-zero.
     if (a01!=0.0f) {
-      g = 100.0f*abs(a01);
-      h = d1-d0;
-      hh = abs(h);
-      if (hh+g==hh) {
-        t = a01/h;
+      float tiny = 0.1f*sqrt(FLT_EPSILON); // avoid overflow in r*r below
+      float c,r,s,t,u,vpr,vqr;
+      u = a11-a00;
+      if (abs(a01)<tiny*abs(u)) {
+        t = a01/u;
       } else {
-        theta = 0.5f*h/a01;
-        t = (theta>=0.0f) ?
-           1.0f/(theta+sqrt(1.0f+theta*theta)) :
-           1.0f/(theta-sqrt(1.0f+theta*theta));
+        r = 0.5f*u/a01;
+        t = (r>=0.0f)?1.0f/(r+sqrt(1.0f+r*r)):1.0f/(r-sqrt(1.0f+r*r));
       }
       c = 1.0f/sqrt(1.0f+t*t);
       s = t*c;
-      tau = s/(1.0f+c);
-      h = t*a01;
-      d0 -= h;
-      d1 += h;
+      u = s/(1.0f+c);
+      r = t*a01;
+      a00 -= r;
+      a11 += r;
       a01 = 0.0f;
-      g = v00;
-      h = v10;
-      v00 = g-s*(h+g*tau);
-      v10 = h+s*(g-h*tau);
-      g = v01;
-      h = v11;
-      v01 = g-s*(h+g*tau);
-      v11 = h+s*(g-h*tau);
+      vpr = v00;
+      vqr = v10;
+      v00 = vpr-s*(vqr+vpr*u);
+      v10 = vqr+s*(vpr-vqr*u);
+      vpr = v01;
+      vqr = v11;
+      v01 = vpr-s*(vqr+vpr*u);
+      v11 = vqr+s*(vpr-vqr*u);
     }
 
     // Copy eigenvalues and eigenvectors to output arrays.
-    d[0] = d0;
-    d[1] = d1;
+    d[0] = a00;
+    d[1] = a11;
     v[0][0] = v00;  v[0][1] = v01;
     v[1][0] = v10;  v[1][1] = v11;
 
@@ -100,135 +97,125 @@ public class Eigen {
     float a01 = a[0][1],  a11 = a[1][1];
     float a02 = a[0][2],  a12 = a[1][2],  a22 = a[2][2];
 
-    // Initialize eigenvalues and eigenvectors. 
-    float  d0 = a00,       d1 = a11,       d2 = a22;
+    // Initial eigenvectors. 
     float v00 = 1.0f,     v01 = 0.0f,     v02 = 0.0f;
     float v10 = 0.0f,     v11 = 1.0f,     v12 = 0.0f;
     float v20 = 0.0f,     v21 = 0.0f,     v22 = 1.0f;
-    float g,h,hh,c,s,t,tau,theta;
+
+    // Tiny constant to avoid overflow of r*r (in computation of t) below.
+    float tiny = 0.1f*sqrt(FLT_EPSILON);
     
-    // Absolute values of off-diagonal elements determine convergence.
+    // Absolute values of off-diagonal elements.
     float aa01 = abs(a01);
     float aa02 = abs(a02);
     float aa12 = abs(a12);
 
-    // Loop until off-diagonal elements are zero.
-    // Count rotations in case we do not converge.
+    // Apply Jacobi rotations until all off-diagonal elements are zero.
+    // Count rotations, just in case this does not converge.
     for (int nrot=0; aa01+aa02+aa12>0.0f; ++nrot) {
       Check.state(nrot<100,"number of Jacobi rotations is less than 100");
+      float c,r,s,t,u,vpr,vqr,apr,aqr;
 
       // If a01 is the largest off-diagonal element, ...
       if (aa01>=aa02 && aa01>=aa12) {
-        g = 100.0f*aa01;
-        h = d1-d0;
-        hh = abs(h);
-        if (hh+g==hh) {
-          t = a01/h;
+        u = a11-a00;
+        if (abs(a01)<tiny*abs(u)) {
+          t = a01/u;
         } else {
-          theta = 0.5f*h/a01;
-          t = (theta>=0.0f) ?
-             1.0f/(theta+sqrt(1.0f+theta*theta)) :
-             1.0f/(theta-sqrt(1.0f+theta*theta));
+          r = 0.5f*u/a01;
+          t = (r>=0.0f)?1.0f/(r+sqrt(1.0f+r*r)):1.0f/(r-sqrt(1.0f+r*r));
         }
         c = 1.0f/sqrt(1.0f+t*t);
         s = t*c;
-        tau = s/(1.0f+c);
-        h = t*a01;
-        d0 -= h;
-        d1 += h;
+        u = s/(1.0f+c);
+        r = t*a01;
+        a00 -= r;
+        a11 += r;
         a01 = 0.0f;
-        g = a02;
-        h = a12;
-        a02 = g-s*(h+g*tau);
-        a12 = h+s*(g-h*tau);
-        g = v00;
-        h = v10;
-        v00 = g-s*(h+g*tau);
-        v10 = h+s*(g-h*tau);
-        g = v01;
-        h = v11;
-        v01 = g-s*(h+g*tau);
-        v11 = h+s*(g-h*tau);
-        g = v02;
-        h = v12;
-        v02 = g-s*(h+g*tau);
-        v12 = h+s*(g-h*tau);
+        apr = a02;
+        aqr = a12;
+        a02 = apr-s*(aqr+apr*u);
+        a12 = aqr+s*(apr-aqr*u);
+        vpr = v00;
+        vqr = v10;
+        v00 = vpr-s*(vqr+vpr*u);
+        v10 = vqr+s*(vpr-vqr*u);
+        vpr = v01;
+        vqr = v11;
+        v01 = vpr-s*(vqr+vpr*u);
+        v11 = vqr+s*(vpr-vqr*u);
+        vpr = v02;
+        vqr = v12;
+        v02 = vpr-s*(vqr+vpr*u);
+        v12 = vqr+s*(vpr-vqr*u);
       } 
       
       // Else if a02 is the largest off-diagonal element, ...
       else if (aa02>=aa01 && aa02>=aa12) {
-        g = 100.0f*aa02;
-        h = d2-d0;
-        hh = abs(h);
-        if (hh+g==hh) {
-          t = a02/h;
+        u = a22-a00;
+        if (abs(a02)<tiny*abs(u)) {
+          t = a02/u;
         } else {
-          theta = 0.5f*h/a02;
-          t = (theta>=0.0f) ?
-             1.0f/(theta+sqrt(1.0f+theta*theta)) :
-             1.0f/(theta-sqrt(1.0f+theta*theta));
+          r = 0.5f*u/a02;
+          t = (r>=0.0f)?1.0f/(r+sqrt(1.0f+r*r)):1.0f/(r-sqrt(1.0f+r*r));
         }
         c = 1.0f/sqrt(1.0f+t*t);
         s = t*c;
-        tau = s/(1.0f+c);
-        h = t*a02;
-        d0 -= h;
-        d2 += h;
+        u = s/(1.0f+c);
+        r = t*a02;
+        a00 -= r;
+        a22 += r;
         a02 = 0.0f;
-        g = a01;
-        h = a12;
-        a01 = g-s*(h+g*tau);
-        a12 = h+s*(g-h*tau);
-        g = v00;
-        h = v20;
-        v00 = g-s*(h+g*tau);
-        v20 = h+s*(g-h*tau);
-        g = v01;
-        h = v21;
-        v01 = g-s*(h+g*tau);
-        v21 = h+s*(g-h*tau);
-        g = v02;
-        h = v22;
-        v02 = g-s*(h+g*tau);
-        v22 = h+s*(g-h*tau);
+        apr = a01;
+        aqr = a12;
+        a01 = apr-s*(aqr+apr*u);
+        a12 = aqr+s*(apr-aqr*u);
+        vpr = v00;
+        vqr = v20;
+        v00 = vpr-s*(vqr+vpr*u);
+        v20 = vqr+s*(vpr-vqr*u);
+        vpr = v01;
+        vqr = v21;
+        v01 = vpr-s*(vqr+vpr*u);
+        v21 = vqr+s*(vpr-vqr*u);
+        vpr = v02;
+        vqr = v22;
+        v02 = vpr-s*(vqr+vpr*u);
+        v22 = vqr+s*(vpr-vqr*u);
       } 
 
       // Else if a12 is the largest off-diagonal element, ...
       else {
-        g = 100.0f*aa12;
-        h = d2-d1;
-        hh = abs(h);
-        if (hh+g==hh) {
-          t = a12/h;
+        u = a22-a11;
+        if (abs(a12)<tiny*abs(u)) {
+          t = a12/u;
         } else {
-          theta = 0.5f*h/a12;
-          t = (theta>=0.0f) ?
-             1.0f/(theta+sqrt(1.0f+theta*theta)) :
-             1.0f/(theta-sqrt(1.0f+theta*theta));
+          r = 0.5f*u/a12;
+          t = (r>=0.0f)?1.0f/(r+sqrt(1.0f+r*r)):1.0f/(r-sqrt(1.0f+r*r));
         }
         c = 1.0f/sqrt(1.0f+t*t);
         s = t*c;
-        tau = s/(1.0f+c);
-        h = t*a12;
-        d1 -= h;
-        d2 += h;
+        u = s/(1.0f+c);
+        r = t*a12;
+        a11 -= r;
+        a22 += r;
         a12 = 0.0f;
-        g = a01;
-        h = a02;
-        a01 = g-s*(h+g*tau);
-        a02 = h+s*(g-h*tau);
-        g = v10;
-        h = v20;
-        v10 = g-s*(h+g*tau);
-        v20 = h+s*(g-h*tau);
-        g = v11;
-        h = v21;
-        v11 = g-s*(h+g*tau);
-        v21 = h+s*(g-h*tau);
-        g = v12;
-        h = v22;
-        v12 = g-s*(h+g*tau);
-        v22 = h+s*(g-h*tau);
+        apr = a01;
+        aqr = a02;
+        a01 = apr-s*(aqr+apr*u);
+        a02 = aqr+s*(apr-aqr*u);
+        vpr = v10;
+        vqr = v20;
+        v10 = vpr-s*(vqr+vpr*u);
+        v20 = vqr+s*(vpr-vqr*u);
+        vpr = v11;
+        vqr = v21;
+        v11 = vpr-s*(vqr+vpr*u);
+        v21 = vqr+s*(vpr-vqr*u);
+        vpr = v12;
+        vqr = v22;
+        v12 = vpr-s*(vqr+vpr*u);
+        v22 = vqr+s*(vpr-vqr*u);
       }
 
       // Update absolute values of all off-diagonal elements.
@@ -238,9 +225,9 @@ public class Eigen {
     }
 
     // Copy eigenvalues and eigenvectors to output arrays.
-    d[0] = d0;
-    d[1] = d1;
-    d[2] = d2;
+    d[0] = a00;
+    d[1] = a11;
+    d[2] = a22;
     v[0][0] = v00;  v[0][1] = v01;  v[0][2] = v02;
     v[1][0] = v10;  v[1][1] = v11;  v[1][2] = v12;
     v[2][0] = v20;  v[2][1] = v21;  v[2][2] = v22;
