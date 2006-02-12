@@ -42,6 +42,9 @@ def makePlotPanel(orientation):
   pp.setHLabel(0,"offset (km)")
   pp.setHLabel(1,"velocity (km/s)")
   pp.setVLabel("depth (km)")
+  #pp.setHFormat(0,"%1.1f")
+  #pp.setHFormat(1,"%1.1f")
+  pp.setVFormat("%1.1f")
 
   return pp
 

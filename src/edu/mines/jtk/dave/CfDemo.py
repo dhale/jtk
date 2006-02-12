@@ -1,4 +1,5 @@
 from math import *
+from java.awt import *
 from edu.mines.jtk.dave import *
 from edu.mines.jtk.dsp import *
 from edu.mines.jtk.io import *
@@ -8,23 +9,28 @@ from edu.mines.jtk.util import *
 True = 1
 False = 0
 
-def plot(f):
+def plot(f,png=None):
   fmin = Array.min(f)
   fmax = Array.max(f)
   print "fmin =",fmin,"  fmax =",fmax
   panel = PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
+  panel.addColorBar()
   pv = panel.addPixels(f)
-  pv.setPercentiles(1.0,99.0)
+  #pv.setPercentiles(1.0,99.0)
   #pv.setInterpolation(PixelsView.Interpolation.NEAREST)
   frame = PlotFrame(panel)
-  frame.setSize(900,900)
+  frame.setBackground(Color.WHITE)
+  frame.setFontSize(18)
+  frame.setSize(800,600)
   frame.setVisible(True)
+  if png!=None:
+    frame.paintToPng(600,3,png)
 
 def makeChirp(n1,n2):
   c1 = (n1-1)/2.0
   c2 = (n2-1)/2.0
   a = 0.0
-  b = 0.5*pi/max(c1,c2)
+  b = 0.3*pi/(sqrt(2.0)*max(c1,c2))
   f = Array.zerofloat(n1,n2)
   for i2 in range(n2):
     for i1 in range(n1):
@@ -74,12 +80,16 @@ def filter(sigma,f):
       cf.apply(lag1,lag2,f,f,r)
       r = Array.div(r,r0)
       Array.copy(n1/15,n2/15,7,7,15,15,r,7+lag1,7+lag2,15,15,c)
-      if lag1%5==0 and lag2%5==0:
-        plot(r)
+      #if lag1%5==0 and lag2%5==0:
+      #  plot(r)
   return c
 
-#f = makeChirp(105,105)
-f = readData()
-plot(f)
+f = makeChirp(105,105)
+plot(f,"chirp.png")
 c = filter(8,f)
-plot(c)
+plot(c,"chirpcf8.png")
+
+f = readData()
+plot(f,"seis.png")
+c = filter(8,f)
+plot(c,"seiscf8.png")

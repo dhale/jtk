@@ -363,8 +363,6 @@ public class RecursiveParallelFilter {
         rb0 = 0.0;
         rb1 = -fb0*a1;
         rb2 = 0.0;
-        System.out.println("pj="+pj);
-        System.out.println("  b0="+b0+" fb0="+fb0+" rb1="+rb1);
       } else { // else if pole is complex, ...
         ++jp; // skip its conjugate mate
         Cdouble qj = pj.inv();
@@ -388,7 +386,6 @@ public class RecursiveParallelFilter {
     }
     _c = (float)c;
     _g = (float)gain;
-    System.out.println("c="+_c+" g="+_g);
   }
   private static Recursive2ndOrderFilter makeFilter(
     double b0, double b1, double b2, double a1, double a2)
