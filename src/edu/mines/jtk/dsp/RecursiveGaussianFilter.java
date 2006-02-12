@@ -27,7 +27,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * same array. When the filter cannot be applied in-place, intermediate
  * arrays are constructed internally.
  * <p>
- * This filter implements one of two different methods for approximating 
+ * This filter implements two different methods for approximating 
  * with difference equations a Gaussian filter and its derivatives.
  * <p>
  * The first method is that of Deriche, R., 1993, Recursively implementing 
@@ -423,6 +423,27 @@ public class RecursiveGaussianFilter {
 
   private Filter _filter;
 
+  private static void checkArrays(float[] x, float[] y) {
+    Check.argument(x.length==y.length,"x.length==y.length");
+  }
+
+  private static void checkArrays(float[][] x, float[][] y) {
+    Check.argument(x.length==y.length,"x.length==y.length");
+    Check.argument(x[0].length==y[0].length,"x[0].length==y[0].length");
+    Check.argument(Array.isRegular(x),"x is regular");
+    Check.argument(Array.isRegular(y),"y is regular");
+  }
+
+  private static void checkArrays(float[][][] x, float[][][] y) {
+    Check.argument(x.length==y.length,"x.length==y.length");
+    Check.argument(x[0].length==y[0].length,"x[0].length==y[0].length");
+    Check.argument(x[0][0].length==y[0][0].length,
+      "x[0][0].length==y[0][0].length");
+    Check.argument(Array.isRegular(x),"x is regular");
+    Check.argument(Array.isRegular(y),"y is regular");
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
   private static abstract class Filter {
 
     abstract void applyN(int nd, float[] x, float[] y);
@@ -474,6 +495,7 @@ public class RecursiveGaussianFilter {
     }
   }
 
+  ///////////////////////////////////////////////////////////////////////////
   private static class DericheFilter extends Filter {
 
     DericheFilter(double sigma) {
@@ -748,6 +770,7 @@ public class RecursiveGaussianFilter {
     }
   }
 
+  ///////////////////////////////////////////////////////////////////////////
   private static class VanVlietFilter extends Filter {
 
     VanVlietFilter(double sigma) {
@@ -946,25 +969,5 @@ public class RecursiveGaussianFilter {
       }
       return sqrt(cs.r);
     }
-  }
-
-  private static void checkArrays(float[] x, float[] y) {
-    Check.argument(x.length==y.length,"x.length==y.length");
-  }
-
-  private static void checkArrays(float[][] x, float[][] y) {
-    Check.argument(x.length==y.length,"x.length==y.length");
-    Check.argument(x[0].length==y[0].length,"x[0].length==y[0].length");
-    Check.argument(Array.isRegular(x),"x is regular");
-    Check.argument(Array.isRegular(y),"y is regular");
-  }
-
-  private static void checkArrays(float[][][] x, float[][][] y) {
-    Check.argument(x.length==y.length,"x.length==y.length");
-    Check.argument(x[0].length==y[0].length,"x[0].length==y[0].length");
-    Check.argument(x[0][0].length==y[0][0].length,
-      "x[0][0].length==y[0][0].length");
-    Check.argument(Array.isRegular(x),"x is regular");
-    Check.argument(Array.isRegular(y),"y is regular");
   }
 }
