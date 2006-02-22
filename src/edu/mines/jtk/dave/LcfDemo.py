@@ -14,14 +14,16 @@ def plot(f,png=None):
   fmax = Array.max(f)
   print "fmin =",fmin,"  fmax =",fmax
   panel = PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
-  panel.addColorBar()
+  panel.setVFormat("%4.0f");
+  #cb = panel.addColorBar()
+  #cb.setFormat("%3.1f");
   pv = panel.addPixels(f)
   #pv.setPercentiles(1.0,99.0)
   #pv.setInterpolation(PixelsView.Interpolation.NEAREST)
   frame = PlotFrame(panel)
   frame.setBackground(Color.WHITE)
   frame.setFontSize(18)
-  frame.setSize(800,600)
+  frame.setSize(800,850)
   frame.setVisible(True)
   if png!=None:
     frame.paintToPng(600,3,png)
@@ -70,24 +72,24 @@ def readData():
 def filter(sigma,f):
   n2 = len(f)
   n1 = len(f[0])
-  cf = CorrelationFilter(sigma)
+  lcf = LocalCorrelationFilter(sigma)
   r0 = Array.zerofloat(n1,n2)
-  cf.apply(0,0,f,f,r0)
+  lcf.apply(0,0,f,f,r0)
   r = Array.zerofloat(n1,n2)
   c = Array.zerofloat(n1,n2)
   for lag2 in range(-7,8,1):
     for lag1 in range(-7,8,1):
-      cf.apply(lag1,lag2,f,f,r)
+      lcf.apply(lag1,lag2,f,f,r)
+      if lag1==5 and lag2==5:
+        plot(r,"seislag55.png")
       r = Array.div(r,r0)
       Array.copy(n1/15,n2/15,7,7,15,15,r,7+lag1,7+lag2,15,15,c)
-      #if lag1%5==0 and lag2%5==0:
-      #  plot(r)
   return c
 
-f = makeChirp(105,105)
-plot(f,"chirp.png")
-c = filter(8,f)
-plot(c,"chirpcf8.png")
+#f = makeChirp(105,105)
+#plot(f,"chirp.png")
+#c = filter(8,f)
+#plot(c,"chirpcf8.png")
 
 f = readData()
 plot(f,"seis.png")

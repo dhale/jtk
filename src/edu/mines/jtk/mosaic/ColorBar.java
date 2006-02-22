@@ -52,6 +52,21 @@ public class ColorBar extends IPanel implements ColorMapListener {
    */
   public void setLabel(String label) {
     _mosaic.getTileAxisRight(0).setLabel(label);
+    updatePreferredSize();
+    revalidate();
+  }
+
+  /**
+   * Sets the format for major tic annotation for this color bar.
+   * The default format is "%1.4G", which yields a minimum of 1 digit,
+   * with up to 4 digits of precision. Any trailing zeros and decimal
+   * point are removed from tic annotation.
+   * @param format the format.
+   */
+  public void setFormat(String format) {
+    _mosaic.getTileAxisRight(0).setFormat(format);
+    updatePreferredSize();
+    revalidate();
   }
 
   public void colorMapChanged(ColorMap cm) {
