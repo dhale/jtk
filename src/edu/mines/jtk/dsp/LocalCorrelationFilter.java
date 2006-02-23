@@ -55,17 +55,17 @@ public class LocalCorrelationFilter {
     int l1g = (l1>=0)?(l1+1)/2:(l1+0)/2;
     float scale1 = (float)exp((-0.25*l1*l1)/(_sigma*_sigma));
     float scales = (float)(1.0/(sqrt(PI)*2*_sigma));
-    //float scale = 0.5f*scales*scale1;
     float scale = scales*scale1;
     int i1min = max(abs(l1f),abs(l1g));
     int i1max = n1-i1min;
     float[] h = new float[n1];
     for (int i1=i1min; i1<i1max; ++i1) {
-      //h[i1] = scale*(f[i1-l1f]*g[i1+l1g] +
-      //               f[i1-l1g]*g[i1+l1f]);
       r[i1] = scale*f[i1-l1f]*g[i1+l1g];
     }
-    shift(l1f-l1g,r,h);
+    if (l1f!=l1g)
+      shift(r,h);
+    else
+      Array.copy(r,h);
     _rgf.apply0(h,r);
   }
 
@@ -85,7 +85,6 @@ public class LocalCorrelationFilter {
     float scale1 = (float)exp((-0.25*l1*l1)/(_sigma*_sigma));
     float scale2 = (float)exp((-0.25*l2*l2)/(_sigma*_sigma));
     float scales = (float)(1.0/(PI*4*_sigma*_sigma));
-    //float scale = 0.25f*scales*scale1*scale2;
     float scale = scales*scale1*scale2;
     int i1min = max(abs(l1f),abs(l1g));
     int i1max = n1-i1min;
@@ -94,15 +93,17 @@ public class LocalCorrelationFilter {
     float[][] h = new float[n2][n1];
     for (int i2=i2min; i2<i2max; ++i2) {
       for (int i1=i1min; i1<i1max; ++i1) {
-        //h[i2][i1] = scale*(f[i2-l2f][i1-l1f]*g[i2+l2g][i1+l1g] +
-        //                   f[i2-l2g][i1-l1f]*g[i2+l2f][i1+l1g] +
-        //                   f[i2-l2f][i1-l1g]*g[i2+l2g][i1+l1f] +
-        //                   f[i2-l2g][i1-l1g]*g[i2+l2f][i1+l1f]);
         h[i2][i1] = scale*f[i2-l2f][i1-l1f]*g[i2+l2g][i1+l1g];
       }
     }
-    shift1(l1f-l1g,h,r);
-    shift2(l2f-l2g,r,h);
+    if (l1f!=l1g)
+      shift1(h,r);
+    else
+      Array.copy(h,r);
+    if (l2f!=l2g)
+      shift2(r,h);
+    else
+      Array.copy(r,h);
     _rgf.apply00(h,r);
   }
 
@@ -118,156 +119,98 @@ public class LocalCorrelationFilter {
   private static float S4 = -0.0115417f;
   private static float[] S = {S4,S3,S2,S1,S1,S2,S3,S4};
 
-  private static void shift(int s, float[] f, float[] g) {
+  private static void shift(float[] f, float[] g) {
     int n1 = f.length;
     int i1b,i1e;
 
-    // If no shift, simply copy.
-    if (s==0) {
-      for (int i1=0; i1<n1; ++i1) {
-        g[i1] = f[i1];
-      }
-    } 
-    
-    // Else, if shift, ...
-    else {
-      int m1 = (s<0)?4:3;
+    // Rolling on.
+    i1b = 0;
+    i1e = min(4,n1);
+    for (int i1=i1b; i1<i1e; ++i1) {
+      int ib = max(0,4-i1);
+      int ie = min(8,4-i1+n1);
+      g[i1] = 0.0f;
+      for (int i=ib; i<ie; ++i)
+        g[i1] += S[i]*f[i1+i-4];
+    }
 
-      // Rolling on.
-      i1b = 0;
-      i1e = min(m1,n1);
-      for (int i1=i1b; i1<i1e; ++i1) {
-        int ib = max(0,m1-i1);
-        int ie = min(8,m1-i1+n1);
-        g[i1] = 0.0f;
-        for (int i=ib; i<ie; ++i)
-          g[i1] += S[i]*f[i1+i-m1];
-      }
+    // Middle.
+    i1b = 4;
+    i1e = n1-3;
+    for (int i1=i1b; i1<i1e; ++i1) {
+      g[i1] = S4*(f[i1-4]+f[i1+3]) +
+              S3*(f[i1-3]+f[i1+2]) +
+              S2*(f[i1-2]+f[i1+1]) +
+              S1*(f[i1-1]+f[i1  ]);
+    }
 
-      // Middle.
-      if (s<0) {
-        i1b = 4;
-        i1e = n1-3;
-        for (int i1=i1b; i1<i1e; ++i1) {
-          g[i1] = S4*(f[i1-4]+f[i1+3]) +
-                  S3*(f[i1-3]+f[i1+2]) +
-                  S2*(f[i1-2]+f[i1+1]) +
-                  S1*(f[i1-1]+f[i1  ]);
-        }
-      } else {
-        i1b = 3;
-        i1e = n1-4;
-        for (int i1=i1b; i1<i1e; ++i1) {
-          g[i1] = S4*(f[i1+4]+f[i1-3]) +
-                  S3*(f[i1+3]+f[i1-2]) +
-                  S2*(f[i1+2]+f[i1-1]) +
-                  S1*(f[i1+1]+f[i1  ]);
-        }
-      }
-
-      // Rolling off.
-      i1b = max(0,n1-m1-1);
-      i1e = n1;
-      for (int i1=i1b; i1<i1e; ++i1) {
-        int ib = max(0,m1-i1);
-        int ie = min(8,m1-i1+n1);
-        g[i1] = 0.0f;
-        for (int i=ib; i<ie; ++i)
-          g[i1] += S[i]*f[i1+i-m1];
-      }
+    // Rolling off.
+    i1b = max(0,n1-3);
+    i1e = n1;
+    for (int i1=i1b; i1<i1e; ++i1) {
+      int ib = max(0,4-i1);
+      int ie = min(8,4-i1+n1);
+      g[i1] = 0.0f;
+      for (int i=ib; i<ie; ++i)
+        g[i1] += S[i]*f[i1+i-4];
     }
   }
 
-  private static void shift1(int s, float[][] f, float[][] g) {
+  private static void shift1(float[][] f, float[][] g) {
     int n2 = f.length;
     for (int i2=0; i2<n2; ++i2)
-      shift(s,f[i2],g[i2]);
+      shift(f[i2],g[i2]);
   }
 
-  private static void shift2(int s, float[][] f, float[][] g) {
+  private static void shift2(float[][] f, float[][] g) {
     int n2 = f.length;
     int n1 = f[0].length;
     int i2b,i2e;
 
-    // If no shift, simply copy.
-    if (s==0) {
-      for (int i2=0; i2<n2; ++i2) {
-        for (int i1=0; i1<n1; ++i1) {
-          g[i2][i1] = f[i2][i1];
-        }
-      }
-    } 
-    
-    // Else, if shift, ...
-    else {
-      int m2 = (s<0)?4:3;
-
-      // Rolling on.
-      i2b = 0;
-      i2e = min(m2,n2);
-      for (int i2=i2b; i2<i2e; ++i2) {
-        int ib = max(0,m2-i2);
-        int ie = min(8,m2-i2+n2);
+    // Rolling on.
+    i2b = 0;
+    i2e = min(4,n2);
+    for (int i2=i2b; i2<i2e; ++i2) {
+      int ib = max(0,4-i2);
+      int ie = min(8,4-i2+n2);
+      for (int i1=0; i1<n1; ++i1)
+        g[i2][i1] = 0.0f;
+      for (int i=ib; i<ie; ++i)
         for (int i1=0; i1<n1; ++i1)
-          g[i2][i1] = 0.0f;
-        for (int i=ib; i<ie; ++i)
-          for (int i1=0; i1<n1; ++i1)
-            g[i2][i1] += S[i]*f[i2+i-m2][i1];
-      }
+          g[i2][i1] += S[i]*f[i2+i-4][i1];
+    }
 
-      // Middle.
-      if (s<0) {
-        i2b = 4;
-        i2e = n2-3;
-        for (int i2=i2b; i2<i2e; ++i2) {
-          float[] g2 = g[i2];
-          float[] fm4 = f[i2-4];
-          float[] fm3 = f[i2-3];
-          float[] fm2 = f[i2-2];
-          float[] fm1 = f[i2-1];
-          float[] fp0 = f[i2  ];
-          float[] fp1 = f[i2+1];
-          float[] fp2 = f[i2+2];
-          float[] fp3 = f[i2+3];
-          for (int i1=0; i1<n1; ++i1)
-            g2[i1] = S4*(fm4[i1]+fp3[i1]) +
-                     S3*(fm3[i1]+fp2[i1]) +
-                     S2*(fm2[i1]+fp1[i1]) +
-                     S1*(fm1[i1]+fp0[i1]);
-        }
-      } else {
-        i2b = 3;
-        i2e = n2-4;
-        for (int i2=i2b; i2<i2e; ++i2) {
-          float[] g2 = g[i2];
-          float[] fp4 = f[i2-4];
-          float[] fp3 = f[i2-3];
-          float[] fp2 = f[i2-2];
-          float[] fp1 = f[i2-1];
-          float[] fm0 = f[i2  ];
-          float[] fm1 = f[i2+1];
-          float[] fm2 = f[i2+2];
-          float[] fm3 = f[i2+3];
-          for (int i1=0; i1<n1; ++i1)
-            g2[i1] = S4*(fp4[i1]+fm3[i1]) +
-                     S3*(fp3[i1]+fm2[i1]) +
-                     S2*(fp2[i1]+fm1[i1]) +
-                     S1*(fp1[i1]+fm0[i1]);
-        }
-      }
+    // Middle.
+    i2b = 4;
+    i2e = n2-3;
+    for (int i2=i2b; i2<i2e; ++i2) {
+      float[] g2 = g[i2];
+      float[] fm4 = f[i2-4];
+      float[] fm3 = f[i2-3];
+      float[] fm2 = f[i2-2];
+      float[] fm1 = f[i2-1];
+      float[] fp0 = f[i2  ];
+      float[] fp1 = f[i2+1];
+      float[] fp2 = f[i2+2];
+      float[] fp3 = f[i2+3];
+      for (int i1=0; i1<n1; ++i1)
+        g2[i1] = S4*(fm4[i1]+fp3[i1]) +
+                 S3*(fm3[i1]+fp2[i1]) +
+                 S2*(fm2[i1]+fp1[i1]) +
+                 S1*(fm1[i1]+fp0[i1]);
+    }
 
-      // Rolling off.
-      i2b = max(0,n2-m2-1);
-      i2e = n2;
-      for (int i2=i2b; i2<i2e; ++i2) {
-        int ib = max(0,m2-i2);
-        int ie = min(8,m2-i2+n2);
+    // Rolling off.
+    i2b = max(0,n2-3);
+    i2e = n2;
+    for (int i2=i2b; i2<i2e; ++i2) {
+      int ib = max(0,4-i2);
+      int ie = min(8,4-i2+n2);
+      for (int i1=0; i1<n1; ++i1)
+        g[i2][i1] = 0.0f;
+      for (int i=ib; i<ie; ++i)
         for (int i1=0; i1<n1; ++i1)
-          g[i2][i1] = 0.0f;
-        for (int i=ib; i<ie; ++i)
-          for (int i1=0; i1<n1; ++i1)
-            g[i2][i1] += S[i]*f[i2+i-m2][i1];
-      }
+          g[i2][i1] += S[i]*f[i2+i-4][i1];
     }
   }
 }

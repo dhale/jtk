@@ -28,7 +28,7 @@ public class LocalPredictionFilter {
     _lcf = new LocalCorrelationFilter(sigma);
   }
 
-  public void apply(int[] lag1, int[] lag2, float[][] f, float[][] g) {
+  public float[][][] apply(int[] lag1, int[] lag2, float[][] f, float[][] g) {
     Check.argument(lag1.length==lag2.length,"lag1.length==lag2.length");
     Check.argument(f!=g,"f!=g");
 
@@ -58,7 +58,10 @@ public class LocalPredictionFilter {
     CgSolver cgs = new CgSolver(m,100);
     //DirectSolver ds = new DirectSolver(m);
     for (int i2=0; i2<n2; ++i2) {
-      for (int i1=0; i1<n1; ++i1) {
+      int i1b = (i2%2==0)?0:n1-1;
+      int i1e = (i2%2==0)?n1:-1;
+      int i1s = (i2%2==0)?1:-1;
+      for (int i1=i1b; i1!=i1e; i1+=i1s) {
         for (int k=0; k<m; ++k) {
           for (int j=0; j<m; ++j)
             rkjt[k][j] = rkj[k][j][i2][i1];
@@ -75,22 +78,28 @@ public class LocalPredictionFilter {
 
     // Apply prediction filters.
     Array.zero(g);
-    for (int i=0; i<m; ++i) {
-      int j1 = lag1[i];
-      int j2 = lag1[i];
-      float[][] ai = a[i];
+    for (int j=0; j<m; ++j) {
+      int j1 = lag1[j];
+      int j2 = lag2[j];
+      System.out.println("j="+j+" j1="+j1+" j2="+j2);
+      float[][] aj = a[j];
       int i1min = max(0,j1);
       int i1max = min(n1,n1+j1);
       int i2min = max(0,j2);
       int i2max = min(n2,n2+j2);
       for (int i2=i2min; i2<i2max; ++i2) {
         for (int i1=i1min; i1<i1max; ++i1) {
-          g[i2][i1] += ai[i2][i1]*f[i2-j2][i1-j1];
+          g[i2][i1] += aj[i2][i1]*f[i2-j2][i1-j1];
         }
       }
     }
-    Array.copy(a[0],g);
-    Array.copy(a[m-1],f);
+
+    return a;
+    //return rcache.get();
+    
+    //Array.copy(Array.div(rcache.get(1,1),rcache.get(0,0)),g);
+    //Array.copy(a[0],g);
+    //Array.copy(a[m-1],f);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -231,6 +240,16 @@ public class LocalPredictionFilter {
   private class R2Cache {
     R2Cache(float[][] f) {
       _f = f;
+    }
+    float[][][] get() {
+      int n = _rlist.size();
+      float[][][] r = new float[n][][];
+      int i = 0;
+      for (R2 r2 : _rlist) {
+        r[i] = _rlist.get(i).r;
+        ++i;
+      }
+      return r;
     }
     float[][] get(int l1, int l2) {
       for (R2 r2 : _rlist) {

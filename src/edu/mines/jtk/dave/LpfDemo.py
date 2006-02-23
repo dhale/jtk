@@ -20,7 +20,7 @@ def plot(f,png=None):
   pv = panel.addPixels(f)
   pv.setPercentiles(1.0,99.0)
   #pv.setClips(-10,10)
-  pv.setInterpolation(PixelsView.Interpolation.NEAREST)
+  #pv.setInterpolation(PixelsView.Interpolation.NEAREST)
   frame = PlotFrame(panel)
   frame.setBackground(Color.WHITE)
   frame.setFontSize(18)
@@ -44,10 +44,12 @@ def filter(sigma,f):
   n1 = len(f[0])
   lpf = LocalPredictionFilter(sigma)
   g = Array.zerofloat(n1,n2)
-  #lag1 = (1,2,0,1,2,0,1,2)
-  #lag2 = (0,0,1,1,1,2,2,2)
-  #lag1 = (-1, 0, 1, -1, 1, -1, 0, 1)
-  #lag2 = (-1,-1,-1,  0, 0,  1, 1, 1)
+  lag1 = (    1, 2,
+           0, 1, 2,
+           0, 1, 2)
+  lag2 = (    0, 0,  
+          -1,-1,-1,
+          -2,-2,-2)
   lag1 = (-2,-1, 0, 1, 2, 
           -2,-1, 0, 1, 2,
           -2,-1,    1, 2,
@@ -58,31 +60,39 @@ def filter(sigma,f):
            0, 0,    0, 0,  
            1, 1, 1, 1, 1,
            2, 2, 2, 2, 2)
-  lag1 = ( 0, 0, 0,    0, 0, 0)
-  lag2 = (-3,-2,-1,    1, 2, 3)
-  lag1 = ( 1, 2, 3)
-  lag2 = ( 0, 0, 0)
-  lag1 = ( 1, 2, 3, 4)
-  lag2 = ( 0, 0, 0, 0)
-  lag1 = (    1, 2,
-           0, 1, 2,
-           0, 1, 2)
-  lag2 = (    0, 0,  
-          -1,-1,-1,
-          -2,-2,-2)
-  lag1 = (-1, 0, 1, 
-          -1,    1,
-          -1, 0, 1)
-  lag2 = (-1,-1,-1,  
-           0,    0,  
-           1, 1, 1)
+  lag1 = ( 0, 0, 0,    0, 0, 0,
+           1, 1, 1, 1, 1, 1, 1)
+  lag2 = (-3,-2,-1,    1, 2, 3,
+          -3,-2,-1, 0, 1, 2, 3)
+  lag1 = ( 0, 0, 0, 0,    0, 0, 0, 0)
+  lag2 = (-4,-3,-2,-1,    1, 2, 3, 4)
+  lag1 = ( 0,
+           1, 1)
+  lag2 = (-1,
+          -1, 0)
+  lag1 = (    0,
+           1, 1)
+  lag2 = (    1,  
+           0, 1)
+  lag1 = ( 0, 0, 0,    0, 0, 0,
+           1, 1, 1, 1, 1, 1, 1)
+  lag2 = (-3,-2,-1,    1, 2, 3,
+          -3,-2,-1, 0, 1, 2, 3)
+  lag1 = ( 0, 0, 0, 0,    0, 0, 0, 0)
+  lag2 = (-4,-3,-2,-1,    1, 2, 3, 4)
+  lag1 = ( 0, 0, 0,    0, 0, 0,
+           1, 1, 1, 1, 1, 1, 1)
+  lag2 = (-3,-2,-1,    1, 2, 3,
+          -3,-2,-1, 0, 1, 2, 3)
   lpf.apply(lag1,lag2,f,g)
+  #n = len(a)
+  #for i in range(n):
+  #  plot(a[i])
   return g
 
 f = readData()
 plot(f)
-g = filter(40,f)
+g = filter(20,f)
 plot(g)
-plot(f)
-r = Array.sub(f,g)
+r = Array.sub(g,f)
 plot(r)
