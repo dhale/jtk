@@ -39,17 +39,48 @@ def readData():
   df.readFloats(f)
   return f
 
-def filter(sigma,f):
+def filter(lag1,lag2,sigma,f):
   n2 = len(f)
   n1 = len(f[0])
   lpf = LocalPredictionFilter(sigma)
   g = Array.zerofloat(n1,n2)
-  lag1 = (    0, 0,  
-           1, 1, 1,
-           2, 2, 2)
-  lag2 = (    1, 2,
-           0, 1, 2,
-           0, 1, 2)
+  a = lpf.apply(lag1,lag2,f,g)
+  return g,a
+
+def filterQ1(sigma,f):
+  lag1 = (    0,
+           1, 1)
+  lag2 = (    1,  
+           0, 1)
+  return filter(lag1,lag2,sigma,f)
+
+def filterQ4(sigma,f):
+  lag1 = ( 0,
+           1, 1)
+  lag2 = (-1,
+          -1, 0)
+  return filter(lag1,lag2,sigma,f)
+
+def filterV3(sigma,f):
+  lag1 = (-1,-1,-1,
+           1, 1, 1)
+  lag2 = (-1, 0, 1,
+          -1, 0, 1)
+  return filter(lag1,lag2,sigma,f)
+
+def filter19(sigma,f):
+  lag1 = ( 0, 0, 0, 0,    0, 0, 0, 0)
+  lag2 = (-4,-3,-2,-1,    1, 2, 3, 4)
+  return filter(lag1,lag2,sigma,f)
+
+def filter27(sigma,f):
+  lag1 = ( 0, 0, 0,    0, 0, 0,
+           1, 1, 1, 1, 1, 1, 1)
+  lag2 = (-3,-2,-1,    1, 2, 3,
+          -3,-2,-1, 0, 1, 2, 3)
+  return filter(lag1,lag2,sigma,f)
+
+def filter55(sigma,f):
   lag1 = (-2,-2,-2,-2,-2, 
           -1,-1,-1,-1,-1,  
            0, 0,    0, 0,  
@@ -60,37 +91,13 @@ def filter(sigma,f):
           -2,-1,    1, 2,
           -2,-1, 0, 1, 2,
           -2,-1, 0, 1, 2)
-  lag1 = (    0,
-           1, 1)
-  lag2 = (    1,  
-           0, 1)
-  lag1 = ( 0,
-           1, 1)
-  lag2 = (-1,
-          -1, 0)
-  lag1 = ( 0, 0, 0,    0, 0, 0,
-           1, 1, 1, 1, 1, 1, 1)
-  lag2 = (-3,-2,-1,    1, 2, 3,
-          -3,-2,-1, 0, 1, 2, 3)
-  lag1 = ( 0, 0, 0, 0,    0, 0, 0, 0)
-  lag2 = (-4,-3,-2,-1,    1, 2, 3, 4)
-  lag1 = ( 0,    0,
-           3, 3, 3)
-  lag2 = (-1,    1,
-          -1, 0, 1)
-  lag1 = ( 0, 0, 0,    0, 0, 0,
-           1, 1, 1, 1, 1, 1, 1)
-  lag2 = (-3,-2,-1,    1, 2, 3,
-          -3,-2,-1, 0, 1, 2, 3)
-  lpf.apply(lag1,lag2,f,g)
-  #n = len(a)
-  #for i in range(n):
-  #  plot(a[i])
-  return g
+  return filter(lag1,lag2,sigma,f)
 
 f = readData()
 plot(f)
-g = filter(32,f)
+g,a = filter27(800,f)
 plot(g)
 r = Array.sub(g,f)
 plot(r)
+for aa in a:
+  plot(aa)
