@@ -18,6 +18,8 @@ import static java.lang.Math.*;
  * that is centered at that sample. In other words, for each sample in the
  * input arrays f and g, this filter computes an output local cross-correlation
  * coefficient r.
+ * <p>
+ * <em>Warning: not yet completed or optimized for performance.</em>
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.01.22
  */

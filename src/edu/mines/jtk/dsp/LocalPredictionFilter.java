@@ -13,6 +13,8 @@ import java.util.*;
 
 /**
  * Local prediction filtering.
+ * <p>
+ * <em>Warning: not yet completed or optimized for performance.</em>
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.02.21
  */
@@ -32,7 +34,7 @@ public class LocalPredictionFilter {
     Check.argument(lag1.length==lag2.length,"lag1.length==lag2.length");
     Check.argument(f!=g,"f!=g");
 
-    // Compute necessary auto-correlations.
+    // Compute auto-correlation for all necessary lags.
     R2Cache rcache = new R2Cache(f);
     int m = lag1.length;
     float[][][][] rkj = new float[m][m][][];
@@ -45,7 +47,7 @@ public class LocalPredictionFilter {
         int j2 = lag2[j];
         rkj[k][j] = rcache.get(j1-k1,j2-k2);
       }
-      rk0[k] = rcache.get(-k1,-k2);
+      rk0[k] = rcache.get(k1,k2);
     }
 
     // Compute prediction filters.
@@ -81,7 +83,6 @@ public class LocalPredictionFilter {
     for (int j=0; j<m; ++j) {
       int j1 = lag1[j];
       int j2 = lag2[j];
-      System.out.println("j="+j+" j1="+j1+" j2="+j2);
       float[][] aj = a[j];
       int i1min = max(0,j1);
       int i1max = min(n1,n1+j1);
@@ -256,7 +257,6 @@ public class LocalPredictionFilter {
         if (l1==r2.l1 && l2==r2.l2 || -l1==r2.l1 && -l2==r2.l2)
           return r2.r;
       }
-      System.out.println("R2Cache.get: l1="+l1+" l2="+l2);
       R2 r2 = new R2(l1,l2,_f);
       _rlist.add(r2);
       return r2.r;
