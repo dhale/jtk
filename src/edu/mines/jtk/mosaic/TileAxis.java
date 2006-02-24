@@ -135,7 +135,9 @@ public class TileAxis extends IPanel {
    */
   public void setLabel(String label) {
     _label = label;
-    _mosaic.revalidate();
+    updateSizes();
+    if (_mosaic!=null)
+      _mosaic.revalidate();
     repaint();
   }
 
@@ -148,7 +150,9 @@ public class TileAxis extends IPanel {
    */
   public void setFormat(String format) {
     _format = format;
-    _mosaic.revalidate();
+    updateSizes();
+    if (_mosaic!=null)
+      _mosaic.revalidate();
     repaint();
   }
 
@@ -157,8 +161,10 @@ public class TileAxis extends IPanel {
   // constructor, before our constructor sets the (non-null) mosaic.
   public void setFont(Font font) {
     super.setFont(font);
+    updateSizes();
     if (_mosaic!=null)
       _mosaic.revalidate();
+    repaint();
   }
 
   /**
@@ -424,6 +430,14 @@ public class TileAxis extends IPanel {
     return height;
   }
 
+  private void updateSizes() {
+    int w = getWidthMinimum();
+    int h = getHeightMinimum();
+    Dimension size = new Dimension(w,h);
+    this.setMinimumSize(size);
+    this.setPreferredSize(size);
+  }
+
   // Tracking methods called by MouseTrackMode.
   void beginTracking(int x, int y) {
     if (!_tracking) {
@@ -474,7 +488,8 @@ public class TileAxis extends IPanel {
 
   // Returns the maximum width of a formatted tic string.
   private int maxTicStringWidth(FontMetrics fm) {
-    double vtic = -0.123456789E-10;
+    double vtic = -123456789.0E-10;
+    //System.out.println("TileAxis.maxTicStringWidth: vtic="+formatTic(vtic));
     return fm.stringWidth(formatTic(vtic));
   }
 

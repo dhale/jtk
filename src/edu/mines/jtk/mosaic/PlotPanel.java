@@ -154,6 +154,8 @@ public class PlotPanel extends IPanel {
     if (_colorBar==null) {
       _colorBar = new ColorBar(label);
       _colorBar.setFont(getFont());
+      if (_colorBarFormat!=null)
+        _colorBar.setFormat(_colorBarFormat);
       _colorBar.setForeground(getForeground());
       _colorBar.setBackground(getBackground());
       if (_colorBarPixelsView!=null) {
@@ -180,6 +182,21 @@ public class PlotPanel extends IPanel {
       this.revalidate();
     }
     return _colorBar;
+  }
+
+  /**
+   * Sets the format for major tic annotation of the color bar.
+   * The default format is "%1.4G", which yields a minimum of 1 digit,
+   * with up to 4 digits of precision. Any trailing zeros and decimal
+   * point are removed from tic annotation.
+   * @param format the format.
+   */
+  public void setColorBarFormat(String format) {
+    _colorBarFormat = format;
+    if (_colorBar!=null) {
+      _colorBar.setFormat(format);
+      this.revalidate();
+    }
   }
 
   /**
@@ -687,6 +704,7 @@ public class PlotPanel extends IPanel {
 
   private Mosaic _mosaic;
   private ColorBar _colorBar;
+  private String _colorBarFormat;
   private String _colorBarLabel;
   private PixelsView _colorBarPixelsView;
   private Title _title;

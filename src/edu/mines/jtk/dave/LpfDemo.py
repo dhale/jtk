@@ -15,8 +15,8 @@ def plot(f,png=None):
   print "fmin =",fmin,"  fmax =",fmax
   panel = PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
   panel.setVFormat("%4.0f");
-  cb = panel.addColorBar()
-  #cb.setFormat("%3.1f");
+  panel.addColorBar()
+  panel.setColorBarFormat("%4.2f");
   pv = panel.addPixels(f)
   pv.setPercentiles(1.0,99.0)
   #pv.setClips(-10,10)
@@ -25,7 +25,7 @@ def plot(f,png=None):
   frame.setBackground(Color.WHITE)
   frame.setFontSize(18)
   #frame.setSize(800,850)
-  frame.setSize(900,850)
+  frame.setSize(900,800)
   frame.setVisible(True)
   if png!=None:
     frame.paintToPng(600,3,png)
@@ -79,7 +79,7 @@ def filter(sigma,f):
   lag2 = (-1,    1,
           -1, 0, 1)
   lag1 = ( 0, 0, 0,    0, 0, 0,
-           2, 2, 2, 2, 2, 2, 2)
+           1, 1, 1, 1, 1, 1, 1)
   lag2 = (-3,-2,-1,    1, 2, 3,
           -3,-2,-1, 0, 1, 2, 3)
   lpf.apply(lag1,lag2,f,g)
@@ -90,7 +90,7 @@ def filter(sigma,f):
 
 f = readData()
 plot(f)
-g = filter(8,f)
+g = filter(32,f)
 plot(g)
 r = Array.sub(g,f)
 plot(r)

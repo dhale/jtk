@@ -41,7 +41,7 @@ public class ColorBar extends IPanel implements ColorMapListener {
     _mosaic.setWidthMinimum(0,25);
     _mosaic.setWidthElastic(0,0);
     _tile = _mosaic.getTile(0,0);
-    updatePreferredSize();
+    updateSizes();
     this.setLayout(new BorderLayout());
     this.add(_mosaic,BorderLayout.CENTER);
   }
@@ -52,7 +52,7 @@ public class ColorBar extends IPanel implements ColorMapListener {
    */
   public void setLabel(String label) {
     _mosaic.getTileAxisRight(0).setLabel(label);
-    updatePreferredSize();
+    updateSizes();
     revalidate();
   }
 
@@ -65,7 +65,7 @@ public class ColorBar extends IPanel implements ColorMapListener {
    */
   public void setFormat(String format) {
     _mosaic.getTileAxisRight(0).setFormat(format);
-    updatePreferredSize();
+    updateSizes();
     revalidate();
   }
 
@@ -110,7 +110,7 @@ public class ColorBar extends IPanel implements ColorMapListener {
     super.setFont(font);
     if (_mosaic!=null) {
       _mosaic.setFont(font);
-      updatePreferredSize();
+      updateSizes();
     }
     revalidate();
   }
@@ -144,8 +144,10 @@ public class ColorBar extends IPanel implements ColorMapListener {
   private Tile _tile;
   private PixelsView _pixels;
 
-  private void updatePreferredSize() {
+  private void updateSizes() {
     int war = _mosaic.getWidthAxesRight();
-    this.setPreferredSize(new Dimension(25+2+war,100));
+    Dimension size = new Dimension(25+2+war,100);
+    this.setMinimumSize(size);
+    this.setPreferredSize(size);
   }
 }

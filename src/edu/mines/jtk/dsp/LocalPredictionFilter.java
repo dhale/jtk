@@ -232,7 +232,7 @@ public class LocalPredictionFilter {
       if (l1==0 && l2==0) {
         for (int i2=0; i2<n2; ++i2) {
           for (int i1=0; i1<n1; ++i1) {
-            r[i2][i1] *= 1.001f;
+            r[i2][i1] *= 1.01f;
           }
         }
       }
