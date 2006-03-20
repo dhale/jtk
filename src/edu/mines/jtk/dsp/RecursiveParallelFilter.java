@@ -298,6 +298,28 @@ public class RecursiveParallelFilter {
     }
   }
 
+  /**
+   * For experimental use only.
+   */
+  public void applyFrf(float[] x, float[] y) {
+    scale(_c*_g,x,y);
+    for (int i2=0; i2<_n2; i2+=2) {
+      _f2[i2  ].accumulateForward(x,y);
+      //_f2[i2+1].accumulateReverse(x,y);
+    }
+  }
+
+  /**
+   * For experimental use only.
+   */
+  public void applyFrr(float[] x, float[] y) {
+    scale(_c*_g,x,y);
+    for (int i2=0; i2<_n2; i2+=2) {
+      //_f2[i2  ].accumulateForward(x,y);
+      _f2[i2+1].accumulateReverse(x,y);
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
 

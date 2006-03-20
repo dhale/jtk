@@ -48,12 +48,32 @@ import static edu.mines.jtk.util.MathPlus.*;
 public class RecursiveGaussianFilter {
 
   /**
+   * The method used to design the Gaussian filter.
+   */
+  public enum Method {
+    DERICHE,
+    VAN_VLIET
+  }
+
+  /**
+   * Construct a Gaussian filter with specified width and design method.
+   * @param sigma the width; must not be less than 1.
+   * @param method the method used to design the filter.
+   */
+  public RecursiveGaussianFilter(double sigma, Method method) {
+    Check.argument(sigma>=1.0,"sigma>=1.0");
+    _filter = (method==Method.DERICHE)?
+      new DericheFilter(sigma) :
+      new VanVlietFilter(sigma);
+  }
+
+  /**
    * Construct a Gaussian filter with specified width.
    * @param sigma the width; must not be less than 1.
    */
   public RecursiveGaussianFilter(double sigma) {
     Check.argument(sigma>=1.0,"sigma>=1.0");
-    _filter = (sigma<8.0) ? 
+    _filter = (sigma<32.0) ? 
       new DericheFilter(sigma) :
       new VanVlietFilter(sigma);
   }
@@ -666,6 +686,7 @@ public class RecursiveGaussianFilter {
     private static double[] c1 = {c10,c11,c12};
     private static double[] w0 = {w00,w01,w02};
     private static double[] w1 = {w10,w11,w12};
+
     /*
     // Deriche's published coefficients.
     private static double[] a0 = {  1.6800, -0.6472, -1.3310};
@@ -747,7 +768,7 @@ public class RecursiveGaussianFilter {
       float[] y0 = new float[n];
       float[] y1 = new float[n];
       float[] y2 = new float[n];
-      int m = n/2;
+      int m = (n-1)/2;
       x[m] = 1.0f;
       applyN(0,x,y0);
       applyN(1,x,y1);
@@ -755,12 +776,14 @@ public class RecursiveGaussianFilter {
       double[] s = new double[3];
       for (int i=0,j=n-1; i<j; ++i,--j) {
         double t = i-m;
-        s[0] += y0[i]+y0[j];
-        s[1] += -t*(y1[i]-y1[j]);
-        s[2] += t*t*(y2[i]+y2[j]);
+        s[0] += y0[j]+y0[i];
+        s[1] += sin(t/sigma)*(y1[j]-y1[i]);
+        s[2] += cos(t*sqrt(2.0)/sigma)*(y2[j]+y2[i]);
       }
       s[0] += y0[m];
-      s[2] *= 0.5;
+      s[2] += y2[m];
+      s[1] *= sigma*exp(0.5);
+      s[2] *= -(sigma*sigma)/2.0*exp(1.0);
       for (int i=0; i<3; ++i) {
         _n0[i] /= s[i];
         _n1[i] /= s[i];
@@ -799,10 +822,10 @@ public class RecursiveGaussianFilter {
 
     // Poles (inverses) for 4th-order filters published by van Vliet, et al.
     private static Cdouble[][] POLES = {
-      {new Cdouble( 1.13228, 1.28114),
-       new Cdouble( 1.13228,-1.28114),
-       new Cdouble( 1.78534, 0.46763),
-       new Cdouble( 1.78534,-0.46763)},
+      {new Cdouble( 1.12075, 1.27788),
+       new Cdouble( 1.12075,-1.27788),
+       new Cdouble( 1.76952, 0.46611),
+       new Cdouble( 1.76952,-0.46611)},
       {new Cdouble( 1.04185, 1.24034),
        new Cdouble( 1.04185,-1.24034),
        new Cdouble( 1.69747, 0.44790),

@@ -46,11 +46,11 @@ public class LocalCorrelationFilter {
     Check.argument(f!=r,"f!=r");
     Check.argument(g!=r,"g!=r");
     //  lag  l1f  l1g
+    //  -2   -1   -1
+    //  -1   -1    0
     //   0    0    0
     //   1    0    1
     //   2    1    1
-    //  -1   -1    0
-    //  -2   -1   -1
     int n1 = f.length;
     int l1 = lag;
     int l1f = (l1>=0)?(l1+0)/2:(l1-1)/2;

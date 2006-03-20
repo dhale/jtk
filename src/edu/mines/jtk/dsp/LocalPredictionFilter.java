@@ -34,7 +34,7 @@ public class LocalPredictionFilter {
     Check.argument(lag1.length==lag2.length,"lag1.length==lag2.length");
     Check.argument(f!=g,"f!=g");
 
-    // Compute auto-correlation for all necessary lags.
+    // Compute local auto-correlation for all necessary lags.
     R2Cache rcache = new R2Cache(f);
     int m = lag1.length;
     float[][][][] rkj = new float[m][m][][];
@@ -59,6 +59,7 @@ public class LocalPredictionFilter {
     float[][][] a = new float[m][n2][n1];
     CgSolver cgs = new CgSolver(m,100);
     //DirectSolver ds = new DirectSolver(m);
+    double niter = 0.0;
     for (int i2=0; i2<n2; ++i2) {
       int i1b = (i2%2==0)?0:n1-1;
       int i1e = (i2%2==0)?n1:-1;
@@ -69,7 +70,7 @@ public class LocalPredictionFilter {
             rkjt[k][j] = rkj[k][j][i2][i1];
           rk0t[k] = rk0[k][i2][i1];
         }
-        cgs.solve(rkjt,rk0t,at);
+        niter += cgs.solve(rkjt,rk0t,at);
         //boolean bad = ds.solve(rkjt,rk0t,at);
         //if (bad)
         //  System.out.println("bad for i1="+i1+" i2="+i2);
@@ -77,6 +78,9 @@ public class LocalPredictionFilter {
           a[i][i2][i1] = (float)at[i];
       }
     }
+    niter /= n1;
+    niter /= n2;
+    System.out.println("Average number of CG iterations = "+niter);
 
     // Apply prediction filters.
     Array.zero(g);
@@ -106,7 +110,7 @@ public class LocalPredictionFilter {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private class DirectSolver {
+  private static class DirectSolver {
     DirectSolver(int m) {
       this.m = m;
       this.a = new DMatrix(m,m);
@@ -144,7 +148,7 @@ public class LocalPredictionFilter {
     private double[] aa,bb;
   }
 
-  private class CgSolver {
+  private static class CgSolver {
     CgSolver(int m, int maxiter) {
       this.m = m;
       this.maxiter = maxiter;
@@ -152,7 +156,7 @@ public class LocalPredictionFilter {
       this.q = new double[m];
       this.r = new double[m];
     }
-    void solve(double[][] a, double[] b, double[] x) {
+    int solve(double[][] a, double[] b, double[] x) {
       double rp = 0.0;
       double rr = 0.0;
       double bb = 0.0;
@@ -166,7 +170,7 @@ public class LocalPredictionFilter {
         bb += bi*bi;
         rr += ri*ri;
       }
-      double small = bb*ulp(1.0);
+      double small = bb*TINY;
       int niter;
       for (niter=0; niter<maxiter && rr>small; ++niter) {
         if (niter==0) {
@@ -214,7 +218,9 @@ public class LocalPredictionFilter {
       System.out.println(
         "niter="+niter+" bb="+bb+" rr="+rr+" rc="+rc);
       */
+      return niter;
     }
+    private static final double TINY = ulp(1.0f);
     private int m,maxiter;
     private double[] p,q,r;
   }

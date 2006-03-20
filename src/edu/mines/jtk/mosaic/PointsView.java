@@ -412,6 +412,11 @@ public class PointsView extends TiledView {
         markSize = round(_markSize*lineWidth);
       if (_markColor!=null)
         gmark.setColor(_markColor);
+      float width = lineWidth;
+      if (_lineWidth!=0.0f)
+        width *= _lineWidth;
+      BasicStroke bs = new BasicStroke(width);
+      gmark.setStroke(bs);
     }
 
     // Arrays for (x,y) coordinates.
