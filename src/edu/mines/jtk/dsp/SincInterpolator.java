@@ -235,7 +235,6 @@ public class SincInterpolator {
     _nxin = nxin;
     _dxin = dxin;
     _fxin = fxin;
-    _ioutb = -_lsinc-_lsinc/2+1;
     _xoutf = fxin;
     _xouts = 1.0/dxin;
     _xoutb = _lsinc-_xoutf*_xouts;
@@ -394,6 +393,134 @@ public class SincInterpolator {
       }
     });
 
+  /**
+   * Sets the current input sampling for a uniformly-sampled function y(x1,x2).
+   * In some applications, this sampling never changes, and this method 
+   * may be called only once for this interpolator.
+   * @param nx1in the number of input samples in 1st dimension.
+   * @param dx1in the input sampling interval in 1st dimension.
+   * @param fx1in the value x1 for the first input sample yin[0][0].
+   * @param nx2in the number of input samples in 2nd dimension.
+   * @param dx2in the input sampling interval in 2nd dimension.
+   * @param fx2in the value x2 for the first input sample yin[0][0].
+   */
+  public void setInputSampling(
+    int nx1in, double dx1in, double fx1in,
+    int nx2in, double dx2in, double fx2in) {
+    if (_asinc==null)
+      makeTable();
+    _nx1in = nx1in;
+    _dx1in = dx1in;
+    _fx1in = fx1in;
+    _x1outf = fx1in;
+    _x1outs = 1.0/dx1in;
+    _x1outb = _lsinc-_x1outf*_x1outs;
+    _nx1inm = nx1in-_lsinc;
+    _nx2in = nx2in;
+    _dx2in = dx2in;
+    _fx2in = fx2in;
+    _x2outf = fx2in;
+    _x2outs = 1.0/dx2in;
+    _x2outb = _lsinc-_x2outf*_x2outs;
+    _nx2inm = nx2in-_lsinc;
+  }
+
+  /**
+   * Sets the current input samples for a uniformly-sampled function y(x1,x2).
+   * If input sample values are complex numbers, real and imaginary parts 
+   * are packed in the array as real, imaginary, real, imaginary, and so on.
+   * <p>
+   * Input samples are passed by reference, not by copy. Changes to sample
+   * values in the specified array will yield changes in interpolated values.
+   * @param yin array of input samples of y(x1,x2); by reference, not by copy.
+   */
+  public void setInputSamples(float[][] yin) {
+    _yyin = yin;
+  }
+
+  /**
+   * Sets the current input sampling and samples for a function y(x1,x2). 
+   * This method simply calls the two methods 
+   * {@link #setInputSampling(int,double,double,int,double,double)} and
+   * {@link #setInputSamples(float[][])} 
+   * with the specified parameters.
+   * @param nx1in the number of input samples in 1st dimension.
+   * @param dx1in the input sampling interval in 1st dimension.
+   * @param fx1in the value x1 for the first input sample yin[0][0].
+   * @param nx2in the number of input samples in 2nd dimension.
+   * @param dx2in the input sampling interval in 2nd dimension.
+   * @param fx2in the value x2 for the first input sample yin[0][0].
+   * @param yin array of input samples of y(x1,x2); by reference, not by copy.
+   */
+  public void setInput(
+    int nx1in, double dx1in, double fx1in,
+    int nx2in, double dx2in, double fx2in,
+    float[][] yin) {
+    setInputSampling(nx1in,dx1in,fx1in,nx2in,dx2in,fx2in);
+    setInputSamples(yin);
+  }
+
+  /**
+   * Interpolates the current input samples as real numbers.
+   * @param x1out the value x1 at which to interpolate an output y(x1,x2).
+   * @param x2out the value x2 at which to interpolate an output y(x1,x2).
+   * @return the interpolated output y(x1,x2).
+   */
+  public float interpolate(double x1out, double x2out) {
+
+    // Which input samples?
+    double x1outn = _x1outb+x1out*_x1outs;
+    double x2outn = _x2outb+x2out*_x2outs;
+    int ix1outn = (int)x1outn;
+    int ix2outn = (int)x2outn;
+    int ky1in = _ioutb+ix1outn;
+    int ky2in = _ioutb+ix2outn;
+
+    // Which sinc approximations?
+    double frac1 = x1outn-ix1outn;
+    double frac2 = x2outn-ix2outn;
+    if (frac1<0.0)
+      frac1 += 1.0;
+    if (frac2<0.0)
+      frac2 += 1.0;
+    int ksinc1 = (int)(frac1*_nsincm1+0.5);
+    int ksinc2 = (int)(frac2*_nsincm1+0.5);
+    float[] asinc1 = _asinc[ksinc1];
+    float[] asinc2 = _asinc[ksinc2];
+
+    // If no extrapolation is necessary, use a fast loop.
+    // Otherwise, extrapolate input samples, as necessary.
+    float youtr = 0.0f;
+    if (ky1in>=0 && ky1in<=_nx1inm &&  ky2in>=0 &&  ky2in<=_nx2inm) {
+      for (int i2sinc=0; i2sinc<_lsinc; ++i2sinc,++ky2in) {
+        float asinc22 = asinc2[i2sinc];
+        float[] yyink2 = _yyin[ky2in];
+        float youtr2 = 0.0f;
+        for (int i1sinc=0,my1in=ky1in; i1sinc<_lsinc; ++i1sinc,++my1in)
+          youtr2 += yyink2[my1in]*asinc1[i1sinc];
+        youtr += asinc22*youtr2;
+      }
+    } else if (_extrap==Extrapolation.ZERO) {
+      for (int i2sinc=0; i2sinc<_lsinc; ++i2sinc,++ky2in) {
+        if (0<=ky2in && ky2in<_nx2in) {
+          for (int i1sinc=0,my1in=ky1in; i1sinc<_lsinc; ++i1sinc,++my1in) {
+            if (0<=my1in && my1in<_nx1in)
+              youtr += _yyin[ky2in][my1in]*asinc2[i2sinc]*asinc1[i1sinc];
+          }
+        }
+      }
+    } else if (_extrap==Extrapolation.CONSTANT) {
+      for (int i2sinc=0; i2sinc<_lsinc; ++i2sinc,++ky2in) {
+        int jy2in = (ky2in<0)?0:(_nx2in<=ky2in)?_nx2in-2:ky2in;
+        for (int i1sinc=0,my1in=ky1in; i1sinc<_lsinc; ++i1sinc,++my1in) {
+          int jy1in = (my1in<0)?0:(_nx1in<=my1in)?_nx1in-1:my1in;
+          youtr += _yyin[jy2in][jy1in]*asinc2[i2sinc]*asinc1[i1sinc];
+        }
+      }
+    }
+    return youtr;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -418,21 +545,33 @@ public class SincInterpolator {
   private int _nxin;
   private double _dxin;
   private double _fxin;
-  private int _ioutb;
   private double _xoutf;
   private double _xouts;
   private double _xoutb;
-  private double _nsincm1;
   private int _nxinm;
 
   // Current input samples.
   private float[] _yin; // real or complex samples
+
+  // Current 2-D input sampling.
+  private int _nx1in,_nx2in;
+  private double _dx1in,_dx2in;
+  private double _fx1in,_fx2in;
+  private double _x1outf,_x2outf;
+  private double _x1outs,_x2outs;
+  private double _x1outb,_x2outb;
+  private int _nx1inm,_nx2inm;
+
+  // Current 2-D input samples.
+  private float[][] _yyin; // real or complex samples
 
   // Table of sinc interpolation coefficients.
   private int _lsinc; // length of sinc approximations
   private int _nsinc; // number of sinc approximations
   private double _dsinc; // sampling interval in table
   private float[][] _asinc; // array[nsinc][lsinc] of sinc approximations
+  private double _nsincm1; // nsinc-1
+  private int _ioutb; // -lsinc-lsinc/2+1
 
   /**
    * Constructs a sinc interpolator with specified parameters.
@@ -543,8 +682,9 @@ public class SincInterpolator {
    * optimal design parameters, without actually using all of them.
    */
   private void makeTable() {
-    _nsincm1 = _nsinc-1;
     _asinc = new float[_nsinc][_lsinc];
+    _nsincm1 = _nsinc-1;
+    _ioutb = -_lsinc-_lsinc/2+1;
 
     // The first and last interpolators are shifted unit impulses.
     // Handle these two cases exactly, with no rounding errors.
