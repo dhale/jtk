@@ -813,8 +813,9 @@ public class SincInterpolator {
    * Ken's method is the one that has been in SU and ProMAX for years.
    */
   private void makeTableKenLarner() {
-    _nsincm1 = _nsinc-1;
     _asinc = new float[_nsinc][_lsinc];
+    _nsincm1 = _nsinc-1;
+    _ioutb = -_lsinc-_lsinc/2+1;
 
     // The first and last interpolators are shifted unit impulses.
     // Handle these two cases exactly, with no rounding errors.
