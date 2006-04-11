@@ -36,7 +36,7 @@ def plot(x,png=None):
     frame.paintToPng(600,3,png)
   return frame
 
-def plotu(u,png=None):
+def plotu(u,png=None,clip=0):
   panel = PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
   panel.setVFormat("%4.0f");
   panel.addColorBar()
@@ -53,6 +53,8 @@ def plotu(u,png=None):
     s2 = Sampling(n2,1.0,0.0)
   pv = panel.addPixels(s1,s2,u)
   pv.setColorMap(PixelsView.ColorMap.JET);
+  if clip!=0:
+    pv.setClips(-clip,clip)
   frame = PlotFrame(panel)
   frame.setBackground(Color.WHITE)
   frame.setFontSize(18)
@@ -178,22 +180,29 @@ y1,y2 = y[0],y[1]
 #plot(y1)
 #plot(y2)
 
+z1 = Array.rampfloat(0.0,1.0,0.0,n1,n2)
+z2 = Array.rampfloat(0.0,0.0,1.0,n1,n2)
+e1 = Array.sub(y1,z1)
+e2 = Array.sub(y2,z2)
+plotu(e1,"e1.png",6)
+plotu(e2,"e2.png",3)
+
 p = readData()
 q = WarpTest.warp(x1,x2,p)
 r = WarpTest.warp(y1,y2,q)
-plotWithGrid(p,None,"image1.png")
-plotWithGrid(q,y,"image2.png")
-c = lcc(8,p,q)
-plot(c,"lcc.png")
+#plotWithGrid(p,None,"image1.png")
+#plotWithGrid(q,y,"image2.png")
+#c = lcc(8,p,q)
+#plot(c,"lcc.png")
 
-#u = WarpTest.findWarpL(8,7,7,p,q)
-#u1 = u[0]
-#u2 = u[1]
-#plotu(u1)
-#plotu(u2)
+u = WarpTest.findWarpL(8,7,7,p,q)
+u1 = u[0]
+u2 = u[1]
+plotu(u1,"i1.png",6)
+plotu(u2,"i2.png",3)
 
 u = WarpTest.findWarpU(8,7,7,p,q)
 u1 = u[0]
 u2 = u[1]
-plotu(u1,"u1.png")
-plotu(u2,"u2.png")
+plotu(u1,"u1.png",6)
+plotu(u2,"u2.png",3)

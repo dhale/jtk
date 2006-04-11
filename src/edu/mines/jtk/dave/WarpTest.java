@@ -184,7 +184,7 @@ public class WarpTest {
           y2p = y2;
           y1 = x1/(1.0f+a1*gauss(s1,s2,y1p,y2p));
           y2 = x2/(1.0f+a2*gauss(s1,s2,y1p,y2p));
-        } while (abs(y1-y1p)>0.001f && abs(y2-y1p)>0.001f);
+        } while (abs(y1-y1p)>0.001f || abs(y2-y2p)>0.001f);
         y[0][i2][i1] = y1+b1;
         y[1][i2][i1] = y2+b2;
       }
