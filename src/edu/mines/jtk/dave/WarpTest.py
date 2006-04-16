@@ -32,8 +32,8 @@ def plot(x,png=None):
   frame.setFontSize(18)
   frame.setSize(700,600)
   frame.setVisible(True)
-  if png!=None:
-    frame.paintToPng(600,3,png)
+  #if png!=None:
+  #  frame.paintToPng(600,3,png)
   return frame
 
 def plotu(u,png=None,clip=0):

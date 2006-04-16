@@ -2,6 +2,7 @@ import math
 from edu.mines.jtk.util.Array import *
 from edu.mines.jtk.dave import *
 from edu.mines.jtk.dsp import *
+from edu.mines.jtk.mosaic import *
 
 True = 1
 False = 0
@@ -20,6 +21,14 @@ def plotReal1(rx):
 
 def plotReal1db(rx):
   SpectrumPlot(rx,True)
+
+#############################################################################
+# Data from Gary Olhoeft, GPGN210, April 2006
+
+def springdashpot():
+  return Real1Reader.readData("data/SpringDashpot.txt")
+def springspring():
+  return Real1Reader.readData("data/SpringSpring.txt")
 
 #############################################################################
 # Data from GP404 students
@@ -153,9 +162,27 @@ def filterReal1(r,f3db,npole,type):
 def makeImpulse(n,m=0):
   return Real1(n,1.0,-m,impulse(m,n))
 
-x = makeImpulse(101)
-y = filterReal1(x,0.25,3,LP)
-plotReal1(y)
+def plotSpringDashpot():
+  rss = springspring()
+  rsd = springdashpot()
+  panel = PlotPanel(2,1)
+  panel.setHLabel("time (s)")
+  panel.setVLabel(0,"volts")
+  panel.setVLabel(1,"volts")
+  panel.addSequence(0,0,rss.sampling,rss.values)
+  panel.addSequence(1,0,rsd.sampling,rsd.values)
+  frame = PlotFrame(panel)
+  frame.setSize(950,600)
+  frame.setVisible(True)
+  return frame
+fsd = plotSpringDashpot()
+
+#x = makeImpulse(101)
+#y = filterReal1(x,0.25,3,LP)
+#plotReal1(y)
+
+#f = springdashpot()
+#plotReal1db(f)
 
 #ri = emily1(1)
 #plotReal1db(ri)

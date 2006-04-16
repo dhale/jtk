@@ -7,7 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp;
 
 import edu.mines.jtk.util.*;
-import static java.lang.Math.*;
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Local cross-correlation of two arrays with overlapping Gaussian windows.
@@ -213,6 +213,61 @@ public class LocalCorrelationFilter {
       for (int i=ib; i<ie; ++i)
         for (int i1=0; i1<n1; ++i1)
           g[i2][i1] += S[i]*f[i2+i-4][i1];
+    }
+  }
+
+  private static float[] makeWindow(double sigma) {
+    int m = 1+2*(int)(4.0*sigma);
+    int j = (m-1)/2;
+    float[] w = new float[m];
+    double s = -0.5/(sigma*sigma);
+    for (int i=0; i<m; ++i) {
+      double x = i-j;
+      w[i] = (float)exp(s*x*x);
+    }
+    return w;
+  }
+
+  /**
+   * Multiplies a specified array by a specified window.
+   * g[jg+i] = w[i]*f[jf+i]
+   */
+  private static void applyWindow(
+    float[] w, 
+    int jf, float[] f, 
+    int jg, float[] g) 
+  {
+    int nf = f.length;
+    int ng = g.length;
+    int nw = w.length;
+    int imin = max(0,-jf,-jg);
+    int imax = min(nw,nf-jf,ng-jg);
+    for (int i=imin; i<imax; ++i)
+      g[jg+i] = w[i]*f[jf+i];
+  }
+
+  private static void applyWindow(
+    float[] w1, float[] w2, 
+    int j1f, int j2f, float[][] f, 
+    int j1g, int j2g, float[][] g) 
+  {
+    int n2f = f.length;
+    int n2g = g.length;
+    int n2w = w2.length;
+    int i2min = max(0,-j2f,-j2g);
+    int i2max = min(n2w,n2f-j2f,n2g-j2g);
+    int n1f = f[0].length;
+    int n1g = g[0].length;
+    int n1w = w1.length;
+    int i1min = max(0,-j1f,-j1g);
+    int i1max = min(n1w,n1f-j1f,n1g-j1g);
+    for (int i2=i2min; i2<i2max; ++i2) {
+      float w2i2 = w2[i2];
+      float[] fi2 = f[j2f+i2];
+      float[] gi2 = g[j2g+i2];
+      for (int i1=i1min; i1<i1max; ++i1) {
+        gi2[j1g+i1] = w2i2*w1[i1]*fi2[j1f+i1];
+      }
     }
   }
 }

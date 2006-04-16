@@ -111,6 +111,8 @@ public class WarpTest {
     DMatrix a = new DMatrix(ea);
     DMatrix b = new DMatrix(eb);
     DMatrixQrd qrd = new DMatrixQrd(a);
+    //System.out.println("Q="+qrd.getQ());
+    //System.out.println("R="+qrd.getR());
 
     // Locations of peaks of best-fit quadratics.
     float[][][] u = new float[2][n2c][n1c];
@@ -196,4 +198,28 @@ public class WarpTest {
     float e2 = x2/s2;
     return exp(-0.5f*(e1*e1+e2*e2));
   }
+
+  private static final float Q20 = 1.0f/3.0f;
+  private static final float Q21 = 1.0f/sqrt(6.0f);
+  private static final float Q22 = 1.0f/2.0f;
+  private static final float Q23 = 1.0f/(3.0f*sqrt(2.0f));
+  private static final float Q24 = sqrt(2.0f)/3.0f;
+  private static final float Q2Z = 0.0f;
+  private static final float[][] Q2 = {
+    {-Q21,-Q21, Q22, Q23, Q23},
+    { Q2Z,-Q21, Q2Z,-Q24, Q23},
+    { Q21,-Q21,-Q22, Q23, Q23},
+    {-Q21, Q2Z, Q2Z, Q23,-Q24},
+    { Q2Z, Q2Z, Q2Z,-Q24,-Q24},
+    { Q21, Q2Z, Q2Z, Q23,-Q24},
+    {-Q21, Q21,-Q22, Q23, Q23},
+    { Q2Z, Q21, Q2Z,-Q24, Q23},
+    { Q21, Q21, Q22, Q23, Q23},
+  };
+  private static final float S21 = 1.0f/sqrt(6.0f);
+  private static final float S22 = 1.0f/2.0f;
+  private static final float S23 = 1.0f/sqrt(2.0f);
+  private static final float[] S2 = {
+    S21, S21, S22, S23, S23
+  };
 }
