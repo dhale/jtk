@@ -108,6 +108,14 @@ public class LocalCorrelationFilter {
     _rgf1.apply0(h,c);
   }
 
+  /**
+   * Applies this correlation filter for the specified lag.
+   * @param lag1 the lag in the 1st dimension.
+   * @param lag2 the lag in the 2nd dimension.
+   * @param f the 1st input array; can be the same as g.
+   * @param g the 2nd input array; can be the same as f.
+   * @param c the output array; cannot be the same as f or g.
+   */
   public void apply(
     int lag1, int lag2, float[][] f, float[][] g, float[][] c) 
   {
@@ -149,6 +157,15 @@ public class LocalCorrelationFilter {
     _rgf2.applyX0(h,c);
   }
 
+  /**
+   * Applies this correlation filter for the specified lag.
+   * @param lag1 the lag in the 1st dimension.
+   * @param lag2 the lag in the 2nd dimension.
+   * @param lag3 the lag in the 3rd dimension.
+   * @param f the 1st input array; can be the same as g.
+   * @param g the 2nd input array; can be the same as f.
+   * @param c the output array; cannot be the same as f or g.
+   */
   public void apply(
     int lag1, int lag2, int lag3, float[][][] f, float[][][] g, float[][][] c) 
   {
@@ -188,15 +205,15 @@ public class LocalCorrelationFilter {
       }
     }
     if (l1f!=l1g)
-      ;//shift1(c,h);
+      shift1(c,h);
     else
       Array.copy(c,h);
     if (l2f!=l2g)
-      ;//shift2(h,c);
+      shift2(h,c);
     else
       Array.copy(h,c);
     if (l3f!=l3g)
-      ;//shift3(c,h);
+      shift3(c,h);
     else
       Array.copy(c,h);
     _rgf1.apply0XX(h,c);
@@ -204,8 +221,496 @@ public class LocalCorrelationFilter {
     _rgf3.applyXX0(h,c);
   }
 
+  /**
+   * Applies this correlation filter for the specified lags.
+   * The number of lags is nl1 = l1max-l1min+1.
+   * @param l1min the minimum lag in the 1st dimension.
+   * @param l1max the maximum lag in the 1st dimension.
+   * @param j1c the sample index of the first correlation.
+   * @param k1c the sample stride between correlations.
+   * @param f the 1st input array; can be the same as g.
+   * @param g the 2nd input array; can be the same as f.
+   * @param c the output array; cannot be the same as f or g.
+   */
+  public void apply(
+    int l1min, int l1max, int j1c, int k1c,
+    float[] f, float[] g, float[][] c)
+  {
+    int n1f = f.length;
+    int n1c = c.length;
+    float[] t = new float[n1f];
+    for (int l1=l1min; l1<=l1max; ++l1) {
+      apply(l1,f,g,t);
+      for (int i1c=0; i1c<n1c; ++i1c) {
+        c[i1c][l1-l1min] = t[j1c+i1c*k1c];
+      }
+    }
+  }
+
+  /**
+   * Like {@link #apply(int,int,int,int,float[],float[],float[][])}, but
+   * uses conventional windowing and FFTs to perform the cross-correlations.
+   * Best for small numbers of cross-correlation windows.
+   * The number of lags is nl1 = l1max-l1min+1.
+   * @param l1min the minimum lag in the 1st dimension.
+   * @param l1max the maximum lag in the 1st dimension.
+   * @param j1c the sample index of the first correlation.
+   * @param k1c the sample stride between correlations.
+   * @param f the 1st input array; can be the same as g.
+   * @param g the 2nd input array; can be the same as f.
+   * @param c the output array; cannot be the same as f or g.
+   */
+  public void applyFft(
+    int l1min, int l1max, int j1c, int k1c,
+    float[] f, float[] g, float[][] c)
+  {
+    float[] w1 = makeGaussianWindow(_sigma1);
+    int n1f = f.length;
+    int n1c = c.length;
+    int n1w = w1.length;
+    int n1h = (n1w-1)/2;
+    int n1l = l1max-l1min+1;
+    int n1p = n1w+max(-l1min,n1l-1+l1min);
+    int n1fft = FftReal.nfftFast(n1p);
+    int n1pad = n1fft+2;
+    FftReal fft = new FftReal(n1fft);
+    float[] fpad = new float[n1pad];
+    float[] gpad = new float[n1pad];
+    int j1f = max(0, l1min);
+    int j1g = max(0,-l1min);
+    for (int i1c=0; i1c<n1c; ++i1c) {
+      int m1c = j1c+i1c*k1c;
+      Array.zero(fpad);
+      Array.zero(gpad);
+      applyWindow(w1,m1c,f,n1h+j1f,fpad);
+      applyWindow(w1,m1c,g,n1h+j1g,gpad);
+      fft.realToComplex(-1,fpad,fpad);
+      fft.realToComplex(-1,gpad,gpad);
+      for (int i1=0; i1<n1pad; i1+=2) {
+        float fr = fpad[i1  ];
+        float fi = fpad[i1+1];
+        float gr = gpad[i1  ];
+        float gi = gpad[i1+1];
+        gpad[i1  ] = fr*gr+fi*gi;
+        gpad[i1+1] = fr*gi-fi*gr;
+      }
+      fft.complexToReal(1,gpad,gpad);
+      float s = 1.0f/(float)n1fft;
+      float[] cc = c[i1c];
+      for (int i1=0; i1<n1l; ++i1)
+        cc[i1] = s*gpad[i1];
+    }
+  }
+
+  public void applyFft(
+    int l1min, int l1max, int j1c, int k1c,
+    int l2min, int l2max, int j2c, int k2c,
+    float[][] f, float[][] g, float[][][] c)
+  {
+    float[] w1 = makeGaussianWindow(_sigma1);
+    float[] w2 = makeGaussianWindow(_sigma2);
+    int j1f = max(0, l1min);
+    int j1g = max(0,-l1min);
+    int n1f = f[0].length;
+    int n1g = g[0].length;
+    int n1c = c[0].length;
+    int n1w = w1.length;
+    int n1h = (n1w-1)/2;
+    int n1l = l1max-l1min+1;
+    int n1p = n1w+max(-l1min,n1l-1+l1min);
+    int n1fft = FftReal.nfftFast(n1p);
+    int n1pad = n1fft+2;
+    int j2f = max(0, l2min);
+    int j2g = max(0,-l2min);
+    int n2f = f.length;
+    int n2g = g.length;
+    int n2c = c.length;
+    int n2w = w2.length;
+    int n2h = (n2w-1)/2;
+    int n2l = l2max-l2min+1;
+    int n2p = n2w+max(-l2min,n2l-1+l2min);
+    int n2fft = FftComplex.nfftFast(n2p);
+    int n2pad = n2fft*2;
+    FftReal fft1 = new FftReal(n1fft);
+    FftComplex fft2 = new FftComplex(n2fft);
+    float[][] fpad = new float[n2pad][n1pad];
+    float[][] gpad = new float[n2pad][n1pad];
+    for (int i2c=0; i2c<n2c; ++i2c) {
+      int m2c = j2c+i2c*k2c;
+      for (int i1c=0; i1c<n1c; ++i1c) {
+        int m1c = j1c+i1c*k1c;
+        Array.zero(fpad);
+        Array.zero(gpad);
+        applyWindow(w1,w2,m1c,m2c,f,n1h+j1f,n2h+j2f,fpad);
+        applyWindow(w1,w2,m1c,m2c,g,n1h+j1g,n2h+j2g,gpad);
+        fft1.realToComplex1(-1,n2f,fpad,fpad);
+        fft1.realToComplex1(-1,n2g,gpad,gpad);
+        fft2.complexToComplex2(-1,n1fft/2+1,fpad,fpad);
+        fft2.complexToComplex2(-1,n1fft/2+1,gpad,gpad);
+        for (int i2=0; i2<n2fft; ++i2) {
+          float[] fpad2 = fpad[i2];
+          float[] gpad2 = gpad[i2];
+          for (int i1=0; i1<n1pad; i1+=2) {
+            float fr = fpad2[i1  ];
+            float fi = fpad2[i1+1];
+            float gr = gpad2[i1  ];
+            float gi = gpad2[i1+1];
+            gpad2[i1  ] = fr*gr+fi*gi;
+            gpad2[i1+1] = fr*gi-fi*gr;
+          }
+        }
+        fft2.complexToComplex2(1,n1fft/2+1,gpad,gpad);
+        fft1.realToComplex1(1,n2l,gpad,gpad);
+        float s = 1.0f/((float)n1fft*(float)n2fft);
+        float[] cc = c[i2c][i1c];
+        for (int i2=0,ic=0; i2<n2l; ++i2) {
+          float[] gpad2 = gpad[i2];
+          for (int i1=0; i1<n1l; ++i1,++ic) {
+            cc[ic] = s*gpad2[i1];
+          }
+        }
+      }
+    }
+  }
+
+  public void applyFft(
+    int l1min, int l1max, int j1c, int k1c,
+    int l2min, int l2max, int j2c, int k2c,
+    int l3min, int l3max, int j3c, int k3c,
+    float[][][] f, float[][][] g, float[][][][] c)
+  {
+    float[] w1 = makeGaussianWindow(_sigma1);
+    float[] w2 = makeGaussianWindow(_sigma2);
+    float[] w3 = makeGaussianWindow(_sigma3);
+    int j1f = max(0, l1min);
+    int j1g = max(0,-l1min);
+    int n1f = f[0][0].length;
+    int n1g = g[0][0].length;
+    int n1c = c[0][0].length;
+    int n1w = w1.length;
+    int n1h = (n1w-1)/2;
+    int n1l = l1max-l1min+1;
+    int n1p = n1w+max(-l1min,n1l-1+l1min);
+    int n1fft = FftReal.nfftFast(n1p);
+    int n1pad = n1fft+2;
+    int j2f = max(0, l2min);
+    int j2g = max(0,-l2min);
+    int n2f = f[0].length;
+    int n2g = g[0].length;
+    int n2c = c[0].length;
+    int n2w = w2.length;
+    int n2h = (n2w-1)/2;
+    int n2l = l2max-l2min+1;
+    int n2p = n2w+max(-l2min,n2l-1+l2min);
+    int n2fft = FftComplex.nfftFast(n2p);
+    int n2pad = n2fft*2;
+    int j3f = max(0, l3min);
+    int j3g = max(0,-l3min);
+    int n3f = f.length;
+    int n3g = g.length;
+    int n3c = c.length;
+    int n3w = w3.length;
+    int n3h = (n3w-1)/2;
+    int n3l = l3max-l3min+1;
+    int n3p = n3w+max(-l3min,n3l-1+l3min);
+    int n3fft = FftComplex.nfftFast(n3p);
+    int n3pad = n3fft*2;
+    FftReal fft1 = new FftReal(n1fft);
+    FftComplex fft2 = new FftComplex(n2fft);
+    FftComplex fft3 = new FftComplex(n3fft);
+    float[][][] fpad = new float[n3pad][n2pad][n1pad];
+    float[][][] gpad = new float[n3pad][n2pad][n1pad];
+    for (int i3c=0; i3c<n3c; ++i3c) {
+      int m3c = j3c+i3c*k3c;
+      for (int i2c=0; i2c<n2c; ++i2c) {
+        int m2c = j2c+i2c*k2c;
+        for (int i1c=0; i1c<n1c; ++i1c) {
+          int m1c = j1c+i1c*k1c;
+          Array.zero(fpad);
+          Array.zero(gpad);
+          applyWindow(w1,w2,w3,m1c,m2c,m3c,f,n1h+j1f,n2h+j2f,j3f+n3h,fpad);
+          applyWindow(w1,w2,w3,m1c,m2c,m3c,g,n1h+j1g,n2h+j2g,j3g+n3h,gpad);
+          fft1.realToComplex1(-1,n2f,n3f,fpad,fpad);
+          fft1.realToComplex1(-1,n2g,n3g,gpad,gpad);
+          fft2.complexToComplex2(-1,n1fft/2+1,n3f,fpad,fpad);
+          fft2.complexToComplex2(-1,n1fft/2+1,n3g,gpad,gpad);
+          fft3.complexToComplex3(-1,n1fft/2+1,n2fft,fpad,fpad);
+          fft3.complexToComplex3(-1,n1fft/2+1,n2fft,gpad,gpad);
+          for (int i3=0; i3<n3fft; ++i3) {
+            float[][] fpad3 = fpad[i3];
+            float[][] gpad3 = gpad[i3];
+            for (int i2=0; i2<n2fft; ++i2) {
+              float[] fpad32 = fpad3[i2];
+              float[] gpad32 = gpad3[i2];
+              for (int i1=0; i1<n1pad; i1+=2) {
+                float fr = fpad32[i1  ];
+                float fi = fpad32[i1+1];
+                float gr = gpad32[i1  ];
+                float gi = gpad32[i1+1];
+                gpad32[i1  ] = fr*gr+fi*gi;
+                gpad32[i1+1] = fr*gi-fi*gr;
+              }
+            }
+          }
+          fft3.complexToComplex3(1,n1fft/2+1,n2fft,gpad,gpad);
+          fft2.complexToComplex2(1,n1fft/2+1,n3l,gpad,gpad);
+          fft1.realToComplex1(1,n2l,n3l,gpad,gpad);
+          float s = 1.0f/((float)n1fft*(float)n2fft*(float)n3fft);
+          float[] cc = c[i3c][i2c][i1c];
+          for (int i3=0,ic=0; i3<n3l; ++i3) {
+            float[][] gpad3 = gpad[i3];
+            for (int i2=0; i2<n2l; ++i2) {
+              float[] gpad32 = gpad3[i2];
+              for (int i1=0; i1<n1l; ++i1,++ic) {
+                cc[ic] = s*gpad32[i1];
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Searches for lags for which cross-correlations are maximized.
+   * @param f the 1st input array; can be the same as g.
+   * @param g the 2nd input array; can be the same as f.
+   * @param min1 minimum lag in 1st dimension
+   * @param max1 maximum lag in 1st dimension
+   * @param min2 minimum lag in 2nd dimension
+   * @param max2 maximum lag in 2nd dimension
+   * @param lag1 output array of lags in the 1st dimension.
+   * @param lag2 output array of lags in the 2nd dimension.
+   * @param cmax output array of correlation values for output lags.
+   */
+  public void findMax(
+    float[][] f, float[][] g, 
+    int min1, int max1, int min2, int max2,
+    float[][] cmax, byte[][] lag1, byte[][] lag2) 
+  {
+    // Initialize arrays of lags and correlation maxima.
+    int n1 = f[0].length;
+    int n2 = f.length;
+    for (int i2=0; i2<n2; ++i2) {
+      for (int i1=0; i1<n1; ++i1) {
+        cmax[i2][i1] = 0.0f;
+        lag1[i2][i1] = 0;
+        lag2[i2][i1] = 0;
+      }
+    }
+
+    // Array for cross-correlations.
+    float[][] c = new float[n2][n1];
+
+    // Search begins in the middle of the specified range of lags.
+    Lags lags = new Lags(min1,max1,min2,max2);
+    int l1 = (min1+max1)/2;
+    int l2 = (min2+max2)/2;
+
+    // While lags remain to be processed, ...
+    boolean done = false;
+    while (!done) {
+
+      // Apply correlation filter for this lag.
+      apply(l1,l2,f,g,c);
+
+      // Correlations have been computed for this lag, 
+      // but no maxima have yet been found.
+      lags.markLag(l1,l2);
+
+      // Look for maxima; if found, mark this lag accordingly.
+      boolean foundMax = false;
+      for (int i2=0; i2<n2; ++i2) { 
+        for (int i1=0; i1<n1; ++i1) { 
+          float ci = c[i2][i1];
+          if (ci>cmax[i2][i1]) {
+            cmax[i2][i1] = ci;
+            lag1[i2][i1] = (byte)l1;
+            lag2[i2][i1] = (byte)l2;
+            foundMax = true;
+          }
+        }
+      }
+      if (foundMax)
+        lags.markMax(l1,l2);
+
+      // Which lag to process next?
+      int[] ls = lags.nextLag();
+      if (ls==null) {
+        done = true;
+      } else {
+        l1 = ls[0];
+        l2 = ls[1];
+      }
+    }
+  }
+
+  public void findMax(
+    float[][][] f, float[][][] g, 
+    int min1, int max1, int min2, int max2, int min3, int max3,
+    float[][][] cmax, byte[][][] lag1, byte[][][] lag2) 
+  {
+    // Initialize arrays of lags and correlation maxima.
+    int n1 = f[0][0].length;
+    int n2 = f[0].length;
+    int n3 = f.length;
+    for (int i3=0; i3<n3; ++i3) {
+      for (int i2=0; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          cmax[i3][i2][i1] = 0.0f;
+          lag1[i3][i2][i1] = 0;
+          lag2[i3][i2][i1] = 0;
+        }
+      }
+    }
+
+    // Array for cross-correlations.
+    float[][][] c = new float[n3][n2][n1];
+
+    // Search begins in the middle of the specified range of lags.
+    Lags lags = new Lags(min1,max1,min2,max2,min3,max3);
+    int l1 = (min1+max1)/2;
+    int l2 = (min2+max2)/2;
+    int l3 = (min3+max3)/2;
+
+    // While lags remain to be processed, ...
+    boolean done = false;
+    while (!done) {
+
+      // Apply correlation filter for this lag.
+      apply(l1,l2,l3,f,g,c);
+
+      // Correlations have been computed for this lag, 
+      // but no maxima have yet been found.
+      lags.markLag(l1,l2,l3);
+
+      // Look for maxima; if found, mark this lag accordingly.
+      boolean foundMax = false;
+      for (int i3=0; i3<n3; ++i3) { 
+        for (int i2=0; i2<n2; ++i2) { 
+          float[] c32 = c[i3][i2];
+          float[] cmax32 = cmax[i3][i2];
+          byte[] lag132 = lag1[i3][i2];
+          byte[] lag232 = lag2[i3][i2];
+          for (int i1=0; i1<n1; ++i1) { 
+            float ci = c32[i1];
+            if (ci>cmax32[i1]) {
+              cmax32[i1] = ci;
+              lag132[i1] = (byte)l1;
+              lag232[i1] = (byte)l2;
+              foundMax = true;
+            }
+          }
+        }
+      }
+      if (foundMax)
+        lags.markMax(l1,l2,l3);
+
+      // Which lag to process next?
+      int[] ls = lags.nextLag();
+      if (ls==null) {
+        done = true;
+      } else {
+        l1 = ls[0];
+        l2 = ls[1];
+        l3 = ls[2];
+      }
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  // Information about lags used when searching for correlation maxima.
+  // Lags for which correlations have been computed are marked. Lags for 
+  // which correlation maxima have been found are marked differently.
+  // The next lag to process is one that is not marked, but that is 
+  // adjacent to a lag for which a maximum has been found. If no such 
+  // next lag exists, then the next lag is null.
+  private static class Lags {
+    Lags(int min1, int max1) {
+      this(min1,max1,0,0,0,0);
+    }
+    Lags(int min1, int max1, int min2, int max2) {
+      this(min1,max1,min2,max2,0,0);
+    }
+    Lags(int min1, int max1, int min2, int max2, int min3, int max3) {
+      int nl1 = 1+max1-min1;
+      int nl2 = 1+max2-min2;
+      int nl3 = 1+max3-min3;
+      _min1 = min1;
+      _max1 = max1;
+      _min2 = min2;
+      _max2 = max2;
+      _min3 = min3;
+      _max3 = max3;
+      _mark = new byte[nl3][nl2][nl1];
+    }
+    void markLag(int l1) {
+      markLag(l1,0,0);
+    }
+    void markLag(int l1, int l2) {
+      markLag(l1,l2,0);
+    }
+    void markLag(int l1, int l2, int l3) {
+      _mark[l3-_min3][l2-_min2][l1-_min1] = -1;
+    }
+    void markMax(int l1) {
+      markMax(l1,0,0);
+    }
+    void markMax(int l1, int l2) {
+      markMax(l1,l2,0);
+    }
+    void markMax(int l1, int l2, int l3) {
+      _mark[l3-_min3][l2-_min2][l1-_min1] = 1;
+    }
+    boolean isMarkedLag(int l1) {
+      return isMarkedLag(l1,0,0);
+    }
+    boolean isMarkedLag(int l1, int l2) {
+      return isMarkedLag(l1,l2,0);
+    }
+    boolean isMarkedLag(int l1, int l2, int l3) {
+      return !inBounds(l1,l2,l3) || _mark[l3-_min3][l2-_min2][l1-_min1]!=0;
+    }
+    boolean isMarkedMax(int l1) {
+      return isMarkedMax(l1,0,0);
+    }
+    boolean isMarkedMax(int l1, int l2) {
+      return isMarkedMax(l1,l2,0);
+    }
+    boolean isMarkedMax(int l1, int l2, int l3) {
+      return inBounds(l1,l2,l3) && _mark[l3-_min3][l2-_min2][l1-_min1]==1;
+    }
+    boolean inBounds(int l1, int l2, int l3) {
+      return l1>=_min1 && l1<=_max1 &&
+             l2>=_min2 && l2<=_max2 &&
+             l3>=_min3 && l3<=_max3;
+    }
+    int[] nextLag() {
+      for (int l3=_min3; l3<=_max3; ++l3) {
+        for (int l2=_min2; l2<=_max2; ++l2) {
+          for (int l1=_min1; l1<=_max1; ++l1) {
+            if (isMarkedMax(l1,l2,l3)) {
+              for (int k3=l3-1; k3<=l3+1; ++k3) {
+                for (int k2=l2-1; k2<=l2+1; ++k2) {
+                  for (int k1=l1-1; k1<=l1+1; ++k1) {
+                    if (!isMarkedLag(k1,k2,k3)) {
+                      return new int[]{k1,k2,k3};
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      return null;
+    }
+    int _min1,_max1,_min2,_max2,_min3,_max3;
+    byte[][][] _mark;
+  }
+
   private double _sigma1;
   private double _sigma2;
   private double _sigma3;
@@ -315,7 +820,58 @@ public class LocalCorrelationFilter {
     }
   }
 
-  private static float[] makeWindow(double sigma) {
+  private static void shift1(float[][][] f, float[][][] g) {
+    int n3 = f.length;
+    for (int i3=0; i3<n3; ++i3)
+      shift1(f[i3],g[i3]);
+  }
+
+  private static void shift2(float[][][] f, float[][][] g) {
+    int n3 = f.length;
+    for (int i3=0; i3<n3; ++i3)
+      shift2(f[i3],g[i3]);
+  }
+
+  private static void shift3(float[][][] f, float[][][] g) {
+    int n3 = f.length;
+    int n2 = f[0].length;
+    int n1 = f[0][0].length;
+    float[][] f2 = new float[n3][];
+    float[][] g2 = new float[n3][];
+    for (int i2=0; i2<n2; ++i2) {
+      for (int i3=0; i3<n3; ++i3) {
+        f2[i3] = f[i3][i2];
+        g2[i3] = g[i3][i2];
+      }
+      shift2(f2,g2);
+    }
+  }
+
+  private static void get2(int i2, float[][][] x, float[][] x2) {
+    int n3 = x2.length;
+    int n1 = x2[0].length;
+    for (int i3=0; i3<n3; ++i3) {
+      float[] x32 = x[i3][i2];
+      float[] x23 = x2[i3];
+      for (int i1=0; i1<n1; ++i1) {
+        x23[i1] = x32[i1];
+      }
+    }
+  }
+
+  private static void set2(int i2, float[][] x2, float[][][] x) {
+    int n3 = x2.length;
+    int n1 = x2[0].length;
+    for (int i3=0; i3<n3; ++i3) {
+      float[] x32 = x[i3][i2];
+      float[] x23 = x2[i3];
+      for (int i1=0; i1<n1; ++i1) {
+        x32[i1] = x23[i1];
+      }
+    }
+  }
+
+  private static float[] makeGaussianWindow(double sigma) {
     int m = 1+2*(int)(4.0*sigma);
     int j = (m-1)/2;
     float[] w = new float[m];
@@ -337,7 +893,7 @@ public class LocalCorrelationFilter {
    * @param jg the index of the output array g corresponding to index jf.
    * @param g the output array.
    */
-  public static void applyWindow(
+  private static void applyWindow(
     float[] w, 
     int jf, float[] f, 
     int jg, float[] g) 
@@ -369,7 +925,7 @@ public class LocalCorrelationFilter {
    * @param j2g the index of the output array g corresponding to index j2f.
    * @param g the output array.
    */
-  public static void applyWindow(
+  private static void applyWindow(
     float[] w1, float[] w2, 
     int j1f, int j2f, float[][] f, 
     int j1g, int j2g, float[][] g) 
@@ -389,69 +945,53 @@ public class LocalCorrelationFilter {
     int i2min = max(0,-j2f,-j2g);
     int i2max = min(n2w,n2f-j2f,n2g-j2g);
     for (int i2=i2min; i2<i2max; ++i2) {
-      float w2i2 = w2[i2];
-      float[] fi2 = f[j2f+i2];
-      float[] gi2 = g[j2g+i2];
+      float w2i = w2[i2];
+      float[] f2 = f[j2f+i2];
+      float[] g2 = g[j2g+i2];
       for (int i1=i1min; i1<i1max; ++i1) {
-        gi2[j1g+i1] = w2i2*w1[i1]*fi2[j1f+i1];
+        g2[j1g+i1] = w2i*w1[i1]*f2[j1f+i1];
       }
     }
   }
 
-  public void apply(
-    int l1min, int l1max, int j1c, int k1c,
-    float[] f, float[] g, float[][] c)
+  private static void applyWindow(
+    float[] w1, float[] w2, float[] w3,
+    int j1f, int j2f, int j3f, float[][][] f, 
+    int j1g, int j2g, int j3g, float[][][] g) 
   {
-    int n1f = f.length;
-    int n1c = c.length;
-    float[] t = new float[n1f];
-    for (int l1=l1min; l1<=l1max; ++l1) {
-      apply(l1,f,g,t);
-      for (int i1c=0; i1c<n1c; ++i1c) {
-        c[i1c][l1-l1min] = t[j1c+i1c*k1c];
-      }
-    }
-  }
-
-  public void applyFft(
-    int l1min, int l1max, int j1c, int k1c,
-    float[] f, float[] g, float[][] c)
-  {
-    float[] w1 = makeWindow(_sigma1);
-    int n1f = f.length;
-    int n1c = c.length;
+    int n1f = f[0].length;
+    int n1g = g[0].length;
     int n1w = w1.length;
-    int n1h = (n1w-1)/2;
-    int n1l = l1max-l1min+1;
-    int n1p = n1w+max(-l1min,n1l-1+l1min);
-    int n1fft = FftReal.nfftFast(n1p);
-    int n1pad = n1fft+2;
-    FftReal fft = new FftReal(n1fft);
-    float[] fpad = new float[n1pad];
-    float[] gpad = new float[n1pad];
-    int j1f = max(0, l1min);
-    int j1g = max(0,-l1min);
-    for (int i1c=0; i1c<n1c; ++i1c) {
-      int m1c = j1c+i1c*k1c;
-      Array.zero(fpad);
-      Array.zero(gpad);
-      applyWindow(w1,m1c,f,m1c+j1f,fpad);
-      applyWindow(w1,m1c,g,m1c+j1g,gpad);
-      fft.realToComplex(-1,fpad,fpad);
-      fft.realToComplex(-1,gpad,gpad);
-      for (int i1=0; i1<n1pad; i1+=2) {
-        float fr = fpad[i1  ];
-        float fi = fpad[i1+1];
-        float gr = gpad[i1  ];
-        float gi = gpad[i1+1];
-        gpad[i1  ] = fr*gr+fi*gi;
-        gpad[i1+1] = fr*gi-fi*gr;
+    j1f -= (n1w-1)/2;
+    j1g -= (n1w-1)/2;
+    int i1min = max(0,-j1f,-j1g);
+    int i1max = min(n1w,n1f-j1f,n1g-j1g);
+    int n2f = f.length;
+    int n2g = g.length;
+    int n2w = w2.length;
+    j2f -= (n2w-1)/2;
+    j2g -= (n2w-1)/2;
+    int i2min = max(0,-j2f,-j2g);
+    int i2max = min(n2w,n2f-j2f,n2g-j2g);
+    int n3f = f.length;
+    int n3g = g.length;
+    int n3w = w3.length;
+    j3f -= (n3w-1)/2;
+    j3g -= (n3w-1)/2;
+    int i3min = max(0,-j3f,-j3g);
+    int i3max = min(n3w,n3f-j3f,n3g-j3g);
+    for (int i3=i3min; i3<i3max; ++i3) {
+      float w3i = w3[i3];
+      float[][] f3 = f[j3f+i3];
+      float[][] g3 = g[j3g+i3];
+      for (int i2=i2min; i2<i2max; ++i2) {
+        float w32i = w3i*w2[i2];
+        float[] f32 = f3[j2f+i2];
+        float[] g32 = g3[j2g+i2];
+        for (int i1=i1min; i1<i1max; ++i1) {
+          g32[j1g+i1] = w32i*w1[i1]*f32[j1f+i1];
+        }
       }
-      fft.complexToReal(1,gpad,gpad);
-      float s = 1.0f/(float)n1fft;
-      float[] cc = c[i1c];
-      for (int i1=0; i1<n1l; ++i1)
-        cc[i1] = s*gpad[i1];
     }
   }
 }

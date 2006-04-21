@@ -341,6 +341,48 @@ public class FftReal {
   }
 
   /**
+   * Computes a real-to-complex dimension-1 fast Fourier transform. 
+   * Transforms a 3-D input array rx[n3][n2][nfft] of n3*n2*nfft real 
+   * numbers to a 3-D output array cy[n3][n2][nfft+2] of n3*n2*(nfft/2+1) 
+   * complex numbers.
+   * @param sign the sign (1 or -1) of the exponent used in the FFT.
+   * @param n2 the 2nd dimension of arrays.
+   * @param n3 the 3rd dimension of arrays.
+   * @param rx the input array.
+   * @param cy the output array.
+   */
+  public void realToComplex1(
+    int sign, int n2, int n3, float[][][] rx, float[][][] cy) 
+  {
+    checkSign(sign);
+    checkArray(_nfft,n2,n3,rx,"rx");
+    checkArray(_nfft+2,n2,n3,cy,"cy");
+    for (int i3=0; i3<n3; ++i3)
+      realToComplex1(sign,n2,rx[i3],cy[i3]);
+  }
+
+  /**
+   * Computes a complex-to-real dimension-1 fast Fourier transform. 
+   * Transforms a 3-D input array cx[n3][n2][nfft+2] of n3*n2*(nfft/2+1) 
+   * complex numbers to a 3-D output array ry[n3][n2][nfft] of n3*n2*nfft 
+   * real numbers.
+   * @param sign the sign (1 or -1) of the exponent used in the FFT.
+   * @param n2 the 2nd dimension of arrays.
+   * @param n3 the 3rd dimension of arrays.
+   * @param cx the input array.
+   * @param ry the output array.
+   */
+  public void complexToReal1(
+    int sign, int n2, int n3, float[][][] cx, float[][][] ry) 
+  {
+    checkSign(sign);
+    checkArray(_nfft+2,n2,n3,cx,"cx");
+    checkArray(_nfft,n2,n3,ry,"ry");
+    for (int i3=0; i3<n3; ++i3)
+      complexToReal1(sign,n2,cx[i3],ry[i3]);
+  }
+
+  /**
    * Scales n1 real numbers in the specified array by 1/nfft. 
    * The inverse of a real-to-complex FFT is a complex-to-real FFT 
    * (with opposite sign) followed by this scaling.
@@ -366,6 +408,20 @@ public class FftReal {
       scale(n1,rx[i2]);
   }
 
+  /**
+   * Scales n1*n2*n3 real numbers in the specified array by 1/nfft. 
+   * The inverse of a real-to-complex FFT is a complex-to-real FFT 
+   * (with opposite sign) followed by this scaling.
+   * @param n1 the 1st dimension of the array rx.
+   * @param n2 the 2nd dimension of the array rx.
+   * @param n3 the 3rd dimension of the array rx.
+   * @param rx the input/output array[n3][n2][n1].
+   */
+  public void scale(int n1, int n2, int n3, float[][][] rx) {
+    for (int i3=0; i3<n3; ++i3)
+      scale(n1,n2,rx[i3]);
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -383,6 +439,19 @@ public class FftReal {
     boolean ok = a.length>=n2;
     for (int i2=0; i2<n2 && ok; ++i2)
       ok = a[i2].length>=n1;
+    Check.argument(ok,"dimensions of "+name+" are valid");
+  }
+
+  private static void checkArray(
+    int n1, int n2, int n3, float[][][] a, String name) 
+  {
+    boolean ok = a.length>=n3;
+    for (int i3=0; i3<n3 && ok; ++i3) {
+      ok = a[i3].length>=n2;
+      for (int i2=0; i2<n2 && ok; ++i2) {
+        ok = a[i3][i2].length>=n1;
+      }
+    }
     Check.argument(ok,"dimensions of "+name+" are valid");
   }
 }
