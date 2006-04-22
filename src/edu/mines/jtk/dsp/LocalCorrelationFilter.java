@@ -481,19 +481,17 @@ public class LocalCorrelationFilter {
    * @param max2 maximum lag in 2nd dimension
    * @param lag1 output array of lags in the 1st dimension.
    * @param lag2 output array of lags in the 2nd dimension.
-   * @param cmax output array of correlation values for output lags.
    */
-  public void findMax(
+  public void findMaxLags(
     float[][] f, float[][] g, 
     int min1, int max1, int min2, int max2,
-    float[][] cmax, byte[][] lag1, byte[][] lag2) 
+    byte[][] lag1, byte[][] lag2) 
   {
-    // Initialize arrays of lags and correlation maxima.
+    // Initialize arrays of lags.
     int n1 = f[0].length;
     int n2 = f.length;
     for (int i2=0; i2<n2; ++i2) {
       for (int i1=0; i1<n1; ++i1) {
-        cmax[i2][i1] = 0.0f;
         lag1[i2][i1] = 0;
         lag2[i2][i1] = 0;
       }
@@ -501,6 +499,7 @@ public class LocalCorrelationFilter {
 
     // Array for cross-correlations.
     float[][] c = new float[n2][n1];
+    float[][] cmax = new float[n2][n1];
 
     // Search begins in the middle of the specified range of lags.
     Lags lags = new Lags(min1,max1,min2,max2);
@@ -521,9 +520,11 @@ public class LocalCorrelationFilter {
       // Look for maxima; if found, mark this lag accordingly.
       boolean foundMax = false;
       for (int i2=0; i2<n2; ++i2) { 
+        float[] c2 = c[i2];
+        float[] cmax2 = cmax[i2];
         for (int i1=0; i1<n1; ++i1) { 
-          float ci = c[i2][i1];
-          if (ci>cmax[i2][i1]) {
+          float ci = c2[i1];
+          if (ci>cmax2[i1]) {
             cmax[i2][i1] = ci;
             lag1[i2][i1] = (byte)l1;
             lag2[i2][i1] = (byte)l2;
@@ -545,19 +546,18 @@ public class LocalCorrelationFilter {
     }
   }
 
-  public void findMax(
+  public void findMaxLags(
     float[][][] f, float[][][] g, 
     int min1, int max1, int min2, int max2, int min3, int max3,
-    float[][][] cmax, byte[][][] lag1, byte[][][] lag2) 
+    byte[][][] lag1, byte[][][] lag2) 
   {
-    // Initialize arrays of lags and correlation maxima.
+    // Initialize arrays of lags.
     int n1 = f[0][0].length;
     int n2 = f[0].length;
     int n3 = f.length;
     for (int i3=0; i3<n3; ++i3) {
       for (int i2=0; i2<n2; ++i2) {
         for (int i1=0; i1<n1; ++i1) {
-          cmax[i3][i2][i1] = 0.0f;
           lag1[i3][i2][i1] = 0;
           lag2[i3][i2][i1] = 0;
         }
@@ -566,6 +566,7 @@ public class LocalCorrelationFilter {
 
     // Array for cross-correlations.
     float[][][] c = new float[n3][n2][n1];
+    float[][][] cmax = new float[n3][n2][n1];
 
     // Search begins in the middle of the specified range of lags.
     Lags lags = new Lags(min1,max1,min2,max2,min3,max3);
@@ -710,6 +711,90 @@ public class LocalCorrelationFilter {
     int _min1,_max1,_min2,_max2,_min3,_max3;
     byte[][][] _mark;
   }
+
+
+  // Coefficients for 2-D lag refinement. Assume a sampled correlation 
+  // maximum at integer lag (l1,l2). Let (u1,u2) be fractional components 
+  // of a refined lag (l1+u1,l2+u2). Near its maximum, we approximate the 
+  // correlation function c(l1+u1,l2+u2) by a quadratic function least-
+  // squares fit to the nine sampled correlation values surrounding the 
+  // sampled c(l1,l2).
+  // The quadratic function is
+  // c(l1+u1,l2+u2) = a0 + a1*u1 + a2*u2 + a3*u1*u2 + a4*u1*u1 + a5*u2*u2
+  // The nine sampled corrrelation values yield nine equations for the six
+  // coefficients a0, a1, a2, a3, a4, and a5.
+  // By QR decomposition of this overdetermined system of equations, we 
+  // obtained the following array of constants. The rows of this array 
+  // contain the weights that we apply to each of the nine correlation 
+  // values in the computation of the six quadratic coefficients. For
+  // example, the first (top) row contains the weights applied to the 
+  // sampled correlation value c(l1-1,l2-1).
+  // When refining correlation lags, we use this table of weights to 
+  // accumulate the contributions of the nine correlation values nearest
+  // to each sampled correlation maximum. For lag refinement, we need only 
+  // the five coefficients a1, a2, a3, a4, and a5.
+  private static final float C00 = 0.0f;
+  private static final float C13 = 1.0f/3.0f;
+  private static final float C14 = 1.0f/4.0f;
+  private static final float C16 = 1.0f/6.0f;
+  private static final float C19 = 1.0f/9.0f;
+  private static final float C29 = 2.0f/9.0f;
+  private static final float C59 = 5.0f/9.0f;
+  private static final float[][] C2 = {
+    {-C19, -C16, -C16,  C14,  C16,  C16}, // (-1,-1) = (u1,u2)
+    { C29,  C00, -C16,  C00, -C13,  C16}, // ( 0,-1)
+    {-C19,  C16, -C16, -C14,  C16,  C16}, // ( 1,-1)
+    { C29, -C16,  C00,  C00,  C16, -C13}, // (-1, 0)
+    { C59,  C00,  C00,  C00, -C13, -C13}, // ( 0, 0)
+    { C29,  C16,  C00,  C00,  C16, -C13}, // ( 1, 0)
+    {-C19, -C16,  C16, -C14,  C16,  C16}, // (-1, 1)
+    { C29,  C00,  C16,  C00, -C13,  C16}, // ( 0, 1)
+    {-C19,  C16,  C16,  C14,  C16,  C16}, // ( 1, 1)
+  };
+
+  // Coefficients for 3-D lag refinement. Here we fit 27 sampled correlation 
+  // values with have 10 coefficients of the 3-D quadratic function
+  // c(l1+u1,l2+u2,l3+u3) = a0 + a1*u1    + a2*u2    + a3*u3    +
+  //                             a4*u1*u2 + a5*u1*u3 + a6*u2*u3 +
+  //                             a7*u1*u1 + a8*u2*u2 + a9*u3*u3
+  private static final float C000 = 0.0f;
+  private static final float C109 = 1.0f/9.0f;
+  private static final float C112 = 1.0f/12.0f;
+  private static final float C118 = 1.0f/18.0f;
+  private static final float C127 = 1.0f/27.0f;
+  private static final float C227 = 2.0f/27.0f;
+  private static final float C427 = 4.0f/27.0f;
+  private static final float C727 = 7.0f/27.0f;
+  private static final float[][] C3 = {
+    {-C227, -C118, -C118, -C118,  C112,  C112,  C112,  C118,  C118,  C118},
+    {-C227, -C118, -C118, -C118,  C112,  C112,  C112,  C118,  C118,  C118},
+    { C127,  C000, -C118, -C118,  C000,  C000,  C112, -C109,  C118,  C118}, 
+    {-C227,  C118, -C118, -C118, -C112, -C112,  C112,  C118,  C118,  C118}, 
+    { C127, -C118,  C000, -C118,  C000,  C112,  C000,  C118, -C109,  C118},
+    { C427,  C000,  C000, -C118,  C000,  C000,  C000, -C109, -C109,  C118},
+    { C127,  C118,  C000, -C118,  C000, -C112,  C000,  C118, -C109,  C118},
+    {-C227, -C118,  C118, -C118, -C112,  C112, -C112,  C118,  C118,  C118}, 
+    { C127,  C000,  C118, -C118,  C000,  C000, -C112, -C109,  C118,  C118}, 
+    {-C227,  C118,  C118, -C118,  C112, -C112, -C112,  C118,  C118,  C118}, 
+    { C127, -C118, -C118,  C000,  C112,  C000,  C000,  C118,  C118, -C109}, 
+    { C427,  C000, -C118,  C000,  C000,  C000,  C000, -C109,  C118, -C109}, 
+    { C127,  C118, -C118,  C000, -C112,  C000,  C000,  C118,  C118, -C109}, 
+    { C427, -C118,  C000,  C000,  C000,  C000,  C000,  C118, -C109, -C109}, 
+    { C727,  C000,  C000,  C000,  C000,  C000,  C000, -C109, -C109, -C109}, 
+    { C427,  C118,  C000,  C000,  C000,  C000,  C000,  C118, -C109, -C109}, 
+    { C127, -C118,  C118,  C000, -C112,  C000,  C000,  C118,  C118, -C109}, 
+    { C427,  C000,  C118,  C000,  C000,  C000,  C000, -C109,  C118, -C109}, 
+    { C127,  C118,  C118,  C000,  C112,  C000,  C000,  C118,  C118, -C109}, 
+    {-C227, -C118, -C118,  C118,  C112, -C112, -C112,  C118,  C118,  C118}, 
+    { C127,  C000, -C118,  C118,  C000,  C000, -C112, -C109,  C118,  C118}, 
+    {-C227,  C118, -C118,  C118, -C112,  C112, -C112,  C118,  C118,  C118}, 
+    { C127, -C118,  C000,  C118,  C000, -C112,  C000,  C118, -C109,  C118}, 
+    { C427,  C000,  C000,  C118,  C000,  C000,  C000, -C109, -C109,  C118}, 
+    { C127,  C118,  C000,  C118,  C000,  C112,  C000,  C118, -C109,  C118}, 
+    {-C227, -C118,  C118,  C118, -C112, -C112,  C112,  C118,  C118,  C118}, 
+    { C127,  C000,  C118,  C118,  C000,  C000,  C112, -C109,  C118,  C118}, 
+    {-C227,  C118,  C118,  C118,  C112,  C112,  C112,  C118,  C118,  C118},
+  };
 
   private double _sigma1;
   private double _sigma2;
