@@ -619,6 +619,83 @@ public class LocalCorrelationFilter {
     }
   }
 
+  public void refineLags(
+    float[][] f, float[][] g, 
+    int min1, int max1, int min2, int max2,
+    byte[][] l1, byte[][] l2,
+    float[][] u1, float[][] u2) 
+  {
+    int n1 = f[0].length;
+    int n2 = f.length;
+
+    // Coefficients for quadratic fit.
+    float[][] c = new float[n2][n1];
+    float[][] a1 = new float[n2][n1];
+    float[][] a2 = new float[n2][n1];
+    float[][] a3 = new float[n2][n1];
+    float[][] a4 = new float[n2][n1];
+    float[][] a5 = new float[n2][n1];
+    for (int lag2=min2+1; lag2<=max2-1; ++lag2) {
+      for (int lag1=min1+1; lag1<=max1-1; ++lag1) {
+        apply(lag1,lag2,f,g,c);
+        for (int i2=0; i2<n2; ++i2) {
+          for (int i1=0; i1<n1; ++i1) {
+            int k1 = lag1-l1[i2][i1];
+            int k2 = lag2-l2[i2][i1];
+            if (-1<=k1 && k1<=1 && -1<=k2 && k2<=1) {
+              int k = (k1+1)+3*(k2+1);
+              float[] ck = C2[k];
+              float ci = c[i2][i1];
+              a1[i2][i1] += ck[1]*ci;
+              a2[i2][i1] += ck[2]*ci;
+              a3[i2][i1] += ck[3]*ci;
+              a4[i2][i1] += ck[4]*ci;
+              a5[i2][i1] += ck[5]*ci;
+            }
+          }
+        }
+      }
+    }
+
+    // Cholesky decomposition solves 2x2 system for refined lags.
+    for (int i2=0; i2<n2; ++i2) {
+      for (int i1=0; i1<n1; ++i1) {
+        double b1 = a1[i2][i1];
+        double b2 = a2[i2][i1];
+        double a21 = -a3[i2][i1];
+        double a11 = -2.0*a4[i2][i1];
+        double a22 = -2.0*a5[i2][i1];
+        double w1 = 0.0;
+        double w2 = 0.0;
+        double d11 = a11;
+        if (d11>0.0) {
+          double l11 = sqrt(d11);
+          double l21 = a21/l11;
+          double d22 = a22-l21*l21;
+          if (d22>0.0) {
+            double l22 = sqrt(d22);
+            double v1 = b1/l11;
+            double v2 = (b2-l21*v1)/l22;
+            w2 = v2/l22;
+            w1 = (v1-l21*w2)/l11;
+            if (w1<-1.0) {
+              w1 = -1.0;
+            } else if (w1>1.0) {
+              w1 = 1.0;
+            }
+            if (w2<-1.0) {
+              w2 = -1.0;
+            } else if (w2>1.0) {
+              w2 = 1.0;
+            }
+          }
+        }
+        u1[i2][i1] = (float)(w1+l1[i2][i1]);
+        u2[i2][i1] = (float)(w2+l2[i2][i1]);
+      }
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -752,13 +829,40 @@ public class LocalCorrelationFilter {
     {-C19,  C16,  C16,  C14,  C16,  C16}, // ( 1, 1)
   };
 
+  private static final float C11 = 1.0f/1.0f;
+  private static final float C12 = 1.0f/2.0f;
+  private static final float[][] C2X = {
+    { C00,  C00,  C00,  C14,  C00,  C00}, // (-1,-1) = (u1,u2)
+    { C00,  C00, -C12,  C00,  C00,  C12}, // ( 0,-1)
+    { C00,  C00,  C00, -C14,  C00,  C00}, // ( 1,-1)
+    { C00, -C12,  C00,  C00,  C12,  C00}, // (-1, 0)
+    { C11,  C00,  C00,  C00, -C11, -C11}, // ( 0, 0)
+    { C00,  C12,  C00,  C00,  C12,  C00}, // ( 1, 0)
+    { C00,  C00,  C00, -C14,  C00,  C00}, // (-1, 1)
+    { C00,  C00,  C12,  C00,  C00,  C12}, // ( 0, 1)
+    { C00,  C00,  C00,  C14,  C00,  C00}, // ( 1, 1)
+  };
+
+  private static final float[][] C2Y = {
+    { C00,  C00,  C00,  C00,  C00,  C00}, // (-1,-1) = (u1,u2)
+    { C00,  C00, -C12,  C00,  C00,  C12}, // ( 0,-1)
+    { C00,  C00,  C00,  C00,  C00,  C00}, // ( 1,-1)
+    { C00, -C12,  C00,  C00,  C12,  C00}, // (-1, 0)
+    { C11,  C00,  C00,  C00, -C11, -C11}, // ( 0, 0)
+    { C00,  C12,  C00,  C00,  C12,  C00}, // ( 1, 0)
+    { C00,  C00,  C00,  C00,  C00,  C00}, // (-1, 1)
+    { C00,  C00,  C12,  C00,  C00,  C12}, // ( 0, 1)
+    { C00,  C00,  C00,  C00,  C00,  C00}, // ( 1, 1)
+  };
+
   // Coefficients for 3-D lag refinement. Here we fit 27 sampled correlation 
-  // values with have 10 coefficients of the 3-D quadratic function
+  // values with 10 coefficients of a 3-D quadratic function
   // c(l1+u1,l2+u2,l3+u3) = a0 + a1*u1    + a2*u2    + a3*u3    +
   //                             a4*u1*u2 + a5*u1*u3 + a6*u2*u3 +
   //                             a7*u1*u1 + a8*u2*u2 + a9*u3*u3
+  // For lag refinement, we need only the last nine coefficients.
   private static final float C000 = 0.0f;
-  private static final float C109 = 1.0f/9.0f;
+  private static final float C109 = 1.0f/ 9.0f;
   private static final float C112 = 1.0f/12.0f;
   private static final float C118 = 1.0f/18.0f;
   private static final float C127 = 1.0f/27.0f;

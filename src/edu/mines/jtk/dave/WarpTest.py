@@ -184,8 +184,8 @@ z1 = Array.rampfloat(0.0,1.0,0.0,n1,n2)
 z2 = Array.rampfloat(0.0,0.0,1.0,n1,n2)
 e1 = Array.sub(y1,z1)
 e2 = Array.sub(y2,z2)
-plotu(e1,"e1.png",6)
-plotu(e2,"e2.png",3)
+#plotu(e1,"e1.png",6)
+#plotu(e2,"e2.png",3)
 
 p = readData()
 q = WarpTest.warp(x1,x2,p)
@@ -198,11 +198,43 @@ r = WarpTest.warp(y1,y2,q)
 u = WarpTest.findWarpL(8,7,7,p,q)
 u1 = u[0]
 u2 = u[1]
-plotu(u1,"i1.png",6)
-plotu(u2,"i2.png",3)
+#plotu(u1,"i1.png",6)
+#plotu(u2,"i2.png",3)
 
 u = WarpTest.findWarpU(8,7,7,p,q)
 u1 = u[0]
 u2 = u[1]
-plotu(u1,"u1.png",6)
-plotu(u2,"u2.png",3)
+#plotu(u1,"u1.png",6)
+#plotu(u2,"u2.png",3)
+plotu(u1,None,6)
+plotu(u2,None,3)
+
+#############################################################################
+lcf = LocalCorrelationFilter(8)
+max1 = 7
+min1 = -max1
+max2 = 7
+min2 = -max2
+
+def findMaxLags2(f,g):
+  n1 = len(f[0])
+  n2 = len(f)
+  lag1 = Array.zerobyte(n1,n2)
+  lag2 = Array.zerobyte(n1,n2)
+  lcf.findMaxLags(f,g,min1,max1,min2,max2,lag1,lag2)
+  return lag1,lag2
+
+def refineLags2(f,g,lag1,lag2):
+  n1 = len(f[0])
+  n2 = len(f)
+  u1 = Array.zerofloat(n1,n2)
+  u2 = Array.zerofloat(n1,n2)
+  lcf.refineLags(f,g,min1,max1,min2,max2,lag1,lag2,u1,u2)
+  return u1,u2
+
+lag1,lag2 = findMaxLags2(p,q)
+u1,u2 = refineLags2(p,q,lag1,lag2)
+plotu(u1,None,6)
+plotu(u2,None,3)
+
+
