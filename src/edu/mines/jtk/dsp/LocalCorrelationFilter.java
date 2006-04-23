@@ -198,7 +198,7 @@ public class LocalCorrelationFilter {
       for (int i2=i2min; i2<i2max; ++i2) {
         float[] f32 = f[i3-l3f][i2-l2f];
         float[] g32 = g[i3+l3g][i2+l2g];
-        float[] c32 = h[i3][i2];
+        float[] c32 = c[i3][i2];
         for (int i1=i1min; i1<i1max; ++i1) {
           c32[i1] = scale*f32[i1-l1f]*g32[i1+l1g];
         }
@@ -549,7 +549,7 @@ public class LocalCorrelationFilter {
   public void findMaxLags(
     float[][][] f, float[][][] g, 
     int min1, int max1, int min2, int max2, int min3, int max3,
-    byte[][][] lag1, byte[][][] lag2) 
+    byte[][][] lag1, byte[][][] lag2, byte[][][] lag3) 
   {
     // Initialize arrays of lags.
     int n1 = f[0][0].length;
@@ -560,6 +560,7 @@ public class LocalCorrelationFilter {
         for (int i1=0; i1<n1; ++i1) {
           lag1[i3][i2][i1] = 0;
           lag2[i3][i2][i1] = 0;
+          lag3[i3][i2][i1] = 0;
         }
       }
     }
@@ -579,6 +580,7 @@ public class LocalCorrelationFilter {
     while (!done) {
 
       // Apply correlation filter for this lag.
+      System.out.println("findMaxLags: l1="+l1+" l2="+l2+" l3="+l3);
       apply(l1,l2,l3,f,g,c);
 
       // Correlations have been computed for this lag, 
@@ -593,12 +595,14 @@ public class LocalCorrelationFilter {
           float[] cmax32 = cmax[i3][i2];
           byte[] lag132 = lag1[i3][i2];
           byte[] lag232 = lag2[i3][i2];
+          byte[] lag332 = lag3[i3][i2];
           for (int i1=0; i1<n1; ++i1) { 
             float ci = c32[i1];
             if (ci>cmax32[i1]) {
               cmax32[i1] = ci;
               lag132[i1] = (byte)l1;
               lag232[i1] = (byte)l2;
+              lag332[i1] = (byte)l3;
               foundMax = true;
             }
           }
@@ -621,12 +625,30 @@ public class LocalCorrelationFilter {
 
   public void refineLags(
     float[][] f, float[][] g, 
-    int min1, int max1, int min2, int max2,
     byte[][] l1, byte[][] l2,
     float[][] u1, float[][] u2) 
   {
     int n1 = f[0].length;
     int n2 = f.length;
+
+    // Minimum and maximum lags.
+    int min1 = l1[0][0];
+    int max1 = l1[0][0];
+    int min2 = l2[0][0];
+    int max2 = l2[0][0];
+    for (int i2=0; i2<n2; ++i2) {
+      for (int i1=0; i1<n1; ++i1) {
+        int lag1 = l1[i2][i1];
+        int lag2 = l2[i2][i1];
+        if (lag1<min1) min1 = lag1;
+        if (lag1>max1) max1 = lag1;
+        if (lag2<min2) min2 = lag2;
+        if (lag2>max2) max2 = lag2;
+      }
+    }
+    System.out.println("refineLags:");
+    System.out.println("  min1="+min1+" max1="+max1);
+    System.out.println("  min2="+min2+" max2="+max2);
 
     // Coefficients for quadratic fit.
     float[][] c = new float[n2][n1];
@@ -635,8 +657,8 @@ public class LocalCorrelationFilter {
     float[][] a3 = new float[n2][n1];
     float[][] a4 = new float[n2][n1];
     float[][] a5 = new float[n2][n1];
-    for (int lag2=min2+1; lag2<=max2-1; ++lag2) {
-      for (int lag1=min1+1; lag1<=max1-1; ++lag1) {
+    for (int lag2=min2-1; lag2<=max2+1; ++lag2) {
+      for (int lag1=min1-1; lag1<=max1+1; ++lag1) {
         apply(lag1,lag2,f,g,c);
         for (int i2=0; i2<n2; ++i2) {
           for (int i1=0; i1<n1; ++i1) {
@@ -660,13 +682,13 @@ public class LocalCorrelationFilter {
     // Cholesky decomposition solves 2x2 system for refined lags.
     for (int i2=0; i2<n2; ++i2) {
       for (int i1=0; i1<n1; ++i1) {
+        double w1 = 0.0;
+        double w2 = 0.0;
         double b1 = a1[i2][i1];
         double b2 = a2[i2][i1];
         double a21 = -a3[i2][i1];
         double a11 = -2.0*a4[i2][i1];
         double a22 = -2.0*a5[i2][i1];
-        double w1 = 0.0;
-        double w2 = 0.0;
         double d11 = a11;
         if (d11>0.0) {
           double l11 = sqrt(d11);
@@ -692,6 +714,145 @@ public class LocalCorrelationFilter {
         }
         u1[i2][i1] = (float)(w1+l1[i2][i1]);
         u2[i2][i1] = (float)(w2+l2[i2][i1]);
+      }
+    }
+  }
+
+  public void refineLags(
+    float[][][] f, float[][][] g, 
+    byte[][][] l1, byte[][][] l2, byte[][][] l3,
+    float[][][] u1, float[][][] u2, float[][][] u3) 
+  {
+    int n1 = f[0][0].length;
+    int n2 = f[0].length;
+    int n3 = f.length;
+
+    // Minimum and maximum lags.
+    int min1 = l1[0][0][0];
+    int max1 = l1[0][0][0];
+    int min2 = l2[0][0][0];
+    int max2 = l2[0][0][0];
+    int min3 = l3[0][0][0];
+    int max3 = l3[0][0][0];
+    for (int i3=0; i3<n3; ++i3) {
+      for (int i2=0; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          int lag1 = l1[i3][i2][i1];
+          int lag2 = l2[i3][i2][i1];
+          int lag3 = l3[i3][i2][i1];
+          if (lag1<min1) min1 = lag1;
+          if (lag1>max1) max1 = lag1;
+          if (lag2<min2) min2 = lag2;
+          if (lag2>max2) max2 = lag2;
+          if (lag3<min3) min3 = lag3;
+          if (lag3>max3) max3 = lag3;
+        }
+      }
+    }
+    System.out.println("refineLags:");
+    System.out.println("  min1="+min1+" max1="+max1);
+    System.out.println("  min2="+min2+" max2="+max2);
+    System.out.println("  min3="+min3+" max3="+max3);
+
+    // Coefficients for quadratic fit.
+    float[][][] c = new float[n3][n2][n1];
+    float[][][] a1 = new float[n3][n2][n1];
+    float[][][] a2 = new float[n3][n2][n1];
+    float[][][] a3 = new float[n3][n2][n1];
+    float[][][] a4 = new float[n3][n2][n1];
+    float[][][] a5 = new float[n3][n2][n1];
+    float[][][] a6 = new float[n3][n2][n1];
+    float[][][] a7 = new float[n3][n2][n1];
+    float[][][] a8 = new float[n3][n2][n1];
+    float[][][] a9 = new float[n3][n2][n1];
+    for (int lag3=min3-1; lag3<=max3+1; ++lag3) {
+      for (int lag2=min2-1; lag2<=max2+1; ++lag2) {
+        for (int lag1=min1-1; lag1<=max1+1; ++lag1) {
+          System.out.println("("+lag1+","+lag2+","+lag3+")");
+          apply(lag1,lag2,lag3,f,g,c);
+          for (int i3=0; i3<n3; ++i3) {
+            for (int i2=0; i2<n2; ++i2) {
+              for (int i1=0; i1<n1; ++i1) {
+                int k1 = lag1-l1[i3][i2][i1];
+                int k2 = lag2-l2[i3][i2][i1];
+                int k3 = lag3-l3[i3][i2][i1];
+                if (-1<=k1 && k1<=1 && -1<=k2 && k2<=1 && -1<=k3 &&  k3<=1) {
+                  int k = (k1+1)+3*(k2+1)+9*(k3+1);
+                  float[] ck = C3[k];
+                  float ci = c[i3][i2][i1];
+                  a1[i3][i2][i1] += ck[1]*ci;
+                  a2[i3][i2][i1] += ck[2]*ci;
+                  a3[i3][i2][i1] += ck[3]*ci;
+                  a4[i3][i2][i1] += ck[4]*ci;
+                  a5[i3][i2][i1] += ck[5]*ci;
+                  a6[i3][i2][i1] += ck[6]*ci;
+                  a7[i3][i2][i1] += ck[7]*ci;
+                  a8[i3][i2][i1] += ck[8]*ci;
+                  a9[i3][i2][i1] += ck[9]*ci;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Cholesky decomposition solves 3x3 system for refined lags.
+    for (int i3=0; i3<n3; ++i3) {
+      for (int i2=0; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          double w1 = 0.0;
+          double w2 = 0.0;
+          double w3 = 0.0;
+          double b1 = a1[i3][i2][i1];
+          double b2 = a2[i3][i2][i1];
+          double b3 = a3[i3][i2][i1];
+          double a21 = -a4[i3][i2][i1];
+          double a31 = -a5[i3][i2][i1];
+          double a32 = -a6[i3][i2][i1];
+          double a11 = -2.0*a7[i3][i2][i1];
+          double a22 = -2.0*a8[i3][i2][i1];
+          double a33 = -2.0*a9[i3][i2][i1];
+          double d11 = a11;
+          if (d11>0.0) {
+            double l11 = sqrt(d11);
+            double l21 = a21/l11;
+            double l31 = a31/l11;
+            double d22 = a22-l21*l21;
+            if (d22>0.0) {
+              double l22 = sqrt(d22);
+              double l32 = (a32-l31*l21)/l22;
+              double d33 = a33-l31*l31-l32*l32;
+              if (d33>0.0) {
+                double l33 = sqrt(d33);
+                double v1 = b1/l11;
+                double v2 = (b2-l21*v1)/l22;
+                double v3 = (b3-l31*v1-l32*v2)/l33;
+                w3 = v3/l33;
+                w2 = (v2-l32*w3)/l22;
+                w1 = (v1-l21*w2-l31*w3)/l11;
+                if (w1<-1.0) {
+                  w1 = -1.0;
+                } else if (w1>1.0) {
+                  w1 = 1.0;
+                }
+                if (w2<-1.0) {
+                  w2 = -1.0;
+                } else if (w2>1.0) {
+                  w2 = 1.0;
+                }
+                if (w3<-1.0) {
+                  w3 = -1.0;
+                } else if (w3>1.0) {
+                  w3 = 1.0;
+                }
+              }
+            }
+          }
+          u1[i3][i2][i1] = (float)(w1+l1[i3][i2][i1]);
+          u2[i3][i2][i1] = (float)(w2+l2[i3][i2][i1]);
+          u3[i3][i2][i1] = (float)(w3+l3[i3][i2][i1]);
+        }
       }
     }
   }
@@ -870,7 +1031,6 @@ public class LocalCorrelationFilter {
   private static final float C427 = 4.0f/27.0f;
   private static final float C727 = 7.0f/27.0f;
   private static final float[][] C3 = {
-    {-C227, -C118, -C118, -C118,  C112,  C112,  C112,  C118,  C118,  C118},
     {-C227, -C118, -C118, -C118,  C112,  C112,  C112,  C118,  C118,  C118},
     { C127,  C000, -C118, -C118,  C000,  C000,  C112, -C109,  C118,  C118}, 
     {-C227,  C118, -C118, -C118, -C112, -C112,  C112,  C118,  C118,  C118}, 

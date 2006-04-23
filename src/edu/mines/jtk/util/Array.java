@@ -13755,8 +13755,35 @@ public class Array {
     return s;
   }
 
-  // Static methods only.
-  private Array() {
+  ///////////////////////////////////////////////////////////////////////////
+  // convert
+
+  public static float[] tofloat(byte[] rx) {
+    int n1 = rx.length;
+    float[] ry = new float[n1];
+    for (int i1=0; i1<n1; ++i1)
+      ry[i1] = (float)rx[i1];
+    return ry;
+  }
+  public static float[][] tofloat(byte[][] rx) {
+    int n1 = rx[0].length;
+    int n2 = rx.length;
+    float[][] ry = new float[n2][n1];
+    for (int i2=0; i2<n2; ++i2)
+      for (int i1=0; i1<n1; ++i1)
+        ry[i2][i1] = (float)rx[i2][i1];
+    return ry;
+  }
+  public static float[][][] tofloat(byte[][][] rx) {
+    int n1 = rx[0][0].length;
+    int n2 = rx[0].length;
+    int n3 = rx.length;
+    float[][][] ry = new float[n3][n2][n1];
+    for (int i3=0; i3<n3; ++i3)
+      for (int i2=0; i2<n2; ++i2)
+        for (int i1=0; i1<n1; ++i1)
+          ry[i3][i2][i1] = (float)rx[i3][i2][i1];
+    return ry;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -14732,5 +14759,9 @@ public class Array {
       s = (iend<len)?sb+s.substring(iend,len):sb;
     }
     return s;
+  }
+
+  // Static methods only.
+  private Array() {
   }
 }
