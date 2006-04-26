@@ -260,7 +260,8 @@ public class LocalCorrelationFilter {
    * @param g the 2nd input array; can be the same as f.
    * @param c the output array; cannot be the same as f or g.
    */
-  public void applyFft(
+  // Not yet tested!
+  private void applyFft(
     int l1min, int l1max, int j1c, int k1c,
     float[] f, float[] g, float[][] c)
   {
@@ -302,7 +303,8 @@ public class LocalCorrelationFilter {
     }
   }
 
-  public void applyFft(
+  // Not yet tested!
+  private void applyFft(
     int l1min, int l1max, int j1c, int k1c,
     int l2min, int l2max, int j2c, int k2c,
     float[][] f, float[][] g, float[][][] c)
@@ -343,8 +345,8 @@ public class LocalCorrelationFilter {
         Array.zero(gpad);
         applyWindow(w1,w2,m1c,m2c,f,n1h+j1f,n2h+j2f,fpad);
         applyWindow(w1,w2,m1c,m2c,g,n1h+j1g,n2h+j2g,gpad);
-        fft1.realToComplex1(-1,n2f,fpad,fpad);
-        fft1.realToComplex1(-1,n2g,gpad,gpad);
+        fft1.realToComplex1(-1,n2p,fpad,fpad);
+        fft1.realToComplex1(-1,n2p,gpad,gpad);
         fft2.complexToComplex2(-1,n1fft/2+1,fpad,fpad);
         fft2.complexToComplex2(-1,n1fft/2+1,gpad,gpad);
         for (int i2=0; i2<n2fft; ++i2) {
@@ -373,7 +375,8 @@ public class LocalCorrelationFilter {
     }
   }
 
-  public void applyFft(
+  // Not yet tested!
+  private void applyFft(
     int l1min, int l1max, int j1c, int k1c,
     int l2min, int l2max, int j2c, int k2c,
     int l3min, int l3max, int j3c, int k3c,
@@ -430,10 +433,10 @@ public class LocalCorrelationFilter {
           Array.zero(gpad);
           applyWindow(w1,w2,w3,m1c,m2c,m3c,f,n1h+j1f,n2h+j2f,j3f+n3h,fpad);
           applyWindow(w1,w2,w3,m1c,m2c,m3c,g,n1h+j1g,n2h+j2g,j3g+n3h,gpad);
-          fft1.realToComplex1(-1,n2f,n3f,fpad,fpad);
-          fft1.realToComplex1(-1,n2g,n3g,gpad,gpad);
-          fft2.complexToComplex2(-1,n1fft/2+1,n3f,fpad,fpad);
-          fft2.complexToComplex2(-1,n1fft/2+1,n3g,gpad,gpad);
+          fft1.realToComplex1(-1,n2p,n3p,fpad,fpad);
+          fft1.realToComplex1(-1,n2p,n3p,gpad,gpad);
+          fft2.complexToComplex2(-1,n1fft/2+1,n3p,fpad,fpad);
+          fft2.complexToComplex2(-1,n1fft/2+1,n3p,gpad,gpad);
           fft3.complexToComplex3(-1,n1fft/2+1,n2fft,fpad,fpad);
           fft3.complexToComplex3(-1,n1fft/2+1,n2fft,gpad,gpad);
           for (int i3=0; i3<n3fft; ++i3) {
@@ -855,6 +858,33 @@ public class LocalCorrelationFilter {
         }
       }
     }
+  }
+
+  public void applyWindow(
+    int jf, float[] f, 
+    int jg, float[] g) 
+  {
+    float[] w1 = makeGaussianWindow(_sigma1);
+    applyWindow(w1,jf,f,jg,g);
+  }
+
+  public void applyWindow(
+    int j1f, int j2f, float[][] f, 
+    int j1g, int j2g, float[][] g) 
+  {
+    float[] w1 = makeGaussianWindow(_sigma1);
+    float[] w2 = makeGaussianWindow(_sigma2);
+    applyWindow(w1,w2,j1f,j2f,f,j1g,j2g,g);
+  }
+
+  public void applyWindow(
+    int j1f, int j2f, int j3f, float[][][] f, 
+    int j1g, int j2g, int j3g, float[][][] g) 
+  {
+    float[] w1 = makeGaussianWindow(_sigma1);
+    float[] w2 = makeGaussianWindow(_sigma2);
+    float[] w3 = makeGaussianWindow(_sigma3);
+    applyWindow(w1,w2,w3,j1f,j2f,j3f,f,j1g,j2g,j3g,g);
   }
 
   ///////////////////////////////////////////////////////////////////////////
