@@ -165,6 +165,7 @@ public class Jnicpp extends MatchingTask {
   private List<Incarg> _incargs = new ArrayList<Incarg>();
   private List<Libarg> _libargs = new ArrayList<Libarg>();
   private static boolean _isLinux;
+  private static boolean _isMacOSX;
   private static boolean _isWindows;
   static {
     /*
@@ -176,6 +177,9 @@ public class Jnicpp extends MatchingTask {
     _isLinux = osName.equals("Linux");;
     // TODO: handle other Windows OS
     _isWindows = osName.equals("Windows XP");;
+    _isMacOSX = osName.equals("Mac OS X");;
+    if (!_isLinux  && !_isWindows && !_isMacOSX)
+      throw new RuntimeException("cannot recognize "+System.getProperty("os.name"));
   }
 
   private void throwBuildException(String message) throws BuildException {
@@ -212,7 +216,7 @@ public class Jnicpp extends MatchingTask {
   private void compile(File objFile, File cppFile, String[] incArgs) 
     throws BuildException 
   {
-    if (_isLinux) {
+    if (_isLinux || _isMacOSX) {
       compileGcc(objFile,cppFile,incArgs);
     } else if (_isWindows) {
       if (USING_MINGW)
@@ -264,7 +268,7 @@ public class Jnicpp extends MatchingTask {
   private void link(File jniFile, String[] objFiles, String[] libArgs) 
     throws BuildException 
   {
-    if (_isLinux) {
+    if (_isLinux || _isMacOSX) {
       linkGcc(jniFile,objFiles,libArgs);
     } else if (_isWindows) {
       if (USING_MINGW)
@@ -327,10 +331,12 @@ public class Jnicpp extends MatchingTask {
 
   // JNI shared library name.
   private File makeJniFile(File jnidir, String jniname) {
-    if (_isLinux) {
+    if (_isLinux || _isMacOSX) {
       return makeJniFileLinux(jnidir,jniname);
-    } else {
+    } else if (_isWindows) {
       return makeJniFileWindows(jnidir,jniname);
+    } else {
+      return null;
     }
   }
   private File makeJniFileLinux(File jnidir, String jniname) {
