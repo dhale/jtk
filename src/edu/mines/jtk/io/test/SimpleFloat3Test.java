@@ -28,9 +28,10 @@ public class SimpleFloat3Test extends TestCase {
     int n3 = 12;
     float[][][] a = Array.randfloat(n1,n2,n3);
     SimpleFloat3 sf3 = new SimpleFloat3(a);
-    test1(sf3,a);
-    test2(sf3,a);
-    test3(sf3,a);
+    float[][][] c = Array.copy(a);
+    test1(sf3,c);
+    test2(sf3,c);
+    test3(sf3,c);
   }
 
   public void testRandom() {
@@ -39,9 +40,10 @@ public class SimpleFloat3Test extends TestCase {
     int n3 = 12;
     float[][][] a = Array.randfloat(n1,n2,n3);
     SimpleFloat3 sf3 = new SimpleFloat3(a);
-    testRandom1(sf3,a);
-    testRandom2(sf3,a);
-    testRandom3(sf3,a);
+    float[][][] c = Array.copy(a);
+    testRandom1(sf3,c);
+    testRandom2(sf3,c);
+    testRandom3(sf3,c);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -49,82 +51,6 @@ public class SimpleFloat3Test extends TestCase {
 
   private Random _random = new Random();
   private static final int NTRIAL = 10000;
-
-  private void testRandom1(Float3 f3, float[][][] a) {
-    int n1 = f3.getN1();
-    int n2 = f3.getN2();
-    int n3 = f3.getN3();
-    int ntrial = NTRIAL;
-    float[] b = new float[n1*n2*n3];
-    for (int itrial=0; itrial<ntrial; ++itrial) {
-      int m1 = 1+_random.nextInt(n1-1);
-      int m2 = 1+_random.nextInt(n2-1);
-      int m3 = 1+_random.nextInt(n3-1);
-      int j1 = _random.nextInt(n1-m1);
-      int j2 = _random.nextInt(n2-m2);
-      int j3 = _random.nextInt(n3-m3);
-      f3.get(m1,m2,m3,j1,j2,j3,b);
-      assertEqual(m1,m2,m3,j1,j2,j3,a,b);
-    }
-  }
-
-  private void testRandom2(Float3 f3, float[][][] a) {
-    int n1 = f3.getN1();
-    int n2 = f3.getN2();
-    int n3 = f3.getN3();
-    int ntrial = NTRIAL;
-    float[][] b12 = new float[n2][n1];
-    for (int itrial=0; itrial<ntrial; ++itrial) {
-      int m1 = 1+_random.nextInt(n1-1);
-      int m2 = 1+_random.nextInt(n2-1);
-      int m3 = 1;
-      int j1 = _random.nextInt(n1-m1);
-      int j2 = _random.nextInt(n2-m2);
-      int j3 = _random.nextInt(n3-m3);
-      f3.get(m1,m2,m3,j1,j2,j3,b12);
-      assertEqual(m1,m2,m3,j1,j2,j3,a,b12);
-    }
-    float[][] b13 = new float[n3][n1];
-    for (int itrial=0; itrial<ntrial; ++itrial) {
-      int m1 = 1+_random.nextInt(n1-1);
-      int m2 = 1;
-      int m3 = 1+_random.nextInt(n3-1);
-      int j1 = _random.nextInt(n1-m1);
-      int j2 = _random.nextInt(n2-m2);
-      int j3 = _random.nextInt(n3-m3);
-      f3.get(m1,m2,m3,j1,j2,j3,b13);
-      assertEqual(m1,m2,m3,j1,j2,j3,a,b13);
-    }
-    float[][] b23 = new float[n3][n2];
-    for (int itrial=0; itrial<ntrial; ++itrial) {
-      int m1 = 1;
-      int m2 = 1+_random.nextInt(n2-1);
-      int m3 = 1+_random.nextInt(n3-1);
-      int j1 = _random.nextInt(n1-m1);
-      int j2 = _random.nextInt(n2-m2);
-      int j3 = _random.nextInt(n3-m3);
-      f3.get(m1,m2,m3,j1,j2,j3,b23);
-      assertEqual(m1,m2,m3,j1,j2,j3,a,b23);
-    }
-  }
-
-  private void testRandom3(Float3 f3, float[][][] a) {
-    int n1 = f3.getN1();
-    int n2 = f3.getN2();
-    int n3 = f3.getN3();
-    int ntrial = NTRIAL;
-    float[][][] b = new float[n3][n2][n1];
-    for (int itrial=0; itrial<ntrial; ++itrial) {
-      int m1 = 1+_random.nextInt(n1-1);
-      int m2 = 1+_random.nextInt(n2-1);
-      int m3 = 1+_random.nextInt(n3-1);
-      int j1 = _random.nextInt(n1-m1);
-      int j2 = _random.nextInt(n2-m2);
-      int j3 = _random.nextInt(n3-m3);
-      f3.get(m1,m2,m3,j1,j2,j3,b);
-      assertEqual(m1,m2,m3,j1,j2,j3,a,b);
-    }
-  }
 
   private void test1(Float3 f3, float[][][] a) {
     int n1 = f3.getN1();
@@ -134,6 +60,7 @@ public class SimpleFloat3Test extends TestCase {
     for (int i3=0; i3<n3; ++i3) {
       for (int i2=0; i2<n2; ++i2) {
         f3.get(     n1,1,1,0,i2,i3,b1);
+        f3.set(     n1,1,1,0,i2,i3,b1);
         assertEqual(n1,1,1,0,i2,i3,a,b1);
       }
     }
@@ -141,6 +68,7 @@ public class SimpleFloat3Test extends TestCase {
     for (int i3=0; i3<n3; ++i3) {
       for (int i1=0; i1<n1; ++i1) {
         f3.get(     1,n2,1,i1,0,i3,b2);
+        f3.set(     1,n2,1,i1,0,i3,b2);
         assertEqual(1,n2,1,i1,0,i3,a,b2);
       }
     }
@@ -148,6 +76,7 @@ public class SimpleFloat3Test extends TestCase {
     for (int i2=0; i2<n2; ++i2) {
       for (int i1=0; i1<n1; ++i1) {
         f3.get(     1,1,n3,i1,i2,0,b3);
+        f3.set(     1,1,n3,i1,i2,0,b3);
         assertEqual(1,1,n3,i1,i2,0,a,b3);
       }
     }
@@ -181,6 +110,87 @@ public class SimpleFloat3Test extends TestCase {
     float[][][] b123 = new float[n3][n2][n1];
     f3.get(     n1,n2,n3,0,0,0,b123);
     assertEqual(n1,n2,n3,0,0,0,a,b123);
+  }
+
+  private void testRandom1(Float3 f3, float[][][] a) {
+    int n1 = f3.getN1();
+    int n2 = f3.getN2();
+    int n3 = f3.getN3();
+    int ntrial = NTRIAL;
+    float[] b = new float[n1*n2*n3];
+    for (int itrial=0; itrial<ntrial; ++itrial) {
+      int m1 = 1+_random.nextInt(n1-1);
+      int m2 = 1+_random.nextInt(n2-1);
+      int m3 = 1+_random.nextInt(n3-1);
+      int j1 = _random.nextInt(n1-m1);
+      int j2 = _random.nextInt(n2-m2);
+      int j3 = _random.nextInt(n3-m3);
+      f3.get(m1,m2,m3,j1,j2,j3,b);
+      f3.set(m1,m2,m3,j1,j2,j3,b);
+      assertEqual(m1,m2,m3,j1,j2,j3,a,b);
+    }
+  }
+
+  private void testRandom2(Float3 f3, float[][][] a) {
+    int n1 = f3.getN1();
+    int n2 = f3.getN2();
+    int n3 = f3.getN3();
+    int ntrial = NTRIAL;
+    float[][] b12 = new float[n2][n1];
+    for (int itrial=0; itrial<ntrial; ++itrial) {
+      int m1 = 1+_random.nextInt(n1-1);
+      int m2 = 1+_random.nextInt(n2-1);
+      int m3 = 1;
+      int j1 = _random.nextInt(n1-m1);
+      int j2 = _random.nextInt(n2-m2);
+      int j3 = _random.nextInt(n3-m3);
+      f3.get(m1,m2,m3,j1,j2,j3,b12);
+      f3.set(m1,m2,m3,j1,j2,j3,b12);
+      assertEqual(m1,m2,m3,j1,j2,j3,a,b12);
+    }
+    float[][] b13 = new float[n3][n1];
+    for (int itrial=0; itrial<ntrial; ++itrial) {
+      int m1 = 1+_random.nextInt(n1-1);
+      int m2 = 1;
+      int m3 = 1+_random.nextInt(n3-1);
+      int j1 = _random.nextInt(n1-m1);
+      int j2 = _random.nextInt(n2-m2);
+      int j3 = _random.nextInt(n3-m3);
+      f3.get(m1,m2,m3,j1,j2,j3,b13);
+      f3.set(m1,m2,m3,j1,j2,j3,b13);
+      assertEqual(m1,m2,m3,j1,j2,j3,a,b13);
+    }
+    float[][] b23 = new float[n3][n2];
+    for (int itrial=0; itrial<ntrial; ++itrial) {
+      int m1 = 1;
+      int m2 = 1+_random.nextInt(n2-1);
+      int m3 = 1+_random.nextInt(n3-1);
+      int j1 = _random.nextInt(n1-m1);
+      int j2 = _random.nextInt(n2-m2);
+      int j3 = _random.nextInt(n3-m3);
+      f3.get(m1,m2,m3,j1,j2,j3,b23);
+      f3.set(m1,m2,m3,j1,j2,j3,b23);
+      assertEqual(m1,m2,m3,j1,j2,j3,a,b23);
+    }
+  }
+
+  private void testRandom3(Float3 f3, float[][][] a) {
+    int n1 = f3.getN1();
+    int n2 = f3.getN2();
+    int n3 = f3.getN3();
+    int ntrial = NTRIAL;
+    float[][][] b = new float[n3][n2][n1];
+    for (int itrial=0; itrial<ntrial; ++itrial) {
+      int m1 = 1+_random.nextInt(n1-1);
+      int m2 = 1+_random.nextInt(n2-1);
+      int m3 = 1+_random.nextInt(n3-1);
+      int j1 = _random.nextInt(n1-m1);
+      int j2 = _random.nextInt(n2-m2);
+      int j3 = _random.nextInt(n3-m3);
+      f3.get(m1,m2,m3,j1,j2,j3,b);
+      f3.set(m1,m2,m3,j1,j2,j3,b);
+      assertEqual(m1,m2,m3,j1,j2,j3,a,b);
+    }
   }
 
   private static void assertEqual(

@@ -42,7 +42,7 @@ public interface Float3 {
    * @param j1 index of first element in 1st dimension of subarray.
    * @param j2 index of first element in 2nd dimension of subarray.
    * @param j3 index of first element in 3rd dimension of subarray.
-   * @param s array containing the elements of the specified subarray.
+   * @param s array[m1*m2*m3] of elements of the specified subarray.
    */
   public void get(
     int m1, int m2, int m3, 
@@ -51,15 +51,17 @@ public interface Float3 {
 
   /**
    * Gets the specified subarray of elements into the specified array.
-   * The length of the array must be at least m1*m2*m3.
-   * One of the dimensions m1, m2, or m3 must equal 1.
+   * At least one of the dimensions m1, m2, or m3 must equal 1.
    * @param m1 number of elements in 1st dimension of subarray.
    * @param m2 number of elements in 2nd dimension of subarray.
    * @param m3 number of elements in 3rd dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
    * @param j2 index of first element in 2nd dimension of subarray.
    * @param j3 index of first element in 3rd dimension of subarray.
-   * @param s array containing the elements of the specified subarray.
+   * @param s array[ma][mb] of elements of the specified subarray.
+   *  If m1==1, then ma&gt;=m3 and mb&gt;m2; 
+   *  else if m2==1, then ma&gt;=m3 and mb&gt;=m1;
+   *  else (m3==1), then ma&gt;=m2 and mb&gt;=m1.
    */
   public void get(
     int m1, int m2, int m3, 
@@ -68,6 +70,21 @@ public interface Float3 {
 
   /**
    * Gets the specified subarray of elements into the specified array.
+   * @param m1 number of elements in 1st dimension of subarray.
+   * @param m2 number of elements in 2nd dimension of subarray.
+   * @param m3 number of elements in 3rd dimension of subarray.
+   * @param j1 index of first element in 1st dimension of subarray.
+   * @param j2 index of first element in 2nd dimension of subarray.
+   * @param j3 index of first element in 3rd dimension of subarray.
+   * @param s array[m3][m2][m1] of elements of the specified subarray.
+   */
+  public void get(
+    int m1, int m2, int m3, 
+    int j1, int j2, int j3, 
+    float[][][] s);
+
+  /**
+   * Sets the specified subarray of elements from the specified array.
    * The length of the array must be at least m1*m2*m3.
    * @param m1 number of elements in 1st dimension of subarray.
    * @param m2 number of elements in 2nd dimension of subarray.
@@ -75,9 +92,43 @@ public interface Float3 {
    * @param j1 index of first element in 1st dimension of subarray.
    * @param j2 index of first element in 2nd dimension of subarray.
    * @param j3 index of first element in 3rd dimension of subarray.
-   * @param s array containing the elements of the specified subarray.
+   * @param s array[m1*m2*m3] of elements of the specified subarray.
    */
-  public void get(
+  public void set(
+    int m1, int m2, int m3, 
+    int j1, int j2, int j3, 
+    float[] s);
+
+  /**
+   * Sets the specified subarray of elements from the specified array.
+   * At least one of the dimensions m1, m2, or m3 must equal 1.
+   * @param m1 number of elements in 1st dimension of subarray.
+   * @param m2 number of elements in 2nd dimension of subarray.
+   * @param m3 number of elements in 3rd dimension of subarray.
+   * @param j1 index of first element in 1st dimension of subarray.
+   * @param j2 index of first element in 2nd dimension of subarray.
+   * @param j3 index of first element in 3rd dimension of subarray.
+   * @param s array[ma][mb] of elements of the specified subarray.
+   *  If m1==1, then ma&gt;=m3 and mb&gt;m2; 
+   *  else if m2==1, then ma&gt;=m3 and mb&gt;=m1;
+   *  else (m3==1), then ma&gt;=m2 and mb&gt;=m1.
+   */
+  public void set(
+    int m1, int m2, int m3, 
+    int j1, int j2, int j3, 
+    float[][] s);
+
+  /**
+   * Sets the specified subarray of elements from the specified array.
+   * @param m1 number of elements in 1st dimension of subarray.
+   * @param m2 number of elements in 2nd dimension of subarray.
+   * @param m3 number of elements in 3rd dimension of subarray.
+   * @param j1 index of first element in 1st dimension of subarray.
+   * @param j2 index of first element in 2nd dimension of subarray.
+   * @param j3 index of first element in 3rd dimension of subarray.
+   * @param s array[m3][m2][m1] of elements of the specified subarray.
+   */
+  public void set(
     int m1, int m2, int m3, 
     int j1, int j2, int j3, 
     float[][][] s);
