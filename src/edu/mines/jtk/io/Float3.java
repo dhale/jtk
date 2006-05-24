@@ -1,0 +1,84 @@
+/****************************************************************************
+Copyright (c) 2006, Colorado School of Mines and others. All rights reserved.
+This program and accompanying materials are made available under the terms of
+the Common Public License - v1.0, which accompanies this distribution, and is
+available at http://www.eclipse.org/legal/cpl-v10.html
+****************************************************************************/
+package edu.mines.jtk.io;
+
+/**
+ * A generic interface for a 3-D array of floats. This interface enables
+ * getting and setting 1-D, 2-D, and 3-D subarrays (slices) from a 3-D 
+ * array of floats that need not be resident in memory.
+ * @author Dave Hale, Colorado School of Mines
+ * @version 2006.05.24
+ */
+public interface Float3 {
+
+  /**
+   * Gets the number of elements in 1st dimension of this array.
+   * @return the number of elements in 1st dimension.
+   */
+  public int getN1();
+
+  /**
+   * Gets the number of elements in 2nd dimension of this array.
+   * @return the number of elements in 2nd dimension.
+   */
+  public int getN2();
+
+  /**
+   * Gets the number of elements in 3rd dimension of this array.
+   * @return the number of elements in 3rd dimension.
+   */
+  public int getN3();
+
+  /**
+   * Gets the specified subarray of elements into the specified array.
+   * The length of the array must be at least m1*m2*m3.
+   * @param m1 number of elements in 1st dimension of subarray.
+   * @param m2 number of elements in 2nd dimension of subarray.
+   * @param m3 number of elements in 3rd dimension of subarray.
+   * @param j1 index of first element in 1st dimension of subarray.
+   * @param j2 index of first element in 2nd dimension of subarray.
+   * @param j3 index of first element in 3rd dimension of subarray.
+   * @param s array containing the elements of the specified subarray.
+   */
+  public void get(
+    int m1, int m2, int m3, 
+    int j1, int j2, int j3, 
+    float[] s);
+
+  /**
+   * Gets the specified subarray of elements into the specified array.
+   * The length of the array must be at least m1*m2*m3.
+   * One of the dimensions m1, m2, or m3 must equal 1.
+   * @param m1 number of elements in 1st dimension of subarray.
+   * @param m2 number of elements in 2nd dimension of subarray.
+   * @param m3 number of elements in 3rd dimension of subarray.
+   * @param j1 index of first element in 1st dimension of subarray.
+   * @param j2 index of first element in 2nd dimension of subarray.
+   * @param j3 index of first element in 3rd dimension of subarray.
+   * @param s array containing the elements of the specified subarray.
+   */
+  public void get(
+    int m1, int m2, int m3, 
+    int j1, int j2, int j3, 
+    float[][] s);
+
+  /**
+   * Gets the specified subarray of elements into the specified array.
+   * The length of the array must be at least m1*m2*m3.
+   * @param m1 number of elements in 1st dimension of subarray.
+   * @param m2 number of elements in 2nd dimension of subarray.
+   * @param m3 number of elements in 3rd dimension of subarray.
+   * @param j1 index of first element in 1st dimension of subarray.
+   * @param j2 index of first element in 2nd dimension of subarray.
+   * @param j3 index of first element in 3rd dimension of subarray.
+   * @param s array containing the elements of the specified subarray.
+   */
+  public void get(
+    int m1, int m2, int m3, 
+    int j1, int j2, int j3, 
+    float[][][] s);
+}
