@@ -38,7 +38,7 @@ public interface Float3 {
   public int getN3();
 
   /**
-   * Gets the specified subarray of elements into the specified array.
+   * Gets the specified subarray of elements into the specified 1-D array.
    * @param m1 number of elements in 1st dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
    * @param j2 index of first element in 2nd dimension of subarray.
@@ -48,7 +48,7 @@ public interface Float3 {
   public void get1(int m1, int j1, int j2, int j3, float[] s);
 
   /**
-   * Gets the specified subarray of elements into the specified array.
+   * Gets the specified subarray of elements into the specified 1-D array.
    * @param m2 number of elements in 2nd dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
    * @param j2 index of first element in 2nd dimension of subarray.
@@ -58,7 +58,7 @@ public interface Float3 {
   public void get2(int m2, int j1, int j2, int j3, float[] s);
 
   /**
-   * Gets the specified subarray of elements into the specified array.
+   * Gets the specified subarray of elements into the specified 1-D array.
    * @param m3 number of elements in 3rd dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
    * @param j2 index of first element in 2nd dimension of subarray.
@@ -68,7 +68,7 @@ public interface Float3 {
   public void get3(int m3, int j1, int j2, int j3, float[] s);
 
   /**
-   * Gets the specified subarray of elements into the specified array.
+   * Gets the specified subarray of elements into the specified 2-D array.
    * @param m1 number of elements in 1st dimension of subarray.
    * @param m2 number of elements in 2nd dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
@@ -79,7 +79,7 @@ public interface Float3 {
   public void get12(int m1, int m2, int j1, int j2, int j3, float[][] s);
 
   /**
-   * Gets the specified subarray of elements into the specified array.
+   * Gets the specified subarray of elements into the specified 2-D array.
    * @param m1 number of elements in 1st dimension of subarray.
    * @param m3 number of elements in 3rd dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
@@ -90,7 +90,7 @@ public interface Float3 {
   public void get13(int m1, int m3, int j1, int j2, int j3, float[][] s);
 
   /**
-   * Gets the specified subarray of elements into the specified array.
+   * Gets the specified subarray of elements into the specified 2-D array.
    * @param m2 number of elements in 2nd dimension of subarray.
    * @param m3 number of elements in 3rd dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
@@ -101,7 +101,7 @@ public interface Float3 {
   public void get23(int m2, int m3, int j1, int j2, int j3, float[][] s);
 
   /**
-   * Gets the specified subarray of elements into the specified array.
+   * Gets the specified subarray of elements into the specified 3-D array.
    * @param m1 number of elements in 1st dimension of subarray.
    * @param m2 number of elements in 2nd dimension of subarray.
    * @param m3 number of elements in 3rd dimension of subarray.
@@ -116,7 +116,7 @@ public interface Float3 {
     float[][][] s);
 
   /**
-   * Gets the specified subarray of elements into the specified array.
+   * Gets the specified subarray of elements into the specified 1-D array.
    * The length of the array must be at least m1*m2*m3.
    * @param m1 number of elements in 1st dimension of subarray.
    * @param m2 number of elements in 2nd dimension of subarray.
@@ -132,7 +132,7 @@ public interface Float3 {
     float[] s);
 
   /**
-   * Sets the specified subarray of elements from the specified array.
+   * Sets the specified subarray of elements from the specified 1-D array.
    * @param m1 number of elements in 1st dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
    * @param j2 index of first element in 2nd dimension of subarray.
@@ -142,7 +142,7 @@ public interface Float3 {
   public void set1(int m1, int j1, int j2, int j3, float[] s);
 
   /**
-   * Sets the specified subarray of elements from the specified array.
+   * Sets the specified subarray of elements from the specified 1-D array.
    * @param m2 number of elements in 2nd dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
    * @param j2 index of first element in 2nd dimension of subarray.
@@ -152,7 +152,7 @@ public interface Float3 {
   public void set2(int m2, int j1, int j2, int j3, float[] s);
 
   /**
-   * Sets the specified subarray of elements from the specified array.
+   * Sets the specified subarray of elements from the specified 1-D array.
    * @param m3 number of elements in 3rd dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
    * @param j2 index of first element in 2nd dimension of subarray.
@@ -162,7 +162,7 @@ public interface Float3 {
   public void set3(int m3, int j1, int j2, int j3, float[] s);
 
   /**
-   * Sets the specified subarray of elements from the specified array.
+   * Sets the specified subarray of elements from the specified 2-D array.
    * @param m1 number of elements in 1st dimension of subarray.
    * @param m2 number of elements in 2nd dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
@@ -173,7 +173,7 @@ public interface Float3 {
   public void set12(int m1, int m2, int j1, int j2, int j3, float[][] s);
 
   /**
-   * Sets the specified subarray of elements from the specified array.
+   * Sets the specified subarray of elements from the specified 2-D array.
    * @param m1 number of elements in 1st dimension of subarray.
    * @param m3 number of elements in 3rd dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
@@ -184,7 +184,7 @@ public interface Float3 {
   public void set13(int m1, int m3, int j1, int j2, int j3, float[][] s);
 
   /**
-   * Sets the specified subarray of elements from the specified array.
+   * Sets the specified subarray of elements from the specified 2-D array.
    * @param m2 number of elements in 2nd dimension of subarray.
    * @param m3 number of elements in 3rd dimension of subarray.
    * @param j1 index of first element in 1st dimension of subarray.
@@ -195,7 +195,7 @@ public interface Float3 {
   public void set23(int m2, int m3, int j1, int j2, int j3, float[][] s);
 
   /**
-   * Sets the specified subarray of elements from the specified array.
+   * Sets the specified subarray of elements from the specified 3-D array.
    * @param m1 number of elements in 1st dimension of subarray.
    * @param m2 number of elements in 2nd dimension of subarray.
    * @param m3 number of elements in 3rd dimension of subarray.
@@ -210,7 +210,7 @@ public interface Float3 {
     float[][][] s);
 
   /**
-   * Sets the specified subarray of elements from the specified array.
+   * Sets the specified subarray of elements from the specified 1-D array.
    * The length of the array must be at least m1*m2*m3.
    * @param m1 number of elements in 1st dimension of subarray.
    * @param m2 number of elements in 2nd dimension of subarray.
