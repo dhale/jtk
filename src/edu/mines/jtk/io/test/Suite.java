@@ -19,6 +19,7 @@ public class Suite extends TestSuite {
     TestSuite suite = new TestSuite();
 
     suite.addTestSuite(DataFileTest.class);
+    suite.addTestSuite(SimpleFloat3Test.class);
 
     return suite;
   }
