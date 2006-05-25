@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.opengl;
 
 import java.awt.Canvas;
+import java.util.ArrayList;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -96,12 +97,20 @@ public class GlContext {
   /**
    * Dispose this context.
    */
-  public void dispose() {
+  public synchronized void dispose() {
     Check.state(_peer!=0,"this OpenGL context has not been disposed");
     Check.state(!_locked,"this OpenGL context is not locked in any thread");
     killGlContext(_peer);
     _peer = 0;
     _gotProcAddresses = false;
+  }
+
+  /**
+   * Determines whether this context has been disposed.
+   * @return true, if disposed; false, otherwise.
+   */
+  public boolean isDisposed() {
+    return _peer==0;
   }
 
   ///////////////////////////////////////////////////////////////////////////

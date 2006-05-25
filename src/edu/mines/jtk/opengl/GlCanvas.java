@@ -60,7 +60,7 @@ public class GlCanvas extends Canvas {
   /**
    * Dispose this context.
    */
-  public void dispose() {
+  public synchronized void dispose() {
     _context.dispose();
   }
 
