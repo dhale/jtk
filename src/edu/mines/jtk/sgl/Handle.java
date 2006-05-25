@@ -31,9 +31,9 @@ import static edu.mines.jtk.opengl.Gl.*;
  * children within its local coordinate system.
  * <p>
  * A handle is a group node, because the child leaf nodes of each handle 
- * subclass are typically  shared by instances of that subclass. Then, any 
+ * subclass are typically shared by instances of that subclass. Then, any 
  * changes to the shared node children are conveniently reflected in all 
- * handles of that class. Often, a handle subclass has a single leaf node 
+ * handles of that class. Often a handle subclass has a single leaf node 
  * child.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.06.30
