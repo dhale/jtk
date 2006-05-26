@@ -35,27 +35,36 @@ public class AxisAlignedQuad extends Group implements Selectable {
 
   /**
    * Constructs an axis-aligned quad with specified axis and corner points.
+   * Sets the coordinate for the specified constant axis to the average of 
+   * the corresponding corner point coordinates.
    * @param axis the coordinate that is constant for this quad.
    * @param qa a corner point.
    * @param qb a corner point.
    */
   public AxisAlignedQuad(Constant axis, Point3 qa, Point3 qb) {
-    set(axis,qa,qb);
+    _axis = axis;
+    setCorners(qa,qb);
     _frame = new Frame();
     addChild(_frame);
   }
 
-  public void set(Constant axis, Point3 qa, Point3 qb) {
+  /**
+   * Sets the corner points of this quad. Sets the coordinate for the 
+   * constant axis to the average of the corresponding corner point 
+   * coordinates.
+   * @param qa a corner point.
+   * @param qb a corner point.
+   */
+  public void setCorners(Point3 qa, Point3 qb) {
     Point3 qmin = new Point3(min(qa.x,qb.x),min(qa.y,qb.y),min(qa.z,qb.z));
     Point3 qmax = new Point3(max(qa.x,qb.x),max(qa.y,qb.y),max(qa.z,qb.z));
-    _axis = axis;
-    if (axis==Constant.X) {
+    if (_axis==Constant.X) {
       double x = 0.5*(qmin.x+qmax.x);
       _q00 = new Point3(x,qmin.y,qmin.z);
       _q10 = new Point3(x,qmax.y,qmin.z);
       _q01 = new Point3(x,qmin.y,qmax.z);
       _q11 = new Point3(x,qmax.y,qmax.z);
-    } else if (axis==Constant.Y) {
+    } else if (_axis==Constant.Y) {
       double y = 0.5*(qmin.y+qmax.y);
       _q00 = new Point3(qmin.x,y,qmin.z);
       _q10 = new Point3(qmin.x,y,qmax.z);
@@ -71,18 +80,6 @@ public class AxisAlignedQuad extends Group implements Selectable {
     updateHandles();
     dirtyBoundingSphere();
     dirtyDraw();
-  }
-
-  public void resize(Point3 qold, Point3 qnew) {
-    if (_q00.equals(qold)) {
-      set(_axis,qnew,_q11);
-    } else if (_q10.equals(qold)) {
-      set(_axis,qnew,_q01);
-    } else if (_q01.equals(qold)) {
-      set(_axis,qnew,_q10);
-    } else if (_q11.equals(qold)) {
-      set(_axis,qnew,_q00);
-    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -171,9 +168,16 @@ public class AxisAlignedQuad extends Group implements Selectable {
 
     public void drag(DragContext dc) {
       Check.state(_mouseOnPlane!=null,"dragging");
-      Point3 qold = getLocation();
       Point3 qnew = _mouseOnPlane.getPoint(dc.getMouseEvent());
-      resize(qold,qnew);
+      if (this==_h00) {
+        setCorners(qnew,_q11);
+      } else if (this==_h10) {
+        setCorners(qnew,_q01);
+      } else if (this==_h01) {
+        setCorners(qnew,_q10);
+      } else if (this==_h11) {
+        setCorners(qnew,_q00);
+      }
     }
 
     public void dragEnd(DragContext dc) {
