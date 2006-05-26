@@ -377,6 +377,15 @@ public class Sampling {
   }
 
   /**
+   * Returns the value of the sample nearest to the specified value.
+   * @param x the value.
+   * @return the value of the nearest sample.
+   */
+  public double valueOfNearest(double x) {
+    return getValue(indexOfNearest(x));
+  }
+
+  /**
    * Determines the overlap between this sampling and the specified sampling.
    * Both the specified sampling and this sampling represent a first-to-last
    * range of sample values. The overlap is a contiguous set of samples that 
