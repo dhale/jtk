@@ -25,9 +25,9 @@ import static edu.mines.jtk.opengl.Gl.*;
  * <p>
  * The world-to-unit-sphere transform centers and normalizes the world. 
  * A world drawn by an orbit view has a world sphere that, by default, is 
- * the bounding sphere of the world. The world-to-unit-sphere transform 
- * first translates the world sphere's center to the origin, and then 
- * scales the world sphere to have unit radius. The purpose of this 
+ * the bounding sphere of the world when first viewed. The world-to-unit-
+ * sphere transform first translates the world sphere's center to the origin, 
+ * and then scales the world sphere to have unit radius. The purpose of this 
  * first transform is to make other orbit view parameters independent 
  * of world coordinates. To modify the world-to-unit-sphere transform, 
  * set the world sphere.
@@ -91,7 +91,8 @@ public class OrbitView extends View {
 
   /**
    * Sets the world sphere used to parameterize this view.
-   * If null (the default), the world's bounding sphere is used.
+   * If null (the default), this view uses the bounding sphere of the
+   * the world when first viewed.
    * @param worldSphere the world sphere; null, if none.
    */
   public void setWorldSphere(BoundingSphere worldSphere) {
@@ -303,9 +304,9 @@ public class OrbitView extends View {
     _worldToUnitSphere = Matrix44.identity();
     World world = getWorld();
     if (world!=null) {
+      if (_worldSphere==null)
+        _worldSphere = world.getBoundingSphere(true);
       BoundingSphere ws = _worldSphere;
-      if (ws==null)
-        ws = world.getBoundingSphere(true);
       Point3 c = (!ws.isEmpty())?ws.getCenter():new Point3();
       double tx = -c.x;
       double ty = -c.y;

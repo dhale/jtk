@@ -11,6 +11,7 @@ import java.awt.event.*;
 import java.nio.*;
 import java.util.*;
 import javax.swing.*;
+import static java.lang.Math.*;
 
 import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.gui.*;
@@ -32,11 +33,21 @@ public class AxisAlignedQuad extends Group implements Selectable {
     X,Y,Z
   };
 
-  public AxisAlignedQuad(Constant axis, Point3 qmin, Point3 qmax) {
-    Check.argument(axis==Constant.X && qmin.y<=qmax.y && qmin.z<=qmax.z ||
-                   axis==Constant.Y && qmin.x<=qmax.x && qmin.z<=qmax.z ||
-                   axis==Constant.Z && qmin.x<=qmax.x && qmin.y<=qmax.y,
-                   "points qmin and qmax are valid");
+  /**
+   * Constructs an axis-aligned quad with specified axis and corner points.
+   * @param axis the coordinate that is constant for this quad.
+   * @param qa a corner point.
+   * @param qb a corner point.
+   */
+  public AxisAlignedQuad(Constant axis, Point3 qa, Point3 qb) {
+    set(axis,qa,qb);
+    _frame = new Frame();
+    addChild(_frame);
+  }
+
+  public void set(Constant axis, Point3 qa, Point3 qb) {
+    Point3 qmin = new Point3(min(qa.x,qb.x),min(qa.y,qb.y),min(qa.z,qb.z));
+    Point3 qmax = new Point3(max(qa.x,qb.x),max(qa.y,qb.y),max(qa.z,qb.z));
     _axis = axis;
     if (axis==Constant.X) {
       double x = 0.5*(qmin.x+qmax.x);
@@ -57,12 +68,21 @@ public class AxisAlignedQuad extends Group implements Selectable {
       _q01 = new Point3(qmin.x,qmax.y,z);
       _q11 = new Point3(qmax.x,qmax.y,z);
     }
-    _h00 = new Handle(_q00);
-    _h10 = new Handle(_q10);
-    _h01 = new Handle(_q01);
-    _h11 = new Handle(_q11);
-    _frame = new Frame();
-    addChild(_frame);
+    updateHandles();
+    dirtyBoundingSphere();
+    dirtyDraw();
+  }
+
+  public void resize(Point3 qold, Point3 qnew) {
+    if (_q00.equals(qold)) {
+      set(_axis,qnew,_q11);
+    } else if (_q10.equals(qold)) {
+      set(_axis,qnew,_q01);
+    } else if (_q01.equals(qold)) {
+      set(_axis,qnew,_q10);
+    } else if (_q11.equals(qold)) {
+      set(_axis,qnew,_q00);
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -83,6 +103,7 @@ public class AxisAlignedQuad extends Group implements Selectable {
   private Constant _axis;
   private Point3 _q00,_q10,_q01,_q11;
   private Handle _h00,_h10,_h01,_h11;
+  private boolean _handlesVisible;
   private Frame _frame;
 
   private class Frame extends Node {
@@ -122,6 +143,9 @@ public class AxisAlignedQuad extends Group implements Selectable {
     }
   }
 
+  ///////////////////////////////////////////////////////////////////////////
+  // handles
+
   private class Handle extends HandleBox implements Dragable {
     Handle(Point3 p) {
       super(p);
@@ -147,8 +171,9 @@ public class AxisAlignedQuad extends Group implements Selectable {
 
     public void drag(DragContext dc) {
       Check.state(_mouseOnPlane!=null,"dragging");
-      Point3 p = _mouseOnPlane.getPoint(dc.getMouseEvent());
-      setLocation(p);
+      Point3 qold = getLocation();
+      Point3 qnew = _mouseOnPlane.getPoint(dc.getMouseEvent());
+      resize(qold,qnew);
     }
 
     public void dragEnd(DragContext dc) {
@@ -158,22 +183,38 @@ public class AxisAlignedQuad extends Group implements Selectable {
     private MouseOnPlane _mouseOnPlane;
   }
 
+  private void updateHandles() {
+    if (_h00==null) {
+      _h00 = new Handle(_q00);
+      _h10 = new Handle(_q10);
+      _h01 = new Handle(_q01);
+      _h11 = new Handle(_q11);
+    } else {
+      _h00.setLocation(_q00);
+      _h10.setLocation(_q10);
+      _h01.setLocation(_q01);
+      _h11.setLocation(_q11);
+    }
+  }
+
   private void showHandles() {
-    _h00.setLocation(_q00);
-    _h10.setLocation(_q10);
-    _h01.setLocation(_q01);
-    _h11.setLocation(_q11);
-    addChild(_h00);
-    addChild(_h10);
-    addChild(_h01);
-    addChild(_h11);
+    if (!_handlesVisible) {
+      addChild(_h00);
+      addChild(_h10);
+      addChild(_h01);
+      addChild(_h11);
+      _handlesVisible = true;
+    }
   }
 
   private void hideHandles() {
-    removeChild(_h00);
-    removeChild(_h10);
-    removeChild(_h01);
-    removeChild(_h11);
+    if (_handlesVisible) {
+      removeChild(_h00);
+      removeChild(_h10);
+      removeChild(_h01);
+      removeChild(_h11);
+      _handlesVisible = false;
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
