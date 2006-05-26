@@ -48,9 +48,14 @@ public class MouseOnLine extends MouseConstrained {
     Point3 mouseNear = mouseSegment.getA();
     Point3 mouseFar = mouseSegment.getB();
     Vector3 mouseVector = mouseFar.minus(mouseNear).normalize();
-    _mode = (abs(mouseVector.dot(vector)))<0.867?Mode.NEAREST:Mode.PUSH_PULL;
+    double d = mouseVector.dot(_vector);
+    if (d<0.0) {
+      d = -d;
+      _vector.negateEquals();
+    }
+    _mode = (d<0.867)?Mode.NEAREST:Mode.PUSH_PULL;
     _length = mouseSegment.length();
-    _delta = origin.minus(getPointOnLine(event,null));
+    _delta = origin.minus(getPointOnLine(event));
   }
 
   /**
@@ -59,7 +64,7 @@ public class MouseOnLine extends MouseConstrained {
    * @return the point, in local coordinates.
    */
   public Point3 getPoint(MouseEvent event) {
-    return getPointOnLine(event,_delta);
+    return getPointOnLine(event).plusEquals(_delta);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -78,7 +83,7 @@ public class MouseOnLine extends MouseConstrained {
   private double _length; // length of initial mouse segment
   private Mode _mode; // either nearest or push-pull
 
-  private Point3 getPointOnLine(MouseEvent event, Vector3 delta) {
+  private Point3 getPointOnLine(MouseEvent event) {
     Point3 point = null;
 
     // If mode is nearest, ...
@@ -109,13 +114,9 @@ public class MouseOnLine extends MouseConstrained {
       Canvas canvas = (Canvas)event.getSource();
       double height = canvas.getHeight();
       double ymouse = event.getY();
-      double scale = (_ymouse-ymouse)/height;
+      double scale = 0.05*(_ymouse-ymouse)/height;
       point = _origin.plus(_vector.times(scale*_length));
     }
-
-    // Offset point by vector delta, if specified.
-    if (delta!=null)
-      point.plusEquals(delta);
 
     return point;
   }

@@ -23,7 +23,7 @@ import static edu.mines.jtk.opengl.Gl.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.05.25
  */
-public class AxisAlignedQuad extends Group implements Selectable {
+public class AxisAlignedQuad extends Group implements Selectable, Dragable {
 
   /**
    * The coordinate that is constant for this quad. An axis-aligned quad 
@@ -35,8 +35,9 @@ public class AxisAlignedQuad extends Group implements Selectable {
 
   /**
    * Constructs an axis-aligned quad with specified axis and corner points.
-   * Sets the coordinate for the specified constant axis to the average of 
-   * the corresponding corner point coordinates.
+   * The specified corner points need not lie within a single axis-aligned 
+   * plane. In that case, the coordinate for the constant axis of this quad 
+   * is set to the average of the corresponding corner point coordinates.
    * @param axis the coordinate that is constant for this quad.
    * @param qa a corner point.
    * @param qb a corner point.
@@ -49,9 +50,10 @@ public class AxisAlignedQuad extends Group implements Selectable {
   }
 
   /**
-   * Sets the corner points of this quad. Sets the coordinate for the 
-   * constant axis to the average of the corresponding corner point 
-   * coordinates.
+   * Sets the corner points of this quad. 
+   * The specified corner points need not lie within a single axis-aligned 
+   * plane. In that case, the coordinate for the constant axis of this quad 
+   * is set to the average of the corresponding corner point coordinates.
    * @param qa a corner point.
    * @param qb a corner point.
    */
@@ -82,6 +84,34 @@ public class AxisAlignedQuad extends Group implements Selectable {
     dirtyDraw();
   }
 
+  /**
+   * Moves this quad by adding the specified vector to its corner points.
+   * @param v the vector.
+   */
+  public void move(Vector3 v) {
+    _q00.plusEquals(v);
+    _q10.plusEquals(v);
+    _q01.plusEquals(v);
+    _q11.plusEquals(v);
+    updateHandles();
+    dirtyBoundingSphere();
+    dirtyDraw();
+  }
+
+  public void dragBegin(DragContext dc) {
+    _dragger = new Dragger();
+    _dragger.dragBegin(dc);
+  }
+
+  public void drag(DragContext dc) {
+    _dragger.drag(dc);
+  }
+
+  public void dragEnd(DragContext dc) {
+    _dragger.dragEnd(dc);
+    _dragger = null;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
 
@@ -100,17 +130,57 @@ public class AxisAlignedQuad extends Group implements Selectable {
   private Constant _axis;
   private Point3 _q00,_q10,_q01,_q11;
   private Handle _h00,_h10,_h01,_h11;
-  private boolean _handlesVisible;
   private Frame _frame;
+  private boolean _handlesVisible;
+  private Dragger _dragger;
+
+  ///////////////////////////////////////////////////////////////////////////
+  // dragger for quad
+
+  private class Dragger implements Dragable {
+    public void dragBegin(DragContext dc) {
+      Point3 origin = dc.getPointWorld();
+      Vector3 normal = null;
+      if (_axis==Constant.X) {
+        normal = new Vector3(1.0,0.0,0.0);
+      } else if (_axis==Constant.Y) {
+        normal = new Vector3(0.0,1.0,0.0);
+      } else if (_axis==Constant.Z) {
+        normal = new Vector3(0.0,0.0,1.0);
+      }
+      Plane plane = new Plane(origin,normal);
+      MouseEvent event = dc.getMouseEvent();
+      Matrix44 worldToPixel = dc.getWorldToPixel();
+      if (event.isControlDown()) {
+        _mouseConstrained = new MouseOnLine(event,origin,normal,worldToPixel);
+      } else {
+        _mouseConstrained = new MouseOnPlane(event,origin,plane,worldToPixel);
+      }
+      _origin = origin;
+    }
+    public void drag(DragContext dc) {
+      Point3 point = _mouseConstrained.getPoint(dc.getMouseEvent());
+      Vector3 vector = point.minus(_origin);
+      _origin = point;
+      move(vector);
+    }
+    public void dragEnd(DragContext dc) {
+      _mouseConstrained = null;
+      _origin = null;
+    }
+    private MouseConstrained _mouseConstrained; 
+    private Point3 _origin;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // frame for panels
 
   private class Frame extends Node {
-
     protected BoundingSphere computeBoundingSphere(boolean finite) {
       Point3 c = _q00.affine(0.5,_q10).affine(0.5,_q01.affine(0.5,_q11));
       double r = _q00.minus(c).length();
       return new BoundingSphere(c,r);
     }
-
     protected void draw(DrawContext dc) {
       glColor3f(0.0f,0.0f,1.0f);
       glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
@@ -122,7 +192,6 @@ public class AxisAlignedQuad extends Group implements Selectable {
       } glEnd();
       glFlush();
     }
-
     protected void pick(PickContext pc) {
       Segment ps = pc.getPickSegment();
       Point3 p = ps.intersectWithTriangle(
@@ -141,15 +210,13 @@ public class AxisAlignedQuad extends Group implements Selectable {
   }
 
   ///////////////////////////////////////////////////////////////////////////
-  // handles
+  // handles for resizing
 
   private class Handle extends HandleBox implements Dragable {
     Handle(Point3 p) {
       super(p);
     }
-
     public void dragBegin(DragContext dc) {
-      Check.state(_mouseOnPlane==null,"not dragging");
       Point3 p = dc.getPointWorld();
       Vector3 n = null;
       if (_axis==Constant.X) {
@@ -165,9 +232,7 @@ public class AxisAlignedQuad extends Group implements Selectable {
       Matrix44 worldToPixel = dc.getWorldToPixel();
       _mouseOnPlane = new MouseOnPlane(event,origin,plane,worldToPixel);
     }
-
     public void drag(DragContext dc) {
-      Check.state(_mouseOnPlane!=null,"dragging");
       Point3 qnew = _mouseOnPlane.getPoint(dc.getMouseEvent());
       if (this==_h00) {
         setCorners(qnew,_q11);
@@ -179,12 +244,10 @@ public class AxisAlignedQuad extends Group implements Selectable {
         setCorners(qnew,_q00);
       }
     }
-
     public void dragEnd(DragContext dc) {
       _mouseOnPlane = null;
     }
-
-    private MouseOnPlane _mouseOnPlane;
+    private MouseOnPlane _mouseOnPlane; // not null if dragging
   }
 
   private void updateHandles() {
