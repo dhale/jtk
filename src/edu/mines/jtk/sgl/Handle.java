@@ -81,6 +81,14 @@ public abstract class Handle extends Group {
   }
 
   /**
+   * Gets the view-independent location of the center of this handle.
+   * @return the center point.
+   */
+  public Point3 getLocation() {
+    return _transform.times(new Point3());
+  }
+
+  /**
    * Sets the view-independent location of the center of this handle.
    * This method conveniently sets the handle transform to a pure
    * translation to the specified center point.
@@ -100,6 +108,8 @@ public abstract class Handle extends Group {
    */
   public void setLocation(double x, double y, double z) {
     _transform = Matrix44.translate(x,y,z);
+    dirtyBoundingSphere();
+    dirtyDraw();
   }
 
   ///////////////////////////////////////////////////////////////////////////

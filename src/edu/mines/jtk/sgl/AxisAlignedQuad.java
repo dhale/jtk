@@ -57,10 +57,12 @@ public class AxisAlignedQuad extends Group implements Selectable {
       _q01 = new Point3(qmin.x,qmax.y,z);
       _q11 = new Point3(qmax.x,qmax.y,z);
     }
-    _h00 = new HandleBox(_q00);
-    _h10 = new HandleBox(_q10);
-    _h01 = new HandleBox(_q01);
-    _h11 = new HandleBox(_q11);
+    _h00 = new Handle(_q00);
+    _h10 = new Handle(_q10);
+    _h01 = new Handle(_q01);
+    _h11 = new Handle(_q11);
+    _frame = new Frame();
+    addChild(_frame);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -75,45 +77,86 @@ public class AxisAlignedQuad extends Group implements Selectable {
     dirtyDraw();
   }
 
-  protected BoundingSphere computeBoundingSphere(boolean finite) {
-    Point3 c = _q00.affine(0.5,_q10).affine(0.5,_q01.affine(0.5,_q11));
-    double r = _q00.minus(c).length();
-    return new BoundingSphere(c,r);
-  }
-
-  protected void draw(DrawContext dc) {
-    glColor3f(1.0f,1.0f,1.0f);
-    glBegin(GL_QUADS); {
-      glVertex3d(_q00.x,_q00.y,_q00.z);
-      glVertex3d(_q10.x,_q10.y,_q10.z);
-      glVertex3d(_q01.x,_q01.y,_q01.z);
-      glVertex3d(_q11.x,_q11.y,_q11.z);
-    } glEnd();
-    glFlush();
-  }
-
-  protected void pick(PickContext pc) {
-    Segment ps = pc.getPickSegment();
-    Point3 p = ps.intersectWithTriangle(
-      _q00.x,_q00.y,_q00.z,
-      _q10.x,_q10.y,_q10.z,
-      _q11.x,_q11.y,_q11.z);
-    Point3 q = ps.intersectWithTriangle(
-      _q00.x,_q00.y,_q00.z,
-      _q11.x,_q11.y,_q11.z,
-      _q01.x,_q01.y,_q01.z);
-    if (p!=null)
-      pc.addResult(p);
-    if (q!=null)
-      pc.addResult(q);
-  }
-
   ///////////////////////////////////////////////////////////////////////////
   // private
 
   private Constant _axis;
   private Point3 _q00,_q10,_q01,_q11;
-  private HandleBox _h00,_h10,_h01,_h11;
+  private Handle _h00,_h10,_h01,_h11;
+  private Frame _frame;
+
+  private class Frame extends Node {
+
+    protected BoundingSphere computeBoundingSphere(boolean finite) {
+      Point3 c = _q00.affine(0.5,_q10).affine(0.5,_q01.affine(0.5,_q11));
+      double r = _q00.minus(c).length();
+      return new BoundingSphere(c,r);
+    }
+
+    protected void draw(DrawContext dc) {
+      glColor3f(0.0f,0.0f,1.0f);
+      glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+      glBegin(GL_QUADS); {
+        glVertex3d(_q00.x,_q00.y,_q00.z);
+        glVertex3d(_q10.x,_q10.y,_q10.z);
+        glVertex3d(_q11.x,_q11.y,_q11.z);
+        glVertex3d(_q01.x,_q01.y,_q01.z);
+      } glEnd();
+      glFlush();
+    }
+
+    protected void pick(PickContext pc) {
+      Segment ps = pc.getPickSegment();
+      Point3 p = ps.intersectWithTriangle(
+        _q00.x,_q00.y,_q00.z,
+        _q10.x,_q10.y,_q10.z,
+        _q11.x,_q11.y,_q11.z);
+      Point3 q = ps.intersectWithTriangle(
+        _q00.x,_q00.y,_q00.z,
+        _q11.x,_q11.y,_q11.z,
+        _q01.x,_q01.y,_q01.z);
+      if (p!=null)
+        pc.addResult(p);
+      if (q!=null)
+        pc.addResult(q);
+    }
+  }
+
+  private class Handle extends HandleBox implements Dragable {
+    Handle(Point3 p) {
+      super(p);
+    }
+
+    public void dragBegin(DragContext dc) {
+      Check.state(_mouseOnPlane==null,"not dragging");
+      Point3 p = dc.getPointWorld();
+      Vector3 n = null;
+      if (_axis==Constant.X) {
+        n = new Vector3(1.0,0.0,0.0);
+      } else if (_axis==Constant.Y) {
+        n = new Vector3(0.0,1.0,0.0);
+      } else if (_axis==Constant.Z) {
+        n = new Vector3(0.0,0.0,1.0);
+      }
+      MouseEvent event = dc.getMouseEvent();
+      Point3 origin = getLocation();
+      Plane plane = new Plane(p,n);
+      Matrix44 worldToPixel = dc.getWorldToPixel();
+      _mouseOnPlane = new MouseOnPlane(event,origin,plane,worldToPixel);
+    }
+
+    public void drag(DragContext dc) {
+      Check.state(_mouseOnPlane!=null,"dragging");
+      Point3 p = _mouseOnPlane.getPoint(dc.getMouseEvent());
+      setLocation(p);
+    }
+
+    public void dragEnd(DragContext dc) {
+      _mouseOnPlane = null;
+    }
+
+    private MouseOnPlane _mouseOnPlane;
+  }
 
   private void showHandles() {
     _h00.setLocation(_q00);

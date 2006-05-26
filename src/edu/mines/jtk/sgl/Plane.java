@@ -39,7 +39,7 @@ public class Plane {
    * @param n the normal vector.
    */
   public Plane(Point3 p, Vector3 n) {
-    set(n.x,n.y,n.z,-(_a*p.x+_b*p.y+_c*p.z));
+    set(n.x,n.y,n.z,-(n.x*p.x+n.y*p.y+n.z*p.z));
   }
 
   /**
