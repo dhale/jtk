@@ -163,8 +163,8 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
     }
     public void drag(DragContext dc) {
       Point3 point = _mouseConstrained.getPoint(dc.getMouseEvent());
-      if (_constraint!=null)
-        _constraint.constrainPoint(point);
+      if (_constraint!=null && !_constraint.containsPoint(point))
+        return;
       Vector3 vector = point.minus(_origin);
       Point3 qa = _qa.plus(vector);
       Point3 qb = _qb.plus(vector);
@@ -240,8 +240,8 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
     }
     public void drag(DragContext dc) {
       Point3 qnew = _mouseOnPlane.getPoint(dc.getMouseEvent());
-      if (_constraint!=null)
-        _constraint.constrainPoint(qnew);
+      if (_constraint!=null && !_constraint.containsPoint(qnew))
+        return;
       if (this==_h00) {
         setCorners(qnew,_q11);
       } else if (this==_h01) {

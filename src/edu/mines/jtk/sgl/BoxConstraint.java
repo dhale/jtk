@@ -95,8 +95,19 @@ public class BoxConstraint {
   }
 
   /**
+   * Determines whether this box constraint contains the specified point.
+   * @param p the point
+   * @return true, if this box contains the point; false, otherwise.
+   */
+  public boolean containsPoint(Point3 p) {
+    return _xmin<=p.x && p.x<=_xmax &&
+           _ymin<=p.y && p.y<=_ymax &&
+           _zmin<=p.z && p.z<=_zmax;
+  }
+
+  /**
    * Constrains a specified point.
-   * @param the point.
+   * @param p the point.
    */
   public void constrainPoint(Point3 p) {
     p.x = max(_xmin,min(_xmax,p.x));
