@@ -121,10 +121,8 @@ public class BoxConstraint {
   }
 
   /**
-   * Constrains a box defined by two specified corner points.
-   * If necessary, modifies either or both of the points to satisfy
-   * this constraint. When possible, modifies the second point q
-   * more than the first point p.
+   * Constrains a box defined by two specified corner points. If necessary, 
+   * modifies either or both of the points to satisfy this constraint.
    * @param p a corner point
    * @param q a corner point
    */
