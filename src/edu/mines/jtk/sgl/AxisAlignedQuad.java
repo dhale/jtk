@@ -19,80 +19,29 @@ import edu.mines.jtk.util.*;
 import static edu.mines.jtk.opengl.Gl.*;
 
 /**
- * An axis-aligned quad that manages one or more panels.
+ * An axis-aligned quad has one frame that contains one or more panels.
  * @author Dave Hale, Colorado School of Mines
- * @version 2006.05.25
+ * @version 2006.06.01
  */
 public class AxisAlignedQuad extends Group implements Selectable, Dragable {
 
   /**
-   * The coordinate that is constant for this quad. 
-   * An axis-aligned quad lies in a plane of constant X, Y, or Z.
-   */
-  public enum Constant {
-    X,Y,Z
-  }
-
-  /**
    * Constructs an axis-aligned quad with specified axis and corner points.
-   * The specified corner points need not lie within a single axis-aligned 
-   * plane. In that case, the coordinate for the constant axis of this quad 
-   * is set to the average of the corresponding corner point coordinates.
-   * @param axis the coordinate that is constant for this quad.
+   * @param axis the axis orthogonal to the plane of this quad.
    * @param qa a corner point.
    * @param qb a corner point.
    */
-  public AxisAlignedQuad(Constant axis, Point3 qa, Point3 qb) {
-    _axis = axis;
-    setCorners(qa,qb);
-    _frame = new Frame();
+  public AxisAlignedQuad(Axis axis, Point3 qa, Point3 qb) {
+    _frame = new AxisAlignedFrame(axis,qa,qb);
     addChild(_frame);
   }
 
   /**
-   * Sets the corner points of this quad. 
-   * The specified corner points need not lie within a single axis-aligned 
-   * plane. In that case, the coordinate for the constant axis of this quad 
-   * is set to the average of the corresponding corner point coordinates.
-   * @param qa a corner point.
-   * @param qb a corner point.
+   * Gets the frame for this quad.
+   * @return the frame.
    */
-  public void setCorners(Point3 qa, Point3 qb) {
-    if (_constraint!=null) {
-      qa = new Point3(qa);
-      qb = new Point3(qb);
-      _constraint.constrainBox(qa,qb);
-    }
-    Point3 qmin = new Point3(min(qa.x,qb.x),min(qa.y,qb.y),min(qa.z,qb.z));
-    Point3 qmax = new Point3(max(qa.x,qb.x),max(qa.y,qb.y),max(qa.z,qb.z));
-    if (_axis==Constant.X) {
-      double x = 0.5*(qmin.x+qmax.x);
-      _q00 = new Point3(x,qmin.y,qmin.z);
-      _q01 = new Point3(x,qmax.y,qmin.z);
-      _q10 = new Point3(x,qmin.y,qmax.z);
-      _q11 = new Point3(x,qmax.y,qmax.z);
-    } else if (_axis==Constant.Y) {
-      double y = 0.5*(qmin.y+qmax.y);
-      _q00 = new Point3(qmin.x,y,qmin.z);
-      _q01 = new Point3(qmin.x,y,qmax.z);
-      _q10 = new Point3(qmax.x,y,qmin.z);
-      _q11 = new Point3(qmax.x,y,qmax.z);
-    } else {
-      double z = 0.5*(qmin.z+qmax.z);
-      _q00 = new Point3(qmin.x,qmin.y,z);
-      _q01 = new Point3(qmax.x,qmin.y,z);
-      _q10 = new Point3(qmin.x,qmax.y,z);
-      _q11 = new Point3(qmax.x,qmax.y,z);
-    }
-    updateHandles();
-    dirtyBoundingSphere();
-    dirtyDraw();
-  }
-
-  public void setConstraint(BoxConstraint constraint) {
-    _constraint = constraint;
-    if (_constraint!=null)
-      setCorners(_q00,_q11);
+  public AxisAlignedFrame getFrame() {
+    return _frame;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -117,22 +66,19 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
 
   protected void selectedChanged() {
     if (isSelected()) {
+      updateHandles();
       showHandles();
     } else {
       hideHandles();
     }
-    dirtyDraw();
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private Constant _axis;
-  private BoxConstraint _constraint;
-  private Point3 _q00,_q01,_q10,_q11;
-  private Handle _h00,_h01,_h10,_h11;
-  private Frame _frame;
+  private AxisAlignedFrame _frame;
   private boolean _handlesVisible;
+  private Handle[] _h = new Handle[4];
   private Dragger _dragger;
 
   ///////////////////////////////////////////////////////////////////////////
@@ -142,11 +88,12 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
     public void dragBegin(DragContext dc) {
       Point3 origin = dc.getPointWorld();
       Vector3 normal = null;
-      if (_axis==Constant.X) {
+      Axis axis = _frame.getAxis();
+      if (axis==Axis.X) {
         normal = new Vector3(1.0,0.0,0.0);
-      } else if (_axis==Constant.Y) {
+      } else if (axis==Axis.Y) {
         normal = new Vector3(0.0,1.0,0.0);
-      } else if (_axis==Constant.Z) {
+      } else if (axis==Axis.Z) {
         normal = new Vector3(0.0,0.0,1.0);
       }
       Plane plane = new Plane(origin,normal);
@@ -158,17 +105,19 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
         _mouseConstrained = new MouseOnPlane(event,origin,plane,worldToPixel);
       }
       _origin = origin;
-      _qa = _q00;
-      _qb = _q11;
+      _qa = _frame.getCorner(0);
+      _qb = _frame.getCorner(3);
     }
     public void drag(DragContext dc) {
       Point3 point = _mouseConstrained.getPoint(dc.getMouseEvent());
-      if (_constraint!=null && !_constraint.containsPoint(point))
+      BoxConstraint constraint = _frame.getBoxConstraint();
+      if (constraint!=null && !constraint.containsPoint(point))
         return;
       Vector3 vector = point.minus(_origin);
       Point3 qa = _qa.plus(vector);
       Point3 qb = _qb.plus(vector);
-      setCorners(qa,qb);
+      _frame.setCorners(qa,qb);
+      updateHandles();
     }
     public void dragEnd(DragContext dc) {
       _mouseConstrained = null;
@@ -176,43 +125,6 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
     private MouseConstrained _mouseConstrained; 
     private Point3 _origin;
     private Point3 _qa,_qb;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // frame for panels
-
-  private class Frame extends Node {
-    protected BoundingSphere computeBoundingSphere(boolean finite) {
-      Point3 c = _q00.affine(0.5,_q01).affine(0.5,_q10.affine(0.5,_q11));
-      double r = _q00.minus(c).length();
-      return new BoundingSphere(c,r);
-    }
-    protected void draw(DrawContext dc) {
-      glColor3f(0.0f,0.0f,1.0f);
-      glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-      glBegin(GL_QUADS); {
-        glVertex3d(_q00.x,_q00.y,_q00.z);
-        glVertex3d(_q01.x,_q01.y,_q01.z);
-        glVertex3d(_q11.x,_q11.y,_q11.z);
-        glVertex3d(_q10.x,_q10.y,_q10.z);
-      } glEnd();
-      glFlush();
-    }
-    protected void pick(PickContext pc) {
-      Segment ps = pc.getPickSegment();
-      Point3 p = ps.intersectWithTriangle(
-        _q00.x,_q00.y,_q00.z,
-        _q01.x,_q01.y,_q01.z,
-        _q11.x,_q11.y,_q11.z);
-      Point3 q = ps.intersectWithTriangle(
-        _q00.x,_q00.y,_q00.z,
-        _q11.x,_q11.y,_q11.z,
-        _q10.x,_q10.y,_q10.z);
-      if (p!=null)
-        pc.addResult(p);
-      if (q!=null)
-        pc.addResult(q);
-    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -225,11 +137,12 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
     public void dragBegin(DragContext dc) {
       Point3 p = dc.getPointWorld();
       Vector3 n = null;
-      if (_axis==Constant.X) {
+      Axis axis = _frame.getAxis();
+      if (axis==Axis.X) {
         n = new Vector3(1.0,0.0,0.0);
-      } else if (_axis==Constant.Y) {
+      } else if (axis==Axis.Y) {
         n = new Vector3(0.0,1.0,0.0);
-      } else if (_axis==Constant.Z) {
+      } else if (axis==Axis.Z) {
         n = new Vector3(0.0,0.0,1.0);
       }
       MouseEvent event = dc.getMouseEvent();
@@ -240,17 +153,19 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
     }
     public void drag(DragContext dc) {
       Point3 qnew = _mouseOnPlane.getPoint(dc.getMouseEvent());
-      if (_constraint!=null && !_constraint.containsPoint(qnew))
+      BoxConstraint constraint = _frame.getBoxConstraint();
+      if (constraint!=null && !constraint.containsPoint(qnew))
         return;
-      if (this==_h00) {
-        setCorners(qnew,_q11);
-      } else if (this==_h01) {
-        setCorners(qnew,_q10);
-      } else if (this==_h10) {
-        setCorners(qnew,_q01);
-      } else if (this==_h11) {
-        setCorners(qnew,_q00);
+      if (this==_h[0]) {
+        _frame.setCorners(qnew,_frame.getCorner(3));
+      } else if (this==_h[1]) {
+        _frame.setCorners(qnew,_frame.getCorner(2));
+      } else if (this==_h[2]) {
+        _frame.setCorners(qnew,_frame.getCorner(1));
+      } else if (this==_h[3]) {
+        _frame.setCorners(qnew,_frame.getCorner(0));
       }
+      updateHandles();
     }
     public void dragEnd(DragContext dc) {
       _mouseOnPlane = null;
@@ -259,36 +174,42 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
   }
 
   private void updateHandles() {
-    if (_h00==null) {
-      _h00 = new Handle(_q00);
-      _h01 = new Handle(_q01);
-      _h10 = new Handle(_q10);
-      _h11 = new Handle(_q11);
+    Point3 q0 = _frame.getCorner(0);
+    Point3 q1 = _frame.getCorner(1);
+    Point3 q2 = _frame.getCorner(2);
+    Point3 q3 = _frame.getCorner(3);
+    if (_h[0]==null) {
+      _h[0] = new Handle(q0);
+      _h[1] = new Handle(q1);
+      _h[2] = new Handle(q2);
+      _h[3] = new Handle(q3);
     } else {
-      _h00.setLocation(_q00);
-      _h01.setLocation(_q01);
-      _h10.setLocation(_q10);
-      _h11.setLocation(_q11);
+      _h[0].setLocation(q0);
+      _h[1].setLocation(q1);
+      _h[2].setLocation(q2);
+      _h[3].setLocation(q3);
     }
   }
 
   private void showHandles() {
     if (!_handlesVisible) {
-      addChild(_h00);
-      addChild(_h01);
-      addChild(_h10);
-      addChild(_h11);
       _handlesVisible = true;
+      addChild(_h[0]);
+      addChild(_h[1]);
+      addChild(_h[2]);
+      addChild(_h[3]);
+      dirtyDraw();
     }
   }
 
   private void hideHandles() {
     if (_handlesVisible) {
-      removeChild(_h00);
-      removeChild(_h01);
-      removeChild(_h10);
-      removeChild(_h11);
       _handlesVisible = false;
+      removeChild(_h[0]);
+      removeChild(_h[1]);
+      removeChild(_h[2]);
+      removeChild(_h[3]);
+      dirtyDraw();
     }
   }
 
@@ -297,25 +218,21 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
 
   private static final int SIZE = 600;
   public static void main(String[] args) {
-    AxisAlignedQuad.Constant axis = AxisAlignedQuad.Constant.Y;
     Point3 qmin = new Point3(0,0,0);
     Point3 qmax = new Point3(1,1,1);
-    AxisAlignedQuad aaq = new AxisAlignedQuad(axis,qmin,qmax);
-    //BoxConstraint bc = new BoxConstraint(qmin,qmax);
-    Sampling s = new Sampling(11,0.1,0.0);
-    BoxConstraint bc = new BoxConstraint(s,s,s);
-    bc.setMinimum(s.getDelta(),0.0,s.getDelta());
-    aaq.setConstraint(bc);
+
+    AxisAlignedQuad aaq = new AxisAlignedQuad(Axis.Y,qmin,qmax);
+    AxisAlignedFrame aaf = aaq.getFrame();
+
+    Sampling s = new Sampling(101,0.01,0.0);
+    ImageOnPanel iop = new ImageOnPanel(s,s,s,null);
+    aaf.addChild(iop);
+
     World world = new World();
     world.addChild(aaq);
 
     OrbitView view = new OrbitView(world);
-    //view.setProjection(OrbitView.Projection.ORTHOGRAPHIC);
-    //view.setAzimuthAndElevation(90.0,0.0);
-    //view.setScale(5.0);
-    //view.setWorldSphere(new BoundingSphere(0.5,0.5,0.5,4));
     view.setAxesOrientation(View.AxesOrientation.XRIGHT_YOUT_ZDOWN);
-    //view.setAxesScale(1.0,2.0,3.0);
     ViewCanvas canvas = new ViewCanvas(view);
     canvas.setView(view);
 

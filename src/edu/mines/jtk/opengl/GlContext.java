@@ -50,38 +50,51 @@ public class GlContext {
    * Locks this context. If another thread has locked this context,
    * this method waits until that lock is released.
    * @exception IllegalStateException if the current thread already 
-   *  has this or any other OpenGL context locked.
+   *  has another OpenGL context locked.
    */
   public void lock() {
     Check.state(_peer!=0,"this OpenGL context has not been disposed");
     _lock.acquire();
-    if (Gl.getContext()!=null) {
-      _lock.release();
-      Check.state(false,"the current thread has no OpenGL context locked");
+    if (_lock.holds()==1) {
+      if (Gl.getContext()!=null) {
+        _lock.release();
+        Check.state(false,"current thread has no other OpenGL context locked");
+      }
+      if (!lock(_peer)) {
+        _lock.release();
+        Check.state(false,"successfully locked OpenGL context peer");
+      }
+      _locked = true;
+      Gl.setContext(this);
+      getProcAddresses();
     }
-    if (!lock(_peer)) {
-      _lock.release();
-      Check.state(false,"successfully locked OpenGL context peer");
-    }
-    _locked = true;
-    Gl.setContext(this);
-    getProcAddresses();
   }
 
   /**
    * Unlocks this context.
    * @exception IllegalStateException if the current thread does
-   *  already have this OpenGL context locked.
+   *  not already have this OpenGL context locked.
    */
   public void unlock() {
     Check.state(_peer!=0,"this OpenGL context has not been disposed");
-    Check.state(Gl.getContext()==this,
-      "this OpenGL context is locked in current thread");
-    if (!unlock(_peer))
-      Check.state(false,"successfully unlocked OpenGL context peer");
-    Gl.setContext(null);
-    _locked = false;
+    if (_lock.holds()==1) {
+      Check.state(Gl.getContext()==this,
+        "this OpenGL context is locked in current thread");
+      if (!unlock(_peer))
+        Check.state(false,"successfully unlocked OpenGL context peer");
+      Gl.setContext(null);
+      _locked = false;
+    }
     _lock.release();
+  }
+
+  /**
+   * Determines whether the current thread has this context locked.
+   * Used only for debugging, not for synchronization.
+   * @return true, if locked; false, otherwise.
+   */
+  public boolean isLocked() {
+    return _locked;
   }
 
   /**
@@ -140,7 +153,7 @@ public class GlContext {
 
   /**
    * Stripped-down version of Doug Lea's reentrant lock.
-   * TODO: replace with JDK 5.0 standard lock.
+   * TODO: replace with JDK 5.0 standard lock?
    */
   private static class ReentrantLock {
     public void acquire() {
@@ -169,6 +182,9 @@ public class GlContext {
         _owner = null;
         notify(); 
       }
+    }
+    public synchronized long holds() {
+      return _holds;
     }
     private Thread _owner = null;
     private long _holds = 0;

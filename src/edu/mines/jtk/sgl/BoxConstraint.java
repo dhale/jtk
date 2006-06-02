@@ -23,7 +23,21 @@ public class BoxConstraint {
    * @param box bounding box.
    */
   public BoxConstraint(BoundingBox box) {
-    this(box.getMin(),box.getMax());
+    this(box.getMin(),box.getMax(),0.0,0.0,0.0);
+  }
+
+  /**
+   * Constructs a box constraint with specified bounding box and min sizes.
+   * Constrains objects to lie inside the bounding box.
+   * @param box bounding box.
+   * @param dxmin minimum size in x dimension.
+   * @param dymin minimum size in y dimension.
+   * @param dzmin minimum size in z dimension.
+   */
+  public BoxConstraint(BoundingBox box,
+    double dxmin, double dymin, double dzmin) 
+  {
+    this(box.getMin(),box.getMax(),dxmin,dymin,dzmin);
   }
 
   /**
@@ -33,12 +47,30 @@ public class BoxConstraint {
    * @param q a corner point.
    */
   public BoxConstraint(Point3 p, Point3 q) {
+    this(p,q,0.0,0.0,0.0);
+  }
+
+  /**
+   * Constructs a box constraint with specified corner points and min sizes.
+   * Constrains objects to lie inside a box defined by the corner points.
+   * @param p a corner point.
+   * @param q a corner point.
+   * @param dxmin minimum size in x dimension.
+   * @param dymin minimum size in y dimension.
+   * @param dzmin minimum size in z dimension.
+   */
+  public BoxConstraint(Point3 p, Point3 q,
+    double dxmin, double dymin, double dzmin) 
+  {
     _xmin = min(p.x,q.x);
     _ymin = min(p.y,q.y);
     _zmin = min(p.z,q.z);
     _xmax = max(p.x,q.x);
     _ymax = max(p.y,q.y);
     _zmax = max(p.z,q.z);
+    _dxmin = dxmin;
+    _dymin = dymin;
+    _dzmin = dzmin;
     _sampled = false;
   }
 
@@ -50,12 +82,32 @@ public class BoxConstraint {
    * @param sz sampling of z coordinate
    */
   public BoxConstraint(Sampling sx, Sampling sy, Sampling sz) {
+    this(sx,sy,sz,0.0,0.0,0.0);
+  }
+
+  /**
+   * Constructs a box constraint with specified samplings and min sizes.
+   * Constrains object vertices to lie on the sampling grid.
+   * @param sx sampling of x coordinate
+   * @param sy sampling of y coordinate
+   * @param sz sampling of z coordinate
+   * @param dxmin minimum size in x dimension.
+   * @param dymin minimum size in y dimension.
+   * @param dzmin minimum size in z dimension.
+   */
+  public BoxConstraint(
+    Sampling sx, Sampling sy, Sampling sz,
+    double dxmin, double dymin, double dzmin) 
+  {
     _xmin = sx.getFirst();
     _ymin = sy.getFirst();
     _zmin = sz.getFirst();
     _xmax = sx.getLast();
     _ymax = sy.getLast();
     _zmax = sz.getLast();
+    _dxmin = dxmin;
+    _dymin = dymin;
+    _dzmin = dzmin;
     _sx = sx;
     _sy = sy;
     _sz = sz;
@@ -78,20 +130,6 @@ public class BoxConstraint {
     BoundingSphere bs = new BoundingSphere();
     bs.expandBy(getBoundingBox());
     return bs;
-  }
-
-  /**
-   * Sets minimum sizes for objects constrained by this box. The dimensions 
-   * of any constrained object will not be less than the specified sizes.
-   * The default minimum sizes are zero.
-   * @param dxmin minimum size in x dimension.
-   * @param dymin minimum size in y dimension.
-   * @param dzmin minimum size in z dimension.
-   */
-  public void setMinimum(double dxmin, double dymin, double dzmin) {
-    _dxmin = dxmin;
-    _dymin = dymin;
-    _dzmin = dzmin;
   }
 
   /**
