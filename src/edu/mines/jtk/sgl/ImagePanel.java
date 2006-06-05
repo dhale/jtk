@@ -17,16 +17,21 @@ import static edu.mines.jtk.opengl.Gl.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * An image on an axis-aligned panel.
+ * An axis-aligned panel that draws a 2-D image of a slice of a 3-D array.
+ * The corner points of the image panel's frame determines3-D array is 
  * @author Dave Hale, Colorado School of Mines
- * @version 2006.05.30
+ * @version 2006.06.04
  */
-public class ImageOnPanel extends AxisAlignedPanel {
+public class ImagePanel extends AxisAlignedPanel {
 
   /**
-   * Constructs an image on panel.
+   * Constructs an image panel.
+   * @param sx sampling of the X axis.
+   * @param sy sampling of the Y axis.
+   * @param sz sampling of the Z axis.
+   * @param f the floats for which to draw images.
    */
-  public ImageOnPanel(Sampling sx, Sampling sy, Sampling sz, Float3 f) {
+  public ImagePanel(Sampling sx, Sampling sy, Sampling sz, Float3 f) {
     _sx = sx;
     _sy = sy;
     _sz = sz;
@@ -346,7 +351,7 @@ public class ImageOnPanel extends AxisAlignedPanel {
   }
 
   private void loadTexture(int js, int jt) {
-    System.out.println("ImageOnPanel.loadTexture: js="+js+" jt="+jt);
+    System.out.println("ImagePanel.loadTexture: js="+js+" jt="+jt);
     float scale = 1.0f/(float)(_ls+_lt-2);
     for (int it=0; it<_lt; ++it) {
       for (int is=0; is<_ls; ++is) {

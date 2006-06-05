@@ -225,7 +225,7 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
     AxisAlignedFrame aaf = aaq.getFrame();
 
     Sampling s = new Sampling(101,0.01,0.0);
-    ImageOnPanel iop = new ImageOnPanel(s,s,s,null);
+    ImagePanel iop = new ImagePanel(s,s,s,null);
     aaf.addChild(iop);
 
     World world = new World();

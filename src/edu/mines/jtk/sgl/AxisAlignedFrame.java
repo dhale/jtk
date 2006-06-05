@@ -82,6 +82,8 @@ public class AxisAlignedFrame extends Group {
 
   /**
    * Sets the corner points of (moves and/or resizes) this frame.
+   * If this frame has a non-null box constraint, then this method
+   * first applies the constraint before settig the corner points.
    * <p>
    * The specified corner points must be opposite vertices of the
    * quadrilateral that defines this frame. For the axis that is 
@@ -123,7 +125,7 @@ public class AxisAlignedFrame extends Group {
 
   /**
    * Gets the box constraint for this frame.
-   * @return the constraint.
+   * @return the box constraint; null, if none.
    */
   public BoxConstraint getBoxConstraint() {
     return _constraint;
