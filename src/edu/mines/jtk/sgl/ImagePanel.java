@@ -29,7 +29,7 @@ public class ImagePanel extends AxisAlignedPanel {
    * @param sx sampling of the X axis.
    * @param sy sampling of the Y axis.
    * @param sz sampling of the Z axis.
-   * @param f the floats for which to draw images.
+   * @param f the floats to slice for images.
    */
   public ImagePanel(Sampling sx, Sampling sy, Sampling sz, Float3 f) {
     _sx = sx;
@@ -41,7 +41,7 @@ public class ImagePanel extends AxisAlignedPanel {
   /**
    * Gets a box constraint for this panel. The constraint is consistent
    * with the sampling of this image.
-   * @return the constraint.
+   * @return the box constraint.
    */
   public BoxConstraint getBoxConstraint() {
     return new BoxConstraint(
@@ -58,33 +58,66 @@ public class ImagePanel extends AxisAlignedPanel {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private Axis _axis; // axis orthogonal to plane of this quad
+  private Axis _axis; // axis orthogonal to plane of this panel
   private Sampling _sx,_sy,_sz; // sampling of x, y, z axes
   private Float3 _f; // 3-D indexed collection of floats
 
-  private double _xmin,_ymin,_zmin; // minimum box coordinates
-  private double _xmax,_ymax,_zmax; // maximum box coordinates
+  private double _xmin,_ymin,_zmin; // minimum array coordinates
+  private double _xmax,_ymax,_zmax; // maximum array coordinates
 
+  // This panel can draw ns*nt samples sliced from nx*ny*nz samples from
+  // an array. The dimensions ns and nt are chosen from array dimensions 
+  // nx, ny, and nz, depending on which axis of the array is orthogonal to 
+  // the plane of this panel.
+  //
+  // The panel is drawn as a mosaic of ms*mt textures. The size of each
+  // textures is ls*lt samples, where ls and lt are powers of two. To 
+  // enable seamless linear interpolation, these textures must overlap 
+  // by one sample. For either the s or t dimensions, given l>3 and n, 
+  // the number of textures in the panel is m = 1+(n-2)/(l-1).
+  //
+  // By convention, we index samples within the panel with ks and kt,
+  // textures within the panel by js and jt, and samples within each 
+  // texture by is and it. In other words, index variables i, j, and k 
+  // correspond to dimensions l, m, and n. 
+  // 
+  // Here is an example of indices k and j for l=4, m=3, and n=10:
+  // 0 1 2 3 4 5 6 7 8 9    sample index k
+  // 0 0 0 0                texture index j=0
+  //       1 1 1 1          texture index j=1
+  //             2 2 2 2    texture index j=2
+  //
+  // This panel may or may not draw its entire mosaic of ms*mt textures;
+  // the corner points of the frame containing this panel determine the
+  // subset of the ms*mt textures drawn. For fast drawing, this panel 
+  // maintains a cache of the required textures in an array[mt][ms].
+  // In this array, only those textures that are required for drawing
+  // are non-null.
+
+  // Sampling of panels and textures, as described above.
   int _ls,_lt; // numbers of samples per textures
-  int _ms,_mt; // numbers of textures in quad
-  int _ns,_nt; // numbers of samples in quad
-  double _ds,_dt; // sampling intervals in quad
-  double _fs,_ft; // first sample values in quad
+  int _ms,_mt; // numbers of textures in panel
+  int _ns,_nt; // numbers of samples in panel
+  double _ds,_dt; // sampling intervals in panel
+  double _fs,_ft; // first sample values in panel
 
-  int _kxmin,_kymin,_kzmin; // min sample-in-box indices
-  int _kxmax,_kymax,_kzmax; // max sample-in-box indices
-  int _ksmin,_ktmin; // min sample-in-quad indices
-  int _ksmax,_ktmax; // max sample-in-quad indices
+  // The texture cache; textures required for drawing are non-null.
+  private GlTextureName[][] _tn; // array[_mt][_ms] of texture names
+
+  // The subset of samples that must be drawn depends on frame corner points.
+  int _kxmin,_kymin,_kzmin; // min sample-in-array indices
+  int _kxmax,_kymax,_kzmax; // max sample-in-array indices
+  int _ksmin,_ktmin; // min sample-in-panel indices
+  int _ksmax,_ktmax; // max sample-in-panel indices
   int _jsmin,_jtmin; // min texture-in-cache indices
   int _jsmax,_jtmax; // max texture-in-cache indices
 
+  // Used when computing a texture.
   int[] _pixels; // array[_lt][_ls] of pixels for one texture
-
-  private GlTextureName[][] _tn; // array[_mt][_ms] of texture names
 
   private void drawTextures() {
 
-    // If parent is not a quad frame, cannot draw.
+    // If parent is not a frame, do not know where to draw.
     AxisAlignedFrame frame = getFrame();
     if (frame==null)
       return;
@@ -116,12 +149,6 @@ public class ImagePanel extends AxisAlignedPanel {
     double xa = 0.5*(_xmin+_xmax);
     double ya = 0.5*(_ymin+_ymax);
     double za = 0.5*(_zmin+_zmax);
-    // 0 1 2 3 4 5 6 7 8 9    sample index
-    // 0 0 0 0                texture index
-    //       1 1 1 1          texture index
-    //             2 2 2 2    texture index
-    System.out.println("_jsmin="+_jsmin+" _jsmax="+_jsmax);
-    System.out.println("_jtmin="+_jtmin+" _jtmax="+_jtmax);
     for (int jt=_jtmin; jt<=_jtmax; ++jt) {
       for (int js=_jsmin; js<=_jsmax; ++js) {
         int ks0 = js*(_ls-1);
@@ -153,11 +180,6 @@ public class ImagePanel extends AxisAlignedPanel {
           double z0 = _ft+kt0*_dt;
           double x1 = _fs+ks1*_ds;
           double z1 = _ft+kt1*_dt;
-          System.out.println("s0="+s0+" s1="+s1);
-          System.out.println("t0="+t0+" t1="+t1);
-          System.out.println("x0="+x0+" x1="+x1);
-          System.out.println("z0="+z0+" z1="+z1);
-          System.out.println("ya="+ya);
           glTexCoord2f(s0,t0);  glVertex3d(x0,ya,z0);
           glTexCoord2f(s1,t0);  glVertex3d(x1,ya,z0);
           glTexCoord2f(s1,t1);  glVertex3d(x1,ya,z1);
@@ -183,36 +205,47 @@ public class ImagePanel extends AxisAlignedPanel {
     Axis axis, Sampling sx, Sampling sy, Sampling sz) 
   {
     disposeTextures();
+    int nx = _sx.getCount();
+    int ny = _sy.getCount();
+    int nz = _sz.getCount();
+    double dx = _sx.getDelta();
+    double dy = _sy.getDelta();
+    double dz = _sz.getDelta();
+    double fx = _sx.getFirst();
+    double fy = _sy.getFirst();
+    double fz = _sz.getFirst();
     _axis = axis;
     _sx = sx;
     _sy = sy;
     _sz = sz;
-    _ls = 64;
-    _lt = 64;
+    _ls = 16; // for debugging
+    _lt = 16; // for debugging
+    //_ls = 64;
+    //_lt = 64;
     if (_axis==Axis.X) {
-      _ns = _sy.getCount();
-      _ds = _sy.getDelta();
-      _fs = _sy.getFirst();
-      _nt = _sz.getCount();
-      _dt = _sz.getDelta();
-      _ft = _sz.getFirst();
+      _ns = ny;
+      _ds = dy;
+      _fs = fy;
+      _nt = nz;
+      _dt = dz;
+      _ft = fz;
     } else if (_axis==Axis.Y) {
-      _ns = _sx.getCount();
-      _ds = _sx.getDelta();
-      _fs = _sx.getFirst();
-      _nt = _sz.getCount();
-      _dt = _sz.getDelta();
-      _ft = _sz.getFirst();
+      _ns = nx;
+      _ds = dx;
+      _fs = fx;
+      _nt = nz;
+      _dt = dz;
+      _ft = fz;
     } else {
-      _ns = _sx.getCount();
-      _ds = _sx.getDelta();
-      _fs = _sx.getFirst();
-      _nt = _sy.getCount();
-      _dt = _sy.getDelta();
-      _ft = _sy.getFirst();
+      _ns = nx;
+      _ds = dx;
+      _fs = fx;
+      _nt = ny;
+      _dt = dy;
+      _ft = fy;
     }
-    _ms = 1+(_ns-2)/(_ls-2);
-    _mt = 1+(_nt-2)/(_lt-2);
+    _ms = 1+(_ns-2)/(_ls-1);
+    _mt = 1+(_nt-2)/(_lt-1);
     _tn = new GlTextureName[_mt][_ms];
     _kxmin = 0;  _kxmax = -1;
     _kymin = 0;  _kymax = -1;
@@ -266,11 +299,6 @@ public class ImagePanel extends AxisAlignedPanel {
       _ktmax = _kymax = kymax;
       _kzmax = kzmax;
     }
-    System.out.println("_kxmin="+_kxmin+" _kxmax="+_kxmax);
-    System.out.println("_kymin="+_kymin+" _kymax="+_kymax);
-    System.out.println("_kzmin="+_kzmin+" _kzmax="+_kzmax);
-    System.out.println("_ksmin="+_ksmin+" _ksmax="+_ksmax);
-    System.out.println("_ktmin="+_ktmin+" _ktmax="+_ktmax);
 
     // New texture-in-cache index bounds.
     int jsmin = _ksmin/(_ls-1);
@@ -351,7 +379,6 @@ public class ImagePanel extends AxisAlignedPanel {
   }
 
   private void loadTexture(int js, int jt) {
-    System.out.println("ImagePanel.loadTexture: js="+js+" jt="+jt);
     float scale = 1.0f/(float)(_ls+_lt-2);
     for (int it=0; it<_lt; ++it) {
       for (int is=0; is<_ls; ++is) {
