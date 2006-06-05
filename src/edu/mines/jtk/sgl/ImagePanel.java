@@ -44,8 +44,7 @@ public class ImagePanel extends AxisAlignedPanel {
    * @return the box constraint.
    */
   public BoxConstraint getBoxConstraint() {
-    return new BoxConstraint(
-      _sx,_sy,_sz,_sx.getDelta(),_sy.getDelta(),_sz.getDelta());
+    return new BoxConstraint(_sx,_sy,_sz);
   }
 
   ///////////////////////////////////////////////////////////////////////////
