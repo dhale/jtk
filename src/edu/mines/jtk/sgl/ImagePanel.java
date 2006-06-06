@@ -64,10 +64,13 @@ public class ImagePanel extends AxisAlignedPanel {
   private double _xmin,_ymin,_zmin; // minimum array coordinates
   private double _xmax,_ymax,_zmax; // maximum array coordinates
 
-  // This panel can draw ns*nt samples sliced from nx*ny*nz samples from
-  // an array. The dimensions ns and nt are chosen from array dimensions 
+  // This panel can draw up to ns*nt samples sliced from nx*ny*nz samples
+  // of an array. The dimensions ns and nt are chosen from array dimensions 
   // nx, ny, and nz, depending on which axis of the array is orthogonal to 
-  // the plane of this panel.
+  // the plane of this panel. Specifically,
+  // Axis.X:  ns = ny,  nt = nz
+  // Axis.Y:  ns = nx,  nt = nz
+  // Axis.Z:  ns = nx,  nt = ny
   //
   // The panel is drawn as a mosaic of ms*mt textures. The size of each
   // textures is ls*lt samples, where ls and lt are powers of two. To 
@@ -85,9 +88,10 @@ public class ImagePanel extends AxisAlignedPanel {
   // 0 0 0 0                texture index j=0
   //       1 1 1 1          texture index j=1
   //             2 2 2 2    texture index j=2
+  // Note the one-sample overlap of the textures.
   //
-  // This panel may or may not draw its entire mosaic of ms*mt textures;
-  // the corner points of the frame containing this panel determine the
+  // The panel may or may not draw its entire mosaic of ms*mt textures.
+  // The corner points of the frame containing this panel determine the
   // subset of the ms*mt textures drawn. For fast drawing, this panel 
   // maintains a cache of the required textures in an array[mt][ms].
   // In this array, only those textures that are required for drawing
@@ -111,7 +115,7 @@ public class ImagePanel extends AxisAlignedPanel {
   int _jsmin,_jtmin; // min texture-in-cache indices
   int _jsmax,_jtmax; // max texture-in-cache indices
 
-  // Used when computing a texture.
+  // Used when creating/loading a texture.
   int[] _pixels; // array[_lt][_ls] of pixels for one texture
 
   private void drawTextures() {
