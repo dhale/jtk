@@ -331,7 +331,7 @@ public class GridView extends TiledView {
       int y = ts.y(vp.u(0.0));
       g2d.drawLine(0,y,w-1,y);
     } else if (_horizontal==Horizontal.MAJOR && axisLeftRight!=null) {
-      AxisTics at = axisLeftRight.getAxisTics(g2d,w,h);
+      AxisTics at = axisLeftRight.getAxisTics();
       int nticMajor = at.getCountMajor();
       double dticMajor = at.getDeltaMajor();
       double fticMajor = at.getFirstMajor();
@@ -348,7 +348,7 @@ public class GridView extends TiledView {
       int x = ts.x(hp.u(0.0));
       g2d.drawLine(x,0,x,h-1);
     } else if (_vertical==Vertical.MAJOR && axisTopBottom!=null) {
-      AxisTics at = axisTopBottom.getAxisTics(g2d,w,h);
+      AxisTics at = axisTopBottom.getAxisTics();
       int nticMajor = at.getCountMajor();
       double dticMajor = at.getDeltaMajor();
       double fticMajor = at.getFirstMajor();

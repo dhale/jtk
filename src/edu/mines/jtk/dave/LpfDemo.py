@@ -31,8 +31,8 @@ def plot(f,png=None,clip=0,cmin=0):
   #frame.setSize(800,850)
   frame.setSize(900,800)
   frame.setVisible(True)
-  if png!=None:
-    frame.paintToPng(600,3,png)
+  #if png!=None:
+  #  frame.paintToPng(600,3,png)
 
 def readData():
   bo = DataFile.ByteOrder.LITTLE_ENDIAN
@@ -189,7 +189,7 @@ def makeFigs27():
   e = Array.sub(f,g)
   plot(g,"lpf278g.png",10)
   plot(e,"lpf278e.png",1)
-makeFigs27()
+#makeFigs27()
 
 def makeFigsFR():
   f = readData()

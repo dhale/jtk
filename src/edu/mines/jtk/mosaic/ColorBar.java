@@ -41,7 +41,6 @@ public class ColorBar extends IPanel implements ColorMapListener {
     _mosaic.setWidthMinimum(0,25);
     _mosaic.setWidthElastic(0,0);
     _tile = _mosaic.getTile(0,0);
-    updateSizes();
     this.setLayout(new BorderLayout());
     this.add(_mosaic,BorderLayout.CENTER);
   }
@@ -52,7 +51,6 @@ public class ColorBar extends IPanel implements ColorMapListener {
    */
   public void setLabel(String label) {
     _mosaic.getTileAxisRight(0).setLabel(label);
-    updateSizes();
     revalidate();
   }
 
@@ -65,7 +63,6 @@ public class ColorBar extends IPanel implements ColorMapListener {
    */
   public void setFormat(String format) {
     _mosaic.getTileAxisRight(0).setFormat(format);
-    updateSizes();
     revalidate();
   }
 
@@ -108,10 +105,8 @@ public class ColorBar extends IPanel implements ColorMapListener {
   // Override base class implementation.
   public void setFont(Font font) {
     super.setFont(font);
-    if (_mosaic!=null) {
+    if (_mosaic!=null)
       _mosaic.setFont(font);
-      updateSizes();
-    }
     revalidate();
   }
 
@@ -129,6 +124,28 @@ public class ColorBar extends IPanel implements ColorMapListener {
       _mosaic.setBackground(color);
   }
 
+  // Override base class implementation.
+  public Dimension getMinimumSize() {
+    Dimension size;
+    if (isMinimumSizeSet()) {
+      size = super.getMinimumSize();
+    } else {
+      size = _mosaic.getMinimumSize();
+    }
+    return size;
+  }
+
+  // Override base class implementation.
+  public Dimension getPreferredSize() {
+    Dimension size;
+    if (isPreferredSizeSet()) {
+      size = super.getPreferredSize();
+    } else {
+      size = _mosaic.getPreferredSize();
+    }
+    return size;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
 
@@ -143,11 +160,4 @@ public class ColorBar extends IPanel implements ColorMapListener {
   private Mosaic _mosaic;
   private Tile _tile;
   private PixelsView _pixels;
-
-  private void updateSizes() {
-    int war = _mosaic.getWidthAxesRight();
-    Dimension size = new Dimension(25+2+war,100);
-    this.setMinimumSize(size);
-    this.setPreferredSize(size);
-  }
 }

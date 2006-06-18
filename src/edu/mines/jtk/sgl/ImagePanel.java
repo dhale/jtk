@@ -18,7 +18,8 @@ import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * An axis-aligned panel that draws a 2-D image of a slice of a 3-D array.
- * The corner points of the image panel's frame determines3-D array is 
+ * The corner points of the image panel's frame determines which slice of
+ * the 3-D array is drawn.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.06.04
  */

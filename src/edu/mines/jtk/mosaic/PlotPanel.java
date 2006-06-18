@@ -113,8 +113,8 @@ public class PlotPanel extends IPanel {
     gbc.weighty = 100;
     gbc.fill = GridBagConstraints.BOTH;
     this.add(_mosaic,gbc);
-    this.revalidate();
     this.setPreferredSize(new Dimension(200+300*ncol,100+300*nrow));
+    //this.revalidate();
   }
 
   /**
@@ -154,10 +154,10 @@ public class PlotPanel extends IPanel {
     if (_colorBar==null) {
       _colorBar = new ColorBar(label);
       _colorBar.setFont(getFont());
-      if (_colorBarFormat!=null)
-        _colorBar.setFormat(_colorBarFormat);
       _colorBar.setForeground(getForeground());
       _colorBar.setBackground(getBackground());
+      if (_colorBarFormat!=null)
+        _colorBar.setFormat(_colorBarFormat);
       if (_colorBarPixelsView!=null) {
         _colorBarPixelsView.addColorMapListener(_colorBar);
         GridBagConstraints gbc = new GridBagConstraints();

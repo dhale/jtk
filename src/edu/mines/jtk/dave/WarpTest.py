@@ -22,14 +22,15 @@ def readData():
 
 def plot(x,png=None):
   panel = PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
-  panel.setVFormat("%4.0f");
+  #panel.setVFormat("%4.0f");
   panel.addColorBar()
-  panel.setColorBarFormat("%4.2f");
+  #panel.setColorBarFormat("%4.2f");
   pv = panel.addPixels(x)
   pv.setColorMap(PixelsView.ColorMap.GRAY);
   frame = PlotFrame(panel)
   frame.setBackground(Color.WHITE)
   frame.setFontSize(18)
+  frame.pack()
   frame.setSize(700,600)
   frame.setVisible(True)
   #if png!=None:
@@ -38,9 +39,9 @@ def plot(x,png=None):
 
 def plotu(u,png=None,clip=0):
   panel = PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
-  panel.setVFormat("%4.0f");
+  #panel.setVFormat("%4.0f");
   panel.addColorBar()
-  panel.setColorBarFormat("%4.2f");
+  #panel.setColorBarFormat("%4.2f");
   panel.setHLimits(-0.5,n2-0.5)
   panel.setVLimits(-0.5,n1-0.5)
   if len(u[0])<n1:
@@ -58,6 +59,7 @@ def plotu(u,png=None,clip=0):
   frame = PlotFrame(panel)
   frame.setBackground(Color.WHITE)
   frame.setFontSize(18)
+  frame.pack()
   frame.setSize(700,600)
   frame.setVisible(True)
   if png!=None:
@@ -66,9 +68,9 @@ def plotu(u,png=None,clip=0):
 
 def plotWithGrid(x,g=None,png=None):
   panel = PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
-  panel.setVFormat("%4.0f");
+  #panel.setVFormat("%4.0f");
   panel.addColorBar()
-  panel.setColorBarFormat("%4.2f");
+  #panel.setColorBarFormat("%4.2f");
   pv = panel.addPixels(x)
   pv.setColorMap(PixelsView.ColorMap.GRAY);
   if g:
@@ -78,6 +80,7 @@ def plotWithGrid(x,g=None,png=None):
   frame = PlotFrame(panel)
   frame.setBackground(Color.WHITE)
   frame.setFontSize(18)
+  frame.pack()
   frame.setSize(700,600)
   frame.setVisible(True)
   if png!=None:
@@ -229,7 +232,7 @@ def refineLags2(f,g,lag1,lag2):
   n2 = len(f)
   u1 = Array.zerofloat(n1,n2)
   u2 = Array.zerofloat(n1,n2)
-  lcf.refineLags(f,g,min1,max1,min2,max2,lag1,lag2,u1,u2)
+  lcf.refineLags(f,g,lag1,lag2,u1,u2)
   return u1,u2
 
 lag1,lag2 = findMaxLags2(p,q)

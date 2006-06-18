@@ -42,9 +42,6 @@ def makePlotPanel(orientation):
   pp.setHLabel(0,"offset (km)")
   pp.setHLabel(1,"velocity (km/s)")
   pp.setVLabel("depth (km)")
-  #pp.setHFormat(0,"%1.1f")
-  #pp.setHFormat(1,"%1.1f")
-  pp.setVFormat("%1.1f")
 
   return pp
 
@@ -57,8 +54,9 @@ pp1 = makePlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
 pp2 = makePlotPanel(PlotPanel.Orientation.X1RIGHT_X2UP)
 pf = PlotFrame(pp1,pp2,PlotFrame.Split.VERTICAL)
 
-#pf.setBackground(Color.MAGENTA)
-#pf.setFontSize(18))
+pf.setBackground(Color.MAGENTA)
+pf.setFontSize(24)
 
+pf.pack();
 pf.setVisible(True)
-pf.paintToPng(300,6,"junk.png")
+#pf.paintToPng(300,6,"junk.png")

@@ -8,7 +8,9 @@ package edu.mines.jtk.mosaic;
 
 import static java.lang.Math.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.awt.font.*;
+import java.awt.geom.*;
 import javax.swing.*;
 import edu.mines.jtk.util.*;
 
@@ -135,9 +137,7 @@ public class TileAxis extends IPanel {
    */
   public void setLabel(String label) {
     _label = label;
-    updateSizes();
-    if (_mosaic!=null)
-      _mosaic.revalidate();
+    updateAxisTics();
     repaint();
   }
 
@@ -150,100 +150,44 @@ public class TileAxis extends IPanel {
    */
   public void setFormat(String format) {
     _format = format;
-    updateSizes();
-    if (_mosaic!=null)
-      _mosaic.revalidate();
+    updateAxisTics();
     repaint();
   }
 
-  // Override base class, so we can revalidate the mosaic layout. Must check 
-  // for a null mosaic, because this method is called by the base class 
-  // constructor, before our constructor sets the (non-null) mosaic.
+  // Override base class implementation, so we can update axis tics.
   public void setFont(Font font) {
     super.setFont(font);
-    updateSizes();
-    if (_mosaic!=null)
-      _mosaic.revalidate();
+    updateAxisTics();
     repaint();
   }
 
   /**
-   * Gets the axis tics painted by this tile axis. Axis tics depend on
-   * the graphics context in which the axis will be painted. For example,
-   * the font size in the graphics context font used to ensure that the
-   * labels of major tics can be painted without overlap.
-   * <p>
-   * The axis tics depend also on the projectors and transcaler of the
-   * tile adjacent to this axis. These attributes are assumed to be valid
-   * when this method is called.
-   * @param g2d the graphics context.
-   * @param w the width of the graphics rectangle.
-   * @param h the height of the graphics rectangle.
+   * Gets the axis tics painted by this tile axis.
    * @return the axis tics.
    */
-  public AxisTics getAxisTics(Graphics2D g2d, int w, int h) {
-
-    // Adjacent tile.
-    Tile tile = getTile();
-    if (tile==null)
-      return null;
-
-    // Projector and transcaler from adjacent tile.
-    Projector p = (isHorizontal()) ?
-      tile.getHorizontalProjector() :
-      tile.getVerticalProjector();
-    Transcaler t = tile.getTranscaler(w,h);
-
-    // Font height.
-    Font font = g2d.getFont();
-    FontMetrics fm = g2d.getFontMetrics();
-    FontRenderContext frc = g2d.getFontRenderContext();
-    LineMetrics lm = font.getLineMetrics("0.123456789",frc);
-    int fh = round(lm.getHeight());
-
-    // Axis placement.
-    boolean isHorizontal = isHorizontal();
-
-    // Axis tics.
-    AxisTics at;
-    double umin = p.u0();
-    double umax = p.u1();
-    double vmin = min(p.v0(),p.v1());
-    double vmax = max(p.v0(),p.v1());
-    if (isHorizontal) {
-      int nmax = 2+w/maxTicStringWidth(fm);
-      double u0 = max(umin,t.x(0));
-      double u1 = min(umax,t.x(w-1));
-      double v0 = max(vmin,min(vmax,p.v(u0)));
-      double v1 = max(vmin,min(vmax,p.v(u1)));
-      double du = min(umax-umin,t.width(w));
-      double dv = abs(p.v(u0+du)-p.v(u0));
-      at = new AxisTics(vmin,vmin+dv,nmax);
-      at = new AxisTics(v0,v1,at.getDeltaMajor());
-    } else {
-      int nmax = 2+h/(4*fh);
-      double u0 = max(umin,t.y(0));
-      double u1 = min(umax,t.y(h-1));
-      double v0 = max(vmin,min(vmax,p.v(u0)));
-      double v1 = max(vmin,min(vmax,p.v(u1)));
-      double du = min(umax-umin,t.height(h));
-      double dv = abs(p.v(u0+du)-p.v(u0));
-      at = new AxisTics(vmin,vmin+dv,nmax);
-      at = new AxisTics(v0,v1,at.getDeltaMajor());
-    }
-    return at;
+  public AxisTics getAxisTics() {
+    return _axisTics;
   }
 
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
-    g2d = createGraphics(g2d,x,y,w,h);
-    g2d.setRenderingHint(
-      RenderingHints.KEY_ANTIALIASING,
-      RenderingHints.VALUE_ANTIALIAS_ON);
+
+    // If no axis tics, paint nothing.
+    if (_axisTics==null)
+      return;
 
     // Adjacent tile; if none, do nothing.
     Tile tile = getTile();
     if (tile==null)
       return;
+
+    // Create graphics context.
+    g2d = createGraphics(g2d,x,y,w,h);
+    g2d.setRenderingHint(
+      RenderingHints.KEY_ANTIALIASING,
+      RenderingHints.VALUE_ANTIALIAS_ON);
+    g2d.setRenderingHint(
+      RenderingHints.KEY_TEXT_ANTIALIASING,
+      RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
     // Projector and transcaler from adjacent tile.
     Projector p = (isHorizontal()) ?
@@ -269,15 +213,14 @@ public class TileAxis extends IPanel {
     boolean isTop = isTop();
     boolean isLeft = isLeft();
 
-    // Axis tics.
-    AxisTics at = getAxisTics(g2d,w,h);
-    int nticMajor = at.getCountMajor();
-    double dticMajor = at.getDeltaMajor();
-    double fticMajor = at.getFirstMajor();
-    int nticMinor = at.getCountMinor();
-    double dticMinor = at.getDeltaMinor();
-    double fticMinor = at.getFirstMinor();
-    int mtic = at.getMultiple();
+    // Axis tic sampling.
+    int nticMajor = _axisTics.getCountMajor();
+    double dticMajor = _axisTics.getDeltaMajor();
+    double fticMajor = _axisTics.getFirstMajor();
+    int nticMinor = _axisTics.getCountMinor();
+    double dticMinor = _axisTics.getDeltaMinor();
+    double fticMinor = _axisTics.getFirstMinor();
+    int mtic = _axisTics.getMultiple();
 
     // Minor tics. Skip major tics, which may not coincide, due to rounding.
     int ktic = (int)round((fticMajor-fticMinor)/dticMinor);
@@ -370,6 +313,7 @@ public class TileAxis extends IPanel {
       }
     }
 
+    // Dispose graphics context.
     g2d.dispose();
   }
 
@@ -385,10 +329,12 @@ public class TileAxis extends IPanel {
   ///////////////////////////////////////////////////////////////////////////
   // package
 
+  // Called by constructor for mosaic.
   TileAxis(Mosaic mosaic, Placement placement, int index) {
     _mosaic = mosaic;
     _placement = placement;
     _index = index;
+    //setBackground(Color.CYAN); // for debugging
     mosaic.add(this);
   }
 
@@ -398,9 +344,12 @@ public class TileAxis extends IPanel {
    */
   int getWidthMinimum() {
     FontMetrics fm = getFontMetrics(getFont());
+    int ticLabelWidth = _ticLabelWidth;
+    if (ticLabelWidth==0)
+      ticLabelWidth = maxTicLabelWidth(fm);
     int width = 0;
     if (isVertical()) {
-      width = maxTicStringWidth(fm)+fm.getHeight();
+      width = ticLabelWidth+fm.getHeight();
       if (_label!=null)
         width += fm.getHeight();
     } else {
@@ -430,12 +379,146 @@ public class TileAxis extends IPanel {
     return height;
   }
 
-  private void updateSizes() {
-    int w = getWidthMinimum();
-    int h = getHeightMinimum();
-    Dimension size = new Dimension(w,h);
-    this.setMinimumSize(size);
-    this.setPreferredSize(size);
+  /**
+   * Updates the axis tics for this axis. Axes tics depend on many different
+   * parameters, including the axis width, height, font, tic label format, 
+   * and tile projector. Methods that change these parameters should call
+   * this method.
+   * <p>
+   * The dependency on axis width and height must be handled carefully. A 
+   * mosaic lays out its tile axes using their minimum (preferred) widths 
+   * and heights. The minimum width and height depend on axis tic labels 
+   * that, in turn, depend on the axis width and height. To help manage 
+   * this circular dependency, this method returns true if its minimum
+   * width or height is changed by this update. Otherwise, it returns
+   * false.
+   * @return true, if this update changes the minimum width or height
+   *  of this axis; false, otherwise.
+   */
+  boolean updateAxisTics() {
+
+    // Adjacent tile.
+    Tile tile = getTile();
+    if (tile==null)
+      return false;
+
+    // Width and height of this axis.
+    int w = getWidth();
+    int h = getHeight();
+    if (w==0 || h==0)
+      return false;
+
+    // Projector and transcaler from adjacent tile.
+    Projector p = (isHorizontal()) ?
+      tile.getHorizontalProjector() :
+      tile.getVerticalProjector();
+    Transcaler t = tile.getTranscaler(w,h);
+
+    // Font and font render context.
+    Font font = getFont();
+    FontRenderContext frc = new FontRenderContext(null,true,false);
+
+    // Axis orientation.
+    boolean isHorizontal = isHorizontal();
+
+    // Min/max normalized coordinates for tics.
+    // (We do not want any tics in the margins.)
+    double umin = p.u0();
+    double umax = p.u1();
+
+    // Min/max world coordinates.
+    double vmin = min(p.v0(),p.v1());
+    double vmax = max(p.v0(),p.v1());
+
+    // Normalized coordinates range [u0,u1] that is currently visible.
+    // u0 is the smallest (closest to zero) normalized coordinate visible.
+    // u1 is the largest (farthest from zero) normalized coordinate visible.
+    // du is the range of normalized coordinates u currently visible.
+    double u0,u1,du;
+    if (isHorizontal) {
+      u0 = max(umin,t.x(0));
+      u1 = min(umax,t.x(w-1));
+      du = min(umax-umin,t.width(w));
+    } else {
+      u0 = max(umin,t.y(0));
+      u1 = min(umax,t.y(h-1));
+      du = min(umax-umin,t.height(h));
+    }
+
+    // The corresponding world coordinate range [v0,v1]. Again, we do not 
+    // want any tics in the margins. Also, we ensure that [v0,v1] lies
+    // inside the min/max world coordinate bounds. (Is this necessary?)
+    // v0 is the world coordinate corresponding to u0.
+    // v1 is the world coordinate corresponding to u1.
+    // dv is the range of world coordinates v currently visible.
+    double v0 = max(vmin,min(vmax,p.v(u0)));
+    double v1 = max(vmin,min(vmax,p.v(u1)));
+    double dv = abs(p.v(u0+du)-p.v(u0));
+
+    // Maximum width and height of any tic label.
+    int ticLabelWidth = 0;
+    int ticLabelHeight = 0;
+
+    // Begin with a large maximum number of tics, and decrease that 
+    // maximum number until we find a good fit. 
+    // Note: instead of a hard-wired large initial maximum number 
+    // (here, 20), we might instead compute that number from the
+    // dimensions of one digit and the dimensions of this axis.
+    int ntic = 0;
+    double dtic = 0.0;
+    for (int nmax=20; nmax>=2; nmax=ntic-1) {
+
+      // Compute the actual number of tics and a readable tic interval.
+      // We do not construct these axis tics for [v0,v1], because we want 
+      // the tic interval dtic to depend only on the span dv of world 
+      // coordinates visible, not the actual coordinate values. In this way,
+      // we maintain a constant tic interval as this axis is scrolled.
+      AxisTics at= new AxisTics(vmin,vmin+dv,nmax);
+      ntic = at.getCountMajor();
+      dtic = at.getDeltaMajor();
+
+      // The tic values nearest vmin and vmax. 
+      double va = ceil(vmin/dtic)*dtic;
+      double vb = floor(vmax/dtic)*dtic;
+
+      // Format the smallest two tic values and the largest two tic values
+      // to obtain four tic labels. From these, compute the max width and 
+      // height of tic labels.
+      Rectangle2D.Double r = new Rectangle2D.Double();
+      Rectangle2D.union(font.getStringBounds(formatTic(va     ),frc),r,r);
+      Rectangle2D.union(font.getStringBounds(formatTic(va+dtic),frc),r,r);
+      Rectangle2D.union(font.getStringBounds(formatTic(vb-dtic),frc),r,r);
+      Rectangle2D.union(font.getStringBounds(formatTic(vb     ),frc),r,r);
+      ticLabelWidth = (int)ceil(r.width);
+      ticLabelHeight = (int)ceil(r.height);
+
+      // Now assume that all tic labels have the max width and height.
+      // If those tic labels use less than half of the space available,
+      // then we have a good fit and stop looking.
+      if (isHorizontal) {
+        if (ticLabelWidth*ntic<0.5*w)
+          break;
+      } else {
+        if (ticLabelHeight*ntic<0.5*h)
+          break;
+      }
+    }
+
+    // Compute new axis tics constructed with the best-fit tic interval 
+    // computed above, but now for the currently visible range [v0,v1] 
+    // of world coordinates. These axis tics are painted by this axis.
+    _axisTics = new AxisTics(v0,v1,dtic);
+
+    // If either the tic label max width or height has changed, remember 
+    // the new values and revalidate this axis before returning true.
+    if (_ticLabelWidth!=ticLabelWidth || _ticLabelHeight!=ticLabelHeight) {
+      _ticLabelWidth = ticLabelWidth;
+      _ticLabelHeight = ticLabelHeight;
+      revalidate();
+      return true;
+    }
+
+    return false;
   }
 
   // Tracking methods called by MouseTrackMode.
@@ -485,11 +568,13 @@ public class TileAxis extends IPanel {
   private String _format = "%1.4G";
   private int _xtrack,_ytrack;
   private boolean _tracking;
+  private int _ticLabelWidth;
+  private int _ticLabelHeight;
+  private AxisTics _axisTics;
 
-  // Returns the maximum width of a formatted tic string.
-  private int maxTicStringWidth(FontMetrics fm) {
+  // Returns the maximum possible tic label width.
+  private int maxTicLabelWidth(FontMetrics fm) {
     double vtic = -123456789.0E-10;
-    //System.out.println("TileAxis.maxTicStringWidth: vtic="+formatTic(vtic));
     return fm.stringWidth(formatTic(vtic));
   }
 
