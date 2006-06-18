@@ -132,6 +132,19 @@ public class TileAxis extends IPanel {
   }
 
   /**
+   * Sets the interval between major labeled tics for this axis.
+   * The default tic interval is zero, in which case a readable tic
+   * interval is computed automatically. This default is especially
+   * useful when interactively zooming and scrolling.
+   * @param interval the major labeled tic interval.
+   */
+  public void setInterval(double interval) {
+    _interval = interval;
+    updateAxisTics();
+    repaint();
+  }
+
+  /**
    * Sets the label for this axis.
    * @param label the label.
    */
@@ -287,7 +300,7 @@ public class TileAxis extends IPanel {
         if (ws>wsmax)
           wsmax = ws;
         int xs = (isLeft)?x-ws:x;
-        int ys = max(fa,min(h-1,y+fa/3));
+        int ys = max(fa,min(h-1,y+(int)round(0.3*fa)));
         g2d.drawString(stic,xs,ys);
       }
     }
@@ -302,8 +315,8 @@ public class TileAxis extends IPanel {
       } else {
         int wl = fm.stringWidth(_label);
         int xl = isLeft ?
-          max(fa,w-1-tl-fd-wsmax-fd-fl) :
-          min(w-1-fd,tl+fd+wsmax+fh);
+          max(fa,w-1-tl-fd-wsmax-fd-fd-fl) :
+          min(w-1-fd,tl+fd+wsmax+fa);
         int yl = max(wl,min(h,(h+wl)/2));
         g2d.translate(xl,yl);
         g2d.rotate(-PI/2.0);
@@ -334,7 +347,7 @@ public class TileAxis extends IPanel {
     _mosaic = mosaic;
     _placement = placement;
     _index = index;
-    //setBackground(Color.CYAN); // for debugging
+    //setBackground(Color.CYAN); // for debugging only
     mosaic.add(this);
   }
 
@@ -368,7 +381,7 @@ public class TileAxis extends IPanel {
     FontMetrics fm = getFontMetrics(getFont());
     int height = 0;
     if (isHorizontal()) {
-      height = 2*fm.getHeight();
+      height = fm.getHeight()+fm.getAscent();
       if (_label!=null)
         height += fm.getHeight();
     } else {
@@ -459,11 +472,10 @@ public class TileAxis extends IPanel {
     int ticLabelWidth = 0;
     int ticLabelHeight = 0;
 
-    // Begin with a large maximum number of tics, and decrease that 
-    // maximum number until we find a good fit. 
-    // Note: instead of a hard-wired large initial maximum number 
-    // (here, 20), we might instead compute that number from the
-    // dimensions of one digit and the dimensions of this axis.
+    // Begin with an excessive maximum number of tics, and decrease that 
+    // maximum number until we find a good fit. As a special case, if the
+    // tic interval is specified, then this loop exits quickly after we
+    // compute the max width and height of tic labels.
     int ntic = 0;
     double dtic = 0.0;
     for (int nmax=20; nmax>=2; nmax=ntic-1) {
@@ -473,9 +485,15 @@ public class TileAxis extends IPanel {
       // the tic interval dtic to depend only on the span dv of world 
       // coordinates visible, not the actual coordinate values. In this way,
       // we maintain a constant tic interval as this axis is scrolled.
-      AxisTics at= new AxisTics(vmin,vmin+dv,nmax);
+      AxisTics at;
+      if (_interval==0.0) {
+        at= new AxisTics(vmin,vmin+dv,nmax);
+      } else {
+        at= new AxisTics(vmin,vmin+dv,_interval);
+      }
       ntic = at.getCountMajor();
       dtic = at.getDeltaMajor();
+
 
       // The tic values nearest vmin and vmax. 
       double va = ceil(vmin/dtic)*dtic;
@@ -492,9 +510,13 @@ public class TileAxis extends IPanel {
       ticLabelWidth = (int)ceil(r.width);
       ticLabelHeight = (int)ceil(r.height);
 
-      // Now assume that all tic labels have the max width and height.
-      // If those tic labels use less than half of the space available,
-      // then we have a good fit and stop looking.
+      // If tic interval is specified, we're done.
+      if (_interval!=0.0)
+        break;
+
+      // Otherwise, assume that all tic labels have the max width and height.
+      // If those tic labels use less than half of the space available, then 
+      // we have a good fit and stop looking.
       if (isHorizontal) {
         if (ticLabelWidth*ntic<0.5*w)
           break;
@@ -568,11 +590,15 @@ public class TileAxis extends IPanel {
   private String _format = "%1.4G";
   private int _xtrack,_ytrack;
   private boolean _tracking;
+  private double _interval;
   private int _ticLabelWidth;
   private int _ticLabelHeight;
   private AxisTics _axisTics;
 
   // Returns the maximum possible tic label width.
+  // This method should be called only when this axis does not yet have axis 
+  // tics, perhaps because it does not yet have a tile or width or height.
+  // It is used to compute the minimum size of this axis.
   private int maxTicLabelWidth(FontMetrics fm) {
     double vtic = -123456789.0E-10;
     return fm.stringWidth(formatTic(vtic));

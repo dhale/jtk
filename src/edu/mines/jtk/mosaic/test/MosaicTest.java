@@ -31,7 +31,7 @@ public class MosaicTest {
       Mosaic.AxesPlacement.RIGHT
     );
     Mosaic mosaic = new Mosaic(nrow,ncol,axesPlacement);
-    mosaic.setBackground(Color.WHITE);
+    //mosaic.setBackground(Color.WHITE);
     mosaic.setFont(new Font("SansSerif",Font.PLAIN,12));
     mosaic.setWidthMinimum(1,200);
     mosaic.setWidthElastic(1,200);
@@ -39,8 +39,21 @@ public class MosaicTest {
     Tile tile11 = mosaic.getTile(1,1);
     tile11.setViewRectangle(new DRectangle(0.1,0.1,0.8,0.8));
 
-    TileZoomMode zoomMode = new TileZoomMode(mosaic.getModeManager());
+    mosaic.getTileAxisTop(0).setLabel("axis label");
+    mosaic.getTileAxisTop(1).setLabel("axis label");
+    mosaic.getTileAxisTop(2).setLabel("axis label");
+    mosaic.getTileAxisLeft(0).setLabel("axis label");
+    mosaic.getTileAxisLeft(1).setLabel("axis label");
+    mosaic.getTileAxisBottom(0).setLabel("axis label");
+    mosaic.getTileAxisBottom(1).setLabel("axis label");
+    mosaic.getTileAxisBottom(2).setLabel("axis label");
+    mosaic.getTileAxisRight(0).setLabel("axis label");
+    mosaic.getTileAxisRight(1).setLabel("axis label");
 
+    TileZoomMode zoomMode = new TileZoomMode(mosaic.getModeManager());
+    zoomMode.setActive(true);
+
+    /*
     JMenuBar menuBar = new JMenuBar();
     JMenu modeMenu = new JMenu("Mode");
     modeMenu.setMnemonic(KeyEvent.VK_M);
@@ -51,20 +64,21 @@ public class MosaicTest {
     JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
     JToggleButton zoomButton = new ModeToggleButton(zoomMode);
     toolBar.add(zoomButton);
+    */
 
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    /*
     frame.setJMenuBar(menuBar);
     frame.add(toolBar,BorderLayout.WEST);
+    */
     frame.add(mosaic,BorderLayout.CENTER);
     frame.setSize(600,500);
     frame.setVisible(true);
-    /*
     try {
       mosaic.paintToPng(300,6,"junk.png");
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
-    */
   }
 }

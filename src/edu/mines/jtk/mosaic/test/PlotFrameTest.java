@@ -46,7 +46,7 @@ public class PlotFrameTest {
 
     final PlotFrame frame = new PlotFrame(panel);
     frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
-    //frame.setFontSize(24);
+    frame.setFontSize(24);
     frame.pack();
     frame.setVisible(true);
     //frame.paintToPng(300,6,"junk.png");
