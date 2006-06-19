@@ -52,9 +52,10 @@ public class AxisTics {
     xmin -= (xmax-xmin)*FLT_EPSILON;
     xmax += (xmax-xmin)*FLT_EPSILON;
     double d = abs(dtic);
-    double f = ((int)(xmin/d)-1)*d;
-    while (f<xmin)
-      f += d;
+    double f = ceil(xmin/d)*d;
+    //double f = ((int)(xmin/d)-1)*d;
+    //while (f<xmin)
+    //  f += d;
     int n = 1+(int)((xmax-f)/d);
     _xmin = xmin;
     _xmax = xmax;

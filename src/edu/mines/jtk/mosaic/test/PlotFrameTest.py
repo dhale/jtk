@@ -54,7 +54,7 @@ pp1 = makePlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
 pp2 = makePlotPanel(PlotPanel.Orientation.X1RIGHT_X2UP)
 pf = PlotFrame(pp1,pp2,PlotFrame.Split.VERTICAL)
 
-pf.setBackground(Color.MAGENTA)
+pf.setBackground(Color.CYAN)
 pf.setFontSize(24)
 
 pf.pack();

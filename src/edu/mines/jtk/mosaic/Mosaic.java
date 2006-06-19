@@ -377,6 +377,8 @@ public class Mosaic extends IPanel {
     int[] wcol = new int[_ncol];
     for (int icol=0,wleft=wfill; icol<_ncol; ++icol) {
       int we = (icol<_ncol-1)?wfill*_we[icol]/wesum:wleft;
+      if (_we[icol]==0)
+        we = 0;
       wcol[icol] = max(_wm[icol],we);
       wleft -= wcol[icol];
     }
@@ -385,6 +387,8 @@ public class Mosaic extends IPanel {
     int[] hrow = new int[_nrow];
     for (int irow=0,hleft=hfill; irow<_nrow; ++irow) {
       int he = (irow<_nrow-1)?hfill*_he[irow]/hesum:hleft;
+      if (_he[irow]==0)
+        he = 0;
       hrow[irow] = max(_hm[irow],he);
       hleft -= hrow[irow];
     }

@@ -314,9 +314,10 @@ public class TileAxis extends IPanel {
         g2d.drawString(_label,xl,yl);
       } else {
         int wl = fm.stringWidth(_label);
-        int xl = isLeft ?
-          max(fa,w-1-tl-fd-wsmax-fd-fd-fl) :
-          min(w-1-fd,tl+fd+wsmax+fa);
+        //int xl = isLeft ?
+        //  max(fa,w-1-tl-fd-wsmax-fd-fd-fl) :
+        //  min(w-1-fd,tl+fd+wsmax+fa);
+        int xl = isLeft?fa+fd:w-1-fd-fd-fl;
         int yl = max(wl,min(h,(h+wl)/2));
         g2d.translate(xl,yl);
         g2d.rotate(-PI/2.0);
@@ -494,7 +495,6 @@ public class TileAxis extends IPanel {
       ntic = at.getCountMajor();
       dtic = at.getDeltaMajor();
 
-
       // The tic values nearest vmin and vmax. 
       double va = ceil(vmin/dtic)*dtic;
       double vb = floor(vmax/dtic)*dtic;
@@ -515,13 +515,13 @@ public class TileAxis extends IPanel {
         break;
 
       // Otherwise, assume that all tic labels have the max width and height.
-      // If those tic labels use less than half of the space available, then 
-      // we have a good fit and stop looking.
+      // If those tic labels use less than a fraction of the space available, 
+      // then we have a good fit and stop looking.
       if (isHorizontal) {
-        if (ticLabelWidth*ntic<0.5*w)
+        if (ticLabelWidth*ntic<0.7*w)
           break;
       } else {
-        if (ticLabelHeight*ntic<0.5*h)
+        if (ticLabelHeight*ntic<0.6*h)
           break;
       }
     }

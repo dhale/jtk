@@ -114,7 +114,7 @@ public class PlotPanel extends IPanel {
     gbc.fill = GridBagConstraints.BOTH;
     this.add(_mosaic,gbc);
     this.setPreferredSize(new Dimension(200+300*ncol,100+300*nrow));
-    //this.revalidate();
+    this.revalidate();
   }
 
   /**
