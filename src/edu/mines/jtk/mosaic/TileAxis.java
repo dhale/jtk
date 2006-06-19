@@ -367,7 +367,7 @@ public class TileAxis extends IPanel {
       if (_label!=null)
         width += fm.getHeight();
     } else {
-      width = 20;
+      width = 50;
       if (_label!=null)
         width = max(width,fm.stringWidth(_label));
     }
@@ -386,7 +386,7 @@ public class TileAxis extends IPanel {
       if (_label!=null)
         height += fm.getHeight();
     } else {
-      height = 20;
+      height = 50;
       if (_label!=null)
         height = max(height,fm.stringWidth(_label));
     }
