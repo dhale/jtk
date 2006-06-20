@@ -12,7 +12,7 @@ Binary distributions
 --------------------
 
 Binary distributions include the following directories:
-bin/ - platform-dependent scripts for running Mines JTK programs
+bin/ - platform-dependent scripts for building and running Mines JTK programs
 doc/ - documentation files
 jar/ - Java archive (JAR) files (*.jar)
 lib/ - platform-specific runtime libraries (*.so or *.dll)
