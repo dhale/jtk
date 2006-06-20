@@ -124,28 +124,6 @@ public class ColorBar extends IPanel implements ColorMapListener {
       _mosaic.setBackground(color);
   }
 
-  // Override base class implementation.
-  public Dimension getMinimumSize() {
-    Dimension size;
-    if (isMinimumSizeSet()) {
-      size = super.getMinimumSize();
-    } else {
-      size = _mosaic.getMinimumSize();
-    }
-    return size;
-  }
-
-  // Override base class implementation.
-  public Dimension getPreferredSize() {
-    Dimension size;
-    if (isPreferredSizeSet()) {
-      size = super.getPreferredSize();
-    } else {
-      size = _mosaic.getPreferredSize();
-    }
-    return size;
-  }
-
   ///////////////////////////////////////////////////////////////////////////
   // protected
 

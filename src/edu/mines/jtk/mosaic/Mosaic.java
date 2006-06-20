@@ -342,13 +342,6 @@ public class Mosaic extends IPanel {
 
   // Override base class implementation; ignore any layout manager.
   public void doLayout() {
-    doLayout(0);
-  }
-  private void doLayout(int count) {
-
-    // After 10 attempts, give up on layout.
-    if (count>10)
-      return;
 
     // Ensure scroll bars are visible or invisible, as necessary.
     updateScrollBars();
@@ -400,8 +393,6 @@ public class Mosaic extends IPanel {
     // Width of spacing between adjacent tiles.
     int wts = widthTileSpacing();
 
-    boolean redo = false;
-
     // Axes top.
     if (_axesTop!=null) {
       int haxis = heightMinimumAxesTop()-wab-wab;
@@ -409,8 +400,7 @@ public class Mosaic extends IPanel {
       int yaxis = wab;
       for (int icol=0; icol<_ncol; ++icol) {
         int waxis = wcol[icol];
-        if (setAxisBounds(_axesTop[icol],xaxis,yaxis,waxis,haxis))
-          redo = true;
+        _axesTop[icol].setBounds(xaxis,yaxis,waxis,haxis);
         xaxis += waxis+wtb+wts+wtb;
       }
     }
@@ -422,8 +412,7 @@ public class Mosaic extends IPanel {
       int yaxis = heightMinimumAxesTop()+wtb;
       for (int irow=0; irow<_nrow; ++irow) {
         int haxis = hrow[irow];
-        if (setAxisBounds(_axesLeft[irow],xaxis,yaxis,waxis,haxis))
-          redo = true;
+        _axesLeft[irow].setBounds(xaxis,yaxis,waxis,haxis);
         yaxis += haxis+wtb+wts+wtb;
       }
     }
@@ -459,8 +448,7 @@ public class Mosaic extends IPanel {
       int yaxis = ytile+wab;
       for (int icol=0; icol<_ncol; ++icol) {
         int waxis = wcol[icol];
-        if (setAxisBounds(_axesBottom[icol],xaxis,yaxis,waxis,haxis))
-          redo = true;
+        _axesBottom[icol].setBounds(xaxis,yaxis,waxis,haxis);
         xaxis += waxis+wtb+wts+wtb;
       }
     }
@@ -472,8 +460,7 @@ public class Mosaic extends IPanel {
       int yaxis = heightMinimumAxesTop()+wtb;
       for (int irow=0; irow<_nrow; ++irow) {
         int haxis = hrow[irow];
-        if (setAxisBounds(_axesRight[irow],xaxis,yaxis,waxis,haxis))
-          redo = true;
+        _axesRight[irow].setBounds(xaxis,yaxis,waxis,haxis);
         yaxis += haxis+wtb+wts+wtb;
       }
     }
@@ -505,9 +492,6 @@ public class Mosaic extends IPanel {
         yvsb += hvsb+wtb+wts+wtb;
       }
     }
-
-    if (redo)
-      doLayout(count+1);
   }
 
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
@@ -681,13 +665,6 @@ public class Mosaic extends IPanel {
   private void repaintAxis(TileAxis axis) {
     axis.repaint();
     axis.updateAxisTics();
-  }
-
-  // Sets bounds for axis. Returns true if this changes the minimum
-  // width or minimum height of the axis; false, otherwise.
-  private boolean setAxisBounds(TileAxis axis, int x, int y, int w, int h) {
-    axis.setBounds(x,y,w,h);
-    return axis.updateAxisTics();
   }
 
   private int widthAxesBorder() {

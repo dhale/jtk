@@ -22,6 +22,13 @@ import edu.mines.jtk.mosaic.*;
 public class MosaicTest {
 
   public static void main(String[] args) {
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        go();
+      }
+    });
+  }
+  private static void go() {
     int nrow = 2;
     int ncol = 3;
     Set<Mosaic.AxesPlacement> axesPlacement = EnumSet.of(
@@ -53,32 +60,22 @@ public class MosaicTest {
     TileZoomMode zoomMode = new TileZoomMode(mosaic.getModeManager());
     zoomMode.setActive(true);
 
-    /*
-    JMenuBar menuBar = new JMenuBar();
-    JMenu modeMenu = new JMenu("Mode");
-    modeMenu.setMnemonic(KeyEvent.VK_M);
-    JMenuItem zoomItem = new ModeMenuItem(zoomMode);
-    modeMenu.add(zoomItem);
-    menuBar.add(modeMenu);
-
-    JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
-    JToggleButton zoomButton = new ModeToggleButton(zoomMode);
-    toolBar.add(zoomButton);
-    */
-
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    /*
-    frame.setJMenuBar(menuBar);
-    frame.add(toolBar,BorderLayout.WEST);
-    */
     frame.add(mosaic,BorderLayout.CENTER);
     frame.setSize(600,500);
     frame.setVisible(true);
-    try {
-      mosaic.paintToPng(300,6,"junk.png");
-    } catch (IOException ioe) {
-      throw new RuntimeException(ioe);
-    }
+    /*
+    final Mosaic mosaicFinal = mosaic;
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        try {
+          mosaicFinal.paintToPng(300,6,"junk.png");
+        } catch (IOException ioe) {
+          throw new RuntimeException(ioe);
+        }
+      }
+    });
+    */
   }
 }

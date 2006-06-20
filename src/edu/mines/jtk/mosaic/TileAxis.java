@@ -174,6 +174,13 @@ public class TileAxis extends IPanel {
     repaint();
   }
 
+  // Override base class implementation, so we can update axis tics.
+  public void setBounds(int x, int y, int width, int height) {
+    super.setBounds(x,y,width,height);
+    updateAxisTics();
+    repaint();
+  }
+
   /**
    * Gets the axis tics painted by this tile axis.
    * @return the axis tics.
@@ -409,18 +416,18 @@ public class TileAxis extends IPanel {
    * @return true, if this update changes the minimum width or height
    *  of this axis; false, otherwise.
    */
-  boolean updateAxisTics() {
+  void updateAxisTics() {
 
     // Adjacent tile.
     Tile tile = getTile();
     if (tile==null)
-      return false;
+      return;
 
     // Width and height of this axis.
     int w = getWidth();
     int h = getHeight();
     if (w==0 || h==0)
-      return false;
+      return;
 
     // Projector and transcaler from adjacent tile.
     Projector p = (isHorizontal()) ?
@@ -536,11 +543,23 @@ public class TileAxis extends IPanel {
     if (_ticLabelWidth!=ticLabelWidth || _ticLabelHeight!=ticLabelHeight) {
       _ticLabelWidth = ticLabelWidth;
       _ticLabelHeight = ticLabelHeight;
-      revalidate();
-      return true;
+      revalidateLater();
+      return;
     }
-
-    return false;
+  }
+  private void revalidateLater() {
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        //revalidate();
+        invalidate();
+        RepaintManager.
+          currentManager(TileAxis.this).
+          addInvalidComponent(TileAxis.this);
+        RepaintManager.
+          currentManager(TileAxis.this).
+          validateInvalidComponents();
+      }
+    });
   }
 
   // Tracking methods called by MouseTrackMode.

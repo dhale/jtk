@@ -6,6 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic.test;
 
+import javax.swing.*;
+
 import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.util.*;
 import edu.mines.jtk.mosaic.*;
@@ -18,7 +20,13 @@ import edu.mines.jtk.mosaic.*;
 public class PlotFrameTest {
 
   public static void main(String[] args) {
-
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        go();
+      }
+    });
+  }
+  private static void go() {
     int n1 = 101;
     double d1 = 0.03;
     double f1 = -1.3;
@@ -54,11 +62,10 @@ public class PlotFrameTest {
     panel.setHLabel(0,"offset (km)");
     panel.setHLabel(1,"velocity (km/s)");
 
-    final PlotFrame frame = new PlotFrame(panel);
+    PlotFrame frame = new PlotFrame(panel);
     frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
     frame.setFontSize(24);
-    frame.pack();
     frame.setVisible(true);
-    frame.paintToPng(300,6,"junk.png");
+    //frame.paintToPng(300,6,"junk.png");
   }
 }
