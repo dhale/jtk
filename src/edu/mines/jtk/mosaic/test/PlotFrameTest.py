@@ -57,6 +57,5 @@ pf = PlotFrame(pp1,pp2,PlotFrame.Split.VERTICAL)
 pf.setBackground(Color.CYAN)
 pf.setFontSize(24)
 
-pf.pack();
 pf.setVisible(True)
 #pf.paintToPng(300,6,"junk.png")

@@ -410,11 +410,9 @@ public class TileAxis extends IPanel {
    * mosaic lays out its tile axes using their minimum (preferred) widths 
    * and heights. The minimum width and height depend on axis tic labels 
    * that, in turn, depend on the axis width and height. To help manage 
-   * this circular dependency, this method returns true if its minimum
-   * width or height is changed by this update. Otherwise, it returns
-   * false.
-   * @return true, if this update changes the minimum width or height
-   *  of this axis; false, otherwise.
+   * this circular dependency, this method calls a special private method
+   * revalidateLater when its minimum width or height is changed by this 
+   * update. 
    */
   void updateAxisTics() {
 
@@ -517,7 +515,7 @@ public class TileAxis extends IPanel {
       ticLabelWidth = (int)ceil(r.width);
       ticLabelHeight = (int)ceil(r.height);
 
-      // If tic interval is specified, we're done.
+      // If tic interval is specified explicitly, we're done.
       if (_interval!=0.0)
         break;
 
@@ -546,20 +544,6 @@ public class TileAxis extends IPanel {
       revalidateLater();
       return;
     }
-  }
-  private void revalidateLater() {
-    SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        //revalidate();
-        invalidate();
-        RepaintManager.
-          currentManager(TileAxis.this).
-          addInvalidComponent(TileAxis.this);
-        RepaintManager.
-          currentManager(TileAxis.this).
-          validateInvalidComponents();
-      }
-    });
   }
 
   // Tracking methods called by MouseTrackMode.
@@ -644,5 +628,45 @@ public class TileAxis extends IPanel {
       s = (iend<len)?sb+s.substring(iend,len):sb;
     }
     return s;
+  }
+
+  /**
+   * Queues an event to validate this axis. Simply calling revalidate
+   * will not always work. In particular, calling revalidate while in 
+   * doLayout (as this axis and its parents are being validated) does not 
+   * cause this axis to be validated again.
+   */
+  private void revalidateLater() {
+
+    // We cannot invalidate/validate now, because we may already be in the
+    // process of validating the hierarchy that contains this axis. So we
+    // postpone this work by putting it on the Swing event queue.
+    SwingUtilities.invokeLater(new Runnable() {
+
+      // When this is called, we know that Swing is not in the middle of
+      // something, like validating this axis and its parents.
+      public void run() {
+
+        // Mark this axis and parents up to root not valid.
+        // (Just like JComponent.revalidate.)
+        invalidate();
+
+        // Add this axis to repaint manager's invalid list. This also queues 
+        // a work request to validate invalid components and to paint dirty 
+        // regions. (Just like JComponent.revalidate.)
+        RepaintManager.
+          currentManager(TileAxis.this).
+          addInvalidComponent(TileAxis.this);
+
+        // Now validate any invalid components. We do not wait for the work
+        // request that we just queued, because other events may already be on 
+        // the queue and this component should be validated before processing 
+        // those other events. When that queued work request is processed, it
+        // should do nothing, because the components are already valid.
+        RepaintManager.
+          currentManager(TileAxis.this).
+          validateInvalidComponents();
+      }
+    });
   }
 }

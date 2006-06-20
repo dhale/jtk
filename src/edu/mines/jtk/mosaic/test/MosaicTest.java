@@ -38,13 +38,13 @@ public class MosaicTest {
       Mosaic.AxesPlacement.RIGHT
     );
     Mosaic mosaic = new Mosaic(nrow,ncol,axesPlacement);
-    //mosaic.setBackground(Color.WHITE);
+    mosaic.setBackground(Color.WHITE);
     mosaic.setFont(new Font("SansSerif",Font.PLAIN,12));
     mosaic.setWidthMinimum(1,200);
     mosaic.setWidthElastic(1,200);
     mosaic.setHeightElastic(0,0);
-    Tile tile11 = mosaic.getTile(1,1);
-    tile11.setViewRectangle(new DRectangle(0.1,0.1,0.8,0.8));
+    //Tile tile11 = mosaic.getTile(1,1);
+    //tile11.setViewRectangle(new DRectangle(0.1,0.1,0.8,0.8));
 
     mosaic.getTileAxisTop(0).setLabel("axis label");
     mosaic.getTileAxisTop(1).setLabel("axis label");
@@ -65,6 +65,12 @@ public class MosaicTest {
     frame.add(mosaic,BorderLayout.CENTER);
     frame.setSize(600,500);
     frame.setVisible(true);
+
+    /*
+     * This code creates a PNG image in a file named junk.png. We create the 
+     * image later on the Swing thread, because it likely depends on other
+     * events on that thread being processed first.
+     */
     /*
     final Mosaic mosaicFinal = mosaic;
     SwingUtilities.invokeLater(new Runnable() {
