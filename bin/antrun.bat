@@ -2,14 +2,13 @@
 setlocal
 
 rem Customize these locations as necessary.
-set GCC_HOME=C:\pro\mingw
 set ANT_HOME=C:\pro\ant
 set JDK_HOME=C:\pro\jdk
 
-rem These are needed by g++ compiler and linker.
-set LIB=%JDK_HOME%\lib;%GCC_HOME%\lib
-set PATH=%JDK_HOME%\bin;%ANT_HOME%\bin;%GCC_HOME%\bin;%PATH%
+rem Include the JDK and Ant bin folders in our PATH.
+set PATH=%JDK_HOME%\bin;%ANT_HOME%\bin;%PATH%
 
+rem Run ant without adornments.
 ant -e %*
 
 endlocal
