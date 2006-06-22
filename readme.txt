@@ -1,84 +1,141 @@
-The Colorado School of Mines Java Toolkit
-
 *****************************************************************************
-Copyright (c) 2004, Colorado School of Mines and others. All rights reserved.
+Copyright (c) 2006, Colorado School of Mines and others. All rights reserved.
 This software and accompanying materials are made available under the terms 
 of the Common Public License - v1.0, which accompanies this distribution, 
 and is available at http://www.eclipse.org/legal/cpl-v10.html
 *****************************************************************************
 
+The Colorado School of Mines Java Toolkit
+-----------------------------------------
 
-Binary distributions
---------------------
+The Mines Java Toolkit (JTK) is a set of Java packages and native (non-Java) 
+code libraries for scientific and engineering computing. Applications
+currently include digital signal processing and 2-D and 3-D graphics.
 
-Binary distributions include the following directories:
-bin/ - platform-dependent scripts for building and running Mines JTK programs
-doc/ - documentation files
-jar/ - Java archive (JAR) files (*.jar)
-lib/ - platform-specific runtime libraries (*.so or *.dll)
-src/ - source code files (*.java, *.cpp, etc.)
+To take advantage of useful existing software not written in Java, we wrap 
+such software using the Java Native Interface (JNI). Where needed, we load
+JNI libraries dynamically via Java's System.loadLibrary method. Examples 
+include our JNI libraries that wrap OpenGL (for 3-D graphics) and LAPACK 
+(for dense linear algebra). 
 
-The Mines JTK requires Java Runtime Environment (JRE) 5.0. It will not 
-work with JRE 1.4.2 or earlier.
-
-If you obtained this file by downloading a platform-specific (binary)
-distribution, then you have all of the source code for the Mines JTK.
-We provide source files in a binary distribution for reference, only.
-You should not attempt to build a binary distribution from those files. 
-
-
-Building from source
---------------------
-
-If you want to build a binary distribution yourself, perhaps because you
-need to modify our source code, then you should SVN checkout our source 
-code and other essential files from our Subversion (SVN) repository: 
-http://boole.mines.edu/jtk. For that, you need an SVN client. These are
-available for many operating systems from http://subversion.tigris.org/.
+To simplify development, we include pre-compiled binaries for our JNI 
+libraries with the source code for the Mines JTK. Currently, we provide
+JNI libraries for 32-bit x86 systems running Linux or Windows. For these
+platforms, you need only a Java compiler to build the Mines JTK.
 
 Note: if you modify (or port, or translate, or ...) our source code, then
 you have created a "derived work", and should review carefully the terms
 of the license that accompanies this software.
 
-We designed the Mines JTK to be portable software. However, because of
-dependencies on some external packages and libraries, we build today for
-only Linux and Windows platforms.
-  
-To build the Mines JTK (after SVN checkout), you need the following:
+
+Getting the source code
+-----------------------
+
+To build the Mines JTK from source, you must first use Subversion (SVN)
+client software to checkout (co) the source code from our SVN repository:
+http://boole.mines.edu/jtk.
+
+
+If you are using Linux, an SVN client is likely available with your Linux 
+distribution. If not yet installed, perhaps you simply need to install it. 
+In a terminal window, type "svn". If that command is found, then (1) cd to 
+the directory that will contain your jtk directory and (2) type the command
+svn co http://boole.mines.edu/jtk
+This command will create a directory jtk in your current working
+directory.
+
+For Windows, we recommand that you download and install TortoiseSVN from 
+http://tortoisesvn.tigris.org. TortoiseSVN integrates nicely with the
+Windows Explorer. After installing TortoiseSVN, (1) make a folder jtk 
+(in the same folder as your jtk folder), (2) right-click on your jtk 
+folder and select "SVN checkout ..." from the menu, (3) enter the URL
+http://boole.mines.edu/jtk, and (4) enter the output path, including
+the jtk directory.
+
+After SVN checkout, you should have a directory jtk/trunk/ with
+the following subdirectories:
+bin/  - platform-dependent scripts (e.g., antrun.bat and javarun.bat)
+data/ - data used for demos and testing
+doc/  - documentation for tools we use but do not build (e.g., JUnit)
+jar/  - JAR files (e.g., junit.jar)
+lib/  - platform-specific JNI libraries (e.g., edu_mines_jtk_opengl.dll)
+src/  - source code files (e.g., edu/mines/jtk/util/Stopwatch.java)
+
+
+Tools for building
+------------------
+
+To build the Mines JTK, you need:
 * J2SE JDK 5.0 (or later): http://java.sun.com/j2se
 * Apache Ant 1.6.2 (or later): http://ant.apache.org
-* g++ (GCC) 3.2.3 (or later): http://www.mingw.org (for Windows only)
+
+These tools are freely available on the web. 
 
 The Mines JTK exploits significant new language features and classes that 
 became available only with Java 5.0. Therefore, this software cannot be 
 used or built with Java 1.4.2 (or earlier).
 
+On Windows, we like to put tools such as the JDK and Ant in a folder named 
+"C:\pro\". This folder name is shorter than "C:\Program Files" and contains 
+no spaces, which makes it easy to specify in scripts.
 
-C++ compilers
--------------
+These tools may be used with or without an IDE, such as NetBeans or Eclipse.
+Furthermore, you need not use Ant, though that is what we use and support.
 
-The Mines JTK depends on some external libraries, which can be accessed only 
-via native (non-Java) code. For example, the package edu.mines.jtk.opengl 
-wraps OpenGL 3-D graphics libraries via glue that we wrote in C++. For such 
-packages, we require a C++ compiler.
 
-For both Linux and Windows, we use g++, the GNU C++ compiler. For Linux,
-we simply use the g++ compiler provided with our Linux distribution. 
+Building the Mines JTK
+----------------------
 
-For Windows, we use g++ as provided with the MinGW (Minimalist GNU for 
-Windows) system, which is free software. As its name implies, MinGW is 
-relatively small and easy to download and install. 
+In your jtk/trunk/bin/ directory are scripts for running Ant. Choose an
+appropriate script for your platform, and copy it to some directory that is 
+in your PATH. From any directory, you will want to type the command antrun 
+and have this script be found. You may of course rename this script to 
+anything you like.
 
-Libraries built with MinGW depend on the file mingwm10.dll provided here 
-(lib\windows\x86) and with the MinGW distribution. At runtime, this file 
-must be in your PATH.
+In your copy of the antrun script, edit the environment variables so that 
+the script will find your JDK and Ant.
 
-To build our C++ code on any platform, you will need appropriate header 
-files. In particular, to build the native code glue for edu.mines.jtk.opengl, 
-you will need the header files gl.h, glext.h, and so on. These files are 
-freely available, but with licenses that do not permit us to redistribute 
-them. 
+Then cd to your jtk/trunk/ directory (the one that contains build.xml) 
+and type antrun. This command should build the Mines Java Toolkit. 
 
-Alternatively, you may simply build only the Java source code, and then use 
-the native code libraries from one of our binary distributions.
+Type antrun -p to learn more about other build targets, such as clean and doc.
 
+
+Using the Mines JTK
+-------------------
+
+After you have built the Mines JTK, you should have the JAR file
+jtk/trunk/build/jar/edu_mines_jtk.jar.
+You may use this file as you would any other JAR file.
+To run JUnit tests, you will also need jtk/trunk/jar/junit.jar.
+
+Some packages (e.g., edu.mines.jtk.opengl) require JNI libraries of
+native (non-Java) code. These platform-specific libraries should be
+in a subdirectory of jtk/trunk/lib/.
+
+To use the Mines JTK, we must launch a Java virtual machine, specifying 
+all of these JAR files and the locations of our JNI libraries.
+
+In jtk/trunk/bin/ are scripts (e.g., javarun.bat) that illustrate how
+we do this for different platforms. To use the Mines JTK from the command
+line, you should (1) copy the appropriate script to some directory in
+your PATH, (2) edit the script to specify the correct directories, and
+(3) run a Mines JTK program by typing javarun. 
+
+For example, you might run JUnit tests for edu.mines.jtk.util by typing
+javarun edu.mines.jtk.util.test.Suite
+If this test fails, then you may need to edit your javarun script.
+
+To test something that requires JNI libraries, type
+javarun edu.mines.jtk.lapack.test.Suite
+Again, if this test fails, then you may need to edit your javarun script.
+
+To test our OpenGL wrappers, type
+javarun edu.mines.jtk.opengl.test.Hello
+
+If the OpenGL test fails, then you may need to install OpenGL version 1.2 
+or higher. (Microsoft's OpenGL libraries support only OpenGL version 1.1.)
+Note the OpenGL version and vendor printed by this test. For accelerated 
+3-D graphics, you want the vendor to be something like NVIDIA or ATI,
+not Microsoft or Mesa. You may need to download and install new video
+drivers.
