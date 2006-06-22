@@ -22,10 +22,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <property name="build.jar" value="${build}/jar"/>
   <property name="build.lib" value="${build}/lib"/>
   <property name="build.obj" value="${build}/obj"/>
-  <property name="build.src" value="${build}/src"/>
   <property name="obj.jtk" value="${build.obj}/edu/mines/jtk"/>
   <property name="src.jtk" value="${src}/edu/mines/jtk"/>
-  <property name="dist" value="${basedir}/dist"/>
 
   <!-- Other global settings -->
   <property name="title" value="MinesJTK"/>
@@ -55,18 +53,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <mkdir dir="${build.jar}"/>
     <mkdir dir="${build.lib}"/>
     <mkdir dir="${build.obj}"/>
-    <mkdir dir="${build.src}"/>
   </target>
 
   <!-- Compile Java -->
   <target name="compile-java" depends="init">
-    <javac srcdir="${build.src}" destdir="${build.cls}"
-      compiler="javac1.5"
-      debug="on" 
-      deprecation="on">
-      <compilerarg value="-Xlint:unchecked"/>
-      <classpath refid="classpath"/>
-    </javac>
     <javac srcdir="${src}" destdir="${build.cls}" 
       compiler="javac1.5"
       debug="on" 
@@ -91,146 +81,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     </copy>
   </target>
 
-  <!-- Build JNI libraries -->
-  <target name="jni" depends="os-init,jni-init,jni-linux,jni-windows"
-      description="build JNI libraries (compile and link C++)">
-  </target>
-  <target name="jni-init" depends="compile-java">
-    <taskdef name="jnicpp" 
-        classname="edu.mines.jtk.ant.Jnicpp"
-        classpath="${build.cls}"/>
-  </target>
-
-  <!-- Build JNI libraries for Linux -->
-  <target name="jni-linux" if="linux">
-    <property name="jdk.home" value="${env.JDK_HOME}"/>
-    <property name="jdk.include" value="${jdk.home}/include"/>
-    <property name="jre.home" value="${jdk.home}/jre"/>
-    <property name="jre.lib" value="${jre.home}/lib/i386"/>
-    <jnicpp 
-        srcdir="${src.jtk}/bench" 
-        objdir="${obj.jtk}/bench"
-        jnidir="${build.lib}" 
-        jniname="edu_mines_jtk_bench">
-      <incarg arg="-I${jdk.include}"/>
-      <incarg arg="-I${jdk.include}/linux"/>
-      <libarg arg="-L/usr/X11R6/lib"/>
-      <libarg arg="-lGL"/>
-      <libarg arg="-lGLU"/>
-      <libarg arg="-L${jre.lib}"/>
-      <libarg arg="-ljawt"/>
-    </jnicpp>
-    <jnicpp 
-        srcdir="${src.jtk}/lapack" 
-        objdir="${obj.jtk}/lapack"
-        jnidir="${build.lib}" 
-        jniname="edu_mines_jtk_lapack">
-      <incarg arg="-I${jdk.include}"/>
-      <incarg arg="-I${jdk.include}/linux"/>
-      <libarg arg="-L${lib}/linux/x86"/>
-      <libarg arg="-llapack"/>
-      <libarg arg="-lcblaswr"/>
-      <libarg arg="-lcblas"/>
-      <libarg arg="-latlas"/>
-      <libarg arg="-lI77"/>
-      <libarg arg="-lF77"/>
-    </jnicpp>
-    <jnicpp 
-        srcdir="${src.jtk}/opengl" 
-        objdir="${obj.jtk}/opengl"
-        jnidir="${build.lib}" 
-        jniname="edu_mines_jtk_opengl">
-      <incarg arg="-I${jdk.include}"/>
-      <incarg arg="-I${jdk.include}/linux"/>
-      <libarg arg="-L/usr/X11R6/lib"/>
-      <libarg arg="-lGL"/>
-      <libarg arg="-lGLU"/>
-      <libarg arg="-L${jre.lib}"/>
-      <libarg arg="-ljawt"/>
-    </jnicpp>
-  </target>
-
-  <!-- Build JNI libraries for Windows (using MinGW) -->
-  <target name="jni-windows" if="windows">
-    <property name="jdk.home" value="${env.JDK_HOME}"/>
-    <property name="jdk.include" value="${jdk.home}\include"/>
-    <property name="jdk.lib" value="${jdk.home}\lib"/>
-    <jnicpp 
-        srcdir="${src.jtk}\bench" 
-        objdir="${obj.jtk}\bench"
-        jnidir="${build.lib}" 
-        jniname="edu_mines_jtk_bench">
-      <incarg arg="-I${jdk.include}"/>
-      <incarg arg="-I${jdk.include}\win32"/>
-      <libarg arg="-lopengl32"/>
-      <libarg arg="${jdk.lib}\jawt.lib"/>
-    </jnicpp>
-    <jnicpp 
-        srcdir="${src.jtk}\lapack" 
-        objdir="${obj.jtk}\lapack"
-        jnidir="${build.lib}" 
-        jniname="edu_mines_jtk_lapack">
-      <incarg arg="-I${jdk.include}"/>
-      <incarg arg="-I${jdk.include}\win32"/>
-      <libarg arg="-L${lib}\windows\x86"/>
-      <libarg arg="-llapack"/>
-      <libarg arg="-lcblaswr"/>
-      <libarg arg="-lcblas"/>
-      <libarg arg="-latlas"/>
-      <libarg arg="-lI77"/>
-      <libarg arg="-lF77"/>
-    </jnicpp>
-    <jnicpp 
-        srcdir="${src.jtk}\opengl" 
-        objdir="${obj.jtk}\opengl"
-        jnidir="${build.lib}" 
-        jniname="edu_mines_jtk_opengl">
-      <incarg arg="-I${jdk.include}"/>
-      <incarg arg="-I${jdk.include}\win32"/>
-      <libarg arg="-lopengl32"/>
-      <libarg arg="-lglu32"/>
-      <libarg arg="-lgdi32"/>
-      <libarg arg="${jdk.lib}\jawt.lib"/>
-    </jnicpp>
-  </target>
-
-  <!-- Build JNI libraries for Windows (using MSVC) - CURRENTLY NOT USED!
-  <target name="jni-windows" if="windows">
-    <property name="vc.home" value="${env.VC_HOME}"/>
-    <property name="sdk.home" value="${env.SDK_HOME}"/>
-    <property name="jdk.home" value="${env.JDK_HOME}"/>
-    <property name="vc.include" value="${vc.home}\include"/>
-    <property name="sdk.include" value="${sdk.home}\include"/>
-    <property name="jdk.include" value="${jdk.home}\include"/>
-    <jnicpp 
-        srcdir="${src.jtk}/bench" 
-        objdir="${obj.jtk}/bench"
-        jnidir="${build.lib}" 
-        jniname="edu_mines_jtk_bench">
-      <incarg arg="/I${jdk.include}"/>
-      <incarg arg="/I${jdk.include}\win32"/>
-      <incarg arg="/I${vc.include}"/>
-      <incarg arg="/I${sdk.include}"/>
-      <libarg arg="opengl32.lib"/>
-      <libarg arg="jawt.lib"/>
-    </jnicpp>
-    <jnicpp 
-        srcdir="${src.jtk}/opengl" 
-        objdir="${obj.jtk}/opengl"
-        jnidir="${build.lib}" 
-        jniname="edu_mines_jtk_opengl">
-      <incarg arg="/I${jdk.include}"/>
-      <incarg arg="/I${jdk.include}\win32"/>
-      <incarg arg="/I${vc.include}"/>
-      <incarg arg="/I${sdk.include}"/>
-      <libarg arg="opengl32.lib"/>
-      <libarg arg="glu32.lib"/>
-      <libarg arg="gdi32.lib"/>
-      <libarg arg="jawt.lib"/>
-    </jnicpp>
-  </target>
-  -->
-
   <!--Build javadocs -->
   <target name="doc" depends="init" description="build javadocs">
     <javadoc 
@@ -250,62 +100,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   </target>
 
   <!-- Build everything (except javadocs) -->
-  <target name="all" depends="jar,jni"
+  <target name="all" depends="jar"
       description="build everything"/>
-
-  <!-- Build distribution -->
-  <target name="dist" depends="dist-init,dist-linux,dist-windows"/>
-  <target name="dist-init" depends="all,doc">
-    <tstamp/>
-    <delete dir="${dist}"/>
-    <mkdir dir="${dist}"/>
-    <mkdir dir="${dist}/bin"/>
-    <mkdir dir="${dist}/doc"/>
-    <mkdir dir="${dist}/jar"/>
-    <mkdir dir="${dist}/lib"/>
-    <mkdir dir="${dist}/src"/>
-    <copy todir="${dist}" file="license.txt"/>
-    <copy todir="${dist}" file="readme.txt"/>
-    <copy todir="${dist}/doc">
-      <fileset dir="${build.doc}"/>
-    </copy>
-    <copy todir="${dist}/jar">
-      <fileset dir="${build.jar}"/>
-      <fileset dir="${jar}" includes="junit.jar"/>
-    </copy>
-    <copy todir="${dist}/lib">
-      <fileset dir="${build.lib}"/>
-    </copy>
-    <copy todir="${dist}/src">
-      <fileset dir="${src}">
-        <exclude name="edu/mines/jtk/**/new/"/>
-        <exclude name="edu/mines/jtk/**/old/"/>
-      </fileset>
-    </copy>
-  </target>
-  <target name="dist-linux" depends="all,doc" if="linux">
-    <copy todir="${dist}/bin">
-      <fileset dir="${bin}" includes="javarun.sh"/>
-    </copy>
-    <copy todir="${dist}/lib">
-      <fileset dir="${lib}/linux/x86" includes="*.so"/>
-    </copy>
-    <tar destfile="${dist}/${title}_${DSTAMP}_${TSTAMP}.tar.gz"
-         compression="gzip">
-      <tarfileset dir="${dist}" prefix="${title}"/>
-    </tar>
-  </target>
-  <target name="dist-windows" depends="all,doc" if="windows">
-    <copy todir="${dist}/bin">
-      <fileset dir="${bin}" includes="javarun.bat"/>
-    </copy>
-    <copy todir="${dist}/lib">
-      <fileset dir="${lib}/windows/x86" includes="*.dll"/>
-    </copy>
-    <zip destfile="${dist}/${title}_${DSTAMP}_${TSTAMP}.zip">
-      <zipfileset dir="${dist}" prefix="${title}"/>
-    </zip>
-  </target>
 
   <!-- Clean jar -->
   <target name="clean-jar"
@@ -314,30 +110,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <delete dir="${build.jar}"/>
   </target>
 
-  <!-- Clean jni -->
-  <target name="clean-jni"
-      description="delete all products of jni build">
-    <delete dir="${build.lib}"/>
-    <delete dir="${build.obj}"/>
-  </target>
-
-  <!-- Clean build -->
-  <target name="clean-build"
-      description="delete all products of build, not including dist">
-    <delete dir="${build}"/>
-  </target>
-
-  <!-- Clean dist -->
-  <target name="clean-dist"
-      description="delete all products of dist build">
-    <delete dir="${dist}"/>
-  </target>
-
   <!-- Cleanup -->
   <target name="clean"
-      description="delete all products of build, including dist">
+      description="delete all products of build">
     <delete dir="${build}"/>
-    <delete dir="${dist}"/>
   </target>
 
 </project>
