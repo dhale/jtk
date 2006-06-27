@@ -19,6 +19,7 @@ public class Suite extends TestSuite {
     TestSuite suite = new TestSuite();
 
     suite.addTestSuite(BoundingTest.class);
+    suite.addTestSuite(BoundingBoxTreeTest.class);
     suite.addTestSuite(MatrixPointVectorTest.class);
 
     return suite;

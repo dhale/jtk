@@ -57,6 +57,15 @@ public class BoundingSphere {
   }
 
   /**
+   * Constructs a bounding sphere that contains the specified bounding box.
+   * @param bb the bounding box.
+   */
+  public BoundingSphere(BoundingBox bb) {
+    this();
+    expandBy(bb);
+  }
+
+  /**
    * Constructs a copy of the specified bounding sphere.
    * @param bs the bounding sphere.
    */
@@ -397,6 +406,10 @@ public class BoundingSphere {
     BoundingSphere bs = new BoundingSphere();
     bs.setInfinite();
     return bs;
+  }
+
+  public String toString() {
+    return "{"+getCenter()+":"+getRadius()+"}";
   }
 
   ///////////////////////////////////////////////////////////////////////////

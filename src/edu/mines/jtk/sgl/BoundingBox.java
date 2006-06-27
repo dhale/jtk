@@ -83,6 +83,30 @@ public class BoundingBox {
   }
 
   /**
+   * Constructs a bounding box for points with specified coordinates.
+   * The (x,y,z) coordinates are packed into the specified array such
+   * that (xyz[0],xyz[1],xyz[2]) are the (x,y,z) coordinates of the 
+   * 1st point, (xyz[3],xyz[4],xyz[5]) are the (x,y,z) coordinates of 
+   * the 2nd point, and so on.
+   * @param xyz array of packed (x,y,z) coordinates.
+   */
+  public BoundingBox(float[] xyz) {
+    this();
+    expandBy(xyz);
+  }
+
+  /**
+   * Constructs a bounding box for points with specified coordinates.
+   * @param x array of x coordinates.
+   * @param y array of y coordinates.
+   * @param z array of z coordinates.
+   */
+  public BoundingBox(float[] x, float[] y, float[] z) {
+    this();
+    expandBy(x,y,z);
+  }
+
+  /**
    * Constructs a copy of the specified bounding box.
    * @param bb the bounding box.
    */
@@ -184,6 +208,14 @@ public class BoundingBox {
   }
 
   /**
+   * Expands this box to include the specified point.
+   * @param p the point.
+   */
+  public void expandBy(Point3 p) {
+    expandBy(p.x,p.y,p.z);
+  }
+
+  /**
    * Expands this box to include the point with specified coordinates.
    * @param x the point x coordinate.
    * @param y the point y coordinate.
@@ -199,11 +231,29 @@ public class BoundingBox {
   }
 
   /**
-   * Expands this box to include the specified point.
-   * @param p the point.
+   * Expands this box to include the points with specified coordinates.
+   * The (x,y,z) coordinates are packed into the specified array, such
+   * that (xyz[0],xyz[1],xyz[2]) are the (x,y,z) coordinates of the 1st
+   * point, (xyz[3],xyz[4],xyz[5]) are the (x,y,z) coordinates of the 2nd
+   * point, and so on.
+   * @param xyz array of packed (x,y,z) coordinates.
    */
-  public void expandBy(Point3 p) {
-    expandBy(p.x,p.y,p.z);
+  public void expandBy(float[] xyz) {
+    int n = xyz.length;
+    for (int i=0; i<n; i+=3)
+      expandBy(xyz[i],xyz[i+1],xyz[i+2]);
+  }
+
+  /**
+   * Expands this box to include the points with specified coordinates.
+   * @param x array of x coordinates.
+   * @param y array of y coordinates.
+   * @param z array of z coordinates.
+   */
+  public void expandBy(float[] x, float[] y, float[] z) {
+    int n = x.length;
+    for (int i=0; i<n; ++i)
+      expandBy(x[i],y[i],z[i]);
   }
 
   /**
@@ -266,6 +316,16 @@ public class BoundingBox {
   }
 
   /**
+   * Determines whether this box contains the specified bounding box.
+   * @param bb the bounding box.
+   * @return true, if this box contains the specified box; false, otherwise.
+   */
+  public boolean contains(BoundingBox bb) {
+    return contains(bb._xmin,bb._ymin,bb._zmin) &&
+           contains(bb._xmax,bb._ymax,bb._zmax);
+  }
+
+  /**
    * Determines whether this box intersects the specified bounding box.
    * @param bb the bounding box.
    * @return true, if intersects; false, otherwise.
@@ -292,6 +352,10 @@ public class BoundingBox {
     BoundingBox bb = new BoundingBox();
     bb.setInfinite();
     return bb;
+  }
+
+  public String toString() {
+    return "{"+getMin()+":"+getMax()+"}";
   }
 
   ///////////////////////////////////////////////////////////////////////////
