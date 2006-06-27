@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Where is the Mines Java Toolkit?
+# Where is the Mines JTK? (Where is your build.xml?)
 export MINES_JTK_HOME=~/box/jtk/trunk
 
 # Where are the Mines JTK jars and JNI libraries?
@@ -11,4 +11,6 @@ export LD_LIBRARY_PATH=\
 $MINES_JTK_HOME/lib/linux/x86
 
 # Run java with the server VM, assertions enabled, and a 1GB Java heap.
+# If you use the java inside Sun's JDK, you have the Hotspot server VM;
+# Otherwise, you may need to remove this flag.
 java -server -ea -Xmx1000m $*
