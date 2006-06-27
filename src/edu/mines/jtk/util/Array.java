@@ -7389,7 +7389,7 @@ public class Array {
    * Partially sorts the elements of the specified array in ascending order.
    * After partial sorting, the element a[k] with specified index k has the 
    * value it would have if the array were completely sorted. That is,
-   * a[0:k-1] &lt;= a[k] &lt;= a[k:n-1], where n is the array length.
+   * a[0:k-1] &lt;= a[k] &lt;= a[k:n-1], where n is the length of a.
    * @param k the index.
    * @param a the array to be partially sorted.
    */
@@ -7417,13 +7417,13 @@ public class Array {
    * Partially sorts indices of the elements of the specified array.
    * After partial sorting, the element i[k] with specified index k has the 
    * value it would have if the indices were completely sorted. That is, 
-   * a[i[0:k-1]] &lt;= a[i[k]] &lt;= a[i[k:n-1]], where n is the array length.
+   * a[i[0:k-1]] &lt;= a[i[k]] &lt;= a[i[k:n-1]], where n is the length of i.
    * @param k the index.
    * @param a the array.
    * @param i the indices to be partially sorted.
    */
   public static void quickPartialIndexSort(int k, byte[] a, int[] i) {
-    int n = a.length;
+    int n = i.length;
     int p = 0;
     int q = n-1;
     int[] m = (n>NSMALL_SORT)?new int[2]:null;
@@ -7477,7 +7477,7 @@ public class Array {
    * Partially sorts the elements of the specified array in ascending order.
    * After partial sorting, the element a[k] with specified index k has the 
    * value it would have if the array were completely sorted. That is,
-   * a[0:k-1] &lt;= a[k] &lt;= a[k:n-1], where n is the array length.
+   * a[0:k-1] &lt;= a[k] &lt;= a[k:n-1], where n is the length of a.
    * @param k the index.
    * @param a the array to be partially sorted.
    */
@@ -7505,13 +7505,13 @@ public class Array {
    * Partially sorts indices of the elements of the specified array.
    * After partial sorting, the element i[k] with specified index k has the 
    * value it would have if the indices were completely sorted. That is, 
-   * a[i[0:k-1]] &lt;= a[i[k]] &lt;= a[i[k:n-1]], where n is the array length.
+   * a[i[0:k-1]] &lt;= a[i[k]] &lt;= a[i[k:n-1]], where n is the length of i.
    * @param k the index.
    * @param a the array.
    * @param i the indices to be partially sorted.
    */
   public static void quickPartialIndexSort(int k, short[] a, int[] i) {
-    int n = a.length;
+    int n = i.length;
     int p = 0;
     int q = n-1;
     int[] m = (n>NSMALL_SORT)?new int[2]:null;
@@ -7565,7 +7565,7 @@ public class Array {
    * Partially sorts the elements of the specified array in ascending order.
    * After partial sorting, the element a[k] with specified index k has the 
    * value it would have if the array were completely sorted. That is,
-   * a[0:k-1] &lt;= a[k] &lt;= a[k:n-1], where n is the array length.
+   * a[0:k-1] &lt;= a[k] &lt;= a[k:n-1], where n is the length of a.
    * @param k the index.
    * @param a the array to be partially sorted.
    */
@@ -7593,13 +7593,13 @@ public class Array {
    * Partially sorts indices of the elements of the specified array.
    * After partial sorting, the element i[k] with specified index k has the 
    * value it would have if the indices were completely sorted. That is, 
-   * a[i[0:k-1]] &lt;= a[i[k]] &lt;= a[i[k:n-1]], where n is the array length.
+   * a[i[0:k-1]] &lt;= a[i[k]] &lt;= a[i[k:n-1]], where n is the length of i.
    * @param k the index.
    * @param a the array.
    * @param i the indices to be partially sorted.
    */
   public static void quickPartialIndexSort(int k, int[] a, int[] i) {
-    int n = a.length;
+    int n = i.length;
     int p = 0;
     int q = n-1;
     int[] m = (n>NSMALL_SORT)?new int[2]:null;
@@ -7653,7 +7653,7 @@ public class Array {
    * Partially sorts the elements of the specified array in ascending order.
    * After partial sorting, the element a[k] with specified index k has the 
    * value it would have if the array were completely sorted. That is,
-   * a[0:k-1] &lt;= a[k] &lt;= a[k:n-1], where n is the array length.
+   * a[0:k-1] &lt;= a[k] &lt;= a[k:n-1], where n is the length of a.
    * @param k the index.
    * @param a the array to be partially sorted.
    */
@@ -7681,13 +7681,13 @@ public class Array {
    * Partially sorts indices of the elements of the specified array.
    * After partial sorting, the element i[k] with specified index k has the 
    * value it would have if the indices were completely sorted. That is, 
-   * a[i[0:k-1]] &lt;= a[i[k]] &lt;= a[i[k:n-1]], where n is the array length.
+   * a[i[0:k-1]] &lt;= a[i[k]] &lt;= a[i[k:n-1]], where n is the length of i.
    * @param k the index.
    * @param a the array.
    * @param i the indices to be partially sorted.
    */
   public static void quickPartialIndexSort(int k, long[] a, int[] i) {
-    int n = a.length;
+    int n = i.length;
     int p = 0;
     int q = n-1;
     int[] m = (n>NSMALL_SORT)?new int[2]:null;
@@ -7741,7 +7741,7 @@ public class Array {
    * Partially sorts the elements of the specified array in ascending order.
    * After partial sorting, the element a[k] with specified index k has the 
    * value it would have if the array were completely sorted. That is,
-   * a[0:k-1] &lt;= a[k] &lt;= a[k:n-1], where n is the array length.
+   * a[0:k-1] &lt;= a[k] &lt;= a[k:n-1], where n is the length of a.
    * @param k the index.
    * @param a the array to be partially sorted.
    */
@@ -7769,13 +7769,13 @@ public class Array {
    * Partially sorts indices of the elements of the specified array.
    * After partial sorting, the element i[k] with specified index k has the 
    * value it would have if the indices were completely sorted. That is, 
-   * a[i[0:k-1]] &lt;= a[i[k]] &lt;= a[i[k:n-1]], where n is the array length.
+   * a[i[0:k-1]] &lt;= a[i[k]] &lt;= a[i[k:n-1]], where n is the length of i.
    * @param k the index.
    * @param a the array.
    * @param i the indices to be partially sorted.
    */
   public static void quickPartialIndexSort(int k, float[] a, int[] i) {
-    int n = a.length;
+    int n = i.length;
     int p = 0;
     int q = n-1;
     int[] m = (n>NSMALL_SORT)?new int[2]:null;
@@ -7829,7 +7829,7 @@ public class Array {
    * Partially sorts the elements of the specified array in ascending order.
    * After partial sorting, the element a[k] with specified index k has the 
    * value it would have if the array were completely sorted. That is,
-   * a[0:k-1] &lt;= a[k] &lt;= a[k:n-1], where n is the array length.
+   * a[0:k-1] &lt;= a[k] &lt;= a[k:n-1], where n is the length of a.
    * @param k the index.
    * @param a the array to be partially sorted.
    */
@@ -7857,13 +7857,13 @@ public class Array {
    * Partially sorts indices of the elements of the specified array.
    * After partial sorting, the element i[k] with specified index k has the 
    * value it would have if the indices were completely sorted. That is, 
-   * a[i[0:k-1]] &lt;= a[i[k]] &lt;= a[i[k:n-1]], where n is the array length.
+   * a[i[0:k-1]] &lt;= a[i[k]] &lt;= a[i[k:n-1]], where n is the length of i.
    * @param k the index.
    * @param a the array.
    * @param i the indices to be partially sorted.
    */
   public static void quickPartialIndexSort(int k, double[] a, int[] i) {
-    int n = a.length;
+    int n = i.length;
     int p = 0;
     int q = n-1;
     int[] m = (n>NSMALL_SORT)?new int[2]:null;
