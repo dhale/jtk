@@ -10,6 +10,7 @@ import java.awt.*;
 import static java.lang.Math.*;
 
 import edu.mines.jtk.opengl.*;
+import edu.mines.jtk.util.*;
 import static edu.mines.jtk.opengl.Gl.*;
 
 /**
@@ -382,6 +383,16 @@ public class OrbitView extends View {
     DrawList dl = cc.getDrawList();
     DrawContext dc = new DrawContext(canvas);
     dl.draw(dc);
+
+    // Statistics:
+    ++_ndraw;
+    if (_stopwatch.time()>2.0) {
+      _stopwatch.stop();
+      int rate = (int)(_ndraw/_stopwatch.time());
+      System.out.println("OrbitView: draw frames/second = "+rate);
+      _ndraw = 0;
+      _stopwatch.restart();
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -395,6 +406,8 @@ public class OrbitView extends View {
   private BoundingSphere _worldSphere = null;
   private Matrix44 _worldToUnitSphere;
   private Matrix44 _unitSphereToView;
+  private Stopwatch _stopwatch;
+  private int _ndraw;
 
   private void init() {
     _scale = 1.0;
@@ -402,6 +415,9 @@ public class OrbitView extends View {
     _azimuth = 40.0;
     _elevation = 25.0;
     _projection = Projection.PERSPECTIVE;
+    _ndraw = 0;
+    _stopwatch = new Stopwatch();
+    _stopwatch.start();
   }
 
   private void updateView() {

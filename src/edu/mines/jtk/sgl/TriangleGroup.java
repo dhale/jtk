@@ -39,7 +39,7 @@ public class TriangleGroup extends Group implements Selectable {
    * <p>
    * For each vertex, this method computes a normal vector as an 
    * area-weighted average of the normal vectors for each triangle 
-   * that references that vertex.
+   * with a vertex with precisely the same coordinates.
    * @param xyz array[3*nv] of packed vertex coordinates.
    */
   public TriangleGroup(float[] xyz) {
@@ -59,7 +59,7 @@ public class TriangleGroup extends Group implements Selectable {
    * <p>
    * For each vertex, this method computes a normal vector as an 
    * area-weighted average of the normal vectors for each triangle 
-   * that references that vertex.
+   * with a vertex with precisely the same coordinates.
    * @param xyz array[3*nv] of packed vertex coordinates.
    * @param rgb array[3*nc] of packed color components.
    */
@@ -112,6 +112,59 @@ public class TriangleGroup extends Group implements Selectable {
   public TriangleGroup(int[] ijk, float[] xyz, float[] rgb) {
     float[] uvw = computeNormals(ijk,xyz);
     buildTree(ijk,xyz,uvw,rgb);
+  }
+
+  /**
+   * Computes indices ijk for triangle vertex coordinates xyz.
+   * <p>
+   * The (x,y,z) coordinates of vertices are packed into the specified 
+   * array xyz. The number of vertices is nv = xyz.length/3. The number 
+   * of triangles is nt = xyz.length/9.
+   * <p>
+   * For each triangle, this method computes a triplet (i,j,k) of integer 
+   * vertex indices. A vertex index is an integer in the range [0,nu-1],
+   * where nu equals the number of unique vertices. That number nu will 
+   * not exceed (but may be less than) the number nv of specified vertices.
+   * <p>
+   * The number nu of unique vertices is less than the number nv of 
+   * vertices when the same triplet of vertex (x,y,z) coordinates occurs 
+   * multiple times in the array xyz. In this case, only the index of the 
+   * first occurence will be present in the returned array of indices.
+   * <p>
+   * Triplets of indices (i,j,k), one triplet per triangle, are packed 
+   * into the returned array of integers ijk, which has length 3*nt.
+   * @param xyz array[3*nv] of packed triangle vertex coordinates.
+   * @return an array[3*nt] of packed integer vertex indices.
+   */
+  public static int[] indexVertices(float[] xyz) {
+
+    // Number of vertices and triangles (not necessarily unique).
+    int nv = xyz.length/3;
+    int nt = nv/3;
+
+    // Array of vertex indices, three per triangle.
+    int[] ijk = new int[3*nt];
+
+    // Map each unique vertex to a unique index.
+    HashMap<Vertex,Integer> vimap = new HashMap<Vertex,Integer>(nv);
+
+    // Number of unique vertices.
+    int nu = 0;
+
+    // For each triangle, ...
+    for (int it=0; it<nt; ++it) {
+      for (int iv=0,jv=3*it,kv=3*jv; iv<3; ++iv,++jv,kv+=3) {
+        Vertex v = new Vertex(xyz[kv+X],xyz[kv+Y],xyz[kv+Z]);
+        Integer i = vimap.get(v);
+        if (i==null) {
+          i = new Integer(jv);
+          vimap.put(v,i);
+          ++nu;
+        }
+        ijk[jv] = i.intValue();
+      }
+    }
+    return ijk;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -281,7 +334,8 @@ public class TriangleGroup extends Group implements Selectable {
       this.y = y;
       this.z = z;
     }
-    public boolean equals(Vertex v) {
+    public boolean equals(Object o) {
+      Vertex v = (Vertex)o;
       return x==v.x &&  y==v.y && z==v.z;
     }
     public int hashCode() {
@@ -289,59 +343,6 @@ public class TriangleGroup extends Group implements Selectable {
              Float.floatToIntBits(y) ^
              Float.floatToIntBits(z);
     }
-  }
-
-  /**
-   * Computes indices ijk for triangle vertex coordinates xyz.
-   * <p>
-   * The (x,y,z) coordinates of vertices are packed into the specified 
-   * array xyz. The number of vertices is nv = xyz.length/3. The number 
-   * of triangles is nt = xyz.length/9.
-   * <p>
-   * For each triangle, this method computes a triplet (i,j,k) of integer 
-   * vertex indices. A vertex index is an integer in the range [0,nu-1],
-   * where nu equals the number of unique vertices. That number nu cannot 
-   * exceed, but may be less than, the number nv of specified vertices.
-   * <p>
-   * The number nu of unique vertices is less than the number nv of 
-   * vertices when the same triplet of vertex (x,y,z) coordinates occurs 
-   * multiple times in the array xyz. In this case, only the index of the 
-   * first occurence will be present in the returned array of indices.
-   * <p>
-   * Triplets of indices (i,j,k), one triplet per triangle, are packed 
-   * into the returned array of integers ijk, which has length 3*nt.
-   * @param xyz array[3*nv] of packed triangle vertex coordinates.
-   * @return an array[3*nt] of packed integer vertex indices.
-   */
-  private static int[] indexVertices(float[] xyz) {
-
-    // Number of vertices and triangles (not necessarily unique).
-    int nv = xyz.length/3;
-    int nt = nv/3;
-
-    // Array of vertex indices, three per triangle.
-    int[] ijk = new int[3*nt];
-
-    // Map each unique vertex to a unique index.
-    HashMap<Vertex,Integer> vimap = new HashMap<Vertex,Integer>(nv);
-
-    // Number of unique vertices.
-    int nu = 0;
-
-    // For each triangle, ...
-    for (int it=0; it<nt; ++it) {
-      for (int iv=0,jv=3*it,kv=3*jv; iv<3; ++iv,++jv,kv+=3) {
-        Vertex v = new Vertex(xyz[kv+X],xyz[kv+Y],xyz[kv+Z]);
-        Integer i = vimap.get(v);
-        if (i==null) {
-          i = new Integer(nu);
-          vimap.put(v,i);
-          ++nu;
-        }
-        ijk[jv] = i.intValue();
-      }
-    }
-    return ijk;
   }
 
   /**
@@ -417,38 +418,6 @@ public class TriangleGroup extends Group implements Selectable {
   }
 
   /**
-   * Unindexes the specified indexed triangle vertices. After unindexing,
-   * the indices are not valid for the return array of vertex coordinates.
-   * @param i array[3*nt] of packed integer vertex indices, where nt is
-   *  the number of triangles.
-   * @param v array[3*nv] of packed triangle vertex coordinates, where 
-   *  nv is the number of vertices.
-   * @return array[3*nu] of unindexed packed triangle vertex coordinates,
-   *  where nu = 3*nt is the number of unindexed triangle vertices.
-   */
-  private float[] unindexVertices(int[] i, float[] v) {
-    int nv = v.length/3;
-    int nt = i.length/3;
-    int nu = 3*nt;
-    float[] u = new float[3*nu];
-    for (int it=0,jt=0,j=0; it<nt; ++it,j+=9) {
-      int iv = 3*i[jt++];
-      int jv = 3*i[jt++];
-      int kv = 3*i[jt++];
-      u[j+0] = v[iv+X];
-      u[j+1] = v[iv+Y];
-      u[j+2] = v[iv+Z];
-      u[j+3] = v[jv+X];
-      u[j+4] = v[jv+Y];
-      u[j+5] = v[jv+Z];
-      u[j+6] = v[kv+X];
-      u[j+7] = v[kv+Y];
-      u[j+8] = v[kv+Z];
-    }
-    return u;
-  }
-
-  /**
    * Computes (x,y,z) components of triangle centers (centroids).
    * <p>
    * The (x,y,z) coordinates of vertices are packed into the specified 
@@ -489,120 +458,35 @@ public class TriangleGroup extends Group implements Selectable {
     return c;
   }
 
-  ///////////////////////////////////////////////////////////////////////////
-  // testing
-
-  private static final int SIZE = 600;
-  private static float sin(float a, float b, float x, float y) {
-    return (float)(5.0+a*Math.sin(b*(x+y)));
-  }
-  private static float[] makeSineWave() {
-    int nx = 128;
-    int ny = 128;
-    float a = 0.05f*(float)(nx+ny);
-    float b = 20.0f/(float)(nx+ny);
-    float[] xyz = new float[3*6*nx*ny];
-    for (int ix=0,i=0; ix<nx; ++ix) {
-      float x0 = (float)ix;
-      float x1 = x0+1.0f;
-      for (int iy=0; iy<ny; ++iy) {
-        float y0 = (float)iy;
-        float y1 = y0+1.0f;
-        xyz[i++] = x0;  xyz[i++] = y0;  xyz[i++] = sin(a,b,x0,y0);
-        xyz[i++] = x0;  xyz[i++] = y1;  xyz[i++] = sin(a,b,x0,y1);
-        xyz[i++] = x1;  xyz[i++] = y0;  xyz[i++] = sin(a,b,x1,y0);
-        xyz[i++] = x1;  xyz[i++] = y0;  xyz[i++] = sin(a,b,x1,y0);
-        xyz[i++] = x0;  xyz[i++] = y1;  xyz[i++] = sin(a,b,x0,y1);
-        xyz[i++] = x1;  xyz[i++] = y1;  xyz[i++] = sin(a,b,x1,y1);
-      }
+  /**
+   * Unindexes the specified indexed triangle vertices. After unindexing,
+   * the indices are not valid for the return array of vertex coordinates.
+   * @param i array[3*nt] of packed integer vertex indices, where nt is
+   *  the number of triangles.
+   * @param v array[3*nv] of packed triangle vertex coordinates, where 
+   *  nv is the number of vertices.
+   * @return array[3*nu] of unindexed packed triangle vertex coordinates,
+   *  where nu = 3*nt is the number of unindexed triangle vertices.
+   */
+  private float[] unindexVertices(int[] i, float[] v) {
+    int nv = v.length/3;
+    int nt = i.length/3;
+    int nu = 3*nt;
+    float[] u = new float[3*nu];
+    for (int it=0,jt=0,j=0; it<nt; ++it,j+=9) {
+      int iv = 3*i[jt++];
+      int jv = 3*i[jt++];
+      int kv = 3*i[jt++];
+      u[j+0] = v[iv+X];
+      u[j+1] = v[iv+Y];
+      u[j+2] = v[iv+Z];
+      u[j+3] = v[jv+X];
+      u[j+4] = v[jv+Y];
+      u[j+5] = v[jv+Z];
+      u[j+6] = v[kv+X];
+      u[j+7] = v[kv+Y];
+      u[j+8] = v[kv+Z];
     }
-    return xyz;
-  }
-  private static float[] makeColors(float[] xyz) {
-    int nv = xyz.length/3;
-    float[] rgb = new float[3*nv];
-    for (int iv=0,jv=0,jc=0; iv<nv; ++iv) {
-      float x = xyz[jv++];
-      float y = xyz[jv++];
-      float z = xyz[jv++];
-      float s = 1.0f/(float)Math.sqrt(x*x+y*y+z*z);
-      rgb[jc++] = x*s;
-      rgb[jc++] = y*s;
-      rgb[jc++] = z*s;
-    }
-    return rgb;
-  }
-  public static void main(String[] args) {
-    float[] xyz = makeSineWave();
-    float[] rgb = makeColors(xyz);
-    TriangleGroup tg = new TriangleGroup(xyz,rgb);
-
-    StateSet states = new StateSet();
-    //ColorState cs = new ColorState();
-    //cs.setColor(Color.CYAN);
-    //states.add(cs);
-    LightModelState lms = new LightModelState();
-    lms.setTwoSide(true);
-    states.add(lms);
-    MaterialState ms = new MaterialState();
-    ms.setColorMaterial(GL_AMBIENT_AND_DIFFUSE);
-    ms.setSpecular(Color.white);
-    ms.setShininess(100.0f);
-    states.add(ms);
-    tg.setStates(states);
-
-    World world = new World();
-    world.addChild(tg);
-
-    OrbitView view = new OrbitView(world);
-    view.setAxesOrientation(View.AxesOrientation.XRIGHT_YOUT_ZDOWN);
-    ViewCanvas canvas = new ViewCanvas(view);
-    canvas.setView(view);
-
-    ModeManager mm = new ModeManager();
-    mm.add(canvas);
-    OrbitViewMode ovm = new OrbitViewMode(mm);
-    SelectDragMode sdm = new SelectDragMode(mm);
-
-    JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-    ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
-
-    JMenu fileMenu = new JMenu("File");
-    fileMenu.setMnemonic('F');
-    Action exitAction = new AbstractAction("Exit") {
-      public void actionPerformed(ActionEvent event) {
-        System.exit(0);
-      }
-    };
-    JMenuItem exitItem = fileMenu.add(exitAction);
-    exitItem.setMnemonic('x');
-
-    JMenu modeMenu = new JMenu("Mode");
-    modeMenu.setMnemonic('M');
-    JMenuItem ovmItem = new ModeMenuItem(ovm);
-    modeMenu.add(ovmItem);
-    JMenuItem sdmItem = new ModeMenuItem(sdm);
-    modeMenu.add(sdmItem);
-
-    JMenuBar menuBar = new JMenuBar();
-    menuBar.add(fileMenu);
-    menuBar.add(modeMenu);
-
-    JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
-    toolBar.setRollover(true);
-    JToggleButton ovmButton = new ModeToggleButton(ovm);
-    toolBar.add(ovmButton);
-    JToggleButton sdmButton = new ModeToggleButton(sdm);
-    toolBar.add(sdmButton);
-
-    ovm.setActive(true);
-
-    JFrame frame = new JFrame();
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(new Dimension(SIZE,SIZE));
-    frame.add(canvas,BorderLayout.CENTER);
-    frame.add(toolBar,BorderLayout.WEST);
-    frame.setJMenuBar(menuBar);
-    frame.setVisible(true);
+    return u;
   }
 }
