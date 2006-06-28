@@ -20,22 +20,98 @@ import javax.swing.*;
 import edu.mines.jtk.gui.*;
 
 /**
- * @author Dave Hale, Colorado School of Mines
- * @author Christine Brady, Colorado School of Mines
- * @author Adam McCormick, Colorado School of Mines
- * @author Zachary Pember, Colorado School of Mines
- * @author Danielle Schulte, Colorado School of Mines
+ * A group of triangles that represents a triangulated surface.
+ * Triangles can be specified by only the (x,y,z) coordinates of
+ * their vertices. Then
+ * 
+ * @author Dave Hale, Christine Brady, Adam McCormick, Zachary Pember, 
+ *  Danielle Schulte, Colorado School of Mines
  * @version 2006.06.27
  */
 public class TriangleGroup extends Group implements Selectable {
 
   /**
-   * Constructs a triangle group with specified coordinates.
+   * Constructs a triangle group with specified vertex coordinates.
+   * <p>
+   * The (x,y,z) coordinates of vertices are packed into the specified 
+   * array xyz. The number of vertices is nv = xyz.length/3. The number
+   * of triangles is nt = nv/3 = xyz.length/9.
+   * <p>
+   * For each vertex, this method computes a normal vector as an 
+   * area-weighted average of the normal vectors for each triangle 
+   * that references that vertex.
+   * @param xyz array[3*nv] of packed vertex coordinates.
    */
   public TriangleGroup(float[] xyz) {
+    this(xyz,null);
+  }
+
+  /**
+   * Constructs a triangle group with specified vertex coordinates.
+   * <p>
+   * The (x,y,z) coordinates of vertices are packed into the specified 
+   * array xyz. The number of vertices is nv = xyz.length/3. The number
+   * of triangles is nt = nv/3 = xyz.length/9.
+   * <p>
+   * The (r,g,b) components of colors are packed into the specified 
+   * array rgb. The number of colors is nc = rgb.length/3. The number
+   * of triangles is nt = nc/3 = rgb.length/9.
+   * <p>
+   * For each vertex, this method computes a normal vector as an 
+   * area-weighted average of the normal vectors for each triangle 
+   * that references that vertex.
+   * @param xyz array[3*nv] of packed vertex coordinates.
+   * @param rgb array[3*nc] of packed color components.
+   */
+  public TriangleGroup(float[] xyz, float[] rgb) {
     int[] ijk = indexVertices(xyz);
-    float[] uvw = computeNormals(xyz,ijk);
-    buildTree(ijk,xyz,uvw,null);
+    float[] uvw = computeNormals(ijk,xyz);
+    buildTree(ijk,xyz,uvw,rgb);
+  }
+
+  /**
+   * Constructs a triangle group with specified vertex coordinates.
+   * <p>
+   * Triangles are specified by triplets of vertex indices (i,j,k), one 
+   * triplet per triangle, packed into the specified array of integers 
+   * ijk. The number of triangles is nt = ijk.length/3.
+   * <p>
+   * The (x,y,z) coordinates of vertices are packed into the specified 
+   * array xyz. The number of vertices is nv = xyz.length/3.
+   * <p>
+   * For each vertex, this method computes a normal vector as an 
+   * area-weighted average of the normal vectors for each triangle 
+   * that references that vertex.
+   * @param ijk array[3*nt] of packed vertex indices.
+   * @param xyz array[3*nv] of packed vertex coordinates.
+   */
+  public TriangleGroup(int[] ijk, float[] xyz) {
+    this(ijk,xyz,null);
+  }
+
+  /**
+   * Constructs a triangle group with specified vertex coordinates.
+   * <p>
+   * Triangles are specified by triplets of vertex indices (i,j,k), one 
+   * triplet per triangle, packed into the specified array of integers 
+   * ijk. The number of triangles is nt = ijk.length/3.
+   * <p>
+   * The (x,y,z) coordinates of vertices are packed into the specified 
+   * array xyz. The number of vertices is nv = xyz.length/3.
+   * <p>
+   * The (r,g,b) components of colors are packed into the specified 
+   * array rgb. The number of colors is nc = rgb.length/3.
+   * <p>
+   * For each vertex, this method computes a normal vector as an 
+   * area-weighted average of the normal vectors for each triangle 
+   * that references that vertex.
+   * @param ijk array[3*nt] of packed vertex indices.
+   * @param xyz array[3*nv] of packed vertex coordinates.
+   * @param rgb array[3*nc] of packed color components.
+   */
+  public TriangleGroup(int[] ijk, float[] xyz, float[] rgb) {
+    float[] uvw = computeNormals(ijk,xyz);
+    buildTree(ijk,xyz,uvw,rgb);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -60,7 +136,7 @@ public class TriangleGroup extends Group implements Selectable {
    * Recursively builds the binary tree of triangle nodes.
    */
   private void buildTree(int[] ijk, float[] xyz, float[] uvw, float[] rgb) {
-    float[] c = computeCenters(xyz,ijk);
+    float[] c = computeCenters(ijk,xyz);
     BoundingBoxTree bbt = new BoundingBoxTree(MIN_TRI_PER_NODE,c);
     buildTree(this,bbt.getRoot(),ijk,xyz,uvw,rgb);
   }
@@ -88,10 +164,12 @@ public class TriangleGroup extends Group implements Selectable {
       _nt = bbtNode.getSize();
       int nt = _nt;
       int nv = 3*nt;
+      int nn = 3*nt;
+      int nc = 3*nt;
       int[] index = bbtNode.getIndices();
       _vb = Direct.newFloatBuffer(3*nv);
-      _nb = (uvw!=null)?Direct.newFloatBuffer(3*nv):null;
-      _cb = (rgb!=null)?Direct.newFloatBuffer(3*nv):null;
+      _nb = (uvw!=null)?Direct.newFloatBuffer(3*nn):null;
+      _cb = (rgb!=null)?Direct.newFloatBuffer(3*nc):null;
       for (int it=0,iv=0,in=0,ic=0; it<nt; ++it) {
         int jt = 3*index[it];
         int i = 3*ijk[jt+I];
@@ -123,7 +201,7 @@ public class TriangleGroup extends Group implements Selectable {
           _cb.put(ic++,rgb[i+B]);
           _cb.put(ic++,rgb[j+R]);
           _cb.put(ic++,rgb[j+G]);
-          _cb.put(ic++,rgb[j+G]);
+          _cb.put(ic++,rgb[j+B]);
           _cb.put(ic++,rgb[k+R]);
           _cb.put(ic++,rgb[k+G]);
           _cb.put(ic++,rgb[k+B]);
@@ -139,6 +217,7 @@ public class TriangleGroup extends Group implements Selectable {
     }
 
     protected void draw(DrawContext dc) {
+      boolean selected = TriangleGroup.this.isSelected();
       glEnableClientState(GL_VERTEX_ARRAY);
       glVertexPointer(3,GL_FLOAT,0,_vb);
       if (_nb!=null) {
@@ -149,7 +228,7 @@ public class TriangleGroup extends Group implements Selectable {
         glEnableClientState(GL_COLOR_ARRAY);
         glColorPointer(3,GL_FLOAT,0,_cb);
       }
-      if (TriangleGroup.this.isSelected()) {
+      if (selected) {
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0f,1.0f);
       }
@@ -158,7 +237,7 @@ public class TriangleGroup extends Group implements Selectable {
         glDisableClientState(GL_NORMAL_ARRAY);
       if (_cb!=null)
         glDisableClientState(GL_COLOR_ARRAY);
-      if (TriangleGroup.this.isSelected()) {
+      if (selected) {
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
         glDisable(GL_LIGHTING);
         glColor3d(1.0,1.0,1.0);
@@ -184,6 +263,9 @@ public class TriangleGroup extends Group implements Selectable {
           pc.addResult(p);
       }
     }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // private
     
     private BoundingSphere _bs; // pre-computed bounding sphere
     private int _nt; // number of triangles
@@ -281,11 +363,11 @@ public class TriangleGroup extends Group implements Selectable {
    * (x,y,z) coordinates. However, normal vectors are computed for only 
    * indexed vertices. All (u,v,w) components corresponding to vertices 
    * not indexed are zero.
-   * @param xyz array[3*nv] of packed triangle vertex coordinates.
    * @param ijk array[3*nt] of packed integer vertex indices.
+   * @param xyz array[3*nv] of packed triangle vertex coordinates.
    * @return array[3*nv] of packed indexed normal vectors.
    */
-  private static float[] computeNormals(float[] xyz, int[] ijk) {
+  private static float[] computeNormals(int[] ijk, float[] xyz) {
     int nv = xyz.length/3;
     int nt = ijk.length/3;
     float[] uvw = new float[3*nv];
@@ -337,14 +419,14 @@ public class TriangleGroup extends Group implements Selectable {
   /**
    * Unindexes the specified indexed triangle vertices. After unindexing,
    * the indices are not valid for the return array of vertex coordinates.
-   * @param v array[3*nv] of packed triangle vertex coordinates, where 
-   *  nv is the number of vertices.
    * @param i array[3*nt] of packed integer vertex indices, where nt is
    *  the number of triangles.
+   * @param v array[3*nv] of packed triangle vertex coordinates, where 
+   *  nv is the number of vertices.
    * @return array[3*nu] of unindexed packed triangle vertex coordinates,
    *  where nu = 3*nt is the number of unindexed triangle vertices.
    */
-  private float[] unindexVertices(float[] v, int[] i) {
+  private float[] unindexVertices(int[] i, float[] v) {
     int nv = v.length/3;
     int nt = i.length/3;
     int nu = 3*nt;
@@ -379,11 +461,11 @@ public class TriangleGroup extends Group implements Selectable {
    * The returned array of packed (x,y,z) coordinates of triangle centers
    * has length equal to ijk.length. Each center (centroid) is the average
    * of the corresponding triangle vertices.
-   * @param xyz array[3*nv] of packed triangle vertex coordinates.
    * @param ijk array[3*nt] of packed integer vertex indices.
+   * @param xyz array[3*nv] of packed triangle vertex coordinates.
    * @return array[3*nt] of packed triangle center coordinates.
    */
-  private float[] computeCenters(float[] xyz, int[] ijk) {
+  private float[] computeCenters(int[] ijk, float[] xyz) {
     int nt = ijk.length/3;
     float[] c = new float[3*nt];
     float o3 = 1.0f/3.0f;
@@ -412,13 +494,13 @@ public class TriangleGroup extends Group implements Selectable {
 
   private static final int SIZE = 600;
   private static float sin(float a, float b, float x, float y) {
-    return (float)(a*Math.sin(b*(x+y)));
+    return (float)(5.0+a*Math.sin(b*(x+y)));
   }
   private static float[] makeSineWave() {
     int nx = 128;
     int ny = 128;
-    float a = 0.1f*(float)(nx+ny);
-    float b = 6.0f/(float)(nx+ny);
+    float a = 0.05f*(float)(nx+ny);
+    float b = 20.0f/(float)(nx+ny);
     float[] xyz = new float[3*6*nx*ny];
     for (int ix=0,i=0; ix<nx; ++ix) {
       float x0 = (float)ix;
@@ -436,21 +518,36 @@ public class TriangleGroup extends Group implements Selectable {
     }
     return xyz;
   }
+  private static float[] makeColors(float[] xyz) {
+    int nv = xyz.length/3;
+    float[] rgb = new float[3*nv];
+    for (int iv=0,jv=0,jc=0; iv<nv; ++iv) {
+      float x = xyz[jv++];
+      float y = xyz[jv++];
+      float z = xyz[jv++];
+      float s = 1.0f/(float)Math.sqrt(x*x+y*y+z*z);
+      rgb[jc++] = x*s;
+      rgb[jc++] = y*s;
+      rgb[jc++] = z*s;
+    }
+    return rgb;
+  }
   public static void main(String[] args) {
     float[] xyz = makeSineWave();
-    TriangleGroup tg = new TriangleGroup(xyz);
+    float[] rgb = makeColors(xyz);
+    TriangleGroup tg = new TriangleGroup(xyz,rgb);
 
     StateSet states = new StateSet();
-    ColorState cs = new ColorState();
-    cs.setColor(Color.CYAN);
-    states.add(cs);
+    //ColorState cs = new ColorState();
+    //cs.setColor(Color.CYAN);
+    //states.add(cs);
     LightModelState lms = new LightModelState();
     lms.setTwoSide(true);
     states.add(lms);
     MaterialState ms = new MaterialState();
     ms.setColorMaterial(GL_AMBIENT_AND_DIFFUSE);
-    ms.setSpecularFront(Color.white);
-    ms.setShininessFront(100.0f);
+    ms.setSpecular(Color.white);
+    ms.setShininess(100.0f);
     states.add(ms);
     tg.setStates(states);
 
