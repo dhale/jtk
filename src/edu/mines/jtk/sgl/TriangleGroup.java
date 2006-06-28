@@ -13,12 +13,6 @@ import static java.lang.Math.*;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.opengl.Gl.*;
 
-// For testing only.
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import edu.mines.jtk.gui.*;
-
 /**
  * A group of triangles that represents a triangulated surface.
  * Triangles can be specified by only the (x,y,z) coordinates of
