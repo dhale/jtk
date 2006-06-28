@@ -27,7 +27,7 @@ import edu.mines.jtk.gui.*;
  * @author Danielle Schulte, Colorado School of Mines
  * @version 2006.06.27
  */
-public class TriangleGroup extends Group {
+public class TriangleGroup extends Group implements Selectable {
 
   /**
    * Constructs a triangle group with specified coordinates.
@@ -54,7 +54,7 @@ public class TriangleGroup extends Group {
   private static final int U = 0,  V = 1,  W = 2;
   private static final int R = 0,  G = 1,  B = 2;
 
-  private static final int MIN_TRI_PER_NODE = 2;
+  private static final int MIN_TRI_PER_NODE = 1024;
 
   /**
    * Recursively builds the binary tree of triangle nodes.
@@ -78,7 +78,7 @@ public class TriangleGroup extends Group {
     }
   }
 
-  private class TriangleNode extends Node implements Selectable {
+  private class TriangleNode extends Node {
 
     public TriangleNode(BoundingBoxTree.Node bbtNode, 
       int[] ijk, float[] xyz, float[] uvw, float[] rgb) 
@@ -86,12 +86,9 @@ public class TriangleGroup extends Group {
       BoundingBox bb = bbtNode.getBoundingBox();
       _bs = new BoundingSphere(bb);
       _nt = bbtNode.getSize();
-      System.out.println("nt="+_nt+"\nbs="+_bs);
       int nt = _nt;
       int nv = 3*nt;
       int[] index = bbtNode.getIndices();
-      System.out.println("index=");
-      Array.dump(index);
       _vb = Direct.newFloatBuffer(3*nv);
       _nb = (uvw!=null)?Direct.newFloatBuffer(3*nv):null;
       _cb = (rgb!=null)?Direct.newFloatBuffer(3*nv):null;
@@ -137,11 +134,6 @@ public class TriangleGroup extends Group {
     ///////////////////////////////////////////////////////////////////////////
     // protected
 
-    protected void selectedChanged() {
-      System.out.println("TriangleNode: "+this+" selected="+isSelected());
-      dirtyDraw();
-    }
-
     protected BoundingSphere computeBoundingSphere(boolean finite) {
       return _bs;
     }
@@ -157,7 +149,7 @@ public class TriangleGroup extends Group {
         glEnableClientState(GL_COLOR_ARRAY);
         glColorPointer(3,GL_FLOAT,0,_cb);
       }
-      if (isSelected()) {
+      if (TriangleGroup.this.isSelected()) {
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0f,1.0f);
       }
@@ -166,7 +158,7 @@ public class TriangleGroup extends Group {
         glDisableClientState(GL_NORMAL_ARRAY);
       if (_cb!=null)
         glDisableClientState(GL_COLOR_ARRAY);
-      if (isSelected()) {
+      if (TriangleGroup.this.isSelected()) {
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
         glDisable(GL_LIGHTING);
         glColor3d(1.0,1.0,1.0);
@@ -399,7 +391,6 @@ public class TriangleGroup extends Group {
       int i = 3*ijk[jt++];
       int j = 3*ijk[jt++];
       int k = 3*ijk[jt++];
-      System.out.println("i: i="+ijk[jt-3]+" j="+ijk[jt-2]+" k="+ijk[jt-1]);
       float xi = xyz[i+X];
       float yi = xyz[i+Y];
       float zi = xyz[i+Z];
@@ -412,7 +403,6 @@ public class TriangleGroup extends Group {
       c[jc++] = (xi+xj+xk)*o3;
       c[jc++] = (yi+yj+yk)*o3;
       c[jc++] = (zi+zj+zk)*o3;
-      System.out.println("c: x="+c[jc-3]+" y="+c[jc-2]+" z="+c[jc-1]);
     }
     return c;
   }
@@ -425,9 +415,9 @@ public class TriangleGroup extends Group {
     return (float)(a*Math.sin(b*(x+y)));
   }
   private static float[] makeSineWave() {
-    int nx = 2;
-    int ny = 2;
-    float a = 0.02f*(float)(nx+ny);
+    int nx = 128;
+    int ny = 128;
+    float a = 0.1f*(float)(nx+ny);
     float b = 6.0f/(float)(nx+ny);
     float[] xyz = new float[3*6*nx*ny];
     for (int ix=0,i=0; ix<nx; ++ix) {

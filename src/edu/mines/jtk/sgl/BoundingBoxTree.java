@@ -201,32 +201,24 @@ public class BoundingBoxTree {
     Array.quickPartialIndexSort(kmid-kmin,a,i);
     for (int k=kmin; k<=kmax; ++k)
       _i[k] = i[k-kmin];
-    System.out.println("kmin="+kmin+" kmid="+kmid+" kmax="+kmax);
-    Array.dump(_i);
-    Array.dump(_x);
-    Array.dump(_y);
-    Array.dump(_z);
 
     // Left and right child nodes.
     Node left = new Node();
     Node right = new Node();
     if (adif==xdif) {
       float spltx = _x[_i[kmid]];
-      System.out.println("spltx="+spltx);
       left._bb = new BoundingBox(min.x,min.y,min.z,
                                  spltx,max.y,max.z);
       right._bb = new BoundingBox(spltx,min.y,min.z,
                                   max.x,max.y,max.z);
     } else if (adif==ydif) {
       float splty = _y[_i[kmid]];
-      System.out.println("splty="+splty);
       left._bb = new BoundingBox(min.x,min.y,min.z,
                                  max.x,splty,max.z);
       right._bb = new BoundingBox(min.x,splty,min.z,
                                   max.x,max.y,max.z);
     } else {
       float spltz = _z[_i[kmid]];
-      System.out.println("spltz="+spltz);
       left._bb = new BoundingBox(min.x,min.y,min.z,
                                  max.x,max.y,spltz);
       right._bb = new BoundingBox(min.x,min.y,spltz,
