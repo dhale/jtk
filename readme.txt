@@ -125,17 +125,22 @@ your PATH, (2) edit the script to specify the correct directories, and
 For example, you might run JUnit tests for edu.mines.jtk.util by typing
 javarun edu.mines.jtk.util.test.Suite
 If this test fails, then you may need to edit your javarun script.
+This test depends on only pure Java code; it does not depend on our JNI
+libraries. Many of our Java packages contain test suites like this one.
 
-To test something that requires JNI libraries, type
+To test something that requires one of our JNI libraries, type
 javarun edu.mines.jtk.lapack.test.Suite
 Again, if this test fails, then you may need to edit your javarun script.
 
-To test our OpenGL wrappers, type
-javarun edu.mines.jtk.opengl.test.Hello
+If your javarun script looks ok, then perhaps you have an old version of 
+the standard C++ library. We compile and link our JNI libraries with a 
+recent version of that library, but your system may have an older and
+incompatible version. In such cases, if you cannot upgrade your standard
+C++ library, then you must build the JNI libraries yourself.
 
-If the OpenGL test fails, then you may need to install OpenGL version 1.2 
-or higher. (Microsoft's OpenGL libraries support only OpenGL version 1.1.)
-Note the OpenGL version and vendor printed by this test. For accelerated 
-3-D graphics, you want the vendor to be something like NVIDIA or ATI,
-not Microsoft or Mesa. You may need to download and install new video
-drivers.
+Finally, to test our OpenGL wrappers, type
+javarun edu.mines.jtk.opengl.test.Hello
+Note the OpenGL version and vendor printed by this test. The version
+number should not be less than 1.2. For accelerated 3-D graphics, you want 
+the vendor to be something like NVIDIA or ATI, not Microsoft or Mesa. You 
+may need to download and install new video drivers.
