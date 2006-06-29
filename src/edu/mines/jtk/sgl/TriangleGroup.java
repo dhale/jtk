@@ -136,8 +136,8 @@ public class TriangleGroup extends Group implements Selectable {
    * <p>
    * Triplets of indices (i,j,k), one triplet per triangle, are packed 
    * into the returned array of integers ijk, which has length 3*nt.
-   * @param xyz array[3*nv] of packed triangle vertex coordinates.
-   * @return an array[3*nt] of packed integer vertex indices.
+   * @param xyz array[3*nv] of packed vertex coordinates.
+   * @return an array[3*nt] of packed vertex indices.
    */
   public static int[] indexVertices(float[] xyz) {
 
@@ -365,8 +365,8 @@ public class TriangleGroup extends Group implements Selectable {
    * (x,y,z) coordinates. However, normal vectors are computed for only 
    * indexed vertices. All (u,v,w) components corresponding to vertices 
    * not indexed are zero.
-   * @param ijk array[3*nt] of packed integer vertex indices.
-   * @param xyz array[3*nv] of packed triangle vertex coordinates.
+   * @param ijk array[3*nt] of packed vertex indices.
+   * @param xyz array[3*nv] of packed vertex coordinates.
    * @return array[3*nv] of packed indexed normal vectors.
    */
   private static float[] computeNormals(int[] ijk, float[] xyz) {
@@ -431,9 +431,9 @@ public class TriangleGroup extends Group implements Selectable {
    * The returned array of packed (x,y,z) coordinates of triangle centers
    * has length equal to ijk.length. Each center (centroid) is the average
    * of the corresponding triangle vertices.
-   * @param ijk array[3*nt] of packed integer vertex indices.
-   * @param xyz array[3*nv] of packed triangle vertex coordinates.
-   * @return array[3*nt] of packed triangle center coordinates.
+   * @param ijk array[3*nt] of packed vertex indices.
+   * @param xyz array[3*nv] of packed vertex coordinates.
+   * @return array[3*nt] of packed center coordinates.
    */
   private float[] computeCenters(int[] ijk, float[] xyz) {
     int nt = ijk.length/3;
@@ -462,12 +462,12 @@ public class TriangleGroup extends Group implements Selectable {
   /**
    * Unindexes the specified indexed triangle vertices. After unindexing,
    * the indices are not valid for the return array of vertex coordinates.
-   * @param i array[3*nt] of packed integer vertex indices, where nt is
-   *  the number of triangles.
-   * @param v array[3*nv] of packed triangle vertex coordinates, where 
-   *  nv is the number of vertices.
-   * @return array[3*nu] of unindexed packed triangle vertex coordinates,
-   *  where nu = 3*nt is the number of unindexed triangle vertices.
+   * @param i array[3*nt] of packed vertex indices, where nt is the number 
+   *  of triangles.
+   * @param v array[3*nv] of packed vertex coordinates, where nv is the 
+   *  number of vertices.
+   * @return array[3*nu] of unindexed packed vertex coordinates, where 
+   *  nu = 3*nt is the number of unindexed vertices.
    */
   private float[] unindexVertices(int[] i, float[] v) {
     int nv = v.length/3;
