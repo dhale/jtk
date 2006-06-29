@@ -4,34 +4,22 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is 
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.sgl;
+package edu.mines.jtk.sgl.test;
 
 import java.awt.*;
-import java.awt.event.*;
 import java.nio.*;
 import java.util.*;
-import javax.swing.*;
 
-import edu.mines.jtk.gui.*;
 import edu.mines.jtk.util.*;
+import edu.mines.jtk.sgl.*;
 import static edu.mines.jtk.opengl.Gl.*;
 
 /**
- * A simple cube with colored sides for testing.
+ * A simple cube with colored sides.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.27
  */
 public class ColorCube extends Node implements Selectable {
-
-  public ColorCube() {
-    StateSet states = new StateSet();
-    MaterialState ms = new MaterialState();
-    ms.setColorMaterialFront(GL_AMBIENT_AND_DIFFUSE);
-    ms.setSpecularFront(Color.white);
-    ms.setShininessFront(100.0f);
-    states.add(ms);
-    setStates(states);
-  }
 
   ///////////////////////////////////////////////////////////////////////////
   // protected
@@ -59,16 +47,13 @@ public class ColorCube extends Node implements Selectable {
       glPolygonOffset(1.0f,1.0f);
     }
     glDrawArrays(GL_QUADS,0,24);
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
     if (isSelected()) {
       glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
       glDisable(GL_LIGHTING);
-      glDisableClientState(GL_NORMAL_ARRAY);
-      glDisableClientState(GL_COLOR_ARRAY);
       glColor3d(1.0,1.0,1.0);
       glDrawArrays(GL_QUADS,0,24);
-    } else {
-      glDisableClientState(GL_NORMAL_ARRAY);
-      glDisableClientState(GL_COLOR_ARRAY);
     }
     glDisableClientState(GL_VERTEX_ARRAY);
   }
@@ -132,76 +117,29 @@ public class ColorCube extends Node implements Selectable {
   ///////////////////////////////////////////////////////////////////////////
   // testing
 
-  private static final int SIZE = 600;
   public static void main(String[] args) {
+    StateSet states = new StateSet();
+    MaterialState ms = new MaterialState();
+    ms.setColorMaterialFront(GL_AMBIENT_AND_DIFFUSE);
+    ms.setSpecularFront(Color.white);
+    ms.setShininessFront(100.0f);
+    states.add(ms);
+
     ColorCube cc1 = new ColorCube();
     ColorCube cc2 = new ColorCube();
-    HandleBox hb1 = new HandleBox(1,1,1);
-    HandleBox hb2 = new HandleBox(1,1,1);
+    cc1.setStates(states);
+    cc2.setStates(states);
+
     TransformGroup tg1 = new TransformGroup(Matrix44.translate(-2,0,0));
     TransformGroup tg2 = new TransformGroup(Matrix44.translate( 2,0,0));
     tg1.addChild(cc1);
-    tg1.addChild(hb1);
     tg2.addChild(cc2);
-    tg2.addChild(hb2);
+
     World world = new World();
     world.addChild(tg1);
     world.addChild(tg2);
 
-    OrbitView view = new OrbitView(world);
-    //view.setProjection(OrbitView.Projection.ORTHOGRAPHIC);
-    //view.setAzimuthAndElevation(90.0,0.0);
-    //view.setScale(5.0);
-    //view.setWorldSphere(new BoundingSphere(0.5,0.5,0.5,4));
-    view.setAxesOrientation(View.AxesOrientation.XRIGHT_YOUT_ZDOWN);
-    view.setAxesScale(1.0,2.0,3.0);
-    ViewCanvas canvas = new ViewCanvas(view);
-    canvas.setView(view);
-
-    ModeManager mm = new ModeManager();
-    mm.add(canvas);
-    OrbitViewMode ovm = new OrbitViewMode(mm);
-    SelectDragMode sdm = new SelectDragMode(mm);
-
-    JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-    ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
-
-    JMenu fileMenu = new JMenu("File");
-    fileMenu.setMnemonic('F');
-    Action exitAction = new AbstractAction("Exit") {
-      public void actionPerformed(ActionEvent event) {
-        System.exit(0);
-      }
-    };
-    JMenuItem exitItem = fileMenu.add(exitAction);
-    exitItem.setMnemonic('x');
-
-    JMenu modeMenu = new JMenu("Mode");
-    modeMenu.setMnemonic('M');
-    JMenuItem ovmItem = new ModeMenuItem(ovm);
-    modeMenu.add(ovmItem);
-    JMenuItem sdmItem = new ModeMenuItem(sdm);
-    modeMenu.add(sdmItem);
-
-    JMenuBar menuBar = new JMenuBar();
-    menuBar.add(fileMenu);
-    menuBar.add(modeMenu);
-
-    JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
-    toolBar.setRollover(true);
-    JToggleButton ovmButton = new ModeToggleButton(ovm);
-    toolBar.add(ovmButton);
-    JToggleButton sdmButton = new ModeToggleButton(sdm);
-    toolBar.add(sdmButton);
-
-    ovm.setActive(true);
-
-    JFrame frame = new JFrame();
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(new Dimension(SIZE,SIZE));
-    frame.add(canvas,BorderLayout.CENTER);
-    frame.add(toolBar,BorderLayout.WEST);
-    frame.setJMenuBar(menuBar);
+    TestFrame frame = new TestFrame(world);
     frame.setVisible(true);
   }
 }

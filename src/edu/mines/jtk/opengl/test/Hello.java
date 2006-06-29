@@ -10,8 +10,8 @@ import edu.mines.jtk.opengl.*;
 import static edu.mines.jtk.opengl.Gl.*;
 
 /**
- * Simple OpenGL program.
- * Requires OpenGL version 1.2 or above.
+ * Prints Opengl version and vendor and draws a white square.
+ * Useful for determining which OpenGL driver you are using.
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.02
  */
@@ -30,7 +30,7 @@ public class Hello {
     }
     public void glPaint() {
       glClear(GL_COLOR_BUFFER_BIT);
-      glBlendColor(1.0f,1.0f,1.0f,1.0f); // something from OpenGL 1.2
+      //glBlendColor(1.0f,1.0f,1.0f,1.0f); // something from OpenGL 1.2
       glColor3f(1.0f,1.0f,1.0f);
       glBegin(GL_POLYGON);
         glVertex3f(0.25f,0.25f,0.00f);

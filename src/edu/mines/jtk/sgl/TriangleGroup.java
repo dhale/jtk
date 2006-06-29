@@ -15,9 +15,18 @@ import static edu.mines.jtk.opengl.Gl.*;
 
 /**
  * A group of triangles that represents a triangulated surface.
- * Triangles can be specified by only the (x,y,z) coordinates of
- * their vertices. Then
- * 
+ * <p>
+ * Triangles may be specified by providing an array of packed vertex
+ * (x,y,z) coordinates and an array of packed (i,j,k) vertex indices.
+ * Each triplet (i,j,k) of vertex indices corresponds to one triangle.
+ * <p>
+ * Alternatively, triangles may be specified by providing only the array 
+ * of packed vertex (x,y,z) coordinates. In this case, a vertex index is
+ * computed automatically for each unique vertex.
+ * <p>
+ * Normal vectors may be computed for each vertex as an area-weighted 
+ * average of the vectors normal to each triangle that references that 
+ * vertex. These area-weighted normal vectors are used in lighting.
  * @author Dave Hale, Christine Brady, Adam McCormick, Zachary Pember, 
  *  Danielle Schulte, Colorado School of Mines
  * @version 2006.06.27
@@ -172,6 +181,7 @@ public class TriangleGroup extends Group implements Selectable {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  // Constants for indexing packed arrays.
   private static final int I = 0,  J = 1,  K = 2;
   private static final int X = 0,  Y = 1,  Z = 2;
   private static final int U = 0,  V = 1,  W = 2;
@@ -180,7 +190,7 @@ public class TriangleGroup extends Group implements Selectable {
   private static final int MIN_TRI_PER_NODE = 1024;
 
   /**
-   * Recursively builds the binary tree of triangle nodes.
+   * Recursively builds a binary tree with leaf triangle nodes.
    */
   private void buildTree(int[] ijk, float[] xyz, float[] uvw, float[] rgb) {
     float[] c = computeCenters(ijk,xyz);
@@ -201,6 +211,9 @@ public class TriangleGroup extends Group implements Selectable {
     }
   }
 
+  /**
+   * A leaf triangle node in the hierarchy of nodes for this group.
+   */
   private class TriangleNode extends Node {
 
     public TriangleNode(BoundingBoxTree.Node bbtNode, 
@@ -256,9 +269,6 @@ public class TriangleGroup extends Group implements Selectable {
       }
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    // protected
-
     protected BoundingSphere computeBoundingSphere(boolean finite) {
       return _bs;
     }
@@ -310,9 +320,6 @@ public class TriangleGroup extends Group implements Selectable {
           pc.addResult(p);
       }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // private
     
     private BoundingSphere _bs; // pre-computed bounding sphere
     private int _nt; // number of triangles

@@ -1,9 +1,7 @@
 package edu.mines.jtk.sgl.test;
 
 import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import edu.mines.jtk.gui.*;
+
 import edu.mines.jtk.sgl.*;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.opengl.Gl.*;
@@ -51,8 +49,8 @@ public class TriangleGroupTest {
   }
 
   private static float[] makeSineWave() {
-    int nx = 100;
-    int ny = 100;
+    int nx = 1000;
+    int ny = 1000;
     float dx = 10.0f/(float)nx;
     float dy = 10.0f/(float)ny;
     float[] xyz = new float[3*6*nx*ny];
@@ -92,8 +90,8 @@ public class TriangleGroupTest {
     System.out.println("Benchmarking TriangleGroup construction");
     int nv = xyz.length/3;
     int nt = nv/3;
-    System.out.println("  number of triangles = "+nt);
     System.out.println("  number of vertices = "+nv);
+    System.out.println("  number of triangles = "+nt);
 
     //int[] ijk = TriangleGroup.indexVertices(xyz);
 

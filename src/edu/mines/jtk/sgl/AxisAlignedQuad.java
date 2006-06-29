@@ -6,17 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import java.awt.*;
 import java.awt.event.*;
-import java.nio.*;
-import java.util.*;
-import javax.swing.*;
-import static java.lang.Math.*;
-
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.gui.*;
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.opengl.Gl.*;
 
 /**
  * An axis-aligned quad has one frame that contains one or more panels.
@@ -211,75 +201,5 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
       removeChild(_h[3]);
       dirtyDraw();
     }
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // testing
-
-  private static final int SIZE = 600;
-  public static void main(String[] args) {
-    Point3 qmin = new Point3(0,0,0);
-    Point3 qmax = new Point3(1,1,1);
-
-    AxisAlignedQuad aaq = new AxisAlignedQuad(Axis.Y,qmin,qmax);
-    AxisAlignedFrame aaf = aaq.getFrame();
-
-    Sampling s = new Sampling(101,0.01,0.0);
-    ImagePanel iop = new ImagePanel(s,s,s,null);
-    aaf.addChild(iop);
-
-    World world = new World();
-    world.addChild(aaq);
-
-    OrbitView view = new OrbitView(world);
-    view.setAxesOrientation(View.AxesOrientation.XRIGHT_YOUT_ZDOWN);
-    ViewCanvas canvas = new ViewCanvas(view);
-    canvas.setView(view);
-
-    ModeManager mm = new ModeManager();
-    mm.add(canvas);
-    OrbitViewMode ovm = new OrbitViewMode(mm);
-    SelectDragMode sdm = new SelectDragMode(mm);
-
-    JPopupMenu.setDefaultLightWeightPopupEnabled(false);
-    ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
-
-    JMenu fileMenu = new JMenu("File");
-    fileMenu.setMnemonic('F');
-    Action exitAction = new AbstractAction("Exit") {
-      public void actionPerformed(ActionEvent event) {
-        System.exit(0);
-      }
-    };
-    JMenuItem exitItem = fileMenu.add(exitAction);
-    exitItem.setMnemonic('x');
-
-    JMenu modeMenu = new JMenu("Mode");
-    modeMenu.setMnemonic('M');
-    JMenuItem ovmItem = new ModeMenuItem(ovm);
-    modeMenu.add(ovmItem);
-    JMenuItem sdmItem = new ModeMenuItem(sdm);
-    modeMenu.add(sdmItem);
-
-    JMenuBar menuBar = new JMenuBar();
-    menuBar.add(fileMenu);
-    menuBar.add(modeMenu);
-
-    JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
-    toolBar.setRollover(true);
-    JToggleButton ovmButton = new ModeToggleButton(ovm);
-    toolBar.add(ovmButton);
-    JToggleButton sdmButton = new ModeToggleButton(sdm);
-    toolBar.add(sdmButton);
-
-    ovm.setActive(true);
-
-    JFrame frame = new JFrame();
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(new Dimension(SIZE,SIZE));
-    frame.add(canvas,BorderLayout.CENTER);
-    frame.add(toolBar,BorderLayout.WEST);
-    frame.setJMenuBar(menuBar);
-    frame.setVisible(true);
   }
 }
