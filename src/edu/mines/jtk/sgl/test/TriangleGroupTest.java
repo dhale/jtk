@@ -49,8 +49,8 @@ public class TriangleGroupTest {
   }
 
   private static float[] makeSineWave() {
-    int nx = 1000;
-    int ny = 1000;
+    int nx = 100;
+    int ny = 100;
     float dx = 10.0f/(float)nx;
     float dy = 10.0f/(float)ny;
     float[] xyz = new float[3*6*nx*ny];
