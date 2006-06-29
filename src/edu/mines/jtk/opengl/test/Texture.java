@@ -14,7 +14,7 @@ import static edu.mines.jtk.opengl.Gl.*;
  * @author Jeff Emanuel, Transform Software
  * @version 2004.12.03
  */
-public class Tex {
+public class Texture {
   private static GlPainter painter = new GlPainter() {
     /**
      * The texture data.
