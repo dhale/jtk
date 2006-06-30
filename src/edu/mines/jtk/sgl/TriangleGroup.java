@@ -22,11 +22,12 @@ import static edu.mines.jtk.opengl.Gl.*;
  * <p>
  * Alternatively, triangles may be specified by providing only the array 
  * of packed vertex (x,y,z) coordinates. In this case, a vertex index is
- * computed automatically for each unique vertex.
+ * assigned automatically to each vertex.
  * <p>
- * Normal vectors may be computed for each vertex as an area-weighted 
- * average of the vectors normal to each triangle that references that 
- * vertex. These area-weighted normal vectors are used in lighting.
+ * Normal vectors are computed for each vertex as an area-weighted 
+ * average of the vectors normal to all triangles that reference that 
+ * vertex with the same index. These area-weighted normal vectors are 
+ * used in lighting.
  * @author Dave Hale, Christine Brady, Adam McCormick, Zachary Pember, 
  *  Danielle Schulte, Colorado School of Mines
  * @version 2006.06.27
@@ -40,13 +41,18 @@ public class TriangleGroup extends Group implements Selectable {
    * array xyz. The number of vertices is nv = xyz.length/3. The number
    * of triangles is nt = nv/3 = xyz.length/9.
    * <p>
-   * For each vertex, this method computes a normal vector as an 
-   * area-weighted average of the normal vectors for each triangle 
-   * with a vertex with precisely the same coordinates.
+   * Normal vectors may be computed for either vertices or triangles.
+   * When computed for a vertex, a normal vector is the area-weighted 
+   * average of the normal vectors for all triangles with that vertex.
+   * <p>
+   * If no vertices have the same (x,y,z) coordinates, then vertex and
+   * triangle normal vectors are the same vectors, but triangle normal
+   * vectors are less costly to compute.
+   * @param vn true, for vertex normals; false, for triangle normals.
    * @param xyz array[3*nv] of packed vertex coordinates.
    */
-  public TriangleGroup(float[] xyz) {
-    this(xyz,null);
+  public TriangleGroup(boolean vn, float[] xyz) {
+    this(vn,xyz,null);
   }
 
   /**
@@ -60,14 +66,19 @@ public class TriangleGroup extends Group implements Selectable {
    * array rgb. The number of colors is nc = rgb.length/3. The number
    * of triangles is nt = nc/3 = rgb.length/9.
    * <p>
-   * For each vertex, this method computes a normal vector as an 
-   * area-weighted average of the normal vectors for each triangle 
-   * with a vertex with precisely the same coordinates.
+   * Normal vectors may be computed for either vertices or triangles.
+   * When computed for a vertex, a normal vector is the area-weighted 
+   * average of the normal vectors for all triangles with that vertex.
+   * <p>
+   * If no vertices have the same (x,y,z) coordinates, then vertex and
+   * triangle normal vectors are the same vectors, but triangle normal
+   * vectors are less costly to compute.
+   * @param vn true, for vertex normals; false, for triangle normals.
    * @param xyz array[3*nv] of packed vertex coordinates.
    * @param rgb array[3*nc] of packed color components.
    */
-  public TriangleGroup(float[] xyz, float[] rgb) {
-    int[] ijk = indexVertices(xyz);
+  public TriangleGroup(boolean vn, float[] xyz, float[] rgb) {
+    int[] ijk = indexVertices(!vn,xyz);
     float[] uvw = computeNormals(ijk,xyz);
     buildTree(ijk,xyz,uvw,rgb);
   }
@@ -82,9 +93,9 @@ public class TriangleGroup extends Group implements Selectable {
    * The (x,y,z) coordinates of vertices are packed into the specified 
    * array xyz. The number of vertices is nv = xyz.length/3.
    * <p>
-   * For each vertex, this method computes a normal vector as an 
-   * area-weighted average of the normal vectors for each triangle 
-   * that references that vertex.
+   * For any vertex with index iv, this method computes a normal vector 
+   * as an area-weighted average of the normal vectors for all triangles 
+   * specified with index iv.
    * @param ijk array[3*nt] of packed vertex indices.
    * @param xyz array[3*nv] of packed vertex coordinates.
    */
@@ -105,9 +116,9 @@ public class TriangleGroup extends Group implements Selectable {
    * The (r,g,b) components of colors are packed into the specified 
    * array rgb. The number of colors is nc = rgb.length/3.
    * <p>
-   * For each vertex, this method computes a normal vector as an 
-   * area-weighted average of the normal vectors for each triangle 
-   * that references that vertex.
+   * For any vertex with index iv, this method computes a normal vector 
+   * as an area-weighted average of the normal vectors for all triangles 
+   * specified with index iv.
    * @param ijk array[3*nt] of packed vertex indices.
    * @param xyz array[3*nv] of packed vertex coordinates.
    * @param rgb array[3*nc] of packed color components.
@@ -122,49 +133,57 @@ public class TriangleGroup extends Group implements Selectable {
    * <p>
    * The (x,y,z) coordinates of vertices are packed into the specified 
    * array xyz. The number of vertices is nv = xyz.length/3. The number 
-   * of triangles is nt = xyz.length/9.
+   * of triangles is nt = nv/3 = xyz.length/9.
    * <p>
    * For each triangle, this method computes a triplet (i,j,k) of integer 
-   * vertex indices. A vertex index is an integer in the range [0,nu-1],
-   * where nu equals the number of unique vertices. That number nu will 
-   * not exceed (but may be less than) the number nv of specified vertices.
+   * vertex indices. A vertex index is an integer in the range [0,nv-1].
+   * The (x,y,z) coordinates of a vertex with index iv are xyz[3*iv+0],
+   * xyz[3*iv+1] and xyz[3*iv+2], respectively.
    * <p>
-   * The number nu of unique vertices is less than the number nv of 
-   * vertices when the same triplet of vertex (x,y,z) coordinates occurs 
-   * multiple times in the array xyz. In this case, only the index of the 
-   * first occurence will be present in the returned array of indices.
+   * The simplest indexing is the sequence {0, 1, 2, ..., nv-1}. In this
+   * case, indices are assigned sequentially, so that every vertex of 
+   * every triangle has a different index.
+   * <p>
+   * In non-sequential indexing, vertices with the same (x,y,z) coordinates 
+   * are assigned the same index. Again, index vertices will be in the range
+   * [0,nv-1], but some integers in this range may not be used. Whereas
+   * sequential indexing would assign integers ia and ib to two vertices 
+   * that have the same (x,y,z) coordinates, non-sequential indexing will 
+   * assign the smaller index min(ia,ib) to both vertices; the larger index
+   * max(ia,ib) will be unused.
    * <p>
    * Triplets of indices (i,j,k), one triplet per triangle, are packed 
    * into the returned array of integers ijk, which has length 3*nt.
+   * @param sequential true, for sequential indexing; false, otherwise.
    * @param xyz array[3*nv] of packed vertex coordinates.
    * @return an array[3*nt] of packed vertex indices.
    */
-  public static int[] indexVertices(float[] xyz) {
+  public static int[] indexVertices(boolean sequential, float[] xyz) {
 
-    // Number of vertices and triangles (not necessarily unique).
+    // Number of vertices and triangles.
     int nv = xyz.length/3;
     int nt = nv/3;
 
-    // Array of vertex indices, three per triangle.
-    int[] ijk = new int[3*nt];
+    // Array of vertex indices, one per vertex.
+    int[] ijk = new int[nv];
 
-    // Map each unique vertex to a unique index.
-    HashMap<Vertex,Integer> vimap = new HashMap<Vertex,Integer>(nv);
-
-    // Number of unique vertices.
-    int nu = 0;
-
-    // For each triangle, ...
-    for (int it=0; it<nt; ++it) {
-      for (int iv=0,jv=3*it,kv=3*jv; iv<3; ++iv,++jv,kv+=3) {
-        Vertex v = new Vertex(xyz[kv+X],xyz[kv+Y],xyz[kv+Z]);
-        Integer i = vimap.get(v);
-        if (i==null) {
-          i = new Integer(jv);
-          vimap.put(v,i);
-          ++nu;
+    // For sequential indexing, simply fill the array. For non-sequential 
+    // indexing, map each unique vertex to a unique vertex index.
+    if (sequential) {
+      for (int iv=0; iv<nv; ++iv)
+        ijk[iv] = iv;
+    } else {
+      HashMap<Vertex,Integer> vimap = new HashMap<Vertex,Integer>(nv);
+      for (int it=0; it<nt; ++it) {
+        for (int iv=0,jv=3*it,kv=3*jv; iv<3; ++iv,++jv,kv+=3) {
+          Vertex v = new Vertex(xyz[kv+X],xyz[kv+Y],xyz[kv+Z]);
+          Integer i = vimap.get(v);
+          if (i==null) {
+            i = new Integer(jv);
+            vimap.put(v,i);
+          }
+          ijk[jv] = i.intValue();
         }
-        ijk[jv] = i.intValue();
       }
     }
     return ijk;

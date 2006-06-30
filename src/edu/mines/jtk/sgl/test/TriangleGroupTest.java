@@ -19,7 +19,7 @@ public class TriangleGroupTest {
 
     bench(xyz,rgb);
 
-    TriangleGroup tg = new TriangleGroup(xyz,rgb);
+    TriangleGroup tg = new TriangleGroup(true,xyz,rgb);
     System.out.println("TriangleGroup bounding sphere =\n" +
       tg.getBoundingSphere(true));
 
@@ -93,16 +93,13 @@ public class TriangleGroupTest {
     System.out.println("  number of vertices = "+nv);
     System.out.println("  number of triangles = "+nt);
 
-    //int[] ijk = TriangleGroup.indexVertices(xyz);
-
     TriangleGroup tg;
     int ntg;
     Stopwatch sw = new Stopwatch();
     for (int ntrial=0; ntrial<3; ++ntrial) {
       sw.restart();
       for (ntg=0; sw.time()<1.0; ++ntg)
-        //tg = new TriangleGroup(ijk,xyz,rgb);
-        tg = new TriangleGroup(xyz,rgb);
+        tg = new TriangleGroup(true,xyz,rgb);
       sw.stop();
       double rate = (double)ntg*(double)nt/sw.time();
       System.out.println("  triangles/sec = "+rate);
