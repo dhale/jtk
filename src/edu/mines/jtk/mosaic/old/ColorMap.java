@@ -16,6 +16,18 @@ import java.awt.Color;
 public interface ColorMap {
 
   /**
+   * Standard color maps. Each of these color maps corresponds to 
+   * a pre-computed {@link edu.mines.jtk.awt.ByteIndexColorModel}.
+   */
+  public enum Standard {
+    GRAY,
+    JET,
+    HUE,
+    PRISM,
+    RED_WHITE_BLUE,
+  }
+
+  /**
    * Gets the minimum value in the range of mapped values.
    * @return the minimum value.
    */

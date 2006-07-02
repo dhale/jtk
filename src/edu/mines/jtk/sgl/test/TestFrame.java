@@ -3,7 +3,8 @@ package edu.mines.jtk.sgl.test;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import edu.mines.jtk.gui.*;
+
+import edu.mines.jtk.awt.*;
 import edu.mines.jtk.sgl.*;
 
 /**

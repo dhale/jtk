@@ -6,11 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static java.lang.Math.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import edu.mines.jtk.gui.*;
+import static java.lang.Math.*;
+
+import edu.mines.jtk.awt.*;
 
 /**
  * A mode for zooming tiles and tile axes.

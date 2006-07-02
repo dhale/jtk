@@ -8,6 +8,7 @@ package edu.mines.jtk.mosaic.test;
 
 import javax.swing.*;
 
+import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.util.*;
 import edu.mines.jtk.mosaic.*;
@@ -48,8 +49,8 @@ public class PlotFrameTest {
 
     PixelsView pxv0 = panel.addPixels(0,0,s1,s2,f);
     PixelsView pxv1 = panel.addPixels(0,1,s1,s2,f);
-    pxv0.setColorMap(PixelsView.ColorMap.GRAY);
-    pxv1.setColorMap(PixelsView.ColorMap.JET);
+    pxv0.setColorModel(ColorMap.GRAY);
+    pxv1.setColorModel(ColorMap.JET);
 
     PointsView ptv0 = panel.addPoints(0,0,x1,x2);
     PointsView ptv1 = panel.addPoints(0,1,x1,x2);

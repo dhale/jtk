@@ -1,4 +1,5 @@
 from math import *
+from edu.mines.jtk.awt import *
 from edu.mines.jtk.dave import *
 from edu.mines.jtk.dsp import *
 from edu.mines.jtk.io import *
@@ -15,7 +16,7 @@ def plot(f):
   panel = PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
   pv = panel.addPixels(f)
   pv.setPercentiles(1.0,99.0)
-  #pv.setColorMap(PixelsView.ColorMap.JET);
+  #pv.setColorModel(ColorMap.JET);
   #pv.setInterpolation(PixelsView.Interpolation.NEAREST)
   panel.addColorBar()
   frame = PlotFrame(panel)

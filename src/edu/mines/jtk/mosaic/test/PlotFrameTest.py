@@ -1,4 +1,5 @@
 from java.awt import *
+from edu.mines.jtk.awt import *
 from edu.mines.jtk.dsp import *
 from edu.mines.jtk.mosaic import *
 from edu.mines.jtk.util import *
@@ -22,8 +23,8 @@ def makePlotPanel(orientation):
 
   pxv0 = pp.addPixels(0,0,s1,s2,f)
   pxv1 = pp.addPixels(0,1,s1,s2,f)
-  pxv0.setColorMap(PixelsView.ColorMap.GRAY)
-  pxv1.setColorMap(PixelsView.ColorMap.JET)
+  pxv0.setColorModel(ColorMap.GRAY)
+  pxv1.setColorModel(ColorMap.JET)
 
   gv0 = pp.addGrid(0,0)
   gv1 = pp.addGrid(0,1)
@@ -57,5 +58,6 @@ pf = PlotFrame(pp1,pp2,PlotFrame.Split.VERTICAL)
 pf.setBackground(Color.CYAN)
 pf.setFontSize(24)
 
+pf.pack();
 pf.setVisible(True)
 #pf.paintToPng(300,6,"junk.png")

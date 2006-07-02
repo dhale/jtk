@@ -6,12 +6,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static java.lang.Math.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import edu.mines.jtk.gui.ModeManager;
+import static java.lang.Math.*;
+
+import edu.mines.jtk.awt.ModeManager;
 
 /**
  * A mosaic of tiles and tile axes. A mosaic lays out its tiles in a matrix,

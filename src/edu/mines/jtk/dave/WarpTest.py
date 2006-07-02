@@ -1,6 +1,7 @@
 from math import *
 from java.awt import *
 from java.lang import *
+from edu.mines.jtk.awt import *
 from edu.mines.jtk.dave import *
 from edu.mines.jtk.dsp import *
 from edu.mines.jtk.io import *
@@ -26,7 +27,7 @@ def plot(x,png=None):
   panel.addColorBar()
   #panel.setColorBarFormat("%4.2f");
   pv = panel.addPixels(x)
-  pv.setColorMap(PixelsView.ColorMap.GRAY);
+  pv.setColorModel(ColorMap.GRAY);
   frame = PlotFrame(panel)
   frame.setBackground(Color.WHITE)
   frame.setFontSize(18)

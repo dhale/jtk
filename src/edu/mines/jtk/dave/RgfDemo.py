@@ -1,6 +1,7 @@
 from math import *
 from java.awt import *
 from java.lang import *
+from edu.mines.jtk.awt import *
 from edu.mines.jtk.dave import *
 from edu.mines.jtk.dsp import *
 from edu.mines.jtk.io import *
@@ -450,7 +451,7 @@ def plot2(f):
   panel = PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
   panel.addColorBar()
   pv = panel.addPixels(f)
-  pv.setColorMap(PixelsView.ColorMap.JET);
+  pv.setColorModel(ColorMap.JET);
   #pv.setInterpolation(PixelsView.Interpolation.NEAREST)
   frame = PlotFrame(panel)
   frame.setBackground(Color.WHITE)

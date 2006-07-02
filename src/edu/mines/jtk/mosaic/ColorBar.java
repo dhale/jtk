@@ -7,10 +7,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic;
 
 import java.awt.*;
+import java.awt.image.*;
 import java.util.*;
 import javax.swing.*;
+
+import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.ByteIndexColorModel;
 
 /**
  * A color bar is a view of a color map, a mapping from values to colors.
@@ -67,8 +69,8 @@ public class ColorBar extends IPanel implements ColorMapListener {
   }
 
   public void colorMapChanged(ColorMap cm) {
-    float vmin = cm.getMinValue();
-    float vmax = cm.getMaxValue();
+    float vmin = (float)cm.getMinValue();
+    float vmax = (float)cm.getMaxValue();
     if (vmin==vmax) {
       vmin -= Math.ulp(vmin);
       vmax += Math.ulp(vmax);
@@ -91,8 +93,8 @@ public class ColorBar extends IPanel implements ColorMapListener {
       _pixels.setClips(vmin,vmax);
       _tile.addTiledView(_pixels);
     }
-    ByteIndexColorModel bicm = new ByteIndexColorModel(ca);
-    _pixels.setColorModel(bicm);
+    IndexColorModel icm = ColorMap.makeIndexColorModel(ca);
+    _pixels.setColorModel(icm);
     Sampling s1 = new Sampling(1);
     Sampling s2 = vs;
     _pixels.set(s1,s2,va);

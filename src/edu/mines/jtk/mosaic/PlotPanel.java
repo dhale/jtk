@@ -11,8 +11,9 @@ import java.awt.font.*;
 import java.util.*;
 import javax.swing.*;
 import static java.lang.Math.*;
-import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.gui.*;
+
+import edu.mines.jtk.awt.*;
+import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.util.*;
 
 /**

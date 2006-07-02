@@ -12,6 +12,7 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 
+import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.mosaic.*;
 import edu.mines.jtk.util.*;
@@ -124,7 +125,7 @@ public class Data3dTest {
     PlotPanel panel = new PlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT);
     PixelsView pv = panel.addPixels(f);
     pv.setInterpolation(PixelsView.Interpolation.NEAREST);
-    pv.setColorMap(PixelsView.ColorMap.GRAY);
+    pv.setColorModel(ColorMap.GRAY);
     //pv.setClips(fmin,fmax);
 
     PlotFrame frame = new PlotFrame(panel);

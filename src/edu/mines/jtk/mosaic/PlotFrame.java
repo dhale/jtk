@@ -9,8 +9,9 @@ package edu.mines.jtk.mosaic;
 import java.awt.*;
 import java.io.*;
 import javax.swing.*;
-import edu.mines.jtk.gui.*;
 import static java.lang.Math.*;
+
+import edu.mines.jtk.awt.*;
 
 /**
  * A plot frame is a window containing one or two plot panels. 

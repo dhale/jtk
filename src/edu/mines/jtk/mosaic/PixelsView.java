@@ -9,7 +9,8 @@ package edu.mines.jtk.mosaic;
 import java.awt.*;
 import java.awt.image.*;
 import java.util.*;
-import javax.swing.event.EventListenerList;
+
+import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
@@ -37,8 +38,8 @@ import static edu.mines.jtk.util.MathPlus.*;
  * may be specified for this first step.
  * <p>
  * The second step is a table lookup. It uses the pixel bytes computed in 
- * the first mapping as indices in a specified color map. The color map is 
- * an array of 256 colors, one for each of the 256 possible byte indices. 
+ * the first mapping as indices in a specified index color model. This color
+ * model converts a pixel index in the range [0,255] to a color.
  * See {@link edu.mines.jtk.util.ByteIndexColorModel} for more details.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.09.27
@@ -67,24 +68,13 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Commonly used color maps. Each of these color maps corresponds to 
-   * a pre-computed {@link edu.mines.jtk.util.ByteIndexColorModel}.
-   */
-  public enum ColorMap {
-    GRAY,
-    JET,
-    HUE,
-    PRISM,
-    RED_WHITE_BLUE,
-  }
-
-  /**
    * Constructs a pixels view of the specified sampled function f(x1,x2).
    * Assumes zero first sample values and unit sampling intervals.
    * @param f array[n2][n1] of sampled function values f(x1,x2), where 
    *  n1 = f[0].length and n2 = f.length.
    */
   public PixelsView(float[][] f) {
+    init();
     set(f);
   }
 
@@ -96,6 +86,7 @@ public class PixelsView extends TiledView {
    *  n1 and n2 denote the number of samples in s1 and s2, respectively.
    */
   public PixelsView(Sampling s1, Sampling s2, float[][] f) {
+    init();
     set(s1,s2,f);
   }
 
@@ -127,43 +118,6 @@ public class PixelsView extends TiledView {
     _f = Array.copy(f);
     updateClips();
     updateSampling();
-  }
-
-  /**
-   * Sets the color model for this view to the specified color map.
-   * @param colorMap the color map.
-   */
-  public void setColorMap(ColorMap colorMap) {
-    if (colorMap==ColorMap.GRAY) {
-      setColorModel(ByteIndexColorModel.GRAY);
-    } else if (colorMap==ColorMap.JET) {
-      setColorModel(ByteIndexColorModel.JET);
-    } else if (colorMap==ColorMap.HUE) {
-      setColorModel(ByteIndexColorModel.HUE);
-    } else if (colorMap==ColorMap.PRISM) {
-      setColorModel(ByteIndexColorModel.PRISM);
-    } else if (colorMap==ColorMap.RED_WHITE_BLUE) {
-      setColorModel(ByteIndexColorModel.RED_WHITE_BLUE);
-    }
-  }
-
-  /**
-   * Sets the byte index color model for this view.
-   * The default color model is a linear gray map.
-   * @param colorModel the color model.
-   */
-  public void setColorModel(ByteIndexColorModel colorModel) {
-    _colorModel = colorModel;
-    fireColorMapChanged();
-    repaint();
-  }
-
-  /**
-   * Gets the byte index color model for this view.
-   * @return the color model.
-   */
-  public ByteIndexColorModel getColorModel() {
-    return _colorModel;
   }
 
   /**
@@ -207,6 +161,24 @@ public class PixelsView extends TiledView {
   }
 
   /**
+   * Sets the index color model for this view.
+   * The default color model is a black-to-white gray model.
+   * @param colorModel the index color model.
+   */
+  public void setColorModel(IndexColorModel colorModel) {
+    _colorMap.setColorModel(colorModel);
+    repaint();
+  }
+
+  /**
+   * Gets the index color model for this view.
+   * @return the index color model.
+   */
+  public IndexColorModel getColorModel() {
+    return _colorMap.getColorModel();
+  }
+
+  /**
    * Sets the clips for this view. A pixels view maps values of the sampled 
    * function f(x1,x2) to bytes, which are then used as indices into a 
    * specified color map. This mapping from sample values to byte indices is 
@@ -223,10 +195,10 @@ public class PixelsView extends TiledView {
   public void setClips(float clipMin, float clipMax) {
     Check.argument(clipMin<clipMax,"clipMin<clipMax");
     if (_clipMin!=clipMin || _clipMax!=clipMax) {
+      _usePercentiles = false;
       _clipMin = clipMin;
       _clipMax = clipMax;
-      _usePercentiles = false;
-      fireColorMapChanged();
+      _colorMap.setValueRange(_clipMin,_clipMax);
       repaint();
     }
   }
@@ -291,8 +263,7 @@ public class PixelsView extends TiledView {
    * @param cml the listener.
    */
   public void addColorMapListener(ColorMapListener cml) {
-    _colorMapListeners.add(ColorMapListener.class,cml);
-    cml.colorMapChanged(_colorMap);
+    _colorMap.addListener(cml);
   }
 
   /**
@@ -300,7 +271,7 @@ public class PixelsView extends TiledView {
    * @param cml the listener.
    */
   public void removeColorMapListener(ColorMapListener cml) {
-    _colorMapListeners.remove(ColorMapListener.class,cml);
+    _colorMap.removeListener(cml);
   }
 
   public void paint(Graphics2D g2d) {
@@ -372,12 +343,13 @@ public class PixelsView extends TiledView {
     }
 
     // Draw image.
+    ColorModel colorModel = _colorMap.getColorModel();
     DataBuffer db = new DataBufferByte(b,nx*ny,0);
     int dataType = DataBuffer.TYPE_BYTE;
     int[] bitMasks = new int[]{0xff};
     SampleModel sm = new SinglePixelPackedSampleModel(dataType,nx,ny,bitMasks);
     WritableRaster wr = Raster.createWritableRaster(sm,db,null);
-    BufferedImage bi = new BufferedImage(_colorModel,wr,false,null);
+    BufferedImage bi = new BufferedImage(colorModel,wr,false,null);
     g2d.drawImage(bi,xc,yc,null);
   }
 
@@ -388,9 +360,6 @@ public class PixelsView extends TiledView {
   private Sampling _s1; // sampling of 1st dimension
   private Sampling _s2; // sampling of 2nd dimension
   private float[][] _f; // copy of array of floats
-
-  // Color model.
-  private ByteIndexColorModel _colorModel = ByteIndexColorModel.getGray();
 
   // View orientation.
   private Orientation _orientation = Orientation.X1RIGHT_X2UP;
@@ -405,6 +374,9 @@ public class PixelsView extends TiledView {
   private float _percMax = 100.0f; // may be used to compute _clipMax
   private boolean _usePercentiles = true; // true, if using percentiles
 
+  // Color map.
+  private ColorMap _colorMap;
+
   // Sampling of the function f(x1,x2) in the pixel (x,y) coordinate system. 
   private boolean _transposed;
   private boolean _xflipped;
@@ -416,34 +388,11 @@ public class PixelsView extends TiledView {
   private double _dy;
   private double _fy;
 
-  // List of color map listeners.
-  private EventListenerList _colorMapListeners = new EventListenerList();
-
-  // Color map for color map listeners.
-  private edu.mines.jtk.mosaic.ColorMap _colorMap = 
-  new edu.mines.jtk.mosaic.ColorMap() {
-    public float getMinValue() {
-      return _clipMin;
-    }
-    public float getMaxValue() {
-      return _clipMax;
-    }
-    public Color getColor(float value) {
-      value = max(_clipMin,min(_clipMax,value));
-      int index = (int)round(255.0*(value-_clipMin)/(_clipMax-_clipMin));
-      return new Color(_colorModel.getRGB(index));
-    }
-  };
-
   /**
-   * Notifies listeners of any color map changes.
+   * Initialization shared by all constructors.
    */
-  private void fireColorMapChanged() {
-    Object[] listeners = _colorMapListeners.getListenerList();
-    for (int i=listeners.length-2; i>=0; i-=2) {
-      ColorMapListener cml = (ColorMapListener)listeners[i+1];
-      cml.colorMapChanged(_colorMap);
-    }
+  private void init() {
+    _colorMap = new ColorMap(0.0,1.0,ColorMap.GRAY);
   }
 
   /**
@@ -467,7 +416,7 @@ public class PixelsView extends TiledView {
         Array.quickPartialSort(kmax,a);
         _clipMax = a[kmax];
       }
-      fireColorMapChanged();
+      _colorMap.setValueRange(_clipMin,_clipMax);
     }
   }
 

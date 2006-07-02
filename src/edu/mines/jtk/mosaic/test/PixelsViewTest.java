@@ -8,6 +8,7 @@ package edu.mines.jtk.mosaic.test;
 
 import static java.lang.Math.*;
 
+import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
 import edu.mines.jtk.mosaic.*;
@@ -32,22 +33,22 @@ public class PixelsViewTest {
     PlotPanel panel = new PlotPanel(1,2);
     PixelsView pv0 = panel.addPixels(0,0,f);
     pv0.setInterpolation(PixelsView.Interpolation.NEAREST);
-    pv0.setColorMap(PixelsView.ColorMap.JET);
+    pv0.setColorModel(ColorMap.JET);
     pv0.setPercentiles(0.0f,100.0f);
 
     PixelsView pv0b = panel.addPixels(0,0,s1,s2,f);
     pv0b.setInterpolation(PixelsView.Interpolation.LINEAR);
-    pv0b.setColorMap(PixelsView.ColorMap.GRAY);
+    pv0b.setColorModel(ColorMap.GRAY);
     pv0b.setPercentiles(0.0f,100.0f);
 
     PixelsView pv1 = panel.addPixels(0,1,f);
     pv1.setInterpolation(PixelsView.Interpolation.LINEAR);
-    pv1.setColorMap(PixelsView.ColorMap.GRAY);
+    pv1.setColorModel(ColorMap.GRAY);
     pv1.setPercentiles(0.0f,100.0f);
 
     PixelsView pv1b = panel.addPixels(0,1,s1,s2,f);
     pv1b.setInterpolation(PixelsView.Interpolation.NEAREST);
-    pv1b.setColorMap(PixelsView.ColorMap.JET);
+    pv1b.setColorModel(ColorMap.JET);
     pv1b.setPercentiles(0.0f,100.0f);
 
     PlotFrame frame = new PlotFrame(panel);
