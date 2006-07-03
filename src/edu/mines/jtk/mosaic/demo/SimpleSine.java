@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2005, Colorado School of Mines and others. All rights reserved.
+Copyright (c) 2006, Colorado School of Mines and others. All rights reserved.
 This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is 
 available at http://www.eclipse.org/legal/cpl-v10.html
@@ -22,20 +22,16 @@ import static edu.mines.jtk.util.MathPlus.*;
 public class SimpleSine {
 
   public static void main(String[] args) {
-    SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        float[] x = Array.rampfloat(0.0f,4.0f*FLT_PI/200.0f,201);
-        float[] s = Array.sin(x);
-        PlotPanel panel = new PlotPanel();
-        PointsView pv = panel.addPoints(x,s);
-        pv.setStyle("r-o");
-        panel.setTitle("The sine function");
-        panel.setHLabel("x");
-        panel.setVLabel("sin(x)");
-        panel.addGrid();
-        PlotFrame frame = new PlotFrame(panel);
-        frame.setVisible(true);
-      }
-    });
+    float[] x = Array.rampfloat(0.0f,4.0f*FLT_PI/200.0f,201);
+    float[] s = Array.sin(x);
+    PlotPanel panel = new PlotPanel();
+    PointsView pv = panel.addPoints(x,s);
+    pv.setStyle("r-o");
+    panel.setTitle("The sine function");
+    panel.setHLabel("x");
+    panel.setVLabel("sin(x)");
+    panel.addGrid();
+    PlotFrame frame = new PlotFrame(panel);
+    frame.setVisible(true);
   }
 }

@@ -189,7 +189,7 @@ public class MtMatMulBench {
       for (int ithread=0; ithread<threads.length; ++ithread)
         threads[ithread].join();
     } catch (InterruptedException ie) {
-      Thread.currentThread().interrupt();
+      throw new RuntimeException(ie);
     }
   }
 
