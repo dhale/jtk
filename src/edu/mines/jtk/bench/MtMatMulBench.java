@@ -48,7 +48,7 @@ public class MtMatMulBench {
 
       s.restart();
       for (nmul=0; s.time()<maxtime; ++nmul)
-        mul2(a,b,c2);
+        mul2b(a,b,c2);
       s.stop();
       System.out.println("mul2: rate="+(int)(nmul*mflops/s.time())+" mflops");
 
@@ -90,7 +90,7 @@ public class MtMatMulBench {
   }
 
   /**
-   * Single-threaded straightforward method.
+   * Single-threaded method.
    */
   private static void mul1(float[][] a, float[][] b, float[][] c) {
     checkDimensions(a,b,c);
@@ -104,7 +104,7 @@ public class MtMatMulBench {
   }
 
   /**
-   * Multi-threaded lock-free version.
+   * Multi-threaded atomic-integer version.
    */
   private static void mul2(
     final float[][] a, final float[][] b, final float[][] c) 
@@ -129,6 +129,57 @@ public class MtMatMulBench {
     try {
       for (int ithread=0; ithread<nthread; ++ithread)
         threads[ithread].join();
+    } catch (InterruptedException ie) {
+      throw new RuntimeException(ie);
+    }
+  }
+
+  /**
+   * Multi-threaded atomic-integer version with some helper classes.
+   */
+  private static void mul2b(
+    final float[][] a, final float[][] b, final float[][] c) 
+  {
+    checkDimensions(a,b,c);
+    final int ni = a.length;
+    final int nj = b[0].length;
+    final int nk = b.length;
+    final AtomicInteger aj = new AtomicInteger();
+    int nt = 4;
+    LoopRunnable[] lr = new LoopRunnable[nt];
+    for (int it=0; it<nt; ++it) {
+      lr[it] = new LoopRunnable(nj,aj) {
+        public void run(int j) {
+          computeColumn(ni,nk,j,_bj,a,b,c);
+        }
+        private float[] _bj = new float[nk];
+      };
+    }
+    run(lr);
+  }
+  private static abstract class LoopRunnable implements Runnable {
+    public LoopRunnable(int n, AtomicInteger ai) {
+      _n = n;
+      _ai = ai;
+    }
+    public void run() {
+      for (int i=_ai.getAndIncrement(); i<_n; i=_ai.getAndIncrement())
+        run(i);
+    }
+    public abstract void run(int i);
+    private int _n;
+    private AtomicInteger _ai;
+  }
+  private static void run(LoopRunnable[] lr) {
+    int nt = lr.length;
+    Thread[] threads = new Thread[nt];
+    for (int it=0; it<nt; ++it) {
+      threads[it] = new Thread(lr[it]);
+      threads[it].start();
+    }
+    try {
+      for (int it=0; it<nt; ++it)
+        threads[it].join();
     } catch (InterruptedException ie) {
       throw new RuntimeException(ie);
     }
