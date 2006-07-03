@@ -21,9 +21,11 @@ import edu.mines.jtk.util.Stopwatch;
  */
 public class MtMatMulBench {
 
+  public static final int NTHREAD = 8;
+
   public static void main(String[] args) {
-    int m = 500;
-    int n = 500;
+    int m = 501;
+    int n = 502;
     float[][] a = Array.randfloat(n,m);
     float[][] b = Array.randfloat(m,n);
     float[][] c1 = Array.zerofloat(m,m);
@@ -33,9 +35,10 @@ public class MtMatMulBench {
     double mflops = 2.0e-6*m*m*n;
     double nmul,maxtime=1.0;
 
-    System.out.println("mul1 = single-threaded method");
-    System.out.println("mul2 = atomic-integer method");
-    System.out.println("mul3 = thread-pool method");
+    System.out.println("Methods:");
+    System.out.println("mul1 = single-threaded");
+    System.out.println("mul2 = multi-threaded (atomic-integer)");
+    System.out.println("mul3 = multi-threaded (thread-pool)");
 
     for (int ntrial=0; ntrial<5; ++ntrial) {
       System.out.println();
@@ -150,9 +153,8 @@ public class MtMatMulBench {
     final int nj = c[0].length;
     final int nk = b.length;
     final AtomicInteger aj = new AtomicInteger();
-    int nthread = 4;
-    Thread[] threads = new Thread[nthread];
-    for (int ithread=0; ithread<nthread; ++ithread) {
+    Thread[] threads = new Thread[NTHREAD];
+    for (int ithread=0; ithread<threads.length; ++ithread) {
       threads[ithread] = new Thread(new Runnable() {
         public void run() {
           for (int j=aj.getAndIncrement(); j<nj; j=aj.getAndIncrement())
@@ -169,7 +171,7 @@ public class MtMatMulBench {
     checkDimensions(a,b,c);
     final int nj = c[0].length;
     final AtomicInteger aj = new AtomicInteger();
-    Thread[] threads = new Thread[4];
+    Thread[] threads = new Thread[NTHREAD];
     for (int ithread=0; ithread<threads.length; ++ithread) {
       threads[ithread] = new Thread(new Runnable() {
         public void run() {
@@ -201,8 +203,7 @@ public class MtMatMulBench {
     final int ni = c.length;
     final int nj = c[0].length;
     final int nk = b.length;
-    int nthread = 4;
-    ExecutorService es = Executors.newFixedThreadPool(nthread);
+    ExecutorService es = Executors.newFixedThreadPool(NTHREAD);
     CompletionService<Void> cs = new ExecutorCompletionService<Void>(es);
     for (int j=0; j<nj; ++j) {
       final int jj = j;
