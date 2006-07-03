@@ -22,8 +22,8 @@ import edu.mines.jtk.util.Stopwatch;
 public class MtMatMulBench {
 
   public static void main(String[] args) {
-    int m = 400;
-    int n = 600;
+    int m = 500;
+    int n = 500;
     float[][] a = Array.randfloat(n,m);
     float[][] b = Array.randfloat(m,n);
     float[][] c1 = Array.zerofloat(m,m);
@@ -42,7 +42,7 @@ public class MtMatMulBench {
 
       s.restart();
       for (nmul=0; s.time()<maxtime; ++nmul)
-        mul1(a,b,c1);
+        mul1b(a,b,c1);
       s.stop();
       System.out.println("mul1: rate="+(int)(nmul*mflops/s.time())+" mflops");
 
@@ -64,8 +64,39 @@ public class MtMatMulBench {
   }
 
   /**
-   * Computes j'th column in methods for matrix-matrix multiply below.
+   * Computes j'th column of matrix multiplication C = A*B.
    * The work array bj is used to cache the j'th column of the matrix b.
+   * This version allocates a new work array bj internally for every call.
+   * Loop unrolling improves performance.
+   */
+  private static void computeColumn(
+    int j, float[][] a, float[][] b, float[][] c) 
+  {
+    int ni = c.length;
+    int nk = b.length;
+    float[] bj = new float[nk];
+    for (int k=0; k<nk; ++k)
+      bj[k] = b[k][j];
+    for (int i=0; i<ni; ++i) {
+      float[] ai = a[i];
+      float cij = 0.0f;
+      int mk = nk%4;
+      for (int k=0; k<mk; ++k)
+        cij += ai[k]*bj[k];
+      for (int k=mk; k<nk; k+=4) {
+        cij += ai[k  ]*bj[k  ];
+        cij += ai[k+1]*bj[k+1];
+        cij += ai[k+2]*bj[k+2];
+        cij += ai[k+3]*bj[k+3];
+      }
+      c[i][j] = cij;
+    }
+  }
+
+  /**
+   * Computes j'th column of matrix multiplication C = A*B.
+   * The work array bj is used to cache the j'th column of the matrix b.
+   * This version requires that the work array bj be passed as a parameter.
    * Loop unrolling improves performance.
    */
   private static void computeColumn(
@@ -98,9 +129,14 @@ public class MtMatMulBench {
     int nj = c[0].length;
     int nk = b.length;
     float[] bj = new float[nk];
-    for (int j=0; j<nj; ++j) {
+    for (int j=0; j<nj; ++j)
       computeColumn(ni,nk,j,bj,a,b,c);
-    }
+  }
+  private static void mul1b(float[][] a, float[][] b, float[][] c) {
+    checkDimensions(a,b,c);
+    int nj = c[0].length;
+    for (int j=0; j<nj; ++j)
+      computeColumn(j,a,b,c);
   }
 
   /**
@@ -118,70 +154,40 @@ public class MtMatMulBench {
     Thread[] threads = new Thread[nthread];
     for (int ithread=0; ithread<nthread; ++ithread) {
       threads[ithread] = new Thread(new Runnable() {
-      final float[] bj = new float[nk];
         public void run() {
           for (int j=aj.getAndIncrement(); j<nj; j=aj.getAndIncrement())
-            computeColumn(ni,nk,j,bj,a,b,c);
+            computeColumn(ni,nk,j,_bj,a,b,c);
         }
+        private float[] _bj = new float[nk];
       });
-      threads[ithread].start();
     }
-    try {
-      for (int ithread=0; ithread<nthread; ++ithread)
-        threads[ithread].join();
-    } catch (InterruptedException ie) {
-      throw new RuntimeException(ie);
-    }
+    run(threads);
   }
-
-  /**
-   * Multi-threaded atomic-integer version with some helper classes.
-   */
   private static void mul2b(
     final float[][] a, final float[][] b, final float[][] c) 
   {
     checkDimensions(a,b,c);
-    final int ni = a.length;
-    final int nj = b[0].length;
-    final int nk = b.length;
+    final int nj = c[0].length;
     final AtomicInteger aj = new AtomicInteger();
-    int nt = 4;
-    LoopRunnable[] lr = new LoopRunnable[nt];
-    for (int it=0; it<nt; ++it) {
-      lr[it] = new LoopRunnable(nj,aj) {
-        public void run(int j) {
-          computeColumn(ni,nk,j,_bj,a,b,c);
+    Thread[] threads = new Thread[4];
+    for (int ithread=0; ithread<threads.length; ++ithread) {
+      threads[ithread] = new Thread(new Runnable() {
+        public void run() {
+          for (int j=aj.getAndIncrement(); j<nj; j=aj.getAndIncrement())
+            computeColumn(j,a,b,c);
         }
-        private float[] _bj = new float[nk];
-      };
+      });
     }
-    run(lr);
+    run(threads);
   }
-  private static abstract class LoopRunnable implements Runnable {
-    public LoopRunnable(int n, AtomicInteger ai) {
-      _n = n;
-      _ai = ai;
-    }
-    public void run() {
-      for (int i=_ai.getAndIncrement(); i<_n; i=_ai.getAndIncrement())
-        run(i);
-    }
-    public abstract void run(int i);
-    private int _n;
-    private AtomicInteger _ai;
-  }
-  private static void run(LoopRunnable[] lr) {
-    int nt = lr.length;
-    Thread[] threads = new Thread[nt];
-    for (int it=0; it<nt; ++it) {
-      threads[it] = new Thread(lr[it]);
-      threads[it].start();
-    }
+  private static void run(Thread[] threads) {
+    for (int ithread=0; ithread<threads.length; ++ithread)
+      threads[ithread].start();
     try {
-      for (int it=0; it<nt; ++it)
-        threads[it].join();
+      for (int ithread=0; ithread<threads.length; ++ithread)
+        threads[ithread].join();
     } catch (InterruptedException ie) {
-      throw new RuntimeException(ie);
+      Thread.currentThread().interrupt();
     }
   }
 
