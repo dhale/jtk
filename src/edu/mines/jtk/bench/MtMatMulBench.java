@@ -21,7 +21,8 @@ import edu.mines.jtk.util.Stopwatch;
  */
 public class MtMatMulBench {
 
-  public static final int NTHREAD = 8;
+  public static final int NTHREAD = 
+    Runtime.getRuntime().availableProcessors();
 
   public static void main(String[] args) {
     int m = 1001;
