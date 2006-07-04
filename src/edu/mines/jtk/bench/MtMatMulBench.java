@@ -40,6 +40,7 @@ public class MtMatMulBench {
     System.out.println("mul1 = single-threaded");
     System.out.println("mul2 = multi-threaded (atomic-integer)");
     System.out.println("mul3 = multi-threaded (thread-pool)");
+    System.out.println("number of threads = "+NTHREAD);
 
     for (int ntrial=0; ntrial<5; ++ntrial) {
       System.out.println();
