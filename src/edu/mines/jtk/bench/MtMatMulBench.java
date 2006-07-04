@@ -24,8 +24,8 @@ public class MtMatMulBench {
   public static final int NTHREAD = 8;
 
   public static void main(String[] args) {
-    int m = 501;
-    int n = 502;
+    int m = 1001;
+    int n = 1002;
     float[][] a = Array.randfloat(n,m);
     float[][] b = Array.randfloat(m,n);
     float[][] c1 = Array.zerofloat(m,m);
@@ -33,7 +33,7 @@ public class MtMatMulBench {
     float[][] c3 = Array.zerofloat(m,m);
     Stopwatch s = new Stopwatch();
     double mflops = 2.0e-6*m*m*n;
-    double nmul,maxtime=1.0;
+    double nmul,maxtime=5.0;
 
     System.out.println("Methods:");
     System.out.println("mul1 = single-threaded");
