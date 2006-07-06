@@ -715,6 +715,7 @@ public class PlotPanel extends IPanel {
    * Internal class for plot title.
    */
   private class Title extends IPanel {
+    private static final long serialVersionUID = 1L;
     String text;
 
     Title(String text) {

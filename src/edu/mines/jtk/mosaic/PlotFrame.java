@@ -234,6 +234,7 @@ public class PlotFrame extends JFrame {
    * that the IPanel children of any JSplitPane are painted.
    */
   private class MainPanel extends IPanel {
+    private static final long serialVersionUID = 1L;
     public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
       if (_split==null) {
         _panelTL.paintToRect(g2d,x,y,w,h);
