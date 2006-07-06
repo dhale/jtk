@@ -127,13 +127,17 @@ public class DMatrixTest extends TestCase {
     assertEqualExact(r.arrayRightDivide(s),s.arrayLeftDivide(r));
     assertEqualFuzzy(r0,r.arrayLeftDivideEquals(s).arrayLeftDivideEquals(s));
 
-    DMatrix t = r.timesTranspose(r);
-    assertTrue(t.isSymmetric());
-    t = r.transposeTimes(r);
-    assertTrue(t.isSymmetric());
-    t.plusEquals(t.transpose()).times(0.5);
-    assertTrue(t.isSymmetric());
+    DMatrix t1 = r.timesTranspose(r);
+    DMatrix t2 = r.transposeTimes(r);
+    assertTrue(t1.isSquare());
+    assertTrue(t2.isSquare());
+    t1 = t1.plus(t1.transpose());
+    t2 = t2.plus(t2.transpose());
+    assertTrue(t1.isSymmetric());
+    assertTrue(t2.isSymmetric());
+   
 
+    DMatrix t = t1;
     n = t.getN();
     double[] a = t.getArray();
     double trace = 0.0;
