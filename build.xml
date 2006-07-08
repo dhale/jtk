@@ -61,10 +61,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       compiler="javac1.5"
       debug="on" 
       deprecation="on">
-      <compilerarg value="-Xlint:unchecked"/>
+      <compilerarg value="-Xlint:all,-serial"/>
       <classpath refid="classpath"/>
-      <exclude name="**/old/*"/>
-      <exclude name="**/new/*"/>
+      <exclude name="**/old/**"/>
+      <exclude name="**/new/**"/>
     </javac>
   </target>
 
@@ -92,9 +92,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       windowtitle="${title}">
       <packageset dir="src" defaultexcludes="yes">
         <include name="edu/mines/jtk/**"/>
-        <exclude name="edu/mines/jtk/**/new"/>
-        <exclude name="edu/mines/jtk/**/old"/>
-        <exclude name="edu/mines/jtk/**/test"/>
+        <exclude name="edu/mines/jtk/**/new/**"/>
+        <exclude name="edu/mines/jtk/**/old/**"/>
+        <exclude name="edu/mines/jtk/**/test/**"/>
       </packageset>
     </javadoc>
   </target>
