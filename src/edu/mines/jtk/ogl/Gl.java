@@ -12,19 +12,21 @@ import javax.media.opengl.GLContext;
 
 /**
  * OpenGL standard constants and methods. These static constants and methods 
- * wrap those provided by JOGL ({@link javax.media.opengl}), and make OpenGL 
- * programming in Java more like that in C or C++. For example, instead of
+ * wrap those provided by JOGL. The reason for this wrapper is to make OpenGL 
+ * programming in Java more like that in C or C++. For example, where with
+ * JOGL we might write
  * <pre><code>
    gl.glClear(GL.GL_COLOR_BUFFER_BIT);
  * </code></pre>
- * one can simply write
+ * with this wrapper we can write
  * <pre><code>
  * glClear(GL_COLOR_BUFFER_BIT);
  * </code></pre>
  * The static methods in this class use the OpenGL context that is current
- * for the current thread.
+ * for the current thread. This class is stateless, and can be used with any
+ * JOGL class.
  * @author Dave Hale, Colorado School of Mines
- * @version 2006.07.07
+ * @version 2006.07.08
  */
 public class Gl {
 

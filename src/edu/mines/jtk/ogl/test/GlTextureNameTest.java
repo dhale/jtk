@@ -60,14 +60,12 @@ public class GlTextureNameTest {
         GL_UNSIGNED_BYTE,_checkImage);
     }
     public void glInit() {
-      System.out.println("glInit");
       glClearColor(0.0f,0.0f,0.0f,0.0f);
       glPixelStorei(GL_UNPACK_ALIGNMENT,1);
       makeCheckImage();
       makeTexture();
     }
-    public void glResize(int width, int height, int widthOld, int heightOld) {
-      System.out.println("glResize");
+    public void glResize(int x, int y, int width, int height) {
       glViewport(0,0,width,height);
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
@@ -75,7 +73,6 @@ public class GlTextureNameTest {
       glMatrixMode(GL_MODELVIEW);
     }
     public void glPaint() {
-      System.out.println("glPaint");
       glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
       glEnable(GL_TEXTURE_2D);
       glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
@@ -88,10 +85,10 @@ public class GlTextureNameTest {
       glEnd();
       glFlush();
       glDisable(GL_TEXTURE_2D);
-      //makeTexture();
+      makeTexture();
     }
   };
   public static void main(String[] args) {
-    TestSimple.run(args,canvas,false);
+    TestSimple.run(args,canvas,true);
   }
 }

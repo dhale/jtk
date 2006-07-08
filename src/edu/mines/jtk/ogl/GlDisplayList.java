@@ -12,64 +12,80 @@ import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.ogl.Gl.*;
 
 /**
- * An OpenGL texture name. When constructed, a texture name calls
- * glGenTextures to generate a single texture name. When disposed, it 
- * calls glDeleteTextures to delete any OpenGL resources bound to that 
- * name. If not disposed explicitly, a texture name will dispose itself 
+ * An OpenGL display list. When constructed, a display list calls
+ * glGenLists to generate one or more display lists. When disposed, it 
+ * calls glDeleteLists to delete any OpenGL resources bound to those 
+ * lists. If not disposed explicitly, a display list will dispose itself 
  * when finalized during garbage collection.
  * <p>
  * This class exists to implement the finalize method and thereby reduce 
  * the likelihood of OpenGL resource leaks. However, it is not foolproof,
- * for two reasons. First, there is no guarantee that a texture name will 
- * ever be finalized. Second, to call glDeleteTextures, a texture name must 
+ * for two reasons. First, there is no guarantee that a display list will 
+ * ever be finalized. Second, to call glDeleteLists, a display list must 
  * lock an OpenGL context, and the only context it knows is the one in which 
- * it was constructed. That context may have been disposed, but the texture 
- * name may have been shared in a different unknown context. In this case, 
- * texture resources may be leaked in that unknown context.
+ * it was constructed. That context may have been disposed, but the display 
+ * list may have been shared in a different unknown context. In this case, 
+ * display list resources may be leaked in that unknown context.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.07.08
  */
-public class GlTextureName {
+public class GlDisplayList {
 
   /**
-   * Constructs a texture name in the current OpenGL context.
-   * Calls glGenTextures to create one texture object.
+   * Constructs a display list in the current OpenGL context.
+   * Calls glGenLists to create one display list object.
    * @exception IllegalStateException if the current OpenGL context is null.
    */
-  public GlTextureName() {
+  public GlDisplayList() {
+    this(1);
+  }
+
+  /**
+   * Constructs display lists in the current OpenGL context.
+   * Calls glGenLists to create the specified number of display list objects.
+   * @param range the number of display lists.
+   * @exception IllegalStateException if the current OpenGL context is null.
+   */
+  public GlDisplayList(int range) {
     _context = GLContext.getCurrent();
     Check.state(_context!=null,"OpenGL context is not null");
-    int[] names = new int[1];
-    glGenTextures(1,names,0);
-    _name = names[0];
-    //System.out.println("GlTextureName: generated name="+_name);
+    _list = glGenLists(range);
+    _range = range;
   }
 
   /**
-   * Returns the integer name corresponding to this texture name.
-   * @return the name; zero, if this texture name has been disposed.
+   * Returns the integer index corresponding to this display list. If more 
+   * than one list, this method returns the index of the first list.
+   * @return the index; zero, if this display list has been disposed.
    */
-  public int name() {
-    return _name;
+  public int list() {
+    return _list;
   }
 
   /**
-   * Disposes this texture name. When practical, this method should be called
+   * Returns the number of display lists.
+   * @return the number of display lists; zero, if disposed.
+   */
+  public int range() {
+    return _range;
+  }
+
+  /**
+   * Disposes this display list. When practical, this method should be called
    * explicitly. Otherwise, it will be called when this object is finalized
    * during garbage collection.
    */
   public synchronized void dispose() {
     if (_context!=null && _context.makeCurrent()==GLContext.CONTEXT_CURRENT) {
-      //System.out.println("dispose: deleting name="+_name);
       try {
-        int[] names = {_name};
-        glDeleteTextures(1,names,0);
+        glDeleteLists(_list,_range);
       } finally {
         _context.release();
       }
     }
     _context = null;
-    _name = 0;
+    _list = 0;
+    _range = 0;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -87,5 +103,6 @@ public class GlTextureName {
   // private
 
   GLContext _context;
-  int _name;
+  int _list;
+  int _range;
 }
