@@ -23,6 +23,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * @version 2005.09.19
  */
 public class SequencePlot extends PlotFrame {
+  private static final long serialVersionUID = 1L;
 
   /**
    * Constructs a plot for one sampled sequence.
@@ -158,6 +159,7 @@ public class SequencePlot extends PlotFrame {
 
   private void addButtons() {
     Action saveToPngAction = new AbstractAction("Save to PNG") {
+      private static final long serialVersionUID = 1L;
       public void actionPerformed(ActionEvent event) {
         JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
         fc.showSaveDialog(_frame);

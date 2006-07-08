@@ -18,7 +18,7 @@ import edu.mines.jtk.util.Check;
  * (1) transforms the value to an integer pixel in the range [0,255],
  * (2) maps this integer pixel to a color using an index color model.
  * <p>
- * The method {@link #getPixel(double)} performs step (1). For any 
+ * The method {@link #getIndex(double)} performs step (1). For any 
  * double value, that method
  * (1a) clips to a specified min-max range of values,
  * (1b) linearly translates and scales to [0.0,255.0], and

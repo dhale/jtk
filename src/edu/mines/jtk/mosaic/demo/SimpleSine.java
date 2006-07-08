@@ -22,16 +22,24 @@ import static edu.mines.jtk.util.MathPlus.*;
 public class SimpleSine {
 
   public static void main(String[] args) {
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        go();
+      }
+    });
+  }
+  private static void go() {
     float[] x = Array.rampfloat(0.0f,4.0f*FLT_PI/200.0f,201);
     float[] s = Array.sin(x);
     PlotPanel panel = new PlotPanel();
     PointsView pv = panel.addPoints(x,s);
     pv.setStyle("r-o");
+    panel.addGrid();
     panel.setTitle("The sine function");
     panel.setHLabel("x");
     panel.setVLabel("sin(x)");
-    panel.addGrid();
     PlotFrame frame = new PlotFrame(panel);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setVisible(true);
   }
 }

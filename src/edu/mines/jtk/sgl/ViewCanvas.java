@@ -19,6 +19,7 @@ import static edu.mines.jtk.opengl.Gl.*;
  * @version 2005.05.24
  */
 public class ViewCanvas extends GlCanvas {
+  private static final long serialVersionUID = 1L;
 
   /**
    * Constructs a canvas with no view.

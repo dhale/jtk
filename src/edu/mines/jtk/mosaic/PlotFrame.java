@@ -26,7 +26,7 @@ import edu.mines.jtk.awt.*;
  * panels.
  * <p>
  * A plot frame has a single mode manager 
- * ({@link edu.mines.jtk.gui.ModeManager}).
+ * ({@link edu.mines.jtk.awt.ModeManager}).
  * When constructed, a plot frame adds and sets active (1) a tile zoom mode 
  * ({@link edu.mines.jtk.mosaic.TileZoomMode}) and (2) a mouse track mode
  * ({@link edu.mines.jtk.mosaic.MouseTrackMode}) to that mode manager. Of

@@ -13,6 +13,7 @@ import edu.mines.jtk.sgl.*;
  * @version 2006.06.28
  */
 public class TestFrame extends JFrame {
+  private static final long serialVersionUID = 1L;
 
   public TestFrame(World world) {
     OrbitView view = (world!=null)?new OrbitView(world):new OrbitView();
@@ -31,6 +32,7 @@ public class TestFrame extends JFrame {
     JMenu fileMenu = new JMenu("File");
     fileMenu.setMnemonic('F');
     Action exitAction = new AbstractAction("Exit") {
+      private static final long serialVersionUID = 1L;
       public void actionPerformed(ActionEvent event) {
         System.exit(0);
       }

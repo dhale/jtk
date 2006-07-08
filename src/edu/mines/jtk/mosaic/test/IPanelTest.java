@@ -25,6 +25,7 @@ import edu.mines.jtk.mosaic.*;
 public class IPanelTest {
 
   static class Title extends IPanel {
+    private static final long serialVersionUID = 1L;
     Title(String text) {
       super();
       _text = text;
@@ -58,6 +59,7 @@ public class IPanelTest {
   }
 
   static class Wave extends IPanel {
+    private static final long serialVersionUID = 1L;
     Wave(double cycles) {
       super();
       _cycles = cycles;

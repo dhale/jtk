@@ -40,7 +40,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * The second step is a table lookup. It uses the pixel bytes computed in 
  * the first mapping as indices in a specified index color model. This color
  * model converts a pixel index in the range [0,255] to a color.
- * See {@link edu.mines.jtk.util.ByteIndexColorModel} for more details.
+ * See {@link edu.mines.jtk.awt.ColorMap} for more details.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.09.27
  */
