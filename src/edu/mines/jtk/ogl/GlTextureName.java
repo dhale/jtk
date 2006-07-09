@@ -59,17 +59,24 @@ public class GlTextureName {
    * during garbage collection.
    */
   public synchronized void dispose() {
-    if (_context!=null && _context.makeCurrent()==GLContext.CONTEXT_CURRENT) {
-      //System.out.println("dispose: deleting name="+_name);
-      try {
-        int[] names = {_name};
-        glDeleteTextures(1,names,0);
-      } finally {
-        _context.release();
+    if (_context!=null) {
+      GLContext current = GLContext.getCurrent();
+      if (_context==current ||
+          _context.makeCurrent()==GLContext.CONTEXT_CURRENT) {
+        try {
+          //System.out.println("dispose: deleting name="+_name);
+          int[] names = {_name};
+          glDeleteTextures(1,names,0);
+        } finally {
+          if (_context!=current) {
+            _context.release();
+            current.makeCurrent();
+          }
+        }
       }
+      _context = null;
+      _name = 0;
     }
-    _context = null;
-    _name = 0;
   }
 
   ///////////////////////////////////////////////////////////////////////////

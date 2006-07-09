@@ -60,6 +60,21 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
   }
 
   /**
+   * Runs the specified runnable with a current OpenGL context.
+   * The specified runnable may safely call OpenGL functions within
+   * its method run.
+   * @param runnable the object to run.
+   */
+  public void runWithContext(Runnable runnable) {
+    _runnable = runnable;
+    try {
+      display();
+    } finally {
+      _runnable = null;
+    }
+  }
+
+  /**
    * Initializes OpenGL state when this canvas is first painted.
    * This method is called before the methods 
    * {@link #glResize(int,int,int,int)} and {@link #glPaint()} when (1)
@@ -108,9 +123,13 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
   }
 
   public void display(GLAutoDrawable drawable) {
-    glPaint();
-    if (_autoRepaint)
-      repaint();
+    if (_runnable!=null) {
+      _runnable.run();
+    } else {
+      glPaint();
+      if (_autoRepaint)
+        repaint();
+    }
   }
 
   public void displayChanged(
@@ -122,4 +141,5 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
   // private
 
   private boolean _autoRepaint;
+  private Runnable _runnable;
 }

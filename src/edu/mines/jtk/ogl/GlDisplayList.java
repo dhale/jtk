@@ -76,16 +76,23 @@ public class GlDisplayList {
    * during garbage collection.
    */
   public synchronized void dispose() {
-    if (_context!=null && _context.makeCurrent()==GLContext.CONTEXT_CURRENT) {
-      try {
-        glDeleteLists(_list,_range);
-      } finally {
-        _context.release();
+    if (_context!=null) {
+      GLContext current = GLContext.getCurrent();
+      if (_context==current ||
+          _context.makeCurrent()==GLContext.CONTEXT_CURRENT) {
+        try {
+          glDeleteLists(_list,_range);
+        } finally {
+          if (_context!=current) {
+            _context.release();
+            current.makeCurrent();
+          }
+        }
       }
+      _context = null;
+      _list = 0;
+      _range = 0;
     }
-    _context = null;
-    _list = 0;
-    _range = 0;
   }
 
   ///////////////////////////////////////////////////////////////////////////
