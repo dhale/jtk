@@ -63,6 +63,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       deprecation="on">
       <compilerarg value="-Xlint:all,-serial"/>
       <classpath refid="classpath"/>
+      <exclude name="**/ogl/**"/>
       <exclude name="**/old/**"/>
       <exclude name="**/new/**"/>
     </javac>
