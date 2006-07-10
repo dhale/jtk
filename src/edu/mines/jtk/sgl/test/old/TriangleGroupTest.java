@@ -4,7 +4,7 @@ import java.awt.*;
 
 import edu.mines.jtk.sgl.*;
 import edu.mines.jtk.util.*;
-import static edu.mines.jtk.ogl.Gl.*;
+import static edu.mines.jtk.opengl.Gl.*;
 
 /**
  * Tests {@link edu.mines.jtk.sgl.TriangleGroup}.

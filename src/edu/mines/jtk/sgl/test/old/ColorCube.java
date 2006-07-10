@@ -12,7 +12,7 @@ import java.util.*;
 
 import edu.mines.jtk.util.*;
 import edu.mines.jtk.sgl.*;
-import static edu.mines.jtk.ogl.Gl.*;
+import static edu.mines.jtk.opengl.Gl.*;
 
 /**
  * A simple cube with colored sides.
