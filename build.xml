@@ -63,7 +63,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       deprecation="on">
       <compilerarg value="-Xlint:all,-serial"/>
       <classpath refid="classpath"/>
-      <exclude name="**/ogl/**"/>
       <exclude name="**/old/**"/>
       <exclude name="**/new/**"/>
     </javac>
@@ -93,7 +92,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       windowtitle="${title}">
       <packageset dir="src" defaultexcludes="yes">
         <include name="edu/mines/jtk/**"/>
-        <exclude name="edu/mines/jtk/**/ogl/**"/>
         <exclude name="edu/mines/jtk/**/new/**"/>
         <exclude name="edu/mines/jtk/**/old/**"/>
         <exclude name="edu/mines/jtk/**/test/**"/>
