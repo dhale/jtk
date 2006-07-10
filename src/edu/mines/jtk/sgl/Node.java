@@ -9,7 +9,7 @@ package edu.mines.jtk.sgl;
 import java.util.*;
 
 import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * A node in the scene graph.

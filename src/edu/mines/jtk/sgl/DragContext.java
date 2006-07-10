@@ -9,8 +9,8 @@ package edu.mines.jtk.sgl;
 import java.awt.event.*;
 import java.util.*;
 
-import edu.mines.jtk.opengl.*;
-import static edu.mines.jtk.opengl.Gl.*;
+import edu.mines.jtk.ogl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**

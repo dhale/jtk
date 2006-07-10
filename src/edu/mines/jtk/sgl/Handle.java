@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * A handle for manipulating other nodes. A handle is a special type of node, 
@@ -179,7 +179,7 @@ public abstract class Handle extends Group {
     Matrix44 transform = computeTransform(dc);
     dc.pushLocalToWorld(transform);
     glPushMatrix();
-    glMultMatrixd(transform.m);
+    glMultMatrixd(transform.m,0);
   }
 
   /**

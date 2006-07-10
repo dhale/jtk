@@ -8,7 +8,7 @@ package edu.mines.jtk.sgl;
 
 import java.awt.*;
 
-import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * OpenGL material state. 
@@ -526,40 +526,40 @@ public class MaterialState implements State {
   public void apply() {
     glEnable(GL_LIGHTING);
     if (_ambientFrontSet && _ambientBackSet && _ambientFront==_ambientBack) {
-      glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,_ambientFront);
+      glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,_ambientFront,0);
     } else {
       if (_ambientFrontSet)
-        glMaterialfv(GL_FRONT,GL_AMBIENT,_ambientFront);
+        glMaterialfv(GL_FRONT,GL_AMBIENT,_ambientFront,0);
       if (_ambientBackSet)
-        glMaterialfv(GL_BACK,GL_AMBIENT,_ambientBack);
+        glMaterialfv(GL_BACK,GL_AMBIENT,_ambientBack,0);
     }
     if (_diffuseFrontSet && _diffuseBackSet && _diffuseFront==_diffuseBack) {
-      glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,_diffuseFront);
+      glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,_diffuseFront,0);
     } else {
       if (_diffuseFrontSet)
-        glMaterialfv(GL_FRONT,GL_DIFFUSE,_diffuseFront);
+        glMaterialfv(GL_FRONT,GL_DIFFUSE,_diffuseFront,0);
       if (_diffuseBackSet)
-        glMaterialfv(GL_BACK,GL_DIFFUSE,_diffuseBack);
+        glMaterialfv(GL_BACK,GL_DIFFUSE,_diffuseBack,0);
     }
     if (_specularFrontSet && 
         _specularBackSet && 
         _specularFront==_specularBack) {
-      glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,_specularFront);
+      glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,_specularFront,0);
     } else {
       if (_specularFrontSet)
-        glMaterialfv(GL_FRONT,GL_SPECULAR,_specularFront);
+        glMaterialfv(GL_FRONT,GL_SPECULAR,_specularFront,0);
       if (_specularBackSet)
-        glMaterialfv(GL_BACK,GL_SPECULAR,_specularBack);
+        glMaterialfv(GL_BACK,GL_SPECULAR,_specularBack,0);
     }
     if (_emissiveFrontSet && 
         _emissiveBackSet && 
         _emissiveFront==_emissiveBack) {
-      glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,_emissiveFront);
+      glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,_emissiveFront,0);
     } else {
       if (_emissiveFrontSet)
-        glMaterialfv(GL_FRONT,GL_EMISSION,_emissiveFront);
+        glMaterialfv(GL_FRONT,GL_EMISSION,_emissiveFront,0);
       if (_emissiveBackSet)
-        glMaterialfv(GL_BACK,GL_EMISSION,_emissiveBack);
+        glMaterialfv(GL_BACK,GL_EMISSION,_emissiveBack,0);
     }
     if (_shininessFrontSet && 
         _shininessBackSet && 

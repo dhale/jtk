@@ -9,7 +9,7 @@ package edu.mines.jtk.sgl;
 import static java.lang.Math.*;
 
 import edu.mines.jtk.util.*;
-import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * An axis-aligned frame is a group of axis-aligned panels. A frame's 

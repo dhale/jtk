@@ -6,8 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import edu.mines.jtk.opengl.*;
-import static edu.mines.jtk.opengl.Gl.*;
+import java.nio.*;
+
+import edu.mines.jtk.ogl.*;
+import edu.mines.jtk.util.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * An OpenGL canvas on which a view draws its world.
@@ -106,22 +109,18 @@ public class ViewCanvas extends GlCanvas {
    * @param yp the pixel y coordinate.
    * @return the pixel z coordinate.
    */
-  public double getPixelZ(int xp, int yp) {
-    int hp = getHeight();
-    GlContext context = getContext();
-    double zp = 0.0;
-    context.lock();
-    try {
-      glPushAttrib(GL_PIXEL_MODE_BIT);
-      glReadBuffer(GL_FRONT);
-      float[] pixels = {0.0f};
-      glReadPixels(xp,hp-1-yp,1,1,GL_DEPTH_COMPONENT,GL_FLOAT,pixels);
-      zp = pixels[0];
-      glPopAttrib();
-    } finally {
-      context.unlock();
-    }
-    return zp;
+  public double getPixelZ(final int xp, final int yp) {
+    final int hp = getHeight();
+    final FloatBuffer pixels = Direct.newFloatBuffer(1);
+    runWithContext(new Runnable() {
+      public void run() {
+        glPushAttrib(GL_PIXEL_MODE_BIT);
+        glReadBuffer(GL_FRONT);
+        glReadPixels(xp,hp-1-yp,1,1,GL_DEPTH_COMPONENT,GL_FLOAT,pixels);
+        glPopAttrib();
+      }
+    });
+    return pixels.get(0);
   }
 
   public void glPaint() {

@@ -9,9 +9,9 @@ package edu.mines.jtk.sgl;
 import java.awt.*;
 import static java.lang.Math.*;
 
-import edu.mines.jtk.opengl.*;
+import edu.mines.jtk.ogl.*;
 import edu.mines.jtk.util.*;
-import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * A view of a world, as if in orbit around that world.
@@ -363,19 +363,19 @@ public class OrbitView extends View {
     // Projection (view-to-cube) transform.
     Matrix44 viewToCube = canvas.getViewToCube();
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixd(viewToCube.m);
+    glLoadMatrixd(viewToCube.m,0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
     // Light.
     // TODO: make lighting customizable.
     float[] lightPosition = {-0.1f,-0.1f,1.0f,0.0f};
-    glLightfv(GL_LIGHT0,GL_POSITION,lightPosition);
+    glLightfv(GL_LIGHT0,GL_POSITION,lightPosition,0);
     glEnable(GL_LIGHT0);
 
     // View (world-to-view) transform.
     Matrix44 worldToView = this.getWorldToView();
-    glLoadMatrixd(worldToView.m);
+    glLoadMatrixd(worldToView.m,0);
 
     // Cull and draw the world.
     CullContext cc = new CullContext(canvas);

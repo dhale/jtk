@@ -8,7 +8,7 @@ package edu.mines.jtk.sgl;
 
 import java.awt.*;
 
-import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * OpenGL color state.

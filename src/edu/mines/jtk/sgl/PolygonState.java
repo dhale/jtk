@@ -8,7 +8,7 @@ package edu.mines.jtk.sgl;
 
 import java.awt.*;
 
-import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * OpenGL polygon state.
@@ -384,7 +384,7 @@ public class PolygonState implements State {
     }
     if (_polygonStippleSet) {
       glEnable(GL_POLYGON_STIPPLE);
-      glPolygonStipple(_polygonStipple);
+      glPolygonStipple(_polygonStipple,0);
     }
   }
 

@@ -11,7 +11,7 @@ import java.util.HashMap;
 import static java.lang.Math.*;
 
 import edu.mines.jtk.util.*;
-import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * A group of triangles that represents a triangulated surface.

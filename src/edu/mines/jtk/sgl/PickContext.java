@@ -9,8 +9,8 @@ package edu.mines.jtk.sgl;
 import java.awt.event.*;
 import java.util.*;
 
-import edu.mines.jtk.opengl.*;
-import static edu.mines.jtk.opengl.Gl.*;
+import edu.mines.jtk.ogl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
@@ -209,16 +209,4 @@ public class PickContext extends TransformContext {
   private ArrayStack<Segment> _pickSegmentStack = 
     new ArrayStack<Segment>();
   private ArrayList<PickResult> _pickResults = new ArrayList<PickResult>();
-
-  private int getDepthBits(ViewCanvas canvas) {
-    int[] bz = {0};
-    GlContext context = canvas.getContext();
-    context.lock();
-    try {
-      glGetIntegerv(GL_DEPTH_BITS,bz);
-    } finally {
-      context.unlock();
-    }
-    return bz[0];
-  }
 }

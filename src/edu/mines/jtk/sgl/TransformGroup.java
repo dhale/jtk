@@ -7,7 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * A group node that transforms the coordinates for its children.
@@ -70,7 +70,7 @@ public class TransformGroup extends Group {
     super.drawBegin(dc);
     dc.pushLocalToWorld(_transform);
     glPushMatrix();
-    glMultMatrixd(_transform.m);
+    glMultMatrixd(_transform.m,0);
   }
 
   /**

@@ -10,7 +10,7 @@ import java.awt.*;
 import java.nio.*;
 
 import edu.mines.jtk.util.*;
-import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 
 /**

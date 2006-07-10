@@ -6,14 +6,15 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import java.nio.*;
 import java.util.*;
 
 import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.io.*;
-import edu.mines.jtk.opengl.*;
+import edu.mines.jtk.ogl.*;
 import edu.mines.jtk.util.*;
 
-import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
@@ -117,7 +118,7 @@ public class ImagePanel extends AxisAlignedPanel {
   int _jsmax,_jtmax; // max texture-in-cache indices
 
   // Used when creating/loading a texture.
-  int[] _pixels; // array[_lt][_ls] of pixels for one texture
+  IntBuffer _pixels; // array[_lt][_ls] of pixels for one texture
 
   private void drawTextures() {
 
@@ -258,7 +259,7 @@ public class ImagePanel extends AxisAlignedPanel {
     _ktmin = 0;  _ktmax = -1;
     _jsmin = 0;  _jsmax = -1;
     _jtmin = 0;  _jtmax = -1;
-    _pixels = new int[_ls*_lt];
+    _pixels = Direct.newIntBuffer(_ls*_lt);
   }
 
   private void updateBounds(
@@ -387,7 +388,7 @@ public class ImagePanel extends AxisAlignedPanel {
     for (int it=0; it<_lt; ++it) {
       for (int is=0; is<_ls; ++is) {
         float gray = scale*(float)(is+it);
-        _pixels[is+_ls*it] = pixelFromFloat(gray);
+        _pixels.put(is+_ls*it,pixelFromFloat(gray));
       }
     }
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);

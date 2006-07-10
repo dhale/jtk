@@ -8,7 +8,7 @@ package edu.mines.jtk.sgl;
 
 import java.awt.*;
 
-import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * OpenGL light model state.
@@ -157,7 +157,7 @@ public class LightModelState implements State {
 
   public void apply() {
     if (_ambientSet)
-      glLightModelfv(GL_LIGHT_MODEL_AMBIENT,_ambient);
+      glLightModelfv(GL_LIGHT_MODEL_AMBIENT,_ambient,0);
     if (_colorControlSet)
       glLightModelf(GL_LIGHT_MODEL_COLOR_CONTROL,_colorControl);
     if (_localViewerSet)
