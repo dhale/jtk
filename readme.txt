@@ -168,3 +168,4 @@ Note the OpenGL version and vendor printed by Hello. The version number
 should not be less than 1.2. For accelerated 3-D graphics, you want the 
 vendor to be something like NVIDIA or ATI, not Microsoft or Mesa. You may 
 need to download and install new video drivers.
+
