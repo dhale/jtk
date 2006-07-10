@@ -14,14 +14,15 @@ currently include digital signal processing and 2-D and 3-D graphics.
 
 To take advantage of useful existing software not written in Java, we wrap 
 such software using the Java Native Interface (JNI). Where needed, we load
-JNI libraries dynamically via Java's System.loadLibrary method. Examples 
-include our JNI libraries that wrap OpenGL (for 3-D graphics) and LAPACK 
-(for dense linear algebra). 
+JNI libraries dynamically via Java's System.loadLibrary method. An example
+is our JNI library that wraps parts of the LAPACK library for dense linear 
+algebra. 
 
 To simplify development, we include pre-compiled binaries for our JNI 
 libraries with the source code for the Mines JTK. Currently, we provide
-JNI libraries for 32-bit x86 systems running Linux or Windows. For these
-platforms, you need only a Java compiler to build the Mines JTK.
+JNI libraries for 32-bit (x86) systems running Linux or Windows and 64-bit
+(x64) systems running Linux. For these platforms, you need only a Java 
+compiler to use everything in the Mines JTK.
 
 Note: if you modify (or port, or translate, or ...) our source code, then
 you have created a "derived work", and should review carefully the terms
@@ -34,7 +35,6 @@ Getting the source code
 To build the Mines JTK from source, you must first use Subversion (SVN)
 client software to checkout (co) the source code from our SVN repository:
 http://boole.mines.edu/jtk.
-
 
 If you are using Linux, an SVN client is likely available with your Linux 
 distribution. If not yet installed, perhaps you simply need to install it. 
@@ -58,7 +58,7 @@ bin/  - platform-dependent scripts (e.g., antrun.bat and javarun.bat)
 data/ - data used for demos and testing
 doc/  - documentation for tools we use but do not build (e.g., JUnit)
 jar/  - JAR files (e.g., junit.jar)
-lib/  - platform-specific JNI libraries (e.g., edu_mines_jtk_opengl.dll)
+lib/  - platform-specific JNI libraries (e.g., edu_mines_jtk_lapack.dll)
 src/  - source code files (e.g., edu/mines/jtk/util/Stopwatch.java)
 
 
@@ -109,9 +109,9 @@ jtk/trunk/build/jar/edu_mines_jtk.jar.
 You may use this file as you would any other JAR file.
 To run JUnit tests, you will also need jtk/trunk/jar/junit.jar.
 
-Some packages (e.g., edu.mines.jtk.opengl) require JNI libraries of
+Some packages (e.g., edu.mines.jtk.lapack) require JNI libraries of
 native (non-Java) code. These platform-specific libraries should be
-in a subdirectory of jtk/trunk/lib/.
+in a subdirectory of jtk/trunk/lib/, such as jtk/trunk/lib/linux/x86/.
 
 To use the Mines JTK, we must launch a Java virtual machine, specifying 
 all of these JAR files and the locations of our JNI libraries.
@@ -138,9 +138,33 @@ recent version of that library, but your system may have an older and
 incompatible version. In such cases, if you cannot upgrade your standard
 C++ library, then you must build the JNI libraries yourself.
 
-Finally, to test our OpenGL wrappers, type
-javarun edu.mines.jtk.opengl.test.Hello
-Note the OpenGL version and vendor printed by this test. The version
-number should not be less than 1.2. For accelerated 3-D graphics, you want 
-the vendor to be something like NVIDIA or ATI, not Microsoft or Mesa. You 
-may need to download and install new video drivers.
+
+3-D graphics in the Mines JTK
+-----------------------------
+
+Our packages for 3-D graphics are built on JOGL, a Java binding for the 
+OpenGL API. Like the Mines JTK, JOGL provides both a JAR file and JNI
+libraries; and the JNI libraries are platform-specific. In the future, 
+JOGL is likely to become part of standard Java Runtime Environment (JRE). 
+Then, JOGL's JNI libraries will be installed with everything else in the JRE. 
+
+Until then, download JNI libraries for JOGL from https://jogl.dev.java.net/. 
+The JNI libraries that we need are in JAR files with names like 
+jogl-natives-linux-i586.jar.
+These "natives" JAR files are ZIP files that you can unpack like any other
+ZIP file, or with the jar utility that comes with Sun's JDK. When you unpack
+them, put the JNI libraries in the appropriate subdirectory of jtk/trunk/lib/, 
+such as jtk/trunk/lib/linux/x86/.
+
+After installing the JOGL JNI libraries, type
+javarun edu.mines.jtk.ogl.test.Hello
+You should see a white square, painted via OpenGL.
+
+If you get a "java.lang.UnsatisfiedLinkError", you may not have installed
+the JOGL JNI libraries in the right directory, or you may not have specified
+that directory correctly in your javarun script.
+
+Note the OpenGL version and vendor printed by Hello. The version number 
+should not be less than 1.2. For accelerated 3-D graphics, you want the 
+vendor to be something like NVIDIA or ATI, not Microsoft or Mesa. You may 
+need to download and install new video drivers.
