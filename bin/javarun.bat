@@ -11,6 +11,7 @@ set MINES_JTK_HOME=c:\dhale\box\jtk\trunk
 rem Where are the Mines JTK jars and JNI libraries?
 set CLASSPATH=^
 %MINES_JTK_HOME%\build\jar\edu_mines_jtk.jar;^
+%MINES_JTK_HOME%\jar\jogl.jar;^
 %MINES_JTK_HOME%\jar\junit.jar
 set PATH=^
 %MINES_JTK_HOME%\lib\windows\x86;^
