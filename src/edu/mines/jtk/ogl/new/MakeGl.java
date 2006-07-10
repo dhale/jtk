@@ -2,6 +2,23 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
+/**
+ * Makes OpenGL wrapper class Gl.java for JOGL's javax.media.opengl.GL.
+ *GL.
+ * To make a new Gl.java, save the javadoc file GL.html from JOGL as a 
+ * text file Gl.txt (note the change in case from GL to Gl), and run this 
+ * program.
+ * <p>
+ * This program may require modification if the format of JOGL's javadoc
+ * files changes. Check the output file Gl.java before using.
+ * <p>
+ * An alternative to this program would be to use reflection on the JOGL
+ * class file javax.media.opengl.GL.class, but this alternative would not
+ * preserve the names of method parameters. A better alternative would be
+ * for JOGL to provide these bindings.
+ * @author Dave Hale, Colorado School of Mines
+ * @version 2006.07.10
+ */
 public class MakeGl {
 
   public static void main(String[] args) {
@@ -133,57 +150,3 @@ public class MakeGl {
     }
   }
 }
-
-/*
-read input line
-for(;;) {
-  if no input line,
-    break
-  if input line begins with "public " {
-    if input line does not begin with "public static ", 
-      break
-    extract name that begins with GL and ends input line
-    new empty output line
-    append "  " to output line
-    append input line to output line
-    append " = \n    GL."+name to output line
-    write output line
-  }
-  read input line
-}
-for(;;) {
-  if no input line,
-    break
-  if input line begins with "public " {
-    extract method name that begins after " " and ends before "("
-    new par list
-    for (;;) {
-      new output line
-      append "  " to output line
-      append input line to output line
-      extract par that begins after " " and ends before "," or ")"
-      if par not empty
-        add par to par list
-      if input line ends with ")" {
-        append " {" to output line
-        break
-      }
-      write output line
-      read input line
-    }
-    write output line
-    append "    gl()."+name+"(" to output line
-    write output line
-    for each par in par list {
-      new output line
-      append "      "+par to output line
-      if last par
-        append ");" to output line
-      else
-        append "," to output line
-      write output line
-    }
-  }
-  read input line
-}
-*/
