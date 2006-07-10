@@ -25,7 +25,8 @@ import static edu.mines.jtk.util.MathPlus.*;
  * true minimizing argument x is less than a specified tolerance. The 
  * function f(x) is never evaluated at two points closer together than 
  * EPS*abs(xmin)+tol/3, where EPS is approximately 1.0e-8, the square 
- * root of machine epsilon for IEEE double precision arithmetic.
+ * root of machine epsilon for IEEE double precision arithmetic, and
+ * tol is a specified tolerance.
  * <p>
  * If f(x) is a unimodal function and if the computed values of f(x) are 
  * always unimodal for arguments x separated by at least EPS*abs(x)+tol/3, 
@@ -34,7 +35,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * then xmin may approximate a local, but perhaps not global, minimum to 
  * the same accuracy.
  * <p>
- * This function is translated from the Fortran function FMIN, by 
+ * This implementation is adapted from the Fortran function FMIN, by 
  * Forsythe, G.E., Malcolm, M.A., and Moler, C.B. 1977, Computer Methods 
  * for Mathematical Computations, Prentice Hall. That Fortran function is, 
  * in turn, a translation of the Algol 60 program by Brent, R., 1973, 
