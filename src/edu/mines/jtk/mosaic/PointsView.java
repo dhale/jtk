@@ -90,12 +90,7 @@ public class PointsView extends TiledView {
    * @param x2 array of x2 coordinates.
    */
   public PointsView(Sampling s1, float[] x2) {
-    Check.argument(s1.getCount()==x2.length,"s1 count equals x2 length");
-    int n1 = x2.length;
-    float[] x1 = new float[n1];
-    for (int i1=0; i1<n1; ++i1)
-      x1[i1] = (float)s1.getValue(i1);
-    set(x1,x2);
+    set(s1,x2);
   }
 
   /**
@@ -115,6 +110,20 @@ public class PointsView extends TiledView {
    * @param x2 array of arrays of x2 coordinates.
    */
   public PointsView(float[][] x1, float[][] x2) {
+    set(x1,x2);
+  }
+
+  /**
+   * Sets (x1,x2) coordinates for a sampled function x2(x1).
+   * @param s1 the sampling of x1 coordinates.
+   * @param x2 array of x2 coordinates.
+   */
+  public void set(Sampling s1, float[] x2) {
+    Check.argument(s1.getCount()==x2.length,"s1 count equals x2 length");
+    int n1 = x2.length;
+    float[] x1 = new float[n1];
+    for (int i1=0; i1<n1; ++i1)
+      x1[i1] = (float)s1.getValue(i1);
     set(x1,x2);
   }
 

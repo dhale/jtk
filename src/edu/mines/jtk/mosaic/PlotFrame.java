@@ -142,6 +142,24 @@ public class PlotFrame extends JFrame {
   }
 
   /**
+   * Gets the tile zoom mode for this plot frame.
+   * By default, this mode is active.
+   * @return the tile zoom mode.
+   */
+  public TileZoomMode getTileZoomMode() {
+    return _tileZoomMode;
+  }
+
+  /**
+   * Gets the mouse track mode for this plot frame.
+   * By default, this mode is active.
+   * @return the mouse track mode.
+   */
+  public MouseTrackMode getMouseTrackMode() {
+    return _mouseTrackMode;
+  }
+
+  /**
    * Paints this panel to a PNG image with specified resolution and width.
    * The image height is computed so that the image has the same aspect 
    * ratio as this panel.
@@ -226,6 +244,8 @@ public class PlotFrame extends JFrame {
   private JSplitPane _splitPane; // null, if only one plot panel
   private MainPanel _panelMain; // main panel may contain split pane
   private ModeManager _modeManager; // mode manager for this plot frame
+  private TileZoomMode _tileZoomMode; // tile zoom mode
+  private MouseTrackMode _mouseTrackMode; // mouse track mode
 
   /**
    * A main panel contains either a plot panel or a split pane that
@@ -269,9 +289,9 @@ public class PlotFrame extends JFrame {
     _panelTL.getMosaic().setModeManager(_modeManager);
     if (_panelBR!=_panelTL)
       _panelBR.getMosaic().setModeManager(_modeManager);
-    TileZoomMode zoomMode = new TileZoomMode(_modeManager);
-    MouseTrackMode trackMode = new MouseTrackMode(_modeManager);
-    zoomMode.setActive(true);
-    trackMode.setActive(true);
+    _tileZoomMode = new TileZoomMode(_modeManager);
+    _mouseTrackMode = new MouseTrackMode(_modeManager);
+    _tileZoomMode.setActive(true);
+    _mouseTrackMode.setActive(true);
   }
 }

@@ -8,6 +8,7 @@ package edu.mines.jtk.mosaic.demo;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -18,9 +19,9 @@ import edu.mines.jtk.mosaic.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * A simple demonstration of {@link edu.mines.jtk.mosaic.PlotFrame}.
+ * Impulse, amplitude and phase responses of filter with poles and zeros.
  * @author Dave Hale, Colorado School of Mines
- * @version 2006.07.03
+ * @version 2006.07.11
  */
 public class PolesAndZeros {
 
@@ -33,10 +34,94 @@ public class PolesAndZeros {
   }
 
   public PolesAndZeros() {
+    _poles = new ArrayList<Cdouble>(0);
+    _zeros = new ArrayList<Cdouble>(0);
     _pzp = new PoleZeroPlot();
+    _rp = new ResponsePlot(false);
   }
+
+  public void addPole(Cdouble pole) {
+    _poles.add(new Cdouble(pole));
+    _pzp.updatePolesView();
+  }
+
+  public void removePole(Cdouble pole) {
+    _poles.remove(pole);
+    _pzp.updatePolesView();
+  }
+
+  public void movePole(Cdouble poleOld, Cdouble poleNew) {
+    _poles.remove(poleOld);
+    _poles.add(poleNew);
+    _pzp.updatePolesView();
+  }
+
+  public ArrayList<Cdouble> getPoles() {
+    return new ArrayList<Cdouble>(_poles);
+  }
+
+  public void setPoles(ArrayList<Cdouble> poles) {
+    _poles = new ArrayList<Cdouble>(poles);
+    _pzp.updatePolesView();
+  }
+
+  public Cdouble getPoleNearest(Cdouble z) {
+    Cdouble pmin = null;
+    double dmin = 0.0;
+    for (Cdouble p: _poles) {
+      double d = p.minus(z).abs();
+      if (pmin==null || d<dmin) {
+        pmin = p;
+        dmin = d;
+      }
+    }
+    return pmin;
+  }
+
+  public void addZero(Cdouble zero) {
+    _zeros.add(new Cdouble(zero));
+    _pzp.updateZerosView();
+  }
+
+  public void removeZero(Cdouble zero) {
+    _zeros.remove(zero);
+    _pzp.updateZerosView();
+  }
+
+  public void moveZero(Cdouble zeroOld, Cdouble zeroNew) {
+    _zeros.remove(zeroOld);
+    _zeros.add(zeroNew);
+    _pzp.updateZerosView();
+  }
+
+  public ArrayList<Cdouble> getZeros() {
+    return new ArrayList<Cdouble>(_zeros);
+  }
+
+  public void setZeros(ArrayList<Cdouble> zeros) {
+    _zeros = new ArrayList<Cdouble>(zeros);
+    _pzp.updateZerosView();
+  }
+
+  public Cdouble getZeroNearest(Cdouble z) {
+    Cdouble pmin = null;
+    double dmin = 0.0;
+    for (Cdouble p: _zeros) {
+      double d = p.minus(z).abs();
+      if (pmin==null || d<dmin) {
+        pmin = p;
+        dmin = d;
+      }
+    }
+    return pmin;
+  }
+
+  private ArrayList<Cdouble> _poles;
+  private ArrayList<Cdouble> _zeros;
   private PoleZeroPlot _pzp;
-  //private FilterPlot
+  private ResponsePlot _rp;
+
+  ///////////////////////////////////////////////////////////////////////////
 
   private class PoleZeroPlot {
     PoleZeroPlot() {
@@ -52,55 +137,49 @@ public class PolesAndZeros {
       _circleView = _plotPanel.addPoints(circlePoints[0],circlePoints[1]);
       _circleView.setLineColor(Color.RED);
 
-      setPoles(new ArrayList<Cdouble>(0));
+      updatePolesView();
+      updateZerosView();
 
       _plotFrame = new PlotFrame(_plotPanel);
+      ModeManager mm = _plotFrame.getModeManager();
+      TileZoomMode tzm = _plotFrame.getTileZoomMode();
+      PoleZeroMode pm = new PoleZeroMode(mm,false); // for poles
+      PoleZeroMode zm = new PoleZeroMode(mm,true);  // for zeros
+
+      JMenu fileMenu = new JMenu("File");
+      fileMenu.setMnemonic('F');
+      Action exitAction = new AbstractAction("Exit") {
+        private static final long serialVersionUID = 1L;
+        public void actionPerformed(ActionEvent event) {
+          System.exit(0);
+        }
+      };
+      fileMenu.add(exitAction).setMnemonic('x');
+      JMenu modeMenu = new JMenu("Mode");
+      modeMenu.setMnemonic('M');
+      modeMenu.add(new ModeMenuItem(tzm));
+      modeMenu.add(new ModeMenuItem(pm));
+      modeMenu.add(new ModeMenuItem(zm));
+      JMenuBar menuBar = new JMenuBar();
+      menuBar.add(fileMenu);
+      menuBar.add(modeMenu);
+
+      JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
+      toolBar.setRollover(true);
+      toolBar.add(new ModeToggleButton(tzm));
+      toolBar.add(new ModeToggleButton(pm));
+      toolBar.add(new ModeToggleButton(zm));
+
+      pm.setActive(true);
+
+      _plotFrame.setJMenuBar(menuBar);
+      _plotFrame.add(toolBar,BorderLayout.WEST);
       _plotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       _plotFrame.setSize(400,440);
       _plotFrame.setVisible(true);
-
-      addModes();
     }
 
-    public void addPole(Cdouble pole) {
-      _poles.add(new Cdouble(pole));
-      updatePolesView();
-    }
-
-    public void removePole(Cdouble pole) {
-      _poles.remove(pole);
-      updatePolesView();
-    }
-
-    public void movePole(Cdouble poleOld, Cdouble poleNew) {
-      _poles.remove(poleOld);
-      _poles.add(poleNew);
-      updatePolesView();
-    }
-
-    public Cdouble getPoleNearest(Cdouble z) {
-      Cdouble pmin = null;
-      double dmin = 0.0;
-      for (Cdouble p: _poles) {
-        double d = p.minus(z).abs();
-        if (pmin==null || d<dmin) {
-          pmin = p;
-          dmin = d;
-        }
-      }
-      return pmin;
-    }
-
-    public ArrayList<Cdouble> getPoles() {
-      return new ArrayList<Cdouble>(_poles);
-    }
-
-    public void setPoles(ArrayList<Cdouble> poles) {
-      _poles = new ArrayList<Cdouble>(poles);
-      updatePolesView();
-    }
-
-    private void updatePolesView() {
+    public void updatePolesView() {
       int np = _poles.size();
       float[] xp = new float[np];
       float[] yp = new float[np];
@@ -118,8 +197,24 @@ public class PolesAndZeros {
       }
     }
 
-    private ArrayList<Cdouble> _poles;
-    private ArrayList<Cdouble> _zeros;
+    public void updateZerosView() {
+      int nz = _zeros.size();
+      float[] xz = new float[nz];
+      float[] yz = new float[nz];
+      for (int iz=0; iz<nz; ++iz) {
+        Cdouble z = _zeros.get(iz);
+        xz[iz] = (float)z.r;
+        yz[iz] = (float)z.i;
+      }
+      if (_zerosView==null) {
+        _zerosView = _plotPanel.addPoints(xz,yz);
+        _zerosView.setMarkStyle(PointsView.Mark.HOLLOW_CIRCLE);
+        _zerosView.setLineStyle(PointsView.Line.NONE);
+      } else {
+        _zerosView.set(xz,yz);
+      }
+    }
+
     private PlotFrame _plotFrame;
     private PlotPanel _plotPanel;
     private PointsView _polesView;
@@ -139,41 +234,157 @@ public class PolesAndZeros {
       }
       return new float[][]{x,y};
     }
+  }
 
-    private void addModes() {
-      ModeManager mm = _plotPanel.getMosaic().getModeManager();
-      PoleZeroMode pm = new PoleZeroMode(mm,this,false); // for poles
-      PoleZeroMode zm = new PoleZeroMode(mm,this,true);  // for zeros
-      pm.setActive(true);
+  ///////////////////////////////////////////////////////////////////////////
+
+  private class ResponsePlot {
+
+    public ResponsePlot(boolean db) {
+      _db = db;
+
+      _plotPanelX = new PlotPanel();
+      _plotPanelX.setHLabel("sample index");
+      _plotPanelX.setVLabel("amplitude");
+
+      _plotPanelAP = new PlotPanel(2,1);
+      _plotPanelAP.setVLimits(1,-0.5,0.5);
+      if (db) {
+        _plotPanelAP.setVLabel(0,"amplitude (dB)");
+      } else {
+        _plotPanelAP.setVLabel(0,"amplitude");
+      }
+      _plotPanelAP.setVLabel(1,"phase (cycles)");
+      _plotPanelAP.setHLabel("frequency (cycles/sample)");
+
+      _plotFrame = new PlotFrame(
+        _plotPanelX,_plotPanelAP,PlotFrame.Split.VERTICAL);
+
+      JMenu fileMenu = new JMenu("File");
+      fileMenu.setMnemonic('F');
+      Action exitAction = new AbstractAction("Exit") {
+        private static final long serialVersionUID = 1L;
+        public void actionPerformed(ActionEvent event) {
+          System.exit(0);
+        }
+      };
+      fileMenu.add(exitAction).setMnemonic('x');
+      JMenuBar menuBar = new JMenuBar();
+      menuBar.add(fileMenu);
+
+      _plotFrame.setJMenuBar(menuBar);
+      _plotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      _plotFrame.setSize(600,600);
+      _plotFrame.setVisible(true);
+    }
+
+    public void updateViews() {
+      int np = _poles.size();
+      int nz = _zeros.size();
+      Cdouble[] poles = new Cdouble[np];
+      Cdouble[] zeros = new Cdouble[nz];
+      _poles.toArray(poles);
+      _zeros.toArray(zeros);
+      float[] x = new float[1001];
+      float[] y = new float[1001];
+      x[0] = 1.0f;
+      RecursiveCascadeFilter f = new RecursiveCascadeFilter(poles,zeros,1.0);
+      f.applyForward(x,y);
+      Real1[] ap = computeSpectra(x,_db);
+      Real1 a = ap[0];
+      Real1 p = ap[1];
+      if (_xView==null) {
+        _xView = _plotPanelX.addSequence(y);
+        _aView = _plotPanelAP.addPoints(0,0,a.getSampling(),a.getValues());
+        _pView = _plotPanelAP.addPoints(1,0,p.getSampling(),p.getValues());
+      } else {
+        _xView.set(y);
+        _aView.set(a.getSampling(),a.getValues());
+        _pView.set(p.getSampling(),p.getValues());
+      }
+    }
+
+    private boolean _db;
+    private PlotPanel _plotPanelX;
+    private PlotPanel _plotPanelAP;
+    private PlotFrame _plotFrame;
+    private SequenceView _xView;
+    private PointsView _aView;
+    private PointsView _pView;
+
+    // TODO
+    private void addButtons() {
+      Action saveToPngAction = new AbstractAction("Save to PNG") {
+        public void actionPerformed(ActionEvent event) {
+          JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
+          fc.showSaveDialog(_plotFrame);
+          File file = fc.getSelectedFile();
+          if (file!=null) {
+            String filename = file.getAbsolutePath();
+            _plotFrame.paintToPng(300,6,filename);
+          }
+        }
+      };
+      JButton saveToPngButton = new JButton(saveToPngAction);
+      JToolBar toolBar = new JToolBar();
+      toolBar.add(saveToPngButton);
+      _plotFrame.add(toolBar,BorderLayout.NORTH);
+    }
+
+    private Real1[] computeSpectra(float[] x, boolean db) {
+      Sampling st = new Sampling(x.length,1.0,0.0);
+      int nt = st.getCount();
+      double dt = st.getDelta();
+      double ft = st.getFirst();
+      int nfft = FftReal.nfftSmall(5*nt);
+      FftReal fft = new FftReal(nfft);
+      int nf = nfft/2+1;
+      double df = 1.0/(dt*nfft);
+      double ff = 0.0;
+      float[] cf = new float[2*nf];
+      Array.copy(nt,x,cf);
+      fft.realToComplex(-1,cf,cf);
+      float[] wft = Array.rampfloat(0.0f,-2.0f*FLT_PI*(float)(df*ft),nf);
+      cf = Array.cmul(cf,Array.cmplx(Array.cos(wft),Array.sin(wft)));
+      float[] af = Array.cabs(cf);
+      if (db) {
+        float amax = Array.max(af);
+        af = Array.mul(1.0f/amax,af);
+        af = Array.log10(af);
+        af = Array.mul(20.0f,af);
+      }
+      float[] pf = Array.carg(cf);
+      pf = Array.mul(0.5f/FLT_PI,pf);
+      Sampling sf = new Sampling(nf,df,ff);
+      Real1 a = new Real1(sf,af);
+      Real1 p = new Real1(sf,pf);
+      return new Real1[]{a,p};
     }
   }
+
+  ///////////////////////////////////////////////////////////////////////////
 
   private class PoleZeroMode extends Mode {
     private static final long serialVersionUID = 1L;
 
-    public PoleZeroMode(
-      ModeManager modeManager, PoleZeroPlot pzp, boolean zeros) 
-    {
+    public PoleZeroMode(ModeManager modeManager, boolean zeros) {
       super(modeManager);
       if (zeros) {
         _zeros = true;
         setName("Zeros");
-        setIcon(loadIcon(PoleZeroMode.class,"resources/Zeros.gif"));
+        setIcon(loadIcon(PolesAndZeros.class,"resources/Zeros.gif"));
         setMnemonicKey(KeyEvent.VK_0);
         setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_0,0));
-        setShortDescription("Add (Shift), remove (Ctrl) or drag zeros");
+        setShortDescription("Add (Shift), remove (Ctrl), or drag zeros");
       } else {
         _poles = true;
         setName("Poles");
-        setIcon(loadIcon(PoleZeroMode.class,"resources/Poles.gif"));
+        setIcon(loadIcon(PolesAndZeros.class,"resources/Poles.gif"));
         setMnemonicKey(KeyEvent.VK_X);
         setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_X,0));
-        setShortDescription("Add (Shift), remove (Ctrl) or drag poles");
+        setShortDescription("Add (Shift), remove (Ctrl), or drag poles");
       }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // protected
     
     protected void setActive(Component component, boolean active) {
       if (component instanceof Tile) {
@@ -184,9 +395,6 @@ public class PolesAndZeros {
         }
       }
     }
-
-    ///////////////////////////////////////////////////////////////////////////
-    // private
 
     private boolean _zeros; // true, if this mode is for zeros
     private boolean _poles; // true, if this mode is for poles
@@ -209,8 +417,8 @@ public class PolesAndZeros {
       }
       public void mouseReleased(MouseEvent e) {
         if (_editing) {
-          endEdit(e);
           _tile.removeMouseMotionListener(_mml);
+          endEdit(e);
           _editing = false;
         }
       }
@@ -247,7 +455,7 @@ public class PolesAndZeros {
 
     private boolean closeEnough(int x, int y, Cdouble c) {
       Point p = complexToPoint(c); 
-      return abs(p.x-x)<4 && abs(p.y-y)<4;
+      return abs(p.x-x)<6 && abs(p.y-y)<6;
     }
 
     private void add(MouseEvent e) {
@@ -256,9 +464,9 @@ public class PolesAndZeros {
       int y = e.getY();
       Cdouble z = pointToComplex(x,y);
       if (_poles) {
-        _pzp.addPole(z);
+        addPole(z);
       } else {
-        // TODO: add zero
+        addZero(z);
       }
     }
 
@@ -268,11 +476,13 @@ public class PolesAndZeros {
       int y = e.getY();
       Cdouble z = pointToComplex(x,y);
       if (_poles) {
-        Cdouble pole = _pzp.getPoleNearest(z);
+        Cdouble pole = getPoleNearest(z);
         if (pole!=null && closeEnough(x,y,pole))
-          _pzp.removePole(pole);
+          removePole(pole);
       } else {
-        // TODO: add zero
+        Cdouble zero = getZeroNearest(z);
+        if (zero!=null && closeEnough(x,y,zero))
+          removeZero(zero);
       }
     }
 
@@ -282,14 +492,19 @@ public class PolesAndZeros {
       int y = e.getY();
       Cdouble z = pointToComplex(x,y);
       if (_poles) {
-        Cdouble pole = _pzp.getPoleNearest(z);
+        Cdouble pole = getPoleNearest(z);
         if (pole!=null && closeEnough(x,y,pole)) {
-          _pzp.movePole(pole,z);
+          movePole(pole,z);
           _zedit = z;
           return true;
         }
       } else {
-        // TODO: move zero
+        Cdouble zero = getZeroNearest(z);
+        if (zero!=null && closeEnough(x,y,zero)) {
+          moveZero(zero,z);
+          _zedit = z;
+          return true;
+        }
       }
       return false;
     }
@@ -298,9 +513,9 @@ public class PolesAndZeros {
       int y = e.getY();
       Cdouble z = pointToComplex(x,y);
       if (_poles) {
-        _pzp.movePole(_zedit,z);
+        movePole(_zedit,z);
       } else {
-        // _pzp.moveZero(_zedit,z);
+        moveZero(_zedit,z);
       }
       _zedit = z;
     }
