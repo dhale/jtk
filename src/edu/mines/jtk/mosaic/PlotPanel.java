@@ -638,6 +638,31 @@ public class PlotPanel extends IPanel {
   }
 
   /**
+   * Adds the specified tiled view to this plot panel. If the tiled view 
+   * is already in this panel, it is first removed, before adding it again.
+   * @param tv the tiled view.
+   * @return true, if this panel did not already contain the specified
+   *  tiled view; false, otherwise.
+   */
+  public boolean addTiledView(TiledView tv) {
+    return addTiledView(0,0,tv);
+  }
+
+  /**
+   * Adds the specified tiled view to this plot panel. If the tiled view 
+   * is already in the specified tile, it is first removed, before adding 
+   * it again.
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param tv the tiled view.
+   * @return true, if the tile did not already contain the specified
+   *  tiled view; false, otherwise.
+   */
+  public boolean addTiledView(int irow, int icol, TiledView tv) {
+    return _mosaic.getTile(irow,icol).addTiledView(tv);
+  }
+
+  /**
    * Removes the specified tiled view from this plot panel.
    * @param tv the tiled view.
    * @return true, if this panel contained the specified tiled view; 

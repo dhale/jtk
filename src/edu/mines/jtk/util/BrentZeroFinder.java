@@ -44,7 +44,7 @@ public class BrentZeroFinder {
 
   /**
    * Constructs a new zero finder for the specified function.
-   * @param func the function.
+   * @param f the function.
    */
   public BrentZeroFinder(Function f) {
     _f = f;

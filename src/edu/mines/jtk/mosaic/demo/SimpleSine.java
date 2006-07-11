@@ -15,7 +15,7 @@ import edu.mines.jtk.mosaic.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * Demonstrates {@link edu.mines.jtk.mosaic.PlotFrame}
+ * A simple demonstration of {@link edu.mines.jtk.mosaic.PlotFrame}.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.07.03
  */
@@ -32,24 +32,24 @@ public class SimpleSine {
   public SimpleSine() {
     float[] x = Array.rampfloat(0.0f,4.0f*FLT_PI/200.0f,201);
     float[] s = Array.sin(x);
-    _panel = new PlotPanel();
-    _pointsView = _panel.addPoints(x,s);
+    _plotPanel = new PlotPanel();
+    _plotPanel.setTitle("The sine function");
+    _plotPanel.setHLabel("x");
+    _plotPanel.setVLabel("sin(x)");
+    _gridView = _plotPanel.addGrid();
+    _pointsView = _plotPanel.addPoints(x,s);
     _pointsView.setStyle("r-o");
-    _gridView = _panel.addGrid();
-    _panel.setTitle("The sine function");
-    _panel.setHLabel("x");
-    _panel.setVLabel("sin(x)");
-    _frame = new PlotFrame(_panel);
-    _frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    _frame.setVisible(true);
+    _plotFrame = new PlotFrame(_plotPanel);
+    _plotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    _plotFrame.setVisible(true);
   }
 
-  public PlotFrame getFrame() {
-    return _frame;
+  public PlotFrame getPlotFrame() {
+    return _plotFrame;
   }
 
-  public PlotPanel getPanel() {
-    return _panel;
+  public PlotPanel getPlotPanel() {
+    return _plotPanel;
   }
 
   public PointsView getPointsView() {
@@ -60,8 +60,8 @@ public class SimpleSine {
     return _gridView;
   }
 
-  private PlotFrame _frame;
-  private PlotPanel _panel;
+  private PlotFrame _plotFrame;
+  private PlotPanel _plotPanel;
   private PointsView _pointsView;
   private GridView _gridView;
 }

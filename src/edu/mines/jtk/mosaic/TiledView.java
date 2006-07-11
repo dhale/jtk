@@ -83,11 +83,10 @@ public abstract class TiledView {
    */
   protected void setBestProjectors(Projector bhp, Projector bvp) {
     if (!equal(_bhp,bhp) || !equal(_bvp,bvp)) {
-      _bhp = new Projector(bhp);
-      _bvp = new Projector(bvp);
-      if (_tile!=null) {
+      _bhp = (bhp!=null)?new Projector(bhp):null;
+      _bvp = (bvp!=null)?new Projector(bvp):null;
+      if (_tile!=null)
         _tile.alignProjectors();
-      }
     }
   }
   

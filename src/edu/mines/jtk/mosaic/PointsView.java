@@ -514,11 +514,11 @@ public class PointsView extends TiledView {
     Projector bhp = null;
     Projector bvp = null;
     if (_orientation==Orientation.X1RIGHT_X2UP) {
-      bhp = new Projector(x1min,x1max,u0,u1);
-      bvp = new Projector(x2max,x2min,u0,u1);
+      bhp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1):null;
+      bvp = (x2min<x2max)?new Projector(x2max,x2min,u0,u1):null;
     } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      bhp = new Projector(x2min,x2max,u0,u1);
-      bvp = new Projector(x1min,x1max,u0,u1);
+      bhp = (x2min<x2max)?new Projector(x2min,x2max,u0,u1):null;
+      bvp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1):null;
     }
     setBestProjectors(bhp,bvp);
   }
