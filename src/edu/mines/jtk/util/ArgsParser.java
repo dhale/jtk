@@ -1,3 +1,9 @@
+/****************************************************************************
+Copyright (c) 2006, Colorado School of Mines and others. All rights reserved.
+This program and accompanying materials are made available under the terms of
+the Common Public License - v1.0, which accompanies this distribution, and is
+available at http://www.eclipse.org/legal/cpl-v10.html
+****************************************************************************/
 package edu.mines.jtk.util;
 
 import java.util.ArrayList;
@@ -61,8 +67,8 @@ import java.util.ArrayList;
  * }
  * </code></pre>
  *
- * @author Dave Hale
- * @version 2001.02.04
+ * @author Dave Hale, Colorado School of Mines
+ * @version 2001.02.04, 2006.07.12
  */
 public class ArgsParser {
 

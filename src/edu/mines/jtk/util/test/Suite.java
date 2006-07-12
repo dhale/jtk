@@ -18,9 +18,11 @@ public class Suite extends TestSuite {
   public static Test suite() {
     TestSuite suite = new TestSuite();
 
+    suite.addTestSuite(ArgsParserTest.class);
     suite.addTestSuite(ArrayTest.class);
     suite.addTestSuite(AxisTicsTest.class);
     suite.addTestSuite(BrentMinFinderTest.class);
+    suite.addTestSuite(BrentZeroFinderTest.class);
     suite.addTestSuite(CfloatTest.class);
     suite.addTestSuite(MathPlusTest.class);
     suite.addTestSuite(StopwatchTest.class);

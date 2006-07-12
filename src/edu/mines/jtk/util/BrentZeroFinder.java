@@ -1,3 +1,9 @@
+/****************************************************************************
+Copyright (c) 2006, Colorado School of Mines and others. All rights reserved.
+This program and accompanying materials are made available under the terms of
+the Common Public License - v1.0, which accompanies this distribution, and is
+available at http://www.eclipse.org/legal/cpl-v10.html
+****************************************************************************/
 package edu.mines.jtk.util;
 
 import static edu.mines.jtk.util.MathPlus.*;
@@ -24,8 +30,8 @@ import static edu.mines.jtk.util.MathPlus.*;
  * for Mathematical Computations, Prentice Hall. That Fortran function is, 
  * in turn, a translation of the Algol 60 program by Brent, R., 1973, 
  * Algorithms for Minimization Without Derivatives, Prentice Hall.
- * @author Dave Hale
- * @version 2001.07.10
+ * @author Dave Hale, Colorado School of Mines
+ * @version 2001.07.10, 2006.07.12
  */
 public class BrentZeroFinder {
 
