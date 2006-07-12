@@ -42,27 +42,29 @@ public class PolesAndZeros {
 
   public void addPole(Cdouble pole) {
     _poles.add(new Cdouble(pole));
+    if (!pole.isReal())
+      _poles.add(pole.conj());
     _pzp.updatePolesView();
+    _rp.updateViews();
   }
 
   public void removePole(Cdouble pole) {
     _poles.remove(pole);
+    if (!pole.isReal())
+      _poles.remove(pole.conj());
     _pzp.updatePolesView();
+    _rp.updateViews();
   }
 
   public void movePole(Cdouble poleOld, Cdouble poleNew) {
     _poles.remove(poleOld);
+    if (!poleOld.isReal())
+      _poles.remove(poleOld.conj());
     _poles.add(poleNew);
+    if (!poleNew.isReal())
+      _poles.add(poleNew.conj());
     _pzp.updatePolesView();
-  }
-
-  public ArrayList<Cdouble> getPoles() {
-    return new ArrayList<Cdouble>(_poles);
-  }
-
-  public void setPoles(ArrayList<Cdouble> poles) {
-    _poles = new ArrayList<Cdouble>(poles);
-    _pzp.updatePolesView();
+    _rp.updateViews();
   }
 
   public Cdouble getPoleNearest(Cdouble z) {
@@ -80,27 +82,29 @@ public class PolesAndZeros {
 
   public void addZero(Cdouble zero) {
     _zeros.add(new Cdouble(zero));
+    if (!zero.isReal())
+      _zeros.add(zero.conj());
     _pzp.updateZerosView();
+    _rp.updateViews();
   }
 
   public void removeZero(Cdouble zero) {
     _zeros.remove(zero);
+    if (!zero.isReal())
+      _zeros.remove(zero.conj());
     _pzp.updateZerosView();
+    _rp.updateViews();
   }
 
   public void moveZero(Cdouble zeroOld, Cdouble zeroNew) {
     _zeros.remove(zeroOld);
+    if (!zeroOld.isReal())
+      _zeros.remove(zeroOld.conj());
     _zeros.add(zeroNew);
+    if (!zeroNew.isReal())
+      _zeros.add(zeroNew.conj());
     _pzp.updateZerosView();
-  }
-
-  public ArrayList<Cdouble> getZeros() {
-    return new ArrayList<Cdouble>(_zeros);
-  }
-
-  public void setZeros(ArrayList<Cdouble> zeros) {
-    _zeros = new ArrayList<Cdouble>(zeros);
-    _pzp.updateZerosView();
+    _rp.updateViews();
   }
 
   public Cdouble getZeroNearest(Cdouble z) {
@@ -121,6 +125,16 @@ public class PolesAndZeros {
   private PoleZeroPlot _pzp;
   private ResponsePlot _rp;
 
+  private static final int PZP_X = 100;
+  private static final int PZP_Y = 0;
+  private static final int PZP_WIDTH = 400;
+  private static final int PZP_HEIGHT = 440;
+
+  private static final int RP_X = PZP_X+PZP_WIDTH;
+  private static final int RP_Y = 0;
+  private static final int RP_WIDTH = 500;
+  private static final int RP_HEIGHT = 700;
+
   ///////////////////////////////////////////////////////////////////////////
 
   private class PoleZeroPlot {
@@ -129,8 +143,8 @@ public class PolesAndZeros {
       _plotPanel.setTitle("poles and zeros");
       _plotPanel.setHLabel("real");
       _plotPanel.setVLabel("imaginary");
-      _plotPanel.setHLimits(-3.0,3.0);
-      _plotPanel.setVLimits(-3.0,3.0);
+      _plotPanel.setHLimits(-2.0,2.0);
+      _plotPanel.setVLimits(-2.0,2.0);
 
       _gridView = _plotPanel.addGrid("H0-V0-");
       float[][] circlePoints = makeCirclePoints();
@@ -175,7 +189,8 @@ public class PolesAndZeros {
       _plotFrame.setJMenuBar(menuBar);
       _plotFrame.add(toolBar,BorderLayout.WEST);
       _plotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      _plotFrame.setSize(400,440);
+      _plotFrame.setLocation(PZP_X,PZP_Y);
+      _plotFrame.setSize(PZP_WIDTH,PZP_HEIGHT);
       _plotFrame.setVisible(true);
     }
 
@@ -246,16 +261,22 @@ public class PolesAndZeros {
       _plotPanelX = new PlotPanel();
       _plotPanelX.setHLabel("sample index");
       _plotPanelX.setVLabel("amplitude");
+      _plotPanelX.setTitle("impulse response");
 
       _plotPanelAP = new PlotPanel(2,1);
-      _plotPanelAP.setVLimits(1,-0.5,0.5);
+      _plotPanelAP.setTitle("amplitude and phase response");
       if (db) {
+        _plotPanelAP.setVLimits(0,0.0,-100.0);
         _plotPanelAP.setVLabel(0,"amplitude (dB)");
       } else {
+        _plotPanelAP.setVLimits(0,0.0,1.0);
         _plotPanelAP.setVLabel(0,"amplitude");
       }
+      _plotPanelAP.setVLimits(1,-0.5,0.5);
       _plotPanelAP.setVLabel(1,"phase (cycles)");
       _plotPanelAP.setHLabel("frequency (cycles/sample)");
+
+      updateViews();
 
       _plotFrame = new PlotFrame(
         _plotPanelX,_plotPanelAP,PlotFrame.Split.VERTICAL);
@@ -274,7 +295,8 @@ public class PolesAndZeros {
 
       _plotFrame.setJMenuBar(menuBar);
       _plotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      _plotFrame.setSize(600,600);
+      _plotFrame.setLocation(RP_X,RP_Y);
+      _plotFrame.setSize(RP_WIDTH,RP_HEIGHT);
       _plotFrame.setVisible(true);
     }
 
@@ -285,12 +307,16 @@ public class PolesAndZeros {
       Cdouble[] zeros = new Cdouble[nz];
       _poles.toArray(poles);
       _zeros.toArray(zeros);
-      float[] x = new float[1001];
-      float[] y = new float[1001];
+      float[] x = new float[101];
+      float[] y = new float[101];
       x[0] = 1.0f;
-      RecursiveCascadeFilter f = new RecursiveCascadeFilter(poles,zeros,1.0);
-      f.applyForward(x,y);
-      Real1[] ap = computeSpectra(x,_db);
+      if (np>0 || nz>0) {
+        RecursiveCascadeFilter f = new RecursiveCascadeFilter(poles,zeros,1.0);
+        f.applyForward(x,y);
+      } else {
+        Array.copy(x,y);
+      }
+      Real1[] ap = computeSpectra(y,_db);
       Real1 a = ap[0];
       Real1 p = ap[1];
       if (_xView==null) {
@@ -332,24 +358,19 @@ public class PolesAndZeros {
     }
 
     private Real1[] computeSpectra(float[] x, boolean db) {
-      Sampling st = new Sampling(x.length,1.0,0.0);
-      int nt = st.getCount();
-      double dt = st.getDelta();
-      double ft = st.getFirst();
+      int nt = x.length;
       int nfft = FftReal.nfftSmall(5*nt);
       FftReal fft = new FftReal(nfft);
       int nf = nfft/2+1;
-      double df = 1.0/(dt*nfft);
+      double df = 1.0/nfft;
       double ff = 0.0;
       float[] cf = new float[2*nf];
       Array.copy(nt,x,cf);
       fft.realToComplex(-1,cf,cf);
-      float[] wft = Array.rampfloat(0.0f,-2.0f*FLT_PI*(float)(df*ft),nf);
-      cf = Array.cmul(cf,Array.cmplx(Array.cos(wft),Array.sin(wft)));
       float[] af = Array.cabs(cf);
+      float amax = max(Array.max(af),FLT_EPSILON);
+      af = Array.mul(1.0f/amax,af);
       if (db) {
-        float amax = Array.max(af);
-        af = Array.mul(1.0f/amax,af);
         af = Array.log10(af);
         af = Array.mul(20.0f,af);
       }
@@ -372,14 +393,14 @@ public class PolesAndZeros {
       if (zeros) {
         _zeros = true;
         setName("Zeros");
-        setIcon(loadIcon(PolesAndZeros.class,"resources/Zeros.gif"));
+        setIcon(loadIcon(PolesAndZeros.class,"resources/Zeros16.png"));
         setMnemonicKey(KeyEvent.VK_0);
         setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_0,0));
         setShortDescription("Add (Shift), remove (Ctrl), or drag zeros");
       } else {
         _poles = true;
         setName("Poles");
-        setIcon(loadIcon(PolesAndZeros.class,"resources/Poles.gif"));
+        setIcon(loadIcon(PolesAndZeros.class,"resources/Poles16.png"));
         setMnemonicKey(KeyEvent.VK_X);
         setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_X,0));
         setShortDescription("Add (Shift), remove (Ctrl), or drag poles");
@@ -439,7 +460,7 @@ public class PolesAndZeros {
       double yu = ts.y(y);
       double xv = hp.v(xu);
       double yv = vp.v(yu);
-      return new Cdouble(xv,yv);
+      return roundToReal(new Cdouble(xv,yv));
     }
 
     private Point complexToPoint(Cdouble z) {
@@ -451,6 +472,13 @@ public class PolesAndZeros {
       int xp = ts.x(xu);
       int yp = ts.y(yu);
       return new Point(xp,yp);
+    }
+
+    private Cdouble roundToReal(Cdouble c) {
+      Cdouble cr = new Cdouble(c.r,0.0);
+      Point pr = complexToPoint(cr);
+      Point p = complexToPoint(c);
+      return (abs(p.y-pr.y)<6)?cr:c;
     }
 
     private boolean closeEnough(int x, int y, Cdouble c) {

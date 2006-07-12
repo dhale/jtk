@@ -11,6 +11,8 @@ import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 
+import edu.mines.jtk.util.Check;
+
 /**
  * A tile in a mosaic contains a list of tiled views. A tile coordinates
  * changes to its tiled views and its view rectangle with other tiles
@@ -291,6 +293,8 @@ public class Tile extends IPanel {
    * when one of its tiled views requests alignment.
    */
   void setProjectors(Projector hp, Projector vp) {
+    Check.argument(hp!=null,"horizontal projector not null");
+    Check.argument(vp!=null,"vertical projector not null");
     _hp = hp;
     _vp = vp;
     repaint();
@@ -300,6 +304,7 @@ public class Tile extends IPanel {
    * Called during alignment of this tile by its mosaic.
    */
   void setHorizontalProjector(Projector hp) {
+    Check.argument(hp!=null,"horizontal projector not null");
     _hp = hp;
     repaint();
   }
@@ -308,6 +313,7 @@ public class Tile extends IPanel {
    * Called during alignment of this tile by its mosaic.
    */
   void setVerticalProjector(Projector vp) {
+    Check.argument(vp!=null,"vertical projector not null");
     _vp = vp;
     repaint();
   }

@@ -568,7 +568,15 @@ public class Mosaic extends IPanel {
           bvp.merge(_tiles[jrow][icol].getBestVerticalProjector());
       }
     }
-    tile.setProjectors(bhp,bvp);
+    if (bhp!=null && bvp!=null) {
+      tile.setProjectors(bhp,bvp);
+    } else if (bhp!=null) {
+      tile.setHorizontalProjector(bhp);
+    } else if (bvp!=null) {
+      tile.setVerticalProjector(bvp);
+    }
+    bhp = tile.getHorizontalProjector();
+    bvp = tile.getVerticalProjector();
     for (int irow=0; irow<_nrow; ++irow) {
       if (irow!=jrow)
         _tiles[irow][jcol].setHorizontalProjector(bhp);
