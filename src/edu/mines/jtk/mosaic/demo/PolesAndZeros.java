@@ -20,11 +20,26 @@ import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Impulse, amplitude and phase responses of filter with poles and zeros.
+ * As we interactively add, remove, or move the poles and zeros, the
+ * impulse, amplitude, and phase responses of the causal filter change
+ * accordingly. Because the filter is constrained to be causal, it is
+ * stable only when all poles (if any) lie inside the unit circle.
+ * <p>
+ * By running this program, we can learn something about digital filter
+ * design. By looking at its source code, we can learn how to develop
+ * similar interactive programs using the Mines Java Toolkit.
+ * <p>
+ * In particular, this program demonstrates how to write a new mode of
+ * interaction, a mode for adding, removing, or moving poles or zeros.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.07.11
  */
 public class PolesAndZeros {
 
+  /**
+   * Runs the program.
+   * @param args arguments (ignored).
+   */
   public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
@@ -33,14 +48,35 @@ public class PolesAndZeros {
     });
   }
 
-  public PolesAndZeros() {
+  // Location and size of pole-zero plot.
+  private static final int PZP_X = 100;
+  private static final int PZP_Y = 0;
+  private static final int PZP_WIDTH = 400;
+  private static final int PZP_HEIGHT = 440;
+
+  // Location and size of response plot.
+  private static final int RP_X = PZP_X+PZP_WIDTH;
+  private static final int RP_Y = 0;
+  private static final int RP_WIDTH = 500;
+  private static final int RP_HEIGHT = 700;
+
+  // This outer class has two lists for the poles and zeros, a plot for 
+  // them, and a plot for the impulse, amplitude, and phase responses. 
+  // When the lists are changed, say, by adding a pole, this class tells 
+  // the plots to update themselves accordingly.
+  private ArrayList<Cdouble> _poles;
+  private ArrayList<Cdouble> _zeros;
+  private PoleZeroPlot _pzp;
+  private ResponsePlot _rp;
+
+  private PolesAndZeros() {
     _poles = new ArrayList<Cdouble>(0);
     _zeros = new ArrayList<Cdouble>(0);
     _pzp = new PoleZeroPlot();
     _rp = new ResponsePlot(false);
   }
 
-  public void addPole(Cdouble pole) {
+  private void addPole(Cdouble pole) {
     _poles.add(new Cdouble(pole));
     if (!pole.isReal())
       _poles.add(pole.conj());
@@ -48,7 +84,7 @@ public class PolesAndZeros {
     _rp.updateViews();
   }
 
-  public void removePole(Cdouble pole) {
+  private void removePole(Cdouble pole) {
     _poles.remove(pole);
     if (!pole.isReal())
       _poles.remove(pole.conj());
@@ -56,7 +92,7 @@ public class PolesAndZeros {
     _rp.updateViews();
   }
 
-  public void movePole(Cdouble poleOld, Cdouble poleNew) {
+  private void movePole(Cdouble poleOld, Cdouble poleNew) {
     _poles.remove(poleOld);
     if (!poleOld.isReal())
       _poles.remove(poleOld.conj());
@@ -67,7 +103,7 @@ public class PolesAndZeros {
     _rp.updateViews();
   }
 
-  public Cdouble getPoleNearest(Cdouble z) {
+  private Cdouble getPoleNearest(Cdouble z) {
     Cdouble pmin = null;
     double dmin = 0.0;
     for (Cdouble p: _poles) {
@@ -80,7 +116,7 @@ public class PolesAndZeros {
     return pmin;
   }
 
-  public void addZero(Cdouble zero) {
+  private void addZero(Cdouble zero) {
     _zeros.add(new Cdouble(zero));
     if (!zero.isReal())
       _zeros.add(zero.conj());
@@ -88,7 +124,7 @@ public class PolesAndZeros {
     _rp.updateViews();
   }
 
-  public void removeZero(Cdouble zero) {
+  private void removeZero(Cdouble zero) {
     _zeros.remove(zero);
     if (!zero.isReal())
       _zeros.remove(zero.conj());
@@ -96,7 +132,7 @@ public class PolesAndZeros {
     _rp.updateViews();
   }
 
-  public void moveZero(Cdouble zeroOld, Cdouble zeroNew) {
+  private void moveZero(Cdouble zeroOld, Cdouble zeroNew) {
     _zeros.remove(zeroOld);
     if (!zeroOld.isReal())
       _zeros.remove(zeroOld.conj());
@@ -107,7 +143,7 @@ public class PolesAndZeros {
     _rp.updateViews();
   }
 
-  public Cdouble getZeroNearest(Cdouble z) {
+  private Cdouble getZeroNearest(Cdouble z) {
     Cdouble pmin = null;
     double dmin = 0.0;
     for (Cdouble p: _zeros) {
@@ -120,25 +156,15 @@ public class PolesAndZeros {
     return pmin;
   }
 
-  private ArrayList<Cdouble> _poles;
-  private ArrayList<Cdouble> _zeros;
-  private PoleZeroPlot _pzp;
-  private ResponsePlot _rp;
-
-  private static final int PZP_X = 100;
-  private static final int PZP_Y = 0;
-  private static final int PZP_WIDTH = 400;
-  private static final int PZP_HEIGHT = 440;
-
-  private static final int RP_X = PZP_X+PZP_WIDTH;
-  private static final int RP_Y = 0;
-  private static final int RP_WIDTH = 500;
-  private static final int RP_HEIGHT = 700;
-
   ///////////////////////////////////////////////////////////////////////////
 
+  // A plot for the poles and zeros. This inner plot class has access to 
+  // the lists of poles and zeros in the outer poles-and-zeros class.
   private class PoleZeroPlot {
-    PoleZeroPlot() {
+
+    private PoleZeroPlot() {
+
+      // The plot panel.
       _plotPanel = new PlotPanel();
       _plotPanel.setTitle("poles and zeros");
       _plotPanel.setHLabel("real");
@@ -146,24 +172,32 @@ public class PolesAndZeros {
       _plotPanel.setHLimits(-2.0,2.0);
       _plotPanel.setVLimits(-2.0,2.0);
 
+      // A grid view for horizontal and vertical lines (axes).
       _gridView = _plotPanel.addGrid("H0-V0-");
+
+      // A points view for the unit circle.
       float[][] circlePoints = makeCirclePoints();
       _circleView = _plotPanel.addPoints(circlePoints[0],circlePoints[1]);
       _circleView.setLineColor(Color.RED);
 
+      // These first updates construct points views for poles and zeros.
+      // Subsequent updates simply modify the data displayed in the views.
       updatePolesView();
       updateZerosView();
 
+      // A plot frame has a mode for zooming in tiles or tile axes.
       _plotFrame = new PlotFrame(_plotPanel);
-      ModeManager mm = _plotFrame.getModeManager();
       TileZoomMode tzm = _plotFrame.getTileZoomMode();
-      PoleZeroMode pm = new PoleZeroMode(mm,false); // for poles
-      PoleZeroMode zm = new PoleZeroMode(mm,true);  // for zeros
 
+      // We add two more modes for editing poles and zeros.
+      ModeManager mm = _plotFrame.getModeManager();
+      PoleZeroMode pm = new PoleZeroMode(mm,true); // for poles
+      PoleZeroMode zm = new PoleZeroMode(mm,false);  // for zeros
+
+      // The menu bar includes a mode menu for selecting a mode.
       JMenu fileMenu = new JMenu("File");
       fileMenu.setMnemonic('F');
       Action exitAction = new AbstractAction("Exit") {
-        private static final long serialVersionUID = 1L;
         public void actionPerformed(ActionEvent event) {
           System.exit(0);
         }
@@ -177,24 +211,28 @@ public class PolesAndZeros {
       JMenuBar menuBar = new JMenuBar();
       menuBar.add(fileMenu);
       menuBar.add(modeMenu);
+      _plotFrame.setJMenuBar(menuBar);
 
+      // The tool bar includes toggle buttons for selecting a mode.
       JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
       toolBar.setRollover(true);
       toolBar.add(new ModeToggleButton(tzm));
       toolBar.add(new ModeToggleButton(pm));
       toolBar.add(new ModeToggleButton(zm));
+      _plotFrame.add(toolBar,BorderLayout.WEST);
 
+      // Initially, enable editing of poles.
       pm.setActive(true);
 
-      _plotFrame.setJMenuBar(menuBar);
-      _plotFrame.add(toolBar,BorderLayout.WEST);
+      // Make the plot frame visible.
       _plotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       _plotFrame.setLocation(PZP_X,PZP_Y);
       _plotFrame.setSize(PZP_WIDTH,PZP_HEIGHT);
       _plotFrame.setVisible(true);
     }
 
-    public void updatePolesView() {
+    // Makes poles view consistent with the list of poles.
+    private void updatePolesView() {
       int np = _poles.size();
       float[] xp = new float[np];
       float[] yp = new float[np];
@@ -212,7 +250,8 @@ public class PolesAndZeros {
       }
     }
 
-    public void updateZerosView() {
+    // Makes zeros view consistent with the list of zeros.
+    private void updateZerosView() {
       int nz = _zeros.size();
       float[] xz = new float[nz];
       float[] yz = new float[nz];
@@ -253,19 +292,29 @@ public class PolesAndZeros {
 
   ///////////////////////////////////////////////////////////////////////////
 
+  // A plot for filter impulse, amplitude, and phase responses. This inner 
+  // plot class has access to the lists of poles and zeros in the outer 
+  // poles-and-zeros class.
   private class ResponsePlot {
 
-    public ResponsePlot(boolean db) {
+    // The amplitude response can be in decibels (db).
+    private ResponsePlot(boolean db) {
       _db = db;
 
-      _plotPanelX = new PlotPanel();
-      _plotPanelX.setHLabel("sample index");
-      _plotPanelX.setVLabel("amplitude");
-      _plotPanelX.setTitle("impulse response");
+      // One plot panel for the impulse response.
+      _plotPanelH = new PlotPanel();
+      _plotPanelH.setHLabel("sample index");
+      _plotPanelH.setVLabel("amplitude");
+      _plotPanelH.setTitle("impulse response");
 
+      // Another plot panel for the amplitude and phase responses.
+      // Amplitude and phase are both functions of frequency, so they
+      // can share a horizontal axis.
+      // The amplitude response is in tile (0,0) (on top).
+      // The phase response is in tile (0,1) (on bottom).
       _plotPanelAP = new PlotPanel(2,1);
       _plotPanelAP.setTitle("amplitude and phase response");
-      if (db) {
+      if (_db) {
         _plotPanelAP.setVLimits(0,0.0,-100.0);
         _plotPanelAP.setVLabel(0,"amplitude (dB)");
       } else {
@@ -276,15 +325,19 @@ public class PolesAndZeros {
       _plotPanelAP.setVLabel(1,"phase (cycles)");
       _plotPanelAP.setHLabel("frequency (cycles/sample)");
 
+      // This first update constructs a sequence view for the impulse 
+      // response, and a points view for amplitude and phase responses.
       updateViews();
 
+      // Both plot panels share a common frame, with the impulse response 
+      // on top and the amplitude and phase responses on the bottom.
       _plotFrame = new PlotFrame(
-        _plotPanelX,_plotPanelAP,PlotFrame.Split.VERTICAL);
+        _plotPanelH,_plotPanelAP,PlotFrame.Split.VERTICAL);
 
+      // The menu bar.
       JMenu fileMenu = new JMenu("File");
       fileMenu.setMnemonic('F');
       Action exitAction = new AbstractAction("Exit") {
-        private static final long serialVersionUID = 1L;
         public void actionPerformed(ActionEvent event) {
           System.exit(0);
         }
@@ -292,49 +345,38 @@ public class PolesAndZeros {
       fileMenu.add(exitAction).setMnemonic('x');
       JMenuBar menuBar = new JMenuBar();
       menuBar.add(fileMenu);
-
       _plotFrame.setJMenuBar(menuBar);
+
+      // Make the plot frame visible.
       _plotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       _plotFrame.setLocation(RP_X,RP_Y);
       _plotFrame.setSize(RP_WIDTH,RP_HEIGHT);
       _plotFrame.setVisible(true);
     }
 
-    public void updateViews() {
-      int np = _poles.size();
-      int nz = _zeros.size();
-      Cdouble[] poles = new Cdouble[np];
-      Cdouble[] zeros = new Cdouble[nz];
-      _poles.toArray(poles);
-      _zeros.toArray(zeros);
-      float[] x = new float[101];
-      float[] y = new float[101];
-      x[0] = 1.0f;
-      if (np>0 || nz>0) {
-        RecursiveCascadeFilter f = new RecursiveCascadeFilter(poles,zeros,1.0);
-        f.applyForward(x,y);
-      } else {
-        Array.copy(x,y);
-      }
-      Real1[] ap = computeSpectra(y,_db);
+    // Makes the views of the impulse, amplitude, and phase responses
+    // consistent with the lists of poles and zeros.
+    private void updateViews() {
+      Real1 h = computeImpulseResponse();
+      Real1[] ap = computeAmplitudeAndPhaseResponses();
       Real1 a = ap[0];
       Real1 p = ap[1];
-      if (_xView==null) {
-        _xView = _plotPanelX.addSequence(y);
+      if (_hView==null) {
+        _hView = _plotPanelH.addSequence(h.getSampling(),h.getValues());
         _aView = _plotPanelAP.addPoints(0,0,a.getSampling(),a.getValues());
         _pView = _plotPanelAP.addPoints(1,0,p.getSampling(),p.getValues());
       } else {
-        _xView.set(y);
+        _hView.set(h.getSampling(),h.getValues());
         _aView.set(a.getSampling(),a.getValues());
         _pView.set(p.getSampling(),p.getValues());
       }
     }
 
     private boolean _db;
-    private PlotPanel _plotPanelX;
+    private PlotPanel _plotPanelH;
     private PlotPanel _plotPanelAP;
     private PlotFrame _plotFrame;
-    private SequenceView _xView;
+    private SequenceView _hView;
     private PointsView _aView;
     private PointsView _pView;
 
@@ -357,56 +399,160 @@ public class PolesAndZeros {
       _plotFrame.add(toolBar,BorderLayout.NORTH);
     }
 
-    private Real1[] computeSpectra(float[] x, boolean db) {
-      int nt = x.length;
-      int nfft = FftReal.nfftSmall(5*nt);
-      FftReal fft = new FftReal(nfft);
-      int nf = nfft/2+1;
-      double df = 1.0/nfft;
+    // Computes the impulse response from poles and zeros.
+    private Real1 computeImpulseResponse() {
+
+      // Arrays of poles and zeros.
+      int np = _poles.size();
+      int nz = _zeros.size();
+      Cdouble[] poles = new Cdouble[np];
+      Cdouble[] zeros = new Cdouble[nz];
+      _poles.toArray(poles);
+      _zeros.toArray(zeros);
+
+      // Array for impulse response h.
+      int n = 101;
+      float[] h = new float[n];
+
+      // If at least one pole or zero, then construct and apply the filter.
+      // Otherwise, the impulse response is simply an impulse.
+      if (np>0 || nz>0) {
+        float[] impulse = new float[n];
+        impulse[0] = 1.0f;
+        RecursiveCascadeFilter f = new RecursiveCascadeFilter(poles,zeros,1.0);
+        f.applyForward(impulse,h);
+      } else {
+        h[0] = 1.0f;
+      }
+
+      Sampling s = new Sampling(n);
+      return new Real1(s,h);
+    }
+
+    // Computes the amplitude and phase responses from poles and zeros.
+    private Real1[] computeAmplitudeAndPhaseResponses() {
+
+      // Frequency sampling from zero to one-half cycles/sample.
+      int nf = 501;
+      double df = 0.5/(nf-1);
       double ff = 0.0;
-      float[] cf = new float[2*nf];
-      Array.copy(nt,x,cf);
-      fft.realToComplex(-1,cf,cf);
-      float[] af = Array.cabs(cf);
+      Sampling sf = new Sampling(nf,df,ff);
+
+      // Arrays for amplitude and phase functions of frequency.
+      float[] af = new float[nf];
+      float[] pf = new float[nf];
+
+      // For all frequencies, ...
+      for (int jf=0;  jf<nf; ++jf) {
+        double f = ff+jf*df;
+        Cdouble cone = new Cdouble(1.0,0.0);
+        Cdouble zinv = Cdouble.polar(1.0,2.0*DBL_PI*f);
+        Cdouble p = new Cdouble(1.0,0.0);
+        for (Cdouble c: _zeros)
+          p.timesEquals(cone.minus(c.times(zinv)));
+        Cdouble q = new Cdouble(1.0,0.0);
+        for (Cdouble d: _poles)
+          q.timesEquals(cone.minus(d.times(zinv)));
+        Cdouble h = p.over(q);
+        af[jf] = (float)h.abs();
+        pf[jf] = (float)h.arg();
+      }
+
+      // Amplitude response, normalized.
       float amax = max(Array.max(af),FLT_EPSILON);
       af = Array.mul(1.0f/amax,af);
-      if (db) {
+      if (_db) {
         af = Array.log10(af);
         af = Array.mul(20.0f,af);
       }
+      Real1 a = new Real1(sf,af);
+
+      // Phase response, in cycles.
+      pf = Array.mul(0.5f/FLT_PI,pf);
+      Real1 p = new Real1(sf,pf);
+
+      return new Real1[]{a,p};
+    }
+
+    // Computes the amplitude and phase responses from impulse response.
+    // This method is fast, because it uses an FFT, but it yields errors
+    // for long impulse responses that are truncated.
+    private Real1[] computeAmplitudeAndPhaseResponses(Real1 h) {
+
+      // Time sampling.
+      Sampling st = h.getSampling();
+      int nt = st.getCount();
+      double dt = st.getDelta();
+      double ft = st.getFirst();
+
+      // Frequency sampling.
+      int nfft = FftReal.nfftSmall(5*nt);
+      int nf = nfft/2+1;
+      double df = 1.0/(nfft*dt);
+      double ff = 0.0;
+      Sampling sf = new Sampling(nf,df,ff);
+
+      // Real-to-complex fast Fourier transform.
+      FftReal fft = new FftReal(nfft);
+      float[] cf = new float[2*nf];
+      Array.copy(nt,h.getValues(),cf);
+      fft.realToComplex(-1,cf,cf);
+
+      // Adjust phase for possibly non-zero time of first sample.
+      float[] wft = Array.rampfloat(0.0f,-2.0f*FLT_PI*(float)(df*ft),nf);
+      cf = Array.cmul(cf,Array.cmplx(Array.cos(wft),Array.sin(wft)));
+
+      // Amplitude response, normalized.
+      float[] af = Array.cabs(cf);
+      float amax = max(Array.max(af),FLT_EPSILON);
+      af = Array.mul(1.0f/amax,af);
+      if (_db) {
+        af = Array.log10(af);
+        af = Array.mul(20.0f,af);
+      }
+      Real1 a = new Real1(sf,af);
+
+      // Phase response, in cycles.
       float[] pf = Array.carg(cf);
       pf = Array.mul(0.5f/FLT_PI,pf);
-      Sampling sf = new Sampling(nf,df,ff);
-      Real1 a = new Real1(sf,af);
       Real1 p = new Real1(sf,pf);
+
       return new Real1[]{a,p};
     }
   }
 
   ///////////////////////////////////////////////////////////////////////////
 
+  // A mode for adding, removing, or moving poles and zeros. This inner
+  // class accesses the lists of poles and zeros in the outer class. It
+  // does not modify those lists directly. Instead, it edits the poles and 
+  // zeros by calling methods in the outer class, so that those methods can 
+  // update the relevant views.
   private class PoleZeroMode extends Mode {
-    private static final long serialVersionUID = 1L;
 
-    public PoleZeroMode(ModeManager modeManager, boolean zeros) {
+    // Constructs a mode for editing either poles or zeros, depending on
+    // whether the flag forPoles is true or false, respectively.
+    public PoleZeroMode(ModeManager modeManager, boolean forPoles) {
       super(modeManager);
-      if (zeros) {
-        _zeros = true;
-        setName("Zeros");
-        setIcon(loadIcon(PolesAndZeros.class,"resources/Zeros16.png"));
-        setMnemonicKey(KeyEvent.VK_0);
-        setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_0,0));
-        setShortDescription("Add (Shift), remove (Ctrl), or drag zeros");
-      } else {
+      if (forPoles) {
         _poles = true;
         setName("Poles");
         setIcon(loadIcon(PolesAndZeros.class,"resources/Poles16.png"));
         setMnemonicKey(KeyEvent.VK_X);
         setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_X,0));
         setShortDescription("Add (Shift), remove (Ctrl), or drag poles");
+      } else {
+        _zeros = true;
+        setName("Zeros");
+        setIcon(loadIcon(PolesAndZeros.class,"resources/Zeros16.png"));
+        setMnemonicKey(KeyEvent.VK_0);
+        setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_0,0));
+        setShortDescription("Add (Shift), remove (Ctrl), or drag zeros");
       }
     }
     
+    // When this mode is activated (or deactivated) for a tile, it simply 
+    // adds (or removes) its mouse listener to (or from) that tile.
     protected void setActive(Component component, boolean active) {
       if (component instanceof Tile) {
         if (active) {
@@ -423,6 +569,7 @@ public class PolesAndZeros {
     private boolean _editing; // true, if currently editing
     private Tile _tile; // tile in which editing began
 
+    // Handles mouse pressed and released events.
     private MouseListener _ml = new MouseAdapter() {;
       public void mousePressed(MouseEvent e) {
         if (e.isShiftDown()) {
@@ -445,6 +592,7 @@ public class PolesAndZeros {
       }
     };
 
+    // Handles mouse dragged events.
     private MouseMotionListener _mml = new MouseMotionAdapter() {
       public void mouseDragged(MouseEvent e) {
         if (_editing)
@@ -452,6 +600,7 @@ public class PolesAndZeros {
       }
     };
 
+    // Converts an point (x,y) in pixels to a complex number z.
     private Cdouble pointToComplex(int x, int y) {
       Transcaler ts = _tile.getTranscaler();
       Projector hp = _tile.getHorizontalProjector();
@@ -463,6 +612,7 @@ public class PolesAndZeros {
       return roundToReal(new Cdouble(xv,yv));
     }
 
+    // Converts  complex number z to an point (x,y) in pixels.
     private Point complexToPoint(Cdouble z) {
       Transcaler ts = _tile.getTranscaler();
       Projector hp = _tile.getHorizontalProjector();
@@ -474,6 +624,10 @@ public class PolesAndZeros {
       return new Point(xp,yp);
     }
 
+    // If the specified complex number c is nearly on the real axis 
+    // (within a small fixed number of pixels), then rounds this 
+    // complex number to the nearest real number by setting the 
+    // imaginary part to zero.
     private Cdouble roundToReal(Cdouble c) {
       Cdouble cr = new Cdouble(c.r,0.0);
       Point pr = complexToPoint(cr);
@@ -481,11 +635,14 @@ public class PolesAndZeros {
       return (abs(p.y-pr.y)<6)?cr:c;
     }
 
+    // Determines whether a specified point (x,y) is within a small
+    // fixed number of pixels to the specified complex number c.
     private boolean closeEnough(int x, int y, Cdouble c) {
       Point p = complexToPoint(c); 
       return abs(p.x-x)<6 && abs(p.y-y)<6;
     }
 
+    // Adds a pole or zero at mouse coordinates (x,y).
     private void add(MouseEvent e) {
       _tile = (Tile)e.getSource();
       int x = e.getX();
@@ -498,6 +655,7 @@ public class PolesAndZeros {
       }
     }
 
+    // Removes a pole or zero, if mouse (x,y) is close enough to one.
     private void remove(MouseEvent e) {
       _tile = (Tile)e.getSource();
       int x = e.getX();
@@ -514,6 +672,9 @@ public class PolesAndZeros {
       }
     }
 
+    // Begins editing of an existing pole or zero, if close enough.
+    // Returns true, if close enough so that we have begun editing; 
+    // false, otherwise.
     private boolean beginEdit(MouseEvent e) {
       _tile = (Tile)e.getSource();
       int x = e.getX();
@@ -536,6 +697,8 @@ public class PolesAndZeros {
       }
       return false;
     }
+
+    // Called while a pole or zero is being dragged during edited.
     private void duringEdit(MouseEvent e) {
       int x = e.getX();
       int y = e.getY();
@@ -547,10 +710,11 @@ public class PolesAndZeros {
       }
       _zedit = z;
     }
+
+    // Called when done editing a pole or zero.
     private void endEdit(MouseEvent e) {
       duringEdit(e);
       _editing = false;
     }
   }
 }
-
