@@ -163,6 +163,13 @@ public class PolesAndZeros {
   // the lists of poles and zeros in the outer poles-and-zeros class.
   private class PoleZeroPlot {
 
+    private PlotFrame _plotFrame;
+    private PlotPanel _plotPanel;
+    private PointsView _polesView;
+    private PointsView _zerosView;
+    private PointsView _circleView;
+    private GridView _gridView;
+
     private PoleZeroPlot() {
 
       // The plot panel.
@@ -266,13 +273,6 @@ public class PolesAndZeros {
       }
     }
 
-    private PlotFrame _plotFrame;
-    private PlotPanel _plotPanel;
-    private PointsView _polesView;
-    private PointsView _zerosView;
-    private PointsView _circleView;
-    private GridView _gridView;
-
     private float[][] makeCirclePoints() {
       int nt = 1000;
       double dt = 2.0*DBL_PI/(nt-1);
@@ -293,6 +293,14 @@ public class PolesAndZeros {
   // plot class has access to the lists of poles and zeros in the outer 
   // poles-and-zeros class.
   private class ResponsePlot {
+
+    private boolean _db;
+    private PlotPanel _plotPanelH;
+    private PlotPanel _plotPanelAP;
+    private PlotFrame _plotFrame;
+    private SequenceView _hView;
+    private PointsView _aView;
+    private PointsView _pView;
 
     // The amplitude response can be in decibels (db).
     private ResponsePlot(boolean db) {
@@ -363,33 +371,6 @@ public class PolesAndZeros {
         _aView.set(a.getSampling(),a.getValues());
         _pView.set(p.getSampling(),p.getValues());
       }
-    }
-
-    private boolean _db;
-    private PlotPanel _plotPanelH;
-    private PlotPanel _plotPanelAP;
-    private PlotFrame _plotFrame;
-    private SequenceView _hView;
-    private PointsView _aView;
-    private PointsView _pView;
-
-    // TODO
-    private void addButtons() {
-      Action saveToPngAction = new AbstractAction("Save to PNG") {
-        public void actionPerformed(ActionEvent event) {
-          JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
-          fc.showSaveDialog(_plotFrame);
-          File file = fc.getSelectedFile();
-          if (file!=null) {
-            String filename = file.getAbsolutePath();
-            _plotFrame.paintToPng(300,6,filename);
-          }
-        }
-      };
-      JButton saveToPngButton = new JButton(saveToPngAction);
-      JToolBar toolBar = new JToolBar();
-      toolBar.add(saveToPngButton);
-      _plotFrame.add(toolBar,BorderLayout.NORTH);
     }
 
     // Computes the impulse response from poles and zeros.
@@ -713,7 +694,7 @@ public class PolesAndZeros {
 
   ///////////////////////////////////////////////////////////////////////////
 
-  // Actions shared by both plot frames.
+  // Actions common to both plot frames.
   private class ExitAction extends AbstractAction {
     private ExitAction() {
       super("Exit");
