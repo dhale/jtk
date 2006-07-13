@@ -341,24 +341,25 @@ public class RecursiveCascadeFilter {
    * @return array of sorted 
    */
   private static Cdouble[] sortPolesOrZeros(Cdouble[] c) {
+    c = c.clone(); // copy, so we can set to null during sorting
     int n = c.length;
     Cdouble[] cs = new Cdouble[n];
     int ns = 0;
     for (int i=0; i<n; ++i) {
-      if (!c[i].isReal()) {
+      if (c[i]!=null && !c[i].isReal()) {
         Cdouble cc = c[i].conj();
-        int j = 0;
-        while (j<n && !cc.equals(c[j]))
-          ++j;
+        int j;
+        for (j=i+1; j<n && !cc.equals(c[j]); ++j)
+          ;
         Check.argument(j<n,"complex "+c[i]+" has a conjugate mate");
-        if (i<j) {
-          cs[ns++] = c[i];
-          cs[ns++] = c[j];
-        }
+        cs[ns++] = c[i]; // copy pair to
+        cs[ns++] = c[j]; // sorted output
+        c[i] = null; // set pair to null, so
+        c[j] = null; // not considered again
       }
     }
     for (int i=0; i<n; ++i) {
-      if (c[i].isReal())
+      if (c[i]!=null && c[i].isReal())
         cs[ns++] = c[i];
     }
     return cs;

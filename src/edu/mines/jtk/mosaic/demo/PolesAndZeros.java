@@ -19,7 +19,7 @@ import edu.mines.jtk.mosaic.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * Impulse, amplitude and phase responses of filter with poles and zeros.
+ * Interactive digital filter design with poles and zeros.
  * As we interactively add, remove, or move the poles and zeros, the
  * impulse, amplitude, and phase responses of the causal filter change
  * accordingly. Because the filter is constrained to be causal, it is
@@ -30,7 +30,8 @@ import static edu.mines.jtk.util.MathPlus.*;
  * similar interactive programs using the Mines Java Toolkit.
  * <p>
  * In particular, this program demonstrates how to write a new mode of
- * interaction, a mode for adding, removing, or moving poles or zeros.
+ * interaction. Here, we construct a mode for adding, removing, or moving 
+ * the poles and zeros of our filter. 
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.07.11
  */
@@ -197,12 +198,8 @@ public class PolesAndZeros {
       // The menu bar includes a mode menu for selecting a mode.
       JMenu fileMenu = new JMenu("File");
       fileMenu.setMnemonic('F');
-      Action exitAction = new AbstractAction("Exit") {
-        public void actionPerformed(ActionEvent event) {
-          System.exit(0);
-        }
-      };
-      fileMenu.add(exitAction).setMnemonic('x');
+      fileMenu.add(new ExitAction()).setMnemonic('x');
+      fileMenu.add(new SaveAsPngAction(_plotFrame)).setMnemonic('a');
       JMenu modeMenu = new JMenu("Mode");
       modeMenu.setMnemonic('M');
       modeMenu.add(new ModeMenuItem(tzm));
@@ -337,12 +334,8 @@ public class PolesAndZeros {
       // The menu bar.
       JMenu fileMenu = new JMenu("File");
       fileMenu.setMnemonic('F');
-      Action exitAction = new AbstractAction("Exit") {
-        public void actionPerformed(ActionEvent event) {
-          System.exit(0);
-        }
-      };
-      fileMenu.add(exitAction).setMnemonic('x');
+      fileMenu.add(new ExitAction()).setMnemonic('x');
+      fileMenu.add(new SaveAsPngAction(_plotFrame)).setMnemonic('a');
       JMenuBar menuBar = new JMenuBar();
       menuBar.add(fileMenu);
       _plotFrame.setJMenuBar(menuBar);
@@ -715,6 +708,34 @@ public class PolesAndZeros {
     private void endEdit(MouseEvent e) {
       duringEdit(e);
       _editing = false;
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+
+  // Actions shared by both plot frames.
+  private class ExitAction extends AbstractAction {
+    private ExitAction() {
+      super("Exit");
+    }
+    public void actionPerformed(ActionEvent event) {
+      System.exit(0);
+    }
+  }
+  private class SaveAsPngAction extends AbstractAction {
+    private PlotFrame _plotFrame;
+    private SaveAsPngAction(PlotFrame plotFrame) {
+      super("Save as PNG");
+      _plotFrame = plotFrame;
+    }
+    public void actionPerformed(ActionEvent event) {
+      JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
+      fc.showSaveDialog(_plotFrame);
+      File file = fc.getSelectedFile();
+      if (file!=null) {
+        String filename = file.getAbsolutePath();
+        _plotFrame.paintToPng(300,6,filename);
+      }
     }
   }
 }

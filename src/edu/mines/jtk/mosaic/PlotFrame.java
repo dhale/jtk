@@ -69,6 +69,7 @@ public class PlotFrame extends JFrame {
     _panelMain.add(_panelTL,BorderLayout.CENTER);
     this.setSize(_panelMain.getPreferredSize());
     this.add(_panelMain,BorderLayout.CENTER);
+    this.setBackground(Color.WHITE);
     addModeManager();
   }
 
@@ -103,6 +104,7 @@ public class PlotFrame extends JFrame {
     _panelMain.add(_splitPane,BorderLayout.CENTER);
     this.setSize(_panelMain.getPreferredSize());
     this.add(_panelMain,BorderLayout.CENTER);
+    this.setBackground(Color.WHITE);
     addModeManager();
   }
 
