@@ -6,9 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import java.awt.*;
+import java.awt.image.*;
 import java.nio.*;
 import java.util.*;
 
+import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.io.*;
 import edu.mines.jtk.ogl.*;
@@ -38,6 +41,8 @@ public class ImagePanel extends AxisAlignedPanel {
     _sy = sy;
     _sz = sz;
     _f = f;
+    _colorMap = new ColorMap(0.0,1.0,ColorMap.GRAY);
+    updateClips();
   }
 
   /**
@@ -47,6 +52,120 @@ public class ImagePanel extends AxisAlignedPanel {
    */
   public BoxConstraint getBoxConstraint() {
     return new BoxConstraint(_sx,_sy,_sz);
+  }
+
+  /**
+   * Sets the index color model for this view.
+   * The default color model is a black-to-white gray model.
+   * @param colorModel the index color model.
+   */
+  public void setColorModel(IndexColorModel colorModel) {
+    _colorMap.setColorModel(colorModel);
+    dirtyDraw();
+  }
+
+  /**
+   * Gets the index color model for this view.
+   * @return the index color model.
+   */
+  public IndexColorModel getColorModel() {
+    return _colorMap.getColorModel();
+  }
+
+  /**
+   * Sets the clips for this view. A pixels view maps values of the sampled 
+   * function f(x1,x2) to bytes, which are then used as indices into a 
+   * specified color model. This mapping from sample values to byte indices 
+   * is linear, and so depends on only these two clip values. The minimum clip 
+   * value corresponds to byte index 0, and the maximum clip value corresponds 
+   * to byte index 255. Sample values outside of the range (clipMin,clipMax)
+   * are clipped to lie inside this range.
+   * <p>
+   * Calling this method disables the computation of clips from percentiles.
+   * Any clip values computed or specified previously will be forgotten.
+   * @param clipMin the sample value corresponding to color model index 0.
+   * @param clipMax the sample value corresponding to color model index 255.
+   */
+  public void setClips(float clipMin, float clipMax) {
+    Check.argument(clipMin<clipMax,"clipMin<clipMax");
+    if (_clipMin!=clipMin || _clipMax!=clipMax) {
+      _usePercentiles = false;
+      _clipMin = clipMin;
+      _clipMax = clipMax;
+      _colorMap.setValueRange(_clipMin,_clipMax);
+      dirtyDraw();
+    }
+  }
+
+  /**
+   * Gets the minimum clip value.
+   * @return the minimum clip value.
+   */
+  public float getClipMin() {
+    return _clipMin;
+  }
+
+  /**
+   * Gets the maximum clip value.
+   * @return the maximum clip value.
+   */
+  public float getClipMax() {
+    return _clipMax;
+  }
+
+  /**
+   * Sets the percentiles used to compute clips for this view. The default 
+   * percentiles are 0 and 100, which correspond to the minimum and maximum 
+   * values of the sampled function f(x1,x2).
+   * <p>
+   * Calling this method enables the computation of clips from percentiles.
+   * Any clip values specified or computed previously will be forgotten.
+   * @param percMin the percentile corresponding to clipMin.
+   * @param percMax the percentile corresponding to clipMax.
+   */
+  public void setPercentiles(float percMin, float percMax) {
+    Check.argument(0.0f<=percMin,"0<=percMin");
+    Check.argument(percMin<percMax,"percMin<percMax");
+    Check.argument(percMax<=100.0f,"percMax<=100");
+    if (_percMin!=percMin || _percMax!=percMax) {
+      _percMin = percMin;
+      _percMax = percMax;
+      _usePercentiles = true;
+      updateClips();
+      dirtyDraw();
+    }
+  }
+
+  /**
+   * Gets the minimum percentile.
+   * @return the minimum percentile.
+   */
+  public float getPercentileMin() {
+    return _percMin;
+  }
+
+  /**
+   * Gets the maximum percentile.
+   * @return the maximum percentile.
+   */
+  public float getPercentileMax() {
+    return _percMax;
+  }
+
+  /**
+   * Adds the specified color map listener.
+   * @param cml the listener.
+   */
+  public void addColorMapListener(ColorMapListener cml) {
+    _colorMap.addListener(cml);
+  }
+
+  /**
+   * Removes the specified color map listener.
+   * @param cml the listener.
+   */
+  public void removeColorMapListener(ColorMapListener cml) {
+    _colorMap.removeListener(cml);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -63,8 +182,19 @@ public class ImagePanel extends AxisAlignedPanel {
   private Sampling _sx,_sy,_sz; // sampling of x, y, z axes
   private Float3 _f; // 3-D indexed collection of floats
 
+  // Coordinate bounds.
   private double _xmin,_ymin,_zmin; // minimum array coordinates
   private double _xmax,_ymax,_zmax; // maximum array coordinates
+
+  // Clips and percentiles.
+  private float _clipMin; // mapped to color model index 0
+  private float _clipMax; // mapped to color model index 255
+  private float _percMin = 0.0f; // may be used to compute _clipMin
+  private float _percMax = 100.0f; // may be used to compute _clipMax
+  private boolean _usePercentiles = true; // true, if using percentiles
+
+  // Color map.
+  private ColorMap _colorMap;
 
   // This panel can draw up to ns*nt samples sliced from nx*ny*nz samples
   // of an array. The dimensions ns and nt are chosen from array dimensions 
@@ -119,6 +249,35 @@ public class ImagePanel extends AxisAlignedPanel {
 
   // Used when creating/loading a texture.
   IntBuffer _pixels; // array[_lt][_ls] of pixels for one texture
+
+  /**
+   * If using percentiles, computes corresponding clip values.
+   */
+  private void updateClips() {
+    if (_usePercentiles) {
+      int nx = _sx.getCount();
+      int ny = _sy.getCount();
+      int nz = _sz.getCount();
+      int n = nx*ny*nz;
+      float[] a = new float[n];
+      _f.get123(nz,ny,nx,0,0,0,a);
+      int kmin = (int)rint(_percMin*0.01*(n-1));
+      if (kmin<=0) {
+        _clipMin = Array.min(a);
+      } else {
+        Array.quickPartialSort(kmin,a);
+        _clipMin = a[kmin];
+      }
+      int kmax = (int)rint(_percMax*0.01*(n-1));
+      if (kmax>=n-1) {
+        _clipMax = Array.max(a);
+      } else {
+        Array.quickPartialSort(kmax,a);
+        _clipMax = a[kmax];
+      }
+      _colorMap.setValueRange(_clipMin,_clipMax);
+    }
+  }
 
   private void drawTextures() {
 
@@ -200,9 +359,9 @@ public class ImagePanel extends AxisAlignedPanel {
           glTexCoord2f(s0,t1);  glVertex3d(x0,y1,za);
         }
         glEnd();
-        glBindTexture(GL_TEXTURE_2D,0);
       }
     }
+    glBindTexture(GL_TEXTURE_2D,0);
     glDisable(GL_TEXTURE_2D);
   }
 
@@ -383,12 +542,17 @@ public class ImagePanel extends AxisAlignedPanel {
     return tn;
   }
 
-  private void loadTexture(int js, int jt) {
+  private void loadTextureX(int js, int jt) {
     float scale = 1.0f/(float)(_ls+_lt-2);
     for (int it=0; it<_lt; ++it) {
       for (int is=0; is<_ls; ++is) {
         float gray = scale*(float)(is+it);
-        _pixels.put(is+_ls*it,pixelFromFloat(gray));
+        int r = (int)(gray*255.0f);
+        int g = (int)(gray*255.0f);
+        int b = (int)(gray*255.0f);
+        int a = 255;
+        int p = ((r&0xff)<<0)|((g&0xff)<<8)|((b&0xff)<<16)|((a&0xff)<<24);
+        _pixels.put(is+_ls*it,p);
       }
     }
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
@@ -399,11 +563,43 @@ public class ImagePanel extends AxisAlignedPanel {
     glBindTexture(GL_TEXTURE_2D,0);
   }
 
-  private int pixelFromFloat(float f) {
-    int r = (int)(f*255.0f);
-    int g = (int)(f*255.0f);
-    int b = (int)(f*255.0f);
-    int a = 255;
-    return ((r&0xff)<<0)|((g&0xff)<<8)|((b&0xff)<<16)|((a&0xff)<<24);
+  private void loadTexture(int js, int jt) {
+    float[][] f = new float[_lt][_ls];
+    int ks = js*(_ls-1);
+    int kt = jt*(_lt-1);
+    int ls = min(_ls,_ns-ks);
+    int lt = min(_lt,_nt-kt);
+    if (_axis==Axis.X) {
+      _f.get12(lt,ls,kt,ks,_kxmin,f);
+    } else if (_axis==Axis.Y) {
+      _f.get13(lt,ls,kt,_kymin,ks,f);
+    } else if (_axis==Axis.Z) {
+      _f.get23(lt,ls,_kzmin,kt,ks,f);
+    }
+    float fscale = 255.0f/(float)(_clipMax-_clipMin);
+    float fshift = (float)_clipMin;
+    IndexColorModel icm = _colorMap.getColorModel();
+    for (int is=0; is<ls; ++is) {
+      for (int it=0; it<lt; ++it) {
+        float fi = (f[is][it]-fshift)*fscale;
+        if (fi<0.0f)
+          fi = 0.0f;
+        if (fi>255.0f)
+          fi = 255.0f;
+        int i = (int)(fi+0.5f);
+        int r = icm.getRed(i);
+        int g = icm.getGreen(i);
+        int b = icm.getBlue(i);
+        int a = 255;
+        int p = ((r&0xff)<<0)|((g&0xff)<<8)|((b&0xff)<<16)|((a&0xff)<<24);
+        _pixels.put(is+it*_ls,p);
+      }
+    }
+    glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+    GlTextureName tn = _tn[jt][js];
+    glBindTexture(GL_TEXTURE_2D,tn.name());
+    glTexSubImage2D(
+      GL_TEXTURE_2D,0,0,0,_ls,_lt,GL_RGBA,GL_UNSIGNED_BYTE,_pixels);
+    glBindTexture(GL_TEXTURE_2D,0);
   }
 }

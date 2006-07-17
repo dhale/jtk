@@ -181,16 +181,16 @@ public class PixelsView extends TiledView {
   /**
    * Sets the clips for this view. A pixels view maps values of the sampled 
    * function f(x1,x2) to bytes, which are then used as indices into a 
-   * specified color map. This mapping from sample values to byte indices is 
-   * linear, and so depends on only these two clip values. The minimum clip 
+   * specified color model. This mapping from sample values to byte indices 
+   * is linear, and so depends on only these two clip values. The minimum clip 
    * value corresponds to byte index 0, and the maximum clip value corresponds 
    * to byte index 255. Sample values outside of the range (clipMin,clipMax)
    * are clipped to lie inside this range.
    * <p>
    * Calling this method disables the computation of clips from percentiles.
    * Any clip values computed or specified previously will be forgotten.
-   * @param clipMin the sample value corresponding to color map byte index 0.
-   * @param clipMax the sample value corresponding to color map byte index 255.
+   * @param clipMin the sample value corresponding to color model index 0.
+   * @param clipMax the sample value corresponding to color model index 255.
    */
   public void setClips(float clipMin, float clipMax) {
     Check.argument(clipMin<clipMax,"clipMin<clipMax");
@@ -368,8 +368,8 @@ public class PixelsView extends TiledView {
   private Interpolation _interpolation = Interpolation.LINEAR;
 
   // Clips and percentiles.
-  private float _clipMin; // mapped to color map byte index 0
-  private float _clipMax; // mapped to color map byte index 255
+  private float _clipMin; // mapped to color model index 0
+  private float _clipMax; // mapped to color model index 255
   private float _percMin = 0.0f; // may be used to compute _clipMin
   private float _percMax = 100.0f; // may be used to compute _clipMax
   private boolean _usePercentiles = true; // true, if using percentiles
@@ -400,8 +400,12 @@ public class PixelsView extends TiledView {
    */
   private void updateClips() {
     if (_usePercentiles) {
-      float[] a = (_percMin!=0.0f || _percMax!=0.0f)?Array.flatten(_f):null;
-      int n = (a!=null)?a.length:0;
+      int n1 = _s1.getCount();
+      int n2 = _s2.getCount();
+      int n = n1*n2;
+      float[] a = null;
+      if (_percMin!=0.0f || _percMax!=100.0f)
+        a = Array.flatten(_f);
       int kmin = (int)rint(_percMin*0.01*(n-1));
       if (kmin<=0) {
         _clipMin = Array.min(_f);
