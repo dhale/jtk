@@ -34,13 +34,13 @@ public class ImagePanel extends AxisAlignedPanel {
    * @param sx sampling of the X axis.
    * @param sy sampling of the Y axis.
    * @param sz sampling of the Z axis.
-   * @param f the floats to slice for images.
+   * @param f3 the 3-D indexed floats to slice for images.
    */
-  public ImagePanel(Sampling sx, Sampling sy, Sampling sz, Float3 f) {
+  public ImagePanel(Sampling sx, Sampling sy, Sampling sz, Float3 f3) {
     _sx = sx;
     _sy = sy;
     _sz = sz;
-    _f = f;
+    _f3 = f3;
     _colorMap = new ColorMap(0.0,1.0,ColorMap.GRAY);
     updateClips();
   }
@@ -180,7 +180,7 @@ public class ImagePanel extends AxisAlignedPanel {
 
   private Axis _axis; // axis orthogonal to plane of this panel
   private Sampling _sx,_sy,_sz; // sampling of x, y, z axes
-  private Float3 _f; // 3-D indexed collection of floats
+  private Float3 _f3; // 3-D indexed floats
 
   // Coordinate bounds.
   private double _xmin,_ymin,_zmin; // minimum array coordinates
@@ -248,7 +248,8 @@ public class ImagePanel extends AxisAlignedPanel {
   int _jsmax,_jtmax; // max texture-in-cache indices
 
   // Used when creating/loading a texture.
-  IntBuffer _pixels; // array[_lt][_ls] of pixels for one texture
+  IntBuffer _pixels; // array[_lt][_ls] of image pixels for one texture
+  float[][] _floats; // array[_ls][_lt] of image floats for one texture
 
   /**
    * If using percentiles, computes corresponding clip values.
@@ -260,7 +261,7 @@ public class ImagePanel extends AxisAlignedPanel {
       int nz = _sz.getCount();
       int n = nx*ny*nz;
       float[] a = new float[n];
-      _f.get123(nz,ny,nx,0,0,0,a);
+      _f3.get123(nz,ny,nx,0,0,0,a);
       int kmin = (int)rint(_percMin*0.01*(n-1));
       if (kmin<=0) {
         _clipMin = Array.min(a);
@@ -291,7 +292,7 @@ public class ImagePanel extends AxisAlignedPanel {
     if (_axis!=axis)
       updateSampling(axis,_sx,_sy,_sz);
 
-    // If necessary, update bounds.
+    // If necessary, update bounds and textures.
     Point3 qmin = frame.getCornerMin();
     Point3 qmax = frame.getCornerMax();
     double xmin = qmin.x;
@@ -304,10 +305,14 @@ public class ImagePanel extends AxisAlignedPanel {
         _xmax!=xmax || _ymax!=ymax || _zmax!=zmax)
       updateBoundsAndTextures(xmin,ymin,zmin,xmax,ymax,zmax);
 
-    // Draw textures.
+    // Prepare to draw textures.
     glShadeModel(GL_FLAT);
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
+
+    // Push image(s) slightly below anything we might draw on top.
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(1.0f,1.0f);
 
     // Shift and scale factors for computing texture coordinates.
     float sa = 0.5f/(float)_ls;
@@ -320,7 +325,7 @@ public class ImagePanel extends AxisAlignedPanel {
     double ya = 0.5*(_ymin+_ymax);
     double za = 0.5*(_zmin+_zmax);
 
-    // For all textures in cache, ...
+    // For all textures in the cache, ...
     for (int jt=_jtmin; jt<=_jtmax; ++jt) {
       for (int js=_jsmin; js<=_jsmax; ++js) {
 
@@ -334,11 +339,12 @@ public class ImagePanel extends AxisAlignedPanel {
         ks1 = min(_ksmax,ks1);
         kt1 = min(_ktmax,kt1);
 
-        // Texture coordinates. In the example pictured here, we assume that 
-        // ls = 4. The "|" correspond to texture coordinates 0.0 and 1.0. 
-        // The "x" correspond to image samples, The spacing between image
-        // sample is 1.0/ls, and the s coordinate of the first image sample 
-        // is 0.5/ls.
+        // Texture coordinates. In the example pictured here, we assume 
+        // three textures (js = 0,1,2) with ls = 4. For each texture, the 
+        // "|" correspond to texture coordinates 0.0 and 1.0. The "x" 
+        // correspond to image samples, The s coordinate interval between 
+        // image samples is 1.0/ls, and the s coordinate of the first image 
+        // sample is 0.5/ls.
         // ks:      0   1   2   3   4   5   6   7
         // js=0:  | x   x   x   x |
         // js=1:              | x   x   x   x |
@@ -441,6 +447,7 @@ public class ImagePanel extends AxisAlignedPanel {
     _jsmin = 0;  _jsmax = -1;
     _jtmin = 0;  _jtmax = -1;
     _pixels = Direct.newIntBuffer(_ls*_lt);
+    _floats = new float[_ls][_lt];
   }
 
   private void updateBoundsAndTextures(
@@ -564,46 +571,24 @@ public class ImagePanel extends AxisAlignedPanel {
     return tn;
   }
 
-  private void loadTextureX(int js, int jt) {
-    float scale = 1.0f/(float)(_ls+_lt-2);
-    for (int it=0; it<_lt; ++it) {
-      for (int is=0; is<_ls; ++is) {
-        float gray = scale*(float)(is+it);
-        int r = (int)(gray*255.0f);
-        int g = (int)(gray*255.0f);
-        int b = (int)(gray*255.0f);
-        int a = 255;
-        int p = ((r&0xff)<<0)|((g&0xff)<<8)|((b&0xff)<<16)|((a&0xff)<<24);
-        _pixels.put(is+_ls*it,p);
-      }
-    }
-    glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-    GlTextureName tn = _tn[jt][js];
-    glBindTexture(GL_TEXTURE_2D,tn.name());
-    glTexSubImage2D(
-      GL_TEXTURE_2D,0,0,0,_ls,_lt,GL_RGBA,GL_UNSIGNED_BYTE,_pixels);
-    glBindTexture(GL_TEXTURE_2D,0);
-  }
-
   private void loadTexture(int js, int jt) {
-    float[][] f = new float[_lt][_ls];
     int ks = js*(_ls-1);
     int kt = jt*(_lt-1);
     int ls = min(_ls,_ns-ks);
     int lt = min(_lt,_nt-kt);
     if (_axis==Axis.X) {
-      _f.get12(lt,ls,kt,ks,_kxmin,f);
+      _f3.get12(lt,ls,kt,ks,_kxmin,_floats);
     } else if (_axis==Axis.Y) {
-      _f.get13(lt,ls,kt,_kymin,ks,f);
+      _f3.get13(lt,ls,kt,_kymin,ks,_floats);
     } else if (_axis==Axis.Z) {
-      _f.get23(lt,ls,_kzmin,kt,ks,f);
+      _f3.get23(lt,ls,_kzmin,kt,ks,_floats);
     }
     float fscale = 255.0f/(float)(_clipMax-_clipMin);
     float fshift = (float)_clipMin;
     IndexColorModel icm = _colorMap.getColorModel();
     for (int is=0; is<ls; ++is) {
       for (int it=0; it<lt; ++it) {
-        float fi = (f[is][it]-fshift)*fscale;
+        float fi = (_floats[is][it]-fshift)*fscale;
         if (fi<0.0f)
           fi = 0.0f;
         if (fi>255.0f)
