@@ -1,0 +1,64 @@
+Dave Hale's notes on the TileAxis resizing problem.
+
+/////////////////////////////////////////////////////////////////////////////
+Important methods
+
+JComponent.revalidate
+  Container.invalidate
+  RepaintManager.addInvalidComponent(this)
+
+Container.invalidate
+  tells layout manager to ignore any info cached for this
+  Component.invalidate
+
+Component.invalidate
+  valid = false
+  nullifies cached prefSize,minSize,maxSize
+  if parent is valid,
+    parent.invalidate()
+
+RepaintManager.addInvalidComponent(this)
+  maintains a list of components to update
+  finds validateRoot for this
+  if validateRoot is already in list,
+    return
+  else
+    adds validateRoot for this to list
+  queues a request to
+    validateInvalidComponents
+    paintDirtyRegions
+
+RepaintManager.validateInvalidComponents
+  copies invalidComponents list to ic
+  sets invalidComponents list to null
+  for all components c in ic
+    c.validate()
+
+Container.validate
+  calls validateTree on self
+    calls doLayout on self
+    calls validate on children
+  valid = true
+
+Component.validate
+  calls layout on peer
+  valid = true
+
+/////////////////////////////////////////////////////////////////////////////
+Problem
+
+when first validated, axis minimum size is too big
+when axis bounds are first set by mosaic doLayout,
+  axis updates tics, because now it has non-zero size
+  this update may change axis minimum size
+  if minimum size changed, revalidate will 
+      set valid=false upwards in tree
+      add validateRoot to repaint manager's invalid list
+  after doLayout of mosaic, 
+    Container.validateTree sets valid = true
+    Container.validate sets valid = true
+  this setting valid=true will continue up to the validateRoot
+therefore, revalidate will have no effect
+  although validateRoot is in repaint manager's invalid list,
+  it and its children are marked valid, so validate does nothing!
+in summary, calling revalidate within validate/doLayout does not work
