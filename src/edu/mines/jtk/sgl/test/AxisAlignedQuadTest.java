@@ -39,6 +39,7 @@ public class AxisAlignedQuadTest {
         float y = (float)(iy*dy);
         for (int iz=0; iz<nz; ++iz) {
           float z = (float)(iz*dz);
+          //a[ix][iy][iz] = x+y+z;
           a[ix][iy][iz] = sin(4.0f*FLT_PI*(x+y+z));
         }
       }

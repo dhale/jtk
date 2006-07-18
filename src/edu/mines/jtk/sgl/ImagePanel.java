@@ -302,19 +302,29 @@ public class ImagePanel extends AxisAlignedPanel {
     double zmax = qmax.z;
     if (_xmin!=xmin || _ymin!=ymin || _zmin!=zmin ||
         _xmax!=xmax || _ymax!=ymax || _zmax!=zmax)
-      updateBounds(xmin,ymin,zmin,xmax,ymax,zmax);
+      updateBoundsAndTextures(xmin,ymin,zmin,xmax,ymax,zmax);
 
     // Draw textures.
     glShadeModel(GL_FLAT);
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
-    float ss = 1.0f/(float)(_ls-1);
-    float tt = 1.0f/(float)(_lt-1);
+
+    // Shift and scale factors for computing texture coordinates.
+    float sa = 0.5f/(float)_ls;
+    float ta = 0.5f/(float)_lt;
+    float sb = 1.0f/(float)_ls;
+    float tb = 1.0f/(float)_lt;
+
+    // Average of corner coordinates. (Will use only one of these.)
     double xa = 0.5*(_xmin+_xmax);
     double ya = 0.5*(_ymin+_ymax);
     double za = 0.5*(_zmin+_zmax);
+
+    // For all textures in cache, ...
     for (int jt=_jtmin; jt<=_jtmax; ++jt) {
       for (int js=_jsmin; js<=_jsmax; ++js) {
+
+        // Indices of samples needed for this texture.
         int ks0 = js*(_ls-1);
         int kt0 = jt*(_lt-1);
         int ks1 = ks0+_ls-1;
@@ -323,10 +333,22 @@ public class ImagePanel extends AxisAlignedPanel {
         kt0 = max(_ktmin,kt0);
         ks1 = min(_ksmax,ks1);
         kt1 = min(_ktmax,kt1);
-        float s0 = (float)(ks0%(_ls-1))*ss;
-        float t0 = (float)(kt0%(_lt-1))*tt;
-        float s1 = (float)(ks1-ks0)*ss;
-        float t1 = (float)(kt1-kt0)*tt;
+
+        // Texture coordinates. In the example pictured here, we assume that 
+        // ls = 4. The "|" correspond to texture coordinates 0.0 and 1.0. 
+        // The "x" correspond to image samples, The spacing between image
+        // sample is 1.0/ls, and the s coordinate of the first image sample 
+        // is 0.5/ls.
+        // ks:      0   1   2   3   4   5   6   7
+        // js=0:  | x   x   x   x |
+        // js=1:              | x   x   x   x |
+        // js=2:                          | x   x   x   x |
+        float s0 = sa+(float)(ks0%(_ls-1))*sb;
+        float t0 = ta+(float)(kt0%(_lt-1))*tb;
+        float s1 = s0+(float)(ks1-ks0)*sb;
+        float t1 = t0+(float)(kt1-kt0)*tb;
+
+        // Draw the texture.
         GlTextureName tn = _tn[jt][js];
         glBindTexture(GL_TEXTURE_2D,tn.name());
         glBegin(GL_POLYGON);
@@ -361,6 +383,8 @@ public class ImagePanel extends AxisAlignedPanel {
         glEnd();
       }
     }
+
+    // Done with textures for now.
     glBindTexture(GL_TEXTURE_2D,0);
     glDisable(GL_TEXTURE_2D);
   }
@@ -382,10 +406,8 @@ public class ImagePanel extends AxisAlignedPanel {
     _sx = sx;
     _sy = sy;
     _sz = sz;
-    _ls = 16; // for debugging
-    _lt = 16; // for debugging
-    //_ls = 64;
-    //_lt = 64;
+    _ls = 64;
+    _lt = 64;
     if (_axis==Axis.X) {
       _ns = ny;
       _ds = dy;
@@ -421,7 +443,7 @@ public class ImagePanel extends AxisAlignedPanel {
     _pixels = Direct.newIntBuffer(_ls*_lt);
   }
 
-  private void updateBounds(
+  private void updateBoundsAndTextures(
     double xmin, double ymin, double zmin,
     double xmax, double ymax, double zmax)
   {
