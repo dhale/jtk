@@ -273,6 +273,7 @@ public class PolesAndZeros {
       }
     }
 
+    // Makes array of points on the unit circle in the complex z-plane.
     private float[][] makeCirclePoints() {
       int nt = 1000;
       double dt = 2.0*DBL_PI/(nt-1);

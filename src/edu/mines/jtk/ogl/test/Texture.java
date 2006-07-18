@@ -21,17 +21,16 @@ public class Texture {
     /**
      * The texture data.
      */
-    private ByteBuffer _checkImage = null;
+    private final int N = 64;
+    private final ByteBuffer _checkImage = ByteBuffer.allocateDirect(N*N*4);
     /**
      * The OpenGL name of the texture data.
      */
     private int[] _texName = new int[1];
     private void makeCheckImage() {
-      int n = 64;
-      _checkImage = ByteBuffer.allocateDirect(n*n*4);
-      for (int i=0; i<n; ++i) {
-        for (int j=0; j<n; ++j) {
-          int index = (n*i+j)*4;
+      for (int i=0; i<N; ++i) {
+        for (int j=0; j<N; ++j) {
+          int index = (N*i+j)*4;
           int c = ((((i&0x8)==0)^((j&0x8))==0)?1:0)*255;
           byte b = (byte)c;
           _checkImage.put(index  ,b);
@@ -51,8 +50,8 @@ public class Texture {
       glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_REPEAT);
       glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
       glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-      glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,64,64,0,GL_RGBA,
-        GL_UNSIGNED_BYTE,_checkImage);
+      glTexImage2D(
+        GL_TEXTURE_2D,0,GL_RGBA,N,N,0,GL_RGBA,GL_UNSIGNED_BYTE,_checkImage);
     }
     public void glResize(int x, int y, int width, int height) {
       glViewport(0,0,width,height);
@@ -71,8 +70,8 @@ public class Texture {
         glTexCoord2f(1.0f,1.0f); glVertex3f(0.75f,0.75f,0.00f);
         glTexCoord2f(0.0f,1.0f); glVertex3f(0.25f,0.75f,0.00f);
       glEnd();
-      glFlush();
       glDisable(GL_TEXTURE_2D);
+      glFlush();
     }
   };
   public static void main(String[] args) {
