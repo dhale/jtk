@@ -1,0 +1,95 @@
+Dave Hale's notes for design of 
+AxisAlignedFrame
+AxisAlignedPanel 
+AxisAlignedQuad
+AxisAlignedBox
+ImagePanel
+
+/////////////////////////////////////////////////////////////////////////////
+
+public enum Axis
+  X,Y,Z
+
+/////////////////////////////////////////////////////////////////////////////
+
+public class AxisAlignedBox extends Group implements Selectable, Dragable
+  constructs six frame children
+    can get frame for any of six faces of box
+  moving and resizing with mouse
+    constructs and manages handles
+    implements selection and dragging
+  when corners set explicitly
+    sets corners of frames
+
+/////////////////////////////////////////////////////////////////////////////
+
+public class AxisAlignedQuad extends Group implements Selectable, Dragable
+  constructs one frame child
+    can get frame
+  moving and resizing with mouse
+    constructs and manages handles
+    implements selection and dragging
+  when corners set explicitly
+    sets corners of frame
+
+/////////////////////////////////////////////////////////////////////////////
+
+scenario
+  user drags quad
+  quad sets frame corners
+  frame constrains corners
+
+scenario
+  panel added to frame (dirty bsphere and draw)
+  panel sets box constraint of frame
+  frame constrains corners (dirty bsphere and draw)
+
+scenario
+  panel changes its sampling (dirty bsphere and draw)
+  panel sets box constraint of frame
+  frame constrains corners (dirty bsphere and draw)
+
+/////////////////////////////////////////////////////////////////////////////
+
+public class AxisAlignedFrame extends Group
+  typically constructed by parent quad or box
+  has axis
+    initialized when frame constructed
+    accessible and immutable
+  has corners
+    initialized when frame constructed
+    accessible and mutable (dirty bsphere and draw)
+  when a child panel is added
+    ensures panel's frame is currently null
+    sets panel's frame to this
+  when a child panel is removed
+    ensures panel's frame is this frame
+    sets panel's frame to null
+  has a box constraint (null if none)
+    typically set by panels
+      last constraint set rules
+
+/////////////////////////////////////////////////////////////////////////////
+
+public class AxisAlignedPanel extends Node
+  may be constructed with a frame or not
+  when non-null frame is set (when child panel is added to frame)
+    gets its box constraint (default is null; may be overridden)
+      if not null, sets box constraint of frame
+  if parent is a frame
+    implements pick and computeBoundingSphere 
+      using frame axis and corners
+  else
+    does not implement pick or computeBoundingSphere
+
+/////////////////////////////////////////////////////////////////////////////
+
+public class ImagePanel extends AxisAlignedPanel
+  constructed with samplings and floats
+  knows what box constraint
+  when sampling changes
+    sets box constraint of frame
+  has a cache of textures
+  implements draw
+    if necessary, updates texture cache
+    draws textures
