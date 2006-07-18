@@ -10,6 +10,8 @@ import java.awt.event.*;
 
 /**
  * An axis-aligned quad has one frame that contains one or more panels.
+ * The quad is constrained to lie within a box specified by two corner
+ * points.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.06.01
  */

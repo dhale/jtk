@@ -14,21 +14,24 @@ import static edu.mines.jtk.util.MathPlus.*;
 public class AxisAlignedQuadTest {
 
   public static void main(String[] args) {
-    Point3 qmin = new Point3(0,0,0);
-    Point3 qmax = new Point3(1,1,1);
-
-    AxisAlignedQuad aaq = new AxisAlignedQuad(Axis.Y,qmin,qmax);
-    AxisAlignedFrame aaf = aaq.getFrame();
-
     int nx = 101;
-    int ny = 101;
-    int nz = 101;
+    int ny = 121;
+    int nz = 141;
     double dx = 1.0/(nx-1);
-    double dy = 1.0/(ny-1);
-    double dz = 1.0/(nz-1);
+    double dy = dx;
+    double dz = dx;
     double fx = 0.0;
     double fy = 0.0;
     double fz = 0.0;
+    double lx = fx+(nx-1)*dx;
+    double ly = fy+(ny-1)*dy;
+    double lz = fz+(nz-1)*dz;
+
+    Point3 qmin = new Point3(fx,fy,fz);
+    Point3 qmax = new Point3(lx,ly,lz);
+
+    AxisAlignedQuad aaq = new AxisAlignedQuad(Axis.Y,qmin,qmax);
+    AxisAlignedFrame aaf = aaq.getFrame();
     Sampling sx = new Sampling(nx,dx,fx);
     Sampling sy = new Sampling(ny,dy,fy);
     Sampling sz = new Sampling(nz,dz,fz);
@@ -44,8 +47,8 @@ public class AxisAlignedQuadTest {
         }
       }
     }
-    Float3 f = new SimpleFloat3(a);
-    ImagePanel iop = new ImagePanel(sx,sy,sz,f);
+    Float3 f3 = new SimpleFloat3(a);
+    ImagePanel iop = new ImagePanel(sx,sy,sz,f3);
     aaf.addChild(iop);
 
     World world = new World();

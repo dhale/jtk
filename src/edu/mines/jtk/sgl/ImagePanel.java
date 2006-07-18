@@ -399,15 +399,15 @@ public class ImagePanel extends AxisAlignedPanel {
     Axis axis, Sampling sx, Sampling sy, Sampling sz) 
   {
     disposeTextures();
-    int nx = _sx.getCount();
-    int ny = _sy.getCount();
-    int nz = _sz.getCount();
-    double dx = _sx.getDelta();
-    double dy = _sy.getDelta();
-    double dz = _sz.getDelta();
-    double fx = _sx.getFirst();
-    double fy = _sy.getFirst();
-    double fz = _sz.getFirst();
+    int nx = sx.getCount();
+    int ny = sy.getCount();
+    int nz = sz.getCount();
+    double dx = sx.getDelta();
+    double dy = sy.getDelta();
+    double dz = sz.getDelta();
+    double fx = sx.getFirst();
+    double fy = sy.getFirst();
+    double fz = sz.getFirst();
     _axis = axis;
     _sx = sx;
     _sy = sy;
