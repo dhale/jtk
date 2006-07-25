@@ -24,6 +24,9 @@ public class Suite extends TestSuite {
     return suite;
   }
 
+  /**
+   * Self test.  Runs the test suite.
+   */
   public static void main(String[] args) {
     junit.textui.TestRunner.run(suite());
   }
