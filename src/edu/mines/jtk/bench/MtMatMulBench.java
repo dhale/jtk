@@ -21,8 +21,9 @@ import edu.mines.jtk.util.Stopwatch;
  */
 public class MtMatMulBench {
 
-  public static final int NTHREAD = 
-    Runtime.getRuntime().availableProcessors();
+  //public static final int NTHREAD = 
+  //  Runtime.getRuntime().availableProcessors();
+  public static final int NTHREAD = 8;
 
   public static void main(String[] args) {
     int m = 1001;
@@ -32,14 +33,16 @@ public class MtMatMulBench {
     float[][] c1 = Array.zerofloat(m,m);
     float[][] c2 = Array.zerofloat(m,m);
     float[][] c3 = Array.zerofloat(m,m);
+    float[][] c4 = Array.zerofloat(m,m);
     Stopwatch s = new Stopwatch();
     double mflops = 2.0e-6*m*m*n;
     double nmul,maxtime=5.0;
 
     System.out.println("Methods:");
     System.out.println("mul1 = single-threaded");
-    System.out.println("mul2 = multi-threaded (atomic-integer)");
-    System.out.println("mul3 = multi-threaded (thread-pool)");
+    System.out.println("mul2 = multi-threaded (equal chunks)");
+    System.out.println("mul3 = multi-threaded (atomic-integer)");
+    System.out.println("mul4 = multi-threaded (thread-pool)");
     System.out.println("number of threads = "+NTHREAD);
 
     for (int ntrial=0; ntrial<5; ++ntrial) {
@@ -47,13 +50,13 @@ public class MtMatMulBench {
 
       s.restart();
       for (nmul=0; s.time()<maxtime; ++nmul)
-        mul1b(a,b,c1);
+        mul1(a,b,c1);
       s.stop();
       System.out.println("mul1: rate="+(int)(nmul*mflops/s.time())+" mflops");
 
       s.restart();
       for (nmul=0; s.time()<maxtime; ++nmul)
-        mul2b(a,b,c2);
+        mul2(a,b,c2);
       s.stop();
       System.out.println("mul2: rate="+(int)(nmul*mflops/s.time())+" mflops");
 
@@ -62,10 +65,17 @@ public class MtMatMulBench {
         mul3(a,b,c3);
       s.stop();
       System.out.println("mul3: rate="+(int)(nmul*mflops/s.time())+" mflops");
-    }
 
-    assertEquals(c1,c2);
-    assertEquals(c1,c3);
+      s.restart();
+      for (nmul=0; s.time()<maxtime; ++nmul)
+        mul4(a,b,c4);
+      s.stop();
+      System.out.println("mul4: rate="+(int)(nmul*mflops/s.time())+" mflops");
+
+      assertEquals(c1,c2);
+      assertEquals(c1,c3);
+      assertEquals(c1,c4);
+    }
   }
 
   /**
@@ -99,45 +109,9 @@ public class MtMatMulBench {
   }
 
   /**
-   * Computes j'th column of matrix multiplication C = A*B.
-   * The work array bj is used to cache the j'th column of the matrix b.
-   * This version requires that the work array bj be passed as a parameter.
-   * Loop unrolling improves performance.
-   */
-  private static void computeColumn(
-    int ni, int nk, int j, float[] bj, float[][] a, float[][] b, float[][] c) 
-  {
-    for (int k=0; k<nk; ++k)
-      bj[k] = b[k][j];
-    for (int i=0; i<ni; ++i) {
-      float[] ai = a[i];
-      float cij = 0.0f;
-      int mk = nk%4;
-      for (int k=0; k<mk; ++k)
-        cij += ai[k]*bj[k];
-      for (int k=mk; k<nk; k+=4) {
-        cij += ai[k  ]*bj[k  ];
-        cij += ai[k+1]*bj[k+1];
-        cij += ai[k+2]*bj[k+2];
-        cij += ai[k+3]*bj[k+3];
-      }
-      c[i][j] = cij;
-    }
-  }
-
-  /**
    * Single-threaded method.
    */
   private static void mul1(float[][] a, float[][] b, float[][] c) {
-    checkDimensions(a,b,c);
-    int ni = c.length;
-    int nj = c[0].length;
-    int nk = b.length;
-    float[] bj = new float[nk];
-    for (int j=0; j<nj; ++j)
-      computeColumn(ni,nk,j,bj,a,b,c);
-  }
-  private static void mul1b(float[][] a, float[][] b, float[][] c) {
     checkDimensions(a,b,c);
     int nj = c[0].length;
     for (int j=0; j<nj; ++j)
@@ -145,29 +119,32 @@ public class MtMatMulBench {
   }
 
   /**
-   * Multi-threaded atomic-integer version.
+   * Multi-threaded equal-chunks version.
    */
   private static void mul2(
     final float[][] a, final float[][] b, final float[][] c) 
   {
     checkDimensions(a,b,c);
-    final int ni = c.length;
-    final int nj = c[0].length;
-    final int nk = b.length;
-    final AtomicInteger aj = new AtomicInteger();
+    int nj = c[0].length;
+    int mj = 1+nj/NTHREAD;
     Thread[] threads = new Thread[NTHREAD];
-    for (int ithread=0; ithread<threads.length; ++ithread) {
+    for (int ithread=0; ithread<NTHREAD; ++ithread) {
+      final int jfirst = ithread*mj;
+      final int jlast = min(jfirst+mj,nj);
       threads[ithread] = new Thread(new Runnable() {
         public void run() {
-          for (int j=aj.getAndIncrement(); j<nj; j=aj.getAndIncrement())
-            computeColumn(ni,nk,j,_bj,a,b,c);
+          for (int j=jfirst; j<jlast; ++j)
+            computeColumn(j,a,b,c);
         }
-        private float[] _bj = new float[nk];
       });
     }
-    run(threads);
+    startAndJoin(threads);
   }
-  private static void mul2b(
+
+  /**
+   * Multi-threaded atomic-integer version.
+   */
+  private static void mul3(
     final float[][] a, final float[][] b, final float[][] c) 
   {
     checkDimensions(a,b,c);
@@ -182,23 +159,13 @@ public class MtMatMulBench {
         }
       });
     }
-    run(threads);
-  }
-  private static void run(Thread[] threads) {
-    for (int ithread=0; ithread<threads.length; ++ithread)
-      threads[ithread].start();
-    try {
-      for (int ithread=0; ithread<threads.length; ++ithread)
-        threads[ithread].join();
-    } catch (InterruptedException ie) {
-      throw new RuntimeException(ie);
-    }
+    startAndJoin(threads);
   }
 
   /**
    * Multi-threaded thread-pool version.
    */
-  private static void mul3(
+  private static void mul4(
     final float[][] a, final float[][] b, final float[][] c) 
   {
     checkDimensions(a,b,c);
@@ -211,9 +178,8 @@ public class MtMatMulBench {
       final int jj = j;
       cs.submit(new Runnable() {
         public void run() {
-          computeColumn(ni,nk,jj,bj,a,b,c);
+          computeColumn(jj,a,b,c);
         }
-        private float[] bj = new float[nk];
       },null);
     }
     try {
@@ -259,6 +225,17 @@ public class MtMatMulBench {
           }
         }
       }
+    }
+  }
+
+  private static void startAndJoin(Thread[] threads) {
+    for (int ithread=0; ithread<threads.length; ++ithread)
+      threads[ithread].start();
+    try {
+      for (int ithread=0; ithread<threads.length; ++ithread)
+        threads[ithread].join();
+    } catch (InterruptedException ie) {
+      throw new RuntimeException(ie);
     }
   }
 
