@@ -1,0 +1,125 @@
+options {
+  STATIC=true;
+}
+
+PARSER_BEGIN(UnitsParser)
+package edu.mines.jtk.util;
+
+import java.io.*;
+
+/**
+ * Parser (generated from UnitsParser.jj via JavaCC) to create Units 
+ * from a string that conforms to the following (extended BNF) grammar:
+ * <pre>
+ * unit -&gt; expr EOF
+ * expr -&gt; term ( ("+" | "-") (DOUBLE|INTEGER) )?
+ * term -&gt; factor ( ("*")? factor | "/" factor )*
+ * factor -&gt; primary ("^" INTEGER)?
+ * primary -&gt; NAME | (DOUBLE|INTEGER) | "(" expr ")"
+ * </pre>
+ *
+ * @author Dave Hale
+ * @version 1998.07.06
+ */
+final class UnitsParser {
+
+  /** 
+   * Parse a String containing a unit definition.
+   * @param the unit definition, as in "coulomb/volt".
+   * @exception ParseException if the definition is not valid.
+   */
+  static synchronized Units parse(String definition) throws ParseException {
+    ReInit(new StringReader(definition));
+    return units();
+  }
+}
+
+PARSER_END(UnitsParser)
+
+SKIP : {
+    " "
+  | "\t"
+}
+
+TOKEN : {
+    < PLUS: "+" >
+  | < MINUS: "-" >
+  | < MUL: ("*"|".") >
+  | < DIV: ("/"|"per"|"PER") >
+  | < POW: ("^"|"**") >
+  | < LP: "(" >
+  | < RP: ")" >
+  | < NAME: "%" | <LETTER>(<ALPHA>)*((<DIGIT>)+(<ALPHA>)+)* >
+  | < INTEGER: ("-")?(<DIGIT>)+ >
+  | < DOUBLE: ("-")?<FLOAT>(["e","E"](["-","+"])?<INTEGER>)? >
+  | < #ALPHA: <LETTER> | "_" >
+  | < #LETTER: ["a"-"z","A"-"Z"] >
+  | < #FLOAT: <INTEGER> | <INTEGER>("."<INTEGER>)? | "."<INTEGER> >
+  | < #DIGIT: ["0"-"9"] >
+}
+
+Units units() : {
+  Units e;
+} {
+  e=expr() <EOF> {
+    return e;
+  }
+}
+
+Units expr() : { 
+  Units t;
+  Token n;
+} {
+  t=term() (
+    <PLUS> (n=<DOUBLE>|n=<INTEGER>) {
+      t.shift(Double.valueOf(n.image).doubleValue());
+    } | <MINUS> (n=<DOUBLE>|n=<INTEGER>) {
+      t.shift(-Double.valueOf(n.image).doubleValue());
+    }
+  )? {
+    return t;
+  }
+}
+
+Units term() : {
+  Units f,fb;
+} {
+  f=factor() (
+    (<MUL>)? fb=factor() {
+      f.mul(fb);
+    } | <DIV> fb=factor() {
+      f.div(fb);
+    }
+  )* {
+    return f;
+  }
+}
+
+Units factor() : {
+  Units p;
+  Token n;
+} {
+  p=primary() (
+    <POW> n=<INTEGER> {
+      p.pow(Integer.valueOf(n.image).intValue());
+    }
+  )? {
+    return p;
+  }
+}
+
+Units primary() : {
+  Units e,p;
+  Token n;
+} {
+  n=<NAME> {
+    p = Units.unitsFromName(n.image);
+    if (p==null) throw new ParseException("Units \""+n.image+"\" are undefined.");
+    return p;
+  } | (n=<DOUBLE>|n=<INTEGER>) {
+    double d = (new Double(n.image)).doubleValue();
+    return (new Units()).scale(d);
+  } | <LP> e=expr() <RP> {
+    return e;
+  }
+}

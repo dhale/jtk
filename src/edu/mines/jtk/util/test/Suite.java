@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2004, Colorado School of Mines and others. All rights reserved.
+Copyright (c) 2006, Colorado School of Mines and others. All rights reserved.
 This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
@@ -11,7 +11,7 @@ import junit.framework.*;
 /**
  * Tests all classes in package edu.mines.jtk.util.
  * @author Dave Hale
- * @version 2004.11.02
+ * @version 2006.08.31
  */
 public class Suite extends TestSuite {
 
@@ -24,8 +24,11 @@ public class Suite extends TestSuite {
     suite.addTestSuite(BrentMinFinderTest.class);
     suite.addTestSuite(BrentZeroFinderTest.class);
     suite.addTestSuite(CfloatTest.class);
+    suite.addTestSuite(CubicInterpolatorTest.class);
     suite.addTestSuite(MathPlusTest.class);
+    suite.addTestSuite(QuantilerTest.class);
     suite.addTestSuite(StopwatchTest.class);
+    suite.addTestSuite(UnitsTest.class);
 
     return suite;
   }

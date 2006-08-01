@@ -63,7 +63,7 @@ public class CubicInterpolator {
    * @param y array[n] of function values y(x).
    */
   public CubicInterpolator(Method method, int n, float[] x, float[] y) {
-    Check.argument(Array.isMonotonic(x), "Array must be monotonic");
+    Check.argument(Array.isMonotonic(x), "array x is monotonic");
     _xd = new float[n];
     _yd = new float[n][4];
     for (int i=0; i<n; ++i) {

@@ -49,7 +49,7 @@ public class BrentZeroFinder {
   }
 
   /**
-   * Constructs a new zero finder for the specified function.
+   * Constructs a zero finder for the specified function.
    * @param f the function.
    */
   public BrentZeroFinder(Function f) {
