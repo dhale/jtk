@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic.demo;
 
+import java.awt.*;
 import javax.swing.*;
 
 import edu.mines.jtk.awt.*;
@@ -42,6 +43,9 @@ public class SimpleSine {
     _plotFrame = new PlotFrame(_plotPanel);
     _plotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     _plotFrame.setVisible(true);
+    _plotFrame.add(
+      new Label("In either plot or axes, click-drag to zoom, click to unzoom."),
+      BorderLayout.NORTH);
   }
 
   public PlotFrame getPlotFrame() {

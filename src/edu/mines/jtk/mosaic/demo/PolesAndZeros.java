@@ -205,8 +205,8 @@ public class PolesAndZeros {
       // The menu bar includes a mode menu for selecting a mode.
       JMenu fileMenu = new JMenu("File");
       fileMenu.setMnemonic('F');
-      fileMenu.add(new ExitAction()).setMnemonic('x');
       fileMenu.add(new SaveAsPngAction(_plotFrame)).setMnemonic('a');
+      fileMenu.add(new ExitAction()).setMnemonic('x');
       JMenu modeMenu = new JMenu("Mode");
       modeMenu.setMnemonic('M');
       modeMenu.add(new ModeMenuItem(tzm));
@@ -343,8 +343,8 @@ public class PolesAndZeros {
       // The menu bar.
       JMenu fileMenu = new JMenu("File");
       fileMenu.setMnemonic('F');
-      fileMenu.add(new ExitAction()).setMnemonic('x');
       fileMenu.add(new SaveAsPngAction(_plotFrame)).setMnemonic('a');
+      fileMenu.add(new ExitAction()).setMnemonic('x');
       JMenuBar menuBar = new JMenuBar();
       menuBar.add(fileMenu);
       _plotFrame.setJMenuBar(menuBar);
