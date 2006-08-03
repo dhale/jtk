@@ -21,9 +21,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <property name="build.doc" value="${build}/doc"/>
   <property name="build.jar" value="${build}/jar"/>
   <property name="build.lib" value="${build}/lib"/>
-  <property name="build.obj" value="${build}/obj"/>
-  <property name="obj.jtk" value="${build.obj}/edu/mines/jtk"/>
-  <property name="src.jtk" value="${src}/edu/mines/jtk"/>
 
   <!-- Other global settings -->
   <property name="title" value="MinesJTK"/>
@@ -34,25 +31,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     </fileset>
   </path>
 
-  <!-- Determine operating system -->
-  <target name="os-init">
-    <condition property="linux">
-      <os family="unix"/>
-    </condition>
-    <condition property="windows">
-      <os family="windows"/>
-    </condition>
-  </target>
-
   <!-- Initialize -->
-  <target name="init" depends="os-init">
+  <target name="init">
     <tstamp/>
     <mkdir dir="${build}"/>
     <mkdir dir="${build.cls}"/>
     <mkdir dir="${build.doc}"/>
     <mkdir dir="${build.jar}"/>
     <mkdir dir="${build.lib}"/>
-    <mkdir dir="${build.obj}"/>
   </target>
 
   <!-- Compile Java -->
