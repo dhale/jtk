@@ -26,9 +26,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <property name="title" value="MinesJTK"/>
   <property environment="env"/>
   <path id="classpath">
-    <fileset dir="${jar}">
-      <include name="**/*.jar"/>
-    </fileset>
+    <fileset dir="${java.home}" includes="lib/javaws.jar"/>
+    <fileset dir="${jar}" includes="**/*.jar"/>
   </path>
 
   <!-- Initialize -->
