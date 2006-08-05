@@ -417,7 +417,7 @@ public class PointsView extends TiledView {
     int markSize = round(fontSize/2.0f);
     if (_markStyle!=Mark.NONE) {
       gmark = (Graphics2D)g2d.create();
-      if (_markSize!=0.0f)
+      if (_markSize>=0.0f)
         markSize = round(_markSize*lineWidth);
       if (_markColor!=null)
         gmark.setColor(_markColor);
@@ -479,7 +479,7 @@ public class PointsView extends TiledView {
   private float _lineWidth = 0.0f;
   private Color _lineColor = null;
   private Mark _markStyle = Mark.NONE;
-  private float _markSize = 0.0f;
+  private float _markSize = -1.0f;
   private Color _markColor = null;
 
   /**
