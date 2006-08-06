@@ -141,7 +141,7 @@ public class ChannelTest {
     int n = p.length;
     int[] imax = new int[1];
     Array.max(p,imax);
-    _si.setInput(nz,dz,fz,p);
+    _si.setUniform(nz,dz,fz,p);
     return (float)_si.findMax(fz+imax[0]*dz);
   }
   private static float ampSinc(int nz, double dz, double fz, float[] p) {

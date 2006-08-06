@@ -141,7 +141,7 @@ public class WarpTest {
     int n1 = p[0].length;
     int n2 = p.length;
     SincInterpolator si = new SincInterpolator();
-    si.setInput(n1,1.0,0.0,n2,1.0,0.0,p);
+    si.setUniform(n1,1.0,0.0,n2,1.0,0.0,p);
     float[][] q = new float[n2][n1];
     for (int i2=0; i2<n2; ++i2) {
       for (int i1=0; i1<n1; ++i1) {

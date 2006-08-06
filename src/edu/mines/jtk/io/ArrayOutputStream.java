@@ -39,14 +39,32 @@ public class ArrayOutputStream
   }
 
   /**
+   * Constructs an array output stream for the specified file name.
+   * The default byte order is BIG_ENDIAN.
+   * @param name the file name.
+   */
+  public ArrayOutputStream(String name) throws FileNotFoundException {
+    this(new FileOutputStream(name));
+  }
+
+  /**
+   * Constructs an array output stream for the specified file.
+   * The default byte order is BIG_ENDIAN.
+   * @param file the file.
+   */
+  public ArrayOutputStream(File file) throws FileNotFoundException {
+    this(new FileOutputStream(file));
+  }
+
+  /**
    * Constructs an array output stream for the specified stream and byte order.
    * @param os the output stream.
-   * @param byteOrder the byte order.
+   * @param bo the byte order.
    */
-  public ArrayOutputStream(OutputStream os, ByteOrder byteOrder) {
+  public ArrayOutputStream(OutputStream os, ByteOrder bo) {
     super(os);
-    _ao = new ArrayOutputAdapter(new DataOutputStream(os),byteOrder);
-    _bo = byteOrder;
+    _ao = new ArrayOutputAdapter(new DataOutputStream(os),bo);
+    _bo = bo;
   }
 
   /**
@@ -54,13 +72,38 @@ public class ArrayOutputStream
    * and byte order.
    * The file channel of the file output stream enables more efficient writes.
    * @param fos the file output stream.
-   * @param byteOrder the byte order.
+   * @param bo the byte order.
    */
-  public ArrayOutputStream(FileOutputStream fos, ByteOrder byteOrder) {
+  public ArrayOutputStream(FileOutputStream fos, ByteOrder bo) {
     super(fos);
     _ao = new ArrayOutputAdapter(
-      fos.getChannel(),new DataOutputStream(fos),byteOrder);
-    _bo = byteOrder;
+      fos.getChannel(),new DataOutputStream(fos),bo);
+    _bo = bo;
+  }
+
+  /**
+   * Constructs an array output stream for the specified file name
+   * and byte order.
+   * The default byte order is BIG_ENDIAN.
+   * @param name the file name.
+   * @param bo the byte order.
+   */
+  public ArrayOutputStream(String name, ByteOrder bo) 
+    throws FileNotFoundException 
+  {
+    this(new FileOutputStream(name),bo);
+  }
+
+  /**
+   * Constructs an array output stream for the specified file and byte order.
+   * The default byte order is BIG_ENDIAN.
+   * @param file the file.
+   * @param bo the byte order.
+   */
+  public ArrayOutputStream(File file, ByteOrder bo) 
+    throws FileNotFoundException 
+  {
+    this(new FileOutputStream(file),bo);
   }
 
   /**

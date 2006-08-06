@@ -45,81 +45,81 @@ public class SincInterpolatorTest extends TestCase {
     SincInterpolator si = new SincInterpolator();
     Random random = new Random();
     int lmax = si.getMaximumLength();
-    int nxin = 2*lmax;
+    int nxu = 2*lmax;
     int npad = lmax;
-    double dxin = 1.0;
-    double fxin = npad;
-    int nxout = npad+nxin+npad;
-    double dxout = 0.999;
-    double fxout = npad;
-    float[] yi = new float[nxin];
-    float[] yz = new float[nxout];
-    float[] yc = new float[nxout];
-    float[] yo = new float[nxout];
-    float[] yt = new float[nxout];
-    for (int ixin=0; ixin<nxin; ++ixin)
-      yi[ixin] = yz[ixin+npad] = yc[ixin+npad] = random.nextFloat();
+    double dxu = 1.0;
+    double fxu = npad;
+    int nx = npad+nxu+npad;
+    double dx = 0.999;
+    double fx = npad;
+    float[] yi = new float[nxu];
+    float[] yz = new float[nx];
+    float[] yc = new float[nx];
+    float[] yo = new float[nx];
+    float[] yt = new float[nx];
+    for (int ixu=0; ixu<nxu; ++ixu)
+      yi[ixu] = yz[ixu+npad] = yc[ixu+npad] = random.nextFloat();
     for (int ipad=0; ipad<npad; ++ipad) {
       yc[ipad] = yc[npad];
-      yc[npad+nxin+ipad] = yc[npad+nxin-1];
+      yc[npad+nxu+ipad] = yc[npad+nxu-1];
     }
     si.setExtrapolation(SincInterpolator.Extrapolation.ZERO);
-    si.setInput(nxin,dxin,fxin,yi);
-    si.interpolate(nxout,dxout,fxout,yo);
-    si.setInput(npad+nxin+npad,dxin,0.0,yz);
-    si.interpolate(nxout,dxout,fxout,yt);
-    for (int ixout=0; ixout<nxout; ++ixout)
-      assertEquals(yo[ixout],yt[ixout],0.0);
+    si.setUniform(nxu,dxu,fxu,yi);
+    si.interpolate(nx,dx,fx,yo);
+    si.setUniform(npad+nxu+npad,dxu,0.0,yz);
+    si.interpolate(nx,dx,fx,yt);
+    for (int ix=0; ix<nx; ++ix)
+      assertEquals(yo[ix],yt[ix],0.0);
     si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
-    si.setInput(nxin,dxin,fxin,yi);
-    si.interpolate(nxout,dxout,fxout,yo);
-    si.setInput(npad+nxin+npad,dxin,0.0,yc);
-    si.interpolate(nxout,dxout,fxout,yt);
-    for (int ixout=0; ixout<nxout; ++ixout)
-      assertEquals(yo[ixout],yt[ixout],0.0);
+    si.setUniform(nxu,dxu,fxu,yi);
+    si.interpolate(nx,dx,fx,yo);
+    si.setUniform(npad+nxu+npad,dxu,0.0,yc);
+    si.interpolate(nx,dx,fx,yt);
+    for (int ix=0; ix<nx; ++ix)
+      assertEquals(yo[ix],yt[ix],0.0);
   }
 
   public void testComplex() {
     SincInterpolator si = new SincInterpolator();
     Random random = new Random();
-    int nxin = 100;
-    double dxin = 3.14159;
-    double fxin = 1.23456;
-    float[] yr = new float[nxin];
-    float[] yi = new float[nxin];
-    float[] yc = new float[2*nxin];
-    for (int ixin=0; ixin<nxin; ++ixin) {
-      yr[ixin] = yc[2*ixin  ] = random.nextFloat();
-      yi[ixin] = yc[2*ixin+1] = random.nextFloat();
+    int nxu = 100;
+    double dxu = 3.14159;
+    double fxu = 1.23456;
+    float[] yr = new float[nxu];
+    float[] yi = new float[nxu];
+    float[] yc = new float[2*nxu];
+    for (int ixu=0; ixu<nxu; ++ixu) {
+      yr[ixu] = yc[2*ixu  ] = random.nextFloat();
+      yi[ixu] = yc[2*ixu+1] = random.nextFloat();
     }
-    si.setInputSampling(nxin,dxin,fxin);
-    int nxout = 200;
-    double dxout = -0.9*dxin;
-    double fxout = fxin+(nxin+30)*dxin;
-    float[] zr = new float[nxout];
-    float[] zi = new float[nxout];
-    float[] zc = new float[2*nxout];
+    si.setUniformSampling(nxu,dxu,fxu);
+    int nx = 200;
+    double dx = -0.9*dxu;
+    double fx = fxu+(nxu+30)*dxu;
+    float[] zr = new float[nx];
+    float[] zi = new float[nx];
+    float[] zc = new float[2*nx];
     si.setExtrapolation(SincInterpolator.Extrapolation.ZERO);
-    si.setInputSamples(yr);
-    si.interpolate(nxout,dxout,fxout,zr);
-    si.setInputSamples(yi);
-    si.interpolate(nxout,dxout,fxout,zi);
-    si.setInputSamples(yc);
-    si.interpolateComplex(nxout,dxout,fxout,zc);
-    for (int ixout=0; ixout<nxout; ++ixout) {
-      assertEquals(zr[ixout],zc[2*ixout  ],0.0);
-      assertEquals(zi[ixout],zc[2*ixout+1],0.0);
+    si.setUniformSamples(yr);
+    si.interpolate(nx,dx,fx,zr);
+    si.setUniformSamples(yi);
+    si.interpolate(nx,dx,fx,zi);
+    si.setUniformSamples(yc);
+    si.interpolateComplex(nx,dx,fx,zc);
+    for (int ix=0; ix<nx; ++ix) {
+      assertEquals(zr[ix],zc[2*ix  ],0.0);
+      assertEquals(zi[ix],zc[2*ix+1],0.0);
     }
     si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
-    si.setInputSamples(yr);
-    si.interpolate(nxout,dxout,fxout,zr);
-    si.setInputSamples(yi);
-    si.interpolate(nxout,dxout,fxout,zi);
-    si.setInputSamples(yc);
-    si.interpolateComplex(nxout,dxout,fxout,zc);
-    for (int ixout=0; ixout<nxout; ++ixout) {
-      assertEquals(zr[ixout],zc[2*ixout  ],0.0);
-      assertEquals(zi[ixout],zc[2*ixout+1],0.0);
+    si.setUniformSamples(yr);
+    si.interpolate(nx,dx,fx,zr);
+    si.setUniformSamples(yi);
+    si.interpolate(nx,dx,fx,zi);
+    si.setUniformSamples(yc);
+    si.interpolateComplex(nx,dx,fx,zc);
+    for (int ix=0; ix<nx; ++ix) {
+      assertEquals(zr[ix],zc[2*ix  ],0.0);
+      assertEquals(zi[ix],zc[2*ix+1],0.0);
     }
   }
 
@@ -172,35 +172,35 @@ public class SincInterpolatorTest extends TestCase {
     long nbytes = si.getTableBytes();
     trace("lmax="+lmax+" fmax="+fmax+" emax="+emax+" nbytes="+nbytes);
     
-    // Input signal is an up-down sweep. (See below.)
+    // Uniformly-sampled signal is an up-down sweep. (See below.)
     int nmax = (int)(1000*fmax);
     double xmax = PI*nmax/fmax;
-    double dxin = 1.0;
-    double fxin = 0.0;
-    int nxin = 1+(int)((xmax-fxin)/dxin);
-    dxin = (xmax-fxin)/(nxin-1);
-    float[] yin = new float[nxin];
-    for (int ixin=0; ixin<nxin; ++ixin) {
-      double x = fxin+ixin*dxin;
-      yin[ixin] = (float)sweep(fmax,nmax,x);
+    double dxu = 1.0;
+    double fxu = 0.0;
+    int nxu = 1+(int)((xmax-fxu)/dxu);
+    dxu = (xmax-fxu)/(nxu-1);
+    float[] yu = new float[nxu];
+    for (int ixu=0; ixu<nxu; ++ixu) {
+      double x = fxu+ixu*dxu;
+      yu[ixu] = (float)sweep(fmax,nmax,x);
     }
-    si.setInput(nxin,dxin,fxin,yin);
+    si.setUniform(nxu,dxu,fxu,yu);
     si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
-    //trace("xmax="+xmax+" nmax="+nmax+" nxin="+nxin);
+    //trace("xmax="+xmax+" nmax="+nmax+" nxu="+nxu);
 
     // Interpolate.
-    double dxout = 0.01*dxin;
-    double fxout = 0.0;
-    int nxout = 1+(int)((xmax-fxout)/dxout);
-    dxout = (xmax-fxout)/(nxout-1);
-    float[] yout = new float[nxout];
-    si.interpolate(nxout,dxout,fxout,yout);
+    double dx = 0.01*dxu;
+    double fx = 0.0;
+    int nx = 1+(int)((xmax-fx)/dx);
+    dx = (xmax-fx)/(nx-1);
+    float[] y = new float[nx];
+    si.interpolate(nx,dx,fx,y);
 
     // Compute the maximum error and compare with emax.
     double error = 0.0;
-    for (int ixout=0; ixout<nxout; ++ixout) {
-      double x = fxout+ixout*dxout;
-      double yi = yout[ixout];
+    for (int ix=0; ix<nx; ++ix) {
+      double x = fx+ix*dx;
+      double yi = y[ix];
       double ys = sweep(fmax,nmax,x);
       double ei = abs(yi-ys);
       if (ei>emax)
@@ -213,15 +213,15 @@ public class SincInterpolatorTest extends TestCase {
       trace("  WARNING: error = "+error+" > emax = "+emax);
 
     // Repeat for a simple shift of 1/2 the input sampling interval.
-    double shift = 0.5*dxin;
-    nxout = nxin;
-    dxout = dxin;
-    fxout = fxin+shift;
-    si.interpolate(nxout,dxout,fxout,yout);
+    double shift = 0.5*dxu;
+    nx = nxu;
+    dx = dxu;
+    fx = fxu+shift;
+    si.interpolate(nx,dx,fx,y);
     error = 0.0;
-    for (int ixout=0; ixout<nxout; ++ixout) {
-      double x = fxout+ixout*dxout;
-      double yi = yout[ixout];
+    for (int ix=0; ix<nx; ++ix) {
+      double x = fx+ix*dx;
+      double yi = y[ix];
       double ys = sweep(fmax,nmax,x);
       double ei = abs(yi-ys);
       if (ei>emax)
@@ -260,42 +260,42 @@ public class SincInterpolatorTest extends TestCase {
       return;
 
     // Sampling and arrays for input signal.
-    int nxin = 2+lmax;
-    double dxin = 0.1;
-    double fxin = (-lmax/2)*dxin;
-    float[] yin = new float[nxin];
+    int nxu = 2+lmax;
+    double dxu = 0.1;
+    double fxu = (-lmax/2)*dxu;
+    float[] yu = new float[nxu];
 
     // Sampling for interpolated output.
-    int nxout = 51;
-    double dxout = dxin/(nxout-1);
-    double fxout = 0.0;
-    float[] xout = new float[nxout];
-    float[] yout = new float[nxout];
-    for (int ixout=0; ixout<nxout; ++ixout) {
-      double x = fxout+ixout*dxout;
-      xout[ixout] = (float)x;
+    int nx = 51;
+    double dx = dxu/(nx-1);
+    double fx = 0.0;
+    float[] x = new float[nx];
+    float[] y = new float[nx];
+    for (int ix=0; ix<nx; ++ix) {
+      double xi = fx+ix*dx;
+      x[ix] = (float)xi;
     }
 
     // Loop over frequencies near maximum frequency.
     int nk = 51;
-    double dk = 2.0*PI*fmax/((nk-1)*dxin);
+    double dk = 2.0*PI*fmax/((nk-1)*dxu);
     double fk = 0.0;
     for (int ik=0; ik<nk; ++ik) {
       double k = fk+ik*dk;
 
-      // Input sine wave.
-      for (int ixin=0; ixin<nxin; ++ixin) {
-        double x = fxin+ixin*dxin;
-        yin[ixin] = sine(k*x);
+      // Uniformly-sampled sine wave.
+      for (int ixu=0; ixu<nxu; ++ixu) {
+        double xu = fxu+ixu*dxu;
+        yu[ixu] = sine(k*xu);
       }
-      si.setInput(nxin,dxin,fxin,yin);
+      si.setUniform(nxu,dxu,fxu,yu);
 
       // Interpolated sine wave.
-      si.interpolate(nxout,dxout,fxout,yout);
-      for (int ixout=0; ixout<nxout; ++ixout) {
-        double x = fxout+ixout*dxout;
-        float yi = yout[ixout];
-        float ye = sine(k*x);
+      si.interpolate(nx,dx,fx,y);
+      for (int ix=0; ix<nx; ++ix) {
+        double xi = fx+ix*dx;
+        float yi = y[ix];
+        float ye = sine(k*xi);
         if (abs(ye-yi)>emax)
           trace("k="+k+" x="+x+" ye="+ye+" yi="+yi);
         assertEquals(ye,yi,emax);

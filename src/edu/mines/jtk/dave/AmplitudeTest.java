@@ -69,7 +69,7 @@ public class AmplitudeTest {
     int n = t.length;
     int[] imax = new int[1];
     Array.max(t,imax);
-    _si.setInput(n,1.0,0.0,t);
+    _si.setUniform(n,1.0,0.0,t);
     double xmax = _si.findMax(imax[0]);
     return _si.interpolate(xmax);
   }

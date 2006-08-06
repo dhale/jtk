@@ -39,14 +39,32 @@ public class ArrayInputStream
   }
 
   /**
+   * Constructs an array input stream for the specified file name.
+   * The default byte order is BIG_ENDIAN.
+   * @param name the file name.
+   */
+  public ArrayInputStream(String name) throws FileNotFoundException {
+    this(new FileInputStream(name));
+  }
+
+  /**
+   * Constructs an array input stream for the specified file.
+   * The default byte order is BIG_ENDIAN.
+   * @param file the file.
+   */
+  public ArrayInputStream(File file) throws FileNotFoundException {
+    this(new FileInputStream(file));
+  }
+
+  /**
    * Constructs an array input stream for the specified stream and byte order.
    * @param is the input stream.
-   * @param byteOrder the byte order.
+   * @param bo the byte order.
    */
-  public ArrayInputStream(InputStream is, ByteOrder byteOrder) {
+  public ArrayInputStream(InputStream is, ByteOrder bo) {
     super(is);
-    _ai = new ArrayInputAdapter(new DataInputStream(is),byteOrder);
-    _bo = byteOrder;
+    _ai = new ArrayInputAdapter(new DataInputStream(is),bo);
+    _bo = bo;
   }
 
   /**
@@ -54,13 +72,38 @@ public class ArrayInputStream
    * and byte order.
    * The file channel of the file input stream enables more efficient reads.
    * @param fis the file input stream.
-   * @param byteOrder the byte order.
+   * @param bo the byte order.
    */
-  public ArrayInputStream(FileInputStream fis, ByteOrder byteOrder) {
+  public ArrayInputStream(FileInputStream fis, ByteOrder bo) {
     super(fis);
     _ai = new ArrayInputAdapter(
-      fis.getChannel(),new DataInputStream(fis),byteOrder);
-    _bo = byteOrder;
+      fis.getChannel(),new DataInputStream(fis),bo);
+    _bo = bo;
+  }
+
+  /**
+   * Constructs an array input stream for the specified file name
+   * and byte order.
+   * The default byte order is BIG_ENDIAN.
+   * @param name the file name.
+   * @param bo the byte order.
+   */
+  public ArrayInputStream(String name, ByteOrder bo) 
+    throws FileNotFoundException 
+  {
+    this(new FileInputStream(name),bo);
+  }
+
+  /**
+   * Constructs an array input stream for the specified file and byte order.
+   * The default byte order is BIG_ENDIAN.
+   * @param file the file.
+   * @param bo the byte order.
+   */
+  public ArrayInputStream(File file, ByteOrder bo) 
+    throws FileNotFoundException 
+  {
+    this(new FileInputStream(file),bo);
   }
 
   /**
