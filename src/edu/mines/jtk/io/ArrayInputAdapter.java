@@ -48,7 +48,6 @@ public class ArrayInputAdapter implements ArrayInput {
    * Constructs an adapter for the specified file input stream and byte order.
    * The file channel of the file input stream enables more efficient reads.
    * @param stream the file input stream.
-   * @param order the byte order.
    */
   public ArrayInputAdapter(FileInputStream stream) {
     this(stream,ByteOrder.BIG_ENDIAN);

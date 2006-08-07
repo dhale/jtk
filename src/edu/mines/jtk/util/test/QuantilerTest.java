@@ -53,7 +53,7 @@ public class QuantilerTest extends TestCase {
 
   public void testRandom() {
     int n = 10000;
-    float[] f = Array.randfloat(n);
+    float[] f = Array.randfloat(new Random(314159),n);
     int ntest = 101;
     for (int itest=0; itest<ntest; ++itest) {
       float q = (float)itest/(float)(ntest-1);

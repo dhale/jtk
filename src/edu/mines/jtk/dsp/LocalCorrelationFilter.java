@@ -478,6 +478,64 @@ public class LocalCorrelationFilter {
    * Searches for lags for which cross-correlations are maximized.
    * @param f the 1st input array; can be the same as g.
    * @param g the 2nd input array; can be the same as f.
+   * @param min minimum lag
+   * @param max maximum lag
+   * @param lag output array of lags
+   */
+  public void findMaxLags(
+    float[] f, float[] g, int min, int max, byte[] lag) 
+  {
+    // Initialize arrays of lags.
+    int n = f.length;
+    for (int i=0; i<n; ++i)
+      lag[i] = 0;
+
+    // Array for cross-correlations.
+    float[] c = new float[n];
+    float[] cmax = new float[n];
+
+    // Search begins in the middle of the specified range of lags.
+    Lags lags = new Lags(min,max);
+    int l = (min+max)/2;
+
+    // While lags remain to be processed, ...
+    boolean done = false;
+    while (!done) {
+
+      // Apply correlation filter for this lag.
+      apply(l,f,g,c);
+
+      // Correlations have been computed for this lag, 
+      // but no maxima have yet been found.
+      lags.markLag(l);
+
+      // Look for maxima; if found, mark this lag accordingly.
+      boolean foundMax = false;
+      for (int i=0; i<n; ++i) { 
+        float ci = c[i];
+        if (ci>cmax[i]) {
+          cmax[i] = ci;
+          lag[i] = (byte)l;
+          foundMax = true;
+        }
+      }
+      if (foundMax)
+        lags.markMax(l);
+
+      // Which lag to process next?
+      int[] ls = lags.nextLag();
+      if (ls==null) {
+        done = true;
+      } else {
+        l = ls[0];
+      }
+    }
+  }
+
+  /**
+   * Searches for lags for which cross-correlations are maximized.
+   * @param f the 1st input array; can be the same as g.
+   * @param g the 2nd input array; can be the same as f.
    * @param min1 minimum lag in 1st dimension
    * @param max1 maximum lag in 1st dimension
    * @param min2 minimum lag in 2nd dimension
@@ -623,6 +681,54 @@ public class LocalCorrelationFilter {
         l2 = ls[1];
         l3 = ls[2];
       }
+    }
+  }
+
+  public void refineLags( float[] f, float[] g, byte[] l, float[] u) {
+    int n = f.length;
+
+    // Minimum and maximum lags.
+    int min = l[0];
+    int max = l[0];
+    for (int i=1; i<n; ++i) {
+      int lag = l[i];
+      if (lag<min) min = lag;
+      if (lag>max) max = lag;
+    }
+    System.out.println("refineLags:");
+    System.out.println("  min="+min+" max="+max);
+
+    // Coefficients for quadratic fit.
+    float[] c = new float[n];
+    float[] a1 = new float[n];
+    float[] a2 = new float[n];
+    for (int lag=min-1; lag<=max+1; ++lag) {
+      apply(lag,f,g,c);
+      for (int i=0; i<n; ++i) {
+        int k = lag-l[i];
+        if (-1<=k && k<=1) {
+          k += 1;
+          float[] ck = C1[k];
+          float ci = c[i];
+          a1[i] += ck[1]*ci;
+          a2[i] += ck[2]*ci;
+        }
+      }
+    }
+
+    // Refined lags.
+    for (int i=0; i<n; ++i) {
+      float a1i = a1[i];
+      float a2i = a2[i];
+      float w = 0.0f;
+      if (a2i<0.0)
+        w = -0.5f*a1i/a2i;
+      if (w<-1.0f) {
+        w = -1.0f;
+      } else if (w>1.0f) {
+        w = 1.0f;
+      }
+      u[i] = (float)(w+l[i]);
     }
   }
 
@@ -980,6 +1086,49 @@ public class LocalCorrelationFilter {
     byte[][][] _mark;
   }
 
+  // Fractions used in tables of coefficients below.
+  private static final float C00 = 0.0f;
+  private static final float C11 = 1.0f/1.0f;
+  private static final float C12 = 1.0f/2.0f;
+  private static final float C13 = 1.0f/3.0f;
+  private static final float C14 = 1.0f/4.0f;
+  private static final float C16 = 1.0f/6.0f;
+  private static final float C19 = 1.0f/9.0f;
+  private static final float C29 = 2.0f/9.0f;
+  private static final float C59 = 5.0f/9.0f;
+  private static final float C000 = 0.0f;
+  private static final float C109 = 1.0f/ 9.0f;
+  private static final float C112 = 1.0f/12.0f;
+  private static final float C118 = 1.0f/18.0f;
+  private static final float C127 = 1.0f/27.0f;
+  private static final float C227 = 2.0f/27.0f;
+  private static final float C427 = 4.0f/27.0f;
+  private static final float C727 = 7.0f/27.0f;
+
+  // Coefficients for 1-D lag refinement. Assume a sampled correlation
+  // maximum at integer lag l. Let u be the fractional component of a
+  // refined lag l+u. Near its maximum, we approximate the correlation
+  // function c(l+u) by a quadratic function fit that interpolates the
+  // three sampled correlation values surrounding the sample c(l).
+  // The quadratic function is c(l+u) = a0 + a1*u + a2*u*u.
+  // The three sampled correlation values c(l-1), c(l), and c(l+1)
+  // yield three equations for the three coefficients a0, a1, and a2.
+  // The rows of this array contain the weights that we apply to each
+  // of the three correlation values in the computation of the three
+  // quadratic coefficients. For example, the first (top) row contains
+  // the weights applied to the sampled correlation value c(l-1).
+  // When refining correlation lags, we use this table of weights to
+  // accumulate the contributions of the three correlation values nearest
+  // to each sampled correlation maximum. For lag refinement, we need only
+  // the two coefficients a1 and a2, for the peak of the quadratic is at
+  // u = -0.5*a1/a2.
+  private static final float[][] C1 = {
+  //  a0    a1    a2
+    { C00, -C12,  C12}, // -1
+    { C11,  C00, -C11}, //  0
+    { C00,  C12,  C12}, //  1
+  };
+
 
   // Coefficients for 2-D lag refinement. Assume a sampled correlation 
   // maximum at integer lag (l1,l2). Let (u1,u2) be fractional components 
@@ -989,7 +1138,7 @@ public class LocalCorrelationFilter {
   // sampled c(l1,l2).
   // The quadratic function is
   // c(l1+u1,l2+u2) = a0 + a1*u1 + a2*u2 + a3*u1*u2 + a4*u1*u1 + a5*u2*u2
-  // The nine sampled corrrelation values yield nine equations for the six
+  // The nine sampled correlation values yield nine equations for the six
   // coefficients a0, a1, a2, a3, a4, and a5.
   // By QR decomposition of this overdetermined system of equations, we 
   // obtained the following array of constants. The rows of this array 
@@ -1001,15 +1150,9 @@ public class LocalCorrelationFilter {
   // accumulate the contributions of the nine correlation values nearest
   // to each sampled correlation maximum. For lag refinement, we need only 
   // the five coefficients a1, a2, a3, a4, and a5.
-  private static final float C00 = 0.0f;
-  private static final float C13 = 1.0f/3.0f;
-  private static final float C14 = 1.0f/4.0f;
-  private static final float C16 = 1.0f/6.0f;
-  private static final float C19 = 1.0f/9.0f;
-  private static final float C29 = 2.0f/9.0f;
-  private static final float C59 = 5.0f/9.0f;
   private static final float[][] C2 = {
-    {-C19, -C16, -C16,  C14,  C16,  C16}, // (-1,-1) = (u1,u2)
+  //  a0    a1    a2    a3    a4    a5
+    {-C19, -C16, -C16,  C14,  C16,  C16}, // (-1,-1)
     { C29,  C00, -C16,  C00, -C13,  C16}, // ( 0,-1)
     {-C19,  C16, -C16, -C14,  C16,  C16}, // ( 1,-1)
     { C29, -C16,  C00,  C00,  C16, -C13}, // (-1, 0)
@@ -1020,10 +1163,9 @@ public class LocalCorrelationFilter {
     {-C19,  C16,  C16,  C14,  C16,  C16}, // ( 1, 1)
   };
 
-  private static final float C11 = 1.0f/1.0f;
-  private static final float C12 = 1.0f/2.0f;
+  // Alternative coefficients? (Experimenting.)
   private static final float[][] C2X = {
-    { C00,  C00,  C00,  C14,  C00,  C00}, // (-1,-1) = (u1,u2)
+    { C00,  C00,  C00,  C14,  C00,  C00}, // (-1,-1)
     { C00,  C00, -C12,  C00,  C00,  C12}, // ( 0,-1)
     { C00,  C00,  C00, -C14,  C00,  C00}, // ( 1,-1)
     { C00, -C12,  C00,  C00,  C12,  C00}, // (-1, 0)
@@ -1033,9 +1175,8 @@ public class LocalCorrelationFilter {
     { C00,  C00,  C12,  C00,  C00,  C12}, // ( 0, 1)
     { C00,  C00,  C00,  C14,  C00,  C00}, // ( 1, 1)
   };
-
   private static final float[][] C2Y = {
-    { C00,  C00,  C00,  C00,  C00,  C00}, // (-1,-1) = (u1,u2)
+    { C00,  C00,  C00,  C00,  C00,  C00}, // (-1,-1)
     { C00,  C00, -C12,  C00,  C00,  C12}, // ( 0,-1)
     { C00,  C00,  C00,  C00,  C00,  C00}, // ( 1,-1)
     { C00, -C12,  C00,  C00,  C12,  C00}, // (-1, 0)
@@ -1052,15 +1193,8 @@ public class LocalCorrelationFilter {
   //                             a4*u1*u2 + a5*u1*u3 + a6*u2*u3 +
   //                             a7*u1*u1 + a8*u2*u2 + a9*u3*u3
   // For lag refinement, we need only the last nine coefficients.
-  private static final float C000 = 0.0f;
-  private static final float C109 = 1.0f/ 9.0f;
-  private static final float C112 = 1.0f/12.0f;
-  private static final float C118 = 1.0f/18.0f;
-  private static final float C127 = 1.0f/27.0f;
-  private static final float C227 = 2.0f/27.0f;
-  private static final float C427 = 4.0f/27.0f;
-  private static final float C727 = 7.0f/27.0f;
   private static final float[][] C3 = {
+  //   a0     a1     a2     a3     a4     a5     a6     a7     a8     a9 
     {-C227, -C118, -C118, -C118,  C112,  C112,  C112,  C118,  C118,  C118},
     { C127,  C000, -C118, -C118,  C000,  C000,  C112, -C109,  C118,  C118}, 
     {-C227,  C118, -C118, -C118, -C112, -C112,  C112,  C118,  C118,  C118}, 

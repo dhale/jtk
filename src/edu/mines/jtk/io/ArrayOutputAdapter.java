@@ -48,7 +48,6 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * Constructs an adapter for the specified file output stream and byte order.
    * The file channel of the file output stream enables more efficient writes.
    * @param stream the file output stream.
-   * @param order the byte order.
    */
   public ArrayOutputAdapter(FileOutputStream stream) {
     this(stream,ByteOrder.BIG_ENDIAN);
