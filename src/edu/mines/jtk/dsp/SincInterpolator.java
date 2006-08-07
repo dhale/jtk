@@ -59,7 +59,7 @@ import static java.lang.Math.*;
  * the table can easily exceed that of interpolating one sequence of 
  * samples, depending on the number of uniform samples. Therefore, one 
  * typically constructs an interpolator and uses it more than once.
- * @author Dave Hale, Colorado School of Mines
+ * @author Dave Hale, Colorado School of Mines; Bill Harlan, Landmark Graphics
  * @version 2005.08.07
  */
 public class SincInterpolator {
@@ -533,8 +533,36 @@ public class SincInterpolator {
    * @param x the value x at which to accumulate y(x).
    * @param y the value y(x) to accumulate.
    */
-  private void accumulate(double x, float y) {
-    // TODO: not yet implemented, so private
+  public void accumulate(double x, float y) {
+
+    // Which uniform samples?
+    double xn = _xb+x*_xs;
+    int ixn = (int)xn;
+    int kyu = _ib+ixn;
+
+    // Which sinc approximation?
+    double frac = xn-ixn;
+    if (frac<0.0)
+      frac += 1.0;
+    int ksinc = (int)(frac*_nsincm1+0.5);
+    float[] asinc = _asinc[ksinc];
+
+    // If no extrapolation is necessary, use a fast loop.
+      // Otherwise, extrapolate uniform samples, as necessary.
+    if (kyu>=0 && kyu<=_nxum) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu)
+        _yu[kyu] += y*asinc[isinc];
+    } else if (_extrap==Extrapolation.ZERO) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
+        if (0<=kyu && kyu<_nxu)
+          _yu[kyu] += y*asinc[isinc];
+      }
+    } else if (_extrap==Extrapolation.CONSTANT) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
+        int jyu = (kyu<0)?0:(_nxu<=kyu)?_nxu-1:kyu;
+        _yu[jyu] += y*asinc[isinc];
+      }
+    }
   }
 
   /**
@@ -545,8 +573,9 @@ public class SincInterpolator {
    * @param x array[nx] of values x at which to accumulate y(x).
    * @param y array[nx] of values y(x) to accumulate.
    */
-  private void accumulate(int nx, float[] x, float[] y) {
-    // TODO: not yet implemented, so private
+  public void accumulate(int nx, float[] x, float[] y) {
+    for (int ix=0; ix<nx; ++ix)
+      accumulate(x[ix],y[ix]);
   }
 
   ///////////////////////////////////////////////////////////////////////////

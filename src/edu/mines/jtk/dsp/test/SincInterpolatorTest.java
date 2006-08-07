@@ -16,7 +16,7 @@ import static edu.mines.jtk.util.Array.*;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.SincInterpolator}.
- * @author Dave Hale, Colorado School of Mines
+ * @author Dave Hale, Colorado School of Mines; Bill Harlan, Landmark Graphics
  * @version 2005.08.01
  */
 public class SincInterpolatorTest extends TestCase {
@@ -157,6 +157,62 @@ public class SincInterpolatorTest extends TestCase {
             SincInterpolator.fromFrequencyAndLength(fmax,lmax);
           testInterpolator(si);
         }
+      }
+    }
+  }
+
+  public void testAccumulate() {
+    // test that accumulate is a true transpose of interpolate
+    Random random = new Random(123456); // avoid unreasonable accidents
+    for (int repeat=0; repeat<5; ++repeat) {
+      for (SincInterpolator.Extrapolation extrapolation:
+             SincInterpolator.Extrapolation.values()) {
+        int nxu = 201;
+        double fxu = Math.PI;
+        double dxu = Math.E;
+        double exu = fxu + dxu*(nxu-1);
+        float[] yu = new float[nxu];
+        for (int i=0; i<nxu; ++i) {
+          yu[i] = 2*random.nextFloat() - 1;
+        }
+        // random locations extending outside range
+        int nx = 2*nxu;
+        float[] x = new float[nx];
+        float[] y = new float[nx];
+        for (int i=0; i<nxu; ++i) {
+          x[i] = (float)((1.2*random.nextFloat()-0.1)*(exu-fxu) + fxu);
+          y[i] = 2*random.nextFloat() - 1;
+        }
+
+        // Same interpolator for both directions
+        SincInterpolator si = new SincInterpolator();
+        si.setExtrapolation(extrapolation);
+        si.setUniformSampling(nxu, dxu, fxu);
+
+        // forward interpolation
+        float[] yi = new float[nx]; // interpolated
+        si.setUniformSamples(yu);
+        si.interpolate(nx, x, yi);
+
+        // transpose accumuation
+        float[] ya = new float[nxu]; // accumulated
+        si.setUniformSamples(ya);
+        si.accumulate(nx, x, y);
+
+        // Check transpose with dot product: yu.ya = y.yi
+        double yuYa = 0;
+        for (int ixu=0; ixu<nxu; ++ixu) {
+          yuYa += yu[ixu]*ya[ixu];
+        }
+        double yYi = 0;
+        for (int ix=0; ix<nx; ++ix) {
+          yYi += y[ix]*yi[ix];
+        }
+        double ratio = yuYa/yYi;
+        String message =
+          "yu.ya="+yuYa+" y.yi="+yYi+" ratio="+ratio;
+        trace(message);
+        assert ratio > 0.99999 && ratio < 1.00001 : message;
       }
     }
   }
