@@ -32,18 +32,6 @@ import static java.lang.Math.min;
 public class ArrayFile implements ArrayInput, ArrayOutput, Closeable {
 
   /**
-   * Returns the native byte order for the platform with this file.
-   * @return the byte order.
-   */
-  public static ByteOrder nativeByteOrder() {
-    if (ByteOrder.nativeOrder()==ByteOrder.BIG_ENDIAN) {
-      return ByteOrder.BIG_ENDIAN;
-    } else {
-      return ByteOrder.LITTLE_ENDIAN;
-    }
-  }
-
-  /**
    * Constructs an array file with specified name and access mode.
    * @param name the file name.
    * @param mode the access mode; "r", "rw", "rws", or "rwd".
