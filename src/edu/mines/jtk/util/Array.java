@@ -8796,7 +8796,8 @@ public class Array {
   // binary search
 
   /**
-   * Performs a binary search in a monotonic array of values. 
+   * Performs a binary search in a monotonic array of values. Values are
+   * assumed to increase or decrease monotonically, with no equal values.
    * <p>
    * Warning: this method does not ensure that the specified array is
    * monotonic; that check would be more costly than this search.
@@ -8811,7 +8812,8 @@ public class Array {
   }
 
   /**
-   * Performs a binary search in a monotonic array of values. 
+   * Performs a binary search in a monotonic array of values. Values are
+   * assumed to increase or decrease monotonically, with no equal values.
    * This method is most efficient when called repeatedly for slightly 
    * changing search values; in such cases, the index returned from one 
    * call should be passed in the next.
@@ -8877,7 +8879,8 @@ public class Array {
   }
 
   /**
-   * Performs a binary search in a monotonic array of values. 
+   * Performs a binary search in a monotonic array of values. Values are
+   * assumed to increase or decrease monotonically, with no equal values.
    * <p>
    * Warning: this method does not ensure that the specified array is
    * monotonic; that check would be more costly than this search.
@@ -8892,7 +8895,8 @@ public class Array {
   }
 
   /**
-   * Performs a binary search in a monotonic array of values. 
+   * Performs a binary search in a monotonic array of values. Values are
+   * assumed to increase or decrease monotonically, with no equal values.
    * This method is most efficient when called repeatedly for slightly 
    * changing search values; in such cases, the index returned from one 
    * call should be passed in the next.
@@ -8958,7 +8962,8 @@ public class Array {
   }
 
   /**
-   * Performs a binary search in a monotonic array of values. 
+   * Performs a binary search in a monotonic array of values. Values are
+   * assumed to increase or decrease monotonically, with no equal values.
    * <p>
    * Warning: this method does not ensure that the specified array is
    * monotonic; that check would be more costly than this search.
@@ -8973,7 +8978,8 @@ public class Array {
   }
 
   /**
-   * Performs a binary search in a monotonic array of values. 
+   * Performs a binary search in a monotonic array of values. Values are
+   * assumed to increase or decrease monotonically, with no equal values.
    * This method is most efficient when called repeatedly for slightly 
    * changing search values; in such cases, the index returned from one 
    * call should be passed in the next.
@@ -9039,7 +9045,8 @@ public class Array {
   }
 
   /**
-   * Performs a binary search in a monotonic array of values. 
+   * Performs a binary search in a monotonic array of values. Values are
+   * assumed to increase or decrease monotonically, with no equal values.
    * <p>
    * Warning: this method does not ensure that the specified array is
    * monotonic; that check would be more costly than this search.
@@ -9054,7 +9061,8 @@ public class Array {
   }
 
   /**
-   * Performs a binary search in a monotonic array of values. 
+   * Performs a binary search in a monotonic array of values. Values are
+   * assumed to increase or decrease monotonically, with no equal values.
    * This method is most efficient when called repeatedly for slightly 
    * changing search values; in such cases, the index returned from one 
    * call should be passed in the next.
@@ -9120,7 +9128,8 @@ public class Array {
   }
 
   /**
-   * Performs a binary search in a monotonic array of values. 
+   * Performs a binary search in a monotonic array of values. Values are
+   * assumed to increase or decrease monotonically, with no equal values.
    * <p>
    * Warning: this method does not ensure that the specified array is
    * monotonic; that check would be more costly than this search.
@@ -9135,7 +9144,8 @@ public class Array {
   }
 
   /**
-   * Performs a binary search in a monotonic array of values. 
+   * Performs a binary search in a monotonic array of values. Values are
+   * assumed to increase or decrease monotonically, with no equal values.
    * This method is most efficient when called repeatedly for slightly 
    * changing search values; in such cases, the index returned from one 
    * call should be passed in the next.
@@ -9201,7 +9211,8 @@ public class Array {
   }
 
   /**
-   * Performs a binary search in a monotonic array of values. 
+   * Performs a binary search in a monotonic array of values. Values are
+   * assumed to increase or decrease monotonically, with no equal values.
    * <p>
    * Warning: this method does not ensure that the specified array is
    * monotonic; that check would be more costly than this search.
@@ -9216,7 +9227,8 @@ public class Array {
   }
 
   /**
-   * Performs a binary search in a monotonic array of values. 
+   * Performs a binary search in a monotonic array of values. Values are
+   * assumed to increase or decrease monotonically, with no equal values.
    * This method is most efficient when called repeatedly for slightly 
    * changing search values; in such cases, the index returned from one 
    * call should be passed in the next.
