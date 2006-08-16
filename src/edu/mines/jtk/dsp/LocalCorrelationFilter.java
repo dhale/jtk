@@ -493,6 +493,8 @@ public class LocalCorrelationFilter {
     // Array for cross-correlations.
     float[] c = new float[n];
     float[] cmax = new float[n];
+    for (int i=0; i<n; ++i)
+      cmax[i] = -FLT_MAX;
 
     // Search begins in the middle of the specified range of lags.
     Lags lags = new Lags(min,max);
@@ -561,6 +563,9 @@ public class LocalCorrelationFilter {
     // Array for cross-correlations.
     float[][] c = new float[n2][n1];
     float[][] cmax = new float[n2][n1];
+    for (int i2=0; i2<n2; ++i2)
+      for (int i1=0; i1<n1; ++i1)
+        cmax[i2][i1] = -FLT_MAX;
 
     // Search begins in the middle of the specified range of lags.
     Lags lags = new Lags(min1,max1,min2,max2);
@@ -629,6 +634,10 @@ public class LocalCorrelationFilter {
     // Array for cross-correlations.
     float[][][] c = new float[n3][n2][n1];
     float[][][] cmax = new float[n3][n2][n1];
+    for (int i3=0; i3<n3; ++i3)
+      for (int i2=0; i2<n2; ++i2)
+        for (int i1=0; i1<n1; ++i1)
+          cmax[i3][i2][i1] = -FLT_MAX;
 
     // Search begins in the middle of the specified range of lags.
     Lags lags = new Lags(min1,max1,min2,max2,min3,max3);
