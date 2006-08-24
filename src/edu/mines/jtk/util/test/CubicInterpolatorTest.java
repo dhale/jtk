@@ -19,7 +19,7 @@ import static edu.mines.jtk.util.MathPlus.*;
 /**
  * Tests {@link edu.mines.jtk.util.CubicInterpolator}.
  * @author Dave Hale, Zachary Pember, Colorado School of Mines
- * @version 2000.02.21, 2006.07.12
+ * @version 2000.02.21, 2006.08.22
  */
 public class CubicInterpolatorTest extends TestCase {
   
@@ -30,16 +30,11 @@ public class CubicInterpolatorTest extends TestCase {
 
   public void testLinearAndSpline() {
     //create set of data points
-    final float domain = 10;
     int npoints = 100;
-    float xinterval = domain/npoints;
-    float[] x = new float[npoints];
-    float[] y = new float[npoints];
-    Random generator = new Random();
-    for (int i=0; i<npoints; i++){
-      x[i]=i*xinterval;
-      y[i]=10*generator.nextFloat();
-    }
+    Random generator = new Random(100);
+    float[] x = Array.randfloat(generator, npoints);
+    float[] y = Array.randfloat(generator, npoints);
+    Array.quickSort(x);
     
     //construct interpolators
     CubicInterpolator.Method linear = CubicInterpolator.Method.LINEAR;
@@ -48,48 +43,43 @@ public class CubicInterpolatorTest extends TestCase {
     CubicInterpolator cs = new CubicInterpolator(spline,npoints,x,y);
     
     //check interpolation between each pair of knots
-    float xpos;
-    float[] abcd;
-    float xi, yi0, yi1;
-    float xj, yj0, yj1;
     for(int i=0; i<npoints-1; i++){
       //test linear
-      xpos = x[i]+0.5f*xinterval;
-      xi = x[i]+0.2f*xinterval;     //=x0
-      yi0 = cl.interpolate(xi);     //=y(x0)
-      yi1 = cl.interpolate1(xi);    //=y'(x0)
-      xj = x[i+1]-0.2f*xinterval;   //=x1
-      yj0 = cl.interpolate(xj);     //=y(x1)
-      yj1 = cl.interpolate1(xj);    //=y'(x1)
-      abcd = computeCoefficients(xi, yi0, yi1, xj, yj0, yj1); 
+      float xpos = 0.5f*(x[i]+x[i+1]);
+      float xi = x[i]+0.2f*(x[i+1]-x[i]);   //=x0
+      float yi0 = cl.interpolate(xi);       //=y(x0)
+      float yi1 = cl.interpolate1(xi);      //=y'(x0)
+      float xj = x[i+1]-0.2f*(x[i+1]-x[i]); //=x1
+      float yj0 = cl.interpolate(xj);       //=y(x1)
+      float yj1 = cl.interpolate1(xj);      //=y'(x1)
+      float[] abcd = computeCoefficients(xi, yi0, yi1, xj, yj0, yj1); 
       assertEqual(deriv0(abcd, xpos-xi), cl.interpolate(xpos));
       assertEqual(deriv1(abcd, xpos-xi), cl.interpolate1(xpos));
       assertEqual(0.0f, cl.interpolate2(xpos));
       assertEqual(0.0f, cl.interpolate3(xpos));
       //test spline
-      xi = x[i];                    //=x0
-      yi0 = cs.interpolate(xi);     //=y(x0)
-      yi1 = cs.interpolate1(xi);    //=y'(x0)
-      xj = x[i+1];                  //=x1
-      yj0 = cs.interpolate(xj);     //=y(x1)
-      yj1 = cs.interpolate1(xj);    //=y'(x1)
+      yi0 = cs.interpolate(xi);       //=y(x0)
+      yi1 = cs.interpolate1(xi);      //=y'(x0)
+      yj0 = cs.interpolate(xj);       //=y(x1)
+      yj1 = cs.interpolate1(xj);      //=y'(x1)
       abcd = computeCoefficients(xi, yi0, yi1, xj, yj0, yj1); 
       assertEqual(deriv0(abcd, xpos-xi), cs.interpolate(xpos));
       assertEqual(deriv1(abcd, xpos-xi), cs.interpolate1(xpos));
       assertEqual(deriv2(abcd, xpos-xi), cs.interpolate2(xpos));
       assertEqual(deriv3(abcd, xpos-xi), cs.interpolate3(xpos));
     }
-
     //Check extrapolation at ends
+    float xinterval = 0.5f;
     checkExtrapolation(linear, cl, npoints, xinterval, x);
     checkExtrapolation(spline, cs, npoints, xinterval, x);
   }
   
-  public void xtestMonotonic() {
+  public void testMonotonic() {
     //create set of monotonic data points
     int npoints = 100;
-    float[] x = Array.randfloat(npoints);
-    float[] y = Array.randfloat(npoints);
+    Random generator = new Random(100);
+    float[] x = Array.randfloat(generator, npoints);
+    float[] y = Array.randfloat(generator, npoints);
     Array.quickSort(x);
     Array.quickSort(y);
     
@@ -100,46 +90,36 @@ public class CubicInterpolatorTest extends TestCase {
     //check interpolation between each pair of knots
     for(int i=0; i<npoints-1; i++){
       float xpos = 0.5f*(x[i]+x[i+1]); 
-      float xi = x[i];                    //=x0
-      float yi0 = cm.interpolate(xi);     //=y(x0)
-      float yi1 = cm.interpolate1(xi);    //=y'(x0)
-      float xj = x[i+1];                  //=x1
-      float yj0 = cm.interpolate(xj);     //=y(x1)
-      float yj1 = cm.interpolate1(xj);    //=y'(x1)
+      float xi = x[i];                  //=x0
+      float yi0 = cm.interpolate(xi);   //=y(x0)
+      float yi1 = cm.interpolate1(xi);  //=y'(x0)
+      float xj = x[i+1];                //=x1
+      float yj0 = cm.interpolate(xj);   //=y(x1)
+      float yj1 = cm.interpolate1(xj);  //=y'(x1)
       float[] abcd = computeCoefficients(xi, yi0, yi1, xj, yj0, yj1);
-      /*
-      System.out.println("xi=" + xi + " yi0=" + yi0 + " yi1=" + yi1 + " xj=" + xj + " yj0=" + yj0 + " yj1=" + yj1);
-      System.out.println(" My y= " + deriv0(abcd, xpos-xi) + "  Comp y= " + cm.interpolate(xpos));
-      System.out.println(" My y'= " + deriv1(abcd, xpos-xi) + "  Comp y'= " + cm.interpolate1(xpos));
-      System.out.println(" My y''= " + deriv2(abcd, xpos-xi) + "  Comp y''= " + cm.interpolate2(xpos));
-      System.out.println(" My y'''= " + deriv3(abcd, xpos-xi) + "  Comp y'''= " + cm.interpolate3(xpos));
-      */
       assertEqual(deriv0(abcd, xpos-xi), cm.interpolate(xpos));
       assertEqual(deriv1(abcd, xpos-xi), cm.interpolate1(xpos));
       assertEqual(deriv2(abcd, xpos-xi), cm.interpolate2(xpos));
       assertEqual(deriv3(abcd, xpos-xi), cm.interpolate3(xpos));
-    }
-
+    }    
     //Check extrapolation at ends
-    //checkExtrapolation(monoto, cm, npoints, xinterval, x);
+    float xinterval = 0.5f;
+    checkExtrapolation(monoto, cm, npoints, xinterval, x);
+
   }
 
   //checks extrapolation at ends
   private static void checkExtrapolation(CubicInterpolator.Method type, 
       CubicInterpolator ci, int npoints, float xinterval, float[] x){
-    float xpos;
-    float[] abcd;
-    float xi, yi0, yi1;
-    float xj, yj0, yj1;
     //extrapolate beyond first knot
-    xpos = x[0]-0.5f*xinterval;
-    xi = x[0]-xinterval;          //=x0
-    yi0 = ci.interpolate(xi);     //=y(x0)
-    yi1 = ci.interpolate1(xi);    //=y'(x0)
-    xj = x[0];                    //=x1
-    yj0 = ci.interpolate(xj);     //=y(x1)
-    yj1 = ci.interpolate1(xj);    //=y'(x1)
-    abcd = computeCoefficients(xi, yi0, yi1, xj, yj0, yj1);
+    float xpos = x[0]-0.5f*xinterval;
+    float xi = x[0]-xinterval;          //=x0
+    float yi0 = ci.interpolate(xi);     //=y(x0)
+    float yi1 = ci.interpolate1(xi);    //=y'(x0)
+    float xj = x[0];                    //=x1
+    float yj0 = ci.interpolate(xj);     //=y(x1)
+    float yj1 = ci.interpolate1(xj);    //=y'(x1)
+    float[] abcd = computeCoefficients(xi, yi0, yi1, xj, yj0, yj1);
     assertEqual(deriv0(abcd, xpos-xi), ci.interpolate(xpos));
     assertEqual(deriv1(abcd, xpos-xi), ci.interpolate1(xpos));
     if(type==CubicInterpolator.Method.LINEAR){
