@@ -1,0 +1,52 @@
+% Bill Harlan's generic technical paper, for LaTeX2e
+% request headings 
+\pagestyle{myheadings}
+
+% constants for margins
+\newlength{\WSH@sidemargin}
+\newlength{\WSH@topmargin}
+\setlength{\WSH@sidemargin}{1.5in}
+\setlength{\WSH@topmargin}{0.7in}
+
+% side
+\setlength{\textwidth}{\paperwidth}
+\addtolength{\textwidth}{-2\WSH@sidemargin}
+
+% no assymetry for now
+\setlength{\oddsidemargin}{\WSH@sidemargin}
+\addtolength{\oddsidemargin}{-1in}
+\setlength{\evensidemargin}{\oddsidemargin}
+
+% height
+\setlength{\textheight}{\paperheight}
+\addtolength{\textheight}{-\headheight}
+\addtolength{\textheight}{-\headsep}
+\addtolength{\textheight}{-\footskip}
+\addtolength{\textheight}{-2\WSH@topmargin}
+
+% no vertical skewing
+\setlength{\topmargin}{\WSH@topmargin}
+\addtolength{\topmargin}{-1in}
+
+% Change look of subsections
+\setcounter{secnumdepth}{0}
+
+\renewcommand{\section}{\@startsection {section}{1}{0pt}%
+	{-3.5ex plus -1ex minus -.2ex}%
+	{2.3ex plus.2ex}%
+	{\centering\normalfont\large\scshape}}
+
+\renewcommand{\subsection}{\@startsection {subsection}{2}{0pt}%
+	{-3.25ex plus -1ex minus -.2ex}%
+	{1.5ex plus.2ex}%
+	{\normalfont\normalsize\bfseries}}
+
+% equation macros
+\newcommand{\realbold}[1]{{\mbox{\boldmath $\bf #1$}}}
+\newcommand{\undertilde}[1]{\oalign{{\realbold{#1}}\crcr\hidewidth
+\vbox to .2ex{\hbox{\bf\char126}\vss}\hidewidth}}
+%\newcommand{\svector}[1]{\undertilde{#1}}
+%\newcommand{\stensor}[1]{\undertilde{\undertilde{#1}}}
+\newcommand{\svector}[1]{\realbold{#1}}
+\newcommand{\stensor}[1]{\undertilde{#1}}
+

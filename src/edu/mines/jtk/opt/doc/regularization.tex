@@ -1,0 +1,221 @@
+\documentclass[12pt]{article}
+\usepackage{wsh}
+
+\begin{document}  
+\bibliographystyle{plain}
+\markright{Model Reparameterization --- W.S. Harlan}
+
+\title{Regularization by Model Reparameterization}
+
+\author{William S. Harlan}
+
+\date{August, 1995}
+
+\maketitle
+
+Geophysical inversion frequently makes use of regularization,
+such as the ``Tikhonov regularization'' 
+used by Kenneth Bube and Bob Langan \cite{SEG-1994-0980}
+for their ``continuation approach.''
+I'd like to suggest an adjustment of the objective
+function to allow faster convergence of
+regularization and the continuation approach.
+A damping term that discourages complexity can be
+replaced equivalently by a change of variables to 
+model simplicity directly.
+
+For an optimized inversion, an objective function typically
+includes a norm of the difference
+between a data vector $\svector{d}$ and a non-linear transform
+$\svector{f}( \svector{m})$ of a model vector $\svector{m}$.
+The global minimum of this norm is often flat, with
+little sensitivity to large variations in the model.
+
+For regularization (more than simple damping), a 
+linear operator $\stensor{D}$ is chosen
+to remove simplicity and preserve complexity when applied
+to the model vector as $\stensor{D} \cdot \svector{m}$.  
+Most examples use a roughening operator, such as a derivative, to suppress
+long wavelengths and amplify short wavelengths.
+A regularized objective function adds a norm of
+this roughened model to the norm fitting the data:
+\begin{equation}
+\label{eq:orig}
+\min_{\svector{\scriptstyle m}} ~~
+J_1 (\svector{m} )=
+\| \svector{d} - \svector{f}(\svector{m}) \|^2 
++ c \| \stensor{D} \cdot \svector{m} \|^2 .
+\end{equation}
+This particular $l^2$ objective function is easily motivated
+as a maximum {\sl a posteriori} estimate of the model given
+the data.  Additive noise is assumed to be Gaussian
+and uncorrelated with zero mean.  The model is assumed to be Gaussian
+and zero mean, with an inverse covariance matrix equal to 
+\begin{equation}
+\label{eq:cova}
+\stensor{C}_m^{-1} \equiv E(\svector{m} \svector{m}^* )^{-1} 
+= \stensor{D}^* \cdot \stensor{D} .
+\end{equation}
+Asterisks indicate adjoints.
+The assumption that model samples are correlated is equivalent
+to the encouragement of simplicity.  A constant $c$
+adjusts the ratio of variances assumed for noise and the model.
+
+Bube and Langan's continuation approach begins with a large constant
+$c$, minimizes the objective function (\ref{eq:orig}) for a first model,
+then reduces $c$ repeatedly for a tradeoff between simplicity
+and accuracy in fitting the recorded data.  They find
+the simplest model possible to explain the data adequately,
+without preventing the model from using complexity 
+to fit genuinely significant features of the data.  
+Informative details are added to the model when
+justified by the data, without unnecessary distracting 
+details that are poorly determined from the data.
+
+Each minimization of the objective function (\ref{eq:orig})
+for a fixed constant $c$ typically uses a descent method such 
+as Gauss-Newton with conjugate gradients.   The properties of the gradient
+are important to the rate of convergence:
+\begin{eqnarray}
+\label{eq:gfir}
+\svector{\nabla}_{\svector{\scriptstyle m}} J_1 (\svector{m}_0 ) &=& 
+\svector{\nabla} \svector{f} ( \svector{m}_0 )^*
+\cdot [ \svector{d} - \svector{f}( \svector{m}_0 ) ] 
+\\
+\label{eq:gsec}
+&+& c \stensor{D}^* \cdot \stensor{D} \cdot \svector{m}_0 .
+\end{eqnarray}
+The model is perturbed with scaled sums of successive 
+gradients, evaluated for different reference versions $\svector{m}_0$
+of the model. 
+The first term (\ref{eq:gfir}) is able to introduce fairly
+arbitrary complexity into the model immediately and at any time, even if
+such complexity will be suppressed at the global
+minimum of objective function (\ref{eq:orig}).  The second
+term (\ref{eq:gsec}) must wait until the reference
+model $\svector{m}_0$ has been revised in later iterations
+to suppress this unnecessary complexity.  Meanwhile, the
+first term (\ref{eq:gfir}) of later iterations can continue
+to introduce other unnecessary complexity into the model.
+The second term removes complexity in the reference model, 
+not in the current perturbation.
+Convergence is slow.  Slow convergence is 
+a natural consequence of applying perturbations which
+do not have any of the correlations assumed for the model
+samples.  Instead,
+let us introduce the appropriate correlation into all gradient 
+perturbations.
+
+Assume a new operator $\stensor{S}$ as a partial right inverse
+of $\stensor{D}$, so that the two operators approximate
+an identity: $\stensor{D} \cdot \stensor{S} \approx \stensor{I}$.
+This operator should be designed to preserve simplicity
+and suppress complexity, although without destroying complexity
+entirely.  If $\stensor{D}$ is a roughening operator like
+differentiation, then $\stensor{S}$ should be a smoothing
+operator like leaky integration.
+
+More directly, define the smoothing operator 
+as a factored form of the assumed covariance.
+(Indeed, such a factorization always exists because 
+the covariance is positive semidefinite.)
+\begin{equation}
+\label{eq:covb}
+\stensor{C}_m \equiv E(\svector{m} \svector{m}^* )
+= \stensor{S}^* \cdot \stensor{S} .
+\end{equation}
+
+Minimization of the original objective function
+(\ref{eq:orig}) is entirely equivalent to minimizing
+the objective function with a new variable $\svector{m}'$, 
+where $\svector{m} = \stensor{S} \cdot \svector{m}'$:
+\begin{equation}
+\label{eq:revi}
+\min_{\svector{\scriptstyle m}'} ~~
+J_1 ( \stensor{S} \cdot \svector{m}' )=
+J_2 ( \svector{m}' )=
+\| \svector{d} - \svector{f}(\stensor{S} \cdot \svector{m}') \|^2 
++ c \| \svector{m}' \|^2 .
+\end{equation}
+The second term reduces to a simple damping norm,
+demonstrating that the new model $\svector{m}'$ now
+has uncorrelated samples.
+Although we optimize this new model $\svector{m}'$,
+we keep and use the original
+model $\svector{m} = \stensor{S} \cdot \svector{m}'$.
+Continuation can adjust the constant $c$ as before,
+with identical results (assuming complete minimization
+of the objective functions [\ref{eq:orig}] and [\ref{eq:revi}]).
+
+The revised gradient contains the desired correlation:
+\begin{eqnarray}
+\label{eq:nfir}
+\svector{\nabla}_{\svector{\scriptstyle m}'} J_2 (\svector{m}'_0 ) &=& 
+\stensor{S}^* \cdot
+\svector{\nabla} \svector{f} 
+( \stensor{S} \cdot \svector{m}'_0 )^*
+\cdot [ \svector{d} - \svector{f}( \stensor{S} \cdot \svector{m}'_0 ) ] 
+\\
+\label{eq:nsec}
+&+& c  \svector{m}'_0
+\end{eqnarray}
+The last operation appearing in the first term of this
+gradient (\ref{eq:nfir}) is the adjoint $\stensor{S}^*$
+of the operator $\stensor{S}$, both of which are
+simplification operators.
+(Many such operators are self-adjoint.)
+Unlike the first term (\ref{eq:gfir}) of the original gradient, 
+the revised term (\ref{eq:nfir}) suppresses complexity
+from each new perturbation direction.
+The original term (\ref{eq:gfir}) 
+contained arbitrary correlations.  If (\ref{eq:gfir}) 
+were entirely uncorrelated, then the revised
+term (\ref{eq:nfir}) would have exactly the desired correlations
+assumed by the covariance (\ref{eq:covb}).  
+
+The two objective functions produce different results when
+optimization is incomplete.
+A descent optimization of the original objective
+function (\ref{eq:orig}) will begin with complex
+perturbations of the model and slowly converge
+toward an increasingly simple model at the global minimum.
+A descent optimization of the revised objective
+function (\ref{eq:revi}) will begin with simple
+perturbations of the model and slowly converge
+toward an increasingly complex model at the global minimum.
+The latter strategy is more consistent with the
+overall goal of the continuation approach.
+A more economic implementation can use fewer iterations.
+Insufficient iterations result in an insufficiently complex
+model, not in an insufficiently simplified model.
+
+I also prefer to adjust more than a single scale factor
+$c$.  Instead, assume a suite of simplification operators
+$\stensor{S_i}$ which allow increasing complexity as the
+index $i$ increases.  (Furthermore $\forall \svector{m}_i'$ and 
+$j>i, \strut \exists ~ \svector{m}_j' \ni \stensor{S_j} \cdot \svector{m}_j'
+=  \stensor{S_i} \cdot \svector{m}_i'$.)
+We then can optimize a suite of possible models, 
+$\{ \svector{m}_i = \stensor{S_i} \cdot \svector{m}'_i \}$
+of increasing complexity as $i$ increases.  
+Use each optimized model $\svector{m}_i$ to initialize \strut the 
+next $\svector{m}_{i+1}$. As multigrid
+methods have shown, we can thus improve our overall
+convergence by optimizing the most reliable (smoothest) 
+global features in the model before attempting finer
+detail.
+
+Finally, I think it easier to choose a simplification
+operator $\stensor{S}$ which describes the desirable
+features of the model, rather than an operator $\stensor{D}$
+which keeps only features thought to be undesirable.
+I see some value in constructing both, however, to
+check the consistency of assumptions.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibliography{wsh}
+
+\end{document}
+
