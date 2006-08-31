@@ -2,7 +2,7 @@ package edu.mines.jtk.opt;
 
 import java.util.logging.*;
 import java.util.Date;
-import static edu.mines.jtk.opt.StringUtil.timeWords;
+import static edu.mines.jtk.opt.Localize.timeWords;
 
 /** Report progress to default Logger 
     @author W.S. Harlan, Landmark Graphics
@@ -190,7 +190,7 @@ public class LogMonitor implements Monitor {
   private class UpdateTimeThread extends Thread {
     /** Constructor. */
     public UpdateTimeThread() {
-      super ("LogMonitor.UpdateTimeThread "+StringUtil.getLongTimeStamp());
+      super ("LogMonitor.UpdateTimeThread "+new Date());
     }
     @Override public void run() {
       try {

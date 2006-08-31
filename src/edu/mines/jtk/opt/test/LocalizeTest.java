@@ -1,29 +1,27 @@
 package edu.mines.jtk.opt.test;
 
-import static edu.mines.jtk.opt.StringUtil.NL;
-import static edu.mines.jtk.opt.StringUtil.getLongTimeStamp;
-import static edu.mines.jtk.opt.StringUtil.getTimeStamp;
-import static edu.mines.jtk.opt.StringUtil.parseLongTimeStamp;
-import static edu.mines.jtk.opt.StringUtil.parseTimeStamp;
-import static edu.mines.jtk.opt.StringUtil.prependToLines;
-import static edu.mines.jtk.opt.StringUtil.timeWords;
+import static edu.mines.jtk.opt.Localize.timeWords;
 
 import java.util.Date;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-/** Wrap edu.mines.jtk.opt.StringUtil for junit testing.
+/** Wrap edu.mines.jtk.opt.Localize for junit testing.
    (junit.jar must be in CLASSPATH)
 */
-public class StringUtilTest extends TestCase {
+public class LocalizeTest extends TestCase {
+
+  /** Line separator */
+  private static final String NL = System.getProperty("line.separator");
 
   /** Junit test code
      @throws Exception any test failure
    */
   public void testAll() throws Exception {
-    String lines = prependToLines("a","bbb"+NL+"ccc");
-    assert (lines.equals("abbb"+NL+"accc"));
+    // move to CleanFormatterTest
+    //String lines = prependToLines("a","bbb"+NL+"ccc");
+    //assert (lines.equals("abbb"+NL+"accc"));
     {
       long seconds =(29L + 60*(9));
       String words = timeWords(seconds);
@@ -93,19 +91,6 @@ public class StringUtilTest extends TestCase {
       String words = timeWords(seconds);
       assert (words.equals("2 days")) : words;
     }
-
-    {
-      String stamp = getLongTimeStamp();
-      Date date = parseLongTimeStamp(stamp);
-      assert getLongTimeStamp(date).equals(getLongTimeStamp(date.getTime()));
-      assert date.equals(parseLongTimeStamp(getLongTimeStamp(date)));
-    }
-    {
-      String stamp = getTimeStamp();
-      Date date = parseTimeStamp(stamp);
-      assert getTimeStamp(date).equals(getTimeStamp(date.getTime()));
-      assert date.equals(parseTimeStamp(getTimeStamp(date)));
-    }
   }
 
   // OPTIONAL OPTIONAL OPTIONAL OPTIONAL OPTIONAL OPTIONAL OPTIONAL
@@ -119,13 +104,13 @@ public class StringUtilTest extends TestCase {
   // NO NEED TO CHANGE THE FOLLOWING
 
   /** Standard constructor calls TestCase(name) constructor */
-  public StringUtilTest(String name) {super (name);}
+  public LocalizeTest(String name) {super (name);}
 
   /** This automatically generates a suite of all "test" methods */
   public static junit.framework.Test suite() {
     try {assert false; throw new IllegalStateException("need -ea");}
     catch (AssertionError e) {}
-    return new TestSuite(StringUtilTest.class);
+    return new TestSuite(LocalizeTest.class);
   }
 
   /** Run all tests with text gui if this class main is invoked */

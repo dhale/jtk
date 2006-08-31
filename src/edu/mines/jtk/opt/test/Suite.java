@@ -24,7 +24,7 @@ public class Suite extends TestSuite {
     suite.addTestSuite(GaussNewtonSolverTest.class);
     suite.addTestSuite(QuadraticSolverTest.class);
     suite.addTestSuite(ScalarSolverTest.class);
-    suite.addTestSuite(StringUtilTest.class);
+    suite.addTestSuite(LocalizeTest.class);
 
     return suite;
   }

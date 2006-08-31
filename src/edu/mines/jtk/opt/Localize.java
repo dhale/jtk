@@ -85,4 +85,50 @@ public class Localize {
     }
     return filter(message, catalog);
   }
+
+  /** Convert a number of seconds into words
+      @param seconds Number of seconds
+      @return Localized words describing the number of seconds.
+  */
+  public static String timeWords(long seconds) {
+    if (seconds == 0) {
+      return filter("0 ${seconds}", Localize.class);
+    }
+    String result = "";
+    long minutes = seconds/60;
+    long hours = minutes/60;
+    long days = hours/24;
+    seconds %= 60;
+    minutes %= 60;
+    hours %= 24;
+    if (days >= 10) {
+      if (hours >=12) ++days;
+      hours = minutes = seconds = 0;
+    } else if (hours >= 10 || days > 0) {
+      if (minutes >=30) {
+        ++hours;
+        days += hours/24;
+        hours %= 24;
+      }
+      minutes = seconds = 0;
+    } else if (minutes >= 10 || hours > 0) {
+      if (seconds >=30) {
+        ++minutes;
+        hours += minutes/60;
+        minutes %= 60;
+      }
+      seconds = 0;
+    }
+    if (seconds != 0)
+      result = " " + seconds + " ${second"+ ((seconds>1)?"s}":"}") + result;
+    if (minutes != 0)
+      result = " " + minutes + " ${minute"+ ((minutes>1)?"s}":"}") + result;
+    if (hours != 0)
+      result = " " + hours + " ${hour" + ((hours>1)?"s}":"}") + result;
+    if (days != 0)
+      result = " " + days + " ${day" + ((days>1)?"s}":"}") + result;
+
+    return filter(result.trim(), Localize.class);
+  }
+  
 }
