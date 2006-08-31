@@ -51,6 +51,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <exclude name="**/old/**"/>
       <exclude name="**/new/**"/>
     </javac>
+    <copy todir="${build.cls}">
+      <fileset dir="${src}" includes="edu/mines/jtk/**/*.properties" />
+      <mapper type="identity" />
+    </copy>
   </target>
 
   <!-- Build Java archive -->
