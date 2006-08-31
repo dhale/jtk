@@ -119,25 +119,5 @@ public String toString() {
   public double magnitude() {
     return Almost.FLOAT.divide (this.dot(this), getSize()*_variance, 0.);
   }
-
-  /** Run tests
-     @param args command line
-     @throws Exception
-   */
-  public static void main(String[] args) throws Exception {
-    double[] a = new double[31];
-    for (int i=0; i<a.length; ++i) {a[i] = i;}
-    Vect v = new ArrayVect1(a, 3.);
-    VectUtil.test(v);
-
-    // test inverse covariance
-    for (int i=0; i<a.length; ++i) {a[i] = 1;}
-    v = new ArrayVect1(a, 3.);
-    Vect w = v.clone();
-    w.multiplyInverseCovariance();
-    assert Almost.FLOAT.equal(1./3., v.dot(w));
-    assert Almost.FLOAT.equal(1./3., v.magnitude());
-  }
-
 }
 
