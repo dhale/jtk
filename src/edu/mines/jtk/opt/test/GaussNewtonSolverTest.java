@@ -1,13 +1,25 @@
-package edu.mines.jtk.opt;
+package edu.mines.jtk.opt.test;
+
+import junit.framework.*;
 
 import edu.mines.jtk.opt.Almost;
+import edu.mines.jtk.opt.ArrayVect1;
+import edu.mines.jtk.opt.GaussNewtonSolver;
+import edu.mines.jtk.opt.LinearTransform;
+import edu.mines.jtk.opt.LinearTransformWrapper;
+import edu.mines.jtk.opt.Transform;
+import edu.mines.jtk.opt.Vect;
+import edu.mines.jtk.opt.VectConst;
+import edu.mines.jtk.opt.VectUtil;
+
 import java.util.logging.*;
 import java.util.*;
 
 /** Solve least-squares inverse of a Transform. 
     @author W.S. Harlan, Landmark Graphics
 */
-public class GaussNewtonSolverTest {
+public class GaussNewtonSolverTest extends TestCase {
+
   private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   private static boolean printedUndisposed = false;
   private static boolean projectWasTested = false;
@@ -31,15 +43,13 @@ public class GaussNewtonSolverTest {
       super.add(scaleThis, scaleOther, other);
     }
 
-    @Override
-        public void project(double scaleThis, double scaleOther, VectConst other) {
+    @Override public void project(double scaleThis, double scaleOther, VectConst other) {
       TestVect tv = (TestVect) other;
       if (!identity.equals(tv.identity)) {projectWasTested = true;}
       super.add(scaleThis, scaleOther, other);
     }
 
-    @Override
-        public double dot(VectConst other) {
+    @Override public double dot(VectConst other) {
       assertSameType(other);
       return super.dot(other);
     }
@@ -107,9 +117,10 @@ public class GaussNewtonSolverTest {
   }
 
   /** test code
- * @param args command line
- * @throws Exception all errors*/
-  public static void main(String[] args) throws Exception {
+      @param args command line
+      @throws Exception all errors
+  */
+  public void testMain() throws Exception {
     GaussNewtonSolver.setExpensiveDebug(true);
     /* fit straight line to points (0,0) (1,8) (3,8) (4,20) */
     final double[] coord = new double[]         {0., 1., 3., 4.};
@@ -266,5 +277,30 @@ public class GaussNewtonSolverTest {
     assert projectWasTested;
 
     GaussNewtonSolver.setExpensiveDebug(false);
+  }
+
+  // OPTIONAL OPTIONAL OPTIONAL OPTIONAL OPTIONAL OPTIONAL OPTIONAL
+
+  /* Initialize objects used by all test methods */
+  @Override protected void setUp() throws Exception { super.setUp();}
+
+  /* Destruction of stuff used by all tests: rarely necessary */
+  @Override protected void tearDown() throws Exception { super.tearDown();}
+
+  // NO NEED TO CHANGE THE FOLLOWING
+
+  /** Standard constructor calls TestCase(name) constructor */
+  public GaussNewtonSolverTest(String name) {super (name);}
+
+  /** This automatically generates a suite of all "test" methods */
+  public static junit.framework.Test suite() {
+    try {assert false; throw new IllegalStateException("need -ea");}
+    catch (AssertionError e) {}
+    return new TestSuite(GaussNewtonSolverTest.class);
+  }
+
+  /** Run all tests with text gui if this class main is invoked */
+  public static void main (String[] args) {
+    junit.textui.TestRunner.run (suite());
   }
 }
