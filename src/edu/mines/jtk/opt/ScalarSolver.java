@@ -3,8 +3,9 @@ package edu.mines.jtk.opt;
 import edu.mines.jtk.opt.Almost;
 import edu.mines.jtk.opt.LogMonitor;
 import edu.mines.jtk.opt.Monitor;
-import edu.mines.jtk.opt.IndexSorter;
+
 import java.util.logging.*;
+import java.util.Arrays;
 
 /** Search a single variable for a value that minimizes a function 
     @author W.S. Harlan, Landmark Graphics
@@ -13,6 +14,7 @@ public class ScalarSolver {
   @SuppressWarnings("unused")
     private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   private static final double GOLD = 0.5*(Math.sqrt(5.) - 1.); // 0.618034
+  private static Almost s_almost = new Almost();
 
   private Function _function = null;
 
@@ -302,4 +304,53 @@ public class ScalarSolver {
     public BadParabolaException(String message) {super (message);}
   }
 
+  /** Get indices that order an array of values. 
+      @author W.S. Harlan, Landmark Graphics
+  */
+  private class IndexSorter {
+    private double[] _values = null;
+    private int _length = 0;
+
+    /** The array of values that determine the sort.
+	@param values Array of values to be sorted.
+	These are held without modification or cloning.
+    */
+    public IndexSorter(double[] values) {
+      _values = values;
+      _length = values.length;
+    }
+
+    /** Get an array of indices such that
+	values[index[i]] >= values[index[j]] if i >= j;
+	@return indices that address original array of values
+	in increasing order.
+    */
+    public int[] getSortedIndices() {
+      MyComparable[] c = new MyComparable[_length];
+      for (int i=0; i< c.length; ++i) {c[i] = new MyComparable(i);}
+
+      Arrays.sort(c);
+      int[] result = new int[c.length];
+      for (int i=0; i< result.length; ++i) {
+	result[i] = c[i].index;
+      }
+      return result;
+    }
+
+    /** For sorting with Arrays.sort */
+    private class MyComparable implements Comparable {
+      /**  */
+      public int index = 0;
+
+      /** Constructor.
+	  @param index
+      */
+      public MyComparable(int index) {this.index = index;}
+
+      public int compareTo(Object o) {
+	MyComparable other = (MyComparable) o;
+	return s_almost.cmp(_values[index], _values[other.index]);
+      }
+    }
+  }
 }
