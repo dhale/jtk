@@ -12,6 +12,9 @@ import edu.mines.jtk.opt.CoordinateTransform;
 */
 public class CoordinateTransformTest extends TestCase {
 
+  /** Test CoordinateTransform class
+     @throws Exception
+   */
   public void testAll() throws Exception {
     double[][] in = new double[][] {
       {1.,1.},
@@ -69,17 +72,20 @@ public class CoordinateTransformTest extends TestCase {
 
   // NO NEED TO CHANGE THE FOLLOWING
 
-  /** Standard constructor calls TestCase(name) constructor */
+  /** Standard constructor calls TestCase(name) constructor 
+   * @param name name of junit test */
   public CoordinateTransformTest(String name) {super (name);}
 
-  /** This automatically generates a suite of all "test" methods */
+  /** This automatically generates a suite of all "test" methods 
+   * @return junit Test */
   public static junit.framework.Test suite() {
     try {assert false; throw new IllegalStateException("need -ea");}
     catch (AssertionError e) {}
     return new TestSuite(CoordinateTransformTest.class);
   }
 
-  /** Run all tests with text gui if this class main is invoked */
+  /** Run all tests with text gui if this class main is invoked 
+   * @param args command-line arguments (ignored) */
   public static void main (String[] args) {
     junit.textui.TestRunner.run (suite());
   }

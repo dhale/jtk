@@ -1,10 +1,6 @@
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.opt.Almost;
-import edu.mines.jtk.util.Array;
-
-import java.util.Arrays;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
 /** Find a best linear combination of input
     coordinates to fit output coordinates.
