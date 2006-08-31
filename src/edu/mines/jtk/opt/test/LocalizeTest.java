@@ -19,9 +19,6 @@ public class LocalizeTest extends TestCase {
      @throws Exception any test failure
    */
   public void testAll() throws Exception {
-    // move to CleanFormatterTest
-    //String lines = prependToLines("a","bbb"+NL+"ccc");
-    //assert (lines.equals("abbb"+NL+"accc"));
     {
       long seconds =(29L + 60*(9));
       String words = timeWords(seconds);

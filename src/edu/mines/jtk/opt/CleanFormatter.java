@@ -83,38 +83,13 @@ public class CleanFormatter extends Formatter {
   private static DateFormat s_time_formatter
     = new SimpleDateFormat("HH:mm:ss.SSS");
 
-  /** Run tests.
-      @param argv command line
-  */
-  public static void main(String[] argv) {
-    CleanHandler.setDefaultHandler();
-    Logger logger = Logger.getLogger("edu.mines.jtk.opt.CleanFormatter");
-    CleanFormatter cf = new CleanFormatter();
-    String[] messages = new String[] {"one", "two", "three"};
-    Level[] levels = new Level[] {Level.INFO, Level.WARNING, Level.SEVERE};
-    String[] s = new String[3];
-    for (int i=0; i<messages.length; ++i) {
-      LogRecord lr = new LogRecord(levels[i], messages[i]);
-      lr.setSourceClassName("Class");
-      lr.setSourceMethodName("method");
-      s[i] = cf.format(lr);
-      assert s[i].endsWith(messages[i]+"\n");
-      logger.info("|"+s[i]+"|");
-    }
-    assert s[0].equals("one\n"): s[0];
-    assert s[1].equals("WARNING: two\n") : s[1];
-    assert s[2].matches("^\\*\\*\\*\\* SEVERE WARNING \\*\\*\\*\\* "+
-                        "\\(Class.method \\d+-\\d+ #.*\\)\n"+
-                        "SEVERE: three\n$") :s[2];
-  }
-
   /** Prepend a string to every line of text in a String
       @param prepend String to be prepended
       @param lines Lines separated by newline character, from
       System.getProperty("line.separator");
       @return Modified lines
   */
-  private static String prependToLines(String prepend, String lines) {
+  public static String prependToLines(String prepend, String lines) {
     if (lines == null) return null;
     if (prepend == null) return lines;
     StringBuilder result = new StringBuilder();
