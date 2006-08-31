@@ -289,17 +289,21 @@ public class GaussNewtonSolverTest extends TestCase {
 
   // NO NEED TO CHANGE THE FOLLOWING
 
-  /** Standard constructor calls TestCase(name) constructor */
+  /** Standard constructor calls TestCase(name) constructor 
+   * @param name name of test case*/
   public GaussNewtonSolverTest(String name) {super (name);}
 
-  /** This automatically generates a suite of all "test" methods */
+  /** This automatically generates a suite of all "test" methods 
+   * @return junit test */
   public static junit.framework.Test suite() {
     try {assert false; throw new IllegalStateException("need -ea");}
     catch (AssertionError e) {}
     return new TestSuite(GaussNewtonSolverTest.class);
   }
 
-  /** Run all tests with text gui if this class main is invoked */
+  /** Run all tests with text gui if this class main is invoked 
+   * @param args command-line arguments
+   * */
   public static void main (String[] args) {
     junit.textui.TestRunner.run (suite());
   }
