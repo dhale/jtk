@@ -3,13 +3,22 @@ package edu.mines.jtk.opt;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.StringTokenizer;
 import java.util.logging.*;
 
-/** Format log messages without any extras. 
+/** Format log messages without any extras.
     @author W.S. Harlan, Landmark Graphics
  */
 public class CleanFormatter extends Formatter {
   private static String s_prefix = "";
+
+  /** The format used by getTimeStamp() methods,
+      like 20050621-153318 */
+  private static final DateFormat TIMESTAMP_FORMAT =
+    new SimpleDateFormat("yyyyMMdd-HHmmss");
+
+  /** Line separator */
+  private static final String NL = System.getProperty("line.separator");
 
   /** Prefix a string to all warnings or severe errors
       We use this method only for unit tests,
@@ -42,17 +51,17 @@ public class CleanFormatter extends Formatter {
       // do nothing
     } else if (level.equals(Level.WARNING)) {
       if (message.indexOf("WARNING") == -1) {
-        message = StringUtil.prependToLines(s_prefix+level+": ", message);
+        message = prependToLines(s_prefix+level+": ", message);
       } else {
         message = s_prefix+message;
       }
     } else if (level.equals(Level.SEVERE)) {
-      message = StringUtil.prependToLines(level+": ", message);
+      message = prependToLines(level+": ", message);
       if (!lastLevel.equals(Level.SEVERE)) {
         message =
           s_prefix + "**** SEVERE WARNING **** ("+
           record.getSourceClassName()+ "." + record.getSourceMethodName()+" "+
-          StringUtil.getTimeStamp(record.getMillis())+" "+
+          getTimeStamp(record.getMillis())+" "+
           "#" + record.getThreadID() + ")\n" + message;
       }
     } else if (level.equals(Level.FINE)
@@ -61,12 +70,9 @@ public class CleanFormatter extends Formatter {
       String shortPackage = record.getLoggerName();
       int index = shortPackage.lastIndexOf(".");
       if (index>0) shortPackage = shortPackage.substring(index+1);
-      message =
-        StringUtil.prependToLines
-        (level+" "+shortPackage+": ", message);
+      message = prependToLines (level+" "+shortPackage+": ", message);
     } else {
-      message =
-        StringUtil.prependToLines
+      message = prependToLines
         (level+ " " + s_time_formatter.format(new Date())
          + " "+ record.getLoggerName()+": ",
          message);
@@ -101,5 +107,45 @@ public class CleanFormatter extends Formatter {
                         "\\(Class.method \\d+-\\d+ #.*\\)\n"+
                         "SEVERE: three\n$") :s[2];
   }
+
+  /** Prepend a string to every line of text in a String
+      @param prepend String to be prepended
+      @param lines Lines separated by newline character, from
+      System.getProperty("line.separator");
+      @return Modified lines
+  */
+  private static String prependToLines(String prepend, String lines) {
+    if (lines == null) return null;
+    if (prepend == null) return lines;
+    StringBuilder result = new StringBuilder();
+    boolean hasFinalNL = lines.endsWith(NL);
+    StringTokenizer divided = new StringTokenizer(lines, NL);
+    while (divided.hasMoreTokens()) {
+      result.append(prepend + divided.nextToken());
+      if (divided.hasMoreTokens() || hasFinalNL) result.append(NL);
+    }
+    return result.toString();
+  }
+
+  /** Return a concise string that can be added as a timestamp to
+      filenames
+      @param date Date for timestamp
+      @return String in format TIMESTAMP_FORMAT.
+  */
+  private static String getTimeStamp(Date date) {
+    synchronized (TIMESTAMP_FORMAT) { // format is not thread-safe
+      return TIMESTAMP_FORMAT.format(date);
+    }
+  }
+
+  /** Return a concise string that can be added as a timestamp to
+      filenames
+      @param date Time in milliseconds since 1970
+      @return String in format TIMESTAMP_FORMAT.
+  */
+  private static String getTimeStamp(long date) {
+    return getTimeStamp(new Date(date));
+  }
+
 }
 
