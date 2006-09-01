@@ -15,6 +15,9 @@ import junit.framework.*;
  */
 public class Suite extends TestSuite {
 
+  /** Get all tests in this package.
+      @return A suite of all junit tests as a Test.
+   */
   public static Test suite() {
     TestSuite suite = new TestSuite();
 
@@ -28,6 +31,9 @@ public class Suite extends TestSuite {
     return suite;
   }
 
+  /** Run all tests with text gui if this class main is invoked
+      @param args Command-line arguments.
+   */
   public static void main(String[] args) {
     junit.textui.TestRunner.run(suite());
   }

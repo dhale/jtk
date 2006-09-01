@@ -1,9 +1,6 @@
 package edu.mines.jtk.util.test;
 
 import static edu.mines.jtk.util.Localize.timeWords;
-
-import java.util.Date;
-
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
@@ -11,9 +8,6 @@ import junit.framework.TestSuite;
    (junit.jar must be in CLASSPATH)
 */
 public class LocalizeTest extends TestCase {
-
-  /** Line separator */
-  private static final String NL = System.getProperty("line.separator");
 
   /** Junit test code
      @throws Exception any test failure
@@ -100,17 +94,23 @@ public class LocalizeTest extends TestCase {
 
   // NO NEED TO CHANGE THE FOLLOWING
 
-  /** Standard constructor calls TestCase(name) constructor */
+  /** Standard constructor calls TestCase(name) constructor
+      @param name Name of junit Test.
+   */
   public LocalizeTest(String name) {super (name);}
 
-  /** This automatically generates a suite of all "test" methods */
+  /** This automatically generates a suite of all "test" methods.
+      @return A suite of all junit tests as a Test.
+   */
   public static junit.framework.Test suite() {
     try {assert false; throw new IllegalStateException("need -ea");}
     catch (AssertionError e) {}
     return new TestSuite(LocalizeTest.class);
   }
 
-  /** Run all tests with text gui if this class main is invoked */
+  /** Run all tests with text gui if this class main is invoked
+      @param args Command-line arguments.
+   */
   public static void main (String[] args) {
     junit.textui.TestRunner.run (suite());
   }

@@ -53,17 +53,23 @@ public class CleanFormatterTest extends TestCase {
 
   // NO NEED TO CHANGE THE FOLLOWING
 
-  /** Standard constructor calls TestCase(name) constructor */
+  /** Standard constructor calls TestCase(name) constructor
+      @param name Name of junit Test.
+   */
   public CleanFormatterTest(String name) {super (name);}
 
-  /** This automatically generates a suite of all "test" methods */
+  /** This automatically generates a suite of all "test" methods.
+      @return A suite of all junit tests as a Test.
+   */
   public static junit.framework.Test suite() {
     try {assert false; throw new IllegalStateException("need -ea");}
     catch (AssertionError e) {}
     return new TestSuite(CleanFormatterTest.class);
   }
 
-  /** Run all tests with text gui if this class main is invoked */
+  /** Run all tests with text gui if this class main is invoked
+      @param args Command-line arguments.
+   */
   public static void main (String[] args) {
     junit.textui.TestRunner.run (suite());
   }

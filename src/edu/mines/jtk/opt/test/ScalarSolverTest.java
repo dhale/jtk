@@ -10,16 +10,18 @@ import static edu.mines.jtk.opt.ScalarSolver.Function;
 */
 public class ScalarSolverTest extends TestCase {
 
-
-  public static void testLinearObjFunc() throws Exception {
+  /** Unit test
+     @throws Exception Any test failure
+   */
+  public void testLinearObjFunc() throws Exception {
     // test linear objective function
     final double answer = 1./3.;
     final int[] calls = new int[]{0};
     ScalarSolver solver = new ScalarSolver(new Function() {
-	public double function(double scalar) {
-	  ++calls[0];
-	  return Math.abs(scalar - answer);
-	}
+        public double function(double scalar) {
+          ++calls[0];
+          return Math.abs(scalar - answer);
+        }
       });
     // s_LOG.fine = true;
     double xmin = solver.solve(0., 1., 0.001, 0.001, 20, null);
@@ -31,15 +33,18 @@ public class ScalarSolverTest extends TestCase {
     assert (calls[0] == 14):("calls[0] == 14 != "+calls[0]);
   }
 
-  public static void testNonUnitScalarRange() throws Exception {
+  /** Unit test
+     @throws Exception Any test failure
+   */
+  public void testNonUnitScalarRange() throws Exception {
     // test non-unit scalar range
     final double answer = 1./3.;
     final int[] calls = new int[]{0};
     ScalarSolver solver = new ScalarSolver(new Function() {
-	public double function(double scalar) {
-	  ++calls[0];
-	  return Math.abs(scalar - answer);
-	}
+        public double function(double scalar) {
+          ++calls[0];
+          return Math.abs(scalar - answer);
+        }
       });
     double xmin = solver.solve(-1., 2., 0.001, 0.001, 20, null);
     assert (xmin > answer - 0.001 ):(  "xmin > answer - 0.001");
@@ -50,16 +55,18 @@ public class ScalarSolverTest extends TestCase {
     assert (calls[0] == 15):("calls[0] == 15 != "+calls[0]);
   }
 
-  
-  public static void testRightHandSide() throws Exception {
+  /** Unit test
+     @throws Exception Any test failure
+   */
+  public void testRightHandSide() throws Exception {
     // test right hand side
     final double answer = 0.03;
     final int[] calls = new int[]{0};
     ScalarSolver solver = new ScalarSolver(new Function() {
-	public double function(double scalar) {
-	  ++calls[0];
-	  return Math.abs(scalar - answer);
-	}
+        public double function(double scalar) {
+          ++calls[0];
+          return Math.abs(scalar - answer);
+        }
       });
     double xmin = solver.solve(0., 1., 0.001, 0.001, 20, null);
     assert (xmin > answer - 0.001 ):(  "xmin > answer - 0.001");
@@ -70,14 +77,17 @@ public class ScalarSolverTest extends TestCase {
     assert (calls[0] == 16):("calls[0] == 16 != "+calls[0]);
   }
 
-  public static void testLeftHandSide2() throws Exception {
+  /** Unit test
+     @throws Exception Any test failure
+   */
+  public void testLeftHandSide2() throws Exception {
     final double answer = 0.98;
     final int[] calls = new int[]{0};
     ScalarSolver solver = new ScalarSolver(new Function() {
-	public double function(double scalar) {
-	  ++calls[0];
-	  return Math.abs(scalar - answer);
-	}
+        public double function(double scalar) {
+          ++calls[0];
+          return Math.abs(scalar - answer);
+        }
       });
     double xmin = solver.solve(0., 1., 0.001, 0.001, 20, null);
     assert (xmin > answer - 0.001 ):(  "xmin > answer - 0.001");
@@ -88,14 +98,17 @@ public class ScalarSolverTest extends TestCase {
     assert (calls[0] == 12):("calls[0] == 12 != "+calls[0]);
   }
 
-  public static void testParabola() throws Exception {
+  /** Unit test
+     @throws Exception Any test failure
+   */
+  public void testParabola() throws Exception {
     final double answer = 1./3.;
     final int[] calls = new int[]{0};
     ScalarSolver solver = new ScalarSolver(new Function() {
-	public double function(double scalar) {
-	  ++calls[0];
-	  return (scalar - answer)*(scalar - answer);
-	}
+        public double function(double scalar) {
+          ++calls[0];
+          return (scalar - answer)*(scalar - answer);
+        }
       });
     double xmin = solver.solve(0., 1., 0.001, 0.001, 7, null); // fewest iterations
     assert (xmin > answer - 0.001 ):(  "xmin > answer - 0.001");
@@ -106,14 +119,17 @@ public class ScalarSolverTest extends TestCase {
     assert (calls[0] == 6):( "Number == 6 != "+calls[0]);
   }
 
-  public static void testPositiveCurvature() throws Exception {
+  /** Unit test
+     @throws Exception Any test failure
+   */
+  public void testPositiveCurvature() throws Exception {
     final double answer = 1./3.;
     final int[] calls = new int[]{0};
     ScalarSolver solver = new ScalarSolver(new Function() {
-	public double function(double scalar) {
-	  ++calls[0];
-	  return Math.sqrt(Math.abs(scalar - answer));
-	}
+        public double function(double scalar) {
+          ++calls[0];
+          return Math.sqrt(Math.abs(scalar - answer));
+        }
       });
     double xmin = solver.solve(0., 1., 0.001, 0.001, 20, null);
     assert (xmin > answer - 0.001 ):(  "xmin > answer - 0.001");
@@ -124,15 +140,18 @@ public class ScalarSolverTest extends TestCase {
     assert (calls[0] == 16):( "Number == 16 != "+calls[0]);
   }
 
-  public static void testStepFunction() throws Exception {
+  /** Unit test
+     @throws Exception Any test failure
+   */
+  public void testStepFunction() throws Exception {
     final double answer = 1./3.;
     final int[] calls = new int[]{0};
     ScalarSolver solver = new ScalarSolver(new Function() {
-	public double function(double scalar) {
-	  ++calls[0];
-	  if (scalar < answer) return 3.;
-	  return scalar - answer;
-	}
+        public double function(double scalar) {
+          ++calls[0];
+          if (scalar < answer) return 3.;
+          return scalar - answer;
+        }
       });
     double xmin = solver.solve(0., 1., 0.001, 0.001, 50, null);
     assert (xmin > answer - 0.001 ):(  "xmin > answer - 0.001");
@@ -151,17 +170,23 @@ public class ScalarSolverTest extends TestCase {
 
   // NO NEED TO CHANGE THE FOLLOWING
 
-  /** Standard constructor calls TestCase(name) constructor */
+  /** Standard constructor calls TestCase(name) constructor
+      @param name Name of junit Test.
+   */
   public ScalarSolverTest(String name) {super (name);}
 
-  /** This automatically generates a suite of all "test" methods */
+  /** This automatically generates a suite of all "test" methods.
+      @return A suite of all junit tests as a Test.
+   */
   public static junit.framework.Test suite() {
     try {assert false; throw new IllegalStateException("need -ea");}
     catch (AssertionError e) {}
     return new TestSuite(ScalarSolverTest.class);
   }
 
-  /** Run all tests with text gui if this class main is invoked */
+  /** Run all tests with text gui if this class main is invoked
+      @param args Command-line arguments.
+   */
   public static void main (String[] args) {
     junit.textui.TestRunner.run (suite());
   }
