@@ -1,4 +1,4 @@
-package edu.mines.jtk.opt;
+package edu.mines.jtk.util;
 
 import java.util.Locale;
 import java.util.MissingResourceException;

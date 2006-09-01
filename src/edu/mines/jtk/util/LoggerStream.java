@@ -1,4 +1,4 @@
-package edu.mines.jtk.opt;
+package edu.mines.jtk.util;
 import java.util.logging.*;
 import java.io.*;
 
@@ -77,7 +77,7 @@ public class LoggerStream extends PrintStream {
       @param args command line
   */
   public static void main(String[] args) {
-    Logger logger = Logger.getLogger("edu.mines.jtk.opt");
+    Logger logger = Logger.getLogger("edu.mines.jtk.util");
     PrintStream psInfo = new LoggerStream(logger, Level.INFO);
     PrintStream psWarning = new LoggerStream(logger, Level.WARNING);
     psInfo.print(3.);

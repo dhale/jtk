@@ -144,7 +144,7 @@ public class VectUtil {
       t = null;
       data = baos.toByteArray();
     } catch (IOException e) {
-      e.printStackTrace(new edu.mines.jtk.opt.LoggerStream(LOG, Level.SEVERE));
+      e.printStackTrace(new edu.mines.jtk.util.LoggerStream(LOG, Level.SEVERE));
       ass(false, "writing serialization failed "+e.getMessage());
     }
     try {
@@ -168,10 +168,10 @@ public class VectUtil {
            " vv="+vv);
       t.dispose();
     } catch (IOException e) {
-      e.printStackTrace(new edu.mines.jtk.opt.LoggerStream(LOG, Level.SEVERE));
+      e.printStackTrace(new edu.mines.jtk.util.LoggerStream(LOG, Level.SEVERE));
       ass(false, "reading serialization failed "+e.getMessage());
     } catch (ClassNotFoundException e) {
-      e.printStackTrace(new edu.mines.jtk.opt.LoggerStream(LOG, Level.SEVERE));
+      e.printStackTrace(new edu.mines.jtk.util.LoggerStream(LOG, Level.SEVERE));
       ass (false, "Can't find class just written "+e.getMessage());
     }
 

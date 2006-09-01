@@ -1,11 +1,11 @@
-package edu.mines.jtk.opt.test;
+package edu.mines.jtk.util.test;
 
 import junit.framework.*;
 import java.util.logging.*;
-import edu.mines.jtk.opt.CleanHandler;
-import edu.mines.jtk.opt.CleanFormatter;
+import edu.mines.jtk.util.CleanHandler;
+import edu.mines.jtk.util.CleanFormatter;
 
-/** Wrap edu.mines.jtk.opt.CleanFormatter for junit testing.
+/** Wrap edu.mines.jtk.util.CleanFormatter for junit testing.
    (junit.jar must be in CLASSPATH)
 */
 public class CleanFormatterTest extends TestCase {
@@ -16,7 +16,7 @@ public class CleanFormatterTest extends TestCase {
   /** Unit tests */
   public void testFormatter() {
     CleanHandler.setDefaultHandler();
-    Logger logger = Logger.getLogger("edu.mines.jtk.opt.CleanFormatter");
+    Logger logger = Logger.getLogger("edu.mines.jtk.util.CleanFormatter");
     CleanFormatter cf = new CleanFormatter();
     String[] messages = new String[] {"one", "two", "three"};
     Level[] levels = new Level[] {Level.INFO, Level.WARNING, Level.SEVERE};

@@ -24,7 +24,9 @@ public class Suite extends TestSuite {
     suite.addTestSuite(BrentMinFinderTest.class);
     suite.addTestSuite(BrentZeroFinderTest.class);
     suite.addTestSuite(CfloatTest.class);
+    suite.addTestSuite(CleanFormatterTest.class);
     suite.addTestSuite(CubicInterpolatorTest.class);
+    suite.addTestSuite(LocalizeTest.class);
     suite.addTestSuite(MathPlusTest.class);
     suite.addTestSuite(QuantilerTest.class);
     suite.addTestSuite(StopwatchTest.class);

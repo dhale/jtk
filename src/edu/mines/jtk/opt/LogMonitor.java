@@ -2,7 +2,10 @@ package edu.mines.jtk.opt;
 
 import java.util.logging.*;
 import java.util.Date;
-import static edu.mines.jtk.opt.Localize.timeWords;
+
+import edu.mines.jtk.util.CleanHandler;
+import edu.mines.jtk.util.Localize;
+import static edu.mines.jtk.util.Localize.timeWords;
 
 /** Report progress to default Logger 
     @author W.S. Harlan, Landmark Graphics

@@ -1,4 +1,4 @@
-package edu.mines.jtk.opt;
+package edu.mines.jtk.util;
 
 import java.util.List;
 import java.util.LinkedList;
@@ -59,10 +59,10 @@ public class CleanHandler extends Handler {
       CleanHandler.class.getResource("CleanHandler.properties");
 
     assert null != java.util.ResourceBundle.getBundle
-      ("edu.mines.jtk.opt.CleanHandler") : "can't find rb";
+      ("edu.mines.jtk.util.CleanHandler") : "can't find rb";
 
-    Logger logger = Logger.getLogger("edu.mines.jtk.opt",
-                                     "edu.mines.jtk.opt.CleanHandler");
+    Logger logger = Logger.getLogger("edu.mines.jtk.util",
+                                     "edu.mines.jtk.util.CleanHandler");
 
     logger.severe("test a severe");
     logger.warning("test a warning");
@@ -96,7 +96,7 @@ public class CleanHandler extends Handler {
       try {
         LogManager.getLogManager().readConfiguration
           (new java.io.ByteArrayInputStream
-           ("handlers=edu.mines.jtk.opt.CleanHandler\n.level=INFO\n"
+           ("handlers=edu.mines.jtk.util.CleanHandler\n.level=INFO\n"
             .getBytes()));
       } catch (java.io.IOException e) {
         e.printStackTrace();

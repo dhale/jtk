@@ -1,13 +1,13 @@
-package edu.mines.jtk.opt.test;
+package edu.mines.jtk.util.test;
 
-import static edu.mines.jtk.opt.Localize.timeWords;
+import static edu.mines.jtk.util.Localize.timeWords;
 
 import java.util.Date;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-/** Wrap edu.mines.jtk.opt.Localize for junit testing.
+/** Wrap edu.mines.jtk.util.Localize for junit testing.
    (junit.jar must be in CLASSPATH)
 */
 public class LocalizeTest extends TestCase {

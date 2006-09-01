@@ -20,12 +20,10 @@ public class Suite extends TestSuite {
 
     suite.addTestSuite(AlmostTest.class);
     suite.addTestSuite(ArrayVect1Test.class);
-    suite.addTestSuite(CleanFormatterTest.class);
     suite.addTestSuite(CoordinateTransformTest.class);
     suite.addTestSuite(GaussNewtonSolverTest.class);
     suite.addTestSuite(QuadraticSolverTest.class);
     suite.addTestSuite(ScalarSolverTest.class);
-    suite.addTestSuite(LocalizeTest.class);
 
     return suite;
   }

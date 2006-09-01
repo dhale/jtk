@@ -1,4 +1,4 @@
-package edu.mines.jtk.opt;
+package edu.mines.jtk.util;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
