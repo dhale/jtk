@@ -1,10 +1,14 @@
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.opt.Almost;
-import java.util.logging.*;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-/** Implements convenience methods for Vect. 
+/** Implements convenience methods for Vect.
 
     @author W.S. Harlan, Landmark Graphics
 */

@@ -1,7 +1,6 @@
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.opt.Almost;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
 /** Implements a Vect by wrapping an array of doubles.
     The embedded data are exposed by a getData method.  For all practical

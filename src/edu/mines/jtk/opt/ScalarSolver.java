@@ -1,13 +1,9 @@
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.opt.Almost;
-import edu.mines.jtk.opt.LogMonitor;
-import edu.mines.jtk.opt.Monitor;
-
-import java.util.logging.*;
 import java.util.Arrays;
+import java.util.logging.Logger;
 
-/** Search a single variable for a value that minimizes a function 
+/** Search a single variable for a value that minimizes a function
     @author W.S. Harlan, Landmark Graphics
  */
 public class ScalarSolver {
@@ -304,7 +300,7 @@ public class ScalarSolver {
     public BadParabolaException(String message) {super (message);}
   }
 
-  /** Get indices that order an array of values. 
+  /** Get indices that order an array of values.
       @author W.S. Harlan, Landmark Graphics
   */
   private class IndexSorter {
@@ -312,8 +308,8 @@ public class ScalarSolver {
     private int _length = 0;
 
     /** The array of values that determine the sort.
-	@param values Array of values to be sorted.
-	These are held without modification or cloning.
+        @param values Array of values to be sorted.
+        These are held without modification or cloning.
     */
     public IndexSorter(double[] values) {
       _values = values;
@@ -321,9 +317,9 @@ public class ScalarSolver {
     }
 
     /** Get an array of indices such that
-	values[index[i]] >= values[index[j]] if i >= j;
-	@return indices that address original array of values
-	in increasing order.
+        values[index[i]] >= values[index[j]] if i >= j;
+        @return indices that address original array of values
+        in increasing order.
     */
     public int[] getSortedIndices() {
       MyComparable[] c = new MyComparable[_length];
@@ -332,7 +328,7 @@ public class ScalarSolver {
       Arrays.sort(c);
       int[] result = new int[c.length];
       for (int i=0; i< result.length; ++i) {
-	result[i] = c[i].index;
+        result[i] = c[i].index;
       }
       return result;
     }
@@ -343,13 +339,13 @@ public class ScalarSolver {
       public int index = 0;
 
       /** Constructor.
-	  @param index
+          @param index
       */
       public MyComparable(int index) {this.index = index;}
 
       public int compareTo(Object o) {
-	MyComparable other = (MyComparable) o;
-	return s_almost.cmp(_values[index], _values[other.index]);
+        MyComparable other = (MyComparable) o;
+        return s_almost.cmp(_values[index], _values[other.index]);
       }
     }
   }

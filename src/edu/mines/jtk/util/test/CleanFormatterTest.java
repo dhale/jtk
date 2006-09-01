@@ -1,9 +1,14 @@
 package edu.mines.jtk.util.test;
 
-import junit.framework.*;
-import java.util.logging.*;
-import edu.mines.jtk.util.CleanHandler;
 import edu.mines.jtk.util.CleanFormatter;
+import edu.mines.jtk.util.CleanHandler;
+
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /** Wrap edu.mines.jtk.util.CleanFormatter for junit testing.
    (junit.jar must be in CLASSPATH)
@@ -35,7 +40,6 @@ public class CleanFormatterTest extends TestCase {
                         "\\(Class.method \\d+-\\d+ #.*\\)\n"+
                         "SEVERE: three\n$") :s[2];
   }
-
 
   /** Test prependToLines method */
   public void testPrepend() {

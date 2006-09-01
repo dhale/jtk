@@ -1,6 +1,8 @@
 package edu.mines.jtk.util;
-import java.util.logging.*;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** Wrap a Logger as a PrintStream.
     Useful mainly for porting code that previously
@@ -13,7 +15,7 @@ import java.io.*;
     by extra newlines, if you call print("\n")
     and flush() instead of println();
 
-    @author W.S. Harlan, Landmark Graphics   
+    @author W.S. Harlan, Landmark Graphics
  */
 public class LoggerStream extends PrintStream {
   private Level _level = null;

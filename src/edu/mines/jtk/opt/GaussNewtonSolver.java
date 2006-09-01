@@ -1,12 +1,8 @@
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.opt.Almost;
-import edu.mines.jtk.opt.LogMonitor;
-import edu.mines.jtk.opt.Monitor;
-import edu.mines.jtk.opt.PartialMonitor;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
-/** Solve least-squares inverse of a Transform. 
+/** Solve least-squares inverse of a Transform.
     @author W.S. Harlan, Landmark Graphics
 */
 public class GaussNewtonSolver {

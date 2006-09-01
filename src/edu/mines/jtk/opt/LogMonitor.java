@@ -1,13 +1,14 @@
 package edu.mines.jtk.opt;
 
-import java.util.logging.*;
-import java.util.Date;
-
+import static edu.mines.jtk.util.Localize.timeWords;
 import edu.mines.jtk.util.CleanHandler;
 import edu.mines.jtk.util.Localize;
-import static edu.mines.jtk.util.Localize.timeWords;
 
-/** Report progress to default Logger 
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/** Report progress to default Logger
     @author W.S. Harlan, Landmark Graphics
  */
 public class LogMonitor implements Monitor {

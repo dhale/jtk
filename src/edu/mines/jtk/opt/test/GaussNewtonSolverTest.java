@@ -1,7 +1,5 @@
 package edu.mines.jtk.opt.test;
 
-import junit.framework.*;
-
 import edu.mines.jtk.opt.Almost;
 import edu.mines.jtk.opt.ArrayVect1;
 import edu.mines.jtk.opt.GaussNewtonSolver;
@@ -12,10 +10,15 @@ import edu.mines.jtk.opt.Vect;
 import edu.mines.jtk.opt.VectConst;
 import edu.mines.jtk.opt.VectUtil;
 
-import java.util.logging.*;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
-/** Solve least-squares inverse of a Transform. 
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+/** Solve least-squares inverse of a Transform.
     @author W.S. Harlan, Landmark Graphics
 */
 public class GaussNewtonSolverTest extends TestCase {
@@ -289,11 +292,11 @@ public class GaussNewtonSolverTest extends TestCase {
 
   // NO NEED TO CHANGE THE FOLLOWING
 
-  /** Standard constructor calls TestCase(name) constructor 
+  /** Standard constructor calls TestCase(name) constructor
    * @param name name of test case*/
   public GaussNewtonSolverTest(String name) {super (name);}
 
-  /** This automatically generates a suite of all "test" methods 
+  /** This automatically generates a suite of all "test" methods
    * @return junit test */
   public static junit.framework.Test suite() {
     try {assert false; throw new IllegalStateException("need -ea");}
@@ -301,7 +304,7 @@ public class GaussNewtonSolverTest extends TestCase {
     return new TestSuite(GaussNewtonSolverTest.class);
   }
 
-  /** Run all tests with text gui if this class main is invoked 
+  /** Run all tests with text gui if this class main is invoked
    * @param args command-line arguments
    * */
   public static void main (String[] args) {

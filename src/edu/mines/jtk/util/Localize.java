@@ -3,13 +3,12 @@ package edu.mines.jtk.util;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.regex.Matcher;
+import java.util.logging.Logger;
 import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import java.util.logging.*;
-
-/** Filter a string with specified ResourceBundles. 
+/** Filter a string with specified ResourceBundles.
     @author W.S. Harlan, Landmark Graphics
 */
 public class Localize {
@@ -130,5 +129,5 @@ public class Localize {
 
     return filter(result.trim(), Localize.class);
   }
-  
+
 }

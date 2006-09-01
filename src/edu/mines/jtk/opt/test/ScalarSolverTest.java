@@ -1,9 +1,9 @@
 package edu.mines.jtk.opt.test;
 
-import junit.framework.*;
 import edu.mines.jtk.opt.ScalarSolver;
-
-import static edu.mines.jtk.opt.ScalarSolver.Function;
+import edu.mines.jtk.opt.ScalarSolver.Function;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /** Wrap edu.mines.jtk.opt.ScalarSolver for junit testing.
     (junit.jar must be in CLASSPATH)

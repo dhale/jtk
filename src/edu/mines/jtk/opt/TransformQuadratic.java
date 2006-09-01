@@ -1,7 +1,6 @@
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.opt.Almost;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
 /** For a linearized transform, implement the Gauss-Newton
     quadratic approximation of a damped least-squares objective function.

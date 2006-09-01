@@ -1,13 +1,13 @@
 package edu.mines.jtk.opt;
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
 /** This class allows safe comparisons of floating point numbers
     with limited precision.
     The Comparator interface should be used for instances of
     java.lang.Number.
-    @author W.S. Harlan, Landmark Graphics 
+    @author W.S. Harlan, Landmark Graphics
 */
 public class Almost implements Serializable, Comparator<Number> {
   static final long serialVersionUID = -5986731124649938548L;

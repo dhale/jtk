@@ -1,14 +1,17 @@
 package edu.mines.jtk.opt.test;
 
-import junit.framework.*;
-
-import edu.mines.jtk.opt.ArrayVect1;
 import edu.mines.jtk.opt.Almost;
+import edu.mines.jtk.opt.ArrayVect1;
 import edu.mines.jtk.opt.Quadratic;
 import edu.mines.jtk.opt.QuadraticSolver;
 import edu.mines.jtk.opt.Vect;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /** Wrap edu.mines.jtk.opt.QuadraticSolver for junit testing.
    (junit.jar must be in CLASSPATH)

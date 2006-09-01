@@ -1,11 +1,15 @@
 package edu.mines.jtk.util;
 
-import java.util.List;
-import java.util.LinkedList;
-import java.util.logging.*;
-import java.io.PrintStream;
-import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 /** An alternative to ConsoleHandler.  Uses CleanFormatter
     and System.out instead of SimpleFormatter and System.err

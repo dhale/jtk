@@ -1,10 +1,11 @@
 package edu.mines.jtk.opt.test;
 
-import junit.framework.*;
 import edu.mines.jtk.opt.Almost;
 import edu.mines.jtk.opt.ArrayVect1;
 import edu.mines.jtk.opt.Vect;
 import edu.mines.jtk.opt.VectUtil;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /** Wrap edu.mines.jtk.opt.ArrayVect1 for junit testing.
    (junit.jar must be in CLASSPATH)
@@ -40,11 +41,11 @@ public class ArrayVect1Test extends TestCase {
 
   // NO NEED TO CHANGE THE FOLLOWING
 
-  /** Standard constructor calls TestCase(name) constructor 
+  /** Standard constructor calls TestCase(name) constructor
    * @param name name of junit test  */
   public ArrayVect1Test(String name) {super (name);}
 
-  /** This automatically generates a suite of all "test" methods 
+  /** This automatically generates a suite of all "test" methods
    * @return junit test */
   public static junit.framework.Test suite() {
     try {assert false; throw new IllegalStateException("need -ea");}
@@ -52,7 +53,7 @@ public class ArrayVect1Test extends TestCase {
     return new TestSuite(ArrayVect1Test.class);
   }
 
-  /** Run all tests with text gui if this class main is invoked 
+  /** Run all tests with text gui if this class main is invoked
    * @param args command-line arguments */
   public static void main (String[] args) {
     junit.textui.TestRunner.run (suite());

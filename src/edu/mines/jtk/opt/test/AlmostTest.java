@@ -1,8 +1,8 @@
 package edu.mines.jtk.opt.test;
 
-import junit.framework.*;
-
 import edu.mines.jtk.opt.Almost;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /** Wrap another class Almost for junit testing.
    (junit.jar must be in CLASSPATH)

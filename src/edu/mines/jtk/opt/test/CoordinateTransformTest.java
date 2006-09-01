@@ -1,11 +1,13 @@
 package edu.mines.jtk.opt.test;
 
-import java.util.Arrays;
-import junit.framework.*;
-
-import edu.mines.jtk.util.Array;
 import edu.mines.jtk.opt.Almost;
 import edu.mines.jtk.opt.CoordinateTransform;
+import edu.mines.jtk.util.Array;
+
+import java.util.Arrays;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 /** Wrap edu.mines.jtk.opt.CoordinateTransform for junit testing.
    (junit.jar must be in CLASSPATH)
@@ -72,11 +74,11 @@ public class CoordinateTransformTest extends TestCase {
 
   // NO NEED TO CHANGE THE FOLLOWING
 
-  /** Standard constructor calls TestCase(name) constructor 
+  /** Standard constructor calls TestCase(name) constructor
    * @param name name of junit test */
   public CoordinateTransformTest(String name) {super (name);}
 
-  /** This automatically generates a suite of all "test" methods 
+  /** This automatically generates a suite of all "test" methods
    * @return junit Test */
   public static junit.framework.Test suite() {
     try {assert false; throw new IllegalStateException("need -ea");}
@@ -84,7 +86,7 @@ public class CoordinateTransformTest extends TestCase {
     return new TestSuite(CoordinateTransformTest.class);
   }
 
-  /** Run all tests with text gui if this class main is invoked 
+  /** Run all tests with text gui if this class main is invoked
    * @param args command-line arguments (ignored) */
   public static void main (String[] args) {
     junit.textui.TestRunner.run (suite());
