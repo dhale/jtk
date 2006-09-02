@@ -47,7 +47,7 @@ import java.util.logging.Logger;
     </pre>
     if only perturbations are damped.
 
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
 */
 public class TransformQuadratic implements Quadratic {
   private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");

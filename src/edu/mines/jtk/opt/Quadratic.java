@@ -5,7 +5,7 @@ package edu.mines.jtk.opt;
     where H is a positive semidefinite quadratic and b is a
     linear gradient.
 
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
 */
 public interface Quadratic {
   /** Multiply vector by the quadratic Hessian H.

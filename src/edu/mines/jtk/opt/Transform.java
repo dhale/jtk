@@ -2,7 +2,7 @@ package edu.mines.jtk.opt;
 
 /** Implement a non-linear transform and its linearizations
     for a non-linear optimization.
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
 */
 
 public interface Transform {

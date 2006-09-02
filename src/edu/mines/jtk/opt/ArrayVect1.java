@@ -11,7 +11,7 @@ import java.util.logging.Logger;
     prevents the mixin pattern, but you can share the wrapped array
     as a private member of your own class,
     and easily delegate all implemented methods.
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
  */
 public class ArrayVect1 implements Vect {
   /** wrapped data */

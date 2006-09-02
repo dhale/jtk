@@ -2,7 +2,7 @@ package edu.mines.jtk.opt;
 
 /** Vector operations that do not change the state of the vector 
 
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
  */
 public interface VectConst extends Cloneable, java.io.Serializable {
   /** Return the Cartesian dot product of this vector with another

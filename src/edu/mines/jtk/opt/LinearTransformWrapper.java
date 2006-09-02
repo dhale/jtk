@@ -2,7 +2,7 @@ package edu.mines.jtk.opt;
 
 /** Wrap a LinearTransform as a non-linear Transform,
     by ignoring reference model.
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
 */
 public class LinearTransformWrapper implements Transform {
   private LinearTransform _linearTransform = null;

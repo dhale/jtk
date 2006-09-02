@@ -1,7 +1,7 @@
 package edu.mines.jtk.opt;
 
 /** Implement this interface to receive notifications of progress  
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
 */
 public interface Monitor {
   /** Initialize the fraction of the work that was

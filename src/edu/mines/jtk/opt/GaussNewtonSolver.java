@@ -3,7 +3,7 @@ package edu.mines.jtk.opt;
 import java.util.logging.Logger;
 
 /** Solve least-squares inverse of a Transform.
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
 */
 public class GaussNewtonSolver {
   private static boolean s_expensiveDebug = false;

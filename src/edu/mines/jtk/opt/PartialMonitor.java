@@ -4,7 +4,7 @@ package edu.mines.jtk.opt;
     Note that only makes sense to call initReport()
     with the first wrapper used.
 
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
 */
 public class PartialMonitor implements Monitor {
   private Monitor _wrapped =null;

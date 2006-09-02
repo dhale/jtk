@@ -1,7 +1,7 @@
 package edu.mines.jtk.opt;
 
 /** Define methods applying a linear transform and its transpose 
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
  */
 public interface LinearTransform {
   /** Apply the linear transform data = F model

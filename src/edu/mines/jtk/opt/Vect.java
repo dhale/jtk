@@ -3,7 +3,7 @@ package edu.mines.jtk.opt;
 /** Implement a vector supporting linear vector-space methods
     Test your implementation with VectUtil.test().
 
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
  */
 public interface Vect extends VectConst {
   /** Add a scaled version of another vector to a scaled version of this

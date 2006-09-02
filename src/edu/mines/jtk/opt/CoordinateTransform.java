@@ -37,7 +37,7 @@ import java.util.logging.Logger;
     <p> If the linear transform needs a translation shift,
     then include a constant as one of the input coordinates.
 
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
 */
 public class CoordinateTransform {
   @SuppressWarnings("unused")

@@ -31,7 +31,7 @@ import java.util.logging.Logger;
     }
 </pre>
 
-@author W.S. Harlan, Landmark Graphics
+@author W.S. Harlan
 */
 public class QuadraticSolver {
   private Quadratic _quadratic = null;

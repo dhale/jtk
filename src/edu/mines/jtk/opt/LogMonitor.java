@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** Report progress to default Logger
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
  */
 public class LogMonitor implements Monitor {
   private Logger _log = null;

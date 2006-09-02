@@ -7,7 +7,7 @@ import java.util.logging.Logger;
     with limited precision.
     The Comparator interface should be used for instances of
     java.lang.Number.
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
 */
 public class Almost implements Serializable, Comparator<Number> {
   static final long serialVersionUID = -5986731124649938548L;

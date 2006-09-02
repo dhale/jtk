@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.logging.Logger;
 
 /** Search a single variable for a value that minimizes a function
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
  */
 public class ScalarSolver {
   @SuppressWarnings("unused")
@@ -301,7 +301,7 @@ public class ScalarSolver {
   }
 
   /** Get indices that order an array of values.
-      @author W.S. Harlan, Landmark Graphics
+      @author W.S. Harlan
   */
   private class IndexSorter {
     private double[] _values = null;

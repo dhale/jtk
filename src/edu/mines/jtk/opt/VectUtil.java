@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 /** Implements convenience methods for Vect.
 
-    @author W.S. Harlan, Landmark Graphics
+    @author W.S. Harlan
 */
 public class VectUtil {
   private static final Logger LOG
