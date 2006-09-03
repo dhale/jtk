@@ -27,6 +27,8 @@ public class Suite extends TestSuite {
     suite.addTestSuite(CubicInterpolatorTest.class);
     suite.addTestSuite(LocalizeTest.class);
     suite.addTestSuite(MathPlusTest.class);
+    suite.addTestSuite(ParameterTest.class);
+    suite.addTestSuite(ParameterSetTest.class);
     suite.addTestSuite(QuantilerTest.class);
     suite.addTestSuite(StopwatchTest.class);
     suite.addTestSuite(UnitsTest.class);
