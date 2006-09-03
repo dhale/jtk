@@ -26,6 +26,8 @@ public class GaussNewtonSolverTest extends TestCase {
   private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   private static boolean printedUndisposed = false;
   private static boolean projectWasTested = false;
+  private static final String NL = System.getProperty("line.separator");
+
   // make sure Vects are disposed
   private static class TestVect extends ArrayVect1 {
     private static final long serialVersionUID = 1L;
@@ -113,7 +115,7 @@ public class GaussNewtonSolverTest extends TestCase {
       StringBuilder sb = new StringBuilder();
       for (String s : undisposed.values()) {
         sb.append(s);
-        sb.append("\n");
+        sb.append(NL);
       }
       return sb.toString();
     }

@@ -21,6 +21,9 @@ public class LogMonitor implements Monitor {
   private volatile double _lastFraction = 0;
   private Thread _thread = null;
 
+  /** Line separator */
+  private static final String NL = System.getProperty("line.separator");
+
   /** Print no more than this often, in milliseconds */
   private static final long SHORTEST_INTERVAL = 10000L;
   /** Wait no longer than this for first report, after minor progress, in ms */
@@ -175,10 +178,10 @@ public class LogMonitor implements Monitor {
       }
       long total = secSoFar + secRemaining;
       if (progress.length() > 0) {
-        progress = "\n  "+progress+", "+timeWords(total)+" ${total}";
+        progress = NL+"  "+progress+", "+timeWords(total)+" ${total}";
       }
       if (fraction >= 1.) {
-        progress = "\n  ${Finished_in} "+timeWords(total)+" ${total}";
+        progress = NL+"  ${Finished_in} "+timeWords(total)+" ${total}";
       }
     }
     // Use full fraction for user's benefit

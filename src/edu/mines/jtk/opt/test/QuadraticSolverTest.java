@@ -17,7 +17,7 @@ import junit.framework.TestSuite;
    (junit.jar must be in CLASSPATH)
 */
 public class QuadraticSolverTest extends TestCase {
-
+  private static final String NL = System.getProperty("line.separator");
   /** Junit test of QuadraticSolver
    */
   public void testQS() {
@@ -111,7 +111,7 @@ public class QuadraticSolverTest extends TestCase {
       StringBuilder sb = new StringBuilder();
       for (String s : undisposed.values()) {
         sb.append(s);
-        sb.append("\n");
+        sb.append(NL);
       }
       return sb.toString();
     }
