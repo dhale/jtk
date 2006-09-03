@@ -44,9 +44,9 @@ public class CleanFormatter extends Formatter {
 
     if (message.endsWith("\\")) {
       message = message.substring(0,message.length()-1);
-    } else if (message.matches("^\\s*\n?$")) {
+    } else if (message.matches("^\\s*("+NL+")?$")) {
     } else {
-      message = message +"\n";
+      message = message +NL;
     }
     Level level = record.getLevel();
     if (level.equals(Level.INFO)) {
@@ -64,7 +64,7 @@ public class CleanFormatter extends Formatter {
           s_prefix + "**** SEVERE WARNING **** ("+
           record.getSourceClassName()+ "." + record.getSourceMethodName()+" "+
           getTimeStamp(record.getMillis())+" "+
-          "#" + record.getThreadID() + ")\n" + message;
+          "#" + record.getThreadID() + ")"+NL+ message;
       }
     } else if (level.equals(Level.FINE)
                || level.equals(Level.FINER)

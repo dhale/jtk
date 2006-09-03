@@ -31,14 +31,14 @@ public class CleanFormatterTest extends TestCase {
       lr.setSourceClassName("Class");
       lr.setSourceMethodName("method");
       s[i] = cf.format(lr);
-      assert s[i].endsWith(messages[i]+"\n");
+      assertTrue(s[i].endsWith(messages[i]+NL));
       logger.fine("|"+s[i]+"|");
     }
-    assert s[0].equals("one\n"): s[0];
-    assert s[1].equals("WARNING: two\n") : s[1];
+    assert s[0].equals("one"+NL): s[0];
+    assert s[1].equals("WARNING: two"+NL) : s[1];
     assert s[2].matches("^\\*\\*\\*\\* SEVERE WARNING \\*\\*\\*\\* "+
-                        "\\(Class.method \\d+-\\d+ #.*\\)\n"+
-                        "SEVERE: three\n$") :s[2];
+                        "\\(Class.method \\d+-\\d+ #.*\\)"+NL+
+                        "SEVERE: three"+NL+"$") :s[2];
   }
 
   /** Test prependToLines method */
