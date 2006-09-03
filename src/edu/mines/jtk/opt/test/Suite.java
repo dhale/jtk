@@ -23,6 +23,8 @@ public class Suite extends TestSuite {
     TestSuite suite = new TestSuite();
 
     suite.addTestSuite(ArrayVect1Test.class);
+    suite.addTestSuite(BrentMinFinderTest.class);
+    suite.addTestSuite(BrentZeroFinderTest.class);
     suite.addTestSuite(CoordinateTransformTest.class);
     suite.addTestSuite(GaussNewtonSolverTest.class);
     suite.addTestSuite(QuadraticSolverTest.class);
