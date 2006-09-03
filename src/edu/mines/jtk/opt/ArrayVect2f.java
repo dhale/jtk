@@ -6,10 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.util.Almost;
-import java.util.logging.*;
 import java.util.Arrays;
-import java.util.Random;
+import java.util.logging.Logger;
+
+import edu.mines.jtk.util.Almost;
 
 /** Implement a Vect as a two dimensional array of floats.
     The second dimension can be of variable lengths.
@@ -21,6 +21,7 @@ import java.util.Random;
     prevents the mixin pattern, but you can share the wrapped array
     as a private member of your own class,
     and easily delegate all implemented methods.
+    @author W.S. Harlan
 */
 public class ArrayVect2f implements Vect {
   @SuppressWarnings("unused")
@@ -175,53 +176,5 @@ public class ArrayVect2f implements Vect {
       }
     }
     return result;
-  }
-
-  /** Run tests
-     @param args command line
-     @throws Exception
-   */
-  public static void main(String[] args) throws Exception {
-    {
-      float[][] a = new float[31][21];
-      for (int i=0; i<a.length; ++i) {
-        for (int j=0; j<a[i].length; ++j) {
-          a[i][j] = i+2.5f*j;
-        }
-      }
-      Vect v = new ArrayVect2f(a, 2.);
-      VectUtil.test(v);
-
-      // test inverse covariance
-      for (int i=0; i<a.length; ++i) {
-        for (int j=0; j<a[i].length; ++j) {
-          a[i][j] = 1;
-        }
-      }
-      v = new ArrayVect2f(a, 3.);
-      Vect w = v.clone();
-      w.multiplyInverseCovariance();
-      assert Almost.FLOAT.equal(1./3., v.dot(w));
-      assert Almost.FLOAT.equal(1./3., v.magnitude());
-    }
-
-    {
-      Random random = new Random(352);
-      float[][] a = new float[201][];
-      boolean oneWasShort = false;
-      boolean oneWasLong = false;
-      for (int i=0; i<a.length; ++i) {
-        a[i] = new float[random.nextInt(11)];
-        if (a[i].length ==0) oneWasShort = true;
-        for (int j=0; j<a[i].length; ++j) {
-          oneWasLong = true;
-          a[i][j] = 5*random.nextFloat()-2;
-        }
-      }
-      assert oneWasShort;
-      assert oneWasLong;
-      Vect v = new ArrayVect2f(a, 2.5);
-      VectUtil.test(v);
-    }
   }
 }

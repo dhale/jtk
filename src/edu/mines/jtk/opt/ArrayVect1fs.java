@@ -6,13 +6,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
+import java.io.IOException;
+import java.util.logging.Logger;
+
 import edu.mines.jtk.util.Almost;
-import java.util.logging.*;
-import java.util.Random;
-import java.io.*;
 
 /** Implements a Vect as a collection of ArrayVect1f's,
     of fixed size.
+    @author W.S. Harlan
 */
 public class ArrayVect1fs implements Vect {
   static final long serialVersionUID = 1L;
@@ -21,7 +22,7 @@ public class ArrayVect1fs implements Vect {
   protected ArrayVect1f[] _data = null;
 
   @SuppressWarnings("unused")
-private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+    private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
 
   /** Wrap an array of ArrayVect1f's
       @param data Wrap this array of ArrayVect1f's.
@@ -36,7 +37,8 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   private void init(ArrayVect1f[] data)  {_data = data;}
 
   /** Return the size of the embedded array
- * @return size of embedded array */
+      @return size of embedded array
+  */
   public int getSize() {return _data.length;}
 
   /** Get the embedded data
@@ -46,8 +48,7 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
     return _data;
   }
 
-  @Override
-public ArrayVect1fs clone() {
+  @Override public ArrayVect1fs clone() {
     try {
       ArrayVect1fs result = (ArrayVect1fs) super.clone();
       if (_data != null) {
@@ -74,8 +75,7 @@ public ArrayVect1fs clone() {
     return result;
   }
 
-  @Override
-public String toString() {
+  @Override public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("(");
     for (int i=0; i<_data.length; ++i) {
@@ -146,40 +146,6 @@ public String toString() {
     _data = new ArrayVect1f[length];
     for (int i=0; i<_data.length; ++i) {
       _data[i] = (ArrayVect1f) in.readObject();
-    }
-  }
-
-  /** run tests
-     @param args command line
-     @throws Exception
-   */
-  public static void main(String[] args) throws Exception {
-    Random random = new Random(32525);
-    {
-      ArrayVect1f[] data = new ArrayVect1f[5];
-      for (int j=0; j<data.length; ++j) {
-        float[] a = new float[31];
-        for (int i=0; i<a.length; ++i) {a[i] = random.nextFloat();}
-        data[j] = new ArrayVect1f(a, j+3, ((j+4.)/3.));
-      }
-      ArrayVect1fs v = new ArrayVect1fs(data);
-      VectUtil.test(v);
-      v.dispose();
-    }
-
-    {
-      ArrayVect1f[] data = new ArrayVect1f[5];
-      for (int j=0; j<data.length; ++j) {
-        float[] a = new float[31];
-        for (int i=0; i<a.length; ++i) {a[i] = 1.f;}
-        data[j] = new ArrayVect1f(a, 0, 3.);
-      }
-      ArrayVect1fs v = new ArrayVect1fs(data);
-      VectUtil.test(v);
-      Vect w = v.clone();
-      w.multiplyInverseCovariance();
-      assert Almost.FLOAT.equal(1./3., v.dot(w));
-      assert Almost.FLOAT.equal(1./3., v.magnitude());
     }
   }
 }

@@ -18,6 +18,7 @@ import java.util.logging.*;
  prevents the mixin pattern, but you can share the wrapped array
  as a private member of your own class,
  and easily delegate all implemented methods.
+ @author W.S. Harlan
 */
 
 public class ArrayVect3f implements Vect {
@@ -29,7 +30,7 @@ public class ArrayVect3f implements Vect {
   protected double _variance = 1.;
 
   @SuppressWarnings("unused")
-private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+    private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   private static final long serialVersionUID = 1L;
 
   /** Wrap an array as a Vect.
@@ -68,7 +69,7 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   }
 
   /** Return the size of the embedded array
- * @return size of embedded array */
+      @return size of embedded array */
   public int getSize() {
     return _data.length*_data[0].length*_data[0][0].length;
   }
@@ -114,8 +115,7 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   public void postCondition() {}
 
   // VectConst interface
-  @Override
-public ArrayVect3f clone() {
+  @Override public ArrayVect3f clone() {
     try {
       float[][][] newData = new float[_data.length][_data[0].length][];
       for (int i=0 ; i<newData.length; ++i) {
@@ -145,36 +145,5 @@ public ArrayVect3f clone() {
       }
     }
     return result;
-  }
-
-  /** Run tests
-     @param args command line
-     @throws Exception
-   */
-  public static void main(String[] args) throws Exception {
-    float[][][] a = new float[13][17][11];
-    for (int i=0; i<a.length; ++i) {
-      for (int j=0; j<a[i].length; ++j) {
-        for (int k=0; k<a[i][j].length; ++k) {
-          a[i][j][k] = i+2.5f*j - 1.7f*k;
-        }
-      }
-    }
-    Vect v = new ArrayVect3f(a, 2.2);
-    VectUtil.test(v);
-
-    // test inverse covariance
-    for (int i=0; i<a.length; ++i) {
-      for (int j=0; j<a[i].length; ++j) {
-        for (int k=0; k<a[i][j].length; ++k) {
-          a[i][j][k] = 1;
-        }
-      }
-    }
-    v = new ArrayVect3f(a, 7.);
-    Vect w = v.clone();
-    w.multiplyInverseCovariance();
-    assert Almost.FLOAT.equal(1./7., v.dot(w));
-    assert Almost.FLOAT.equal(1./7., v.magnitude());
   }
 }

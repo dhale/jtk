@@ -64,8 +64,7 @@ public class ArrayVect1 implements Vect {
     return _data;
   }
 
-  @Override
-public ArrayVect1 clone() {
+  @Override public ArrayVect1 clone() {
     try {
       ArrayVect1 result = (ArrayVect1) super.clone();
       result._data = result._data.clone();
@@ -86,8 +85,7 @@ public ArrayVect1 clone() {
     return result;
   }
 
-  @Override
-public String toString() {
+  @Override public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("(");
     for (int i=0; i<_data.length; ++i) {

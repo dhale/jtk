@@ -6,10 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.util.Almost;
-import java.util.logging.*;
+import java.io.IOException;
 import java.util.Arrays;
-import java.io.*;
+import java.util.logging.Logger;
+
+import edu.mines.jtk.util.Almost;
 
 /** Implements a Vect by wrapping an array of doubles.
     The embedded data are exposed by a getData method.  For all practical
@@ -20,6 +21,7 @@ import java.io.*;
     prevents the mixin pattern, but you can share the wrapped array
     as a private member of your own class,
     and easily delegate all implemented methods.
+    @author W.S. Harlan
  */
 public class ArrayVect1f implements Vect {
   private static final long serialVersionUID = 1L;
@@ -34,6 +36,7 @@ public class ArrayVect1f implements Vect {
       Earlier samples should be constrained to zero. */
   protected int _firstSample = 0;
 
+  @SuppressWarnings("unused")
   private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
 
   /** Construct from an array of data.
@@ -174,61 +177,6 @@ public class ArrayVect1f implements Vect {
     _data = (float[]) in.readObject();
     _variance =  in.readDouble();
     _firstSample = in.readInt();
-  }
-
-  /** Run tests
-     @param args command line
-     @throws Exception
-   */
-  public static void main(String[] args) throws Exception {
-    { // check Vect properties
-      float[] a = new float[31];
-      for (int i=0; i<a.length; ++i) {a[i] = i;}
-      Vect v = new ArrayVect1f(a, 0, 3.);
-      VectUtil.test(v);
-      v = new ArrayVect1f(a, 10, 3.);
-      VectUtil.test(v);
-
-      // test inverse covariance
-      for (int i=0; i<a.length; ++i) {a[i] = 1;}
-      v = new ArrayVect1f(a, 0, 3.);
-      Vect w = v.clone();
-      w.multiplyInverseCovariance();
-      assert Almost.FLOAT.equal(1./3., v.dot(w));
-      assert Almost.FLOAT.equal(1./3., v.magnitude());
-    }
-
-    { // test size of serialization
-      float[] data = new float[501];
-      Arrays.fill(data, 1.f);
-      int minimumSize = data.length*4;
-      int externalSize = 10*minimumSize;
-      int writeObjectSize = 10*minimumSize;
-      LOG.fine("minimum size = "+ minimumSize);
-      ArrayVect1f v = new ArrayVect1f(data, 0, 1.);
-      {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(0);
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(v);
-        oos.close();
-        byte[] result = baos.toByteArray();
-        externalSize = result.length;
-        LOG.fine("externalizable size = "+externalSize);
-      }
-      {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(0);
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(v);
-        oos.close();
-        byte[] result = baos.toByteArray();
-        writeObjectSize = result.length;
-        LOG.fine("writeObject size = "+writeObjectSize);
-      }
-      assert externalSize <= minimumSize + 130 :
-        externalSize+" <= "+(minimumSize+130);
-      assert writeObjectSize <= minimumSize + 130 :
-        writeObjectSize +"<="+ (minimumSize + 130);
-    }
   }
 }
 

@@ -100,20 +100,5 @@ public String toString() {
   public double magnitude() {
     return Almost.FLOAT.divide (this.dot(this), _variance, 0.);
   }
-
-  /** Run tests
-     @param args command line
-     @throws Exception test errors
-   */
-  public static void main(String[] args) throws Exception {
-    {
-      Vect v = new ScalarVect(.266, 3.);
-      VectUtil.test(v);
-    }
-    {
-      Vect v = new ScalarVect(-666.266, 8.);
-      VectUtil.test(v);
-    }
-  }
 }
 

@@ -18,6 +18,7 @@ import java.util.logging.*;
  prevents the mixin pattern, but you can share the wrapped array
  as a private member of your own class,
  and easily delegate all implemented methods.
+ @author W.S.Harlan
 */
 
 public class ArrayVect2 implements Vect {
@@ -100,8 +101,7 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   public void postCondition() {}
 
   // VectConst interface
-  @Override
-public ArrayVect2 clone() {
+  @Override public ArrayVect2 clone() {
     try {
       double[][] newData = new double[_data.length][];
       for (int i=0 ; i<newData.length; ++i) {
@@ -127,32 +127,5 @@ public ArrayVect2 clone() {
       }
     }
     return result;
-  }
-
-  /** Run tests
-     @param args command line
-     @throws Exception
-   */
-  public static void main(String[] args) throws Exception {
-    double[][] a = new double[31][21];
-    for (int i=0; i<a.length; ++i) {
-      for (int j=0; j<a[i].length; ++j) {
-        a[i][j] = i+2.4*j;
-      }
-    }
-    Vect v = new ArrayVect2(a, 2.);
-    VectUtil.test(v);
-
-    // test inverse covariance
-    for (int i=0; i<a.length; ++i) {
-      for (int j=0; j<a[i].length; ++j) {
-        a[i][j] = 1;
-      }
-    }
-    v = new ArrayVect2(a, 3.);
-    Vect w = v.clone();
-    w.multiplyInverseCovariance();
-    assert Almost.FLOAT.equal(1./3., v.dot(w));
-    assert Almost.FLOAT.equal(1./3., v.magnitude());
   }
 }
