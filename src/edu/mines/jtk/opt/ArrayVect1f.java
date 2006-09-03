@@ -93,6 +93,35 @@ public class ArrayVect1f implements Vect {
     System.arraycopy(data,0, _data, 0, _data.length);
   }
 
+  /** Fill a VectContainer with instances of ArrayVect1f
+      from a 2D array.
+      @param container Container to be filled with instances of float[]
+      wrapped as ArrayVect1f.
+      @param data Array of data to be wrapped.
+      @param firstSamples Array of first non-zero samples in each array.
+      @param variance Variance of each ArrayVect1f
+  */
+  public static void fillContainer(VectContainer container,
+                                   int[] firstSamples,
+                                   float[][] data, double variance) {
+    for (int i=0; i<data.length; ++i) {
+      container.put(i, new ArrayVect1f(data[i], firstSamples[i], variance));
+    }
+  }
+
+  /** Extract 2D array from a VectContainer with instances of ArrayVect1f.
+      @param data Array of data to be extracted.
+      @param container Container of ArrayVect1f to be extracted from.
+  */
+  public static void extractContainer(float[][] data,
+                                      VectContainer container) {
+    for (int i=0; i<data.length; ++i) {
+      ArrayVect1f trace = (ArrayVect1f) container.get(i);
+      float[] traceData = trace.getData();
+      System.arraycopy(traceData,0, data[i],0, data[i].length);
+    }
+  }
+
   @Override public ArrayVect1f clone() {
     try {
       ArrayVect1f result = (ArrayVect1f) super.clone();
