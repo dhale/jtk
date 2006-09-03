@@ -151,43 +151,4 @@ public class VectArray implements VectContainer {
     result = Almost.FLOAT.divide (result, _vect.length, 0.);
     return result;
   }
-
-  /** Run all tests
-     @param args command line arguments
-     @throws Exception test errors
-   */
-  public static void main(String[] args) throws Exception {
-    Random random = new Random(32525);
-    VectArray vm = new VectArray(5);
-    for (int index=0; index<5; ++index) {
-      double[] a = new double[7*index];
-      for (int i=0; i<a.length; ++i) {a[i] = random.nextDouble();}
-      Vect v = new ArrayVect1(a, 2.);
-      vm.put(index, v);
-      assert vm.containsKey(index);
-    }
-    assert !vm.containsKey(99);
-    VectUtil.test(vm);
-    int[] keys = vm.getKeys();
-    assert keys.length == 5 : "keys.length = "+keys.length;
-    for (int i=0; i<5; ++i) { assert keys[i] == i;}
-    for (int index=0; index<5; ++index) {
-      ArrayVect1 value = (ArrayVect1) vm.get(index);
-      assert (value != null) : "index="+index;
-      assert (value.getData() != null) : "index="+index;
-      assert (value.getSize() == 7*index) : "index="+index;
-      assert (value.getData().length == 7*index) : "index="+index;
-    }
-    // test inverse covariance
-    vm = new VectArray(5);
-    for (int index=0; index<5; ++index) {
-      double[] a = new double[7*index+1];
-      for (int i=0; i<a.length; ++i) {a[i] = 1;}
-      Vect v = new ArrayVect1(a, 1.);
-      vm.put(index, v);
-    }
-    Vect wm = vm.clone();
-    wm.multiplyInverseCovariance();
-    assert Almost.FLOAT.equal(1., wm.dot(vm)) : wm.dot(vm);
-  }
 }

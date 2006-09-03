@@ -35,6 +35,8 @@ public class Suite extends TestSuite {
     suite.addTestSuite(QuadraticSolverTest.class);
     suite.addTestSuite(ScalarSolverTest.class);
     suite.addTestSuite(ScalarVectTest.class);
+    suite.addTestSuite(VectArrayTest.class);
+    suite.addTestSuite(VectMapTest.class);
     return suite;
   }
 
