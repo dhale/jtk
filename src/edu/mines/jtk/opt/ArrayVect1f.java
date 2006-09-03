@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 import edu.mines.jtk.util.Almost;
 
-/** Implements a Vect by wrapping an array of doubles.
+/** Implements a Vect by wrapping an array of floats.
     The embedded data are exposed by a getData method.  For all practical
     purposes this member is public, except that this class must always
     point to the same array.  The implementation as an array
