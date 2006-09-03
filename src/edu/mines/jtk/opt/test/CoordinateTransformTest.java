@@ -1,6 +1,6 @@
 package edu.mines.jtk.opt.test;
 
-import edu.mines.jtk.opt.Almost;
+import edu.mines.jtk.util.Almost;
 import edu.mines.jtk.opt.CoordinateTransform;
 import edu.mines.jtk.util.Array;
 

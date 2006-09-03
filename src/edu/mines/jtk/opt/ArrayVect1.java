@@ -1,5 +1,6 @@
 package edu.mines.jtk.opt;
 
+import edu.mines.jtk.util.Almost;
 import java.util.logging.Logger;
 
 /** Implements a Vect by wrapping an array of doubles.

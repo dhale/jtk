@@ -1,4 +1,4 @@
-package edu.mines.jtk.opt;
+package edu.mines.jtk.util;
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.logging.Logger;

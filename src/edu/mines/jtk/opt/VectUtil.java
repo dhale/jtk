@@ -1,5 +1,7 @@
 package edu.mines.jtk.opt;
 
+import edu.mines.jtk.util.Almost;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

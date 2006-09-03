@@ -18,6 +18,7 @@ public class Suite extends TestSuite {
   public static Test suite() {
     TestSuite suite = new TestSuite();
 
+    suite.addTestSuite(AlmostTest.class);
     suite.addTestSuite(ArgsParserTest.class);
     suite.addTestSuite(ArrayTest.class);
     suite.addTestSuite(AxisTicsTest.class);

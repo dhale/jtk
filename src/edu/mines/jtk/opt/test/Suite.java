@@ -22,7 +22,6 @@ public class Suite extends TestSuite {
   public static Test suite() {
     TestSuite suite = new TestSuite();
 
-    suite.addTestSuite(AlmostTest.class);
     suite.addTestSuite(ArrayVect1Test.class);
     suite.addTestSuite(CoordinateTransformTest.class);
     suite.addTestSuite(GaussNewtonSolverTest.class);

@@ -1,5 +1,7 @@
 package edu.mines.jtk.opt;
 
+import edu.mines.jtk.util.Almost;
+
 import java.util.logging.Logger;
 
 /** For a linearized transform, implement the Gauss-Newton

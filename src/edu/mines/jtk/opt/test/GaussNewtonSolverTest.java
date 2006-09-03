@@ -1,6 +1,6 @@
 package edu.mines.jtk.opt.test;
 
-import edu.mines.jtk.opt.Almost;
+import edu.mines.jtk.util.Almost;
 import edu.mines.jtk.opt.ArrayVect1;
 import edu.mines.jtk.opt.GaussNewtonSolver;
 import edu.mines.jtk.opt.LinearTransform;

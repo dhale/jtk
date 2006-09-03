@@ -1,6 +1,6 @@
-package edu.mines.jtk.opt.test;
+package edu.mines.jtk.util.test;
 
-import edu.mines.jtk.opt.Almost;
+import edu.mines.jtk.util.Almost;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
