@@ -6,9 +6,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.BrentMinFinder;
+import static java.lang.Math.PI;
+import static java.lang.Math.ceil;
+import static java.lang.Math.log;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.lang.Math.sin;
+import edu.mines.jtk.opt.BrentMinFinder;
 import edu.mines.jtk.util.Check;
-import static java.lang.Math.*;
 
 /**
  * A sinc interpolator for bandlimited uniformly-sampled functions y(x). 
