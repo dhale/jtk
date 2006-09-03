@@ -12,7 +12,7 @@ import static edu.mines.jtk.util.MathPlus.*;
 /**
  * Searches along a line for a minimum of a continuously differentiable 
  * function of one or more variables. Uses values f(s) of the function and 
- * its directional-derivative f'(s) (the dot product of a search-direction 
+ * its directional derivative f'(s) (the dot product of a search-direction 
  * vector and the function's gradient) to find a step s that minimizes the 
  * function along the line constraining the search. The search assumes that 
  * f'(0) &lt; 0, and searches for a positive s that minimizes f(s).
@@ -59,6 +59,17 @@ import static edu.mines.jtk.util.MathPlus.*;
  * If no step can be found that satisfies both conditions, then the 
  * algorithm ends unconverged. In this case the step s satisifies only 
  * the sufficient-decrease condition.
+ * <p>
+ * References: 
+ * <ul><li>
+ * Mor'e, J.J., and Thuente, D.J., 1992, Line search algorithms with
+ * guaranteed sufficient decrease: Preprint MCS-P330-1092, Argonne
+ * National Laboratory.
+ * </li><li>
+ * Averick, B.M., and Mor'e, J.J., 1993, FORTRAN subroutines dcstep
+ * and dcsrch from MINPACK-2, 1993, Argonne National Laboratory and
+ * University of Minnesota.
+ * </li></ul>
  * 
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.09.02
@@ -69,21 +80,13 @@ public class LineSearch {
    * The function to be minimized.
    */
   public interface Function {
-    // TODO: combine eval of f and f'.
 
     /**
-     * Evaluates the function for a specified step.
+     * Evaluates the function and its derivative for the especified step.
      * @param s the step.
-     * @return the value f(s).
+     * @return array {f(s),f'(s)}
      */
-    double f(double s);
-
-    /**
-     * Evaluates the derivative for a specified step.
-     * @param s the step.
-     * @return the derivative g(s) = f'(s).
-     */
-    double g(double s);
+    public double[] evaluate(double s);
   }
 
   /**
@@ -214,8 +217,9 @@ public class LineSearch {
     double slo = 0.0;
     double shi = s*(1.0+SHI_FACTOR);
 
-    f = _func.f(s); 
-    g = _func.g(s); 
+    double[] fg = _func.evaluate(s); 
+    f = fg[0];
+    g = fg[1];
     int neval = 1;
     int ended = 0;
     while (ended==0) {
@@ -304,15 +308,16 @@ public class LineSearch {
         s = max(s,smin);
         s = min(s,smax);
 
-        // If no progress, step s is best found so far.
+        // If further progress is impossible, step s is best found so far.
         if ((bracketed && (s<=slo || s>=shi)) ||
             (bracketed && shi-slo<=_stol*shi)) 
           s = sa;
       }
 
       // Evaluate function f(s) and derivative f'(s).
-      f = _func.f(s); 
-      g = _func.g(s); 
+      fg = _func.evaluate(s); 
+      f = fg[0];
+      g = fg[1];
       ++neval;
     }
 
@@ -361,11 +366,11 @@ public class LineSearch {
       double q = ((gamma-ga)+gamma)+gp;
       double r = p/q;
       double spc = sa+r*(sp-sa);
-      double spq = sa+(0.5*(ga/((fa-fp)/(sp-sa)+ga)))*(sp-sa);
+      double spq = sa+((ga/((fa-fp)/(sp-sa)+ga))/2.0)*(sp-sa);
       if (abs(spc-sa)<abs(spq-sa)) {
         spf = spc;
       } else {
-        spf = spc+0.5*(spq-spc);
+        spf = spc+(spq-spc)/2.0;
       }
       bracketed = true;
     }
