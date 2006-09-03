@@ -7,6 +7,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.opt;
 
 import edu.mines.jtk.util.Almost;
+import edu.mines.jtk.util.LogMonitor;
+import edu.mines.jtk.util.Monitor;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
