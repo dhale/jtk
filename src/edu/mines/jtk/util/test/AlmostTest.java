@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.util.test;
 
 import edu.mines.jtk.util.Almost;
+import edu.mines.jtk.util.MathPlus;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
@@ -125,10 +126,10 @@ public class AlmostTest extends TestCase {
      test Object methods
    */
   public void testAlmostObjectMethod() {
-    Almost af1= new Almost(10*Almost.FLT_EPSILON, 100*Float.MIN_VALUE);
-    Almost af2 = new Almost(10*Almost.FLT_EPSILON);
+    Almost af1= new Almost(10*MathPlus.FLT_EPSILON, 100*Float.MIN_VALUE);
+    Almost af2 = new Almost(10*MathPlus.FLT_EPSILON);
     Almost af3 = new Almost();
-    Almost ad = new Almost(10*Almost.DBL_EPSILON, 100*Double.MIN_VALUE);
+    Almost ad = new Almost(10*MathPlus.DBL_EPSILON, 100*Double.MIN_VALUE);
     assert af1.equals(af2): af1+" "+af2;
     assert af1.equals(af3): af1+" "+af3;
     assert af2.equals(af3): af2+" "+af3;
