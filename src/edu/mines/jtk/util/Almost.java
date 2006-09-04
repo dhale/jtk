@@ -9,6 +9,9 @@ import java.io.Serializable;
 import java.util.Comparator;
 import java.util.logging.Logger;
 
+import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
+import static edu.mines.jtk.util.MathPlus.DBL_EPSILON;
+
 /** This class allows safe comparisons of floating point numbers
     with limited precision.
     The Comparator interface should be used for instances of
@@ -16,18 +19,10 @@ import java.util.logging.Logger;
     @author W.S. Harlan
 */
 public class Almost implements Serializable, Comparator<Number> {
-  static final long serialVersionUID = -5986731124649938548L;
+  static final long serialVersionUID = 1;
   @SuppressWarnings("unused")
     private static final Logger LOG
     = Logger.getLogger(Almost.class.getName());
-
-  /** The smallest positive number that can be added to a float 1
-      before the number is considered different from 1. */
-  public static final float FLT_EPSILON = 1.192092896e-07f;
-
-  /** The absolutely smallest positive number that can be added to a double 1
-      before the number is considered different from 1. */
-  public static final double DBL_EPSILON = 2.2204460492503131e-016;
 
   /** Default epsilon assumes math has destroyed one digit of accuracy.*/
   private double _epsilon = 10.*FLT_EPSILON;
@@ -49,8 +44,8 @@ public class Almost implements Serializable, Comparator<Number> {
   /** Specify precision to be used for operations.
       @param epsilon The smallest positive number that can be added to 1
       before the number is considered different from 1.
-      For double precision, use a multiple of 2.2204460492503131e-016;
-      For float precision use a multiple of 1.192092896e-07.
+      For double precision, use a multiple of MathPlus.DBL_EPSILON.
+      For float precision use a multiple of MathPlus.FLT_EPSILON.
       I recommend multiplying these values by at least 10
       to allow for errors introduced by arithmetic.
       @param minValue The smallest positive value that should be
