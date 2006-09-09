@@ -8,7 +8,6 @@ package edu.mines.jtk.io;
 
 import java.io.*;
 import java.nio.ByteOrder;
-import javax.jnlp.JNLPRandomAccessFile;
 import static java.lang.Math.min;
 
 /**
@@ -23,8 +22,7 @@ import static java.lang.Math.min;
  * <p>
  * An array file can be constructed by specifying a file name and access mode 
  * (as for a {@link java.io.RandomAccessFile}). Alternatively, an array file 
- * can be constructed from an existing {@link java.io.RandomAccessFile} or 
- * {@link javax.jnlp.JNLPRandomAccessFile}.
+ * can be constructed from an existing {@link java.io.RandomAccessFile}.
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.08.05
@@ -91,21 +89,6 @@ public class ArrayFile implements ArrayInput, ArrayOutput, Closeable {
   }
 
   /**
-   * Constructs an array file for a specified JNLP random-access file
-   * and byte orders.
-   * @param raf the JNLP random-access file.
-   * @param bor the byte order for reading.
-   * @param bow the byte order for writing.
-   */
-  public ArrayFile(JNLPRandomAccessFile raf, ByteOrder bor, ByteOrder bow) {
-    _rafJnlp = raf;
-    _bor = bor;
-    _bow = bow;
-    _ai = new ArrayInputAdapter(raf,bor);
-    _ao = new ArrayOutputAdapter(raf,bow);
-  }
-
-  /**
    * Gets the byte order for reading data.
    * @return the byte order.
    */
@@ -127,11 +110,7 @@ public class ArrayFile implements ArrayInput, ArrayOutput, Closeable {
    * @return the byte value.
    */
   public int read() throws IOException {
-    if (_raf!=null) {
-      return _raf.read();
-    } else {
-      return _rafJnlp.read();
-    }
+    return _raf.read();
   }
 
   /**
@@ -140,11 +119,7 @@ public class ArrayFile implements ArrayInput, ArrayOutput, Closeable {
    * @return the number of bytes read; -1 if end of file.
    */
   public int read(byte[] b) throws IOException {
-    if (_raf!=null) {
-      return _raf.read(b);
-    } else {
-      return _rafJnlp.read(b);
-    }
+    return _raf.read(b);
   }
 
   /**
@@ -155,11 +130,7 @@ public class ArrayFile implements ArrayInput, ArrayOutput, Closeable {
    * @return the number of bytes read; -1 if end of file.
    */
   public int read(byte[] b, int off, int len) throws IOException {
-    if (_raf!=null) {
-      return _raf.read(b,off,len);
-    } else {
-      return _rafJnlp.read(b,off,len);
-    }
+    return _raf.read(b,off,len);
   }
 
   public void readFully(byte[] b) throws IOException {
@@ -192,11 +163,7 @@ public class ArrayFile implements ArrayInput, ArrayOutput, Closeable {
    * @return the file pointer.
    */
   public long getFilePointer() throws IOException {
-    if (_raf!=null) {
-      return _raf.getFilePointer();
-    } else {
-      return _rafJnlp.getFilePointer();
-    }
+    return _raf.getFilePointer();
   }
 
   /**
@@ -210,11 +177,7 @@ public class ArrayFile implements ArrayInput, ArrayOutput, Closeable {
    *  beginning of the file.
    */
   public void seek(long off) throws IOException {
-    if (_raf!=null) {
-      _raf.seek(off);
-    } else {
-      _rafJnlp.seek(off);
-    }
+    _raf.seek(off);
   }
 
   /**
@@ -222,11 +185,7 @@ public class ArrayFile implements ArrayInput, ArrayOutput, Closeable {
    * @return the file length, in bytes.
    */
   public long length() throws IOException {
-    if (_raf!=null) {
-      return _raf.length();
-    } else {
-      return _rafJnlp.length();
-    }
+    return _raf.length();
   }
 
   /**
@@ -241,24 +200,15 @@ public class ArrayFile implements ArrayInput, ArrayOutput, Closeable {
    * @param newLength the new length.
    */
   public void setLength(long newLength) throws IOException {
-    if (_raf!=null) {
-      _raf.setLength(newLength);
-    } else {
-      _rafJnlp.setLength(newLength);
-    }
+    _raf.setLength(newLength);
   }
 
   /**
    * Closes this data file, releasing any associated system resources.
    */
   public void close() throws IOException {
-    if (_raf!=null) {
-      _raf.close();
-      _raf = null;
-    } else {
-      _rafJnlp.close();
-      _rafJnlp = null;
-    }
+    _raf.close();
+    _raf = null;
     _ai = null;
     _ao = null;
   }
@@ -865,7 +815,6 @@ public class ArrayFile implements ArrayInput, ArrayOutput, Closeable {
   // Only one of these is non-null, depending on which type of
   // RandomAccessFile is wrapped by this array file.
   private RandomAccessFile _raf;
-  private JNLPRandomAccessFile _rafJnlp;
   private ByteOrder _bor;
   private ByteOrder _bow;
   private ArrayInput _ai;
