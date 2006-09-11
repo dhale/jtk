@@ -20,26 +20,31 @@ public class LinearTransformWrapper implements Transform {
     _linearTransform = linearTransform;
   }
 
+  // Transform
   public void forwardNonlinear(Vect data, VectConst model) {
     _linearTransform.forward(data, model);
   }
 
+  // Transform
   public void forwardLinearized(Vect data,
                                 VectConst model,
                                 VectConst modelReference) {
     _linearTransform.forward(data, model);
   }
 
+  // Transform
   public void addTranspose(VectConst data,
                            Vect model,
                            VectConst modelReference) {
     _linearTransform.addTranspose(data, model);
   }
 
+  // Transform
   public void inverseHessian(Vect model, VectConst modelReference) {
     _linearTransform.inverseHessian(model);
   }
 
+  // Transform
   public void adjustRobustErrors(Vect dataError) {
     _linearTransform.adjustRobustErrors(dataError);
   }

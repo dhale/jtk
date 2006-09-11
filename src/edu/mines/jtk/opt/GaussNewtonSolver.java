@@ -247,9 +247,7 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
       return result;
     }
 
-    /**
-     * Free resources
-     */
+    /** Free resources */
     public void dispose() {
       _model.dispose();
     }
@@ -257,7 +255,7 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
 
   /** Turn on expensive checking of transform and vector properties
       during solving of equations.
- * @param debug If true, then turn on expensive debugging.*/
+      @param debug If true, then turn on expensive debugging.*/
   public static void setExpensiveDebug(boolean debug) {
     s_expensiveDebug = debug;
   }

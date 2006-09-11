@@ -48,6 +48,7 @@ public class VectMap implements VectContainer {
     return result;
   }
 
+  // Get private instance
   private Vect getPrivate(int index) {
     return _map.get(index);
   }
@@ -154,6 +155,7 @@ public class VectMap implements VectContainer {
     addOrProject(scaleThis, scaleOther, other, true);
   }
 
+  // implementation of both add and project
   private void addOrProject
     (double scaleThis, double scaleOther, VectConst other, boolean project)  {
 

@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.opt;
 
 import edu.mines.jtk.util.Almost;
+import edu.mines.jtk.util.LoggerStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,7 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /** Implements convenience methods for Vect.
-
     @author W.S. Harlan
 */
 public class VectUtil {
@@ -102,7 +102,6 @@ public class VectUtil {
     check = t.dot(vect)/vect.dot(vect);
     ass(Almost.FLOAT.equal(check, 1.5), "not 1.5 check="+check);
 
-    // t.add(1., -3.5, vect);
     t.add(2., -5., vect);
     check = t.dot(vect)/vect.dot(vect);
     ass(Almost.FLOAT.equal(check, -2.), "not -2, check="+check);
@@ -156,7 +155,7 @@ public class VectUtil {
       t = null;
       data = baos.toByteArray();
     } catch (IOException e) {
-      e.printStackTrace(new edu.mines.jtk.util.LoggerStream(LOG, Level.SEVERE));
+      e.printStackTrace(new LoggerStream(LOG, Level.SEVERE));
       ass(false, "writing serialization failed "+e.getMessage());
     }
     try {
@@ -180,13 +179,12 @@ public class VectUtil {
            " vv="+vv);
       t.dispose();
     } catch (IOException e) {
-      e.printStackTrace(new edu.mines.jtk.util.LoggerStream(LOG, Level.SEVERE));
+      e.printStackTrace(new LoggerStream(LOG, Level.SEVERE));
       ass(false, "reading serialization failed "+e.getMessage());
     } catch (ClassNotFoundException e) {
-      e.printStackTrace(new edu.mines.jtk.util.LoggerStream(LOG, Level.SEVERE));
+      e.printStackTrace(new LoggerStream(LOG, Level.SEVERE));
       ass (false, "Can't find class just written "+e.getMessage());
     }
-
   }
 
   /** Return the number of significant digits in the dot product
@@ -194,7 +192,7 @@ public class VectUtil {
       @param data Nonzero sample data
       @param model A nonzero sample model.
       @param transform The transform to test.
- * @return number of digits in precision.
+      @return number of digits in precision.
    */
   public static int getTransposePrecision(VectConst data, VectConst model,
                                           Transform transform) {
@@ -208,9 +206,9 @@ public class VectUtil {
     return precision;
   }
 
+  // Assertion that cannot be disabled.
   private static void ass(boolean condition, String requirement) {
     if (!condition) throw new IllegalStateException(requirement);
   }
-
 }
 

@@ -44,11 +44,11 @@ public class ScalarSolver {
       @param scalarMin The minimum value allowed for the argument scalar.
       @param scalarMax The maximum value allowed for the argument scalar.
       @param okError The unknown error in scalar should be less than this
-      fraction of the range: dscalar/(scalarMax-scalarMin) <= okError,
+      fraction of the range: dscalar/(scalarMax-scalarMin) &lt;= okError,
       where dscalar is the error bound on the returned value of scalar.
       @param okFraction The error in scalar should be less than
       this fraction of the minimum possible range for scalar:
-      dscalar <= okFraction*(scalar-scalarMin),
+      dscalar &lt;= okFraction*(scalar-scalarMin),
       where dscalar is the error bound on the returned value of scalar.
       @param numberIterations The maximum number of iterations if greater
       than 6.  The optimization performs at least 6 iterations --
@@ -98,11 +98,11 @@ public class ScalarSolver {
       }
       fraction = Almost.FLOAT.divide(error, xmin, 0.);
       /*
-      LOG.fine ("iter="+iter);
-      LOG.fine ("xs[0]="+xs[0]+" xs[1]="+xs[1]+" xs[2]="+xs[2]+" xs[3]="+xs[3]);
-      LOG.fine ("fs[0]="+fs[0]+" fs[1]="+fs[1]+" fs[2]="+fs[2]+" fs[3]="+fs[3]);
-      LOG.fine ("imin="+imin+" xmin="+xmin+" fraction="+fraction);
-      LOG.fine (" error="+error+ " previousError="+previousError
+      LOG.fine("iter="+iter);
+      LOG.fine("xs[0]="+xs[0]+" xs[1]="+xs[1]+" xs[2]="+xs[2]+" xs[3]="+xs[3]);
+      LOG.fine("fs[0]="+fs[0]+" fs[1]="+fs[1]+" fs[2]="+fs[2]+" fs[3]="+fs[3]);
+      LOG.fine("imin="+imin+" xmin="+xmin+" fraction="+fraction);
+      LOG.fine(" error="+error+ " previousError="+previousError
              +" previousPreviousError="+previousPreviousError);
       */
 
@@ -222,25 +222,25 @@ public class ScalarSolver {
   }
 
   /** @param x A fraction of the distance between scalarMin and scalarMax
- * @param scalarMin Minimum scalar
- * @param scalarMax Maximum scalar
- * @return optimum fraction of distance between minimum and maximum scalars
+      @param scalarMin Minimum scalar
+      @param scalarMax Maximum scalar
+      @return optimum fraction of distance between minimum and maximum scalars
    */
   private double function(double x, double scalarMin, double scalarMax) {
     return function(scalarMin + x*(scalarMax - scalarMin));
   }
 
   /** Evaluate function
-   * @param scalar Argument for embedded function
-    * @return Value of function
-   */
+      @param scalar Argument for embedded function
+      @return Value of function
+  */
   private double function(double scalar) {
     return _function.function(scalar);
   }
 
   /**  Fit a parabola to three points and find the minimum point.
        where f(x1) = f1; f(x2) = f2; f(x3) = f3;
-       and where x1 < x2 < x3; f(x2) < f(x1); f(x2) < f(x3).
+       and where x1 &lt; x2 &lt; x3; f(x2) &lt; f(x1); f(x2) &lt; f(x3).
        @param x1 A value of the argument to the parabolic function
        @param f1 The value of the function f(x1) at x1
        @param x2 A value of the argument to the parabolic function
@@ -249,14 +249,15 @@ public class ScalarSolver {
        @param f3 The value of the function f(x3) at x3
        @return Value of x that minimizes function f(x)
        @exception BadParabolaException If the arguments
-       describe a parabola that cannot be minimized in the range x1 < x <x3,
+       describe a parabola that cannot be minimized in the range
+       x1 &lt; x &lt;x3,
        or if the following strict inequalities
-       are not true: x1 < x2 < x3; f(x2) < f(x1), f(x2) < f(x3),
+       are not true: x1 &lt; x2 &lt; x3; f(x2) &lt; f(x1), f(x2) &lt; f(x3),
        or if the x2 is too close to one of the endpoints
        to describe a parabola accurately.
- * @throws IllegalArgumentException If input values lead to degenerate
- * solutions.
-   */
+       @throws IllegalArgumentException If input values lead to degenerate
+       solutions.
+  */
   private double minParabola(double x1, double f1,
                              double x2, double f2,
                              double x3, double f3)
@@ -306,7 +307,7 @@ public class ScalarSolver {
     private static final long serialVersionUID = 1L;
     /** Available points do not describe a valid parabola
        @param message Error message
-     */
+    */
     public BadParabolaException(String message) {super (message);}
   }
 
@@ -345,11 +346,11 @@ public class ScalarSolver {
 
     /** For sorting with Arrays.sort */
     private class MyComparable implements Comparable {
-      /**  */
+      /** Array index */
       public int index = 0;
 
       /** Constructor.
-          @param index
+          @param index index into array.
       */
       public MyComparable(int index) {this.index = index;}
 

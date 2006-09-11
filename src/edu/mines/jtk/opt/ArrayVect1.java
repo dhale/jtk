@@ -64,6 +64,7 @@ public class ArrayVect1 implements Vect {
     return _data;
   }
 
+  // Cloneable
   @Override public ArrayVect1 clone() {
     try {
       ArrayVect1 result = (ArrayVect1) super.clone();
@@ -76,6 +77,7 @@ public class ArrayVect1 implements Vect {
     }
   }
 
+  // VectConst
   public double dot(VectConst other) {
     double result = 0;
     ArrayVect1 rhs = (ArrayVect1) other;
@@ -85,6 +87,7 @@ public class ArrayVect1 implements Vect {
     return result;
   }
 
+  // Object
   @Override public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("(");
@@ -96,19 +99,24 @@ public class ArrayVect1 implements Vect {
     return sb.toString();
   }
 
+  // Vect
   public void dispose() {
     _data = null;
   }
 
+  // Vect
   public void multiplyInverseCovariance() {
     double scale = Almost.FLOAT.divide (1., getSize()*_variance, 0.);
     VectUtil.scale(this, scale);
   }
 
+  // Vect
   public void constrain() {}
 
+  // Vect
   public void postCondition() {}
 
+  // Vect
   public void add(double scaleThis, double scaleOther, VectConst other)  {
     ArrayVect1 rhs = (ArrayVect1) other;
     for (int i=0; i<_data.length; ++i) {
@@ -116,10 +124,12 @@ public class ArrayVect1 implements Vect {
     }
   }
 
+  // Vect
   public void project(double scaleThis, double scaleOther, VectConst other)  {
     add(scaleThis, scaleOther, other);
   }
 
+  // VectConst
   public double magnitude() {
     return Almost.FLOAT.divide (this.dot(this), getSize()*_variance, 0.);
   }

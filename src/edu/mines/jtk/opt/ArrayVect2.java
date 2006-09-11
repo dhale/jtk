@@ -10,20 +10,20 @@ import edu.mines.jtk.util.Almost;
 import java.util.logging.*;
 
 /** Implement a Vect as a two dimensional array of doubles.
- The embedded data are exposed by a getData method.  For all practical
- purposes this member is public, except that this class must always
- point to the same array.  The implementation as an array
- is the point of this class, to avoid duplicate implementations
- elsewhere.  Multiple inheritance is prohibited and
- prevents the mixin pattern, but you can share the wrapped array
- as a private member of your own class,
- and easily delegate all implemented methods.
- @author W.S.Harlan
+    The embedded data are exposed by a getData method.  For all practical
+    purposes this member is public, except that this class must always
+    point to the same array.  The implementation as an array
+    is the point of this class, to avoid duplicate implementations
+    elsewhere.  Multiple inheritance is prohibited and
+    prevents the mixin pattern, but you can share the wrapped array
+    as a private member of your own class,
+    and easily delegate all implemented methods.
+    @author W.S.Harlan
 */
 
 public class ArrayVect2 implements Vect {
   @SuppressWarnings("unused")
-private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+    private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   private static final long serialVersionUID = 1L;
 
   /** wrapped data */
@@ -75,6 +75,7 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
     }
   }
 
+  // Vect interface
   public void project(double scaleThis, double scaleOther, VectConst other) {
     add(scaleThis, scaleOther, other);
   }
@@ -90,6 +91,7 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
     VectUtil.scale(this, scale);
   }
 
+  // VectConst interface
   public double magnitude() {
     return Almost.FLOAT.divide (this.dot(this), getSize()*_variance, 0.);
   }

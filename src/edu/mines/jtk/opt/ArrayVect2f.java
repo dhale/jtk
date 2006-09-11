@@ -146,7 +146,7 @@ public class ArrayVect2f implements Vect {
   // Vect interface
   public void postCondition() {}
 
-  // VectConst interface
+  // Cloneable, VectConst interface
   @Override public ArrayVect2f clone() {
     try {
       float[][] newData = new float[_data.length][];

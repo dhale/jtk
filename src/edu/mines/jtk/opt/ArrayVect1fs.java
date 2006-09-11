@@ -11,8 +11,7 @@ import java.util.logging.Logger;
 
 import edu.mines.jtk.util.Almost;
 
-/** Implements a Vect as a collection of ArrayVect1f's,
-    of fixed size.
+/** Implements a Vect as a collection of ArrayVect1f's of fixed size.
     @author W.S. Harlan
 */
 public class ArrayVect1fs implements Vect {
@@ -33,7 +32,7 @@ public class ArrayVect1fs implements Vect {
   public ArrayVect1fs() {}
 
   /** Initialize class
- * @param data Wrap this collection of 1D arrays */
+      @param data Wrap this collection of 1D arrays */
   private void init(ArrayVect1f[] data)  {_data = data;}
 
   /** Return the size of the embedded array
@@ -48,6 +47,7 @@ public class ArrayVect1fs implements Vect {
     return _data;
   }
 
+  // Cloneable
   @Override public ArrayVect1fs clone() {
     try {
       ArrayVect1fs result = (ArrayVect1fs) super.clone();
@@ -66,6 +66,7 @@ public class ArrayVect1fs implements Vect {
     }
   }
 
+  // Vect
   public double dot(VectConst other) {
     double result = 0;
     ArrayVect1fs rhs = (ArrayVect1fs) other;
@@ -75,6 +76,7 @@ public class ArrayVect1fs implements Vect {
     return result;
   }
 
+  // Object
   @Override public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("(");
@@ -86,6 +88,7 @@ public class ArrayVect1fs implements Vect {
     return sb.toString();
   }
 
+  // Vect
   public void dispose() {
     for (int i=0; i<_data.length; ++i) {
       _data[i].dispose();
@@ -93,6 +96,7 @@ public class ArrayVect1fs implements Vect {
     _data = null;
   }
 
+  // Vect
   public void multiplyInverseCovariance() {
     double scale = Almost.FLOAT.divide (1., getSize(), 0.);
     for (int i=0; i<_data.length; ++i) {
@@ -101,6 +105,7 @@ public class ArrayVect1fs implements Vect {
     }
   }
 
+  // Vect
   public void constrain() {
     for (int i=0; i<_data.length; ++i) {
       _data[i].constrain();
@@ -110,6 +115,7 @@ public class ArrayVect1fs implements Vect {
   // Vect
   public void postCondition() {}
 
+  // Vect
   public void add(double scaleThis, double scaleOther, VectConst other)  {
     ArrayVect1fs rhs = (ArrayVect1fs) other;
     for (int i=0; i<_data.length; ++i) {
@@ -117,10 +123,12 @@ public class ArrayVect1fs implements Vect {
     }
   }
 
+  // Vect
   public void project(double scaleThis, double scaleOther, VectConst other)  {
     add(scaleThis, scaleOther, other);
   }
 
+  // VectConst
   public double magnitude() {
     double result = 0.;
     for (int i=0; i<_data.length; ++i) {

@@ -104,6 +104,7 @@ public class ArrayVect3f implements Vect {
     VectUtil.scale(this, scale);
   }
 
+  // VectConst interface
   public double magnitude() {
     return Almost.FLOAT.divide (this.dot(this), getSize()*_variance, 0.);
   }

@@ -13,6 +13,7 @@ package edu.mines.jtk.opt;
     @author W.S. Harlan
 */
 public interface VectContainer extends Vect {
+
   /** Save a vect for the specified index.
       @param index A unique integer for the requested vect.
       Integers need not be consecutive.  Use any valid integer.

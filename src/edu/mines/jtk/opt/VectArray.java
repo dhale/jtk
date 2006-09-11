@@ -125,6 +125,7 @@ public class VectArray implements VectContainer {
     addOrProject(scaleThis, scaleOther, other, true);
   }
 
+  // implementation of both project and add.
   private void addOrProject
     (double scaleThis, double scaleOther, VectConst other, boolean project)  {
 

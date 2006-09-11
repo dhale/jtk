@@ -16,7 +16,7 @@ public class ScalarVect implements Vect {
   /** variance for value */
   protected double _variance = 1.;
   @SuppressWarnings("unused")
-private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+    private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   private static final long serialVersionUID = 1L;
 
   /** Specify the initial value
@@ -53,8 +53,8 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
    */
   public void set(double value) {_value = value;}
 
-  @Override
-public ScalarVect clone() {
+  // VectConst, Cloneable
+  @Override public ScalarVect clone() {
     try {
       ScalarVect result = (ScalarVect) super.clone();
       return result;
@@ -65,38 +65,46 @@ public ScalarVect clone() {
     }
   }
 
+  // VectConst
   public double dot(VectConst other) {
     ScalarVect rhs = (ScalarVect) other;
     return _value * rhs._value;
   }
 
-  @Override
-public String toString() {
+  // Object
+  @Override public String toString() {
     return "ScalarVect<"+_value+">";
   }
 
+  // Vect
   public void dispose() {
     _value = Double.NaN;
     _variance = Double.NaN;
   }
 
+  // Vect
   public void multiplyInverseCovariance() {
     _value = Almost.FLOAT.divide (_value, _variance, 0.);
   }
 
+  // Vect
   public void constrain() {}
 
+  // Vect
   public void postCondition() {}
 
+  // Vect
   public void add(double scaleThis, double scaleOther, VectConst other)  {
     ScalarVect rhs = (ScalarVect) other;
     _value = scaleThis * _value + scaleOther * rhs._value;
   }
 
+  // Vect
   public void project(double scaleThis, double scaleOther, VectConst other)  {
     add(scaleThis, scaleOther, other);
   }
 
+  // VectConst
   public double magnitude() {
     return Almost.FLOAT.divide (this.dot(this), _variance, 0.);
   }

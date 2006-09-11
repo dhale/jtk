@@ -6,8 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-/** Vector operations that do not change the state of the vector 
-
+/** Vector operations that do not change the state of the vector
     @author W.S. Harlan
  */
 public interface VectConst extends Cloneable, java.io.Serializable {
@@ -31,11 +30,11 @@ public interface VectConst extends Cloneable, java.io.Serializable {
       return this.dot(vect);
       </pre>
       But you can usually avoid the clone.
- * @return magnitude of vector.
+      @return magnitude of vector.
   */
   public double magnitude() ;
 
-  // You can clone a mutable version of a VectConst
+  // Cloneable: You can clone a mutable version of a VectConst
   public Vect clone();
 }
 

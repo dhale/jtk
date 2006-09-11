@@ -137,5 +137,4 @@ public class QuadraticSolver {
       throw new IllegalStateException("Value is a NaN");
     }
   }
-
 }

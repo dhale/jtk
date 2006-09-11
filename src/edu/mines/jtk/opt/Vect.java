@@ -8,7 +8,6 @@ package edu.mines.jtk.opt;
 
 /** Implement a vector supporting linear vector-space methods
     Test your implementation with VectUtil.test().
-
     @author W.S. Harlan
  */
 public interface Vect extends VectConst {
@@ -71,7 +70,7 @@ public interface Vect extends VectConst {
   */
   public void postCondition();
 
-  // Object
+  // Cloneable, but override return type
   public Vect clone();
 }
 
