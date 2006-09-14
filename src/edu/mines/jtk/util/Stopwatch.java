@@ -12,8 +12,11 @@ package edu.mines.jtk.util;
  * can be read in either state, and that time can be reset to zero.
  * <p>
  * Stopwatch time is elapsed (wall-clock) time, not process or CPU time. 
- * Stopwatch time resolution is one millisecond. In other words, a 
- * stopwatch cannot measure a time difference less than one millisecond.
+ * Stopwatch time resolution is one nanosecond. In other words, a 
+ * stopwatch cannot measure a time difference less than one nanosecond.
+ * On the other hand, the granularity of the stopwatch depends on the
+ * underlying operating system and may be larger.
+ * @see System#nanoTime()
  * @author Dave Hale, Colorado School of Mines
  * @author Dean Witte, Transform Software
  * @version 2004.11.02
