@@ -7,8 +7,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.util;
 
 import java.io.*;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 /**
  * A parameter set - a collection of named parameters and parameter subsets.
@@ -48,8 +48,8 @@ public class ParameterSet implements Cloneable, Externalizable {
     try {
       ParameterSet ps = (ParameterSet)super.clone();
       ps._parent = null;
-      ps._pars = new Hashtable<String, Parameter>();
-      ps._parsets = new Hashtable<String, ParameterSet>();
+      ps._pars = new LinkedHashMap<String, Parameter>();
+      ps._parsets = new LinkedHashMap<String, ParameterSet>();
       return ps.replaceWith(this);
     } catch (CloneNotSupportedException e) {
       throw new InternalError();
@@ -68,13 +68,13 @@ public class ParameterSet implements Cloneable, Externalizable {
     if (parset==this) return this;
     setName(parset.getName());
     clear();
-    Enumeration pe = parset.getParameters();
-    while (pe.hasMoreElements()) {
-      ((Parameter)pe.nextElement()).copyTo(this);
+    Iterator<Parameter> pi = parset.getParameters();
+    while (pi.hasNext()) {
+      pi.next().copyTo(this);
     }
-    Enumeration pse = parset.getParameterSets();
-    while (pse.hasMoreElements()) {
-      ((ParameterSet)pse.nextElement()).copyTo(this);
+    Iterator<ParameterSet> psi = parset.getParameterSets();
+    while (psi.hasNext()) {
+      psi.next().copyTo(this);
     }
     return this;
   }
@@ -103,7 +103,7 @@ public class ParameterSet implements Cloneable, Externalizable {
    *  parameter with the specified name.
    */
   public Parameter getParameter(String name) {
-    return (Parameter)_pars.get(name);
+    return _pars.get(name);
   }
 
   /**
@@ -113,7 +113,7 @@ public class ParameterSet implements Cloneable, Externalizable {
    *  subset with the specified name.
    */
   public ParameterSet getParameterSet(String name) {
-    return (ParameterSet)_parsets.get(name);
+    return _parsets.get(name);
   }
 
   /**
@@ -538,15 +538,15 @@ public class ParameterSet implements Cloneable, Externalizable {
     ParameterSet ps = new ParameterSet(name);
 
     // Copy our pars.
-    Enumeration pe = getParameters();
-    while (pe.hasMoreElements()) {
-      ((Parameter)pe.nextElement()).copyTo(ps);
+    Iterator<Parameter> pi = getParameters();
+    while (pi.hasNext()) {
+      pi.next().copyTo(ps);
     }
 
     // Copy our parsets.
-    Enumeration pse = getParameterSets();
-    while (pse.hasMoreElements()) {
-      ((ParameterSet)pse.nextElement()).copyTo(ps);
+    Iterator<ParameterSet> psi = getParameterSets();
+    while (psi.hasNext()) {
+      psi.next().copyTo(ps);
     }
 
     // Insert the destination parset into the specified parent.
@@ -648,13 +648,13 @@ public class ParameterSet implements Cloneable, Externalizable {
   public void clear() {
 
     // Orphan our children.
-    Enumeration pe = getParameters();
-    while (pe.hasMoreElements()) {
-      ((Parameter)pe.nextElement()).setParent(null);
+    Iterator<Parameter> pi = getParameters();
+    while (pi.hasNext()) {
+      pi.next().setParent(null);
     }
-    Enumeration pse = getParameterSets();
-    while (pse.hasMoreElements()) {
-      ((ParameterSet)pse.nextElement()).setParent(null);
+    Iterator<ParameterSet> psi = getParameterSets();
+    while (psi.hasNext()) {
+      psi.next().setParent(null);
     }
 
     // Clear our maps.
@@ -673,19 +673,19 @@ public class ParameterSet implements Cloneable, Externalizable {
   }
 
   /**
-   * Enumerate the parameters in this parameter set.
-   * @return enumeration.
+   * Gets an iterator for the parameters in this parameter set.
+   * @return the iterator.
    */
-  public Enumeration getParameters() {
-    return _pars.elements();
+  public Iterator<Parameter> getParameters() {
+    return _pars.values().iterator();
   }
 
   /**
-   * Enumerate the parameter sets in this parameter set.
-   * @return enumeration.
+   * Gets an iterator for the parameter sets in this parameter set.
+   * @return the iterator.
    */
-  public Enumeration getParameterSets() {
-    return _parsets.elements();
+  public Iterator<ParameterSet> getParameterSets() {
+    return _parsets.values().iterator();
   }
 
   /**
@@ -724,16 +724,16 @@ public class ParameterSet implements Cloneable, Externalizable {
     sb.append(indent).append("<parset name=").append(name).append(">\n");
 
     // Stringify our parameters.
-    Enumeration pe = getParameters();
-    while (pe.hasMoreElements()) {
-      Parameter p = (Parameter)pe.nextElement();
+    Iterator<Parameter> pi = getParameters();
+    while (pi.hasNext()) {
+      Parameter p = pi.next();
       sb.append(p.toString());
     }
 
     // Stringify our parameter subsets.
-    Enumeration pse = getParameterSets();
-    while (pse.hasMoreElements()) {
-      ParameterSet ps = (ParameterSet)pse.nextElement();
+    Iterator<ParameterSet> psi = getParameterSets();
+    while (psi.hasNext()) {
+      ParameterSet ps = psi.next();
       sb.append(ps.toString());
     }
 
@@ -778,14 +778,14 @@ public class ParameterSet implements Cloneable, Externalizable {
       Parameter[] these = new Parameter[npars];
       Parameter[] those = new Parameter[npars];
       int i = 0;
-      Enumeration e= getParameters();
-      while (e.hasMoreElements()) {
-        these[i++] = (Parameter)e.nextElement();
+      Iterator<Parameter> pi = getParameters();
+      while (pi.hasNext()) {
+        these[i++] = pi.next();
       }
       i = 0;
-      e = other.getParameters();
-      while (e.hasMoreElements()) {
-        those[i++] = (Parameter)e.nextElement();
+      pi = other.getParameters();
+      while (pi.hasNext()) {
+        those[i++] = pi.next();
       }
       sortParametersByName(these);
       sortParametersByName(those);
@@ -800,14 +800,14 @@ public class ParameterSet implements Cloneable, Externalizable {
       ParameterSet[] these = new ParameterSet[nparsets];
       ParameterSet[] those = new ParameterSet[nparsets];
       int i = 0;
-      Enumeration e= getParameterSets();
-      while (e.hasMoreElements()) {
-        these[i++] = (ParameterSet)e.nextElement();
+      Iterator<ParameterSet> psi = getParameterSets();
+      while (psi .hasNext()) {
+        these[i++] = psi.next();
       }
       i = 0;
-      e = other.getParameterSets();
-      while (e.hasMoreElements()) {
-        those[i++] = (ParameterSet)e.nextElement();
+      psi = other.getParameterSets();
+      while (psi.hasNext()) {
+        those[i++] = psi.next();
       }
       sortParameterSetsByName(these);
       sortParameterSetsByName(those);
@@ -828,13 +828,13 @@ public class ParameterSet implements Cloneable, Externalizable {
   public int hashCode() {
     String name = (_name!=null)?_name:"name";
     int code = name.hashCode();
-    Enumeration pars = getParameters();
-    while (pars.hasMoreElements()) {
-      code ^= ((Parameter)pars.nextElement()).hashCode();
+    Iterator<Parameter> pars = getParameters();
+    while (pars.hasNext()) {
+      code ^= pars.next().hashCode();
     }
-    Enumeration parsets = getParameterSets();
-    while (parsets.hasMoreElements()) {
-      code ^= ((ParameterSet)parsets.nextElement()).hashCode();
+    Iterator<ParameterSet> parsets = getParameterSets();
+    while (parsets.hasNext()) {
+      code ^= parsets.next().hashCode();
     }
     return code;
   }
@@ -889,10 +889,10 @@ public class ParameterSet implements Cloneable, Externalizable {
 
   private String _name;
   private ParameterSet _parent;
-  private Hashtable<String, Parameter> _pars = 
-    new Hashtable<String, Parameter>(8);
-  private Hashtable<String, ParameterSet> _parsets = 
-    new Hashtable<String, ParameterSet>(8);
+  private LinkedHashMap<String, Parameter> _pars = 
+    new LinkedHashMap<String, Parameter>(8);
+  private LinkedHashMap<String, ParameterSet> _parsets = 
+    new LinkedHashMap<String, ParameterSet>(8);
 
   private ParameterSet(String name, ParameterSet parent) {
     setNameAndParent(name,parent);
