@@ -6,6 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
@@ -468,50 +471,108 @@ public class RecursiveGaussianFilter {
 
     abstract void applyN(int nd, float[] x, float[] y);
 
-    void applyNX(int nd, float[][] x, float[][] y) {
-      int m2 = y.length;
-      for (int i2=0; i2<m2; ++i2)
-        applyN(nd,x[i2],y[i2]);
-    }
-
     abstract void applyXN(int nd, float[][] x, float[][] y);
 
-    void applyNXX(int nd, float[][][] x, float[][][] y) {
-      int m3 = y.length;
-      for (int i3=0; i3<m3; ++i3)
-        applyNX(nd,x[i3],y[i3]);
+    void applyNX(final int nd, final float[][] x, final float[][] y) {
+      final int m2 = y.length;
+      final AtomicInteger ai = new AtomicInteger();
+      Thread[] threads = newThreads();
+      for (int ithread=0; ithread<threads.length; ++ithread) {
+        threads[ithread] = new Thread(new Runnable() {
+          public void run() {
+            for (int i2=ai.getAndIncrement(); i2<m2; i2=ai.getAndIncrement())
+              applyN(nd,x[i2],y[i2]);
+          }
+        });
+      }
+      startAndJoin(threads);
     }
 
-    void applyXNX(int nd, float[][][] x, float[][][] y) {
-      int m3 = y.length;
-      for (int i3=0; i3<m3; ++i3)
-        applyXN(nd,x[i3],y[i3]);
+    void applyNXX(final int nd, final float[][][] x, final float[][][] y) {
+      final int m3 = y.length;
+      final AtomicInteger ai = new AtomicInteger();
+      Thread[] threads = newThreads();
+      for (int ithread=0; ithread<threads.length; ++ithread) {
+        threads[ithread] = new Thread(new Runnable() {
+          public void run() {
+            for (int i3=ai.getAndIncrement(); i3<m3; i3=ai.getAndIncrement())
+              applyNX(nd,x[i3],y[i3]);
+          }
+        });
+      }
+      startAndJoin(threads);
     }
 
-    void applyXXN(int nd, float[][][] x, float[][][] y) {
+    void applyXNX(final int nd, final float[][][] x, final float[][][] y) {
+      final int m3 = y.length;
+      final AtomicInteger ai = new AtomicInteger();
+      Thread[] threads = newThreads();
+      for (int ithread=0; ithread<threads.length; ++ithread) {
+        threads[ithread] = new Thread(new Runnable() {
+          public void run() {
+            for (int i3=ai.getAndIncrement(); i3<m3; i3=ai.getAndIncrement())
+              applyXN(nd,x[i3],y[i3]);
+          }
+        });
+      }
+      startAndJoin(threads);
+    }
+
+    void applyXXN(final int nd, final float[][][] x, final float[][][] y) {
+      checkArrays(x,y);
+      final int m3 = y.length;
+      final int m2 = y[0].length;
+      final int m1 = y[0][0].length;
+      final AtomicInteger ai = new AtomicInteger();
+      Thread[] threads = newThreads();
+      for (int ithread=0; ithread<threads.length; ++ithread) {
+        threads[ithread] = new Thread(new Runnable() {
+          public void run() {
+            float[][] x2 = new float[m3][];
+            float[][] y2 = new float[m3][];
+            for (int i2=ai.getAndIncrement(); i2<m2; i2=ai.getAndIncrement()) {
+              for (int i3=0; i3<m3; ++i3) {
+                x2[i3] = x[i3][i2];
+                y2[i3] = y[i3][i2];
+              }
+              applyXN(nd,x2,y2);
+            }
+          }
+        });
+      }
+      startAndJoin(threads);
+    }
+
+    void xxxapplyXXN(int nd, float[][][] x, float[][][] y) {
       checkArrays(x,y);
       int m3 = y.length;
       int m2 = y[0].length;
       int m1 = y[0][0].length;
-      float[][] x2 = new float[m3][m1];
-      float[][] y2 = new float[m3][m1];
+      float[][] x2 = new float[m3][];
+      float[][] y2 = new float[m3][];
       for (int i2=0; i2<m2; ++i2) {
         for (int i3=0; i3<m3; ++i3) {
-          float[] x32 = x[i3][i2];
-          float[] x23 = x2[i3];
-          for (int i1=0; i1<m1; ++i1) {
-            x23[i1] = x32[i1];
-          }
+          x2[i3] = x[i3][i2];
+          y2[i3] = y[i3][i2];
         }
         applyXN(nd,x2,y2);
-        for (int i3=0; i3<m3; ++i3) {
-          float[] y32 = y[i3][i2];
-          float[] y23 = y2[i3];
-          for (int i1=0; i1<m1; ++i1) {
-            y32[i1] = y23[i1];
-          }
-        }
       }
+    }
+  }
+
+  private static Thread[] newThreads() {
+    int nthread = Runtime.getRuntime().availableProcessors();
+    return new Thread[nthread];
+  }
+
+  private static void startAndJoin(Thread[] threads) {
+    for (int ithread=0; ithread<threads.length; ++ithread)
+      threads[ithread].start();
+    try {
+      for (int ithread=0; ithread<threads.length; ++ithread)
+        threads[ithread].join();
+    } catch (InterruptedException ie) {
+      throw new RuntimeException(ie);
     }
   }
 
