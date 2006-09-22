@@ -25,6 +25,9 @@ public class CleanHandler extends Handler {
   private static List<PrintStream> s_printStreams
     = new LinkedList<PrintStream>();
 
+  /** Keep track of whether CleanHandler has been set as a default */
+  private static boolean s_setDefault;
+
   /** Construct a new CleanHandler. */
   public CleanHandler() {
     setFormatter(new CleanFormatter());
@@ -99,20 +102,25 @@ public class CleanHandler extends Handler {
       this CleanHandler at an INFO level.
    */
   public static void setDefaultHandler() {
-    if (System.getProperties().getProperty
-        ("java.util.logging.config.file") == null &&
-        System.getProperties().getProperty
-        ("java.util.logging.config.class") == null) {
-      try {
-        LogManager.getLogManager().readConfiguration
-          (new java.io.ByteArrayInputStream
-           ("handlers=edu.mines.jtk.util.CleanHandler\n.level=INFO\n"
-            .getBytes()));
-      } catch (java.io.IOException e) {
-        e.printStackTrace();
-        throw new IllegalStateException("This should never fail "+
-                                        e.getMessage());
+    synchronized (CleanHandler.class) {
+      if (s_setDefault)
+        return;
+      if (System.getProperties().getProperty
+          ("java.util.logging.config.file") == null &&
+          System.getProperties().getProperty
+          ("java.util.logging.config.class") == null) {
+        try {
+          LogManager.getLogManager().readConfiguration
+            (new java.io.ByteArrayInputStream
+             ("handlers=edu.mines.jtk.util.CleanHandler\n.level=INFO\n"
+              .getBytes()));
+        } catch (java.io.IOException e) {
+          e.printStackTrace();
+          throw new IllegalStateException("This should never fail "+
+                                          e.getMessage());
+        }
       }
+      s_setDefault = true;
     }
   }
 }
