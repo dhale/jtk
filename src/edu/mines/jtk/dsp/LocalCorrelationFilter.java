@@ -6,6 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.*;
+
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
@@ -1342,30 +1345,75 @@ public class LocalCorrelationFilter {
     }
   }
 
-  private static void shift1(float[][][] f, float[][][] g) {
-    int n3 = f.length;
-    for (int i3=0; i3<n3; ++i3)
-      shift1(f[i3],g[i3]);
+  private static void shift1(final float[][][] f, final float[][][] g) {
+    final int n3 = f.length;
+    final AtomicInteger ai = new AtomicInteger();
+    Thread[] threads = newThreads();
+    for (int ithread=0; ithread<threads.length; ++ithread) {
+      threads[ithread] = new Thread(new Runnable() {
+        public void run() {
+          for (int i3=ai.getAndIncrement(); i3<n3; i3=ai.getAndIncrement()) {
+            shift1(f[i3],g[i3]);
+          }
+        }
+      });
+    }
+    startAndJoin(threads);
   }
 
-  private static void shift2(float[][][] f, float[][][] g) {
-    int n3 = f.length;
-    for (int i3=0; i3<n3; ++i3)
-      shift2(f[i3],g[i3]);
+  private static void shift2(final float[][][] f, final float[][][] g) {
+    final int n3 = f.length;
+    final AtomicInteger ai = new AtomicInteger();
+    Thread[] threads = newThreads();
+    for (int ithread=0; ithread<threads.length; ++ithread) {
+      threads[ithread] = new Thread(new Runnable() {
+        public void run() {
+          for (int i3=ai.getAndIncrement(); i3<n3; i3=ai.getAndIncrement()) {
+            shift2(f[i3],g[i3]);
+          }
+        }
+      });
+    }
+    startAndJoin(threads);
   }
 
-  private static void shift3(float[][][] f, float[][][] g) {
-    int n3 = f.length;
-    int n2 = f[0].length;
-    int n1 = f[0][0].length;
-    float[][] f2 = new float[n3][];
-    float[][] g2 = new float[n3][];
-    for (int i2=0; i2<n2; ++i2) {
-      for (int i3=0; i3<n3; ++i3) {
-        f2[i3] = f[i3][i2];
-        g2[i3] = g[i3][i2];
-      }
-      shift2(f2,g2);
+  private static void shift3(final float[][][] f, final float[][][] g) {
+    final int n3 = f.length;
+    final int n2 = f[0].length;
+    final int n1 = f[0][0].length;
+    final AtomicInteger ai = new AtomicInteger();
+    Thread[] threads = newThreads();
+    for (int ithread=0; ithread<threads.length; ++ithread) {
+      threads[ithread] = new Thread(new Runnable() {
+        public void run() {
+          float[][] f2 = new float[n3][];
+          float[][] g2 = new float[n3][];
+          for (int i2=ai.getAndIncrement(); i2<n2; i2=ai.getAndIncrement()) {
+            for (int i3=0; i3<n3; ++i3) {
+              f2[i3] = f[i3][i2];
+              g2[i3] = g[i3][i2];
+            }
+            shift2(f2,g2);
+          }
+        }
+      });
+    }
+    startAndJoin(threads);
+  }
+
+  private static Thread[] newThreads() {
+    int nthread = Runtime.getRuntime().availableProcessors();
+    return new Thread[nthread];
+  }
+
+  private static void startAndJoin(Thread[] threads) {
+    for (int ithread=0; ithread<threads.length; ++ithread)
+      threads[ithread].start();
+    try {
+      for (int ithread=0; ithread<threads.length; ++ithread)
+        threads[ithread].join();
+    } catch (InterruptedException ie) {
+      throw new RuntimeException(ie);
     }
   }
 

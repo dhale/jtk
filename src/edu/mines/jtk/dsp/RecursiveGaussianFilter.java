@@ -473,19 +473,10 @@ public class RecursiveGaussianFilter {
 
     abstract void applyXN(int nd, float[][] x, float[][] y);
 
-    void applyNX(final int nd, final float[][] x, final float[][] y) {
-      final int m2 = y.length;
-      final AtomicInteger ai = new AtomicInteger();
-      Thread[] threads = newThreads();
-      for (int ithread=0; ithread<threads.length; ++ithread) {
-        threads[ithread] = new Thread(new Runnable() {
-          public void run() {
-            for (int i2=ai.getAndIncrement(); i2<m2; i2=ai.getAndIncrement())
-              applyN(nd,x[i2],y[i2]);
-          }
-        });
-      }
-      startAndJoin(threads);
+    void applyNX(int nd, float[][] x, float[][] y) {
+      int m2 = y.length;
+      for (int i2=0; i2<m2; ++i2)
+        applyN(nd,x[i2],y[i2]);
     }
 
     void applyNXX(final int nd, final float[][][] x, final float[][][] y) {
