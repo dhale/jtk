@@ -8,8 +8,7 @@ package edu.mines.jtk.opt;
 
 import edu.mines.jtk.util.Almost;
 
-import java.util.*;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
 /** A VectContainer implemented as an array, with sequential indices.
     Keys will be returned in the index order.
