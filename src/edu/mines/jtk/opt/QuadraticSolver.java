@@ -84,12 +84,14 @@ public class QuadraticSolver {
     Vect p = x.clone();      // instance 3
     Vect u = x.clone();      // instance 4
     double pu = 0.;
+    Vect qa = g.clone();     // double use for instance 5
 
   solve:
     for (iter=0; iter<numberIterations; iter++) {
       double beta = 0.;
       {
-        Vect q = g.clone();     // instance 5
+        Vect q = qa;
+        VectUtil.copy(q, g);
         _quadratic.inverseHessian(q);
         q.postCondition();         // a = A g
         _quadratic.multiplyHessian(q); // expensive
@@ -101,14 +103,13 @@ public class QuadraticSolver {
           if (beta > 5.) beta = 5.;
         }
         u.add(beta, -1., q);
-        q.dispose();
       }
       { // Did not save "a" before calculating beta, to avoid extra instance.
-        Vect a = g.clone();    // instance 5
+        Vect a = qa;
+        VectUtil.copy(a, g);
         _quadratic.inverseHessian(a);
         a.postCondition();
         p.add(beta, -1., a);
-        a.dispose();
       }
       double pg = p.dot(g); checkNaN(pg);
       pu = p.dot(u); checkNaN(pu);
@@ -125,6 +126,7 @@ public class QuadraticSolver {
     p.dispose();
     u.dispose();
     g.dispose();
+    qa.dispose();
     monitor.report(1.);
     return x;
   }
