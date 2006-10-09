@@ -21,9 +21,11 @@ public class TriangleGroupTest {
 
   public static void main(String[] args) {
     float[] xyz = makeSineWave();
+    xyz = addBulge(xyz);
+    xyz = addTear(xyz);
     float[] rgb = makeColors(xyz);
 
-    bench(xyz,rgb);
+    //bench(xyz,rgb);
 
     TriangleGroup tg = new TriangleGroup(true,xyz,rgb);
     System.out.println("TriangleGroup bounding sphere =\n" +
@@ -47,11 +49,10 @@ public class TriangleGroupTest {
     world.addChild(tg);
 
     TestFrame frame = new TestFrame(world);
+    OrbitView view = frame.getOrbitView();
+    view.setWorldSphere(new BoundingSphere(5,5,5,5));
+    frame.setSize(new Dimension(800,600));
     frame.setVisible(true);
-  }
-
-  private static float sin(float x, float y) {
-    return (float)(5.0+Math.sin(x+y));
   }
 
   private static float[] makeSineWave() {
@@ -75,6 +76,58 @@ public class TriangleGroupTest {
       }
     }
     return xyz;
+  }
+  private static float sin(float x, float y) {
+    return (float)(5.0+0.25*Math.sin(x+y));
+  }
+
+  private static float[] addBulge(float[] xyz) {
+    int n = xyz.length;
+    float[] t = new float[n];
+    for (int i=0; i<n; i+=3) {
+      float x = xyz[i  ];
+      float y = xyz[i+1];
+      float z = xyz[i+2];
+      z -= exp(x,y);
+      t[i  ] = x;
+      t[i+1] = y;
+      t[i+2] = z;
+    }
+    return t;
+  }
+  private static float exp(float x, float y) {
+    x -= 5.0f;
+    y -= 5.0f;
+    x *= 0.4f;
+    y *= 0.8f;
+    return (float)(2.0*Math.exp(-x*x-y*y));
+  }
+
+  private static float[] addTear(float[] xyz) {
+    int n = xyz.length;
+    float[] t = new float[n];
+    int nt = n/9;
+    for (int it=0,i=0,j=0; it<nt; ++it) {
+      float xa = xyz[i++];  
+      float ya = xyz[i++];  
+      float za = xyz[i++];  
+      float xb = xyz[i++];  
+      float yb = xyz[i++];  
+      float zb = xyz[i++];  
+      float xc = xyz[i++];  
+      float yc = xyz[i++];  
+      float zc = xyz[i++];  
+      float x = 0.333333f*(xa+xb+xc);
+      if (x>5.0f) {
+        za += exp(xa,ya);
+        zb += exp(xb,yb);
+        zc += exp(xc,yc);
+      }
+      t[j++] = xa;  t[j++] = ya;  t[j++] = za;
+      t[j++] = xb;  t[j++] = yb;  t[j++] = zb;
+      t[j++] = xc;  t[j++] = yc;  t[j++] = zc;
+    }
+    return t;
   }
 
   private static float[] makeColors(float[] xyz) {

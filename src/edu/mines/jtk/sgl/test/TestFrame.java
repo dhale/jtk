@@ -71,6 +71,12 @@ public class TestFrame extends JFrame {
     this.add(canvas,BorderLayout.CENTER);
     this.add(toolBar,BorderLayout.WEST);
     this.setJMenuBar(menuBar);
+
+    _view = view;
+  }
+
+  public OrbitView getOrbitView() {
+    return _view;
   }
 
   public static void main(String[] args) {
@@ -79,4 +85,5 @@ public class TestFrame extends JFrame {
   }
 
   private static final int SIZE = 600;
+  private OrbitView _view;
 }
