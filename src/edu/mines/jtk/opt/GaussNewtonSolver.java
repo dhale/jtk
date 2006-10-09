@@ -12,7 +12,8 @@ import edu.mines.jtk.util.Monitor;
 import edu.mines.jtk.util.PartialMonitor;
 import java.util.logging.Logger;
 
-/** Solve least-squares inverse of a Transform.
+/** Solve least-squares inverse of a non-linear Transform.
+    See QuadraticSolver to solve least-squares inverse of a linear Transform.
     @author W.S. Harlan
 */
 public class GaussNewtonSolver {
@@ -165,50 +166,6 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
     }
     monitor.report(1.);
     return m0;
-  }
-
-  /**
-    Solve quadratic objective function for linear transform.
-    Minimizes
-    <pre>
-      [F(m+x)-data]'N[F(m+x)-data] + (m+x)'M(m+x)
-    </pre>
-    if dampOnlyPerturbation is true and
-    <pre>
-      [F(m+x)-data]'N[F(m+x)-data] + (x)'M(x)
-    </pre>
-    if dampOnlyPerturbation is false.
-    @param data The data to be fit.
-    @param referenceModel Linearize with respect to this model.
-    @param linearTransform Describes the linear transform.
-    @param dampOnlyPerturbation If true then, only damp perturbations
-    to model. If false, then damp the reference model plus
-    the perturbation.
-    @param conjugateGradIterations The specified number of conjugate
-    gradient iterations.
-    @param monitor Report progress here, if non-null.
-    @return Result of optimization
-  */
-  public static Vect solve (VectConst data,
-                            VectConst referenceModel,
-                            LinearTransform linearTransform,
-                            boolean dampOnlyPerturbation,
-                            int conjugateGradIterations,
-                            Monitor monitor) {
-    final int linearizationIterations = 1;
-    final int lineSearchIterations = 0;
-    final double lineSearchError = 0.;
-    Transform transform = new LinearTransformWrapper(linearTransform);
-    return GaussNewtonSolver.solve(data,
-                                   referenceModel,
-                                   null,
-                                   transform,
-                                   dampOnlyPerturbation,
-                                   conjugateGradIterations,
-                                   lineSearchIterations,
-                                   linearizationIterations,
-                                   lineSearchError,
-                                   monitor);
   }
 
   // Evaluates the unapproximated objective function for a given scale factor

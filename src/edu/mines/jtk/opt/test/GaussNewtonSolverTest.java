@@ -11,6 +11,7 @@ import edu.mines.jtk.opt.ArrayVect1;
 import edu.mines.jtk.opt.GaussNewtonSolver;
 import edu.mines.jtk.opt.LinearTransform;
 import edu.mines.jtk.opt.LinearTransformWrapper;
+import edu.mines.jtk.opt.QuadraticSolver;
 import edu.mines.jtk.opt.Transform;
 import edu.mines.jtk.opt.Vect;
 import edu.mines.jtk.opt.VectConst;
@@ -165,7 +166,7 @@ public class GaussNewtonSolverTest extends TestCase {
       TestVect model = new TestVect(new double[]{-1., -1.}, 1., "model");
       boolean dampOnlyPerturbation = false;
       int conjugateGradIterations = 2;
-      ArrayVect1 result = (ArrayVect1) GaussNewtonSolver.solve
+      ArrayVect1 result = (ArrayVect1) QuadraticSolver.solve
         (data, model, linearTransform,
          dampOnlyPerturbation, conjugateGradIterations, null);
       LOG.fine("data = "+data);
@@ -183,7 +184,7 @@ public class GaussNewtonSolverTest extends TestCase {
       TestVect model = new TestVect(new double[]{0.9, 3.9}, 1., "model");
       boolean dampOnlyPerturbation = true;
       int conjugateGradIterations = 2;
-      ArrayVect1 result = (ArrayVect1) GaussNewtonSolver.solve
+      ArrayVect1 result = (ArrayVect1) QuadraticSolver.solve
         (data, model, linearTransform,
          dampOnlyPerturbation, conjugateGradIterations, null);
       LOG.fine("data = "+data);
@@ -200,7 +201,7 @@ public class GaussNewtonSolverTest extends TestCase {
       TestVect model = new TestVect(new double[]{0.9, 3.9}, 1., "model");
       boolean dampOnlyPerturbation = false;
       int conjugateGradIterations = 2;
-      ArrayVect1 result = (ArrayVect1) GaussNewtonSolver.solve
+      ArrayVect1 result = (ArrayVect1) QuadraticSolver.solve
         (data, model, linearTransform,
          dampOnlyPerturbation, conjugateGradIterations, null);
       LOG.fine("data = "+data);

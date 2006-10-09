@@ -41,6 +41,10 @@ import java.util.logging.Logger;
     }
 </pre>
 
+
+Also contains a solver for a least-squares inverse of a linear
+transform, using QuadraticTransform as a wrapper.
+
 @author W.S. Harlan
 */
 public class QuadraticSolver {
@@ -129,6 +133,50 @@ public class QuadraticSolver {
     qa.dispose();
     monitor.report(1.);
     return x;
+  }
+
+  /**
+    Solve quadratic objective function for linear transform.
+    Minimizes
+    <pre>
+      [F(m+x)-data]'N[F(m+x)-data] + (m+x)'M(m+x)
+    </pre>
+    if dampOnlyPerturbation is true and
+    <pre>
+      [F(m+x)-data]'N[F(m+x)-data] + (x)'M(x)
+    </pre>
+    if dampOnlyPerturbation is false.
+    @param data The data to be fit.
+    @param referenceModel Initialize with this model.
+    @param linearTransform Describes the linear transform.
+    @param dampOnlyPerturbation If true then, only damp perturbations
+    to reference model. If false, then damp the reference model plus
+    the perturbation.
+    @param conjugateGradIterations The specified number of conjugate
+    gradient iterations.
+    @param monitor Report progress here, if non-null.
+    @return Result of optimization
+  */
+  public static Vect solve (VectConst data,
+                            VectConst referenceModel,
+                            LinearTransform linearTransform,
+                            boolean dampOnlyPerturbation,
+                            int conjugateGradIterations,
+                            Monitor monitor) {
+    final int linearizationIterations = 1;
+    final int lineSearchIterations = 0;
+    final double lineSearchError = 0.;
+    Transform transform = new LinearTransformWrapper(linearTransform);
+    return GaussNewtonSolver.solve(data,
+                                   referenceModel,
+                                   null,
+                                   transform,
+                                   dampOnlyPerturbation,
+                                   conjugateGradIterations,
+                                   lineSearchIterations,
+                                   linearizationIterations,
+                                   lineSearchError,
+                                   monitor);
   }
 
   /** Abort if NaN's appear.
