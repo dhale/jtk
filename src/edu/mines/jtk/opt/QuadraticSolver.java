@@ -41,7 +41,6 @@ import java.util.logging.Logger;
     }
 </pre>
 
-
 Also contains a solver for a least-squares inverse of a linear
 transform, using QuadraticTransform as a wrapper.
 
@@ -90,7 +89,7 @@ public class QuadraticSolver {
     double pu = 0.;
     Vect qa = g.clone();     // double use for instance 5
 
-  solve:
+  SOLVE:
     for (iter=0; iter<numberIterations; iter++) {
       double beta = 0.;
       {
@@ -118,12 +117,12 @@ public class QuadraticSolver {
       double pg = p.dot(g); checkNaN(pg);
       pu = p.dot(u); checkNaN(pu);
       if (Almost.FLOAT.zero(pg)|| Almost.FLOAT.zero(pu)) {
-        break solve;
+        break SOLVE;
       }
       double scalar = -pg/pu;
       x.add(1., scalar, p);
       if (iter == numberIterations-1) {
-        break solve;
+        break SOLVE;
       }
       g.add(1., scalar, u);
     }
@@ -167,16 +166,16 @@ public class QuadraticSolver {
     final int lineSearchIterations = 0;
     final double lineSearchError = 0.;
     Transform transform = new LinearTransformWrapper(linearTransform);
-    return GaussNewtonSolver.solve(data,
-                                   referenceModel,
-                                   null,
-                                   transform,
-                                   dampOnlyPerturbation,
-                                   conjugateGradIterations,
-                                   lineSearchIterations,
-                                   linearizationIterations,
-                                   lineSearchError,
-                                   monitor);
+    VectConst perturbModel = null;
+    TransformQuadratic transformQuadratic =
+      new TransformQuadratic(data, referenceModel, perturbModel, transform,
+                             dampOnlyPerturbation);
+    QuadraticSolver quadraticSolver = new QuadraticSolver(transformQuadratic);
+    Vect result = quadraticSolver.solve(conjugateGradIterations, monitor);
+    transformQuadratic.dispose();
+    result.add(1, 1, referenceModel);
+    result.constrain();
+    return result;
   }
 
   /** Abort if NaN's appear.
