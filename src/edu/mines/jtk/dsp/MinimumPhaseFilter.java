@@ -47,8 +47,7 @@ public class MinimumPhaseFilter {
   public MinimumPhaseFilter(int[] lag1, int[] lag2, float[] a) {
     _m = a.length;
     _a = Array.copy(a);
-    copyLags(lag1);
-    copyLags(lag2);
+    copyLags(lag1,lag2);
   }
 
   /**
@@ -64,9 +63,7 @@ public class MinimumPhaseFilter {
   public MinimumPhaseFilter(int[] lag1, int[] lag2, int[] lag3, float[] a) {
     _m = a.length;
     _a = Array.copy(a);
-    copyLags(lag1);
-    copyLags(lag2);
-    copyLags(lag3);
+    copyLags(lag1,lag2,lag3);
   }
 
   /**
@@ -294,8 +291,8 @@ public class MinimumPhaseFilter {
     Check.state(_lag2!=null,"lag2 has been specified");
     int n1 = y[0].length;
     int n2 = y.length;
-    int i1lo = max(0,-_max1);
-    int i1hi = min(n1,n1-_min1);
+    int i1lo = max(0,-_min1);
+    int i1hi = min(n1,n1-_max1);
     int i2hi = (i1lo<=i1hi)?max(n2-_max2,0):0;
     for (int i2=n2-1; i2>=i2hi; --i2) {
       for (int i1=n1-1; i1>=0; --i1) {
@@ -470,8 +467,8 @@ public class MinimumPhaseFilter {
     Check.state(_lag2!=null,"lag2 has been specified");
     int n1 = y[0].length;
     int n2 = y.length;
-    int i1lo = max(0,-_max1);
-    int i1hi = min(n1,n1-_min1);
+    int i1lo = max(0,-_min1);
+    int i1hi = min(n1,n1-_max1);
     int i2hi = (i1lo<=i1hi)?max(n2-_max2,0):0;
     for (int i2=n2-1; i2>=i2hi; --i2) {
       for (int i1=n1-1; i1>=0; --i1) {

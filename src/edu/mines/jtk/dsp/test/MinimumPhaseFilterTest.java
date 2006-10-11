@@ -55,11 +55,68 @@ public class MinimumPhaseFilterTest extends TestCase {
     assertEquals(d1,d2,n*100.0*FLT_EPSILON);
   }
 
+  public void test2Random() {
+    int[] lag1 = {1,-1,0,1};
+    int[] lag2 = {0,1,1,1};
+    float[] a = {0.9f,0.1f,0.1f,0.1f};
+    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2,a);
+    int n1 = 19;
+    int n2 = 21;
+    float[][] x,y,z;
+
+    x = Array.randfloat(n1,n2);
+    y = Array.zerofloat(n1,n2);
+    z = Array.zerofloat(n1,n2);
+    mpf.apply(x,y);
+    mpf.applyInverse(y,z);
+    assertEqual(x,z);
+    mpf.applyTranspose(x,y);
+    mpf.applyInverseTranspose(y,z);
+    assertEqual(x,z);
+
+    float d1,d2;
+    x = Array.randfloat(n1,n2);
+    y = Array.randfloat(n1,n2);
+    z = Array.zerofloat(n1,n2);
+    mpf.apply(x,z);
+    d1 = dot(z,y);
+    mpf.applyTranspose(y,z);
+    d2 = dot(z,x);
+    assertEquals(d1,d2,n1*n2*100.0*FLT_EPSILON);
+    mpf.applyInverse(x,z);
+    d1 = dot(z,y);
+    mpf.applyInverseTranspose(y,z);
+    d2 = dot(z,x);
+    assertEquals(d1,d2,n1*n2*100.0*FLT_EPSILON);
+  }
+
   private static float dot(float[] x, float[] y) {
     int n = x.length;
     float sum = 0.0f;
     for (int i=0; i<n; ++i)
       sum += x[i]*y[i];
+    return sum;
+  }
+
+  private static float dot(float[][] x, float[][] y) {
+    int n1 = x[0].length;
+    int n2 = x.length;
+    float sum = 0.0f;
+    for (int i2=0; i2<n2; ++i2)
+      for (int i1=0; i1<n1; ++i1)
+        sum += x[i2][i1]*y[i2][i1];
+    return sum;
+  }
+
+  private static float dot(float[][][] x, float[][][] y) {
+    int n1 = x[0][0].length;
+    int n2 = x[0].length;
+    int n3 = x.length;
+    float sum = 0.0f;
+    for (int i3=0; i3<n3; ++i3)
+      for (int i2=0; i2<n2; ++i2)
+        for (int i1=0; i1<n1; ++i1)
+          sum += x[i3][i2][i1]*y[i3][i2][i1];
     return sum;
   }
 
