@@ -8,47 +8,49 @@ package edu.mines.jtk.dsp.test;
 
 import junit.framework.*;
 import edu.mines.jtk.util.Array;
-import edu.mines.jtk.dsp.DifferenceFilter;
+import edu.mines.jtk.dsp.MinimumPhaseFilter;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * Tests {@link edu.mines.jtk.dsp.DifferenceFilter}.
+ * Tests {@link edu.mines.jtk.dsp.MinimumPhaseFilter}.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.11.22
  */
-public class DifferenceFilterTest extends TestCase {
+public class MinimumPhaseFilterTest extends TestCase {
   public static void main(String[] args) {
-    TestSuite suite = new TestSuite(DifferenceFilterTest.class);
+    TestSuite suite = new TestSuite(MinimumPhaseFilterTest.class);
     junit.textui.TestRunner.run(suite);
   }
 
-  public void testRandom() {
-    DifferenceFilter df = new DifferenceFilter(0.99);
+  public void test1Random() {
+    int[] lag1 = {1,2};
+    float[] a = {1.8f,0.81f};
+    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,a);
     int n = 100;
     float[] x,y,z;
 
     x = Array.randfloat(n);
     y = Array.zerofloat(n);
     z = Array.zerofloat(n);
-    df.apply(x,y);
-    df.applyInverse(y,z);
+    mpf.apply(x,y);
+    mpf.applyInverse(y,z);
     assertEqual(x,z);
-    df.applyTranspose(x,y);
-    df.applyInverseTranspose(y,z);
+    mpf.applyTranspose(x,y);
+    mpf.applyInverseTranspose(y,z);
     assertEqual(x,z);
 
     float d1,d2;
     x = Array.randfloat(n);
     y = Array.randfloat(n);
     z = Array.zerofloat(n);
-    df.apply(x,z);
+    mpf.apply(x,z);
     d1 = dot(z,y);
-    df.applyTranspose(y,z);
+    mpf.applyTranspose(y,z);
     d2 = dot(z,x);
     assertEquals(d1,d2,n*100.0*FLT_EPSILON);
-    df.applyInverse(x,z);
+    mpf.applyInverse(x,z);
     d1 = dot(z,y);
-    df.applyInverseTranspose(y,z);
+    mpf.applyInverseTranspose(y,z);
     d2 = dot(z,x);
     assertEquals(d1,d2,n*100.0*FLT_EPSILON);
   }
