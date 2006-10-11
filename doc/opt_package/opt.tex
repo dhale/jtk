@@ -72,12 +72,15 @@ are be encapsulated by two implementations of
 the \texttt{Vect} interface.  The simulation
 to be inverted must be encapsulated by
 \texttt{Transform} if non-linear, or by
-\texttt{LinearTransform} if linear.  Finally,
-the model that best explains a particular
-dataset is inverted by one of the
-\texttt{Gauss\-Newton\-Solver.solve} methods.
+\texttt{LinearTransform} if linear.  
 Any constraints or conditioning can be
 implemented with one of these interfaces.
+Finally,
+the model that best explains a particular
+dataset is inverted by the
+\texttt{Gauss\-Newton\-Solver.solve} method
+if non-linear, and 
+by \texttt{Quadratic\-Solver.solve} if linear.
 
 \section {Model and data as abstract vectors}
 
@@ -393,7 +396,7 @@ You need only damp the magnitude of the model
 slightly to assure a stable inverse.  If your
 noise and model samples are completely
 stationary and independent, your
-\texttt{Vect.multiply\-Inverse\-Hessian()}
+\texttt{Vect.multiply\-Inverse\-Covariance()}
 methods need only multiply by a scalar.  I
 first anticipate reasonable physical
 magnitudes for the noise and for the model.
@@ -542,7 +545,7 @@ interfaces allow us to add
 such knowledge.
 
 The \texttt{Vect} interface has an optional
-method \texttt{Vect.\urlbr{}postCondition()}.
+method \texttt{Vect\urlbr{}.postCondition()}.
 If you define an empty implementation for
 this method, you will receive the default
 behavior, which should be fine.  For better
@@ -562,7 +565,14 @@ approximate linear inverse for the linearized
 forward transform.  We call this inverse the
 ``inverse Hessian'' because the Hessian is
 the tensor curvature of the quadratic
-approximation.  For a given linearization
+approximation.  
+
+You define an approximate inverse Hessian by implementing the 
+\texttt{Transform\urlbr{}.multiply\-Inverse\-Hessian()}
+method.  Leaving a default empty implementation
+is equivalent to assuming an identity.
+
+For a given linearization
 $\Ftz$, the inverse Hessian $\Gt ( \mzv )$
 should be the partial inverse
 
@@ -583,7 +593,7 @@ way we perturb our solution.
 
 One last optional operation is useful for
 very noisy data:
-\texttt{Transform.\urlbr{}adjust\-Robust\-Errors(Vect
+\texttt{Transform\urlbr{}.adjust\-Robust\-Errors(Vect
 data\-Error)}.  This operation does imply a
 change to our objective function, though a
 minor one.  This method will be passed an
@@ -762,7 +772,7 @@ contains one instead of two forward
 transforms.  Use this solver instead:
 
 {\footnotesize \begin{verbatim} 
-public class GaussNewtonSolver {
+public class QuadraticSolver {
 ...
   public static Vect solve (VectConst data,
                             VectConst referenceModel,
@@ -787,7 +797,7 @@ the normal equations of your least-squares
 problem, including a Hessian operator.  For
 inversion problems, this form is much less
 convenient than the
-\texttt{Gauss\-Newton\-Solver.solve} method
+\texttt{Quadratic\-Solver.solve} method
 above.  But if your objective function is
 already expressed as a simple quadratic, then
 you might want to use this lower-level class.
