@@ -128,8 +128,7 @@ public class GaussNewtonSolverTest extends TestCase {
     }
   }
 
-  /** test code
-      @param args command line
+  /** Unit test code.
       @throws Exception all errors
   */
   public void testMain() throws Exception {

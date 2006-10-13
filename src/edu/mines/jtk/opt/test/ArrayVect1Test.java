@@ -18,9 +18,8 @@ import junit.framework.TestSuite;
 */
 public class ArrayVect1Test extends TestCase {
 
-  /** Run tests
-     @param args command line
-     @throws Exception
+  /** Run unit tests.
+      @throws Exception any test failure
    */
   public void testAll() throws Exception {
     double[] a = new double[31];
