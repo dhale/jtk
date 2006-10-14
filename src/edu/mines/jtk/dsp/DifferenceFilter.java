@@ -15,6 +15,22 @@ import edu.mines.jtk.util.*;
  */
 public class DifferenceFilter {
 
+  ///////////////////////////////////////////////////////////////////////////
+  // test
+  public static void main(String[] args) {
+    int n1 = 5;
+    int n2 = 5;
+    float[][] x = Array.zerofloat(n1,n2);
+    float[][] y = Array.zerofloat(n1,n2);
+    float[][] z = Array.zerofloat(n1,n2);
+    x[(n2-1)/2][(n1-1)/2] = 1.0f;
+    DifferenceFilter df = new DifferenceFilter();
+    df.apply(x,y);
+    Array.dump(y);
+    df.applyInverse(y,z);
+    Array.dump(z);
+  }
+
   /**
    * Constructs a difference filter.
    */
@@ -43,6 +59,65 @@ public class DifferenceFilter {
   }
 
   /**
+   * Applies this difference filter.
+   * @param x the filter input.
+   * @param y the filter output.
+   */
+  public void apply(float[][] x, float[][] y) {
+    float xm0,xm1,xm2,xm3,xm4;
+    float xp0,xp1,xp2,xp3,xp4;
+    int n1 = x[0].length;
+    int n2 = x.length;
+    xm0 = xm1 = xm2 = xm3 = xm4 = 0.0f;
+    for (int i1=0; i1<n1; ++i1) {
+      xm4 = xm3;  xm3 = xm2;  xm2 = xm1;  xm1 = xm0;  xm0 = x[0][i1];
+      y[0][i1] = A0P0*xm0+A0P1*xm1+A0P2*xm2+A0P3*xm3+A0P4*xm4;
+    }
+    for (int i2=1; i2<n2; ++i2) {
+      xm0 = xm1 = xm2 = xm3 = xm4 = 0.0f;
+      xp0 = xp1 = xp2 = xp3 = xp4 = 0.0f;
+      if (n1>=4)
+        xp4 = x[i2-1][3];
+      if (n1>=3)
+        xp3 = x[i2-1][2];
+      if (n1>=2)
+        xp2 = x[i2-1][1];
+      if (n1>=1)
+        xp1 = x[i2-1][0];
+      for (int i1=0; i1<n1-4; ++i1) {
+        xm4 = xm3;  xm3 = xm2;  xm2 = xm1;  xm1 = xm0;  xm0 = x[i2  ][i1  ];
+        xp0 = xp1;  xp1 = xp2;  xp2 = xp3;  xp3 = xp4;  xp4 = x[i2-1][i1+4];
+        y[i2][i1] = A0P0*xm0+A0P1*xm1+A0P2*xm2+A0P3*xm3+A0P4*xm4 +
+                    A1M0*xp0+A1M1*xp1+A1M2*xp2+A1M3*xp3+A1M4*xp4;
+      }
+      if (n1>=4) {
+        xm4 = xm3;  xm3 = xm2;  xm2 = xm1;  xm1 = xm0;  xm0 = x[i2][n1-4];
+        xp0 = xp1;  xp1 = xp2;  xp2 = xp3;  xp3 = xp4;
+        y[i2][n1-4] = A0P0*xm0+A0P1*xm1+A0P2*xm2+A0P3*xm3+A0P4*xm4 +
+                      A1M0*xp0+A1M1*xp1+A1M2*xp2+A1M3*xp3;
+      }
+      if (n1>=3) {
+        xm4 = xm3;  xm3 = xm2;  xm2 = xm1;  xm1 = xm0;  xm0 = x[i2][n1-3];
+        xp0 = xp1;  xp1 = xp2;  xp2 = xp3;
+        y[i2][n1-3] = A0P0*xm0+A0P1*xm1+A0P2*xm2+A0P3*xm3+A0P4*xm4 +
+                      A1M0*xp0+A1M1*xp1+A1M2*xp2;
+      }
+      if (n1>=2) {
+        xm4 = xm3;  xm3 = xm2;  xm2 = xm1;  xm1 = xm0;  xm0 = x[i2][n1-2];
+        xp0 = xp1;  xp1 = xp2;
+        y[i2][n1-2] = A0P0*xm0+A0P1*xm1+A0P2*xm2+A0P3*xm3+A0P4*xm4 +
+                      A1M0*xp0+A1M1*xp1;
+      }
+      if (n1>=1) {
+        xm4 = xm3;  xm3 = xm2;  xm2 = xm1;  xm1 = xm0;  xm0 = x[i2][n1-1];
+        xp0 = xp1;
+        y[i2][n1-1] = A0P0*xm0+A0P1*xm1+A0P2*xm2+A0P3*xm3+A0P4*xm4 +
+                      A1M0*xp0;
+      }
+    }
+  }
+
+  /**
    * Applies the transpose of this filter.
    * @param x the filter input.
    * @param y the filter output.
@@ -55,6 +130,65 @@ public class DifferenceFilter {
   }
 
   /**
+   * Applies the transpose of this filter.
+   * @param x the filter input.
+   * @param y the filter output.
+   */
+  public void applyTranspose(float[][] x, float[][] y) {
+    float xm0,xm1,xm2,xm3,xm4;
+    float xp0,xp1,xp2,xp3,xp4;
+    int n1 = x[0].length;
+    int n2 = x.length;
+    xp0 = xp1 = xp2 = xp3 = xp4 = 0.0f;
+    for (int i1=n1-1; i1>=0; --i1) {
+      xp4 = xp3;  xp3 = xp2;  xp2 = xp1;  xp1 = xp0;  xp0 = x[n2-1][i1];
+      y[n2-1][i1] = A0P0*xp0+A0P1*xp1+A0P2*xp2+A0P3*xp3+A0P4*xp4;
+    }
+    for (int i2=n2-2; i2>=0; --i2) {
+      xm0 = xm1 = xm2 = xm3 = xm4 = 0.0f;
+      xp0 = xp1 = xp2 = xp3 = xp4 = 0.0f;
+      if (n1>=4)
+        xm4 = x[i2+1][n1-4];
+      if (n1>=3)
+        xm3 = x[i2+1][n1-3];
+      if (n1>=2)
+        xm2 = x[i2+1][n1-2];
+      if (n1>=1)
+        xm1 = x[i2+1][n1-1];
+      for (int i1=n1-1; i1>=4; --i1) {
+        xp4 = xp3;  xp3 = xp2;  xp2 = xp1;  xp1 = xp0;  xp0 = x[i2  ][i1  ];
+        xm0 = xm1;  xm1 = xm2;  xm2 = xm3;  xm3 = xm4;  xm4 = x[i2+1][i1-4];
+        y[i2][i1] = A0P0*xp0+A0P1*xp1+A0P2*xp2+A0P3*xp3+A0P4*xp4 +
+                    A1M0*xm0+A1M1*xm1+A1M2*xm2+A1M3*xm3+A1M4*xm4;
+      }
+      if (n1>3) {
+        xp4 = xp3;  xp3 = xp2;  xp2 = xp1;  xp1 = xp0;  xp0 = x[i2][3];
+        xm0 = xm1;  xm1 = xm2;  xm2 = xm3;  xm3 = xm4;
+        y[i2][3] = A0P0*xp0+A0P1*xp1+A0P2*xp2+A0P3*xp3+A0P4*xp4 +
+                   A1M0*xm0+A1M1*xm1+A1M2*xm2+A1M3*xm3;
+      }
+      if (n1>2) {
+        xp4 = xp3;  xp3 = xp2;  xp2 = xp1;  xp1 = xp0;  xp0 = x[i2][2];
+        xm0 = xm1;  xm1 = xm2;  xm2 = xm3;
+        y[i2][2] = A0P0*xp0+A0P1*xp1+A0P2*xp2+A0P3*xp3+A0P4*xp4 +
+                   A1M0*xm0+A1M1*xm1+A1M2*xm2;
+      }
+      if (n1>1) {
+        xp4 = xp3;  xp3 = xp2;  xp2 = xp1;  xp1 = xp0;  xp0 = x[i2][1];
+        xm0 = xm1;  xm1 = xm2;
+        y[i2][1] = A0P0*xp0+A0P1*xp1+A0P2*xp2+A0P3*xp3+A0P4*xp4 +
+                   A1M0*xm0+A1M1*xm1;
+      }
+      if (n1>0) {
+        xp4 = xp3;  xp3 = xp2;  xp2 = xp1;  xp1 = xp0;  xp0 = x[i2][0];
+        xm0 = xm1;
+        y[i2][0] = A0P0*xp0+A0P1*xp1+A0P2*xp2+A0P3*xp3+A0P4*xp4 +
+                   A1M0*xm0;
+      }
+    }
+  }
+
+  /**
    * Applies the inverse of this filter.
    * @param x the filter input.
    * @param y the filter output.
@@ -64,6 +198,66 @@ public class DifferenceFilter {
     y[0] = x[0];
     for (int i=1; i<n; ++i)
       y[i] = x[i]+_alpha*y[i-1];
+  }
+
+  /**
+   * Applies the inverse of this filter.
+   * @param x the filter input.
+   * @param y the filter output.
+   */
+  public void applyInverse(float[][] x, float[][] y) {
+    float xm0;
+    float ym0,ym1,ym2,ym3,ym4;
+    float yp0,yp1,yp2,yp3,yp4;
+    int n1 = x[0].length;
+    int n2 = x.length;
+    ym0 = ym1 = ym2 = ym3 = ym4 = 0.0f;
+    for (int i1=0; i1<n1; ++i1) {
+      ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[0][i1];
+      y[0][i1] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4);
+    }
+    for (int i2=1; i2<n2; ++i2) {
+      ym0 = ym1 = ym2 = ym3 = ym4 = 0.0f;
+      yp0 = yp1 = yp2 = yp3 = yp4 = 0.0f;
+      if (n1>=4)
+        yp4 = y[i2-1][3];
+      if (n1>=3)
+        yp3 = y[i2-1][2];
+      if (n1>=2)
+        yp2 = y[i2-1][1];
+      if (n1>=1)
+        yp1 = y[i2-1][0];
+      for (int i1=0; i1<n1-4; ++i1) {
+        ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2  ][i1  ];
+        yp0 = yp1;  yp1 = yp2;  yp2 = yp3;  yp3 = yp4;  yp4 = y[i2-1][i1+4];
+        y[i2][i1] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
+                           A1M0*yp0-A1M1*yp1-A1M2*yp2-A1M3*yp3-A1M4*yp4);
+      }
+      if (n1>=4) {
+        ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-4];
+        yp0 = yp1;  yp1 = yp2;  yp2 = yp3;  yp3 = yp4;
+        y[i2][n1-4] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
+                             A1M0*yp0-A1M1*yp1-A1M2*yp2-A1M3*yp3);
+      }
+      if (n1>=3) {
+        ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-3];
+        yp0 = yp1;  yp1 = yp2;  yp2 = yp3;
+        y[i2][n1-3] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
+                             A1M0*yp0-A1M1*yp1-A1M2*yp2);
+      }
+      if (n1>=2) {
+        ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-3];
+        yp0 = yp1;  yp1 = yp2;
+        y[i2][n1-2] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
+                             A1M0*yp0-A1M1*yp1);
+      }
+      if (n1>=1) {
+        ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-3];
+        yp0 = yp1;
+        y[i2][n1-1] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
+                             A1M0*yp0);
+      }
+    }
   }
 
   /**
@@ -82,4 +276,15 @@ public class DifferenceFilter {
   // private
 
   private float _alpha;
+  private static final float A0P4 = -0.00708972f;
+  private static final float A0P3 = -0.01793403f; 
+  private static final float A0P2 = -0.03850411f; 
+  private static final float A0P1 = -0.64490664f; 
+  private static final float A0P0 =  1.79548454f; 
+  private static final float A1M0 = -0.55659920f;
+  private static final float A1M1 = -0.20031442f;
+  private static final float A1M2 = -0.08457147f; 
+  private static final float A1M3 = -0.04141619f; 
+  private static final float A1M4 = -0.02290331f; 
+  private static final float AIP0 =  1.0f/A0P0; 
 }

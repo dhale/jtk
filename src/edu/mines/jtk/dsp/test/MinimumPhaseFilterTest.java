@@ -23,8 +23,8 @@ public class MinimumPhaseFilterTest extends TestCase {
   }
 
   public void test1Random() {
-    int[] lag1 = {1,2};
-    float[] a = {1.8f,0.81f};
+    int[] lag1 = {0,1,2};
+    float[] a = {2.0f,1.8f,0.81f};
     MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,a);
     int n = 100;
     float[] x,y,z;
@@ -56,9 +56,19 @@ public class MinimumPhaseFilterTest extends TestCase {
   }
 
   public void test2Random() {
-    int[] lag1 = {1,-1,0,1};
-    int[] lag2 = {0,1,1,1};
-    float[] a = {0.9f,0.1f,0.1f,0.1f};
+    int[] lag1 = {
+       0, 1, 2, 3, 4,
+      -4,-3,-2,-1, 0
+    };
+    int[] lag2 = {
+       0, 0, 0, 0, 0,
+       1, 1, 1, 1, 1
+    };
+    float[] a = { 
+       1.79548454f, -0.64490664f, -0.03850411f, -0.01793403f, -0.00708972f,
+      -0.02290331f, -0.04141619f, -0.08457147f, -0.20031442f, -0.55659920f
+    };
+
     MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2,a);
     int n1 = 19;
     int n2 = 21;
@@ -88,6 +98,40 @@ public class MinimumPhaseFilterTest extends TestCase {
     mpf.applyInverseTranspose(y,z);
     d2 = dot(z,x);
     assertEquals(d1,d2,n1*n2*100.0*FLT_EPSILON);
+  }
+
+  public void testFactorFomel() {
+    float[] r = {24.0f,242.0f,867.0f,1334.0f,867.0f,242.0f,24.0f};
+    int n = r.length;
+    int[] lag1 = {0,1,2,3};
+    MinimumPhaseFilter mpf = MinimumPhaseFilter.factor(r,lag1);
+    int nlag = lag1.length;
+    float[] x = new float[nlag];
+    float[] a = new float[nlag];
+    x[0] = 1.0f;
+    mpf.apply(x,a);
+    assertEquals(24.0f,a[0],10*FLT_EPSILON);
+    assertEquals(26.0f,a[1],10*FLT_EPSILON);
+    assertEquals( 9.0f,a[2],10*FLT_EPSILON);
+    assertEquals( 1.0f,a[3],10*FLT_EPSILON);
+  }
+
+  public void xtestFactorLaplacian() {
+    float[][] r = {
+      { 0.000f,-0.999f, 0.000f},
+      {-0.999f, 4.000f,-0.999f},
+      { 0.000f,-0.999f, 0.000f}
+    };
+    int n = r.length;
+    int[] lag1 = {
+                   0, 1, 2, 3, 4,
+      -4,-3,-2,-1, 0
+    };
+    int[] lag2 = {
+                   0, 0, 0, 0, 0,
+       1, 1, 1, 1, 1
+    };
+    MinimumPhaseFilter.factor(r,lag1,lag2);
   }
 
   private static float dot(float[] x, float[] y) {
