@@ -19,37 +19,24 @@ public class DifferenceFilter {
   // test
   public static void main(String[] args) {
     int n1 = 5;
-    int n2 = 7;
+    int n2 = 5;
     int m1 = (n1-1)/2;
     int m2 = (n2-1)/2;
     float[][] x = Array.zerofloat(n1,n2);
     float[][] y = Array.zerofloat(n1,n2);
     float[][] z = Array.zerofloat(n1,n2);
+    /*
     x[0][0] = 1.0f;
     x[0][n1-1] = 1.0f;
     x[n2-1][0] = 1.0f;
     x[n2-1][n1-1] = 1.0f;
+    */
     x[m2][m1] = 1.0f;
     DifferenceFilter df = new DifferenceFilter();
     df.apply(x,y);
     Array.dump(y);
-    df.applyInverse(y,z);
+    df.applyTranspose(y,z);
     Array.dump(z);
-  }
-
-  /**
-   * Constructs a difference filter.
-   */
-  public DifferenceFilter() {
-    this(1.0);
-  }
-
-  /**
-   * Constructs a difference filter with specified weight.
-   * @param alpha the weight applied to the previous sample.
-   */
-  public DifferenceFilter(double alpha) {
-    _alpha = (float)alpha;
   }
 
   /**
@@ -61,7 +48,7 @@ public class DifferenceFilter {
     int n = y.length;
     y[0] = x[0];
     for (int i=1; i<n; ++i)
-      y[i] = x[i]-_alpha*x[i-1];
+      y[i] = x[i]+AP1*x[i-1];
   }
 
   /**
@@ -132,7 +119,7 @@ public class DifferenceFilter {
     int n = y.length;
     y[n-1] = x[n-1];
     for (int i=n-2; i>=0; --i)
-      y[i] = x[i]-_alpha*x[i+1];
+      y[i] = x[i]+AP1*x[i+1];
   }
 
   /**
@@ -203,7 +190,7 @@ public class DifferenceFilter {
     int n = y.length;
     y[0] = x[0];
     for (int i=1; i<n; ++i)
-      y[i] = x[i]+_alpha*y[i-1];
+      y[i] = x[i]-AP1*y[i-1];
   }
 
   /**
@@ -275,7 +262,7 @@ public class DifferenceFilter {
     int n = y.length;
     y[n-1] = x[n-1];
     for (int i=n-2; i>=0; --i)
-      y[i] = x[i]+_alpha*y[i+1];
+      y[i] = x[i]-AP1*y[i+1];
   }
 
   /**
@@ -341,7 +328,7 @@ public class DifferenceFilter {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private float _alpha;
+  private static final float AP1 = -0.999f;
   private static final float A0P4 = -0.00708972f;
   private static final float A0P3 = -0.01793403f; 
   private static final float A0P2 = -0.03850411f; 

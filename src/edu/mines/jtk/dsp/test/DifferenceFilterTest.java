@@ -23,7 +23,7 @@ public class DifferenceFilterTest extends TestCase {
   }
 
   public void testRandom() {
-    DifferenceFilter df = new DifferenceFilter(0.99);
+    DifferenceFilter df = new DifferenceFilter();
     int n = 100;
     float[] x,y,z;
 

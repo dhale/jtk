@@ -29,9 +29,9 @@ public class MinimumPhaseFilterTest extends TestCase {
     int n = 100;
     float[] x,y,z;
 
-    x = Array.randfloat(n);
-    y = Array.zerofloat(n);
-    z = Array.zerofloat(n);
+    x = randfloat(n);
+    y = zerofloat(n);
+    z = zerofloat(n);
     mpf.apply(x,y);
     mpf.applyInverse(y,z);
     assertEqual(x,z);
@@ -40,19 +40,20 @@ public class MinimumPhaseFilterTest extends TestCase {
     assertEqual(x,z);
 
     float d1,d2;
-    x = Array.randfloat(n);
-    y = Array.randfloat(n);
-    z = Array.zerofloat(n);
+    float tiny = n*10.0f*FLT_EPSILON;
+    x = randfloat(n);
+    y = randfloat(n);
+    z = zerofloat(n);
     mpf.apply(x,z);
     d1 = dot(z,y);
     mpf.applyTranspose(y,z);
     d2 = dot(z,x);
-    assertEquals(d1,d2,n*100.0*FLT_EPSILON);
+    assertEquals(d1,d2,tiny);
     mpf.applyInverse(x,z);
     d1 = dot(z,y);
     mpf.applyInverseTranspose(y,z);
     d2 = dot(z,x);
-    assertEquals(d1,d2,n*100.0*FLT_EPSILON);
+    assertEquals(d1,d2,tiny);
   }
 
   public void test2Random() {
@@ -74,9 +75,9 @@ public class MinimumPhaseFilterTest extends TestCase {
     int n2 = 21;
     float[][] x,y,z;
 
-    x = Array.randfloat(n1,n2);
-    y = Array.zerofloat(n1,n2);
-    z = Array.zerofloat(n1,n2);
+    x = randfloat(n1,n2);
+    y = zerofloat(n1,n2);
+    z = zerofloat(n1,n2);
     mpf.apply(x,y);
     mpf.applyInverse(y,z);
     assertEqual(x,z);
@@ -85,22 +86,81 @@ public class MinimumPhaseFilterTest extends TestCase {
     assertEqual(x,z);
 
     float d1,d2;
-    x = Array.randfloat(n1,n2);
-    y = Array.randfloat(n1,n2);
-    z = Array.zerofloat(n1,n2);
+    float tiny = n1*n2*10.0f*FLT_EPSILON;
+    x = randfloat(n1,n2);
+    y = randfloat(n1,n2);
+    z = zerofloat(n1,n2);
     mpf.apply(x,z);
     d1 = dot(z,y);
     mpf.applyTranspose(y,z);
     d2 = dot(z,x);
-    assertEquals(d1,d2,n1*n2*100.0*FLT_EPSILON);
+    assertEquals(d1,d2,tiny);
     mpf.applyInverse(x,z);
     d1 = dot(z,y);
     mpf.applyInverseTranspose(y,z);
     d2 = dot(z,x);
-    assertEquals(d1,d2,n1*n2*100.0*FLT_EPSILON);
+    assertEquals(d1,d2,tiny);
   }
 
-  public void testFactorFomel() {
+  public void test3Random() {
+    int[] lag1 = {
+                   0, 1, 2,
+            -2,-1, 0, 1, 2,
+            -2,-1, 0, 1, 2,
+            -2,-1, 0,
+    };
+    int[] lag2 = {
+                   0, 0, 0,      
+             1, 1, 1, 1, 1,      
+            -1,-1,-1,-1,-1,      
+             0, 0, 0,
+    };
+    int[] lag3 = {
+                   0, 0, 0,      
+             0, 0, 0, 0, 0,      
+             1, 1, 1, 1, 1,      
+             1, 1, 1,
+    };
+    float[] a = {
+                                 2.3110454f, -0.4805547f, -0.0143204f, 
+      -0.0291793f, -0.1057476f, -0.4572746f, -0.0115732f, -0.0047283f, 
+      -0.0149963f, -0.0408317f, -0.0945958f, -0.0223166f, -0.0062781f, 
+      -0.0213786f, -0.0898909f, -0.4322719f
+    };
+    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2,lag3,a);
+    int n1 = 11;
+    int n2 = 13;
+    int n3 = 12;
+    float[][][] x,y,z;
+
+    x = randfloat(n1,n2,n3);
+    y = zerofloat(n1,n2,n3);
+    z = zerofloat(n1,n2,n3);
+    mpf.apply(x,y);
+    mpf.applyInverse(y,z);
+    assertEqual(x,z);
+    mpf.applyTranspose(x,y);
+    mpf.applyInverseTranspose(y,z);
+    assertEqual(x,z);
+
+    float d1,d2;
+    float tiny = n1*n2*n3*10.0f*FLT_EPSILON;
+    x = randfloat(n1,n2,n3);
+    y = randfloat(n1,n2,n3);
+    z = zerofloat(n1,n2,n3);
+    mpf.apply(x,z);
+    d1 = dot(z,y);
+    mpf.applyTranspose(y,z);
+    d2 = dot(z,x);
+    assertEquals(d1,d2,tiny);
+    mpf.applyInverse(x,z);
+    d1 = dot(z,y);
+    mpf.applyInverseTranspose(y,z);
+    d2 = dot(z,x);
+    assertEquals(d1,d2,tiny);
+  }
+
+  public void testFactorFomelExample() {
     float[] r = {24.0f,242.0f,867.0f,1334.0f,867.0f,242.0f,24.0f};
     int n = r.length;
     int[] lag1 = {0,1,2,3};
@@ -116,7 +176,7 @@ public class MinimumPhaseFilterTest extends TestCase {
     assertEquals( 1.0f,a[3],10*FLT_EPSILON);
   }
 
-  public void xtestFactorLaplacian() {
+  public void xtestFactorLaplacian2() {
     float[][] r = {
       { 0.000f,-0.999f, 0.000f},
       {-0.999f, 4.000f,-0.999f},
@@ -131,7 +191,75 @@ public class MinimumPhaseFilterTest extends TestCase {
                    0, 0, 0, 0, 0,
        1, 1, 1, 1, 1
     };
+    /*
+    int[] lag1 = {
+                   0, 1, 2,
+            -2,-1, 0
+    };
+    int[] lag2 = {
+                   0, 0, 0,
+             1, 1, 1
+    };
+    */
     MinimumPhaseFilter.factor(r,lag1,lag2);
+  }
+
+  public void xtestFactorLaplacian3() {
+    float[][][] r = {
+      {
+        { 0.000f, 0.000f, 0.000f},
+        { 0.000f,-0.999f, 0.000f},
+        { 0.000f, 0.000f, 0.000f}
+      },{
+        { 0.000f,-0.999f, 0.000f},
+        {-0.999f, 6.000f,-0.999f},
+        { 0.000f,-0.999f, 0.000f}
+      },{
+        { 0.000f, 0.000f, 0.000f},
+        { 0.000f,-0.999f, 0.000f},
+        { 0.000f, 0.000f, 0.000f}
+      }
+    };
+    int[] lag1 = {
+                   0, 1, 2,
+            -2,-1, 0, 1, 2,
+            -2,-1, 0, 1, 2,
+            -2,-1, 0,
+    };
+    int[] lag2 = {
+                   0, 0, 0,      
+             1, 1, 1, 1, 1,      
+            -1,-1,-1,-1,-1,      
+             0, 0, 0,
+    };
+    int[] lag3 = {
+                   0, 0, 0,      
+             0, 0, 0, 0, 0,      
+             1, 1, 1, 1, 1,      
+             1, 1, 1,
+    };
+    MinimumPhaseFilter.factor(r,lag1,lag2,lag3);
+  }
+
+  private static float[] randfloat(int n1) {
+    return Array.sub(Array.randfloat(n1),0.5f);
+  }
+  private static float[][] randfloat(int n1, int n2) {
+    return Array.sub(Array.randfloat(n1,n2),0.5f);
+  }
+  private static float[][][] randfloat(int n1, int n2, int n3) {
+    return Array.sub(Array.randfloat(n1,n2,n3),0.5f);
+  }
+
+  private static float[] zerofloat(int n1) {
+    return Array.zerofloat(n1);
+  }
+  private static float[][] zerofloat(int n1, int n2) {
+    return Array.zerofloat(n1,n2);
+  }
+
+  private static float[][][] zerofloat(int n1, int n2, int n3) {
+    return Array.zerofloat(n1,n2,n3);
   }
 
   private static float dot(float[] x, float[] y) {
