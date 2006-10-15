@@ -19,11 +19,17 @@ public class DifferenceFilter {
   // test
   public static void main(String[] args) {
     int n1 = 5;
-    int n2 = 5;
+    int n2 = 7;
+    int m1 = (n1-1)/2;
+    int m2 = (n2-1)/2;
     float[][] x = Array.zerofloat(n1,n2);
     float[][] y = Array.zerofloat(n1,n2);
     float[][] z = Array.zerofloat(n1,n2);
-    x[(n2-1)/2][(n1-1)/2] = 1.0f;
+    x[0][0] = 1.0f;
+    x[0][n1-1] = 1.0f;
+    x[n2-1][0] = 1.0f;
+    x[n2-1][n1-1] = 1.0f;
+    x[m2][m1] = 1.0f;
     DifferenceFilter df = new DifferenceFilter();
     df.apply(x,y);
     Array.dump(y);
@@ -246,13 +252,13 @@ public class DifferenceFilter {
                              A1M0*yp0-A1M1*yp1-A1M2*yp2);
       }
       if (n1>=2) {
-        ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-3];
+        ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-2];
         yp0 = yp1;  yp1 = yp2;
         y[i2][n1-2] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
                              A1M0*yp0-A1M1*yp1);
       }
       if (n1>=1) {
-        ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-3];
+        ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-1];
         yp0 = yp1;
         y[i2][n1-1] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
                              A1M0*yp0);
@@ -270,6 +276,66 @@ public class DifferenceFilter {
     y[n-1] = x[n-1];
     for (int i=n-2; i>=0; --i)
       y[i] = x[i]+_alpha*y[i+1];
+  }
+
+  /**
+   * Applies the inverse transpose of this filter.
+   * @param x the filter input.
+   * @param y the filter output.
+   */
+  public void applyInverseTranspose(float[][] x, float[][] y) {
+    float xp0;
+    float ym0,ym1,ym2,ym3,ym4;
+    float yp0,yp1,yp2,yp3,yp4;
+    int n1 = x[0].length;
+    int n2 = x.length;
+    yp0 = yp1 = yp2 = yp3 = yp4 = 0.0f;
+    for (int i1=n1-1; i1>=0; --i1) {
+      yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[n2-1][i1];
+      y[n2-1][i1] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4);
+    }
+    for (int i2=n2-2; i2>=0; --i2) {
+      ym0 = ym1 = ym2 = ym3 = ym4 = 0.0f;
+      yp0 = yp1 = yp2 = yp3 = yp4 = 0.0f;
+      if (n1>=4)
+        ym4 = y[i2+1][n1-4];
+      if (n1>=3)
+        ym3 = y[i2+1][n1-3];
+      if (n1>=2)
+        ym2 = y[i2+1][n1-2];
+      if (n1>=1)
+        ym1 = y[i2+1][n1-1];
+      for (int i1=n1-1; i1>=4; --i1) {
+        yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[i2  ][i1  ];
+        ym0 = ym1;  ym1 = ym2;  ym2 = ym3;  ym3 = ym4;  ym4 = y[i2+1][i1-4];
+        y[i2][i1] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4 -
+                           A1M0*ym0-A1M1*ym1-A1M2*ym2-A1M3*ym3-A1M4*ym4);
+      }
+      if (n1>3) {
+        yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[i2][3];
+        ym0 = ym1;  ym1 = ym2;  ym2 = ym3;  ym3 = ym4;
+        y[i2][3] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4 -
+                          A1M0*ym0-A1M1*ym1-A1M2*ym2-A1M3*ym3);
+      }
+      if (n1>2) {
+        yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[i2][2];
+        ym0 = ym1;  ym1 = ym2;  ym2 = ym3;
+        y[i2][2] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4 -
+                          A1M0*ym0-A1M1*ym1-A1M2*ym2);
+      }
+      if (n1>1) {
+        yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[i2][1];
+        ym0 = ym1;  ym1 = ym2;
+        y[i2][1] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4 -
+                          A1M0*ym0-A1M1*ym1);
+      }
+      if (n1>0) {
+        yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[i2][0];
+        ym0 = ym1;
+        y[i2][0] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4 -
+                          A1M0*ym0);
+      }
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
