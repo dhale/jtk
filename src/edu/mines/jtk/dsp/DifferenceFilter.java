@@ -53,9 +53,9 @@ public class DifferenceFilter {
     float[][][] z = Array.zerofloat(n1,n2,n3);
     x[m3][m2][m1] = 1.0f;
     DifferenceFilter df = new DifferenceFilter();
-    df.apply(x,y);
+    df.applyTranspose(x,y);
     Array.dump(y);
-    df.applyInverse(y,z);
+    df.applyInverseTranspose(y,z);
     Array.dump(z);
   }
 
@@ -101,31 +101,31 @@ public class DifferenceFilter {
         xm4 = xm3;  xm3 = xm2;  xm2 = xm1;  xm1 = xm0;  xm0 = x[i2  ][i1  ];
         xp0 = xp1;  xp1 = xp2;  xp2 = xp3;  xp3 = xp4;  xp4 = x[i2-1][i1+4];
         y[i2][i1] = A0P0*xm0+A0P1*xm1+A0P2*xm2+A0P3*xm3+A0P4*xm4 +
-                    A1M0*xp0+A1M1*xp1+A1M2*xp2+A1M3*xp3+A1M4*xp4;
+                    APM0*xp0+APM1*xp1+APM2*xp2+APM3*xp3+APM4*xp4;
       }
       if (n1>=4) {
         xm4 = xm3;  xm3 = xm2;  xm2 = xm1;  xm1 = xm0;  xm0 = x[i2][n1-4];
         xp0 = xp1;  xp1 = xp2;  xp2 = xp3;  xp3 = xp4;
         y[i2][n1-4] = A0P0*xm0+A0P1*xm1+A0P2*xm2+A0P3*xm3+A0P4*xm4 +
-                      A1M0*xp0+A1M1*xp1+A1M2*xp2+A1M3*xp3;
+                      APM0*xp0+APM1*xp1+APM2*xp2+APM3*xp3;
       }
       if (n1>=3) {
         xm4 = xm3;  xm3 = xm2;  xm2 = xm1;  xm1 = xm0;  xm0 = x[i2][n1-3];
         xp0 = xp1;  xp1 = xp2;  xp2 = xp3;
         y[i2][n1-3] = A0P0*xm0+A0P1*xm1+A0P2*xm2+A0P3*xm3+A0P4*xm4 +
-                      A1M0*xp0+A1M1*xp1+A1M2*xp2;
+                      APM0*xp0+APM1*xp1+APM2*xp2;
       }
       if (n1>=2) {
         xm4 = xm3;  xm3 = xm2;  xm2 = xm1;  xm1 = xm0;  xm0 = x[i2][n1-2];
         xp0 = xp1;  xp1 = xp2;
         y[i2][n1-2] = A0P0*xm0+A0P1*xm1+A0P2*xm2+A0P3*xm3+A0P4*xm4 +
-                      A1M0*xp0+A1M1*xp1;
+                      APM0*xp0+APM1*xp1;
       }
       if (n1>=1) {
         xm4 = xm3;  xm3 = xm2;  xm2 = xm1;  xm1 = xm0;  xm0 = x[i2][n1-1];
         xp0 = xp1;
         y[i2][n1-1] = A0P0*xm0+A0P1*xm1+A0P2*xm2+A0P3*xm3+A0P4*xm4 +
-                      A1M0*xp0;
+                      APM0*xp0;
       }
     }
   }
@@ -144,22 +144,28 @@ public class DifferenceFilter {
     int n3m1 = n3-1;
     for (int i3=0; i3<n3; ++i3) {
       for (int i2=0; i2<n2; ++i2) {
-        float x00m2 = 0.0f;
-        float x00m1 = 0.0f;
-        float x00m0 = 0.0f;
-        float x0mm2 = 0.0f;
-        float x0mm1 = 0.0f;
-        float x0mm0 = 0.0f;
-        float xmpm2 = 0.0f;
-        float xmpm1 = 0.0f;
-        float xmpm0 = 0.0f;
-        float xm0m0 = 0.0f;
-        float x0mp1 = (n1>0 && i2>0           )?x[i3  ][i2-1][0]:0.0f;
-        float xm0p1 = (n1>0 &&            i3>0)?x[i3-1][i2  ][0]:0.0f;
-        float xmpp1 = (n1>0 && i2<n2m1 && i3>0)?x[i3-1][i2+1][0]:0.0f;
-        float x0mp2 = (n1>1 && i2>0           )?x[i3  ][i2-1][1]:0.0f;
-        float xm0p2 = (n1>1 &&            i3>0)?x[i3-1][i2  ][1]:0.0f;
-        float xmpp2 = (n1>1 && i2<n2m1 && i3>0)?x[i3-1][i2+1][1]:0.0f;
+        float x0mm2=0.0f, x0mm1=0.0f, x0mm0=0.0f, x0mp1=0.0f, x0mp2=0.0f;
+        float x00m2=0.0f, x00m1=0.0f, x00m0=0.0f;
+        float                         xm0m0=0.0f, xm0p1=0.0f, xm0p2=0.0f;
+        float xmpm2=0.0f, xmpm1=0.0f, xmpm0=0.0f, xmpp1=0.0f, xmpp2=0.0f;
+        if (n1>0) {
+          if (i2>0)
+            x0mp1 = x[i3][i2-1][0];
+          if (i3>0) {
+            xm0p1 = x[i3-1][i2][0];
+            if (i2<n2m1)
+              xmpp1 = x[i3-1][i2+1][0];
+          }
+        }
+        if (n1>1) {
+          if (i2>0)
+            x0mp2 = x[i3][i2-1][1];
+          if (i3>0) {
+            xm0p2 = x[i3-1][i2][1];
+            if (i2<n2m1)
+              xmpp2 = x[i3-1][i2+1][1];
+          }
+        }
         for (int i1=0; i1<n1-2; ++i1) {
           x00m2 = x00m1;  
           x00m1 = x00m0;  
@@ -269,31 +275,31 @@ public class DifferenceFilter {
         xp4 = xp3;  xp3 = xp2;  xp2 = xp1;  xp1 = xp0;  xp0 = x[i2  ][i1  ];
         xm0 = xm1;  xm1 = xm2;  xm2 = xm3;  xm3 = xm4;  xm4 = x[i2+1][i1-4];
         y[i2][i1] = A0P0*xp0+A0P1*xp1+A0P2*xp2+A0P3*xp3+A0P4*xp4 +
-                    A1M0*xm0+A1M1*xm1+A1M2*xm2+A1M3*xm3+A1M4*xm4;
+                    APM0*xm0+APM1*xm1+APM2*xm2+APM3*xm3+APM4*xm4;
       }
       if (n1>3) {
         xp4 = xp3;  xp3 = xp2;  xp2 = xp1;  xp1 = xp0;  xp0 = x[i2][3];
         xm0 = xm1;  xm1 = xm2;  xm2 = xm3;  xm3 = xm4;
         y[i2][3] = A0P0*xp0+A0P1*xp1+A0P2*xp2+A0P3*xp3+A0P4*xp4 +
-                   A1M0*xm0+A1M1*xm1+A1M2*xm2+A1M3*xm3;
+                   APM0*xm0+APM1*xm1+APM2*xm2+APM3*xm3;
       }
       if (n1>2) {
         xp4 = xp3;  xp3 = xp2;  xp2 = xp1;  xp1 = xp0;  xp0 = x[i2][2];
         xm0 = xm1;  xm1 = xm2;  xm2 = xm3;
         y[i2][2] = A0P0*xp0+A0P1*xp1+A0P2*xp2+A0P3*xp3+A0P4*xp4 +
-                   A1M0*xm0+A1M1*xm1+A1M2*xm2;
+                   APM0*xm0+APM1*xm1+APM2*xm2;
       }
       if (n1>1) {
         xp4 = xp3;  xp3 = xp2;  xp2 = xp1;  xp1 = xp0;  xp0 = x[i2][1];
         xm0 = xm1;  xm1 = xm2;
         y[i2][1] = A0P0*xp0+A0P1*xp1+A0P2*xp2+A0P3*xp3+A0P4*xp4 +
-                   A1M0*xm0+A1M1*xm1;
+                   APM0*xm0+APM1*xm1;
       }
       if (n1>0) {
         xp4 = xp3;  xp3 = xp2;  xp2 = xp1;  xp1 = xp0;  xp0 = x[i2][0];
         xm0 = xm1;
         y[i2][0] = A0P0*xp0+A0P1*xp1+A0P2*xp2+A0P3*xp3+A0P4*xp4 +
-                   A1M0*xm0;
+                   APM0*xm0;
       }
     }
   }
@@ -312,22 +318,28 @@ public class DifferenceFilter {
     int n3m1 = n3-1;
     for (int i3=n3m1; i3>=0; --i3) {
       for (int i2=n2m1; i2>=0; --i2) {
-        float x00m2 = 0.0f;
-        float x00m1 = 0.0f;
-        float x00m0 = 0.0f;
-        float x0mm2 = 0.0f;
-        float x0mm1 = 0.0f;
-        float x0mm0 = 0.0f;
-        float xmpm2 = 0.0f;
-        float xmpm1 = 0.0f;
-        float xmpm0 = 0.0f;
-        float xm0m0 = 0.0f;
-        float x0mp1 = (n1>0 && i2<n2m1           )?x[i3  ][i2+1][n1-1]:0.0f;
-        float xm0p1 = (n1>0 &&            i3<n3m1)?x[i3+1][i2  ][n1-1]:0.0f;
-        float xmpp1 = (n1>0 && i2>0    && i3<n3m1)?x[i3+1][i2-1][n1-1]:0.0f;
-        float x0mp2 = (n1>1 && i2<n2m1           )?x[i3  ][i2+1][n1-2]:0.0f;
-        float xm0p2 = (n1>1 &&            i3<n3m1)?x[i3+1][i2  ][n1-2]:0.0f;
-        float xmpp2 = (n1>1 && i2>0    && i3<n3m1)?x[i3+1][i2-1][n1-2]:0.0f;
+        float x0mm2=0.0f, x0mm1=0.0f, x0mm0=0.0f, x0mp1=0.0f, x0mp2=0.0f;
+        float x00m2=0.0f, x00m1=0.0f, x00m0=0.0f;
+        float                         xm0m0=0.0f, xm0p1=0.0f, xm0p2=0.0f;
+        float xmpm2=0.0f, xmpm1=0.0f, xmpm0=0.0f, xmpp1=0.0f, xmpp2=0.0f;
+        if (n1>0) {
+          if (i2<n2m1)
+            x0mp1 = x[i3][i2+1][n1-1];
+          if (i3<n3m1) {
+            xm0p1 = x[i3+1][i2][n1-1];
+            if (i2>0)
+              xmpp1 = x[i3+1][i2-1][n1-1];
+          }
+        }
+        if (n1>1) {
+          if (i2<n2m1)
+            x0mp2 = x[i3][i2+1][n1-2];
+          if (i3<n3m1) {
+            xm0p2 = x[i3+1][i2][n1-2];
+            if (i2>0)
+              xmpp2 = x[i3+1][i2-1][n1-2];
+          }
+        }
         for (int i1=n1m1; i1>=2; --i1) {
           x00m2 = x00m1;  
           x00m1 = x00m0;  
@@ -438,31 +450,31 @@ public class DifferenceFilter {
         ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2  ][i1  ];
         yp0 = yp1;  yp1 = yp2;  yp2 = yp3;  yp3 = yp4;  yp4 = y[i2-1][i1+4];
         y[i2][i1] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
-                           A1M0*yp0-A1M1*yp1-A1M2*yp2-A1M3*yp3-A1M4*yp4);
+                           APM0*yp0-APM1*yp1-APM2*yp2-APM3*yp3-APM4*yp4);
       }
       if (n1>=4) {
         ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-4];
         yp0 = yp1;  yp1 = yp2;  yp2 = yp3;  yp3 = yp4;
         y[i2][n1-4] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
-                             A1M0*yp0-A1M1*yp1-A1M2*yp2-A1M3*yp3);
+                             APM0*yp0-APM1*yp1-APM2*yp2-APM3*yp3);
       }
       if (n1>=3) {
         ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-3];
         yp0 = yp1;  yp1 = yp2;  yp2 = yp3;
         y[i2][n1-3] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
-                             A1M0*yp0-A1M1*yp1-A1M2*yp2);
+                             APM0*yp0-APM1*yp1-APM2*yp2);
       }
       if (n1>=2) {
         ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-2];
         yp0 = yp1;  yp1 = yp2;
         y[i2][n1-2] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
-                             A1M0*yp0-A1M1*yp1);
+                             APM0*yp0-APM1*yp1);
       }
       if (n1>=1) {
         ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-1];
         yp0 = yp1;
         y[i2][n1-1] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
-                             A1M0*yp0);
+                             APM0*yp0);
       }
     }
   }
@@ -482,22 +494,28 @@ public class DifferenceFilter {
     for (int i3=0; i3<n3; ++i3) {
       for (int i2=0; i2<n2; ++i2) {
         float x00m0;
-        float y00m2 = 0.0f;
-        float y00m1 = 0.0f;
-        float y00m0 = 0.0f;
-        float y0mm2 = 0.0f;
-        float y0mm1 = 0.0f;
-        float y0mm0 = 0.0f;
-        float ympm2 = 0.0f;
-        float ympm1 = 0.0f;
-        float ympm0 = 0.0f;
-        float ym0m0 = 0.0f;
-        float y0mp1 = (n1>0 && i2>0           )?y[i3  ][i2-1][0]:0.0f;
-        float ym0p1 = (n1>0 &&            i3>0)?y[i3-1][i2  ][0]:0.0f;
-        float ympp1 = (n1>0 && i2<n2m1 && i3>0)?y[i3-1][i2+1][0]:0.0f;
-        float y0mp2 = (n1>1 && i2>0           )?y[i3  ][i2-1][1]:0.0f;
-        float ym0p2 = (n1>1 &&            i3>0)?y[i3-1][i2  ][1]:0.0f;
-        float ympp2 = (n1>1 && i2<n2m1 && i3>0)?y[i3-1][i2+1][1]:0.0f;
+        float y0mm2=0.0f, y0mm1=0.0f, y0mm0=0.0f, y0mp1=0.0f, y0mp2=0.0f;
+        float y00m2=0.0f, y00m1=0.0f, y00m0=0.0f;
+        float                         ym0m0=0.0f, ym0p1=0.0f, ym0p2=0.0f;
+        float ympm2=0.0f, ympm1=0.0f, ympm0=0.0f, ympp1=0.0f, ympp2=0.0f;
+        if (n1>0) {
+          if (i2>0)
+            y0mp1 = y[i3][i2-1][0];
+          if (i3>0) {
+            ym0p1 = y[i3-1][i2][0];
+            if (i2<n2m1)
+              ympp1 = y[i3-1][i2+1][0];
+          }
+        }
+        if (n1>1) {
+          if (i2>0)
+            y0mp2 = y[i3][i2-1][1];
+          if (i3>0) {
+            ym0p2 = y[i3-1][i2][1];
+            if (i2<n2m1)
+              ympp2 = y[i3-1][i2+1][1];
+          }
+        }
         for (int i1=0; i1<n1-2; ++i1) {
           x00m0 = x[i3][i2][i1];
           y00m2 = y00m1;
@@ -608,31 +626,135 @@ public class DifferenceFilter {
         yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[i2  ][i1  ];
         ym0 = ym1;  ym1 = ym2;  ym2 = ym3;  ym3 = ym4;  ym4 = y[i2+1][i1-4];
         y[i2][i1] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4 -
-                           A1M0*ym0-A1M1*ym1-A1M2*ym2-A1M3*ym3-A1M4*ym4);
+                           APM0*ym0-APM1*ym1-APM2*ym2-APM3*ym3-APM4*ym4);
       }
       if (n1>3) {
         yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[i2][3];
         ym0 = ym1;  ym1 = ym2;  ym2 = ym3;  ym3 = ym4;
         y[i2][3] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4 -
-                          A1M0*ym0-A1M1*ym1-A1M2*ym2-A1M3*ym3);
+                          APM0*ym0-APM1*ym1-APM2*ym2-APM3*ym3);
       }
       if (n1>2) {
         yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[i2][2];
         ym0 = ym1;  ym1 = ym2;  ym2 = ym3;
         y[i2][2] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4 -
-                          A1M0*ym0-A1M1*ym1-A1M2*ym2);
+                          APM0*ym0-APM1*ym1-APM2*ym2);
       }
       if (n1>1) {
         yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[i2][1];
         ym0 = ym1;  ym1 = ym2;
         y[i2][1] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4 -
-                          A1M0*ym0-A1M1*ym1);
+                          APM0*ym0-APM1*ym1);
       }
       if (n1>0) {
         yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[i2][0];
         ym0 = ym1;
         y[i2][0] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4 -
-                          A1M0*ym0);
+                          APM0*ym0);
+      }
+    }
+  }
+
+  /**
+   * Applies the inverse transpose of this filter.
+   * @param x the filter input.
+   * @param y the filter output.
+   */
+  public void applyInverseTranspose(float[][][] x, float[][][] y) {
+    int n1 = x[0][0].length;
+    int n2 = x[0].length;
+    int n3 = x.length;
+    int n1m1 = n1-1;
+    int n2m1 = n2-1;
+    int n3m1 = n3-1;
+    for (int i3=n3m1; i3>=0; --i3) {
+      for (int i2=n2m1; i2>=0; --i2) {
+        float x00m0;
+        float y0mm2=0.0f, y0mm1=0.0f, y0mm0=0.0f, y0mp1=0.0f, y0mp2=0.0f;
+        float y00m2=0.0f, y00m1=0.0f, y00m0=0.0f;
+        float                         ym0m0=0.0f, ym0p1=0.0f, ym0p2=0.0f;
+        float ympm2=0.0f, ympm1=0.0f, ympm0=0.0f, ympp1=0.0f, ympp2=0.0f;
+        if (n1>0) {
+          if (i2<n2m1)
+            y0mp1 = y[i3][i2+1][n1-1];
+          if (i3<n3m1) {
+            ym0p1 = y[i3+1][i2][n1-1];
+            if (i2>0)
+              ympp1 = y[i3+1][i2-1][n1-1];
+          }
+        }
+        if (n1>1) {
+          if (i2<n2m1)
+            y0mp2 = y[i3][i2+1][n1-2];
+          if (i3<n3m1) {
+            ym0p2 = y[i3+1][i2][n1-2];
+            if (i2>0)
+              ympp2 = y[i3+1][i2-1][n1-2];
+          }
+        }
+        for (int i1=n1m1; i1>=2; --i1) {
+          x00m0 = x[i3][i2][i1];
+          y00m2 = y00m1;  
+          y00m1 = y00m0;  
+          if (i2<n2m1) {
+            y0mm2 = y0mm1;
+            y0mm1 = y0mm0;
+            y0mm0 = y0mp1;
+            y0mp1 = y0mp2;
+            y0mp2 = y[i3][i2+1][i1-2];
+          }
+          if (i3<n3m1) {
+            if (i2>0) {
+              ympm2 = ympm1;
+              ympm1 = ympm0;
+              ympm0 = ympp1;
+              ympp1 = ympp2;
+              ympp2 = y[i3+1][i2-1][i1-2];
+            }
+            ym0m0 = ym0p1;
+            ym0p1 = ym0p2;
+            ym0p2 = y[i3+1][i2][i1-2];
+          }
+          y[i3][i2][i1] = y00m0 =   AI0P0*(x00m0-A00P1*y00m1-A00P2*y00m2 -
+             A0PM2*y0mp2-A0PM1*y0mp1-A0PP0*y0mm0-A0PP1*y0mm1-A0PP2*y0mm2 -
+             APMM2*ympp2-APMM1*ympp1-APMP0*ympm0-APMP1*ympm1-APMP2*ympm2 -
+             AP0M2*ym0p2-AP0M1*ym0p1-AP0P0*ym0m0);
+        }
+        if (n1>1) {
+          x00m0 = x[i3][i2][1];
+          y00m2 = y00m1;  
+          y00m1 = y00m0;  
+          y0mm2 = y0mm1;
+          y0mm1 = y0mm0;
+          y0mm0 = y0mp1;
+          y0mp1 = y0mp2;
+          ympm2 = ympm1;
+          ympm1 = ympm0;
+          ympm0 = ympp1;
+          ympp1 = ympp2;
+          ym0m0 = ym0p1;
+          ym0p1 = ym0p2;
+          y[i3][i2][1] = y00m0 =    AI0P0*(x00m0-A00P1*y00m1-A00P2*y00m2 -
+                         A0PM1*y0mp1-A0PP0*y0mm0-A0PP1*y0mm1-A0PP2*y0mm2 -
+                         APMM1*ympp1-APMP0*ympm0-APMP1*ympm1-APMP2*ympm2 -
+                         AP0M1*ym0p1-AP0P0*ym0m0);
+        }
+        if (n1>0) {
+          x00m0 = x[i3][i2][0];
+          y00m2 = y00m1;  
+          y00m1 = y00m0;  
+          y0mm2 = y0mm1;
+          y0mm1 = y0mm0;
+          y0mm0 = y0mp1;
+          ympm2 = ympm1;
+          ympm1 = ympm0;
+          ympm0 = ympp1;
+          ym0m0 = ym0p1;
+          y[i3][i2][0] = y00m0 =    AI0P0*(x00m0-A00P1*y00m1-A00P2*y00m2 -
+                                     A0PP0*y0mm0-A0PP1*y0mm1-A0PP2*y0mm2 -
+                                     APMP0*ympm0-APMP1*ympm1-APMP2*ympm2 -
+                                     AP0P0*ym0m0);
+        }
       }
     }
   }
@@ -650,11 +772,11 @@ public class DifferenceFilter {
   private static final float A0P2 = -0.03850411f;  //  2    0
   private static final float A0P3 = -0.01793403f;  //  3    0
   private static final float A0P4 = -0.00708972f;  //  4    0
-  private static final float A1M0 = -0.55659920f;  //  0    1
-  private static final float A1M1 = -0.20031442f;  // -1    1
-  private static final float A1M2 = -0.08457147f;  // -2    1
-  private static final float A1M3 = -0.04141619f;  // -3    1
-  private static final float A1M4 = -0.02290331f;  // -4    1
+  private static final float APM0 = -0.55659920f;  //  0    1
+  private static final float APM1 = -0.20031442f;  // -1    1
+  private static final float APM2 = -0.08457147f;  // -2    1
+  private static final float APM3 = -0.04141619f;  // -3    1
+  private static final float APM4 = -0.02290331f;  // -4    1
   private static final float AIP0 =  1.0f/A0P0;
 
   // Coefficients for 3-D difference filter:          lag1 lag2 lag3

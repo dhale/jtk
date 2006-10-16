@@ -22,14 +22,112 @@ public class DifferenceFilterTest extends TestCase {
     junit.textui.TestRunner.run(suite);
   }
 
-  public void testRandom() {
+  public void test1Impulse() {
+    float[] e = {0.0f,0.0f,0.0f,-1.0f,2.0f,-1.0f,0.0f,0.0f,0.0f};
+    int n = e.length;
+    float[] x = new float[n];
+    float[] y = new float[n];
+    float[] z = new float[n];
+    x[(n-1)/2] = 1.0f;
+    DifferenceFilter df = new DifferenceFilter();
+    df.apply(x,y);
+    df.applyInverse(y,z);
+    assertEqual(x,z,10.0f*FLT_EPSILON);
+    df.applyTranspose(x,y);
+    df.applyInverseTranspose(y,z);
+    assertEqual(x,z,10.0f*FLT_EPSILON);
+    df.apply(x,y);
+    df.applyTranspose(y,z);
+    assertEqual(e,z,0.02f);
+  }
+
+  public void test2Impulse() {
+    float[][] e = {
+      { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+      { 0.0f, 0.0f, 0.0f, 0.0f,-1.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+      { 0.0f, 0.0f, 0.0f,-1.0f, 4.0f,-1.0f, 0.0f, 0.0f, 0.0f},
+      { 0.0f, 0.0f, 0.0f, 0.0f,-1.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+      { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
+    };
+    int n1 = e[0].length;
+    int n2 = e.length;
+    float[][] x = new float[n2][n1];
+    float[][] y = new float[n2][n1];
+    float[][] z = new float[n2][n1];
+    x[(n2-1)/2][(n1-1)/2] = 1.0f;
+    DifferenceFilter df = new DifferenceFilter();
+    df.apply(x,y);
+    df.applyInverse(y,z);
+    assertEqual(x,z,10.0f*FLT_EPSILON);
+    df.applyTranspose(x,y);
+    df.applyInverseTranspose(y,z);
+    assertEqual(x,z,10.0f*FLT_EPSILON);
+    df.apply(x,y);
+    df.applyTranspose(y,z);
+    assertEqual(e,z,0.04f);
+  }
+
+  public void test3Impulse() {
+    float[][][] e = {
+      {
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
+      },{
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f,-1.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
+      },{
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f,-1.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f,-1.0f, 6.0f,-1.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f,-1.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
+      },{
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f,-1.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
+      },{
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+        { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
+      }
+    };
+    int n1 = e[0][0].length;
+    int n2 = e[0].length;
+    int n3 = e.length;
+    float[][][] x = new float[n3][n2][n1];
+    float[][][] y = new float[n3][n2][n1];
+    float[][][] z = new float[n3][n2][n1];
+    x[(n3-1)/2][(n2-1)/2][(n1-1)/2] = 1.0f;
+    DifferenceFilter df = new DifferenceFilter();
+    df.apply(x,y);
+    df.applyInverse(y,z);
+    assertEqual(x,z,10.0f*FLT_EPSILON);
+    df.applyTranspose(x,y);
+    df.applyInverseTranspose(y,z);
+    assertEqual(x,z,10.0f*FLT_EPSILON);
+    df.apply(x,y);
+    df.applyTranspose(y,z);
+    assertEqual(e,z,0.06f);
+  }
+
+  public void test1Random() {
     DifferenceFilter df = new DifferenceFilter();
     int n = 100;
     float[] x,y,z;
 
-    x = Array.randfloat(n);
-    y = Array.zerofloat(n);
-    z = Array.zerofloat(n);
+    x = randfloat(n);
+    y = zerofloat(n);
+    z = zerofloat(n);
     df.apply(x,y);
     df.applyInverse(y,z);
     assertEqual(x,z);
@@ -38,53 +136,157 @@ public class DifferenceFilterTest extends TestCase {
     assertEqual(x,z);
 
     float d1,d2;
-    x = Array.randfloat(n);
-    y = Array.randfloat(n);
-    z = Array.zerofloat(n);
+    float tiny = n*10.0f*FLT_EPSILON;
+    x = randfloat(n);
+    y = randfloat(n);
+    z = zerofloat(n);
     df.apply(x,z);
     d1 = dot(z,y);
     df.applyTranspose(y,z);
     d2 = dot(z,x);
-    assertEquals(d1,d2,n*100.0*FLT_EPSILON);
+    assertEquals(d1,d2,tiny);
     df.applyInverse(x,z);
     d1 = dot(z,y);
     df.applyInverseTranspose(y,z);
     d2 = dot(z,x);
-    assertEquals(d1,d2,n*100.0*FLT_EPSILON);
+    assertEquals(d1,d2,tiny);
+  }
+
+  public void test2Random() {
+    DifferenceFilter df = new DifferenceFilter();
+    int n1 = 19;
+    int n2 = 21;
+    float[][] x,y,z;
+
+    x = randfloat(n1,n2);
+    y = zerofloat(n1,n2);
+    z = zerofloat(n1,n2);
+    df.apply(x,y);
+    df.applyInverse(y,z);
+    assertEqual(x,z);
+    df.applyTranspose(x,y);
+    df.applyInverseTranspose(y,z);
+    assertEqual(x,z);
+
+    float d1,d2;
+    float tiny = n1*n2*10.0f*FLT_EPSILON;
+    x = randfloat(n1,n2);
+    y = randfloat(n1,n2);
+    z = zerofloat(n1,n2);
+    df.apply(x,z);
+    d1 = dot(z,y);
+    df.applyTranspose(y,z);
+    d2 = dot(z,x);
+    assertEquals(d1,d2,tiny);
+    df.applyInverse(x,z);
+    d1 = dot(z,y);
+    df.applyInverseTranspose(y,z);
+    d2 = dot(z,x);
+    assertEquals(d1,d2,tiny);
+  }
+
+  public void test3Random() {
+    DifferenceFilter df = new DifferenceFilter();
+    int n1 = 11;
+    int n2 = 13;
+    int n3 = 12;
+    float[][][] x,y,z;
+
+    x = randfloat(n1,n2,n3);
+    y = zerofloat(n1,n2,n3);
+    z = zerofloat(n1,n2,n3);
+    df.apply(x,y);
+    df.applyInverse(y,z);
+    assertEqual(x,z);
+    df.applyTranspose(x,y);
+    df.applyInverseTranspose(y,z);
+    assertEqual(x,z);
+
+    float d1,d2;
+    float tiny = n1*n2*n3*10.0f*FLT_EPSILON;
+    x = randfloat(n1,n2,n3);
+    y = randfloat(n1,n2,n3);
+    z = zerofloat(n1,n2,n3);
+    df.apply(x,z);
+    d1 = dot(z,y);
+    df.applyTranspose(y,z);
+    d2 = dot(z,x);
+    assertEquals(d1,d2,tiny);
+    df.applyInverse(x,z);
+    d1 = dot(z,y);
+    df.applyInverseTranspose(y,z);
+    d2 = dot(z,x);
+    assertEquals(d1,d2,tiny);
+  }
+
+  private static float[] randfloat(int n1) {
+    return Array.sub(Array.randfloat(n1),0.5f);
+  }
+  private static float[][] randfloat(int n1, int n2) {
+    return Array.sub(Array.randfloat(n1,n2),0.5f);
+  }
+  private static float[][][] randfloat(int n1, int n2, int n3) {
+    return Array.sub(Array.randfloat(n1,n2,n3),0.5f);
+  }
+
+  private static float[] zerofloat(int n1) {
+    return Array.zerofloat(n1);
+  }
+  private static float[][] zerofloat(int n1, int n2) {
+    return Array.zerofloat(n1,n2);
+  }
+  private static float[][][] zerofloat(int n1, int n2, int n3) {
+    return Array.zerofloat(n1,n2,n3);
   }
 
   private static float dot(float[] x, float[] y) {
-    int n = x.length;
-    float sum = 0.0f;
-    for (int i=0; i<n; ++i)
-      sum += x[i]*y[i];
-    return sum;
+    return Array.sum(Array.mul(x,y));
+  }
+  private static float dot(float[][] x, float[][] y) {
+    return Array.sum(Array.mul(x,y));
+  }
+  private static float dot(float[][][] x, float[][][] y) {
+    return Array.sum(Array.mul(x,y));
   }
 
   private static void assertEqual(float[] re, float[] ra) {
-    int n = re.length;
-    float tolerance = (float)(n)*FLT_EPSILON;
-    for (int i=0; i<n; ++i)
-      assertEquals(re[i],ra[i],tolerance);
+    int n1 = re.length;
+    float tol= (float)(n1)*FLT_EPSILON;
+    assertEqual(re,ra,tol);
   }
-
   private static void assertEqual(float[][] re, float[][] ra) {
     int n2 = re.length;
     int n1 = re[0].length;
-    float tolerance = (float)(n1*n2)*FLT_EPSILON;
-    for (int i2=0; i2<n2; ++i2)
-      for (int i1=0; i1<n1; ++i1)
-        assertEquals(re[i2][i1],ra[i2][i1],tolerance);
+    float tol= (float)(n1*n2)*FLT_EPSILON;
+    assertEqual(re,ra,tol);
   }
-
   private static void assertEqual(float[][][] re, float[][][] ra) {
     int n3 = re.length;
     int n2 = re[0].length;
     int n1 = re[0][0].length;
-    float tolerance = (float)(n1*n2*n3)*FLT_EPSILON;
+    float tol= (float)(n1*n2*n3)*FLT_EPSILON;
+    assertEqual(re,ra,tol);
+  }
+
+  private static void assertEqual(float[] re, float[] ra, float tol) {
+    int n = re.length;
+    for (int i=0; i<n; ++i)
+      assertEquals(re[i],ra[i],tol);
+  }
+  private static void assertEqual(float[][] re, float[][] ra, float tol) {
+    int n2 = re.length;
+    int n1 = re[0].length;
+    for (int i2=0; i2<n2; ++i2)
+      for (int i1=0; i1<n1; ++i1)
+        assertEquals(re[i2][i1],ra[i2][i1],tol);
+  }
+  private static void assertEqual(float[][][] re, float[][][] ra, float tol) {
+    int n3 = re.length;
+    int n2 = re[0].length;
+    int n1 = re[0][0].length;
     for (int i3=0; i3<n3; ++i3)
       for (int i2=0; i2<n2; ++i2)
         for (int i1=0; i1<n1; ++i1)
-          assertEquals(re[i3][i2][i1],ra[i3][i2][i1],tolerance);
+          assertEquals(re[i3][i2][i1],ra[i3][i2][i1],tol);
   }
 }

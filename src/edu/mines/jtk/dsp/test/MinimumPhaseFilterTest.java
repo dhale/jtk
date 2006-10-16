@@ -257,39 +257,18 @@ public class MinimumPhaseFilterTest extends TestCase {
   private static float[][] zerofloat(int n1, int n2) {
     return Array.zerofloat(n1,n2);
   }
-
   private static float[][][] zerofloat(int n1, int n2, int n3) {
     return Array.zerofloat(n1,n2,n3);
   }
 
   private static float dot(float[] x, float[] y) {
-    int n = x.length;
-    float sum = 0.0f;
-    for (int i=0; i<n; ++i)
-      sum += x[i]*y[i];
-    return sum;
+    return Array.sum(Array.mul(x,y));
   }
-
   private static float dot(float[][] x, float[][] y) {
-    int n1 = x[0].length;
-    int n2 = x.length;
-    float sum = 0.0f;
-    for (int i2=0; i2<n2; ++i2)
-      for (int i1=0; i1<n1; ++i1)
-        sum += x[i2][i1]*y[i2][i1];
-    return sum;
+    return Array.sum(Array.mul(x,y));
   }
-
   private static float dot(float[][][] x, float[][][] y) {
-    int n1 = x[0][0].length;
-    int n2 = x[0].length;
-    int n3 = x.length;
-    float sum = 0.0f;
-    for (int i3=0; i3<n3; ++i3)
-      for (int i2=0; i2<n2; ++i2)
-        for (int i1=0; i1<n1; ++i1)
-          sum += x[i3][i2][i1]*y[i3][i2][i1];
-    return sum;
+    return Array.sum(Array.mul(x,y));
   }
 
   private static void assertEqual(float[] re, float[] ra) {
