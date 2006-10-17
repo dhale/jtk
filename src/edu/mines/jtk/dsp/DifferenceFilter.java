@@ -6,58 +6,38 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.*;
-
 /**
  * A difference filter, with a transpose, inverse, and inverse-transpose.
+ * A 1-D difference filter is an approximation to a backward-difference
+ * filter: y[i] = x[i]-0.999*x[i-1]. The constant 0.999 is less than
+ * one so that the recursive inverse filter y[i] = x[i]+0.999*y[i-1] is 
+ * stable. The inverse filter is sometimes called "leaky integration",
+ * and is especially useful for preconditioning inverse problems with
+ * smooth solutions.
+ * <p>
+ * Sequential application of the backward-difference filter and its 
+ * transpose yields an approximation to a negative centered 2nd-difference 
+ * filter: y[i] = -x[i-1]+2*x[i]-x[i+1].
+ * <p>
+ * Extensions to 2-D and 3-D backward-difference filters are defined as in
+ * Claerbout, J., 1998, Multidimensional recursive filters via a helix: 
+ * Geophysics, v. 63, n. 5, p. 1532-1541.
+ * <p>
+ * These extensions were obtained here by factoring the negative centered 
+ * 2-D and 3-D 2nd-difference filters, respectively, using the Wilson-Burg 
+ * algorithm, as in Fomel, S., Sava, P., Rickett, J., and Claerbout, J., 
+ * 2003, The Wilson-Burg method of spectral factorization with application 
+ * to helical filtering: Geophysical Prospecting, v. 51, p. 409-420.
+ * <p>
+ * For all dimensions, these approximations yield less than one percent 
+ * error in the negative centered 2nd-difference filter, relative to the
+ * exact central filter coefficient. For example, the error for a 2-D 
+ * filter is less than 0.04 = 0.01*4, where 4 is the central coefficient 
+ * in the exact negative 2nd-difference filter.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.10.10
  */
 public class DifferenceFilter {
-
-  ///////////////////////////////////////////////////////////////////////////
-  // test
-  public static void main(String[] args) {
-    test3();
-  }
-  private static void test2() {
-    int n1 = 5;
-    int n2 = 5;
-    int m1 = (n1-1)/2;
-    int m2 = (n2-1)/2;
-    float[][] x = Array.zerofloat(n1,n2);
-    float[][] y = Array.zerofloat(n1,n2);
-    float[][] z = Array.zerofloat(n1,n2);
-    /*
-    x[0][0] = 1.0f;
-    x[0][n1-1] = 1.0f;
-    x[n2-1][0] = 1.0f;
-    x[n2-1][n1-1] = 1.0f;
-    */
-    x[m2][m1] = 1.0f;
-    DifferenceFilter df = new DifferenceFilter();
-    df.apply(x,y);
-    Array.dump(y);
-    df.applyInverse(y,z);
-    Array.dump(z);
-  }
-  private static void test3() {
-    int n1 = 5;
-    int n2 = 5;
-    int n3 = 5;
-    int m1 = (n1-1)/2;
-    int m2 = (n2-1)/2;
-    int m3 = (n3-1)/2;
-    float[][][] x = Array.zerofloat(n1,n2,n3);
-    float[][][] y = Array.zerofloat(n1,n2,n3);
-    float[][][] z = Array.zerofloat(n1,n2,n3);
-    x[m3][m2][m1] = 1.0f;
-    DifferenceFilter df = new DifferenceFilter();
-    df.applyTranspose(x,y);
-    Array.dump(y);
-    df.applyInverseTranspose(y,z);
-    Array.dump(z);
-  }
 
   /**
    * Applies this difference filter.

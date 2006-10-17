@@ -14,15 +14,22 @@ import static edu.mines.jtk.util.MathPlus.*;
  * inverse. The filter and its inverse also have corresponding transposes
  * which are like the filter and inverse applied in the reverse direction.
  * <p>
- * Minimum-phase filters are generalized to multi-dimensional arrays via
- * Claerbout's (19xx) concept of filtering on a helix.
+ * Minimum-phase filters are generalized to multi-dimensional arrays as in
+ * Claerbout, J., 1998, Multidimensional recursive filters via a helix: 
+ * Geophysics, v. 63, n. 5, p. 1532-1541.
+ * <p>
+ * Filter constructors do not ensure that specified lags and coefficients 
+ * correspond to minimum-phase filters. If not minimum-phase, then the 
+ * causal inverse and inverse-transpose filters are unstable.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.10.10
  */
 public class MinimumPhaseFilter {
 
   /**
-   * Constructs a minimum-phase filter.
+   * Constructs a minimum-phase filter for specified lag1.
+   * By default, all lag2 and lag3 are assumed to be zero.
+   * <p>
    * For j=0 only, lag1[j] is zero.
    * All lag1[j] must be non-negative.
    * @param lag1 array of lags.
@@ -37,6 +44,8 @@ public class MinimumPhaseFilter {
       Check.argument(lag1[j]>0,"lag1["+j+"]>0");
     _m = lag1.length;
     _lag1 = Array.copy(lag1);
+    _lag2 = Array.zeroint(_m);
+    _lag3 = Array.zeroint(_m);
     _min1 = Array.min(lag1);
     _max1 = Array.max(lag1);
     _a = Array.copy(a);
@@ -45,7 +54,9 @@ public class MinimumPhaseFilter {
   }
 
   /**
-   * Constructs a minimum-phase filter.
+   * Constructs a minimum-phase filter for specified lag1 and lag2.
+   * By default, all lag3 are assumed to be zero.
+   * <p>
    * For j=0 only, lag1[j] and lag2[j] are zero.
    * All lag2[j] must be non-negative.
    * If lag2[j] is zero, then lag1[j] must be non-negative.
@@ -68,6 +79,7 @@ public class MinimumPhaseFilter {
     _m = a.length;
     _lag1 = Array.copy(lag1);
     _lag2 = Array.copy(lag2);
+    _lag3 = Array.zeroint(_m);
     _min1 = Array.min(lag1);
     _min2 = Array.min(lag2);
     _max1 = Array.max(lag1);
@@ -78,7 +90,8 @@ public class MinimumPhaseFilter {
   }
 
   /**
-   * Constructs a minimum-phase filter.
+   * Constructs a minimum-phase filter for specified lag1, lag2, and lag3.
+   * <p>
    * For j=0 only, lag1[j] and lag2[j] and lag3[j] are zero.
    * All lag3[j] must be non-negative.
    * If lag3[j] is zero, then lag2[j] must be non-negative.
@@ -122,12 +135,10 @@ public class MinimumPhaseFilter {
 
   /**
    * Applies this filter. 
-   * Uses lag1; ignores lag2 or lag3, if specified.
    * @param x input array.
    * @param y output array.
    */
   public void apply(float[] x, float[] y) {
-    Check.state(_lag1!=null,"lag1 has been specified");
     int n1 = y.length;
     int i1lo = min(_max1,n1);
     for (int i1=0; i1<i1lo; ++i1) {
@@ -151,13 +162,10 @@ public class MinimumPhaseFilter {
 
   /**
    * Applies this filter. 
-   * Uses lag1 and lag2; ignores lag3, if specified.
    * @param x input array.
    * @param y output array.
    */
   public void apply(float[][] x, float[][] y) {
-    Check.state(_lag1!=null,"lag1 has been specified");
-    Check.state(_lag2!=null,"lag2 has been specified");
     int n1 = y[0].length;
     int n2 = y.length;
     int i1lo = max(0,_max1);
@@ -210,14 +218,10 @@ public class MinimumPhaseFilter {
 
   /**
    * Applies this filter. 
-   * Uses lag1, lag2, and lag3.
    * @param x input array.
    * @param y output array.
    */
   public void apply(float[][][] x, float[][][] y) {
-    Check.state(_lag1!=null,"lag1 has been specified");
-    Check.state(_lag2!=null,"lag2 has been specified");
-    Check.state(_lag3!=null,"lag3 has been specified");
     int n1 = y[0][0].length;
     int n2 = y[0].length;
     int n3 = y.length;
@@ -861,9 +865,30 @@ public class MinimumPhaseFilter {
   }
 
   ///////////////////////////////////////////////////////////////////////////
-  // Experimental Wilson-Burg factorization
+  // private
 
-  public static MinimumPhaseFilter factor(float[] r, int lag1[]) {
+  private int _m;
+  private int _min1,_max1;
+  private int _min2,_max2;
+  private int _min3,_max3;
+  private int[] _lag1;
+  private int[] _lag2;
+  private int[] _lag3;
+  private float[] _a;
+  private float _a0,_a0i;
+
+  ///////////////////////////////////////////////////////////////////////////
+  // Experimental Wilson-Burg factorization
+  // A better interface is to begin with an already construct MPF, and then
+  // provide a method to update that MPF for a specified auto-correlation.
+  // Also, the convergence criterion needs work; iterations may not end.
+  // The amount of zero-padding required in the work arrays s, t, and u
+  // is unknown. In any case, the auto-correlation should not be centered
+  // in these arrays, since we want to minimize end-effect errors in the
+  // cascade of inverse and inverseTranspose filters.
+  // For all these reasons, keep private for now.
+
+  private static MinimumPhaseFilter factor(float[] r, int lag1[]) {
     int nlag = lag1.length;
     int min1 = Array.min(lag1);
     int max1 = Array.max(lag1);
@@ -902,7 +927,7 @@ public class MinimumPhaseFilter {
     return mpf;
   }
 
-  public static MinimumPhaseFilter factor(
+  private static MinimumPhaseFilter factor(
     float[][] r, int lag1[], int[] lag2) 
   {
     int nlag = lag1.length;
@@ -958,7 +983,7 @@ public class MinimumPhaseFilter {
     return mpf;
   }
 
-  public static MinimumPhaseFilter factor(
+  private static MinimumPhaseFilter factor(
     float[][][] r, int lag1[], int[] lag2, int[] lag3) 
   {
     int nlag = lag1.length;
@@ -1027,17 +1052,4 @@ public class MinimumPhaseFilter {
     }
     return mpf;
   }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // private
-
-  private int _m;
-  private int _min1,_max1;
-  private int _min2,_max2;
-  private int _min3,_max3;
-  private int[] _lag1;
-  private int[] _lag2;
-  private int[] _lag3;
-  private float[] _a;
-  private float _a0,_a0i;
 }

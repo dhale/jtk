@@ -14,7 +14,7 @@ import static edu.mines.jtk.util.MathPlus.*;
 /**
  * Tests {@link edu.mines.jtk.dsp.MinimumPhaseFilter}.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.11.22
+ * @version 2006.10.13
  */
 public class MinimumPhaseFilterTest extends TestCase {
   public static void main(String[] args) {
@@ -160,6 +160,7 @@ public class MinimumPhaseFilterTest extends TestCase {
     assertEquals(d1,d2,tiny);
   }
 
+  /*
   public void testFactorFomelExample() {
     float[] r = {24.0f,242.0f,867.0f,1334.0f,867.0f,242.0f,24.0f};
     int n = r.length;
@@ -175,7 +176,9 @@ public class MinimumPhaseFilterTest extends TestCase {
     assertEquals( 9.0f,a[2],10*FLT_EPSILON);
     assertEquals( 1.0f,a[3],10*FLT_EPSILON);
   }
+  */
 
+  /*
   public void xtestFactorLaplacian2() {
     float[][] r = {
       { 0.000f,-0.999f, 0.000f},
@@ -191,19 +194,11 @@ public class MinimumPhaseFilterTest extends TestCase {
                    0, 0, 0, 0, 0,
        1, 1, 1, 1, 1
     };
-    /*
-    int[] lag1 = {
-                   0, 1, 2,
-            -2,-1, 0
-    };
-    int[] lag2 = {
-                   0, 0, 0,
-             1, 1, 1
-    };
-    */
     MinimumPhaseFilter.factor(r,lag1,lag2);
   }
+  */
 
+  /*
   public void xtestFactorLaplacian3() {
     float[][][] r = {
       {
@@ -240,6 +235,7 @@ public class MinimumPhaseFilterTest extends TestCase {
     };
     MinimumPhaseFilter.factor(r,lag1,lag2,lag3);
   }
+  */
 
   private static float[] randfloat(int n1) {
     return Array.sub(Array.randfloat(n1),0.5f);

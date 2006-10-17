@@ -14,7 +14,7 @@ import static edu.mines.jtk.util.MathPlus.*;
 /**
  * Tests {@link edu.mines.jtk.dsp.DifferenceFilter}.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.11.22
+ * @version 2006.10.15
  */
 public class DifferenceFilterTest extends TestCase {
   public static void main(String[] args) {
