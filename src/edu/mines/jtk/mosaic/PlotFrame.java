@@ -6,12 +6,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import java.awt.*;
-import java.io.*;
-import javax.swing.*;
-import static java.lang.Math.*;
+import static java.lang.Math.round;
 
-import edu.mines.jtk.awt.*;
+import java.awt.*;
+import java.io.IOException;
+
+import javax.swing.*;
+
+import edu.mines.jtk.awt.ModeManager;
 
 /**
  * A plot frame is a window containing one or two plot panels. 

@@ -6,9 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.ogl.test;
 
-import java.nio.*;
-import edu.mines.jtk.ogl.*;
 import static edu.mines.jtk.ogl.Gl.*;
+
+import java.nio.*;
+
+import edu.mines.jtk.ogl.GlCanvas;
 
 /**
  * Simple OpenGL program to display a lit sphere using glDrawArrays.

@@ -6,12 +6,16 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.io.test;
 
-import junit.framework.*;
+import static java.lang.Math.min;
+
 import java.io.File;
 import java.io.IOException;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import edu.mines.jtk.io.DataFile;
 import edu.mines.jtk.util.Array;
-import static java.lang.Math.min;
 
 /**
  * Tests {@link edu.mines.jtk.io.DataFile}.

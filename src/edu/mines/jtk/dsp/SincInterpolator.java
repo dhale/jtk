@@ -6,12 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.ceil;
-import static java.lang.Math.log;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.lang.Math.sin;
+import static java.lang.Math.*;
+
 import edu.mines.jtk.opt.BrentMinFinder;
 import edu.mines.jtk.util.Check;
 

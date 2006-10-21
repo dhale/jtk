@@ -6,10 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.io;
 
+import static java.lang.Math.min;
+
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.FileChannel;
-import static java.lang.Math.min;
 
 /**
  * A data file has the capabilities of a {@link java.io.RandomAccessFile},

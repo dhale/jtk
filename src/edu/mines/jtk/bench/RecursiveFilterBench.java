@@ -6,9 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.bench;
 
-import java.util.ArrayList;
-import edu.mines.jtk.util.Stopwatch;
 import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.Stopwatch;
 
 /**
  * Benchmark different methods for multi-dimensional recursive filtering.

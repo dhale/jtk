@@ -6,19 +6,19 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.nio.*;
-import java.util.*;
-
-import edu.mines.jtk.awt.*;
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.io.*;
-import edu.mines.jtk.ogl.*;
-import edu.mines.jtk.util.*;
-
 import static edu.mines.jtk.ogl.Gl.*;
 import static edu.mines.jtk.util.MathPlus.*;
+
+import java.awt.image.IndexColorModel;
+import java.nio.IntBuffer;
+import java.util.ArrayList;
+
+import edu.mines.jtk.awt.ColorMap;
+import edu.mines.jtk.awt.ColorMapListener;
+import edu.mines.jtk.dsp.Sampling;
+import edu.mines.jtk.io.Float3;
+import edu.mines.jtk.ogl.GlTextureName;
+import edu.mines.jtk.util.*;
 
 /**
  * An axis-aligned panel that draws a 2-D image of a slice of a 3-D array.

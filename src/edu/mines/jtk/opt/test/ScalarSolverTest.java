@@ -6,10 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt.test;
 
-import edu.mines.jtk.opt.ScalarSolver;
-import edu.mines.jtk.opt.ScalarSolver.Function;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import edu.mines.jtk.opt.ScalarSolver;
+import edu.mines.jtk.opt.ScalarSolver.Function;
 
 /** Wrap edu.mines.jtk.opt.ScalarSolver for junit testing.
     (junit.jar must be in CLASSPATH)

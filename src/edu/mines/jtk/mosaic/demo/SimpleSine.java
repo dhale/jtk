@@ -6,14 +6,16 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic.demo;
 
-import java.awt.*;
-import javax.swing.*;
+import static edu.mines.jtk.util.MathPlus.FLT_PI;
 
-import edu.mines.jtk.awt.*;
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.util.*;
+import java.awt.BorderLayout;
+import java.awt.Label;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
 import edu.mines.jtk.mosaic.*;
-import static edu.mines.jtk.util.MathPlus.*;
+import edu.mines.jtk.util.Array;
 
 /**
  * A simple demonstration of {@link edu.mines.jtk.mosaic.PlotFrame}.

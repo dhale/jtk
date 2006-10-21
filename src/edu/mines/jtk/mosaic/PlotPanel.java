@@ -6,15 +6,16 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import java.awt.*;
-import java.awt.font.*;
-import java.util.*;
-import javax.swing.*;
 import static java.lang.Math.*;
 
-import edu.mines.jtk.awt.*;
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.util.*;
+import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineMetrics;
+import java.util.EnumSet;
+import java.util.Set;
+
+import edu.mines.jtk.dsp.Sampling;
+import edu.mines.jtk.util.Check;
 
 /**
  * A plot panel is a panel that contains a mosaic of 2-D graphical views.

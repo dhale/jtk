@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import static java.lang.Math.*;
+import static java.lang.Math.sqrt;
 
 import edu.mines.jtk.util.Check;
 

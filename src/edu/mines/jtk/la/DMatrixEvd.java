@@ -6,9 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.la;
 
-import edu.mines.jtk.util.Check;
-import edu.mines.jtk.util.Array;
 import static java.lang.Math.*;
+
+import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.Check;
 
 /**
  * Eigenvalue and eigenvector decomposition of a square matrix A.

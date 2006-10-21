@@ -6,13 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.bench;
 
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.*;
-import static java.lang.Math.*;
+import static java.lang.Math.min;
 
-import edu.mines.jtk.util.Array;
-import edu.mines.jtk.util.Check;
-import edu.mines.jtk.util.Stopwatch;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import edu.mines.jtk.util.*;
 
 /**
  * Benchmark single- and multi-threaded matrix multiplication.

@@ -6,12 +6,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import java.awt.*;
+import static edu.mines.jtk.ogl.Gl.*;
 import static java.lang.Math.*;
 
-import edu.mines.jtk.ogl.*;
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.ogl.Gl.*;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
+import edu.mines.jtk.util.Stopwatch;
 
 /**
  * A view of a world, as if in orbit around that world.

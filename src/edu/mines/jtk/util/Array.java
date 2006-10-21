@@ -7,8 +7,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.util;
 
 import java.util.Random;
-import edu.mines.jtk.util.Cfloat;
-import edu.mines.jtk.util.Cdouble;
 
 /**
  * Utilities and math for arrays of real and complex values.

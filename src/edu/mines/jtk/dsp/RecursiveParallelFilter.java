@@ -6,7 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.*;
+import edu.mines.jtk.util.Cdouble;
+import edu.mines.jtk.util.Check;
 
 /**
  * A recursive parallel filter is implemented as a sum of 2nd-order filters.

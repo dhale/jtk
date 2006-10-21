@@ -6,9 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.util.Almost;
-
 import java.util.logging.Logger;
+
+import edu.mines.jtk.util.Almost;
 
 /** For a linearized transform, implement the Gauss-Newton
     quadratic approximation of a damped least-squares objective function.

@@ -6,9 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.Array;
-import edu.mines.jtk.util.Check;
-import edu.mines.jtk.util.Cdouble;
+import edu.mines.jtk.util.*;
 
 /**
  * Recursive 2nd-order filter. This filter solves a linear, 2nd-order, 

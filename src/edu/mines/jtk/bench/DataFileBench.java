@@ -6,13 +6,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.bench;
 
-import junit.framework.*;
 import java.io.File;
 import java.io.IOException;
+
+import junit.framework.TestCase;
+
 import edu.mines.jtk.io.DataFile;
 import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Stopwatch;
-import static java.lang.Math.min;
 
 /**
  * Benchmark for {@link edu.mines.jtk.io.DataFile}.

@@ -6,9 +6,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.io.test;
 
-import junit.framework.*;
 import java.util.Random;
-import edu.mines.jtk.io.*;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import edu.mines.jtk.io.Float3;
+import edu.mines.jtk.io.SimpleFloat3;
 import edu.mines.jtk.util.Array;
 
 /**

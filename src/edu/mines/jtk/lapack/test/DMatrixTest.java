@@ -6,9 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack.test;
 
-import junit.framework.*;
-import edu.mines.jtk.lapack.*;
 import static java.lang.Math.*;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import edu.mines.jtk.lapack.DMatrix;
 
 /**
  * Tests {@link edu.mines.jtk.lapack.DMatrix}.

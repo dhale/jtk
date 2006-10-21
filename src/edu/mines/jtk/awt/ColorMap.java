@@ -8,6 +8,7 @@ package edu.mines.jtk.awt;
 
 import java.awt.Color;
 import java.awt.image.IndexColorModel;
+
 import javax.swing.event.EventListenerList;
 
 import edu.mines.jtk.util.Check;

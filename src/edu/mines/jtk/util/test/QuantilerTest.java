@@ -8,13 +8,10 @@ package edu.mines.jtk.util.test;
 
 import java.util.Random;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.util.Array;
-import edu.mines.jtk.util.Quantiler;
-import edu.mines.jtk.util.Stopwatch;
+import edu.mines.jtk.util.*;
 
 /**
  * Tests {@link edu.mines.jtk.util.Quantiler}.

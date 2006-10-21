@@ -8,7 +8,6 @@ package edu.mines.jtk.io;
 
 import java.io.*;
 import java.nio.ByteOrder;
-import static java.lang.Math.min;
 
 /**
  * An array file expands the capabilities of {@link java.io.RandomAccessFile}. 

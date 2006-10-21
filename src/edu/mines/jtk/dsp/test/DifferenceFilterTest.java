@@ -6,10 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp.test;
 
-import junit.framework.*;
-import edu.mines.jtk.util.Array;
+import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import edu.mines.jtk.dsp.DifferenceFilter;
-import static edu.mines.jtk.util.MathPlus.*;
+import edu.mines.jtk.util.Array;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.DifferenceFilter}.

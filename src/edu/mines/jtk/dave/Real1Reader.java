@@ -7,12 +7,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dave;
 
 import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.MathPlus.*;
+import edu.mines.jtk.dsp.Real1;
+import edu.mines.jtk.dsp.Sampling;
 
 /**
  * Reads files containing real-valued functions of one variable.

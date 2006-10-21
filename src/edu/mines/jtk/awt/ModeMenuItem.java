@@ -6,8 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.awt;
 
-import java.beans.*;
-import javax.swing.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import javax.swing.JRadioButtonMenuItem;
 
 /**
  * A menu item for a mode. When the mode is active, the mode menu item 

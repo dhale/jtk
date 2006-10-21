@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import java.util.*;
+import java.util.ArrayList;
 
 /**
  * A list of arrays of nodes (and their parents) to be drawn.

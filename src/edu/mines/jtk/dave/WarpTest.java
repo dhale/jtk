@@ -6,10 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dave;
 
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.la.*;
-import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
+
+import edu.mines.jtk.dsp.LocalCorrelationFilter;
+import edu.mines.jtk.dsp.SincInterpolator;
+import edu.mines.jtk.la.DMatrix;
+import edu.mines.jtk.la.DMatrixQrd;
 
 /**
  * Test warping and unwarping of an image.

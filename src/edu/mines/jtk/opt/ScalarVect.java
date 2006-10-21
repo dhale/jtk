@@ -6,8 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
+import java.util.logging.Logger;
+
 import edu.mines.jtk.util.Almost;
-import java.util.logging.*;
 
 /** Implements a Vect by wrapping a single double */
 public class ScalarVect implements Vect {

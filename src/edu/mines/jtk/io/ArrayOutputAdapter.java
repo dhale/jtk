@@ -6,10 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.io;
 
+import static java.lang.Math.min;
+
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.WritableByteChannel;
-import static java.lang.Math.min;
 
 /**
  * Implements {@link ArrayOutput} by wrapping {@link java.io.DataOutput}.

@@ -6,8 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
+import java.util.logging.Logger;
+
 import edu.mines.jtk.util.Almost;
-import java.util.logging.*;
 
 /** Implement a Vect as a two dimensional array of doubles.
     The embedded data are exposed by a getData method.  For all practical

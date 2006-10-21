@@ -6,9 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.util.Check;
+import static edu.mines.jtk.util.MathPlus.DBL_EPSILON;
+import static edu.mines.jtk.util.MathPlus.abs;
 
-import static edu.mines.jtk.util.MathPlus.*;
+import edu.mines.jtk.util.Check;
 
 /**
  * Brent's algorithm for finding a zero of a function of one variable.

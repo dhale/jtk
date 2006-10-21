@@ -6,16 +6,16 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dave;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.io.File;
+
 import javax.swing.*;
 
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.MathPlus.*;
+import edu.mines.jtk.dsp.Sampling;
+import edu.mines.jtk.mosaic.PlotFrame;
+import edu.mines.jtk.mosaic.PlotPanel;
+import edu.mines.jtk.util.Check;
 
 /**
  * A plot of one or more sampled sequences.

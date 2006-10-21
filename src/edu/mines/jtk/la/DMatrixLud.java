@@ -6,9 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.la;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.min;
+
 import edu.mines.jtk.util.Check;
-import edu.mines.jtk.util.Array;
-import static java.lang.Math.*;
 
 /**
  * LU decomposition (with pivoting) of a matrix A. 

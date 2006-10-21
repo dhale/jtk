@@ -6,10 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util.test;
 
-import edu.mines.jtk.util.Almost;
-import edu.mines.jtk.util.MathPlus;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import edu.mines.jtk.util.Almost;
+import edu.mines.jtk.util.MathPlus;
 
 /** Wrap another class Almost for junit testing.
    (junit.jar must be in CLASSPATH)

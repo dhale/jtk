@@ -6,7 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import java.util.*;
 
 /**
  * A context for scene graph traversal. A traversal context maintains 

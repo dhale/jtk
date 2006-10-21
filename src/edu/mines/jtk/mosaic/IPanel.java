@@ -7,14 +7,18 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic;
 
 import static java.lang.Math.*;
+
 import java.awt.*;
-import java.awt.image.*;
-import java.io.*;
-import java.util.*;
+import java.awt.image.BufferedImage;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Iterator;
+
 import javax.imageio.*;
-import javax.imageio.metadata.*;
-import javax.imageio.stream.*;
-import javax.swing.*;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
+import javax.imageio.stream.ImageOutputStream;
+import javax.swing.JPanel;
 
 /**
  * A panel that can paint itself to fit an image. 

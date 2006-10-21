@@ -6,8 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.bench;
 
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.util.*;
+import edu.mines.jtk.dsp.FftComplex;
+import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.Stopwatch;
 
 /**
  * Benchmark FFTs.

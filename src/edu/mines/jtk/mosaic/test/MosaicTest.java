@@ -7,13 +7,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic.test;
 
 import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
+import java.util.EnumSet;
+import java.util.Set;
 
-import edu.mines.jtk.awt.*;
-import edu.mines.jtk.mosaic.*;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
+import edu.mines.jtk.mosaic.Mosaic;
+import edu.mines.jtk.mosaic.TileZoomMode;
 
 /**
  * Test {@link edu.mines.jtk.mosaic.Mosaic} and associates.

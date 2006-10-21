@@ -8,7 +8,6 @@ package edu.mines.jtk.mesh.test;
 
 import java.io.*;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 

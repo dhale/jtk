@@ -7,12 +7,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.bench;
 
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.image.*;
-import java.io.*;
-import java.util.*;
-import javax.imageio.*;
-import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import edu.mines.jtk.util.Stopwatch;
 

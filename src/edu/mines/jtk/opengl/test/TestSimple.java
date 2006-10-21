@@ -6,10 +6,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opengl.test;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 
-import edu.mines.jtk.opengl.*;
+import javax.swing.JFrame;
+
+import edu.mines.jtk.opengl.GlCanvas;
+import edu.mines.jtk.opengl.GlPainter;
 
 /**
  * Simple OpenGL test harness. Constructs an OpenGL canvas,

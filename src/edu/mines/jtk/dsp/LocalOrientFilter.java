@@ -6,8 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import static edu.mines.jtk.util.MathPlus.max;
+import static edu.mines.jtk.util.MathPlus.sqrt;
+
 import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Local estimates of orientations of features in images.

@@ -7,11 +7,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic;
 
 import java.awt.*;
-import java.awt.image.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.image.IndexColorModel;
+import java.util.EnumSet;
 
-import edu.mines.jtk.awt.*;
+import edu.mines.jtk.awt.ColorMap;
+import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
 
 /**

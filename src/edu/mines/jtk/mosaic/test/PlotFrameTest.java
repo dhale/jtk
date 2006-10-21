@@ -6,12 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic.test;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 
-import edu.mines.jtk.awt.*;
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.util.*;
+import edu.mines.jtk.awt.ColorMap;
+import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.mosaic.*;
+import edu.mines.jtk.util.Array;
 
 /**
  * Tests {@link edu.mines.jtk.mosaic.PlotFrame}

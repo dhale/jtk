@@ -6,8 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
+
+import edu.mines.jtk.util.Cdouble;
+import edu.mines.jtk.util.Check;
 
 /**
  * Butterworth filter.

@@ -9,8 +9,10 @@ package edu.mines.jtk.mosaic;
 import static java.lang.Math.*;
 
 import java.awt.*;
+
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.*;
+import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.Check;
 
 /**
  * A view of a sequence of samples of a function f(x) of one variable x.

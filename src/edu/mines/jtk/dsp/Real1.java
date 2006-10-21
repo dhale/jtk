@@ -6,9 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.Check;
+import static edu.mines.jtk.util.MathPlus.max;
+
 import edu.mines.jtk.util.Array;
-import static edu.mines.jtk.util.MathPlus.*;
+import edu.mines.jtk.util.Check;
 
 /**
  * A real-valued sampled function of one variable.

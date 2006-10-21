@@ -6,13 +6,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl.test;
 
-import java.awt.*;
-import java.nio.*;
-import java.util.*;
-
-import edu.mines.jtk.util.*;
-import edu.mines.jtk.sgl.*;
 import static edu.mines.jtk.ogl.Gl.*;
+
+import java.awt.Color;
+import java.nio.FloatBuffer;
+
+import edu.mines.jtk.sgl.*;
+import edu.mines.jtk.util.Direct;
 
 /**
  * A simple cube with colored sides.

@@ -8,7 +8,6 @@ package edu.mines.jtk.sgl;
 
 import java.awt.Canvas;
 import java.awt.event.MouseEvent;
-import static java.lang.Math.*;
 
 /**
  * A mouse constrained by a line. Constrained points (in local coordinates)

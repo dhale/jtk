@@ -6,13 +6,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opengl.test;
 
+import static edu.mines.jtk.opengl.Gl.*;
+import static edu.mines.jtk.opengl.Glu.gluPerspective;
 import static java.lang.Math.*;
+
 import java.util.Random;
 
-import static edu.mines.jtk.opengl.Gl.*;
-import static edu.mines.jtk.opengl.Glu.*;
-import edu.mines.jtk.opengl.*;
-import edu.mines.jtk.util.*;
+import edu.mines.jtk.opengl.GlPainter;
+import edu.mines.jtk.util.Stopwatch;
 
 /**
  * Draw circles with OpenGL. Adapted from Paul Heckbert's program circ3.c.

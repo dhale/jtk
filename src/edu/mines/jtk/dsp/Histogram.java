@@ -6,9 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import static edu.mines.jtk.util.MathPlus.*;
+
 import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * A histogram summarizes the distribution of values v in an array.

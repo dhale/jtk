@@ -5,10 +5,10 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-import junit.framework.*;
-import edu.mines.jtk.opt.ArrayVect1f;
-import edu.mines.jtk.opt.Vect;
-import edu.mines.jtk.opt.VectUtil;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import edu.mines.jtk.opt.*;
 import edu.mines.jtk.util.Almost;
 
 /** Unit tests for edu.mines.jtk.opt.ArrayVect1f.

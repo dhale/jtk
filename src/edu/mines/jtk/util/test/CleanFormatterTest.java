@@ -6,15 +6,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util.test;
 
-import edu.mines.jtk.util.CleanFormatter;
-import edu.mines.jtk.util.CleanHandler;
-
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import edu.mines.jtk.util.CleanFormatter;
+import edu.mines.jtk.util.CleanHandler;
 
 /** Wrap edu.mines.jtk.util.CleanFormatter for junit testing.
    (junit.jar must be in CLASSPATH)

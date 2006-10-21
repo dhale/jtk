@@ -6,14 +6,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt.test;
 
-import edu.mines.jtk.util.Almost;
-import edu.mines.jtk.opt.CoordinateTransform;
-import edu.mines.jtk.util.Array;
-
 import java.util.Arrays;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import edu.mines.jtk.opt.CoordinateTransform;
+import edu.mines.jtk.util.Almost;
+import edu.mines.jtk.util.Array;
 
 /** Wrap edu.mines.jtk.opt.CoordinateTransform for junit testing.
    (junit.jar must be in CLASSPATH)

@@ -6,17 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dave;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
+import static edu.mines.jtk.util.MathPlus.*;
+
+import java.util.Random;
 
 import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.MathPlus.*;
-import static edu.mines.jtk.mosaic.Mosaic.*;
+import edu.mines.jtk.util.Array;
 
 /**
  * Statitistical test of different measures of relative amplitude.

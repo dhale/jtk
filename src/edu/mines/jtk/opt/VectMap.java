@@ -6,10 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.util.Almost;
-
 import java.util.*;
-import java.util.logging.*;
+import java.util.logging.Logger;
+
+import edu.mines.jtk.util.Almost;
 
 /** A VectContainer implemented as an unsynchronized Map.
     Keys will be returned in the order of insertion.

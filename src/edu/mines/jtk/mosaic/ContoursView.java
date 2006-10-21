@@ -6,12 +6,15 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import java.awt.*;
-import java.awt.image.*;
-import java.util.*;
-import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
+
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.util.ArrayList;
+
+import edu.mines.jtk.dsp.Sampling;
+import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.Check;
 
 /**
  * A view of a sampled function f(x1,x2), displayed with contour lines.

@@ -6,11 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack;
 
-import edu.mines.jtk.util.Check;
-import edu.mines.jtk.util.Array;
+import static edu.mines.jtk.lapack.Lapack.JOB_S;
+import static edu.mines.jtk.lapack.Lapack.dgesvd;
 import static java.lang.Math.*;
-import static edu.mines.jtk.lapack.Blas.*;
-import static edu.mines.jtk.lapack.Lapack.*;
+
+import edu.mines.jtk.util.Array;
 
 /**
  * Singular value decomposition of a matrix A.

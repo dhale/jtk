@@ -6,10 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import java.util.*;
-
-import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.ogl.Gl.*;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * A node in the scene graph.

@@ -7,12 +7,16 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic;
 
 import static java.lang.Math.*;
+
 import java.awt.*;
-import java.awt.event.*;
-import java.awt.font.*;
-import java.awt.geom.*;
-import javax.swing.*;
-import edu.mines.jtk.util.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineMetrics;
+import java.awt.geom.Rectangle2D;
+
+import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
+
+import edu.mines.jtk.util.AxisTics;
 
 /**
  * A tile axis in a mosaic. Tile axes may be placed along the top, left,

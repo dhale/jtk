@@ -6,11 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.*;
+import static edu.mines.jtk.util.MathPlus.*;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Recursive implementation of a Gaussian filter and derivatives. Filters 

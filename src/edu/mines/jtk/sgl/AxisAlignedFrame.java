@@ -6,10 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import static edu.mines.jtk.ogl.Gl.*;
 import static java.lang.Math.*;
 
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.ogl.Gl.*;
+import edu.mines.jtk.util.Check;
 
 /**
  * An axis-aligned frame is a group of axis-aligned panels. A frame's 

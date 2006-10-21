@@ -6,11 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl.test;
 
-import junit.framework.*;
-import java.util.Random;
-import edu.mines.jtk.sgl.*;
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.MathPlus.*;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import edu.mines.jtk.sgl.BoundingBox;
+import edu.mines.jtk.sgl.BoundingBoxTree;
+import edu.mines.jtk.util.Array;
 
 /**
  * Tests {@link edu.mines.jtk.sgl.BoundingBoxTree}.

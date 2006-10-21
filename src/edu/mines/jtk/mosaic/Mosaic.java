@@ -6,11 +6,15 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
 import static java.lang.Math.*;
+
+import java.awt.*;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.util.ArrayList;
+import java.util.Set;
+
+import javax.swing.JScrollBar;
 
 import edu.mines.jtk.awt.ModeManager;
 

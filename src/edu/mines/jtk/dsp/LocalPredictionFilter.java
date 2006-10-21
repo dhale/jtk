@@ -6,10 +6,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.lapack.*;
-import edu.mines.jtk.util.*;
 import static java.lang.Math.*;
-import java.util.*;
+
+import java.util.ArrayList;
+
+import edu.mines.jtk.lapack.DMatrix;
+import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.Check;
 
 /**
  * Local prediction filtering.

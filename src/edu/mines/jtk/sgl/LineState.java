@@ -6,8 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import java.awt.*;
-
 import static edu.mines.jtk.ogl.Gl.*;
 
 /**

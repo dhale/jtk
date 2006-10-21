@@ -6,10 +6,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl.test;
 
-import junit.framework.*;
+import static edu.mines.jtk.util.MathPlus.DBL_EPSILON;
+
 import java.util.Random;
+
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import edu.mines.jtk.sgl.*;
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Tests classes for bounding box and sphere.

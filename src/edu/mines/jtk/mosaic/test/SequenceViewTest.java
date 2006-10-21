@@ -6,10 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic.test;
 
-import java.awt.*;
+import java.awt.Color;
+
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.*;
 import edu.mines.jtk.mosaic.*;
+import edu.mines.jtk.util.Array;
 
 /**
  * Test {@link edu.mines.jtk.mosaic.SequenceView} and associates.

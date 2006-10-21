@@ -6,10 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.ogl;
 
+import static edu.mines.jtk.ogl.Gl.glDeleteLists;
+import static edu.mines.jtk.ogl.Gl.glGenLists;
+
 import javax.media.opengl.GLContext;
 
 import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * An OpenGL display list. When constructed, a display list calls

@@ -6,7 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.ogl;
 
-import java.awt.*;
+import java.awt.GraphicsDevice;
+
 import javax.media.opengl.*;
 
 /**

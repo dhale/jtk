@@ -1,9 +1,9 @@
 package edu.mines.jtk.opt.test;
 
-import junit.framework.*;
-import edu.mines.jtk.opt.ScalarVect;
-import edu.mines.jtk.opt.Vect;
-import edu.mines.jtk.opt.VectUtil;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
+import edu.mines.jtk.opt.*;
 
 /** Unit tests for edu.mines.jtk.opt.ScalarVect.
 */

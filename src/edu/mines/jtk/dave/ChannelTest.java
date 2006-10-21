@@ -6,17 +6,16 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dave;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
-
-import edu.mines.jtk.awt.*;
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
+
+import java.util.Random;
+
+import javax.swing.JFrame;
+
+import edu.mines.jtk.awt.ColorMap;
+import edu.mines.jtk.dsp.SincInterpolator;
+import edu.mines.jtk.mosaic.*;
+import edu.mines.jtk.util.Array;
 
 /**
  * Peak interpolation errors for channel model.

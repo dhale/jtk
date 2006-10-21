@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import static edu.mines.jtk.util.MathPlus.*;
+import static edu.mines.jtk.util.MathPlus.DBL_EPSILON;
 
 /**
  * A segment of a line.

@@ -6,15 +6,16 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util.test;
 
+import static edu.mines.jtk.util.MathPlus.abs;
+import static edu.mines.jtk.util.MathPlus.max;
+
 import java.util.Random;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.CubicInterpolator;
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Tests {@link edu.mines.jtk.util.CubicInterpolator}.

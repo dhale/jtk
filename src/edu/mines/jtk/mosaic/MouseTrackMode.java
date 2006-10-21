@@ -6,12 +6,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.*;
-import javax.swing.*;
-import static java.lang.Math.*;
 
-import edu.mines.jtk.awt.*;
+import javax.swing.KeyStroke;
+
+import edu.mines.jtk.awt.Mode;
+import edu.mines.jtk.awt.ModeManager;
 
 /**
  * A mode for tracking the mouse location. When this mode is active,

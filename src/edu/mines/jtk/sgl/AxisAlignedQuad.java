@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import java.awt.event.*;
+import java.awt.event.MouseEvent;
 
 /**
  * An axis-aligned quad has one frame that contains one or more panels.

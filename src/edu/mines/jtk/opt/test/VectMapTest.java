@@ -11,10 +11,8 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import edu.mines.jtk.opt.ArrayVect1;
-import edu.mines.jtk.opt.Vect;
-import edu.mines.jtk.opt.VectMap;
-import edu.mines.jtk.opt.VectUtil;
+
+import edu.mines.jtk.opt.*;
 import edu.mines.jtk.util.Almost;
 
 /** Unit tests for edu.mines.jtk.opt.VectMap.

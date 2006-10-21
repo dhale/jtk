@@ -7,8 +7,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.awt;
 
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
 import java.awt.image.*;
+
 import javax.swing.*;
 
 /**

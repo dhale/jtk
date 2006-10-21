@@ -6,17 +6,20 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic.demo;
 
+import static edu.mines.jtk.util.MathPlus.*;
+
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.ArrayList;
+
 import javax.swing.*;
 
 import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.util.*;
 import edu.mines.jtk.mosaic.*;
-import static edu.mines.jtk.util.MathPlus.*;
+import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.Cdouble;
 
 /**
  * Interactive digital filter design with poles and zeros.

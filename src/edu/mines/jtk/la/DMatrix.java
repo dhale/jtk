@@ -6,9 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.la;
 
+import static java.lang.Math.*;
+
 import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Check;
-import static java.lang.Math.*;
 
 /**
  * A double-precision matrix.

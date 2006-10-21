@@ -7,8 +7,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.util;
 
 import static edu.mines.jtk.util.Localize.timeWords;
-import edu.mines.jtk.util.CleanHandler;
-import edu.mines.jtk.util.Localize;
 
 import java.util.Date;
 import java.util.logging.Level;

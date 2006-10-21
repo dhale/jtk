@@ -6,11 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.util.Almost;
-import edu.mines.jtk.util.LogMonitor;
-import edu.mines.jtk.util.Monitor;
-
 import java.util.logging.Logger;
+
+import edu.mines.jtk.util.*;
 
 /** Minimize a simple quadratic objective function.
     Finds the x that minimizes the quadratic function 0.5 x'Hx + b'x .

@@ -6,8 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.util.MathPlus.*;
+
+import edu.mines.jtk.util.Check;
 
 /**
  * The Kaiser window is often used in FIR filter design. It is easy to 

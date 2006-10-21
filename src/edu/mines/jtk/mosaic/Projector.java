@@ -6,8 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static edu.mines.jtk.util.MathPlus.*;
-import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.MathPlus.max;
+import static edu.mines.jtk.util.MathPlus.min;
+
+import edu.mines.jtk.util.Check;
 
 /**
  * Converts (projects) world coordinates v to/from normalized coordinates u.

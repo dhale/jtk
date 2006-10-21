@@ -6,10 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.ogl;
 
+import static edu.mines.jtk.ogl.Gl.glDeleteTextures;
+import static edu.mines.jtk.ogl.Gl.glGenTextures;
+
 import javax.media.opengl.GLContext;
 
 import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * An OpenGL texture name. When constructed, a texture name calls

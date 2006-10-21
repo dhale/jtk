@@ -6,11 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import java.nio.*;
-
-import edu.mines.jtk.ogl.*;
-import edu.mines.jtk.util.*;
 import static edu.mines.jtk.ogl.Gl.*;
+
+import java.nio.FloatBuffer;
+
+import edu.mines.jtk.ogl.GlCanvas;
+import edu.mines.jtk.util.Direct;
 
 /**
  * An OpenGL canvas on which a view draws its world.

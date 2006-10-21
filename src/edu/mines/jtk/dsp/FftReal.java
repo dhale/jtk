@@ -6,8 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import static java.lang.Math.PI;
+import static java.lang.Math.sin;
+
 import edu.mines.jtk.util.Check;
-import static java.lang.Math.*;
 
 /**
  * Fast Fourier transform of real-valued arrays. The FFT length nfft 

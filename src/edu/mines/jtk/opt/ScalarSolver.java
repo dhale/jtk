@@ -6,12 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.util.Almost;
-import edu.mines.jtk.util.LogMonitor;
-import edu.mines.jtk.util.Monitor;
-
 import java.util.Arrays;
 import java.util.logging.Logger;
+
+import edu.mines.jtk.util.*;
 
 /** Search a single variable for a value that minimizes a function
     @author W.S. Harlan

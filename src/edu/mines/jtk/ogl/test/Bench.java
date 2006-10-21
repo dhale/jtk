@@ -6,11 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.ogl.test;
 
-import javax.swing.*;
-import javax.media.opengl.*;
-
-import edu.mines.jtk.util.*;
 import static edu.mines.jtk.ogl.Gl.*;
+
+import javax.media.opengl.*;
+import javax.swing.JFrame;
+
+import edu.mines.jtk.util.Stopwatch;
 
 /**
  * Benchmarking to determine overhead of getting GL object for every call.

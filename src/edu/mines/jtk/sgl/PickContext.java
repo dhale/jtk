@@ -6,12 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import java.awt.event.*;
-import java.util.*;
-
-import edu.mines.jtk.ogl.*;
-import static edu.mines.jtk.ogl.Gl.*;
-import static edu.mines.jtk.util.MathPlus.*;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 /**
  * A transform context for picking.

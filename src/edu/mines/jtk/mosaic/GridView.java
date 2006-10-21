@@ -7,10 +7,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic;
 
 import java.awt.*;
-import java.util.*;
-import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.MathPlus.*;
+
+import edu.mines.jtk.util.AxisTics;
 
 /**
  * Grid lines that extend tics in tile axes into tiles. Grid lines can be 

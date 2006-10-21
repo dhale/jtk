@@ -6,16 +6,17 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic.test;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.font.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
 import static java.lang.Math.*;
 
-import edu.mines.jtk.awt.*;
-import edu.mines.jtk.mosaic.*;
+import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineMetrics;
+import java.io.IOException;
+
+import javax.swing.JFrame;
+
+import edu.mines.jtk.mosaic.IPanel;
+import edu.mines.jtk.mosaic.Transcaler;
 
 /**
  * Test {@link edu.mines.jtk.mosaic.IPanel}.

@@ -6,9 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.ogl.test;
 
-import java.nio.ByteBuffer;
-import edu.mines.jtk.ogl.GlCanvas;
 import static edu.mines.jtk.ogl.Gl.*;
+
+import java.nio.ByteBuffer;
+
+import edu.mines.jtk.ogl.GlCanvas;
 
 /**
  * Simple OpenGL texture mapping program.

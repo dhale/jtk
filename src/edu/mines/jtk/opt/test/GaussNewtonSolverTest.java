@@ -6,24 +6,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt.test;
 
-import edu.mines.jtk.util.Almost;
-import edu.mines.jtk.opt.ArrayVect1;
-import edu.mines.jtk.opt.GaussNewtonSolver;
-import edu.mines.jtk.opt.LinearTransform;
-import edu.mines.jtk.opt.LinearTransformWrapper;
-import edu.mines.jtk.opt.QuadraticSolver;
-import edu.mines.jtk.opt.Transform;
-import edu.mines.jtk.opt.Vect;
-import edu.mines.jtk.opt.VectConst;
-import edu.mines.jtk.opt.VectUtil;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import edu.mines.jtk.opt.*;
+import edu.mines.jtk.util.Almost;
 
 /** Solve least-squares inverse of a Transform.
     @author W.S. Harlan, Landmark Graphics

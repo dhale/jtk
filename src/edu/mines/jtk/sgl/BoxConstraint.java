@@ -6,9 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import static java.lang.Math.*;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
-import edu.mines.jtk.dsp.*;
+import edu.mines.jtk.dsp.Sampling;
 
 /**
  * A constraint for objects that must lie inside an axis-aligned box.

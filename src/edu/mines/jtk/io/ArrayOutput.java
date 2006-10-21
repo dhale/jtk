@@ -6,8 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.io;
 
-import java.io.*;
-import java.nio.ByteOrder;
+import java.io.DataOutput;
+import java.io.IOException;
 
 /**
  * An interface for writing arrays of primitive values to a binary stream.

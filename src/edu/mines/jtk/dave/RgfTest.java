@@ -6,17 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dave;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import javax.swing.*;
+import javax.swing.JFrame;
 
-import edu.mines.jtk.awt.*;
-import edu.mines.jtk.dsp.*;
+import edu.mines.jtk.awt.ColorMap;
+import edu.mines.jtk.dsp.RecursiveGaussianFilter;
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.MathPlus.*;
+import edu.mines.jtk.util.Array;
 
 /**
  * Test recursive Gaussian filter for 2-D images.

@@ -6,16 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import edu.mines.jtk.util.Almost;
-import edu.mines.jtk.util.LoggerStream;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import edu.mines.jtk.util.Almost;
+import edu.mines.jtk.util.LoggerStream;
 
 /** Implements convenience methods for Vect.
     @author W.S. Harlan

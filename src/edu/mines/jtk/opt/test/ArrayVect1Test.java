@@ -6,12 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt.test;
 
-import edu.mines.jtk.util.Almost;
-import edu.mines.jtk.opt.ArrayVect1;
-import edu.mines.jtk.opt.Vect;
-import edu.mines.jtk.opt.VectUtil;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import edu.mines.jtk.opt.*;
+import edu.mines.jtk.util.Almost;
 
 /** Wrap edu.mines.jtk.opt.ArrayVect1 for junit testing.
    (junit.jar must be in CLASSPATH)

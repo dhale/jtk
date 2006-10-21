@@ -10,9 +10,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.StringTokenizer;
-import java.util.logging.Formatter;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
+import java.util.logging.*;
 
 /** Format log messages without any extras.
     @author W.S. Harlan, Landmark Graphics
