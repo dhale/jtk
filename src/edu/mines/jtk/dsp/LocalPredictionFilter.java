@@ -110,6 +110,72 @@ public class LocalPredictionFilter {
     //Array.copy(a[m-1],f);
   }
 
+  public void applyPef(int[] lag1, int[] lag2, float[][] f, float[][] g) {
+    Check.argument(lag1.length==lag2.length,"lag1.length==lag2.length");
+    Check.argument(f!=g,"f!=g");
+
+    // Compute local auto-correlation for all necessary lags.
+    R2Cache rcache = new R2Cache(f);
+    int m = lag1.length;
+    float[][][][] rkj = new float[m][m][][];
+    float[][][] rk0 = new float[m][][];
+    for (int k=0; k<m; ++k) {
+      int k1 = lag1[k];
+      int k2 = lag2[k];
+      for (int j=0; j<m; ++j) {
+        int j1 = lag1[j];
+        int j2 = lag2[j];
+        rkj[k][j] = rcache.get(j1-k1,j2-k2);
+      }
+      rk0[k] = rcache.get(k1,k2);
+    }
+
+    // Compute prediction filters.
+    int n1 = f[0].length;
+    int n2 = f.length;
+    double[][] rkjt = new double[m][m];
+    double[] rk0t = new double[m];
+    double[] at = new double[m];
+    float[][][] a = new float[m][n2][n1];
+    CgSolver cgs = new CgSolver(m,100);
+    double niter = 0.0;
+    for (int i2=0; i2<n2; ++i2) {
+      int i1b = (i2%2==0)?0:n1-1;
+      int i1e = (i2%2==0)?n1:-1;
+      int i1s = (i2%2==0)?1:-1;
+      for (int i1=i1b; i1!=i1e; i1+=i1s) {
+        for (int k=0; k<m; ++k) {
+          for (int j=0; j<m; ++j)
+            rkjt[k][j] = rkj[k][j][i2][i1];
+          rk0t[k] = rk0[k][i2][i1];
+        }
+        niter += cgs.solve(rkjt,rk0t,at);
+        for (int i=0; i<m; ++i)
+          a[i][i2][i1] = (float)at[i];
+      }
+    }
+    niter /= n1;
+    niter /= n2;
+    System.out.println("Average number of CG iterations = "+niter);
+
+    // Apply prediction error filters.
+    Array.copy(f,g);
+    for (int j=0; j<m; ++j) {
+      int j1 = lag1[j];
+      int j2 = lag2[j];
+      float[][] aj = a[j];
+      int i1min = max(0,j1);
+      int i1max = min(n1,n1+j1);
+      int i2min = max(0,j2);
+      int i2max = min(n2,n2+j2);
+      for (int i2=i2min; i2<i2max; ++i2) {
+        for (int i1=i1min; i1<i1max; ++i1) {
+          g[i2][i1] -= aj[i2][i1]*f[i2-j2][i1-j1];
+        }
+      }
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
