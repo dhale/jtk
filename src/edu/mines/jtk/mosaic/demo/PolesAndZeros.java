@@ -324,7 +324,7 @@ public class PolesAndZeros {
       _plotPanelAP = new PlotPanel(2,1);
       _plotPanelAP.setTitle("amplitude and phase response");
       if (_db) {
-        _plotPanelAP.setVLimits(0,0.0,-100.0);
+        _plotPanelAP.setVLimits(0,-100.0,0.0);
         _plotPanelAP.setVLabel(0,"amplitude (dB)");
       } else {
         _plotPanelAP.setVLimits(0,0.0,1.0);

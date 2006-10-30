@@ -160,6 +160,8 @@ public class PlotPanel extends IPanel {
       _colorBar.setBackground(getBackground());
       if (_colorBarFormat!=null)
         _colorBar.setFormat(_colorBarFormat);
+      if (_colorBarWidthMinimum!=0)
+        _colorBar.setWidthMinimum(_colorBarWidthMinimum);
       if (_colorBarPixelsView!=null) {
         _colorBarPixelsView.addColorMapListener(_colorBar);
         GridBagConstraints gbc = new GridBagConstraints();
@@ -170,7 +172,7 @@ public class PlotPanel extends IPanel {
         gbc.weightx = 0;
         gbc.weighty = 0;
         gbc.fill = GridBagConstraints.VERTICAL;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.anchor = GridBagConstraints.WEST;
         int top = _mosaic.getHeightAxesTop();
         int left = 25;
         int bottom = _mosaic.getHeightAxesBottom();
@@ -185,6 +187,15 @@ public class PlotPanel extends IPanel {
     }
     return _colorBar;
   }
+
+  public void setColorBarWidthMinimum(int widthMinimum) {
+    _colorBarWidthMinimum = widthMinimum;
+    if (_colorBar!=null) {
+      _colorBar.setWidthMinimum(widthMinimum);
+      this.revalidate();
+    }
+  }
+  private int _colorBarWidthMinimum = 0;
 
   /**
    * Sets the format for major tic annotation of the color bar.

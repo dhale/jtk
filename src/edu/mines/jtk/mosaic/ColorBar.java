@@ -56,6 +56,11 @@ public class ColorBar extends IPanel implements ColorMapListener {
     revalidate();
   }
 
+  public void setWidthMinimum(int widthMinimum) {
+    _mosaic.getTileAxisRight(0).setWidthMinimum(widthMinimum);
+    revalidate();
+  }
+
   /**
    * Sets the format for major tic annotation for this color bar.
    * The default format is "%1.4G", which yields a minimum of 1 digit,

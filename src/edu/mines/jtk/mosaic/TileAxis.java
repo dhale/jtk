@@ -368,6 +368,8 @@ public class TileAxis extends IPanel {
    * any border that will be drawn by the mosaic.
    */
   int getWidthMinimum() {
+    if (_widthMinimum!=0)
+      return _widthMinimum;
     FontMetrics fm = getFontMetrics(getFont());
     int ticLabelWidth = _ticLabelWidth;
     if (ticLabelWidth==0)
@@ -384,6 +386,11 @@ public class TileAxis extends IPanel {
     }
     return width;
   }
+  // Hack!
+  void setWidthMinimum(int widthMinimum) {
+    _widthMinimum = widthMinimum;
+  }
+  private int _widthMinimum;
 
   /**
    * Gets the height minimum for this axis. This height does not include 
