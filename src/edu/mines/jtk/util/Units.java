@@ -519,7 +519,6 @@ public final class Units implements Cloneable {
   }
 
   private static final int NPOWERS = 16;
-  private static UnitsParser _parser = null;
   private static Hashtable<String, UnitsTableEntry> _table = null;
   private static String[] _bases = null;
   private static int _nbase = 0;
@@ -538,8 +537,6 @@ public final class Units implements Cloneable {
     1e12,1e-6,1e-24,1e-24,1e24,1e-21,1e-21,1e21
   };
   static {
-    // Parser and default table of units.
-    _parser = new UnitsParser(System.in);
     _table = new Hashtable<String, UnitsTableEntry>();
     _bases = new String[NPOWERS];
     loadTable();
@@ -560,7 +557,7 @@ public final class Units implements Cloneable {
 
     // Otherwise, parse the definition to construct new Units.
     try {
-      return _parser.parse(definition);
+      return UnitsParser.parse(definition);
     } catch (Exception e) {
       throw new UnitsFormatException(e.getMessage());
     }

@@ -365,8 +365,6 @@ public class PointsView extends TiledView {
       RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);
 
-    // Tile, projectors and transcaler.
-    Tile tile = getTile();
     Projector hp = getHorizontalProjector();
     Projector vp = getVerticalProjector();
     Transcaler ts = getTranscaler();
@@ -559,6 +557,7 @@ public class PointsView extends TiledView {
     }
   }
 
+  /*
   private void paintLines(Graphics2D g2d, int n, int[] x, int[] y) {
     int x1 = x[0];
     int y1 = y[0];
@@ -570,6 +569,7 @@ public class PointsView extends TiledView {
       y1 = y2;
     }
   }
+  */
   
   private void paintPoint(Graphics2D g2d, int n, int[] x, int[] y) {
     for (int i=0; i<n; ++i) {

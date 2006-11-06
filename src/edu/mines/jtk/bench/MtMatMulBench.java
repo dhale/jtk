@@ -168,9 +168,7 @@ public class MtMatMulBench {
     final float[][] a, final float[][] b, final float[][] c) 
   {
     checkDimensions(a,b,c);
-    final int ni = c.length;
     final int nj = c[0].length;
-    final int nk = b.length;
     ExecutorService es = Executors.newFixedThreadPool(NTHREAD);
     CompletionService<Void> cs = new ExecutorCompletionService<Void>(es);
     for (int j=0; j<nj; ++j) {
@@ -193,6 +191,7 @@ public class MtMatMulBench {
   /**
    * Single-threaded blocked version. Currently unused.
    */
+  /*
   private static void mulb(float[][] a, float[][] b, float[][] c) {
     checkDimensions(a,b,c);
     int ni = c.length;
@@ -226,6 +225,7 @@ public class MtMatMulBench {
       }
     }
   }
+  */
 
   private static void startAndJoin(Thread[] threads) {
     for (int ithread=0; ithread<threads.length; ++ithread)

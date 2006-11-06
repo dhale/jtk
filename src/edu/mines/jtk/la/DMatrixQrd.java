@@ -40,15 +40,15 @@ public class DMatrixQrd {
     Check.argument(a.getM()>=a.getN(),"m >= n");
     int m = _m = a.getM();
     int n = _n = a.getN();
-    double[][] qr = _qr = a.get();
-    double[] rdiag = _rdiag = new double[_n];
+    _qr = a.get();
+    _rdiag = new double[_n];
 
     // Main loop.
     for (int k=0; k<n; ++k) {
 
       // Compute 2-norm of k-th column without under/overflow.
       double nrm = 0;
-      for (int i=k; i<_m; ++i)
+      for (int i=k; i<m; ++i)
         nrm = hypot(nrm,_qr[i][k]);
 
       if (nrm!=0.0) {
@@ -56,17 +56,17 @@ public class DMatrixQrd {
         // Form k-th Householder vector.
         if (_qr[k][k]<0.0)
           nrm = -nrm;
-        for (int i=k; i<_m; ++i)
+        for (int i=k; i<m; ++i)
           _qr[i][k] /= nrm;
         _qr[k][k] += 1.0;
 
         // Apply transformation to remaining columns.
-        for (int j=k+1; j<_n; ++j) {
+        for (int j=k+1; j<n; ++j) {
           double s = 0.0; 
-          for (int i=k; i<_m; ++i)
+          for (int i=k; i<m; ++i)
             s += _qr[i][k]*_qr[i][j];
           s = -s/_qr[k][k];
-          for (int i=k; i<_m; ++i)
+          for (int i=k; i<m; ++i)
             _qr[i][j] += s*_qr[i][k];
         }
       }

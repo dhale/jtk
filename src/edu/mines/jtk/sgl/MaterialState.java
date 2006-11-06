@@ -592,42 +592,36 @@ public class MaterialState implements State {
   private static float[] _ambientDefault = {0.2f,0.2f,0.2f,1.0f};
   private float[] _ambientFront = _ambientDefault;
   private float[] _ambientBack = _ambientDefault;
-  private boolean _ambientSet;
   private boolean _ambientFrontSet;
   private boolean _ambientBackSet;
 
   private static float[] _diffuseDefault = {0.8f,0.8f,0.8f,1.0f};
   private float[] _diffuseFront = _diffuseDefault;
   private float[] _diffuseBack = _diffuseDefault;
-  private boolean _diffuseSet;
   private boolean _diffuseFrontSet;
   private boolean _diffuseBackSet;
 
   private static float[] _specularDefault = {0.0f,0.0f,0.0f,1.0f};
   private float[] _specularFront = _specularDefault;
   private float[] _specularBack = _specularDefault;
-  private boolean _specularSet;
   private boolean _specularFrontSet;
   private boolean _specularBackSet;
 
   private static float[] _emissiveDefault = {0.0f,0.0f,0.0f,1.0f};
   private float[] _emissiveFront = _emissiveDefault;
   private float[] _emissiveBack = _emissiveDefault;
-  private boolean _emissiveSet;
   private boolean _emissiveFrontSet;
   private boolean _emissiveBackSet;
 
   private static float _shininessDefault = 0.0f;
   private float _shininessFront = _shininessDefault;
   private float _shininessBack = _shininessDefault;
-  private boolean _shininessSet;
   private boolean _shininessFrontSet;
   private boolean _shininessBackSet;
 
   private static int _colorMaterialDefault = GL_AMBIENT_AND_DIFFUSE;
   private int _colorMaterialFront = _colorMaterialDefault;
   private int _colorMaterialBack = _colorMaterialDefault;
-  private boolean _colorMaterialSet;
   private boolean _colorMaterialFrontSet;
   private boolean _colorMaterialBackSet;
 

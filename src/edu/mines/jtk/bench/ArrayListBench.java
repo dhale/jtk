@@ -60,7 +60,6 @@ public class ArrayListBench {
     Stopwatch sw = new Stopwatch();
     sw.start();
     int niter;
-    float f = 1.0f;
     for (niter=0; sw.time()<maxtime; ++niter)
       lm.makeList(n);
     sw.stop();

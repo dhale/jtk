@@ -62,7 +62,7 @@ public class Mosaic extends IPanel {
   public Mosaic(int nrow, int ncol, Set<AxesPlacement> axesPlacement) {
     _nrow = nrow;
     _ncol = ncol;
-    _axesPlacement = axesPlacement;
+    //_axesPlacement = axesPlacement;
 
     // Tiles.
     _tiles = new Tile[nrow][ncol];
@@ -655,7 +655,7 @@ public class Mosaic extends IPanel {
 
   private int _nrow; // number of rows
   private int _ncol; // number of columns
-  private Set<AxesPlacement> _axesPlacement; // axes placement
+  //private Set<AxesPlacement> _axesPlacement; // axes placement
   private Tile[][] _tiles; // array[nrow][ncol] of tiles
   private TileAxis[] _axesTop; // array[ncol] of top axes; null, if none
   private TileAxis[] _axesLeft; // array[nrow] of left axes; null, if none
@@ -832,8 +832,8 @@ public class Mosaic extends IPanel {
 
   private static final int SCROLL_MAX = 1000000000;
   private static final double SCROLL_SCL = 1.0/SCROLL_MAX;
-  private static final int HORIZONTAL = Adjustable.HORIZONTAL;
-  private static final int VERTICAL = Adjustable.VERTICAL;
+  //private static final int HORIZONTAL = Adjustable.HORIZONTAL;
+  //private static final int VERTICAL = Adjustable.VERTICAL;
   private class TileScrollBar extends JScrollBar {
     private static final long serialVersionUID = 1L;
     Tile tile;

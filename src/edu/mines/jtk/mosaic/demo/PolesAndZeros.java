@@ -171,7 +171,6 @@ public class PolesAndZeros {
     private PointsView _polesView;
     private PointsView _zerosView;
     private PointsView _circleView;
-    private GridView _gridView;
 
     private PoleZeroPlot() {
 
@@ -184,7 +183,7 @@ public class PolesAndZeros {
       _plotPanel.setVLimits(-2.0,2.0);
 
       // A grid view for horizontal and vertical lines (axes).
-      _gridView = _plotPanel.addGrid("H0-V0-");
+      _plotPanel.addGrid("H0-V0-");
 
       // A points view for the unit circle.
       float[][] circlePoints = makeCirclePoints();
@@ -324,10 +323,10 @@ public class PolesAndZeros {
       _plotPanelAP = new PlotPanel(2,1);
       _plotPanelAP.setTitle("amplitude and phase response");
       if (_db) {
-        _plotPanelAP.setVLimits(0,-100.0,0.0);
+        //_plotPanelAP.setVLimits(0,-100.0,0.0);
         _plotPanelAP.setVLabel(0,"amplitude (dB)");
       } else {
-        _plotPanelAP.setVLimits(0,0.0,1.0);
+        //_plotPanelAP.setVLimits(0,0.0,1.0);
         _plotPanelAP.setVLabel(0,"amplitude");
       }
       _plotPanelAP.setVLimits(1,-0.5,0.5);
@@ -424,7 +423,7 @@ public class PolesAndZeros {
       for (int jf=0;  jf<nf; ++jf) {
         double f = ff+jf*df;
         Cdouble cone = new Cdouble(1.0,0.0);
-        Cdouble zinv = Cdouble.polar(1.0,2.0*DBL_PI*f);
+        Cdouble zinv = Cdouble.polar(1.0,-2.0*DBL_PI*f);
         Cdouble p = new Cdouble(1.0,0.0);
         for (Cdouble c: _zeros)
           p.timesEquals(cone.minus(c.times(zinv)));
@@ -437,8 +436,8 @@ public class PolesAndZeros {
       }
 
       // Amplitude response, normalized.
-      float amax = max(Array.max(af),FLT_EPSILON);
-      af = Array.mul(1.0f/amax,af);
+      //float amax = max(Array.max(af),FLT_EPSILON);
+      //af = Array.mul(1.0f/amax,af);
       if (_db) {
         af = Array.log10(af);
         af = Array.mul(20.0f,af);
@@ -455,6 +454,7 @@ public class PolesAndZeros {
     // Computes the amplitude and phase responses from impulse response.
     // This method is fast, because it uses an FFT, but it yields errors
     // for long impulse responses that are truncated.
+    /*
     private Real1[] computeAmplitudeAndPhaseResponses(Real1 h) {
 
       // Time sampling.
@@ -497,6 +497,7 @@ public class PolesAndZeros {
 
       return new Real1[]{a,p};
     }
+    */
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -520,7 +521,7 @@ public class PolesAndZeros {
         setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_X,0));
         setShortDescription("Add (Shift), remove (Ctrl), or drag poles");
       } else {
-        _zeros = true;
+        //_zeros = true;
         setName("Zeros");
         setIcon(loadIcon(PolesAndZeros.class,"resources/Zeros16.png"));
         setMnemonicKey(KeyEvent.VK_0);
@@ -541,7 +542,7 @@ public class PolesAndZeros {
       }
     }
 
-    private boolean _zeros; // true, if this mode is for zeros
+    //private boolean _zeros; // true, if this mode is for zeros
     private boolean _poles; // true, if this mode is for poles
     private Cdouble _zedit; // if editing, last location in complex z plane
     private boolean _editing; // true, if currently editing

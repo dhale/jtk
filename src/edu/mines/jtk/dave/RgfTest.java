@@ -52,9 +52,11 @@ public class RgfTest {
   private static void plot(float[][] f) {
     plot(Array.min(f),Array.max(f),f);
   }
+  /*
   private static void plot(String filename, float[][] f) {
     plot(filename,Array.min(f),Array.max(f),f);
   }
+  */
   private static PlotFrame plot(
     float fmin, float fmax, float[][] f) 
   {
@@ -70,10 +72,12 @@ public class RgfTest {
     frame.setVisible(true);
     return frame;
   }
+  /*
   private static void plot(
     String filename, float fmin, float fmax, float[][] f) 
   {
     PlotFrame frame = plot(fmin,fmax,f);
     frame.paintToPng(300,6,filename+".png");
   }
+  */
 }

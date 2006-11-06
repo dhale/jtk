@@ -9,7 +9,6 @@ package edu.mines.jtk.mosaic;
 import static edu.mines.jtk.util.MathPlus.*;
 
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.util.ArrayList;
 
 import edu.mines.jtk.dsp.Sampling;
@@ -184,6 +183,7 @@ public class ContoursView extends TiledView {
 
   public void paint(Graphics2D g2d) {
 
+	/*
     // Projectors and transcaler.
     Projector hp = getHorizontalProjector();
     Projector vp = getVerticalProjector();
@@ -241,6 +241,7 @@ public class ContoursView extends TiledView {
     double dy = (y1-y0)/max(1,ny-1);
     double fx = x0;
     double fy = y0;
+    */
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -297,7 +298,7 @@ public class ContoursView extends TiledView {
   private boolean _usePercentiles = true; // true, if using percentiles
 
   // Sampling of the function f(x1,x2) in the pixel (x,y) coordinate system. 
-  private boolean _transposed;
+  //private boolean _transposed;
   private boolean _xflipped;
   private boolean _yflipped;
   private int _nx;
@@ -351,7 +352,7 @@ public class ContoursView extends TiledView {
     double f1 = _s1.getFirst();
     double f2 = _s2.getFirst();
     if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      _transposed = true;
+      //_transposed = true;
       _xflipped = false;
       _yflipped = false;
       _nx = n2;
@@ -361,7 +362,7 @@ public class ContoursView extends TiledView {
       _dy = d1;
       _fy = f1;
     } else if (_orientation==Orientation.X1RIGHT_X2UP) {
-      _transposed = false;
+      //_transposed = false;
       _xflipped = false;
       _yflipped = true;
       _nx = n1;

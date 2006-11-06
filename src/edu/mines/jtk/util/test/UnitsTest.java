@@ -120,7 +120,6 @@ public class UnitsTest extends TestCase {
 
     for (int i=0; i<specifications.length; ++i) {
       String sd = null;
-      String message = "";
       try {
         sd = new Units(specifications[i][0]).standardDefinition();
         assertTrue(sd.equals(specifications[i][1]));

@@ -414,15 +414,15 @@ public class SincInterpolator {
     if (_asinc==null)
       makeTable();
     _nx1u = nx1u;
-    _dx1u = dx1u;
-    _fx1u = fx1u;
+    //_dx1u = dx1u;
+    //_fx1u = fx1u;
     _x1f = fx1u;
     _x1s = 1.0/dx1u;
     _x1b = _lsinc-_x1f*_x1s;
     _nx1um = nx1u-_lsinc;
     _nx2u = nx2u;
-    _dx2u = dx2u;
-    _fx2u = fx2u;
+    //_dx2u = dx2u;
+    //_fx2u = fx2u;
     _x2f = fx2u;
     _x2s = 1.0/dx2u;
     _x2b = _lsinc-_x2f*_x2s;
@@ -613,8 +613,8 @@ public class SincInterpolator {
 
   // Current 2-D uniform sampling.
   private int _nx1u,_nx2u;
-  private double _dx1u,_dx2u;
-  private double _fx1u,_fx2u;
+  //private double _dx1u,_dx2u;
+  //private double _fx1u,_fx2u;
   private double _x1f,_x2f;
   private double _x1s,_x2s;
   private double _x1b,_x2b;

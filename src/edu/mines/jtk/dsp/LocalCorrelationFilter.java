@@ -265,6 +265,7 @@ public class LocalCorrelationFilter {
    * @param c the output array; cannot be the same as f or g.
    */
   // Not yet tested!
+  /*
   private void applyFft(
     int l1min, int l1max, int j1c, int k1c,
     float[] f, float[] g, float[][] c)
@@ -306,8 +307,10 @@ public class LocalCorrelationFilter {
         cc[i1] = s*gpad[i1];
     }
   }
+  */
 
   // Not yet tested!
+  /*
   private void applyFft(
     int l1min, int l1max, int j1c, int k1c,
     int l2min, int l2max, int j2c, int k2c,
@@ -378,8 +381,10 @@ public class LocalCorrelationFilter {
       }
     }
   }
+  */
 
   // Not yet tested!
+  /*
   private void applyFft(
     int l1min, int l1max, int j1c, int k1c,
     int l2min, int l2max, int j2c, int k2c,
@@ -477,6 +482,7 @@ public class LocalCorrelationFilter {
       }
     }
   }
+  */
 
   /**
    * Searches for lags for which cross-correlations are maximized.
@@ -1177,6 +1183,7 @@ public class LocalCorrelationFilter {
   };
 
   // Alternative coefficients? (Experimenting.)
+  /*
   private static final float[][] C2X = {
     { C00,  C00,  C00,  C14,  C00,  C00}, // (-1,-1)
     { C00,  C00, -C12,  C00,  C00,  C12}, // ( 0,-1)
@@ -1199,6 +1206,7 @@ public class LocalCorrelationFilter {
     { C00,  C00,  C12,  C00,  C00,  C12}, // ( 0, 1)
     { C00,  C00,  C00,  C00,  C00,  C00}, // ( 1, 1)
   };
+  */
 
   // Coefficients for 3-D lag refinement. Here we fit 27 sampled correlation 
   // values with 10 coefficients of a 3-D quadratic function
@@ -1381,7 +1389,6 @@ public class LocalCorrelationFilter {
   private static void shift3(final float[][][] f, final float[][][] g) {
     final int n3 = f.length;
     final int n2 = f[0].length;
-    final int n1 = f[0][0].length;
     final AtomicInteger ai = new AtomicInteger();
     Thread[] threads = newThreads();
     for (int ithread=0; ithread<threads.length; ++ithread) {
@@ -1418,6 +1425,7 @@ public class LocalCorrelationFilter {
     }
   }
 
+  /*
   private static void get2(int i2, float[][][] x, float[][] x2) {
     int n3 = x2.length;
     int n1 = x2[0].length;
@@ -1441,6 +1449,7 @@ public class LocalCorrelationFilter {
       }
     }
   }
+  */
 
   private static float[] makeGaussianWindow(double sigma) {
     int m = 1+2*(int)(4.0*sigma);

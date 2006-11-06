@@ -70,7 +70,6 @@ public class DMatrixChdTest extends TestCase {
 
   private void test(DMatrix a) {
     int m = a.getM();
-    int n = a.getN();
 
     DMatrixChd chd = new DMatrixChd(a);
     assertTrue(chd.isPositiveDefinite());

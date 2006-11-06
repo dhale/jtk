@@ -12,7 +12,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 
 import edu.mines.jtk.sgl.*;
-import edu.mines.jtk.util.Stopwatch;
+//import edu.mines.jtk.util.Stopwatch;
 
 /**
  * Tests {@link edu.mines.jtk.sgl.TriangleGroup}.
@@ -147,6 +147,7 @@ public class TriangleGroupTest {
     return rgb;
   }
 
+  /*
   private static void bench(float[] xyz, float[] rgb) {
     System.out.println("Benchmarking TriangleGroup construction");
     int nv = xyz.length/3;
@@ -154,16 +155,16 @@ public class TriangleGroupTest {
     System.out.println("  number of vertices = "+nv);
     System.out.println("  number of triangles = "+nt);
 
-    TriangleGroup tg;
     int ntg;
     Stopwatch sw = new Stopwatch();
     for (int ntrial=0; ntrial<3; ++ntrial) {
       sw.restart();
       for (ntg=0; sw.time()<1.0; ++ntg)
-        tg = new TriangleGroup(true,xyz,rgb);
+        new TriangleGroup(true,xyz,rgb);
       sw.stop();
       double rate = (double)ntg*(double)nt/sw.time();
       System.out.println("  triangles/sec = "+rate);
     }
   }
+  */
 }

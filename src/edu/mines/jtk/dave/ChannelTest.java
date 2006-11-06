@@ -8,8 +8,6 @@ package edu.mines.jtk.dave;
 
 import static edu.mines.jtk.util.MathPlus.*;
 
-import java.util.Random;
-
 import javax.swing.JFrame;
 
 import edu.mines.jtk.awt.ColorMap;
@@ -25,10 +23,9 @@ import edu.mines.jtk.util.Array;
 public class ChannelTest {
 
   private static float[][] makeChannel() {
-    Random random = new Random();
     int nx = 101;
     int ny = 101;
-    double xmin = 0.0;
+    //double xmin = 0.0;
     double xmax = nx-1;
     double ymin = 0.0;
     double ymax = ny-1;
@@ -137,7 +134,6 @@ public class ChannelTest {
   }
 
   private static float depSinc(int nz, double dz, double fz, float[] p) {
-    int n = p.length;
     int[] imax = new int[1];
     Array.max(p,imax);
     _si.setUniform(nz,dz,fz,p);
@@ -150,7 +146,6 @@ public class ChannelTest {
   private static SincInterpolator _si = new SincInterpolator();
 
   private static float depPar(int nz, double dz, double fz, float[] p) {
-    int n = p.length;
     int[] imax = new int[1];
     Array.max(p,imax);
     _pi.setInput(nz,dz,fz,p);

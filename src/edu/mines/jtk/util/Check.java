@@ -118,5 +118,11 @@ public class Check {
 
   // Static methods only.
   private Check() {
+	System.out.println(_b);
+	System.out.println(_s);
+	System.out.println(_i);
+	System.out.println(_l);
+	System.out.println(_f);
+	System.out.println(_d);
   }
 }

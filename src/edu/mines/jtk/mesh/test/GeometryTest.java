@@ -216,8 +216,6 @@ public class GeometryTest extends TestCase {
     int nsphere = 0;
     int niter = 100;
     double maxtime = 2.0;
-    double ra = 0.0;
-    double rf = 0.0;
 
     for(;;) {
 
@@ -225,8 +223,8 @@ public class GeometryTest extends TestCase {
     sw.start();
     for (nsphere=0; sw.time()<maxtime; nsphere+=niter) {
       for (int iter=0; iter<niter; ++iter) {
-        ra = Geometry.inSphere(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,xe,ye,ze);
-        //ra = Geometry.inSphere(pa,pb,pc,pd,pe);
+        Geometry.inSphere(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,xe,ye,ze);
+        //Geometry.inSphere(pa,pb,pc,pd,pe);
       }
     }
     sw.stop();
@@ -236,7 +234,7 @@ public class GeometryTest extends TestCase {
     sw.start();
     for (nsphere=0; sw.time()<maxtime; nsphere+=niter) {
       for (int iter=0; iter<niter; ++iter) {
-        rf = Geometry.inSphereFast(
+        Geometry.inSphereFast(
           xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,xe,ye,ze);
         //rf = Geometry.inSphere(pa,pb,pc,pd,pe);
       }
@@ -269,15 +267,13 @@ public class GeometryTest extends TestCase {
     int nplane = 0;
     int niter = 100;
     double maxtime = 2.0;
-    double ra = 0.0;
-    double rf = 0.0;
 
     sw.reset();
     sw.start();
     for (nplane=0; sw.time()<maxtime; nplane+=niter) {
       for (int iter=0; iter<niter; ++iter) {
-        ra = Geometry.leftOfPlane(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd);
-        //ra = Geometry.leftOfPlane(pa,pb,pc,pd);
+        Geometry.leftOfPlane(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd);
+        //Geometry.leftOfPlane(pa,pb,pc,pd);
       }
     }
     sw.stop();
@@ -287,8 +283,8 @@ public class GeometryTest extends TestCase {
     sw.start();
     for (nplane=0; sw.time()<maxtime; nplane+=niter) {
       for (int iter=0; iter<niter; ++iter) {
-        rf = Geometry.leftOfPlaneFast(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd);
-        //rf = Geometry.leftOfPlaneFast(pa,pb,pc,pd);
+        Geometry.leftOfPlaneFast(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd);
+        //Geometry.leftOfPlaneFast(pa,pb,pc,pd);
       }
     }
     sw.stop();

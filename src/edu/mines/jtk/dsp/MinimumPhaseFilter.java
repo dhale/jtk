@@ -126,7 +126,6 @@ public class MinimumPhaseFilter {
     _lag3 = Array.copy(lag3);
     _min1 = Array.min(lag1);
     _min2 = Array.min(lag2);
-    _min3 = Array.min(lag3);
     _max1 = Array.max(lag1);
     _max2 = Array.max(lag2);
     _max3 = Array.max(lag3);
@@ -872,7 +871,7 @@ public class MinimumPhaseFilter {
   private int _m;
   private int _min1,_max1;
   private int _min2,_max2;
-  private int _min3,_max3;
+  private int       _max3;
   private int[] _lag1;
   private int[] _lag2;
   private int[] _lag3;
@@ -890,6 +889,7 @@ public class MinimumPhaseFilter {
   // cascade of inverse and inverseTranspose filters.
   // For all these reasons, keep private for now.
 
+  /*
   private static MinimumPhaseFilter factor(float[] r, int lag1[]) {
     int nlag = lag1.length;
     int min1 = Array.min(lag1);
@@ -1054,4 +1054,5 @@ public class MinimumPhaseFilter {
     }
     return mpf;
   }
+  */
 }

@@ -9,8 +9,6 @@ package edu.mines.jtk.mosaic.test;
 import static java.lang.Math.*;
 
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.font.LineMetrics;
 import java.io.IOException;
 
 import javax.swing.JFrame;
@@ -38,14 +36,14 @@ public class IPanelTest {
       g2d.setRenderingHint(
         RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
-      Font font = g2d.getFont();
+      //Font font = g2d.getFont();
       FontMetrics fm = g2d.getFontMetrics();
-      FontRenderContext frc = g2d.getFontRenderContext();
-      LineMetrics lm = font.getLineMetrics("GgYy",frc);
-      int fh = round(lm.getHeight());
-      int fa = round(lm.getAscent());
-      int fd = round(lm.getDescent());
-      int fl = round(lm.getLeading());
+      //FontRenderContext frc = g2d.getFontRenderContext();
+      //LineMetrics lm = font.getLineMetrics("GgYy",frc);
+      //int fh = round(lm.getHeight());
+      //int fa = round(lm.getAscent());
+      //int fd = round(lm.getDescent());
+      //int fl = round(lm.getLeading());
       int wt = fm.stringWidth(_text);
       int xt = max(0,min(w-wt,(w-wt)/2));
       int yt = h/2;

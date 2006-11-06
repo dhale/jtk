@@ -194,6 +194,7 @@ public class Recursive2ndOrderFilterTest extends TestCase {
     return y;
   }
 
+  /*
   private static float[][][] transpose23(float[][][] x) {
     int n3 = x.length;
     int n2 = x[0].length;
@@ -210,4 +211,5 @@ public class Recursive2ndOrderFilterTest extends TestCase {
     }
     return y;
   }
+  */
 }

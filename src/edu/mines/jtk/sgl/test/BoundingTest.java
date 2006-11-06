@@ -131,7 +131,7 @@ public class BoundingTest extends TestCase {
 
   private static Random _random = new Random(314159);
 
-  private static final double TOLERANCE = 100*DBL_EPSILON;
+  //private static final double TOLERANCE = 100*DBL_EPSILON;
 
   private static double randomDouble() {
     return _random.nextDouble();
@@ -144,6 +144,7 @@ public class BoundingTest extends TestCase {
     return new Point3(x,y,z);
   }
 
+  /*
   private static void assertEquals(Tuple3 e, Tuple3 a) {
     assertEquals(e.x,a.x,TOLERANCE);
     assertEquals(e.y,a.y,TOLERANCE);
@@ -153,4 +154,5 @@ public class BoundingTest extends TestCase {
   private static void assertEquals(double e, double a) {
     assertEquals(e,a,TOLERANCE);
   }
+  */
 }

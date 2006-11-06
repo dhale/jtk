@@ -51,7 +51,7 @@ import java.util.*;
  * @author Dave Hale and Zach Pember, Colorado School of Mines
  * @version 2003.05.02, 2006.07.13
  */
-public class RTree extends AbstractSet {
+public class RTree extends AbstractSet<Object> {
 
   /**
    * An N-dimensional object in a box defined by N min/max coordinates.
@@ -378,7 +378,7 @@ public class RTree extends AbstractSet {
    * {@link java.util.ConcurrentModificationException}.
    * @return the iterator.
    */
-  public Iterator iterator() {
+  public Iterator<Object> iterator() {
     return new RTreeIterator();
   }
 
@@ -1320,7 +1320,7 @@ public class RTree extends AbstractSet {
     }
   }
 
-  private class RTreeIterator implements Iterator {
+  private class RTreeIterator implements Iterator<Object> {
     public boolean hasNext() {
       return _next!=null;
     }

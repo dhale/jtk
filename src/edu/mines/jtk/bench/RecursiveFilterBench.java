@@ -83,7 +83,6 @@ public class RecursiveFilterBench {
     float[][] x, float[][] y) 
   {
     int n2 = y.length;
-    int n1 = y[0].length;
     for (int i2=0; i2<n2; ++i2) {
       filter(b0,b1,b2,a1,a2,x[i2],y[i2]);
     }

@@ -488,8 +488,8 @@ public class TriangleGroup extends Group implements Selectable {
    * @return array[3*nu] of unindexed packed vertex coordinates, where 
    *  nu = 3*nt is the number of unindexed vertices.
    */
+  /*
   private float[] unindexVertices(int[] i, float[] v) {
-    int nv = v.length/3;
     int nt = i.length/3;
     int nu = 3*nt;
     float[] u = new float[3*nu];
@@ -509,4 +509,5 @@ public class TriangleGroup extends Group implements Selectable {
     }
     return u;
   }
+  */
 }

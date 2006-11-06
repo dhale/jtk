@@ -118,11 +118,11 @@ public class HistogramTest extends TestCase {
     float[] v = new float[n];
     for (int i=0; i<n; ++i)
       v[i] = (float)r.nextGaussian();
-    Histogram h = new Histogram(v);
+    //Histogram h = new Histogram(v);
     //Array.dump(h.getDensities());
-    int nbin = h.getBinCount();
-    double dbin = h.getBinDelta();
-    double fbin = h.getBinFirst();
+    //int nbin = h.getBinCount();
+    //double dbin = h.getBinDelta();
+    //double fbin = h.getBinFirst();
     //System.out.println("nbin="+nbin+" dbin="+dbin+" fbin="+fbin);
   }
 }

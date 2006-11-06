@@ -413,7 +413,7 @@ public class TriMesh implements Serializable {
     /**
      * Coordinates of tri's center (typically, the circumcenter).
      */
-    private transient double _xc,_yc;
+    //private transient double _xc,_yc;
 
     /**
      * Constructs a new tri.
@@ -475,6 +475,7 @@ public class TriMesh implements Serializable {
     /**
      * Determines if this tri intersects the specified line.
      */
+    /*
     private boolean intersectsLine(double a, double b, double c)
     {
       int nn = 0;
@@ -490,6 +491,7 @@ public class TriMesh implements Serializable {
       if (s2>0.0) ++np;
       return nn<3 && np<3;
     }
+    */
 
     /**
      * Returns the quality of a tri implied by the specified nodes.
@@ -738,9 +740,11 @@ public class TriMesh implements Serializable {
       }
     }
 
+    /*
     private final boolean isVisibleFromNode(Node node) {
       return isVisibleFromPoint(node._x,node._y);
     }
+    */
   }
 
   /**
@@ -1803,7 +1807,7 @@ public class TriMesh implements Serializable {
     NodeStepList list = new NodeStepList();
 
     // For all steps, ...
-    for (int step=1,nnabor1=0,lnabor=0; step<=stepMax; ++step) {
+    for (int step=1,nnabor1=0; step<=stepMax; ++step) {
 
       // If first step, ...
       if (step==1) {
@@ -2398,6 +2402,7 @@ public class TriMesh implements Serializable {
    * <em>Is this useful? Keep private until we have a need for it.</em>
    * @param map the map from which to get node property values.
    */
+  /*
   private synchronized void cacheNodeProperty(NodePropertyMap map) {
     NodeIterator ni = getNodes();
     while (ni.hasNext()) {
@@ -2405,6 +2410,7 @@ public class TriMesh implements Serializable {
       node.data = map.get(node);
     }
   }
+  */
 
   /**
    * Returns a new tri, possibly one resurrected from the dead.
@@ -2503,7 +2509,11 @@ public class TriMesh implements Serializable {
       n1._x,n1._y,
       n2._x,n2._y);
     Check.state(orient!=0,"three nodes for first tri are not co-linear");
-    Tri tri = (orient>0.0) ? makeTri(n0,n1,n2) : makeTri(n0,n2,n1);
+    if (orient>0.0) {
+      makeTri(n0,n1,n2);
+    } else {
+      makeTri(n0,n2,n1);
+    }
   }
 
   /**
@@ -3331,6 +3341,7 @@ public class TriMesh implements Serializable {
    * specified node (not yet in the mesh), recursively adds all
    * visible edges on the hull to the specified set of edges.
    */
+  /*
   private void getVisibleEdgesOnHull(
     Node node, Edge edge, HashSet<Edge> edges) {
     if (!edges.contains(edge) && edge.isVisibleFromNode(node)) {
@@ -3339,6 +3350,7 @@ public class TriMesh implements Serializable {
       getVisibleEdgesOnHull(node,getNextEdgeOnHull(edge.nodeB(),edge),edges);
     }
   }
+  */
 
   /**
    * Returns the edge in the specified tri that references the specified 
@@ -3550,9 +3562,11 @@ public class TriMesh implements Serializable {
       Check.state(tc.triNabor(tri.nodeNabor(tc))==tri,"c nabors ok");
   }
 
+  /*
   private static final void trace(String s) {
     if (TRACE) System.out.println(s);
   }
+  */
   static final boolean DEBUG = false;
   static final boolean TRACE = false;
 
@@ -3754,8 +3768,6 @@ public class TriMesh implements Serializable {
     private int indexOfMate(Node a, Node b) {
       int i = hash(a,b);
       while (_filled[i]) {
-        Node ai = _a[i];
-        Node bi = _b[i];
         if (a==_b[i] && b==_a[i])
           return i;
         i = (i-1)&_mask;

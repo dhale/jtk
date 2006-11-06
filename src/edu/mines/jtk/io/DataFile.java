@@ -1031,6 +1031,7 @@ public class DataFile implements DataInput, DataOutput, Closeable {
   private DoubleBuffer _db;
 
   // Currently unused.
+  /*
   private static char swap(char v) {
     return (char)((v<<8)|((v>>8)&0xff));
   }
@@ -1053,4 +1054,5 @@ public class DataFile implements DataInput, DataOutput, Closeable {
            ((v>>48)&0xffL)<< 8 |
            ((v>>56)&0xffL);
   }
+  */
 }

@@ -36,7 +36,7 @@ public class MouseOnLine extends MouseConstrained {
     MouseEvent event, Point3 origin, Vector3 vector, Matrix44 localToPixel) 
   {
     super(localToPixel);
-    _xmouse = event.getX();
+    //_xmouse = event.getX();
     _ymouse = event.getY();
     _origin = new Point3(origin);
     _vector = vector.normalize();
@@ -74,7 +74,7 @@ public class MouseOnLine extends MouseConstrained {
     PUSH_PULL
   }
 
-  private double _xmouse; // initial mouse pixel x coordinate
+  //private double _xmouse; // initial mouse pixel x coordinate
   private double _ymouse; // initial mouse pixel y coordinate
   private Point3 _origin; // the specified origin point
   private Vector3 _vector; // vector parallel to line

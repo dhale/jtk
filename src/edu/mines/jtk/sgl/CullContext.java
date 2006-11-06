@@ -158,9 +158,6 @@ public class CullContext extends TransformContext {
     // Initially, all six planes are active; mark each with one bit.
     _active = 0x0000003F;
 
-    // Transform frustum from cube to world coordinates.
-    ViewCanvas canvas = getViewCanvas();
-    View view = getView();
     Matrix44 worldToCube = getWorldToCube();
     for (int i=0; i<6; ++i) {
       _planes[i].transformWithInverse(worldToCube);

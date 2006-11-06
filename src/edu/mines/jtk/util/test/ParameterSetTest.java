@@ -30,7 +30,7 @@ public class ParameterSetTest extends TestCase {
     ParameterSet root = new ParameterSet("root");
     String s1 = root.toString();
     ParameterSet foo = root.addParameterSet("foo");
-    Parameter bar = foo.addParameter("bar");
+    foo.addParameter("bar");
     ParameterSet temp = (ParameterSet)root.clone();
     temp.remove("foo");
     root.replaceWith(temp);

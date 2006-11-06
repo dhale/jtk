@@ -56,6 +56,7 @@ public class Data3dTest {
     return f;
   }
 
+  /*
   private static void writeData(String file, float[][][] f) {
     int n3 = f.length;
     int n2 = f[0].length;
@@ -76,7 +77,9 @@ public class Data3dTest {
       throw new RuntimeException(ioe);
     }
   }
-
+  */
+  
+  /*
   private static void convertData() {
     int n3 = 256;
     int n2 = 256;
@@ -108,13 +111,16 @@ public class Data3dTest {
     f = Array.copy(m1,m2,m3,j1,j2,j3,f);
     writeData("segy180.dat",f);
   }
+  */
 
   private static void plot(float[][] f) {
     plot(Array.min(f),Array.max(f),f);
   }
+  /*
   private static void plot(String filename, float[][] f) {
     plot(filename,Array.min(f),Array.max(f),f);
   }
+  */
   private static PlotFrame plot(
     float fmin, float fmax, float[][] f) 
   {
@@ -130,10 +136,13 @@ public class Data3dTest {
     frame.setVisible(true);
     return frame;
   }
+  /*
   private static void plot(
     String filename, float fmin, float fmax, float[][] f) 
   {
     PlotFrame frame = plot(fmin,fmax,f);
     frame.paintToPng(300,6,filename+".png");
   }
+  */
+
 }

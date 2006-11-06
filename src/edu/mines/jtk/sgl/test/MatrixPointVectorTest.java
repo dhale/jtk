@@ -173,7 +173,6 @@ public class MatrixPointVectorTest extends TestCase {
   }
 
   private static void assertEquals(Matrix44 e, Matrix44 a) {
-    double t = 100.0*DBL_EPSILON;
     double[] em = e.m;
     double[] am = a.m;
     for (int i=0; i<16; ++i)

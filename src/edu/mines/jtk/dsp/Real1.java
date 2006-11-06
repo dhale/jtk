@@ -305,8 +305,7 @@ public class Real1 {
    * @return the sum.
    */
   public static Real1 add(Real1 ra, Real1 rb) {
-    ensureSamplingEquivalent(ra,rb);
-    return new Real1(ra._s,Array.add(ra._v,rb._v));
+	return binaryOp(ra,rb,_add);
   }
 
   /**
@@ -316,7 +315,7 @@ public class Real1 {
    * @return the sum.
    */
   public static Real1 add(float ar, Real1 rb) {
-    return new Real1(rb._s,Array.add(ar,rb._v));
+    return binaryOp(ar,rb,_add);
   }
 
   /**
@@ -326,7 +325,7 @@ public class Real1 {
    * @return the sum.
    */
   public static Real1 add(Real1 ra, float br) {
-    return new Real1(ra._s,Array.add(ra._v,br));
+    return binaryOp(ra,br,_add);
   }
 
   /**
@@ -428,13 +427,15 @@ public class Real1 {
   Sampling _s; // sampling of one independent variable
   float[] _v; // array of function values
 
+  /*
   private static void ensureSamplingEquivalent(Real1 ra, Real1 rb) {
     ensureSamplingEquivalent(ra.getSampling(),rb.getSampling());
   }
-
+  
   private static void ensureSamplingEquivalent(Sampling sa, Sampling sb) {
     Check.argument(sa.isEquivalentTo(sb),"samplings equivalent");
   }
+  */
 
 
   ///////////////////////////////////////////////////////////////////////////

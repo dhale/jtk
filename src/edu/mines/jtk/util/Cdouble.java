@@ -753,9 +753,11 @@ public class Cdouble {
     return Math.log(x);
   }
 
+  /*
   private static double log10(double x) {
     return Math.log10(x);
   }
+  */
 
   private static double pow(double x, double y) {
     return Math.pow(x,y);

@@ -36,7 +36,7 @@ public class MouseOnPlane extends MouseConstrained {
     MouseEvent event, Point3 origin, Plane plane, Matrix44 localToPixel) 
   {
     super(localToPixel);
-    _origin = new Point3(origin);
+    //_origin = new Point3(origin);
     _normal = plane.getNormal();
     _plane = new Plane(plane);
     _delta = origin.minus(getPointOnPlane(event));
@@ -56,7 +56,7 @@ public class MouseOnPlane extends MouseConstrained {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private Point3 _origin; // the specified point in the constraint plane
+  //private Point3 _origin; // the specified point in the constraint plane
   private Vector3 _normal; // unit-vector normal to plane
   private Plane _plane; // the specified plane
   private Vector3 _delta; // specified origin minus initial intersection point

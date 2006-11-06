@@ -751,9 +751,11 @@ public class Cfloat {
     return (float)Math.log(x);
   }
 
+  /*
   private static float log10(float x) {
     return (float)Math.log10(x);
   }
+  */
 
   private static float pow(float x, float y) {
     return (float)Math.pow(x,y);

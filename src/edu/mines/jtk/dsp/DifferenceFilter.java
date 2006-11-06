@@ -119,9 +119,7 @@ public class DifferenceFilter {
     int n1 = x[0][0].length;
     int n2 = x[0].length;
     int n3 = x.length;
-    int n1m1 = n1-1;
     int n2m1 = n2-1;
-    int n3m1 = n3-1;
     for (int i3=0; i3<n3; ++i3) {
       for (int i2=0; i2<n2; ++i2) {
         float x0mm2=0.0f, x0mm1=0.0f, x0mm0=0.0f, x0mp1=0.0f, x0mp2=0.0f;
@@ -468,9 +466,7 @@ public class DifferenceFilter {
     int n1 = x[0][0].length;
     int n2 = x[0].length;
     int n3 = x.length;
-    int n1m1 = n1-1;
     int n2m1 = n2-1;
-    int n3m1 = n3-1;
     for (int i3=0; i3<n3; ++i3) {
       for (int i2=0; i2<n2; ++i2) {
         float x00m0;
@@ -743,7 +739,7 @@ public class DifferenceFilter {
   // private
 
   // Coefficient for 1-D difference filter:     lag1
-  private static final float AP0 =  1.000f;  //  0
+  //private static final float AP0 =  1.000f;  //  0
   private static final float AP1 = -0.999f;  //  1
 
   // Coefficients for 2-D difference filter:          lag1 lag2

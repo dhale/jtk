@@ -1276,12 +1276,14 @@ public final class Geometry {
    * Computes difference a-b, assuming that |a|&gt;=|b|.
    * Puts result in x and error in y.
    */
+  /*
   private strictfp static void twoDiffFast(double a, double b, Two t) {
     double x = a-b;
     double bvirt = a-x;
     t.x = x;
     t.y = bvirt-b;
   }
+  */
 
   /**
    * Splits a into two overlapping parts.
@@ -1298,6 +1300,7 @@ public final class Geometry {
    * Computes the product a*b.
    * Puts the product in x and the error in y.
    */
+  /*
   private strictfp static void twoProduct(double a, double b, Two t) {
     double x = a*b;
     split(a,t);
@@ -1312,6 +1315,7 @@ public final class Geometry {
     t.x = x;
     t.y = (alo*blo)-err3;
   }
+  */
 
   /**
    * Computes the product a*b, where b has already been split.
@@ -2196,8 +2200,8 @@ public final class Geometry {
     double aez = t.x;
     double aeztail = t.y;
     twoDiff(wa,we,t);
-    double aew = t.x;
-    double aewtail = t.y;
+    //double aew = t.x;
+    //double aewtail = t.y;
     twoDiff(xb,xe,t);
     double bex = t.x;
     double bextail = t.y;

@@ -137,7 +137,6 @@ public class PickContext extends TransformContext {
     }
 
     // Compare distance-to-closest-point-squared with radius-squared.
-    Point3 p = new Point3(px,py,pz);
     double dx = px-cx;
     double dy = py-cy;
     double dz = pz-cz;

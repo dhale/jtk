@@ -844,6 +844,7 @@ public class TetMesh implements Serializable {
      * where quality is 3 times the inradius/circumradius ratio, with 
      * range [0:1]. The nodes need not be in any standard order.
      */
+    /*
     private static double qualityInRadiusOverCircumRadius(
       Node na, Node nb, Node nc, Node nd)
     {
@@ -921,6 +922,7 @@ public class TetMesh implements Serializable {
       if (quality>1.0) quality = 1.0;
       return quality;
     }
+    */
   }
 
   /**
@@ -1340,9 +1342,11 @@ public class TetMesh implements Serializable {
       }
     }
 
+    /*
     private final boolean isVisibleFromNode(Node node) {
       return isVisibleFromPoint(node._x,node._y,node._z);
     }
+    */
   }
 
   /**
@@ -2676,7 +2680,7 @@ public class TetMesh implements Serializable {
     NodeStepList list = new NodeStepList();
 
     // For all steps, ...
-    for (int step=1,nnabor1=0,lnabor=0; step<=stepMax; ++step) {
+    for (int step=1,nnabor1=0; step<=stepMax; ++step) {
 
       // If first step, ...
       if (step==1) {
@@ -3553,6 +3557,7 @@ public class TetMesh implements Serializable {
    * <em>Is this useful? Keep private until we have a need for it.</em>
    * @param map the map from which to get node property values.
    */
+  /*
   private synchronized void cacheNodeProperty(NodePropertyMap map) {
     NodeIterator ni = getNodes();
     while (ni.hasNext()) {
@@ -3560,6 +3565,7 @@ public class TetMesh implements Serializable {
       node.data = map.get(node);
     }
   }
+  */
 
   /**
    * Gets a tet iterator for internal use. This iterator checks and
@@ -3583,7 +3589,7 @@ public class TetMesh implements Serializable {
         stackTet(tet._t3);
         return tet;
       }
-      private Tet _tnext = TetMesh.this._troot;
+      //private Tet _tnext = TetMesh.this._troot;
       private ArrayList<Tet> _stack = new ArrayList<Tet>(128);
       {
         clearTetMarks();
@@ -3658,12 +3664,14 @@ public class TetMesh implements Serializable {
   /**
    * Returns the distance squared between two specified nodes.
    */
+  /*
   private static final double distanceSquared(Node a, Node b) {
     double dx = a._x-b._x;
     double dy = a._y-b._y;
     double dz = a._z-b._z;
     return dx*dx+dy*dy+dz*dz;
   }
+  */
 
   /**
    * Returns the distance squared between the specified node and a point
@@ -3768,7 +3776,11 @@ public class TetMesh implements Serializable {
       trace("n3=("+n3._x+","+n3._y+","+n3._z+")");
     }
     Check.state(orient!=0,"four nodes for first tet are not co-planar");
-    Tet tet = (orient>0.0) ? makeTet(n0,n1,n2,n3) : makeTet(n0,n2,n1,n3);
+    if (orient>0.0) {
+      makeTet(n0,n1,n2,n3);
+    } else {
+      makeTet(n0,n2,n1,n3);
+    }
   }
 
   /**
@@ -5211,6 +5223,7 @@ public class TetMesh implements Serializable {
    * specified node (not yet in the mesh), recursively adds all
    * visible faces on the hull to the specified set of faces.
    */
+  /*
   private void getVisibleFacesOnHull(
     Node node, Face face, HashSet<Face> faces) {
     if (!faces.contains(face) && face.isVisibleFromNode(node)) {
@@ -5220,6 +5233,7 @@ public class TetMesh implements Serializable {
       getVisibleFacesOnHull(node,getNextFaceOnHull(face.nodeC(),face),faces);
     }
   }
+  */
 
   /**
    * Returns the edge in the specified tet that references the specified 
@@ -5407,6 +5421,7 @@ public class TetMesh implements Serializable {
    * (The method name is strange, but consistent with edgeOfTet and
    * faceOfTet.)
    */
+  /*
   private static Tet tetOfTet(Tet tet, Node na, Node nb, Node nc, Node nd) {
     Node n0 = tet._n0;
     Node n1 = tet._n1;
@@ -5528,6 +5543,7 @@ public class TetMesh implements Serializable {
       return null;
     }
   }
+  */
 
   /**
    * Determines whether a specified tet has the specified nodes in order.

@@ -10,13 +10,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Random;
+//import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import edu.mines.jtk.util.Stopwatch;
+//import edu.mines.jtk.util.Stopwatch;
 
 /**
  * AWT/Swing workbench.
@@ -106,6 +106,7 @@ public class AwtBench {
       throw new RuntimeException(ioe);
     }
   }
+  /*
   private static class DGraphics {
     public DGraphics(Graphics2D g2d, double dpi) {
       _g2d = g2d;
@@ -143,7 +144,9 @@ public class AwtBench {
     private double _xdshift,_xdscale,_ydshift,_ydscale;
     Graphics2D _g2d;
   }
+  */
 
+  /*
   private static void benchPrimitives() {
     JFrame frame = new JFrame();
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -151,7 +154,9 @@ public class AwtBench {
     frame.setSize(new Dimension(800,800));
     frame.setVisible(true);
   }
+  */
 
+  /*
   private static class MyPanel extends JPanel {
     private static final long serialVersionUID = 1L;
     private MyPanel() {
@@ -203,4 +208,5 @@ public class AwtBench {
     private int _n;
     private int[] _x,_y;
   }
+  */
 }

@@ -115,7 +115,6 @@ public class RTreeTest extends TestCase {
     int ny = 100;
     int nt = nsurf*2*nx*ny;
     int np = nt;
-    int nb = nt;
     float radius = 2.0f/(float)nx;
     Triangle[] ts = makeSurfaceTriangles(nsurf,nx,ny);
     //Triangle[] ts = makeRandomTriangles(nt,radius);
@@ -175,7 +174,7 @@ public class RTreeTest extends TestCase {
       for (sw.restart(); sw.time()<time;  ++nr) {
         Point p = pp[nr%np];
         point[0] = p.x; point[1] = p.y; point[2] = p.z;
-        Object rb = rt.findNearest(point);
+        rt.findNearest(point);
       }
       sw.stop();
       System.out.println("  RTree findNearest/sec = "+(int)(nr/sw.time()));
@@ -183,7 +182,7 @@ public class RTreeTest extends TestCase {
       for (sw.restart(); sw.time()<time;  ++ns) {
         Point p = pp[nr%np];
         point[0] = p.x; point[1] = p.y; point[2] = p.z;
-        Object sb = st.findNearest(point);
+        st.findNearest(point);
       }
       sw.stop();
       System.out.println("  STree findNearest/sec = "+(int)(ns/sw.time()));
@@ -193,7 +192,7 @@ public class RTreeTest extends TestCase {
       for (sw.restart(); sw.time()<time;  ++nr) {
         Point p = ps[nr%np];
         point[0] = p.x; point[1] = p.y; point[2] = p.z;
-        Object[] rb = rt.findInSphere(point,radius);
+        rt.findInSphere(point,radius);
       }
       sw.stop();
       System.out.println("  RTree findInSphere/sec = "+(int)(nr/sw.time()));
@@ -201,7 +200,7 @@ public class RTreeTest extends TestCase {
       for (sw.restart(); sw.time()<time;  ++ns) {
         Point p = ps[nr%np];
         point[0] = p.x; point[1] = p.y; point[2] = p.z;
-        Object[] sb = st.findInSphere(point,radius);
+        st.findInSphere(point,radius);
       }
       sw.stop();
       System.out.println("  STree findInSphere/sec = "+(int)(ns/sw.time()));
@@ -241,7 +240,7 @@ public class RTreeTest extends TestCase {
     for (sw.restart(); sw.time()<time;  ++nr) {
       Point p = ps[nr%n];
       point[0] = p.x; point[1] = p.y; point[2] = p.z;
-      Object[] rb = rt.findInSphere(point,radius);
+      rt.findInSphere(point,radius);
     }
     sw.stop();
     System.out.println("RTree findInSphere/sec = "+(int)(nr/sw.time()));
@@ -249,7 +248,7 @@ public class RTreeTest extends TestCase {
     for (sw.restart(); sw.time()<time;  ++ns) {
       Point p = ps[nr%n];
       point[0] = p.x; point[1] = p.y; point[2] = p.z;
-      Object[] sb = st.findInSphere(point,radius);
+      st.findInSphere(point,radius);
     }
     sw.stop();
     System.out.println("STree findInSphere/sec = "+(int)(ns/sw.time()));
@@ -625,12 +624,14 @@ public class RTreeTest extends TestCase {
     return new Point(x,y,z);
   }
 
+  /*
   private Triangle[] makeRandomTriangles(int nt, float size) {
     Triangle[] t = new Triangle[nt];
     for (int it=0; it<nt; ++it)
       t[it] = new Triangle(size);
     return t;
   }
+  */
 
   private Point[] makeRandomPoints(int np) {
     Point[] p = new Point[np];

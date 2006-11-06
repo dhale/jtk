@@ -7,8 +7,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp.test;
 
 
-import static edu.mines.jtk.util.Array.cabs;
-import static edu.mines.jtk.util.Array.mul;
+//import static edu.mines.jtk.util.Array.cabs;
+//import static edu.mines.jtk.util.Array.mul;
 import static java.lang.Math.*;
 
 import java.util.Random;
@@ -309,6 +309,7 @@ public class SincInterpolatorTest extends TestCase {
   ///////////////////////////////////////////////////////////////////////////
   // more test code that was useful in debugging, and might be again
 
+  /*
   private void testInterpolatorWithSine(SincInterpolator si) {
 
     // Interpolator design parameters.
@@ -362,15 +363,17 @@ public class SincInterpolatorTest extends TestCase {
       }
     }
   }
-
+ 
   // A simple sine wave, with an arbitrary but hardwired shift.
   private static float sine(double x) {
     return (float)sin(1+x);
   }
+ */
 
   // Used to test design via Kaiser windows. Shows the effect of summing 
   // multiple aliases of Kaiser window spectra into the passband of an 
   // interpolator.
+  /*
   private void xtestDesign() {
     int m = 100;
     int lsinc = 8;
@@ -432,4 +435,5 @@ public class SincInterpolatorTest extends TestCase {
   private double sinc(double x) {
     return (x==0.0)?1.0:sin(x)/x;
   }
+  */
 }

@@ -205,7 +205,7 @@ public class ArrayTest extends TestCase {
     float rb1 = 1.0f;
     float rb2 = 2.0f;
     float rb3 = 4.0f;
-    float[][][] rx,ry,rz;
+    float[][][] rx;
 
     assertEqual(zerofloat(n1,n2,n3),fillfloat(r0,n1,n2,n3));
 
@@ -257,6 +257,7 @@ public class ArrayTest extends TestCase {
     assertTrue(equal(rx,ry));
   }
 
+  /*
   private void assertAlmostEqual(float[] rx, float[] ry) {
     float tolerance = 100.0f*FLT_EPSILON;
     assertTrue(equal(tolerance,rx,ry));
@@ -266,6 +267,7 @@ public class ArrayTest extends TestCase {
     float tolerance = 100.0f*FLT_EPSILON;
     assertTrue(equal(tolerance,rx,ry));
   }
+  */
 
   private void assertAlmostEqual(float[][][] rx, float[][][] ry) {
     float tolerance = 100.0f*FLT_EPSILON;

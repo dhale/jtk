@@ -183,7 +183,7 @@ public class TriMeshTest extends TestCase {
         assertTrue(node!=null);
         TriMesh.Node nodeSlow = tm.findNodeNearestSlow(x,y);
         assertTrue(node==nodeSlow);
-        boolean ok = tm.removeNode(node);
+        tm.removeNode(node);
         tm.validate();
         ++nremove;
       }

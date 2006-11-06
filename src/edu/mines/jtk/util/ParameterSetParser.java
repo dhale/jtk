@@ -150,7 +150,6 @@ class ParameterSetParser extends DefaultHandler {
   }
 
   private void endParameter() {
-    int type = _p.getType();
     _p.setStrings(parseValues());
     _p.setType(_ptype);
     _p = null;

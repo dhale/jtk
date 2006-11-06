@@ -9,8 +9,8 @@ package edu.mines.jtk.dave;
 import java.io.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+//import java.util.regex.Matcher;
+//import java.util.regex.Pattern;
 
 import edu.mines.jtk.dsp.Real1;
 import edu.mines.jtk.dsp.Sampling;
@@ -87,6 +87,7 @@ public class Real1Reader {
   */
   // quoted string: "[^"\\\r\n]*(\\.[^"\\\r\n]*)*"
 
+  /*
   private static class Named {
     public String name;
     public boolean found;
@@ -136,4 +137,5 @@ public class Real1Reader {
       }
     }
   }
+  */
 }

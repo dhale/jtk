@@ -774,8 +774,8 @@ public class PlotPanel extends IPanel {
       FontMetrics fm = g2d.getFontMetrics();
       FontRenderContext frc = g2d.getFontRenderContext();
       LineMetrics lm = font.getLineMetrics(text,frc);
-      int fh = round(lm.getHeight());
-      int fa = round(lm.getAscent());
+      //int fh = round(lm.getHeight());
+      //int fa = round(lm.getAscent());
       int fd = round(lm.getDescent());
 
       int wt = fm.stringWidth(text);

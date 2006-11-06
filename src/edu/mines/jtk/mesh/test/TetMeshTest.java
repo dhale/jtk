@@ -336,7 +336,7 @@ public class TetMeshTest extends TestCase {
         assertTrue(node!=null);
         TetMesh.Node nodeSlow = tm.findNodeNearestSlow(x,y,z);
         assertTrue(node==nodeSlow);
-        boolean ok = tm.removeNode(node);
+        tm.removeNode(node);
         tm.validate();
         ++nremove;
       }

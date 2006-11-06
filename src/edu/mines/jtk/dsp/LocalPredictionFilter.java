@@ -10,7 +10,7 @@ import static java.lang.Math.*;
 
 import java.util.ArrayList;
 
-import edu.mines.jtk.lapack.DMatrix;
+//import edu.mines.jtk.lapack.DMatrix;
 import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Check;
 
@@ -29,7 +29,6 @@ public class LocalPredictionFilter {
    */
   public LocalPredictionFilter(double sigma) {
     Check.argument(sigma>=1.0,"sigma>=1.0");
-    _sigma = sigma;
     _lcf = new LocalCorrelationFilter(sigma);
   }
 
@@ -179,6 +178,7 @@ public class LocalPredictionFilter {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  /*
   private static class DirectSolver {
     DirectSolver(int m) {
       this.m = m;
@@ -216,6 +216,7 @@ public class LocalPredictionFilter {
     private DMatrix a,b;
     private double[] aa,bb;
   }
+  */
 
   private static class CgSolver {
     CgSolver(int m, int maxiter) {
@@ -322,7 +323,7 @@ public class LocalPredictionFilter {
       float[][][] r = new float[n][][];
       int i = 0;
       for (R2 r2 : _rlist) {
-        r[i] = _rlist.get(i).r;
+        r[i] = r2.r;
         ++i;
       }
       return r;
@@ -340,6 +341,5 @@ public class LocalPredictionFilter {
     ArrayList<R2> _rlist = new ArrayList<R2>();
   }
 
-  private double _sigma;
   private LocalCorrelationFilter _lcf;
 }

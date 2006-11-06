@@ -245,8 +245,8 @@ final class UnitsParser {
   }
 
   static public void ReInit(java.io.InputStream stream) {
-    jj_input_stream.ReInit(stream, 1, 1);
-    token_source.ReInit(jj_input_stream);
+    ASCII_CharStream.ReInit(stream, 1, 1);
+    UnitsParserTokenManager.ReInit(jj_input_stream);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
@@ -272,8 +272,8 @@ final class UnitsParser {
   }
 
   static public void ReInit(java.io.Reader stream) {
-    jj_input_stream.ReInit(stream, 1, 1);
-    token_source.ReInit(jj_input_stream);
+    ASCII_CharStream.ReInit(stream, 1, 1);
+    UnitsParserTokenManager.ReInit(jj_input_stream);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
@@ -308,7 +308,7 @@ final class UnitsParser {
   static final private Token jj_consume_token(int kind) throws ParseException {
     Token oldToken;
     if ((oldToken = token).next != null) token = token.next;
-    else token = token.next = token_source.getNextToken();
+    else token = token.next = UnitsParserTokenManager.getNextToken();
     jj_ntk = -1;
     if (token.kind == kind) {
       jj_gen++;
@@ -321,7 +321,7 @@ final class UnitsParser {
 
   static final public Token getNextToken() {
     if (token.next != null) token = token.next;
-    else token = token.next = token_source.getNextToken();
+    else token = token.next = UnitsParserTokenManager.getNextToken();
     jj_ntk = -1;
     jj_gen++;
     return token;
@@ -331,14 +331,14 @@ final class UnitsParser {
     Token t = token;
     for (int i = 0; i < index; i++) {
       if (t.next != null) t = t.next;
-      else t = t.next = token_source.getNextToken();
+      else t = t.next = UnitsParserTokenManager.getNextToken();
     }
     return t;
   }
 
   static final private int jj_ntk() {
     if ((jj_nt=token.next) == null)
-      return (jj_ntk = (token.next=token_source.getNextToken()).kind);
+      return (jj_ntk = (token.next=UnitsParserTokenManager.getNextToken()).kind);
     else
       return (jj_ntk = jj_nt.kind);
   }
@@ -471,18 +471,6 @@ final class UnitsParser {
 
   static private class UnitsParserTokenManager
   {
-    private static final int jjStopStringLiteralDfa_0(int pos, long active0)
-    {
-      switch (pos)
-      {
-	default :
-	  return -1;
-      }
-    }
-    private static final int jjStartNfa_0(int pos, long active0)
-    {
-      return jjMoveNfa_0(jjStopStringLiteralDfa_0(pos, active0), pos + 1);
-    }
     static private final int jjStopAtPos(int pos, int kind)
     {
       jjmatchedKind = kind;
@@ -493,7 +481,7 @@ final class UnitsParser {
     {
       jjmatchedKind = kind;
       jjmatchedPos = pos;
-      try { curChar = input_stream.readChar(); }
+      try { curChar = ASCII_CharStream.readChar(); }
       catch(java.io.IOException e) { return pos + 1; }
       return jjMoveNfa_0(state, pos + 1);
     }
@@ -538,19 +526,15 @@ final class UnitsParser {
 	jjCheckNAdd(jjnextStates[start]);
       } while (start++ != end);
     }
-    static private final void jjCheckNAddStates(int start)
-    {
-      jjCheckNAdd(jjnextStates[start]);
-      jjCheckNAdd(jjnextStates[start + 1]);
-    }
     static private final int jjMoveNfa_0(int startState, int curPos)
     {
-      int[] nextStates;
+      //int[] nextStates;
       int startsAt = 0;
       jjnewStateCnt = 33;
       int i = 1;
       jjstateSet[0] = startState;
-      int j, kind = 0x7fffffff;
+      //int j; 
+      int kind = 0x7fffffff;
       for (;;)
       {
 	if (++jjround == 0x7fffffff)
@@ -558,7 +542,7 @@ final class UnitsParser {
 	if (curChar < 64)
 	{
 	  long l = 1L << curChar;
-MatchLoop: do
+      do
 	   {
 	     switch(jjstateSet[--i])
 	     {
@@ -732,7 +716,7 @@ MatchLoop: do
 	else if (curChar < 128)
 	{
 	  long l = 1L << (curChar & 077);
-MatchLoop: do
+      do
 	   {
 	     switch(jjstateSet[--i])
 	     {
@@ -812,9 +796,9 @@ MatchLoop: do
 	}
 	else
 	{
-	  int i2 = (curChar & 0xff) >> 6;
-	  long l2 = 1L << (curChar & 077);
-MatchLoop: do
+	  //int i2 = (curChar & 0xff) >> 6;
+	  //long l2 = 1L << (curChar & 077);
+      do
 	   {
 	     switch(jjstateSet[--i])
 	     {
@@ -831,7 +815,7 @@ MatchLoop: do
 	++curPos;
 	if ((i = jjnewStateCnt) == (startsAt = 33 - (jjnewStateCnt = startsAt)))
 	  return curPos;
-	try { curChar = input_stream.readChar(); }
+	try { curChar = ASCII_CharStream.readChar(); }
 	catch(java.io.IOException e) { return curPos; }
       }
     }
@@ -898,11 +882,11 @@ MatchLoop: do
       Token t = Token.newToken(jjmatchedKind);
       t.kind = jjmatchedKind;
       String im = jjstrLiteralImages[jjmatchedKind];
-      t.image = (im == null) ? input_stream.GetImage() : im;
-      t.beginLine = input_stream.getBeginLine();
-      t.beginColumn = input_stream.getBeginColumn();
-      t.endLine = input_stream.getEndLine();
-      t.endColumn = input_stream.getEndColumn();
+      t.image = (im == null) ? ASCII_CharStream.GetImage() : im;
+      t.beginLine = ASCII_CharStream.getBeginLine();
+      t.beginColumn = ASCII_CharStream.getBeginColumn();
+      t.endLine = ASCII_CharStream.getEndLine();
+      t.endColumn = ASCII_CharStream.getEndColumn();
       return t;
     }
 
@@ -915,8 +899,8 @@ MatchLoop: do
 
     public static final Token getNextToken() 
     {
-      int kind;
-      Token specialToken = null;
+      //int kind;
+      //Token specialToken = null;
       Token matchedToken;
       int curPos = 0;
 
@@ -925,7 +909,7 @@ EOFLoop :
       {   
 	try   
 	{     
-	  curChar = input_stream.BeginToken();
+	  curChar = ASCII_CharStream.BeginToken();
 	}     
 	catch(java.io.IOException e)
 	{        
@@ -934,9 +918,9 @@ EOFLoop :
 	  return matchedToken;
 	}
 
-	try { input_stream.backup(0);
+	try { ASCII_CharStream.backup(0);
 	  while (curChar <= 32 && (0x100000200L & (1L << curChar)) != 0L)
-	    curChar = input_stream.BeginToken();
+	    curChar = ASCII_CharStream.BeginToken();
 	}
 	catch (java.io.IOException e1) { continue EOFLoop; }
 	jjmatchedKind = 0x7fffffff;
@@ -945,7 +929,7 @@ EOFLoop :
 	if (jjmatchedKind != 0x7fffffff)
 	{
 	  if (jjmatchedPos + 1 < curPos)
-	    input_stream.backup(curPos - jjmatchedPos - 1);
+	    ASCII_CharStream.backup(curPos - jjmatchedPos - 1);
 	  if ((jjtoToken[jjmatchedKind >> 6] & (1L << (jjmatchedKind & 077))) != 0L)
 	  {
 	    matchedToken = jjFillToken();
@@ -956,14 +940,14 @@ EOFLoop :
 	    continue EOFLoop;
 	  }
 	}
-	int error_line = input_stream.getEndLine();
-	int error_column = input_stream.getEndColumn();
+	int error_line = ASCII_CharStream.getEndLine();
+	int error_column = ASCII_CharStream.getEndColumn();
 	String error_after = null;
 	boolean EOFSeen = false;
-	try { input_stream.readChar(); input_stream.backup(1); }
+	try { ASCII_CharStream.readChar(); ASCII_CharStream.backup(1); }
 	catch (java.io.IOException e1) {
 	  EOFSeen = true;
-	  error_after = curPos <= 1 ? "" : input_stream.GetImage();
+	  error_after = curPos <= 1 ? "" : ASCII_CharStream.GetImage();
 	  if (curChar == '\n' || curChar == '\r') {
 	    error_line++;
 	    error_column = 0;
@@ -972,8 +956,8 @@ EOFLoop :
 	    error_column++;
 	}
 	if (!EOFSeen) {
-	  input_stream.backup(1);
-	  error_after = curPos <= 1 ? "" : input_stream.GetImage();
+	  ASCII_CharStream.backup(1);
+	  error_after = curPos <= 1 ? "" : ASCII_CharStream.GetImage();
 	}
 	throw new TokenMgrError(EOFSeen, curLexState, error_line, error_column, error_after, curChar, TokenMgrError.LEXICAL_ERROR);
       }
@@ -986,11 +970,13 @@ EOFLoop :
 
   static private class TokenMgrError extends Error
   {
+	 private static final long serialVersionUID = 1L;
     /*
      * Ordinals for various reasons why an Error of this type can be thrown.
      */
 
-    /**
+
+	/**
      * Lexical error occured.
      */
     static final int LEXICAL_ERROR = 0;
@@ -1126,7 +1112,7 @@ EOFLoop :
   ////////////////////////////////////////////////////////////////////////////
   // UnitsParserConstants
 
-  private static final int EOF = 0;
+  //private static final int EOF = 0;
   private static final int PLUS = 3;
   private static final int MINUS = 4;
   private static final int MUL = 5;
@@ -1137,13 +1123,14 @@ EOFLoop :
   private static final int NAME = 10;
   private static final int INTEGER = 11;
   private static final int DOUBLE = 12;
-  private static final int ALPHA = 13;
-  private static final int LETTER = 14;
-  private static final int FLOAT = 15;
-  private static final int DIGIT = 16;
+  //private static final int ALPHA = 13;
+  //private static final int LETTER = 14;
+  //private static final int FLOAT = 15;
+  //private static final int DIGIT = 16;
 
-  private static final int DEFAULT = 0;
+  //private static final int DEFAULT = 0;
 
+  /*
   private static final String[] tokenImage = {
     "<EOF>",
     "\" \"",
@@ -1163,6 +1150,7 @@ EOFLoop :
     "<FLOAT>",
     "<DIGIT>",
   };
+  */
 
   ////////////////////////////////////////////////////////////////////////////
   // ASCII_CharStream
@@ -1559,8 +1547,9 @@ EOFLoop :
    * mechanisms so long as you retain the public fields.
    */
   static private class ParseException extends Exception {
+	private static final long serialVersionUID = 1L;
 
-    /**
+	/**
      * This constructor is used by the method "generateParseException"
      * in the generated parser.  Calling this constructor generates
      * a new object of this type with the fields "currentToken",

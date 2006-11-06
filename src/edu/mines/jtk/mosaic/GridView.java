@@ -350,8 +350,6 @@ public class GridView extends TiledView {
       int nticMajor = at.getCountMajor();
       double dticMajor = at.getDeltaMajor();
       double fticMajor = at.getFirstMajor();
-      int y0 = ts.y(0.0);
-      int y1 = ts.y(1.0);
       for (int itic=0; itic<nticMajor; ++itic) {
         double vtic = fticMajor+itic*dticMajor;
         double utic = hp.u(vtic);

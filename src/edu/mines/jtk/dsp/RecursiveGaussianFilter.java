@@ -513,7 +513,6 @@ public class RecursiveGaussianFilter {
       checkArrays(x,y);
       final int m3 = y.length;
       final int m2 = y[0].length;
-      final int m1 = y[0][0].length;
       final AtomicInteger ai = new AtomicInteger();
       Thread[] threads = newThreads();
       for (int ithread=0; ithread<threads.length; ++ithread) {
@@ -538,7 +537,6 @@ public class RecursiveGaussianFilter {
       checkArrays(x,y);
       int m3 = y.length;
       int m2 = y[0].length;
-      int m1 = y[0][0].length;
       float[][] x2 = new float[m3][];
       float[][] y2 = new float[m3][];
       for (int i2=0; i2<m2; ++i2) {
