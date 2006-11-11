@@ -58,7 +58,7 @@ public class Bench extends JFrame implements GLEventListener {
           glEnd();
         }
       }
-      //glFinish();
+      glFinish();
       s.stop();
       System.out.println("new rate="+nloop+" loops per second");
 
@@ -76,7 +76,7 @@ public class Bench extends JFrame implements GLEventListener {
           gl.glEnd();
         }
       }
-      //gl.glFinish();
+      gl.glFinish();
       s.stop();
       System.out.println("old rate="+nloop+" loops per second");
     }
