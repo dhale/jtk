@@ -466,6 +466,22 @@ public class RecursiveGaussianFilter {
     Check.argument(Array.isRegular(y),"y is regular");
   }
 
+  private static boolean sameArrays(float[] x, float[] y) {
+    return x==y;
+  }
+
+  private static boolean sameArrays(float[][] x, float[][] y) {
+    if (x==y) {
+      return true;
+    } else {
+      int n2 = x.length;
+      for (i2=0; i2<n2; ++i2)
+        if (x[i2]==y[i2])
+          return true;
+    }
+    return false;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   private static abstract class Filter {
 
@@ -574,7 +590,7 @@ public class RecursiveGaussianFilter {
 
     void applyN(int nd, float[] x, float[] y) {
       checkArrays(x,y);
-      if (x==y)
+      if (sameArrays(x,y))
         x = Array.copy(x);
       int m = y.length;
       float n0 = _n0[nd],  n1 = _n1[nd],  n2 = _n2[nd],  n3 = _n3[nd];
@@ -610,7 +626,7 @@ public class RecursiveGaussianFilter {
 
     void applyXN(int nd, float[][] x, float[][] y) {
       checkArrays(x,y);
-      if (x==y)
+      if (sameArrays(x,y))
         x = Array.copy(x);
       int m2 = y.length;
       int m1 = y[0].length;
@@ -852,7 +868,7 @@ public class RecursiveGaussianFilter {
 
     void applyN(int nd, float[] x, float[] y) {
       checkArrays(x,y);
-      if (x==y)
+      if (sameArrays(x,y))
         x = Array.copy(x);
       _g[nd][0][0].applyForward(x,y);
       _g[nd][0][1].accumulateReverse(x,y);
@@ -862,7 +878,7 @@ public class RecursiveGaussianFilter {
 
     void applyXN(int nd, float[][] x, float[][] y) {
       checkArrays(x,y);
-      if (x==y)
+      if (sameArrays(x,y))
         x = Array.copy(x);
       _g[nd][0][0].apply2Forward(x,y);
       _g[nd][0][1].accumulate2Reverse(x,y);
