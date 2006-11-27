@@ -475,7 +475,7 @@ public class RecursiveGaussianFilter {
       return true;
     } else {
       int n2 = x.length;
-      for (i2=0; i2<n2; ++i2)
+      for (int i2=0; i2<n2; ++i2)
         if (x[i2]==y[i2])
           return true;
     }
