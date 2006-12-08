@@ -423,6 +423,11 @@ public class PixelsView extends TiledView {
         Array.quickPartialSort(kmax,a);
         _clipMax = a[kmax];
       }
+      if (_clipMin==_clipMax) {
+        double tiny = max(1.0,Math.ulp(1.0f)*abs(_clipMin));
+        _clipMin -= tiny;
+        _clipMax += tiny;
+      }
       _colorMap.setValueRange(_clipMin,_clipMax);
     }
   }
