@@ -2357,7 +2357,7 @@ public class TetMesh implements Serializable {
         return _i.hasNext();
       }
       public final Tet next() {
-        return (Tet)_i.next();
+        return _i.next();
       }
       private Iterator<Tet> _i;
       {
@@ -2434,7 +2434,7 @@ public class TetMesh implements Serializable {
         if (ntet==0) {
           _tnext = null;
         } else {
-          _tnext = (Tet)_tets.remove(ntet-1);
+          _tnext = _tets.remove(ntet-1);
         }
         return tet;
       }
@@ -3582,7 +3582,7 @@ public class TetMesh implements Serializable {
         int ntet = _stack.size();
         if (ntet==0)
           throw new NoSuchElementException();
-        Tet tet = (Tet)_stack.remove(ntet-1);
+        Tet tet = _stack.remove(ntet-1);
         stackTet(tet._t0);
         stackTet(tet._t1);
         stackTet(tet._t2);

@@ -245,7 +245,7 @@ public class ArgsParser {
     for (int i=0; i<n; ++i)
       _argList.add(_args[i]);
     while (!_argList.isEmpty()) {
-      String arg = (String)_argList.get(0);
+      String arg = _argList.get(0);
       if (arg.charAt(0)!='-' || arg.equals("-"))
         break;
       _argList.remove(0);
@@ -269,7 +269,7 @@ public class ArgsParser {
         if (argString.equals("")) {
           if (_argList.isEmpty())
             throw new OptionException("option -"+opt+" requires a value");
-          argString = (String)_argList.remove(0);
+          argString = _argList.remove(0);
         }
         val = argString;
         argString = "";
@@ -302,7 +302,7 @@ public class ArgsParser {
       if (val==null) {
         if (_argList.isEmpty())
           throw new OptionException("option --"+opt+" requires a value");
-        val = (String)_argList.remove(0);
+        val = _argList.remove(0);
       }
     } else if (val!=null) {
       throw new OptionException("option --"+opt+" must not have a value");

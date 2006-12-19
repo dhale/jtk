@@ -51,7 +51,7 @@ public class DMatrixEvd {
         throw new RuntimeException("internal error in LAPACK dsyevr");
       int lwork = (int)work[0];
       work = new double[lwork];
-      int liwork = (int)iwork[0];
+      int liwork = iwork[0];
       iwork = new int[liwork];
       info = dsyevr(JOB_V,RANGE_A,LOWER,
         _n,aa,_n,0.0,0.0,0,0,0.0,m,_d,_v,_n,isuppz,work,lwork,iwork,liwork);

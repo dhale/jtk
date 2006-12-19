@@ -583,8 +583,8 @@ public class ImagePanel extends AxisAlignedPanel {
     } else if (_axis==Axis.Z) {
       _f3.get23(lt,ls,_kzmin,kt,ks,_floats);
     }
-    float fscale = 255.0f/(float)(_clipMax-_clipMin);
-    float fshift = (float)_clipMin;
+    float fscale = 255.0f/(_clipMax-_clipMin);
+    float fshift = _clipMin;
     IndexColorModel icm = _colorMap.getColorModel();
     for (int is=0; is<ls; ++is) {
       for (int it=0; it<lt; ++it) {

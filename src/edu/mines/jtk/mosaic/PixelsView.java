@@ -611,8 +611,8 @@ public class PixelsView extends TiledView {
    * Also maps _clipMin to 0.0f, and _clipMax to 255.0f.
    */
   private void interpx(int jy, int nx, int[] kf, float[] wf, float[] t) {
-    float fscale = 255.0f/(float)(_clipMax-_clipMin);
-    float fshift = (float)_clipMin;
+    float fscale = 255.0f/(_clipMax-_clipMin);
+    float fshift = _clipMin;
     if (_transposed) {
       if (_nx==1) {
         float fc = (_f[0][jy]-fshift)*fscale;
@@ -722,8 +722,8 @@ public class PixelsView extends TiledView {
    * Nearest-neighbor interpolation of one row of sampled floats to pixels.
    */
   private void interpx(int jy, int nx, int[] kf, byte[] b) {
-    float fscale = 255.0f/(float)(_clipMax-_clipMin);
-    float fshift = (float)_clipMin;
+    float fscale = 255.0f/(_clipMax-_clipMin);
+    float fshift = _clipMin;
     if (_transposed) {
       for (int ix=0; ix<nx; ++ix) {
         int kx = kf[ix];

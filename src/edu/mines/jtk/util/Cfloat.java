@@ -699,7 +699,7 @@ public class Cfloat {
   }
 
   public int hashCode() {
-    return (int)(Float.floatToIntBits(r)^Float.floatToIntBits(i));
+    return Float.floatToIntBits(r)^Float.floatToIntBits(i);
   }
 
   public String toString() {

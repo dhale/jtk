@@ -747,7 +747,7 @@ public class LocalCorrelationFilter {
       } else if (w>1.0f) {
         w = 1.0f;
       }
-      u[i] = (float)(w+l[i]);
+      u[i] = w+l[i];
     }
   }
 

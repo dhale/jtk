@@ -642,7 +642,7 @@ public class RTree extends AbstractSet<Object> {
         // Add all orphan boxes. Some may be nodes with non-zero level.
         int norphan = orphans.size();
         for (int iorphan=0; iorphan<norphan; ++iorphan) {
-          Object orphan = (Object)orphans.get(iorphan);
+          Object orphan = orphans.get(iorphan);
           Node parent = _root.chooseNodeFor(orphan);
           parent.add(orphan);
         }
@@ -784,7 +784,7 @@ public class RTree extends AbstractSet<Object> {
 
         // For each child of this node, ...
         for (int ibox=0; ibox<_nbox; ++ibox) {
-          BoxDistance bd = (BoxDistance)list.get(ibox);
+          BoxDistance bd = list.get(ibox);
 
           // If the child cannot be pruned, recursively find nearest boxes.
           if (bd.distance<nearest.cutoff())
@@ -1264,7 +1264,7 @@ public class RTree extends AbstractSet<Object> {
         _set.add(bd);
         _full = _full || _k==_set.size();
         if (_full)
-          _cutoff = ((BoxDistance)_set.last()).distance;
+          _cutoff = _set.last().distance;
       }
     }
     float[] point() {

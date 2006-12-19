@@ -182,7 +182,7 @@ class ParameterSetParser extends DefaultHandler {
       vtemp.add(sp.nextString());
     String[] values = new String[vtemp.size()];
     for (int i=0; i<values.length; ++i)
-      values[i] = (String)vtemp.get(i);
+      values[i] = vtemp.get(i);
     return values;
   }
 }

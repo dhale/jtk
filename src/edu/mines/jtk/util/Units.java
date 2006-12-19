@@ -80,7 +80,7 @@ public final class Units implements Cloneable {
   public Object clone() {
     try {
       Units units = (Units)super.clone();
-      units._power = (byte[])_power.clone();
+      units._power = _power.clone();
       return units;
     } catch (CloneNotSupportedException e) {
       throw new InternalError();
@@ -457,7 +457,7 @@ public final class Units implements Cloneable {
     if (name==null || name.equals("")) return new Units();
 
     // First, search the table.
-    UnitsTableEntry entry = (UnitsTableEntry)_table.get(name);
+    UnitsTableEntry entry = _table.get(name);
     if (entry!=null) {
       return (Units)entry._units.clone();
     }
@@ -469,7 +469,7 @@ public final class Units implements Cloneable {
     if (prefix) {
       factor = _prefix_factor[index];
       String temp = name.substring(_prefix_string[index].length());
-      entry = (UnitsTableEntry)_table.get(temp);
+      entry = _table.get(temp);
       if (entry!=null) {
 	Units units = (Units)entry._units.clone();
 	units.scale(factor);
@@ -481,7 +481,7 @@ public final class Units implements Cloneable {
     boolean suffix = (name.length()>0 && name.charAt(name.length()-1)=='s');
     if (suffix) {
       name = name.substring(0,name.length()-1);
-      entry = (UnitsTableEntry)_table.get(name);
+      entry = _table.get(name);
       if (entry!=null && entry._plural) {
 	Units units = (Units)entry._units.clone();
 	return units;
@@ -491,7 +491,7 @@ public final class Units implements Cloneable {
     // Fourth, if the name has both prefix and suffix.
     if (prefix && suffix) {
       name = name.substring(_prefix_string[index].length());
-      entry = (UnitsTableEntry)_table.get(name);
+      entry = _table.get(name);
       if (entry!=null && entry._plural) {
 	Units units = (Units)entry._units.clone();
 	units.scale(factor);

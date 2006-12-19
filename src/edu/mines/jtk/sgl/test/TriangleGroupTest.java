@@ -64,11 +64,11 @@ public class TriangleGroupTest {
     float dy = 10.0f/(float)ny;
     float[] xyz = new float[3*6*nx*ny];
     for (int ix=0,i=0; ix<nx; ++ix) {
-      float x0 = (float)(ix*dx);
-      float x1 = (float)((ix+1)*dx);
+      float x0 = ix*dx;
+      float x1 = (ix+1)*dx;
       for (int iy=0; iy<ny; ++iy) {
-        float y0 = (float)(iy*dy);
-        float y1 = (float)((iy+1)*dy);
+        float y0 = iy*dy;
+        float y1 = (iy+1)*dy;
         xyz[i++] = x0;  xyz[i++] = y0;  xyz[i++] = sin(x0,y0);
         xyz[i++] = x0;  xyz[i++] = y1;  xyz[i++] = sin(x0,y1);
         xyz[i++] = x1;  xyz[i++] = y0;  xyz[i++] = sin(x1,y0);
