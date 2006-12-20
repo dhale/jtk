@@ -101,10 +101,26 @@ public class TridiagonalFMatrix {
       u[j-1] -= _w[j]*u[j];
   }
 
+  /**
+   * Multiplies this matrix by the specified column vector.
+   * @param x input array containing the column vector.
+   * @return array containing the matrix-vector product.
+   */
   public float[] times(float[] x) {
     int n = x.length;
-    int nm1 = n-1;
     float[] y = new float[n];
+    times(x,y);
+    return y;
+  }
+
+  /**
+   * Multiplies this matrix by the specified column vector.
+   * @param x input array containing the column vector.
+   * @param y output array containing the matrix-vector product.
+   */
+  public void times(float[] x, float[] y) {
+    int n = x.length;
+    int nm1 = n-1;
     float xim1 = 0.0f;
     float xip1 = 0.0f;
     float xi = x[0];
@@ -120,7 +136,6 @@ public class TridiagonalFMatrix {
       xip1 = x[i+1];
       y[i] = _a[i]*xim1+_b[i]*xi+_c[i]*xip1;
     }
-    return y;
   }
 
   private int _n; // number of rows and columns
