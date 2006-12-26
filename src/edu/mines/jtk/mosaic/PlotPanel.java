@@ -142,6 +142,7 @@ public class PlotPanel extends IPanel {
    * of the most recently added pixels view. To avoid confusion, a color 
    * bar should perhaps not be added when this plot panel contains more 
    * than one pixels view.
+   * @return the color bar.
    */
   public ColorBar addColorBar() {
     return addColorBar(null);
@@ -150,6 +151,7 @@ public class PlotPanel extends IPanel {
   /**
    * Adds the color bar with specified label.
    * @param label the label; null, if none.
+   * @return the color bar.
    */
   public ColorBar addColorBar(String label) {
     _colorBarLabel = label;
@@ -243,7 +245,7 @@ public class PlotPanel extends IPanel {
       if (_title==null) {
         _title = new Title(title);
         Font font = getFont();
-        font = font.deriveFont(1.5f*font.getSize2D());
+        font.deriveFont(1.5f*font.getSize2D());
         _title.setFont(getFont());
         _title.setForeground(getForeground());
         _title.setBackground(getBackground());
@@ -278,6 +280,20 @@ public class PlotPanel extends IPanel {
    */
   public void removeTitle() {
     setTitle(null);
+  }
+
+  /**
+   * Sets limits for the both horizontal and vertical axes.
+   * By default, limits are computed automatically by tiled graphical views.
+   * This method can be used to override those default limits.
+   * @param hmin the minimum value.
+   * @param vmin the minimum value.
+   * @param hmax the maximum value.
+   * @param vmax the maximum value.
+   */
+  public void setLimits(double hmin, double vmin, double hmax, double vmax) {
+    setHLimits(hmin,hmax);
+    setVLimits(vmin,vmax);
   }
 
   /**
@@ -330,6 +346,15 @@ public class PlotPanel extends IPanel {
     } else {
       setBestVerticalProjector(irow,new Projector(vmin,vmax));
     }
+  }
+
+  /**
+   * Sets default limits for horizontal and vertical axes. This method may
+   * be used to restore default limits after they have been set explicitly.
+   */
+  public void setLimitsDefault() {
+    setHLimitsDefault();
+    setVLimitsDefault();
   }
 
   /**
@@ -556,6 +581,7 @@ public class PlotPanel extends IPanel {
    * Adds a points view of (x1,x2) with specified x2 coordinates.
    * The corresponding coordinates x1 are assumed to be 0, 1, 2, ....
    * @param x2 array of x2 coordinates.
+   * @return the points view.
    */
   public PointsView addPoints(float[] x2) {
     return addPoints(0,0,x2);
@@ -565,6 +591,7 @@ public class PlotPanel extends IPanel {
    * Adds a view of points (x1,x2) for a sampled function x2(x1).
    * @param s1 the sampling of x1 coordinates.
    * @param x2 array of x2 coordinates.
+   * @return the points view.
    */
   public PointsView addPoints(Sampling s1, float[] x2) {
     return addPoints(0,0,s1,x2);
@@ -589,6 +616,7 @@ public class PlotPanel extends IPanel {
    * @param irow the tile row index.
    * @param icol the tile column index.
    * @param x2 array of x2 coordinates.
+   * @return the points view.
    */
   public PointsView addPoints(int irow, int icol, float[] x2) {
     PointsView pv = new PointsView(x2);
@@ -601,6 +629,7 @@ public class PlotPanel extends IPanel {
    * @param icol the tile column index.
    * @param s1 the sampling of x1 coordinates.
    * @param x2 array of x2 coordinates.
+   * @return the points view.
    */
   public PointsView addPoints(int irow, int icol, Sampling s1, float[] x2) {
     PointsView pv = new PointsView(s1,x2);
@@ -611,6 +640,7 @@ public class PlotPanel extends IPanel {
    * Adds a sequence view with specified values f(x).
    * Uses default sampling of x = 0, 1, 2, ....
    * @param f array of sampled function values f(x).
+   * @return the sequence view.
    */
   public SequenceView addSequence(float[] f) {
     return addSequence(0,0,f);
@@ -620,6 +650,7 @@ public class PlotPanel extends IPanel {
    * Adds a sequence view with specified sampling and values f(x).
    * @param sx the sampling of the variable x.
    * @param f array of sampled function values f(x).
+   * @return the sequence view.
    */
   public SequenceView addSequence(Sampling sx, float[] f) {
     return addSequence(0,0,sx,f);
@@ -631,6 +662,7 @@ public class PlotPanel extends IPanel {
    * @param irow the tile row index.
    * @param icol the tile column index.
    * @param f array of sampled function values f(x).
+   * @return the sequence view.
    */
   public SequenceView addSequence(int irow, int icol, float[] f) {
     SequenceView sv = new SequenceView(f);
@@ -643,6 +675,7 @@ public class PlotPanel extends IPanel {
    * @param icol the tile column index.
    * @param sx the sampling of the variable x.
    * @param f array of sampled function values f(x).
+   * @return the sequence view.
    */
   public SequenceView addSequence(int irow, int icol, Sampling sx, float[] f) {
     SequenceView sv = new SequenceView(sx,f);
