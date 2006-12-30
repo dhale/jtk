@@ -200,9 +200,9 @@ public class MinimumPhaseFilter {
     // Lengths for zero-padded auto-correlation. We must pad with zeros
     // to reduce truncation of R/A' in Wilson-Burg iterations. Because 1/A'
     // has infinite length, we cannot completely eliminate this truncation 
-    // error. We assume that the length of 1/A' is no more than one hundred
-    // times that of A.
-    int n1 = r.length+100*m1;
+    // error. We assume that the length of 1/A' is no more than ten times
+    // that of A.
+    int n1 = r.length+10*m1;
 
     // Indices of zero lag before and after padding with zeros.
     int l1 = (r.length-1)/2;
@@ -287,10 +287,10 @@ public class MinimumPhaseFilter {
     // Dimensions for zero-padded auto-correlation. We must pad with zeros
     // to reduce truncation of R/A' in Wilson-Burg iterations. Because 1/A'
     // has infinite length, we cannot completely eliminate this truncation 
-    // error. We assume that the length of 1/A' is no more than one hundred
-    // times that of A.
-    int n1 = r[0].length+100*m1;
-    int n2 = r.length+100*m2;
+    // error. We assume that the length of 1/A' is no more than ten times
+    // that of A.
+    int n1 = r[0].length+10*m1;
+    int n2 = r.length+10*m2;
 
     // Indices of zero lag before and after padding with zeros.
     int l1 = (r[0].length-1)/2;
@@ -383,11 +383,11 @@ public class MinimumPhaseFilter {
     // Dimensions for zero-padded auto-correlation. We must pad with zeros
     // to reduce truncation of R/A' in Wilson-Burg iterations. Because 1/A'
     // has infinite length, we cannot completely eliminate this truncation 
-    // error. We assume that the length of 1/A' is no more than one hundred
-    // times that of A.
-    int n1 = r[0][0].length+100*m1;
-    int n2 = r[0].length+100*m2;
-    int n3 = r.length+100*m3;
+    // error. We assume that the length of 1/A' is no more than ten times
+    // that of A.
+    int n1 = r[0][0].length+10*m1;
+    int n2 = r[0].length+10*m2;
+    int n3 = r.length+10*m3;
 
     // Indices of zero lag before and after padding with zeros.
     int l1 = (r[0][0].length-1)/2;
@@ -1172,85 +1172,6 @@ public class MinimumPhaseFilter {
     }
   }
 
-
-  public static MinimumPhaseFilter factor(
-    int maxiter, float[][][] r, MinimumPhaseFilter mpf) 
-  {
-    int m = mpf._m;
-    int min1 = mpf._min1;
-    int min2 = mpf._min2;
-    int min3 = mpf._min3;
-    int max1 = mpf._max1;
-    int max2 = mpf._max2;
-    int max3 = mpf._max3;
-    int[] lag1 = mpf._lag1;
-    int[] lag2 = mpf._lag2;
-    int[] lag3 = mpf._lag3;
-    int m1 = max1-min1;
-    int m2 = max2-min2;
-    int m3 = max3-min3;
-    int n1 = r[0][0].length+2*m1;
-    int n2 = r[0].length+2*m2;
-    int n3 = r.length+2*m3;
-    int k1 = (n1-1)/2;
-    int k2 = (n2-1)/2;
-    int k3 = (n3-1)/2;
-    int l1 = (r[0][0].length-1)/2;
-    int l2 = (r[0].length-1)/2;
-    int l3 = (r.length-1)/2;
-    float[][][] s = new float[n3][n2][n1];
-    float[][][] t = new float[n3][n2][n1];
-    float[][][] u = new float[n3][n2][n1];
-    Array.copy(r[0][0].length,r[0].length,r.length,0,0,0,r,k1-l1,k2-l2,k3-l3,s);
-    float[] a = Array.zerofloat(m);
-    a[0] = sqrt(s[k3][k2][k1]);
-    mpf = new MinimumPhaseFilter(lag1,lag2,lag3,a);
-    a = mpf._a;
-    boolean converged = false;
-    for (int niter=0; niter<maxiter && !converged; ++niter) {
-      //Array.dump(a);
-      mpf.applyInverseTranspose(s,t);
-      mpf.applyInverse(t,u);
-      u[k3][k2][k1] += 1.0f;
-      u[k3][k2][k1] *= 0.5f;
-      for (int i3=0; i3<k3; ++i3)
-        for (int i2=0; i2<n2; ++i2)
-          for (int i1=0; i1<n1; ++i1)
-            u[i3][i2][i1] = 0.0f;
-      for (int i2=0; i2<k2; ++i2)
-        for (int i1=0; i1<n1; ++i1)
-          u[k3][i2][i1] = 0.0f;
-      for (int i1=0; i1<k1; ++i1)
-        u[k3][k2][i1] = 0.0f;
-      mpf.apply(u,t);
-      converged = true;
-      for (int j=0; j<m; ++j) {
-        int j1 = k1+lag1[j];
-        int j2 = k2+lag2[j];
-        int j3 = k3+lag3[j];
-        if (0<=j1 && j1<n1 && 
-            0<=j2 && j2<n2 && 
-            0<=j3 && j3<n3 &&
-            a[j]!=t[j3][j2][j1]) {
-          a[j] = t[j3][j2][j1];
-          converged = false;
-        }
-      }
-      mpf._a0 = a[0];
-      mpf._a0i = 1.0f/a[0];
-
-      // Debugging!
-      /*
-      Array.zero(t);
-      t[k3][k2][k1] = 1.0f;
-      mpf.apply(t,u);
-      mpf.applyTranspose(u,t);
-      Array.dump(t);
-      */
-    }
-    return mpf;
-  }
-
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -1269,182 +1190,4 @@ public class MinimumPhaseFilter {
     a[0] = 1.0f;
     return a;
   }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // Experimental Wilson-Burg factorization
-  // A better interface is to begin with an already construct MPF, and then
-  // provide a method to update that MPF for a specified auto-correlation.
-  // Also, the convergence criterion needs work; iterations may not end.
-  // The amount of zero-padding required in the work arrays s, t, and u
-  // is unknown. In any case, the auto-correlation should not be centered
-  // in these arrays, since we want to minimize end-effect errors in the
-  // cascade of inverse and inverseTranspose filters.
-  // For all these reasons, keep private for now.
-
-  /*
-  public static MinimumPhaseFilter factor(float[] r, int lag1[]) {
-    int nlag = lag1.length;
-    int min1 = Array.min(lag1);
-    int max1 = Array.max(lag1);
-    int m1 = max1-min1;
-    int n1 = r.length+20*m1;
-    int k1 = (n1-1)/2;
-    int l1 = (r.length-1)/2;
-    float[] s = new float[n1];
-    float[] t = new float[n1];
-    float[] u = new float[n1];
-    Array.copy(r.length,0,r,k1-l1,s);
-    float[] a = Array.zerofloat(nlag);
-    a[0] = sqrt(s[k1]);
-    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,a);
-    boolean converged = false;
-    while (!converged) {
-      //Array.dump(a);
-      mpf.applyInverseTranspose(s,t);
-      mpf.applyInverse(t,u);
-      u[k1] += 1.0f;
-      for (int i1=0; i1<k1; ++i1)
-        u[i1] = 0.0f;
-      u[k1] *= 0.5f;
-      mpf.apply(u,t);
-      int m = a.length;
-      converged = true;
-      for (int j=0; j<m; ++j) {
-        int j1 = k1+lag1[j];
-        if (0<=j1 && j1<n1 && a[j]!=t[j1]) {
-          a[j] = t[j1];
-          converged = false;
-        }
-      }
-      mpf = new MinimumPhaseFilter(lag1,a);
-    }
-    return mpf;
-  }
-
-  private static MinimumPhaseFilter factor(
-    float[][] r, int lag1[], int[] lag2) 
-  {
-    int nlag = lag1.length;
-    int min1 = Array.min(lag1);
-    int max1 = Array.max(lag1);
-    int min2 = Array.min(lag2);
-    int max2 = Array.max(lag2);
-    int m1 = max1-min1;
-    int m2 = max2-min2;
-    int n1 = r[0].length+4*m1;
-    int n2 = r.length+4*m2;
-    int k1 = (n1-1)/2;
-    int k2 = (n2-1)/2;
-    int l1 = (r[0].length-1)/2;
-    int l2 = (r.length-1)/2;
-    float[][] s = new float[n2][n1];
-    float[][] t = new float[n2][n1];
-    float[][] u = new float[n2][n1];
-    Array.copy(r[0].length,r.length,0,0,r,k1-l1,k2-l2,s);
-    float[] a = Array.zerofloat(nlag);
-    a[0] = sqrt(s[k2][k1]);
-    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2,a);
-    boolean converged = false;
-    while (!converged) {
-      Array.dump(a);
-      mpf.applyInverseTranspose(s,t);
-      mpf.applyInverse(t,u);
-      u[k2][k1] += 1.0f;
-      u[k2][k1] *= 0.5f;
-      for (int i2=0; i2<k2; ++i2)
-        for (int i1=0; i1<n1; ++i1)
-          u[i2][i1] = 0.0f;
-      for (int i1=0; i1<k1; ++i1)
-        u[k2][i1] = 0.0f;
-      mpf.apply(u,t);
-      int m = a.length;
-      converged = true;
-      for (int j=0; j<m; ++j) {
-        int j1 = k1+lag1[j];
-        int j2 = k2+lag2[j];
-        if (0<=j1 && j1<n1 && 0<=j2 && j2<n2 && a[j]!=t[j2][j1]) {
-          a[j] = t[j2][j1];
-          converged = false;
-        }
-      }
-      mpf = new MinimumPhaseFilter(lag1,lag2,a);
-      Array.zero(t);
-      t[k2][k1] = 1.0f;
-      mpf.apply(t,u);
-      mpf.applyTranspose(u,t);
-      Array.dump(t);
-    }
-    return mpf;
-  }
-
-  private static MinimumPhaseFilter factor(
-    float[][][] r, int lag1[], int[] lag2, int[] lag3) 
-  {
-    int nlag = lag1.length;
-    int min1 = Array.min(lag1);
-    int max1 = Array.max(lag1);
-    int min2 = Array.min(lag2);
-    int max2 = Array.max(lag2);
-    int min3 = Array.min(lag3);
-    int max3 = Array.max(lag3);
-    int m1 = max1-min1;
-    int m2 = max2-min2;
-    int m3 = max3-min3;
-    int n1 = r[0][0].length+2*m1;
-    int n2 = r[0].length+2*m2;
-    int n3 = r.length+2*m3;
-    int k1 = (n1-1)/2;
-    int k2 = (n2-1)/2;
-    int k3 = (n3-1)/2;
-    int l1 = (r[0][0].length-1)/2;
-    int l2 = (r[0].length-1)/2;
-    int l3 = (r.length-1)/2;
-    float[][][] s = new float[n3][n2][n1];
-    float[][][] t = new float[n3][n2][n1];
-    float[][][] u = new float[n3][n2][n1];
-    Array.copy(r[0][0].length,r[0].length,r.length,0,0,0,r,k1-l1,k2-l2,k3-l3,s);
-    float[] a = Array.zerofloat(nlag);
-    a[0] = sqrt(s[k3][k2][k1]);
-    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2,lag3,a);
-    boolean converged = false;
-    while (!converged) {
-      Array.dump(a);
-      mpf.applyInverseTranspose(s,t);
-      mpf.applyInverse(t,u);
-      u[k3][k2][k1] += 1.0f;
-      u[k3][k2][k1] *= 0.5f;
-      for (int i3=0; i3<k3; ++i3)
-        for (int i2=0; i2<n2; ++i2)
-          for (int i1=0; i1<n1; ++i1)
-            u[i3][i2][i1] = 0.0f;
-      for (int i2=0; i2<k2; ++i2)
-        for (int i1=0; i1<n1; ++i1)
-          u[k3][i2][i1] = 0.0f;
-      for (int i1=0; i1<k1; ++i1)
-        u[k3][k2][i1] = 0.0f;
-      mpf.apply(u,t);
-      int m = a.length;
-      converged = true;
-      for (int j=0; j<m; ++j) {
-        int j1 = k1+lag1[j];
-        int j2 = k2+lag2[j];
-        int j3 = k3+lag3[j];
-        if (0<=j1 && j1<n1 && 
-            0<=j2 && j2<n2 && 
-            0<=j3 && j3<n3 &&
-            a[j]!=t[j3][j2][j1]) {
-          a[j] = t[j3][j2][j1];
-          converged = false;
-        }
-      }
-      mpf = new MinimumPhaseFilter(lag1,lag2,lag3,a);
-      Array.zero(t);
-      t[k3][k2][k1] = 1.0f;
-      mpf.apply(t,u);
-      mpf.applyTranspose(u,t);
-      Array.dump(t);
-    }
-    return mpf;
-  }
-  */
 }

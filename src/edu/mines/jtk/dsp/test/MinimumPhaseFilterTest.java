@@ -179,7 +179,7 @@ public class MinimumPhaseFilterTest extends TestCase {
     assertEquals( 1.0f,a[3],10*FLT_EPSILON);
   }
 
-  public void xtestFactorLaplacian2() {
+  public void testFactorLaplacian2() {
     float[][] r = {
       { 0.000f,-0.999f, 0.000f},
       {-0.999f, 4.000f,-0.999f},
@@ -195,6 +195,74 @@ public class MinimumPhaseFilterTest extends TestCase {
     };
     MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2);
     mpf.factorWilsonBurg(100,FLT_EPSILON,r);
+    float[][] s = new float[3][3];
+    float[][] t = new float[3][3];
+    s[1][1] = 1.0f;
+    mpf.apply(s,t);
+    mpf.applyTranspose(t,s);
+    float emax = 0.01f*r[1][1];
+    for (int i2=0; i2<3; ++i2) {
+      for (int i1=0; i1<3; ++i1) {
+        assertEquals(r[i2][i1],s[i2][i1],emax);
+      }
+    }
+    //System.out.println("2-D Laplacian:");
+    //Array.dump(r);
+    //Array.dump(s);
+  }
+
+  public void testFactorLaplacian3() {
+    float[][][] r = {
+      {
+        { 0.000f, 0.000f, 0.000f},
+        { 0.000f,-0.999f, 0.000f},
+        { 0.000f, 0.000f, 0.000f}
+      },{
+        { 0.000f,-0.999f, 0.000f},
+        {-0.999f, 6.000f,-0.999f},
+        { 0.000f,-0.999f, 0.000f}
+      },{
+        { 0.000f, 0.000f, 0.000f},
+        { 0.000f,-0.999f, 0.000f},
+        { 0.000f, 0.000f, 0.000f}
+      }
+    };
+    int[] lag1 = {
+                   0, 1, 2,
+            -2,-1, 0, 1, 2,
+            -2,-1, 0, 1, 2,
+            -2,-1, 0,
+    };
+    int[] lag2 = {
+                   0, 0, 0,      
+             1, 1, 1, 1, 1,      
+            -1,-1,-1,-1,-1,      
+             0, 0, 0,
+    };
+    int[] lag3 = {
+                   0, 0, 0,      
+             0, 0, 0, 0, 0,      
+             1, 1, 1, 1, 1,      
+             1, 1, 1,
+    };
+    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2,lag3);
+    mpf.factorWilsonBurg(100,FLT_EPSILON,r);
+    float[][][] s = new float[3][3][3];
+    float[][][] t = new float[3][3][3];
+    s[1][1][1] = 1.0f;
+    mpf.apply(s,t);
+    mpf.applyTranspose(t,s);
+    float emax = 0.01f*r[1][1][1];
+    for (int i3=0; i3<3; ++i3) {
+      for (int i2=0; i2<3; ++i2) {
+        for (int i1=0; i1<3; ++i1) {
+          assertEquals(r[i3][i2][i1],s[i3][i2][i1],emax);
+        }
+      }
+    }
+    //System.out.println("3-D Laplacian:");
+    //Array.dump(r);
+    //Array.dump(s);
   }
 
   public void xtestFactorPlane2Filter() {
@@ -263,44 +331,6 @@ public class MinimumPhaseFilterTest extends TestCase {
       Array.dump(s);
       Array.dump(t);
     }
-  }
-
-  public void xtestFactorLaplacian3() {
-    float[][][] r = {
-      {
-        { 0.000f, 0.000f, 0.000f},
-        { 0.000f,-0.999f, 0.000f},
-        { 0.000f, 0.000f, 0.000f}
-      },{
-        { 0.000f,-0.999f, 0.000f},
-        {-0.999f, 6.000f,-0.999f},
-        { 0.000f,-0.999f, 0.000f}
-      },{
-        { 0.000f, 0.000f, 0.000f},
-        { 0.000f,-0.999f, 0.000f},
-        { 0.000f, 0.000f, 0.000f}
-      }
-    };
-    int[] lag1 = {
-                   0, 1, 2,
-            -2,-1, 0, 1, 2,
-            -2,-1, 0, 1, 2,
-            -2,-1, 0,
-    };
-    int[] lag2 = {
-                   0, 0, 0,      
-             1, 1, 1, 1, 1,      
-            -1,-1,-1,-1,-1,      
-             0, 0, 0,
-    };
-    int[] lag3 = {
-                   0, 0, 0,      
-             0, 0, 0, 0, 0,      
-             1, 1, 1, 1, 1,      
-             1, 1, 1,
-    };
-    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2,lag3);
-    mpf = MinimumPhaseFilter.factor(100,r,mpf);
   }
 
   /*
