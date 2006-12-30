@@ -29,6 +29,47 @@ import edu.mines.jtk.util.Check;
 public class MinimumPhaseFilter {
 
   /**
+   * Constructs a unit-impulse filter for specified lag1.
+   * By default, all lag2 and lag3 are assumed to be zero.
+   * <p>
+   * For j=0 only, lag1[j] is zero.
+   * All lag1[j] must be non-negative.
+   * @param lag1 array of lags.
+   */
+  public MinimumPhaseFilter(int[] lag1) {
+    this(lag1,impulse(lag1.length));
+  }
+
+  /**
+   * Constructs a unit-impulse filter for specified lag1 and lag2.
+   * By default, all lag3 are assumed to be zero.
+   * <p>
+   * For j=0 only, lag1[j] and lag2[j] are zero.
+   * All lag2[j] must be non-negative.
+   * If lag2[j] is zero, then lag1[j] must be non-negative.
+   * @param lag1 array of lags in 1st dimension.
+   * @param lag2 array of lags in 2nd dimension.
+   */
+  public MinimumPhaseFilter(int[] lag1, int[] lag2) {
+    this(lag1,lag2,impulse(lag1.length));
+  }
+
+  /**
+   * Constructs a unit-impulse filter for specified lag1, lag2, and lag3.
+   * <p>
+   * For j=0 only, lag1[j] and lag2[j] and lag3[j] are zero.
+   * All lag3[j] must be non-negative.
+   * If lag3[j] is zero, then lag2[j] must be non-negative.
+   * If lag3[j] and lag2[j] are zero, then lag1[j] must be non-negative.
+   * @param lag1 array of lags in 1st dimension.
+   * @param lag2 array of lags in 2nd dimension.
+   * @param lag3 array of lags in 3rd dimension.
+   */
+  public MinimumPhaseFilter(int[] lag1, int[] lag2, int[] lag3) {
+    this(lag1,lag2,lag3,impulse(lag1.length));
+  }
+
+  /**
    * Constructs a minimum-phase filter for specified lag1.
    * By default, all lag2 and lag3 are assumed to be zero.
    * <p>
@@ -126,12 +167,296 @@ public class MinimumPhaseFilter {
     _lag3 = Array.copy(lag3);
     _min1 = Array.min(lag1);
     _min2 = Array.min(lag2);
+    _min3 = Array.min(lag3);
     _max1 = Array.max(lag1);
     _max2 = Array.max(lag2);
     _max3 = Array.max(lag3);
     _a = Array.copy(a);
     _a0 = a[0];
     _a0i = 1.0f/a[0];
+  }
+
+  /**
+   * Wilson-Burg factorization for the specified 1-D auto-correlation.
+   * Modifies this filter using the iterative Wilson-Burg algorithm. If this 
+   * algorithm converges, the impulse response of this filter cascaded with 
+   * its transpose approximates the specified auto-correlation.
+   * @param maxiter maximum number of Wilson-Burg iterations.
+   * @param epsilon tolerance for convergence. Iterations have converged
+   *  when the change in all filter coefficients is less than this factor 
+   *  times the square root of the zero-lag of the auto correlation.
+   * @param r the auto-correlation. This 1-D array must have odd length.
+   *  The middle array element is the zero-lag of the auto-correlation,
+   *  and other elements are symmetric about the middle element.
+   * @exception IllegalStateException if Wilson-Burg iterations do not
+   *  converge within the specified maximum number of iterations.
+   */
+  public void factorWilsonBurg(int maxiter, float epsilon, float[] r) {
+    Check.argument(r.length%2==1,"r.length is odd");
+
+    // Maximum length of this filter's impulse response A.
+    int m1 = _max1-_min1;
+
+    // Lengths for zero-padded auto-correlation. We must pad with zeros
+    // to reduce truncation of R/A' in Wilson-Burg iterations. Because 1/A'
+    // has infinite length, we cannot completely eliminate this truncation 
+    // error. We assume that the length of 1/A' is no more than one hundred
+    // times that of A.
+    int n1 = r.length+100*m1;
+
+    // Indices of zero lag before and after padding with zeros.
+    int l1 = (r.length-1)/2;
+    int k1 = n1-1-_max1;
+
+    // Workspace.
+    float[] s = new float[n1];
+    float[] t = new float[n1];
+    float[] u = new float[n1];
+
+    // S is R padded with zeros to reduce truncation of R/(AA').
+    Array.copy(r.length,0,r,k1-l1,s);
+
+    // Initial factor is minimum-phase and matches lag zero of R.
+    Array.zero(_a);
+    _a[0] = sqrt(s[k1]);
+    _a0 = _a[0];
+    _a0i = 1.0f/_a[0];
+
+    // Loop for maximum iterations or until converged.
+    int niter;
+    boolean converged = false;
+    float eemax = s[k1]*epsilon;
+    for (niter=0; niter<maxiter && !converged; ++niter) {
+      //Array.dump(_a); // for debugging only
+
+      // U(z) + U(1/z) = 1 + S(z)/(A(z)*A(1/z))
+      this.applyInverseTranspose(s,t);
+      this.applyInverse(t,u);
+      u[k1] += 1.0f;
+
+      // U(z) is the causal part we want; zero the anti-causal part.
+      u[k1] *= 0.5f;
+      for (int i1=0; i1<k1; ++i1)
+        u[i1] = 0.0f;
+
+      // The new A(z) is T(z)  = U(z)*A(z)
+      this.apply(u,t);
+      converged = true;
+      for (int j=0; j<_m; ++j) {
+        int j1 = k1+_lag1[j];
+        if (0<=j1 && j1<n1) {
+          float aj = t[j1];
+          if (converged) {
+            float e = _a[j]-aj;
+            converged = e*e<=eemax;
+          }
+          _a[j] = aj;
+        }
+      }
+      _a0 = _a[0];
+      _a0i = 1.0f/_a[0];
+    }
+
+    if (!converged)
+      throw new IllegalStateException("Wilson-Burg iterations failed");
+  }
+
+  /**
+   * Wilson-Burg factorization for the specified 2-D auto-correlation.
+   * Modifies this filter using the iterative Wilson-Burg algorithm. If this 
+   * algorithm converges, the impulse response of this filter cascaded with 
+   * its transpose approximates the specified auto-correlation.
+   * @param maxiter maximum number of Wilson-Burg iterations.
+   * @param epsilon tolerance for convergence. Iterations have converged
+   *  when the change in all filter coefficients is less than this factor 
+   *  times the square root of the zero-lag of the auto correlation.
+   * @param r the auto-correlation. This 2-D array must have odd lengths.
+   *  The middle array element is the zero-lag of the auto-correlation,
+   *  and other elements are symmetric about the middle element.
+   * @exception IllegalStateException if Wilson-Burg iterations do not
+   *  converge within the specified maximum number of iterations.
+   */
+  public void factorWilsonBurg(int maxiter, float epsilon, float[][] r) {
+    Check.argument(r[0].length%2==1,"r[0].length is odd");
+    Check.argument(r.length%2==1,"r.length is odd");
+
+    // Maximum dimensions of this filter's impulse response A.
+    int m1 = _max1-_min1;
+    int m2 = _max2-_min2;
+
+    // Dimensions for zero-padded auto-correlation. We must pad with zeros
+    // to reduce truncation of R/A' in Wilson-Burg iterations. Because 1/A'
+    // has infinite length, we cannot completely eliminate this truncation 
+    // error. We assume that the length of 1/A' is no more than one hundred
+    // times that of A.
+    int n1 = r[0].length+100*m1;
+    int n2 = r.length+100*m2;
+
+    // Indices of zero lag before and after padding with zeros.
+    int l1 = (r[0].length-1)/2;
+    int l2 = (r.length-1)/2;
+    int k1 = n1-1-_max1;
+    int k2 = n2-1-_max2;
+
+    // Workspace.
+    float[][] s = new float[n2][n1];
+    float[][] t = new float[n2][n1];
+    float[][] u = new float[n2][n1];
+
+    // S is R padded with zeros to reduce truncation of R/(AA').
+    Array.copy(r[0].length,r.length,0,0,r,k1-l1,k2-l2,s);
+
+    // Initial factor is minimum-phase and matches lag zero of R.
+    Array.zero(_a);
+    _a[0] = sqrt(s[k2][k1]);
+    _a0 = _a[0];
+    _a0i = 1.0f/_a[0];
+
+    // Loop for maximum iterations or until converged.
+    int niter;
+    boolean converged = false;
+    float eemax = s[k2][k1]*epsilon;
+    for (niter=0; niter<maxiter && !converged; ++niter) {
+      //Array.dump(_a); // for debugging only
+
+      // U(z) + U(1/z) = 1 + S(z)/(A(z)*A(1/z))
+      this.applyInverseTranspose(s,t);
+      this.applyInverse(t,u);
+      u[k2][k1] += 1.0f;
+
+      // U(z) is the causal part we want; zero the anti-causal part.
+      u[k2][k1] *= 0.5f;
+      for (int i2=0; i2<k2; ++i2)
+        for (int i1=0; i1<n1; ++i1)
+          u[i2][i1] = 0.0f;
+      for (int i1=0; i1<k1; ++i1)
+        u[k2][i1] = 0.0f;
+
+      // The new A(z) is T(z)  = U(z)*A(z)
+      this.apply(u,t);
+      converged = true;
+      for (int j=0; j<_m; ++j) {
+        int j1 = k1+_lag1[j];
+        int j2 = k2+_lag2[j];
+        if (0<=j1 && j1<n1 && 0<=j2 && j2<n2) {
+          float aj = t[j2][j1];
+          if (converged) {
+            float e = _a[j]-aj;
+            converged = e*e<=eemax;
+          }
+          _a[j] = aj;
+        }
+      }
+      _a0 = _a[0];
+      _a0i = 1.0f/_a[0];
+    }
+
+    if (!converged)
+      throw new IllegalStateException("Wilson-Burg iterations failed");
+  }
+
+  /**
+   * Wilson-Burg factorization for the specified 3-D auto-correlation.
+   * Modifies this filter using the iterative Wilson-Burg algorithm. If this 
+   * algorithm converges, the impulse response of this filter cascaded with 
+   * its transpose approximates the specified auto-correlation.
+   * @param maxiter maximum number of Wilson-Burg iterations.
+   * @param epsilon tolerance for convergence. Iterations have converged
+   *  when the change in all filter coefficients is less than this factor 
+   *  times the square root of the zero-lag of the auto correlation.
+   * @param r the auto-correlation. This 3-D array must have odd lengths.
+   *  The middle array element is the zero-lag of the auto-correlation,
+   *  and other elements are symmetric about the middle element.
+   * @exception IllegalStateException if Wilson-Burg iterations do not
+   *  converge within the specified maximum number of iterations.
+   */
+  public void factorWilsonBurg(int maxiter, float epsilon, float[][][] r) {
+    Check.argument(r[0][0].length%2==1,"r[0][0].length is odd");
+    Check.argument(r[0].length%2==1,"r[0].length is odd");
+    Check.argument(r.length%2==1,"r.length is odd");
+
+    // Maximum dimensions of this filter's impulse response A.
+    int m1 = _max1-_min1;
+    int m2 = _max2-_min2;
+    int m3 = _max3-_min3;
+
+    // Dimensions for zero-padded auto-correlation. We must pad with zeros
+    // to reduce truncation of R/A' in Wilson-Burg iterations. Because 1/A'
+    // has infinite length, we cannot completely eliminate this truncation 
+    // error. We assume that the length of 1/A' is no more than one hundred
+    // times that of A.
+    int n1 = r[0][0].length+100*m1;
+    int n2 = r[0].length+100*m2;
+    int n3 = r.length+100*m3;
+
+    // Indices of zero lag before and after padding with zeros.
+    int l1 = (r[0][0].length-1)/2;
+    int l2 = (r[0].length-1)/2;
+    int l3 = (r.length-1)/2;
+    int k1 = n1-1-_max1;
+    int k2 = n2-1-_max2;
+    int k3 = n3-1-_max3;
+
+    // Workspace.
+    float[][][] s = new float[n3][n2][n1];
+    float[][][] t = new float[n3][n2][n1];
+    float[][][] u = new float[n3][n2][n1];
+
+    // S is R padded with zeros to reduce truncation of R/(AA').
+    Array.copy(r[0][0].length,r[0].length,r.length,0,0,0,r,k1-l1,k2-l2,k3-l3,s);
+
+    // Initial factor is minimum-phase and matches lag zero of R.
+    Array.zero(_a);
+    _a[0] = sqrt(s[k3][k2][k1]);
+    _a0 = _a[0];
+    _a0i = 1.0f/_a[0];
+
+    // Loop for maximum iterations or until converged.
+    int niter;
+    boolean converged = false;
+    float eemax = s[k3][k2][k1]*epsilon;
+    for (niter=0; niter<maxiter && !converged; ++niter) {
+      //Array.dump(_a); // for debugging only
+
+      // U(z) + U(1/z) = 1 + S(z)/(A(z)*A(1/z))
+      this.applyInverseTranspose(s,t);
+      this.applyInverse(t,u);
+      u[k3][k2][k1] += 1.0f;
+
+      // U(z) is the causal part we want; zero the anti-causal part.
+      u[k3][k2][k1] *= 0.5f;
+      for (int i3=0; i3<k3; ++i3)
+        for (int i2=0; i2<n2; ++i2)
+          for (int i1=0; i1<n1; ++i1)
+            u[i3][i2][i1] = 0.0f;
+      for (int i2=0; i2<k2; ++i2)
+        for (int i1=0; i1<n1; ++i1)
+          u[k3][i2][i1] = 0.0f;
+      for (int i1=0; i1<k1; ++i1)
+        u[k3][k2][i1] = 0.0f;
+
+      // The new A(z) is T(z)  = U(z)*A(z)
+      this.apply(u,t);
+      converged = true;
+      for (int j=0; j<_m; ++j) {
+        int j1 = k1+_lag1[j];
+        int j2 = k2+_lag2[j];
+        int j3 = k3+_lag3[j];
+        if (0<=j1 && j1<n1 && 0<=j2 && j2<n2 && 0<=j3 && j3<n3) {
+          float aj = t[j3][j2][j1];
+          if (converged) {
+            float e = _a[j]-aj;
+            converged = e*e<=eemax;
+          }
+          _a[j] = aj;
+        }
+      }
+      _a0 = _a[0];
+      _a0i = 1.0f/_a[0];
+    }
+
+    if (!converged)
+      throw new IllegalStateException("Wilson-Burg iterations failed");
   }
 
   /**
@@ -317,7 +642,6 @@ public class MinimumPhaseFilter {
    * @param y output array.
    */
   public void applyTranspose(float[] x, float[] y) {
-    Check.state(_lag1!=null,"lag1 has been specified");
     int n1 = y.length;
     int i1hi = max(n1-_max1,0);
     for (int i1=n1-1; i1>=i1hi; --i1) {
@@ -346,8 +670,6 @@ public class MinimumPhaseFilter {
    * @param y output array.
    */
   public void applyTranspose(float[][] x, float[][] y) {
-    Check.state(_lag1!=null,"lag1 has been specified");
-    Check.state(_lag2!=null,"lag2 has been specified");
     int n1 = y[0].length;
     int n2 = y.length;
     int i1lo = max(0,-_min1);
@@ -405,9 +727,6 @@ public class MinimumPhaseFilter {
    * @param y output array.
    */
   public void applyTranspose(float[][][] x, float[][][] y) {
-    Check.state(_lag1!=null,"lag1 has been specified");
-    Check.state(_lag2!=null,"lag2 has been specified");
-    Check.state(_lag3!=null,"lag3 has been specified");
     int n1 = y[0][0].length;
     int n2 = y[0].length;
     int n3 = y.length;
@@ -502,7 +821,6 @@ public class MinimumPhaseFilter {
    * @param y output array.
    */
   public void applyInverse(float[] x, float[] y) {
-    Check.state(_lag1!=null,"lag1 has been specified");
     int n1 = y.length;
     int i1lo = min(_max1,n1);
     for (int i1=0; i1<i1lo; ++i1) {
@@ -531,8 +849,6 @@ public class MinimumPhaseFilter {
    * @param y output array.
    */
   public void applyInverse(float[][] x, float[][] y) {
-    Check.state(_lag1!=null,"lag1 has been specified");
-    Check.state(_lag2!=null,"lag2 has been specified");
     int n1 = y[0].length;
     int n2 = y.length;
     int i1lo = max(0,_max1);
@@ -590,9 +906,6 @@ public class MinimumPhaseFilter {
    * @param y output array.
    */
   public void applyInverse(float[][][] x, float[][][] y) {
-    Check.state(_lag1!=null,"lag1 has been specified");
-    Check.state(_lag2!=null,"lag2 has been specified");
-    Check.state(_lag3!=null,"lag3 has been specified");
     int n1 = y[0][0].length;
     int n2 = y[0].length;
     int n3 = y.length;
@@ -687,7 +1000,6 @@ public class MinimumPhaseFilter {
    * @param y output array.
    */
   public void applyInverseTranspose(float[] x, float[] y) {
-    Check.state(_lag1!=null,"lag1 has been specified");
     int n1 = y.length;
     int i1hi = max(n1-_max1,0);
     for (int i1=n1-1; i1>=i1hi; --i1) {
@@ -716,8 +1028,6 @@ public class MinimumPhaseFilter {
    * @param y output array.
    */
   public void applyInverseTranspose(float[][] x, float[][] y) {
-    Check.state(_lag1!=null,"lag1 has been specified");
-    Check.state(_lag2!=null,"lag2 has been specified");
     int n1 = y[0].length;
     int n2 = y.length;
     int i1lo = max(0,-_min1);
@@ -775,9 +1085,6 @@ public class MinimumPhaseFilter {
    * @param y output array.
    */
   public void applyInverseTranspose(float[][][] x, float[][][] y) {
-    Check.state(_lag1!=null,"lag1 has been specified");
-    Check.state(_lag2!=null,"lag2 has been specified");
-    Check.state(_lag3!=null,"lag3 has been specified");
     int n1 = y[0][0].length;
     int n2 = y[0].length;
     int n3 = y.length;
@@ -865,18 +1172,103 @@ public class MinimumPhaseFilter {
     }
   }
 
+
+  public static MinimumPhaseFilter factor(
+    int maxiter, float[][][] r, MinimumPhaseFilter mpf) 
+  {
+    int m = mpf._m;
+    int min1 = mpf._min1;
+    int min2 = mpf._min2;
+    int min3 = mpf._min3;
+    int max1 = mpf._max1;
+    int max2 = mpf._max2;
+    int max3 = mpf._max3;
+    int[] lag1 = mpf._lag1;
+    int[] lag2 = mpf._lag2;
+    int[] lag3 = mpf._lag3;
+    int m1 = max1-min1;
+    int m2 = max2-min2;
+    int m3 = max3-min3;
+    int n1 = r[0][0].length+2*m1;
+    int n2 = r[0].length+2*m2;
+    int n3 = r.length+2*m3;
+    int k1 = (n1-1)/2;
+    int k2 = (n2-1)/2;
+    int k3 = (n3-1)/2;
+    int l1 = (r[0][0].length-1)/2;
+    int l2 = (r[0].length-1)/2;
+    int l3 = (r.length-1)/2;
+    float[][][] s = new float[n3][n2][n1];
+    float[][][] t = new float[n3][n2][n1];
+    float[][][] u = new float[n3][n2][n1];
+    Array.copy(r[0][0].length,r[0].length,r.length,0,0,0,r,k1-l1,k2-l2,k3-l3,s);
+    float[] a = Array.zerofloat(m);
+    a[0] = sqrt(s[k3][k2][k1]);
+    mpf = new MinimumPhaseFilter(lag1,lag2,lag3,a);
+    a = mpf._a;
+    boolean converged = false;
+    for (int niter=0; niter<maxiter && !converged; ++niter) {
+      //Array.dump(a);
+      mpf.applyInverseTranspose(s,t);
+      mpf.applyInverse(t,u);
+      u[k3][k2][k1] += 1.0f;
+      u[k3][k2][k1] *= 0.5f;
+      for (int i3=0; i3<k3; ++i3)
+        for (int i2=0; i2<n2; ++i2)
+          for (int i1=0; i1<n1; ++i1)
+            u[i3][i2][i1] = 0.0f;
+      for (int i2=0; i2<k2; ++i2)
+        for (int i1=0; i1<n1; ++i1)
+          u[k3][i2][i1] = 0.0f;
+      for (int i1=0; i1<k1; ++i1)
+        u[k3][k2][i1] = 0.0f;
+      mpf.apply(u,t);
+      converged = true;
+      for (int j=0; j<m; ++j) {
+        int j1 = k1+lag1[j];
+        int j2 = k2+lag2[j];
+        int j3 = k3+lag3[j];
+        if (0<=j1 && j1<n1 && 
+            0<=j2 && j2<n2 && 
+            0<=j3 && j3<n3 &&
+            a[j]!=t[j3][j2][j1]) {
+          a[j] = t[j3][j2][j1];
+          converged = false;
+        }
+      }
+      mpf._a0 = a[0];
+      mpf._a0i = 1.0f/a[0];
+
+      // Debugging!
+      /*
+      Array.zero(t);
+      t[k3][k2][k1] = 1.0f;
+      mpf.apply(t,u);
+      mpf.applyTranspose(u,t);
+      Array.dump(t);
+      */
+    }
+    return mpf;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
   private int _m;
   private int _min1,_max1;
   private int _min2,_max2;
-  private int       _max3;
+  private int _min3,_max3;
   private int[] _lag1;
   private int[] _lag2;
   private int[] _lag3;
   private float[] _a;
   private float _a0,_a0i;
+
+  private static float[] impulse(int nlag) {
+    float[] a = new float[nlag];
+    a[0] = 1.0f;
+    return a;
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   // Experimental Wilson-Burg factorization
@@ -890,7 +1282,7 @@ public class MinimumPhaseFilter {
   // For all these reasons, keep private for now.
 
   /*
-  private static MinimumPhaseFilter factor(float[] r, int lag1[]) {
+  public static MinimumPhaseFilter factor(float[] r, int lag1[]) {
     int nlag = lag1.length;
     int min1 = Array.min(lag1);
     int max1 = Array.max(lag1);

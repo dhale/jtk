@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp.test;
 
-import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
+import static edu.mines.jtk.util.MathPlus.*;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
@@ -162,12 +162,12 @@ public class MinimumPhaseFilterTest extends TestCase {
     assertEquals(d1,d2,tiny);
   }
 
-  /*
   public void testFactorFomelExample() {
     float[] r = {24.0f,242.0f,867.0f,1334.0f,867.0f,242.0f,24.0f};
     int n = r.length;
     int[] lag1 = {0,1,2,3};
-    MinimumPhaseFilter mpf = MinimumPhaseFilter.factor(r,lag1);
+    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1);
+    mpf.factorWilsonBurg(10,0.0f,r);
     int nlag = lag1.length;
     float[] x = new float[nlag];
     float[] a = new float[nlag];
@@ -178,16 +178,13 @@ public class MinimumPhaseFilterTest extends TestCase {
     assertEquals( 9.0f,a[2],10*FLT_EPSILON);
     assertEquals( 1.0f,a[3],10*FLT_EPSILON);
   }
-  */
 
-  /*
   public void xtestFactorLaplacian2() {
     float[][] r = {
       { 0.000f,-0.999f, 0.000f},
       {-0.999f, 4.000f,-0.999f},
       { 0.000f,-0.999f, 0.000f}
     };
-    int n = r.length;
     int[] lag1 = {
                    0, 1, 2, 3, 4,
       -4,-3,-2,-1, 0
@@ -196,11 +193,78 @@ public class MinimumPhaseFilterTest extends TestCase {
                    0, 0, 0, 0, 0,
        1, 1, 1, 1, 1
     };
-    MinimumPhaseFilter.factor(r,lag1,lag2);
+    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2);
+    mpf.factorWilsonBurg(100,FLT_EPSILON,r);
   }
-  */
 
-  /*
+  public void xtestFactorPlane2Filter() {
+    int[] lag1 = {
+             0, 1, 2,
+      -2,-1, 0, 1
+    };
+    int[] lag2 = {
+             0, 0, 0,
+       1, 1, 1, 1
+    };
+    /*
+    int[] lag1 = {
+                0, 1, 2, 3,
+      -3,-2,-1, 0, 1
+    };
+    int[] lag2 = {
+                0, 0, 0, 0,
+       1, 1, 1, 1, 1
+    };
+    int[] lag1 = {
+             0, 1,
+         -1, 0, 1
+    };
+    int[] lag2 = {
+             0, 0,
+          1, 1, 1
+    };
+    */
+    int maxiter = 100;
+    float epsilon = FLT_EPSILON;
+    float[][] r = new float[3][3];
+    float[][] s = new float[5][5];
+    float[][] t = new float[5][5];
+    int ntheta = 33;
+    float dtheta = FLT_PI/(float)(ntheta-1);
+    float ftheta = -FLT_PI/2.0f;
+    //ntheta = 2;
+    //dtheta = FLT_PI/2.0f;
+    //ftheta = -FLT_PI/4.0f;
+    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2);
+    for (int itheta=0; itheta<ntheta; ++itheta) {
+      float theta = ftheta+itheta*dtheta;
+      float n1 = cos(theta);
+      float n2 = sin(theta);
+      System.out.println("theta="+theta+" n1="+n1+" n2="+n2);
+      float m12 = 0.5f*(n1-n2);
+      float p12 = 0.5f*(n1+n2);
+      r[0][0] = -m12*m12;  
+      r[0][1] = -2.0f*m12*p12;  
+      r[0][2] = -p12*p12;  
+      r[1][0] =  2.0f*m12*p12;
+      r[1][1] =  1.01f;
+      r[1][2] =  2.0f*m12*p12;
+      r[2][0] = -p12*p12;  
+      r[2][1] = -2.0f*m12*p12;  
+      r[2][2] = -m12*m12;  
+      mpf.factorWilsonBurg(maxiter,epsilon,r);
+      Array.dump(r);
+      Array.zero(s);
+      int k1 = (s[0].length-1)/2;
+      int k2 = (s.length-1)/2;
+      s[k2][k2] = 1.0f;
+      mpf.apply(s,t);
+      mpf.applyTranspose(t,s);
+      Array.dump(s);
+      Array.dump(t);
+    }
+  }
+
   public void xtestFactorLaplacian3() {
     float[][][] r = {
       {
@@ -235,7 +299,25 @@ public class MinimumPhaseFilterTest extends TestCase {
              1, 1, 1, 1, 1,      
              1, 1, 1,
     };
-    MinimumPhaseFilter.factor(r,lag1,lag2,lag3);
+    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2,lag3);
+    mpf = MinimumPhaseFilter.factor(100,r,mpf);
+  }
+
+  /*
+  public void xtestFactorFomelExampleOld() {
+    float[] r = {24.0f,242.0f,867.0f,1334.0f,867.0f,242.0f,24.0f};
+    int n = r.length;
+    int[] lag1 = {0,1,2,3};
+    MinimumPhaseFilter mpf = MinimumPhaseFilter.factor(r,lag1);
+    int nlag = lag1.length;
+    float[] x = new float[nlag];
+    float[] a = new float[nlag];
+    x[0] = 1.0f;
+    mpf.apply(x,a);
+    assertEquals(24.0f,a[0],10*FLT_EPSILON);
+    assertEquals(26.0f,a[1],10*FLT_EPSILON);
+    assertEquals( 9.0f,a[2],10*FLT_EPSILON);
+    assertEquals( 1.0f,a[3],10*FLT_EPSILON);
   }
   */
 
