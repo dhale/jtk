@@ -23,8 +23,11 @@ import edu.mines.jtk.util.Check;
  * Filter constructors do not ensure that specified lags and coefficients 
  * correspond to minimum-phase filters. If not minimum-phase, then the 
  * causal inverse and inverse-transpose filters are unstable.
+ * <p>
+ * Minimum-phase filters may be obtained through Wilson-Burg factorization
+ * of specified auto-correlations.
  * @author Dave Hale, Colorado School of Mines
- * @version 2006.10.10
+ * @version 2006.12.30
  */
 public class MinimumPhaseFilter {
 
@@ -256,9 +259,7 @@ public class MinimumPhaseFilter {
       _a0 = _a[0];
       _a0i = 1.0f/_a[0];
     }
-
-    if (!converged)
-      throw new IllegalStateException("Wilson-Burg iterations failed");
+    Check.state(converged,"Wilson-Burg iterations converged");
   }
 
   /**
@@ -350,9 +351,7 @@ public class MinimumPhaseFilter {
       _a0 = _a[0];
       _a0i = 1.0f/_a[0];
     }
-
-    if (!converged)
-      throw new IllegalStateException("Wilson-Burg iterations failed");
+    Check.state(converged,"Wilson-Burg iterations converged");
   }
 
   /**
@@ -454,9 +453,7 @@ public class MinimumPhaseFilter {
       _a0 = _a[0];
       _a0i = 1.0f/_a[0];
     }
-
-    if (!converged)
-      throw new IllegalStateException("Wilson-Burg iterations failed");
+    Check.state(converged,"Wilson-Burg iterations converged");
   }
 
   /**

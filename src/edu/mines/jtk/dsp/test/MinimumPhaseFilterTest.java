@@ -265,16 +265,7 @@ public class MinimumPhaseFilterTest extends TestCase {
     //Array.dump(s);
   }
 
-  public void xtestFactorPlane2Filter() {
-    int[] lag1 = {
-             0, 1, 2,
-      -2,-1, 0, 1
-    };
-    int[] lag2 = {
-             0, 0, 0,
-       1, 1, 1, 1
-    };
-    /*
+  public void testFactorPlane2Filter() {
     int[] lag1 = {
                 0, 1, 2, 3,
       -3,-2,-1, 0, 1
@@ -282,6 +273,15 @@ public class MinimumPhaseFilterTest extends TestCase {
     int[] lag2 = {
                 0, 0, 0, 0,
        1, 1, 1, 1, 1
+    };
+    /*
+    int[] lag1 = {
+             0, 1, 2,
+      -2,-1, 0, 1
+    };
+    int[] lag2 = {
+             0, 0, 0,
+       1, 1, 1, 1
     };
     int[] lag1 = {
              0, 1,
@@ -295,14 +295,14 @@ public class MinimumPhaseFilterTest extends TestCase {
     int maxiter = 100;
     float epsilon = FLT_EPSILON;
     float[][] r = new float[3][3];
-    float[][] s = new float[5][5];
-    float[][] t = new float[5][5];
+    float[][] s = new float[7][7];
+    float[][] t = new float[7][7];
     int ntheta = 33;
     float dtheta = FLT_PI/(float)(ntheta-1);
     float ftheta = -FLT_PI/2.0f;
-    //ntheta = 2;
-    //dtheta = FLT_PI/2.0f;
-    //ftheta = -FLT_PI/4.0f;
+    ntheta = 2;
+    dtheta = FLT_PI/4.0f;
+    ftheta = -FLT_PI/8.0f;
     MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2);
     for (int itheta=0; itheta<ntheta; ++itheta) {
       float theta = ftheta+itheta*dtheta;
@@ -333,23 +333,8 @@ public class MinimumPhaseFilterTest extends TestCase {
     }
   }
 
-  /*
-  public void xtestFactorFomelExampleOld() {
-    float[] r = {24.0f,242.0f,867.0f,1334.0f,867.0f,242.0f,24.0f};
-    int n = r.length;
-    int[] lag1 = {0,1,2,3};
-    MinimumPhaseFilter mpf = MinimumPhaseFilter.factor(r,lag1);
-    int nlag = lag1.length;
-    float[] x = new float[nlag];
-    float[] a = new float[nlag];
-    x[0] = 1.0f;
-    mpf.apply(x,a);
-    assertEquals(24.0f,a[0],10*FLT_EPSILON);
-    assertEquals(26.0f,a[1],10*FLT_EPSILON);
-    assertEquals( 9.0f,a[2],10*FLT_EPSILON);
-    assertEquals( 1.0f,a[3],10*FLT_EPSILON);
-  }
-  */
+  ///////////////////////////////////////////////////////////////////////////
+  // private
 
   private static float[] randfloat(int n1) {
     return Array.sub(Array.randfloat(n1),0.5f);
