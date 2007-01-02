@@ -265,7 +265,7 @@ public class MinimumPhaseFilterTest extends TestCase {
     //Array.dump(s);
   }
 
-  public void testFactorPlane2Filter() {
+  public void xtestFactorPlane2Filter() {
     int[] lag1 = {
                 0, 1, 2, 3,
       -3,-2,-1, 0, 1
@@ -274,29 +274,10 @@ public class MinimumPhaseFilterTest extends TestCase {
                 0, 0, 0, 0,
        1, 1, 1, 1, 1
     };
-    /*
-    int[] lag1 = {
-             0, 1, 2,
-      -2,-1, 0, 1
-    };
-    int[] lag2 = {
-             0, 0, 0,
-       1, 1, 1, 1
-    };
-    int[] lag1 = {
-             0, 1,
-         -1, 0, 1
-    };
-    int[] lag2 = {
-             0, 0,
-          1, 1, 1
-    };
-    */
+    float[][] s = new float[3][7];
+    float[][] t = new float[3][7];
     int maxiter = 100;
     float epsilon = FLT_EPSILON;
-    float[][] r = new float[3][3];
-    float[][] s = new float[7][7];
-    float[][] t = new float[7][7];
     int ntheta = 33;
     float dtheta = FLT_PI/(float)(ntheta-1);
     float ftheta = -FLT_PI/2.0f;
@@ -311,26 +292,166 @@ public class MinimumPhaseFilterTest extends TestCase {
       System.out.println("theta="+theta+" n1="+n1+" n2="+n2);
       float m12 = 0.5f*(n1-n2);
       float p12 = 0.5f*(n1+n2);
-      r[0][0] = -m12*m12;  
-      r[0][1] = -2.0f*m12*p12;  
-      r[0][2] = -p12*p12;  
-      r[1][0] =  2.0f*m12*p12;
-      r[1][1] =  1.01f;
-      r[1][2] =  2.0f*m12*p12;
-      r[2][0] = -p12*p12;  
-      r[2][1] = -2.0f*m12*p12;  
-      r[2][2] = -m12*m12;  
+      float[][] r = {
+        {     -m12*m12, -2.0f*m12*p12,     -p12*p12},
+        { 2.0f*m12*p12,         1.01f, 2.0f*m12*p12},
+        {     -p12*p12, -2.0f*m12*p12,     -m12*m12}
+      };
       mpf.factorWilsonBurg(maxiter,epsilon,r);
       Array.dump(r);
       Array.zero(s);
       int k1 = (s[0].length-1)/2;
       int k2 = (s.length-1)/2;
-      s[k2][k2] = 1.0f;
+      s[k2][k1] = 1.0f;
       mpf.apply(s,t);
       mpf.applyTranspose(t,s);
       Array.dump(s);
       Array.dump(t);
     }
+  }
+
+  public void xtestFactorPlane3Filter() {
+    /*
+    int[] lag1 = {
+                0, 1, 2,
+         -2,-1, 0, 1, 2,
+         -2,-1, 0, 1, 2,
+         -2,-1, 0, 1, 2,
+         -2,-1, 0, 1, 2,
+         -2,-1, 0, 1, 2,
+         -2,-1, 0, 1,
+    };
+    int[] lag2 = {
+                0, 0, 0,
+          1, 1, 1, 1, 1,
+          2, 2, 2, 2, 2,
+         -2,-2,-2,-2,-2,
+         -1,-1,-1,-1,-1,
+          0, 0, 0, 0, 0,
+          1, 1, 1, 1,
+    };
+    int[] lag3 = {
+                0, 0, 0,
+          0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0,
+          1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1,
+          1, 1, 1, 1,
+    };
+    */
+    int[] lag1 = {
+                   0, 1, 2, 3,
+         -3,-2,-1, 0, 1, 2, 3,
+         -3,-2,-1, 0, 1, 2, 3,
+         -3,-2,-1, 0, 1, 2, 3,
+
+         -3,-2,-1, 0, 1, 2, 3,
+         -3,-2,-1, 0, 1, 2, 3,
+         -3,-2,-1, 0, 1, 2, 3,
+         -3,-2,-1, 0, 1, 2, 3,
+         -3,-2,-1, 0, 1, 2, 3,
+         -3,-2,-1, 0, 1, 2, 3,
+         -3,-2,-1, 0, 1, 2, 3,
+    };
+    int[] lag2 = {
+                   0, 0, 0, 0,
+          1, 1, 1, 1, 1, 1, 1,
+          2, 2, 2, 2, 2, 2, 2,
+          3, 3, 3, 3, 3, 3, 3,
+
+         -3,-3,-3,-3,-3,-3,-3,
+         -2,-2,-2,-2,-2,-2,-2,
+         -1,-1,-1,-1,-1,-1,-1,
+          0, 0, 0, 0, 0, 0, 0,
+          1, 1, 1, 1, 1, 1, 1,
+          2, 2, 2, 2, 2, 2, 2,
+          3, 3, 3, 3, 3, 3, 3,
+    };
+    int[] lag3 = {
+                   0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0,
+          0, 0, 0, 0, 0, 0, 0,
+
+          1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1,
+          1, 1, 1, 1, 1, 1, 1,
+    };
+    float[][][] s = new float[3][7][7];
+    float[][][] t = new float[3][7][7];
+    int m = lag1.length;
+    float[] amax = new float[m];
+    int maxiter = 100;
+    float epsilon = FLT_EPSILON;
+    int nphi = 19;
+    float dphi = 2.0f*FLT_PI/(float)(nphi-1);
+    float fphi = -FLT_PI;
+    int ntheta = 5;
+    float dtheta = 0.5f*FLT_PI/(float)(ntheta-1);
+    float ftheta = 0.0f;
+    //nphi = 2;
+    //dphi =  FLT_PI/2.0f;
+    //fphi = -FLT_PI/4.0f;
+    //ntheta = 2;
+    //dtheta = FLT_PI/4.0f;
+    //ftheta = FLT_PI/4.0f;
+    MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2,lag3);
+    for (int iphi=0; iphi<nphi; ++iphi) {
+      float phi = fphi+iphi*dphi;
+      for (int itheta=0; itheta<ntheta; ++itheta) {
+        float theta = ftheta+itheta*dtheta;
+        float n1 = cos(theta);
+        float n2 = sin(theta)*cos(phi);
+        float n3 = sin(theta)*sin(phi);
+        System.out.println("\nphi="+phi+" theta="+theta+
+                           " n1="+n1+" n2="+n2+" n3="+n3);
+        float m12 = 0.5f*(n1-n2);
+        float m13 = 0.5f*(n1-n3);
+        float m23 = 0.5f*(n2-n3);
+        float p12 = 0.5f*(n1+n2);
+        float p13 = 0.5f*(n1+n3);
+        float p23 = 0.5f*(n2+n3);
+        float[][][] r = {{
+          {         0.0f,         -m23*m23,              0.0f},
+          {      -m13*m13,  -2.0f*(m13*p13+m23*p23),  -p13*p13},
+          {         0.0f,         -p23*p23,              0.0f}
+        },{
+          {      -m12*m12,   2.0f*(-m12*p12+m23*p23), -p12*p12},
+          { 2.0f*(m12*p12+m13*p13),  2.02f,    2.0f*(m12*p12+m13*p13)},
+          {      -p12*p12,   2.0f*(-m12*p12+m23*p23), -m12*m12}
+        },{
+          {         0.0f,         -p23*p23,              0.0f},
+          {      -p13*p13,  -2.0f*(m13*p13+m23*p23),  -m13*m13},
+          {         0.0f,         -m23*m23,              0.0f}
+        }};
+        mpf.factorWilsonBurg(maxiter,epsilon,r);
+        float[] a = mpf.getA();
+        for (int j=0; j<m; ++j) {
+          if (abs(a[j])>amax[j])
+            amax[j] = abs(a[j]);
+        }
+        //Array.dump(r);
+        Array.zero(s);
+        int k1 = (s[0][0].length-1)/2;
+        int k2 = (s[0].length-1)/2;
+        int k3 = (s.length-1)/2;
+        s[k3][k2][k1] = 1.0f;
+        mpf.apply(s,t);
+        mpf.applyTranspose(t,s);
+        //Array.dump(s);
+        //Array.dump(t);
+      }
+    }
+    for (int j=0; j<m; ++j)
+      System.out.println("lag1="+lag1[j]+
+                        " lag2="+lag2[j]+
+                        " lag3="+lag3[j]+
+                        " amax="+amax[j]);
   }
 
   ///////////////////////////////////////////////////////////////////////////

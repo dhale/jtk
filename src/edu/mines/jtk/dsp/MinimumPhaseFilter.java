@@ -82,21 +82,8 @@ public class MinimumPhaseFilter {
    * @param a array of filter coefficients for each lag.
    */
   public MinimumPhaseFilter(int[] lag1, float[] a) {
-    Check.argument(lag1.length>0,"lag1.length>0");
-    Check.argument(lag1.length==a.length,"lag1.length==a.length");
-    Check.argument(lag1[0]==0,"lag1[0]==0");
-    Check.argument(a[0]!=0.0f,"a[0]!=0");
-    for (int j=1; j<a.length; ++j)
-      Check.argument(lag1[j]>0,"lag1["+j+"]>0");
-    _m = lag1.length;
-    _lag1 = Array.copy(lag1);
-    _lag2 = Array.zeroint(_m);
-    _lag3 = Array.zeroint(_m);
-    _min1 = Array.min(lag1);
-    _max1 = Array.max(lag1);
-    _a = Array.copy(a);
-    _a0 = a[0];
-    _a0i = 1.0f/a[0];
+    initLags(lag1,a);
+    initA(a);
   }
 
   /**
@@ -111,28 +98,24 @@ public class MinimumPhaseFilter {
    * @param a array of filter coefficients for each lag.
    */
   public MinimumPhaseFilter(int[] lag1, int[] lag2, float[] a) {
-    Check.argument(lag1.length>0,"lag1.length>0");
-    Check.argument(lag1.length==a.length,"lag1.length==a.length");
-    Check.argument(lag2.length==a.length,"lag2.length==a.length");
-    Check.argument(lag1[0]==0,"lag1[0]==0");
-    Check.argument(lag2[0]==0,"lag2[0]==0");
-    Check.argument(a[0]!=0.0f,"a[0]!=0");
-    for (int j=1; j<a.length; ++j) {
-      Check.argument(lag2[j]>=0,"lag2["+j+"]>=0");
-      if (lag2[j]==0)
-        Check.argument(lag1[j]>0,"if lag2==0, lag1["+j+"]>0");
-    }
-    _m = a.length;
-    _lag1 = Array.copy(lag1);
-    _lag2 = Array.copy(lag2);
-    _lag3 = Array.zeroint(_m);
-    _min1 = Array.min(lag1);
-    _min2 = Array.min(lag2);
-    _max1 = Array.max(lag1);
-    _max2 = Array.max(lag2);
-    _a = Array.copy(a);
-    _a0 = a[0];
-    _a0i = 1.0f/a[0];
+    initLags(lag1,lag2,a);
+    initA(a);
+  }
+
+  /**
+   * Constructs indexed minimum-phase filters for specified lag1 and lag2.
+   * By default, all lag3 are assumed to be zero.
+   * <p>
+   * For j=0 only, lag1[j] and lag2[j] are zero.
+   * All lag2[j] must be non-negative.
+   * If lag2[j] is zero, then lag1[j] must be non-negative.
+   * @param lag1 array of lags in 1st dimension.
+   * @param lag2 array of lags in 2nd dimension.
+   * @param a array of filter coefficients for each index and lag.
+   */
+  public MinimumPhaseFilter(int[] lag1, int[] lag2, float[][] a) {
+    initLags(lag1,lag2,a[0]);
+    initA(a);
   }
 
   /**
@@ -148,35 +131,40 @@ public class MinimumPhaseFilter {
    * @param a array of filter coefficients for each lag.
    */
   public MinimumPhaseFilter(int[] lag1, int[] lag2, int[] lag3, float[] a) {
-    Check.argument(lag1.length>0,"lag1.length>0");
-    Check.argument(lag1.length==a.length,"lag1.length==a.length");
-    Check.argument(lag2.length==a.length,"lag2.length==a.length");
-    Check.argument(lag3.length==a.length,"lag3.length==a.length");
-    Check.argument(lag1[0]==0,"lag1[0]==0");
-    Check.argument(lag2[0]==0,"lag2[0]==0");
-    Check.argument(lag3[0]==0,"lag3[0]==0");
-    Check.argument(a[0]!=0.0f,"a[0]!=0");
-    for (int j=1; j<a.length; ++j) {
-      Check.argument(lag3[j]>=0,"lag3["+j+"]>=0");
-      if (lag3[j]==0) {
-        Check.argument(lag2[j]>=0,"if lag3==0, lag2["+j+"]>=0");
-        if (lag2[j]==0)
-          Check.argument(lag1[j]>0,"if lag3==0 && lag2==0, lag1["+j+"]>0");
-      }
-    }
-    _m = a.length;
-    _lag1 = Array.copy(lag1);
-    _lag2 = Array.copy(lag2);
-    _lag3 = Array.copy(lag3);
-    _min1 = Array.min(lag1);
-    _min2 = Array.min(lag2);
-    _min3 = Array.min(lag3);
-    _max1 = Array.max(lag1);
-    _max2 = Array.max(lag2);
-    _max3 = Array.max(lag3);
-    _a = Array.copy(a);
-    _a0 = a[0];
-    _a0i = 1.0f/a[0];
+    initLags(lag1,lag2,lag3,a);
+    initA(a);
+  }
+
+  /**
+   * Gets a copy of the lags in the 1st dimension.
+   * @return array of lags; by copy, not by reference.
+   */
+  public int[] getLag1() {
+    return Array.copy(_lag1);
+  }
+
+  /**
+   * Gets a copy of the lags in the 2nd dimension.
+   * @return array of lags; by copy, not by reference.
+   */
+  public int[] getLag2() {
+    return Array.copy(_lag2);
+  }
+
+  /**
+   * Gets a copy of the lags in the 3rd dimension.
+   * @return array of lags; by copy, not by reference.
+   */
+  public int[] getLag3() {
+    return Array.copy(_lag3);
+  }
+
+  /**
+   * Gets a copy of the filter coefficients.
+   * @return array of filter coefficients; by copy, not by reference.
+   */
+  public float[] getA() {
+    return Array.copy(_a);
   }
 
   /**
@@ -633,6 +621,74 @@ public class MinimumPhaseFilter {
   }
 
   /**
+   * Applies this indexed filter. 
+   * @param i index array.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(int[][] i, float[][] x, float[][] y) {
+    int n1 = y[0].length;
+    int n2 = y.length;
+    int i1lo = max(0,_max1);
+    int i1hi = min(n1,n1+_min1);
+    int i2lo = (i1lo<=i1hi)?min(_max2,n2):n2;
+    for (int i2=0; i2<i2lo; ++i2) {
+      for (int i1=0; i1<n1; ++i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = _ai0[ii]*x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          if (0<=k1 && k1<n1 && 0<=k2)
+            yi += aii[j]*x[k2][k1];
+        }
+        y[i2][i1] = yi;
+      }
+    }
+    for (int i2=i2lo; i2<n2; ++i2) {
+      for (int i1=0; i1<i1lo; ++i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = _ai0[ii]*x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          if (0<=k1)
+            yi += aii[j]*x[k2][k1];
+        }
+        y[i2][i1] = yi;
+      }
+      for (int i1=i1lo; i1<i1hi; ++i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = _ai0[ii]*x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          yi += aii[j]*x[k2][k1];
+        }
+        y[i2][i1] = yi;
+      }
+      for (int i1=i1hi; i1<n1; ++i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = _ai0[ii]*x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          if (k1<n1)
+            yi += aii[j]*x[k2][k1];
+        }
+        y[i2][i1] = yi;
+      }
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // transpose
+
+  /**
    * Applies the transpose of this filter.
    * Uses lag1; ignores lag2 or lag3, if specified.
    * @param x input array.
@@ -810,6 +866,75 @@ public class MinimumPhaseFilter {
       }
     }
   }
+
+  /**
+   * Applies the transpose of this indexed filter.
+   * Uses lag1 and lag2; ignores lag3, if specified.
+   * @param i index array.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void applyTranspose(int[][] i, float[][] x, float[][] y) {
+    int n1 = y[0].length;
+    int n2 = y.length;
+    int i1lo = max(0,-_min1);
+    int i1hi = min(n1,n1-_max1);
+    int i2hi = (i1lo<=i1hi)?max(n2-_max2,0):0;
+    for (int i2=n2-1; i2>=i2hi; --i2) {
+      for (int i1=n1-1; i1>=0; --i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = _ai0[ii]*x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1+_lag1[j];
+          int k2 = i2+_lag2[j];
+          if (0<=k1 && k1<n1 && k2<n2)
+            yi += aii[j]*x[k2][k1];
+        }
+        y[i2][i1] = yi;
+      }
+    }
+    for (int i2=i2hi-1; i2>=0; --i2) {
+      for (int i1=n1-1; i1>=i1hi; --i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = _ai0[ii]*x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1+_lag1[j];
+          int k2 = i2+_lag2[j];
+          if (k1<n1)
+            yi += aii[j]*x[k2][k1];
+        }
+        y[i2][i1] = yi;
+      }
+      for (int i1=i1hi-1; i1>=i1lo; --i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = _ai0[ii]*x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1+_lag1[j];
+          int k2 = i2+_lag2[j];
+          yi += aii[j]*x[k2][k1];
+        }
+        y[i2][i1] = yi;
+      }
+      for (int i1=i1lo-1; i1>=0; --i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = _ai0[ii]*x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1+_lag1[j];
+          int k2 = i2+_lag2[j];
+          if (0<=k1)
+            yi += aii[j]*x[k2][k1];
+        }
+        y[i2][i1] = yi;
+      }
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // inverse
 
   /**
    * Applies the inverse of this filter.
@@ -991,6 +1116,75 @@ public class MinimumPhaseFilter {
   }
 
   /**
+   * Applies the inverse of this indexed filter.
+   * Uses lag1 and lag2; ignores lag3, if specified.
+   * @param i index array.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void applyInverse(int[][] i, float[][] x, float[][] y) {
+    int n1 = y[0].length;
+    int n2 = y.length;
+    int i1lo = max(0,_max1);
+    int i1hi = min(n1,n1+_min1);
+    int i2lo = (i1lo<=i1hi)?min(_max2,n2):n2;
+    for (int i2=0; i2<i2lo; ++i2) {
+      for (int i1=0; i1<n1; ++i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          if (0<=k1 && k1<n1 && 0<=k2)
+            yi -= aii[j]*y[k2][k1];
+        }
+        y[i2][i1] = _ai0i[ii]*yi;
+      }
+    }
+    for (int i2=i2lo; i2<n2; ++i2) {
+      for (int i1=0; i1<i1lo; ++i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          if (0<=k1)
+            yi -= aii[j]*y[k2][k1];
+        }
+        y[i2][i1] = _ai0i[ii]*yi;
+      }
+      for (int i1=i1lo; i1<i1hi; ++i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          yi -= aii[j]*y[k2][k1];
+        }
+        y[i2][i1] = _ai0i[ii]*yi;
+      }
+      for (int i1=i1hi; i1<n1; ++i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          if (k1<n1)
+            yi -= aii[j]*y[k2][k1];
+        }
+        y[i2][i1] = _ai0i[ii]*yi;
+      }
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // inverse transpose
+
+  /**
    * Applies the inverse transpose of this filter.
    * Uses lag1; ignores lag2 or lag3, if specified.
    * @param x input array.
@@ -1169,6 +1363,72 @@ public class MinimumPhaseFilter {
     }
   }
 
+  /**
+   * Applies the inverse transpose of this indexed filter.
+   * Uses lag1 and lag2; ignores lag3, if specified.
+   * @param i index array.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void applyInverseTranspose(int[][] i, float[][] x, float[][] y) {
+    int n1 = y[0].length;
+    int n2 = y.length;
+    int i1lo = max(0,-_min1);
+    int i1hi = min(n1,n1-_max1);
+    int i2hi = (i1lo<=i1hi)?max(n2-_max2,0):0;
+    for (int i2=n2-1; i2>=i2hi; --i2) {
+      for (int i1=n1-1; i1>=0; --i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1+_lag1[j];
+          int k2 = i2+_lag2[j];
+          if (0<=k1 && k1<n1 && k2<n2)
+            yi -= aii[j]*y[k2][k1];
+        }
+        y[i2][i1] = _ai0i[ii]*yi;
+      }
+    }
+    for (int i2=i2hi-1; i2>=0; --i2) {
+      for (int i1=n1-1; i1>=i1hi; --i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1+_lag1[j];
+          int k2 = i2+_lag2[j];
+          if (k1<n1)
+            yi -= aii[j]*y[k2][k1];
+        }
+        y[i2][i1] = _ai0i[ii]*yi;
+      }
+      for (int i1=i1hi-1; i1>=i1lo; --i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1+_lag1[j];
+          int k2 = i2+_lag2[j];
+          yi -= aii[j]*y[k2][k1];
+        }
+        y[i2][i1] = _ai0i[ii]*yi;
+      }
+      for (int i1=i1lo-1; i1>=0; --i1) {
+        int ii = i[i2][i1];
+        float[] aii = _ai[ii];
+        float yi = x[i2][i1];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1+_lag1[j];
+          int k2 = i2+_lag2[j];
+          if (0<=k1)
+            yi -= aii[j]*y[k2][k1];
+        }
+        y[i2][i1] = _ai0i[ii]*yi;
+      }
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -1180,11 +1440,96 @@ public class MinimumPhaseFilter {
   private int[] _lag2;
   private int[] _lag3;
   private float[] _a;
-  private float _a0,_a0i;
+  private float _a0,_a0i; // a[0] and 1/a[0]
+  private int _ni;
+  private float[][] _ai;
+  private float[] _ai0,_ai0i;
 
   private static float[] impulse(int nlag) {
     float[] a = new float[nlag];
     a[0] = 1.0f;
     return a;
+  }
+
+  private void initLags(int[] lag1, float[] a) {
+    Check.argument(lag1.length>0,"lag1.length>0");
+    Check.argument(lag1.length==a.length,"lag1.length==a.length");
+    Check.argument(lag1[0]==0,"lag1[0]==0");
+    for (int j=1; j<a.length; ++j)
+      Check.argument(lag1[j]>0,"lag1["+j+"]>0");
+    _m = lag1.length;
+    _lag1 = Array.copy(lag1);
+    _lag2 = Array.zeroint(_m);
+    _lag3 = Array.zeroint(_m);
+    _min1 = Array.min(lag1);
+    _max1 = Array.max(lag1);
+  }
+
+  private void initLags(int[] lag1, int[] lag2, float[] a) {
+    Check.argument(lag1.length>0,"lag1.length>0");
+    Check.argument(lag1.length==a.length,"lag1.length==a.length");
+    Check.argument(lag2.length==a.length,"lag2.length==a.length");
+    Check.argument(lag1[0]==0,"lag1[0]==0");
+    Check.argument(lag2[0]==0,"lag2[0]==0");
+    for (int j=1; j<a.length; ++j) {
+      Check.argument(lag2[j]>=0,"lag2["+j+"]>=0");
+      if (lag2[j]==0)
+        Check.argument(lag1[j]>0,"if lag2==0, lag1["+j+"]>0");
+    }
+    _m = lag1.length;
+    _lag1 = Array.copy(lag1);
+    _lag2 = Array.copy(lag2);
+    _lag3 = Array.zeroint(_m);
+    _min1 = Array.min(lag1);
+    _min2 = Array.min(lag2);
+    _max1 = Array.max(lag1);
+    _max2 = Array.max(lag2);
+  }
+
+  private void initLags(int[] lag1, int[] lag2, int[] lag3, float[] a) {
+    Check.argument(lag1.length>0,"lag1.length>0");
+    Check.argument(lag1.length==a.length,"lag1.length==a.length");
+    Check.argument(lag2.length==a.length,"lag2.length==a.length");
+    Check.argument(lag3.length==a.length,"lag3.length==a.length");
+    Check.argument(lag1[0]==0,"lag1[0]==0");
+    Check.argument(lag2[0]==0,"lag2[0]==0");
+    Check.argument(lag3[0]==0,"lag3[0]==0");
+    for (int j=1; j<a.length; ++j) {
+      Check.argument(lag3[j]>=0,"lag3["+j+"]>=0");
+      if (lag3[j]==0) {
+        Check.argument(lag2[j]>=0,"if lag3==0, lag2["+j+"]>=0");
+        if (lag2[j]==0)
+          Check.argument(lag1[j]>0,"if lag3==0 && lag2==0, lag1["+j+"]>0");
+      }
+    }
+    _m = a.length;
+    _lag1 = Array.copy(lag1);
+    _lag2 = Array.copy(lag2);
+    _lag3 = Array.copy(lag3);
+    _min1 = Array.min(lag1);
+    _min2 = Array.min(lag2);
+    _min3 = Array.min(lag3);
+    _max1 = Array.max(lag1);
+    _max2 = Array.max(lag2);
+    _max3 = Array.max(lag3);
+  }
+
+  private void initA(float[] a) {
+    _a = Array.copy(a);
+    _a0 = a[0];
+    _a0i = 1.0f/a[0];
+  }
+
+  private void initA(float[][] a) {
+    Check.argument(Array.isRegular(a),"a is regular");
+    initA(a[0]);
+    _ni = a.length;
+    _ai = Array.copy(a);
+    _ai0 = new float[_ni];
+    _ai0i = new float[_ni];
+    for (int ii=0; ii<_ni; ++ii) {
+      _ai0[ii] = a[ii][0];
+      _ai0i[ii] = 1.0f/a[ii][0];
+    }
   }
 }
