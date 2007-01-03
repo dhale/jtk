@@ -81,6 +81,30 @@ public class SimplePlot extends PlotFrame {
   }
 
   /**
+   * Returns a new plot with a points view of a sampled function f(x).
+   * @param s the sampling of the x coordinate.
+   * @param f array of sampled function values f(x).
+   * @return the plot.
+   */
+  public static SimplePlot asPoints(Sampling s, float[] f) {
+    SimplePlot plot = new SimplePlot(Origin.LOWER_LEFT);
+    plot.addPoints(s,f);
+    return plot;
+  }
+
+  /**
+   * Returns a new plot with a points view of specified values (x,y).
+   * @param x array of x coordinates.
+   * @param y array of y coordinates.
+   * @return the plot.
+   */
+  public static SimplePlot asPoints(float[] x, float[] y) {
+    SimplePlot plot = new SimplePlot(Origin.LOWER_LEFT);
+    plot.addPoints(x,y);
+    return plot;
+  }
+
+  /**
    * Returns a new plot with a sequence view of specified values f(x).
    * Uses default sampling of x = 0, 1, 2, ....
    * @param f array of sampled function values f(x).
@@ -89,6 +113,18 @@ public class SimplePlot extends PlotFrame {
   public static SimplePlot asSequence(float[] f) {
     SimplePlot plot = new SimplePlot(Origin.LOWER_LEFT);
     plot.addSequence(f);
+    return plot;
+  }
+
+  /**
+   * Returns a new plot with a sequence view of a sampled function f(x).
+   * @param s the sampling of the x coordinate.
+   * @param f array of sampled function values f(x).
+   * @return the plot.
+   */
+  public static SimplePlot asSequence(Sampling s, float[] f) {
+    SimplePlot plot = new SimplePlot(Origin.LOWER_LEFT);
+    plot.addSequence(s,f);
     return plot;
   }
 
@@ -107,6 +143,51 @@ public class SimplePlot extends PlotFrame {
   }
 
   /**
+   * Returns a new plot with a pixels view of a sampled function f(x1,x2).
+   * @param s1 the sampling of the x1 coordinate.
+   * @param s2 the sampling of the x2 coordinate.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where
+   *  n1 = f[0].length and n2 = f.length.
+   * @return the plot.
+   */
+  public static SimplePlot asPixels(Sampling s1, Sampling s2, float[][] f) {
+    SimplePlot plot = new SimplePlot(Origin.UPPER_LEFT);
+    PixelsView pv = plot.addPixels(s1,s2,f);
+    pv.setInterpolation(PixelsView.Interpolation.NEAREST);
+    return plot;
+  }
+
+  /**
+   * Returns a new plot with a points view of specified values f(x).
+   * Uses default sampling of x = 0, 1, 2, ....
+   * @param f array of sampled function values f(x).
+   * @return the plot.
+   */
+  public static SimplePlot asPoints(double[] f) {
+    return SimplePlot.asPoints(convertToFloat(f));
+  }
+
+  /**
+   * Returns a new plot with a points view of a sampled function f(x).
+   * @param s the sampling of the x coordinate.
+   * @param f array of sampled function values f(x).
+   * @return the plot.
+   */
+  public static SimplePlot asPoints(Sampling s, double[] f) {
+    return SimplePlot.asPoints(s,convertToFloat(f));
+  }
+
+  /**
+   * Returns a new plot with a points view of specified values (x,y).
+   * @param x array of x coordinates.
+   * @param y array of y coordinates.
+   * @return the plot.
+   */
+  public static SimplePlot asPoints(double[] x, double[] y) {
+    return SimplePlot.asPoints(convertToFloat(x),convertToFloat(y));
+  }
+
+  /**
    * Returns a new plot with a sequence view of specified values f(x).
    * Uses default sampling of x = 0, 1, 2, ....
    * @param f array of sampled function values f(x).
@@ -114,6 +195,16 @@ public class SimplePlot extends PlotFrame {
    */
   public static SimplePlot asSequence(double[] f) {
     return SimplePlot.asSequence(convertToFloat(f));
+  }
+
+  /**
+   * Returns a new plot with a sequence view of a sampled function f(x).
+   * @param s the sampling of the x coordinate.
+   * @param f array of sampled function values f(x).
+   * @return the plot.
+   */
+  public static SimplePlot asSequence(Sampling s, double[] f) {
+    return SimplePlot.asSequence(s,convertToFloat(f));
   }
 
   /**
@@ -125,6 +216,18 @@ public class SimplePlot extends PlotFrame {
    */
   public static SimplePlot asPixels(double[][] f) {
     return SimplePlot.asPixels(convertToFloat(f));
+  }
+
+  /**
+   * Returns a new plot with a pixels view of a sampled function f(x1,x2).
+   * @param s1 the sampling of the x1 coordinate.
+   * @param s2 the sampling of the x2 coordinate.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where
+   *  n1 = f[0].length and n2 = f.length.
+   * @return the plot.
+   */
+  public static SimplePlot asPixels(Sampling s1, Sampling s2, double[][] f) {
+    return SimplePlot.asPixels(s1,s2,convertToFloat(f));
   }
 
   /**
@@ -144,6 +247,56 @@ public class SimplePlot extends PlotFrame {
    */
   public GridView addGrid(String parameters) {
     return _panel.addGrid(parameters);
+  }
+
+  /**
+   * Adds a points view of specified values f(x).
+   * Uses default sampling of x = 0, 1, 2, ....
+   * @param f array of sampled function values f(x).
+   * @return the points view.
+   */
+  public PointsView addPoints(float[] f) {
+    return _panel.addPoints(f);
+  }
+
+  /**
+   * Adds a points view of a sampled function f(x).
+   * @param s the sampling of the x coordinate.
+   * @param f array of sampled function values f(x).
+   * @return the points view.
+   */
+  public PointsView addPoints(Sampling s, float[] f) {
+    return _panel.addPoints(s,f);
+  }
+
+  /**
+   * Adds a points view of specified values (x,y).
+   * @param x array of x coordinates.
+   * @param y array of y coordinates.
+   * @return the points view.
+   */
+  public PointsView addPoints(float[] x, float[] y) {
+    return _panel.addPoints(x,y);
+  }
+
+  /**
+   * Adds a sequence view with specified values f(x).
+   * Uses default sampling of x = 0, 1, 2, ....
+   * @param f array of sampled function values f(x).
+   * @return the sequence view.
+   */
+  public SequenceView addSequence(float[] f) {
+    return _panel.addSequence(f);
+  }
+
+  /**
+   * Adds a sequence view with specified sampling and values f(x).
+   * @param s the sampling of the variable x.
+   * @param f array of sampled function values f(x).
+   * @return the sequence view.
+   */
+  public SequenceView addSequence(Sampling s, float[] f) {
+    return _panel.addSequence(s,f);
   }
 
   /**
@@ -167,57 +320,6 @@ public class SimplePlot extends PlotFrame {
    */
   public PixelsView addPixels(Sampling s1, Sampling s2, float[][] f) {
     return _panel.addPixels(s1,s2,f);
-  }
-
-
-  /**
-   * Adds a points view of the arrays x1 and x2 of point (x1,x2) coordinates.
-   * @param x1 array of x1 coordinates.
-   * @param x2 array of x2 coordinates.
-   * @return the points view.
-   */
-  public PointsView addPoints(float[] x1, float[] x2) {
-    return _panel.addPoints(x1,x2);
-  }
-
-  /**
-   * Adds a points view of (x1,x2) with specified x2 coordinates.
-   * The corresponding coordinates x1 are assumed to be 0, 1, 2, ....
-   * @param x2 array of x2 coordinates.
-   * @return the points view.
-   */
-  public PointsView addPoints(float[] x2) {
-    return _panel.addPoints(x2);
-  }
-
-  /**
-   * Adds a view of points (x1,x2) for a sampled function x2(x1).
-   * @param s1 the sampling of x1 coordinates.
-   * @param x2 array of x2 coordinates.
-   * @return the points view.
-   */
-  public PointsView addPoints(Sampling s1, float[] x2) {
-    return _panel.addPoints(s1,x2);
-  }
-
-  /**
-   * Adds a sequence view with specified values f(x).
-   * Uses default sampling of x = 0, 1, 2, ....
-   * @param f array of sampled function values f(x).
-   * @return the sequence view.
-   */
-  public SequenceView addSequence(float[] f) {
-    return _panel.addSequence(f);
-  }
-
-  /**
-   * Adds a sequence view with specified sampling and values f(x).
-   * @param sx the sampling of the variable x.
-   * @param f array of sampled function values f(x).
-   * @return the sequence view.
-   */
-  public SequenceView addSequence(Sampling sx, float[] f) {
-    return _panel.addSequence(sx,f);
   }
 
   /**

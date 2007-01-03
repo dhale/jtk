@@ -31,7 +31,7 @@ public class SimplePlotTest {
   }
   private static void plot0() {
     float[] f = Array.sin(Array.rampfloat(0.0f,0.1f,63));
-    SimplePlot.asPoints(f);
+    SimplePlot.asSequence(f);
   }
   private static void plot1() {
     int nx = 301;
@@ -40,8 +40,7 @@ public class SimplePlotTest {
     Sampling sx = new Sampling(nx,dx,fx);
     float[] x = Array.rampfloat(fx,dx,nx);
     float[] f = Array.sub(Array.mul(x,Array.sin(x)),1.0f);
-    SimplePlot plot = new SimplePlot();
-    plot.addPoints(sx,f);
+    SimplePlot.asPoints(sx,f);
   }
   private static void plot2() {
     float[][] f = Array.sin(Array.rampfloat(0.0f,0.1f,0.1f,101,101));
