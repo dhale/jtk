@@ -6,9 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.util.logging.Logger;
+import edu.mines.jtk.util.Almost;
+import edu.mines.jtk.util.Monitor;
+import edu.mines.jtk.util.PartialMonitor;
 
-import edu.mines.jtk.util.*;
+import java.util.logging.Logger;
 
 /** Solve least-squares inverse of a non-linear Transform.
     See QuadraticSolver to solve least-squares inverse of a linear Transform.
@@ -99,7 +101,7 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
       }
       tq.dispose();
     }
-    if (monitor == null) monitor = new LogMonitor(null, null);
+    if (monitor == null) monitor = Monitor.NULL_MONITOR;
     monitor.report(0.);
     // Make copy of reference model that can be constrained and updated
     Vect m0 = referenceModel.clone();

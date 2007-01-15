@@ -6,9 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.util.logging.Logger;
+import edu.mines.jtk.util.Almost;
+import edu.mines.jtk.util.Monitor;
 
-import edu.mines.jtk.util.*;
+import java.util.logging.Logger;
 
 /** Minimize a simple quadratic objective function.
     Finds the x that minimizes the quadratic function 0.5 x'Hx + b'x .
@@ -66,8 +67,7 @@ public class QuadraticSolver {
   */
   public Vect solve(int numberIterations, Monitor monitor) {
     int iter;
-    if (monitor == null)
-      monitor = new LogMonitor(null, null);
+    if (monitor == null) monitor = Monitor.NULL_MONITOR;
     monitor.report(0.);
     VectConst b = _quadratic.getB(); // instance 1
     monitor.report(1./(numberIterations+2.));

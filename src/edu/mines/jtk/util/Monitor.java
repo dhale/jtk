@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
-/** Implement this interface to receive notifications of progress  
+/** Implement this interface to receive notifications of progress
     @author W.S. Harlan
 */
 public interface Monitor {
@@ -26,5 +26,12 @@ public interface Monitor {
       passed to this method or to initReport.
   */
   public void report(double fraction);
+
+  /** Empty implementation that does nothing.
+   */
+  public static Monitor NULL_MONITOR = new Monitor() {
+      public void initReport(double initFraction) {}
+      public void report(double fraction) {}
+    };
 }
 

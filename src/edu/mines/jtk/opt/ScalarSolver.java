@@ -6,10 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
+import edu.mines.jtk.util.Almost;
+import edu.mines.jtk.util.Monitor;
+
 import java.util.Arrays;
 import java.util.logging.Logger;
-
-import edu.mines.jtk.util.*;
 
 /** Search a single variable for a value that minimizes a function
     @author W.S. Harlan
@@ -59,7 +60,7 @@ public class ScalarSolver {
                       double okError, double okFraction,
                       int numberIterations, Monitor monitor)
   {
-    if (monitor == null) monitor = new LogMonitor(null, null);
+    if (monitor == null) monitor = Monitor.NULL_MONITOR;
     monitor.report(0.);
 
     int iter =0, nter = numberIterations;
