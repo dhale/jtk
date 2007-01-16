@@ -215,19 +215,19 @@ public class LocalCausalFilter {
     int i1lo = min(_max1,n1);
     for (int i1=n1-1; i1>=i1lo; --i1) {
       a1.get(i1,a);
-      x[i1] = (y[i1]-x[i1])/a[0];
+      float xi = x[i1] = (y[i1]-x[i1])/a[0];
       for (int j=1; j<_m; ++j) {
         int k1 = i1-_lag1[j];
-        x[k1] += a[j]*x[i1];
+        x[k1] += a[j]*xi;
       }
     }
     for (int i1=i1lo-1; i1>=0; --i1) {
       a1.get(i1,a);
-      x[i1] = (y[i1]-x[i1])/a[0];
+      float xi = x[i1] = (y[i1]-x[i1])/a[0];
       for (int j=1; j<_m; ++j) {
         int k1 = i1-_lag1[j];
         if (0<=k1)
-          x[k1] += a[j]*x[i1];
+          x[k1] += a[j]*xi;
       }
     }
   }
@@ -249,7 +249,7 @@ public class LocalCausalFilter {
     int i1hi = min(n1,n1+_min1);
     int i2lo = (i1lo<=i1hi)?min(_max2,n2):n2;
     for (int i2=n2-1; i2>=i2lo; --i2) {
-      for (int i1=n1-1; i1>i1hi; --i1) {
+      for (int i1=n1-1; i1>=i1hi; --i1) {
         a2.get(i1,i2,a);
         float yi = a[0]*x[i2][i1];
         for (int j=1; j<_m; ++j) {
@@ -323,13 +323,32 @@ public class LocalCausalFilter {
         }
       }
     }
-    //// TODO:
-    /*
-    for (int i2=n2-1; i2>=i2lo; --i2) {
-      for (int i1=n1-1; i1>i1hi; --i1) {
+    for (int i2=i2lo; i2<n2; ++i2) {
+      for (int i1=0; i1<i1lo; ++i1) {
         a2.get(i1,i2,a);
         float xi = x[i2][i1];
-        float y[i2][i1] = a[0]*xi;
+        y[i2][i1] = a[0]*xi;
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          if (0<=k1)
+            y[k2][k1] += a[j]*xi;
+        }
+      }
+      for (int i1=i1lo; i1<i1hi; ++i1) {
+        a2.get(i1,i2,a);
+        float xi = x[i2][i1];
+        y[i2][i1] = a[0]*xi;
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          y[k2][k1] += a[j]*xi;
+        }
+      }
+      for (int i1=i1hi; i1<n1; ++i1) {
+        a2.get(i1,i2,a);
+        float xi = x[i2][i1];
+        y[i2][i1] = a[0]*xi;
         for (int j=1; j<_m; ++j) {
           int k1 = i1-_lag1[j];
           int k2 = i2-_lag2[j];
@@ -337,29 +356,128 @@ public class LocalCausalFilter {
             y[k2][k1] += a[j]*xi;
         }
       }
-      for (int i1=i1hi-1; i1>=i1lo; --i1) {
+    }
+  }
+
+  /**
+   * Applies the inverse of this filter. 
+   * Uses lag1 and lag2; ignores lag3, if specified.
+   * @param y input array.
+   * @param x output array.
+   */
+  public void applyInverse(A2 a2, float[][] y, float[][] x) {
+    float[] a = new float[_m];
+    int n1 = y[0].length;
+    int n2 = y.length;
+    int i1lo = min(_max1,n1);
+    int i1hi = min(n1,n1+_min1);
+    int i2lo = (i1lo<=i1hi)?min(_max2,n2):n2;
+    for (int i2=0; i2<i2lo; ++i2) {
+      for (int i1=0; i1<n1; ++i1) {
         a2.get(i1,i2,a);
-        float yi = a[0]*x[i2][i1];
+        float xi = 0.0f;
         for (int j=1; j<_m; ++j) {
           int k1 = i1-_lag1[j];
           int k2 = i2-_lag2[j];
-          yi += a[j]*x[k2][k1];
+          if (0<=k1 && k1<n1 && 0<=k2)
+            xi += a[j]*x[k2][k1];
         }
-        y[i2][i1] = yi;
+        x[i2][i1] = (y[i2][i1]-xi)/a[0];
       }
-      for (int i1=i1lo-1; i1>=0; --i1) {
+    }
+    for (int i2=i2lo; i2<n2; ++i2) {
+      for (int i1=0; i1<i1lo; ++i1) {
         a2.get(i1,i2,a);
-        float yi = a[0]*x[i2][i1];
+        float xi = 0.0f;
         for (int j=1; j<_m; ++j) {
           int k1 = i1-_lag1[j];
           int k2 = i2-_lag2[j];
           if (0<=k1)
-            yi += a[j]*x[k2][k1];
+            xi += a[j]*x[k2][k1];
         }
-        y[i2][i1] = yi;
+        x[i2][i1] = (y[i2][i1]-xi)/a[0];
+      }
+      for (int i1=i1lo; i1<i1hi; ++i1) {
+        a2.get(i1,i2,a);
+        float xi = 0.0f;
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          xi += a[j]*x[k2][k1];
+        }
+        x[i2][i1] = (y[i2][i1]-xi)/a[0];
+      }
+      for (int i1=i1hi; i1<n1; ++i1) {
+        a2.get(i1,i2,a);
+        float xi = 0.0f;
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          if (k1<n1)
+            xi += a[j]*x[k2][k1];
+        }
+        x[i2][i1] = (y[i2][i1]-xi)/a[0];
       }
     }
-    */
+  }
+
+  /**
+   * Applies the inverse transpose of this filter. 
+   * Uses lag1 and lag2; ignores lag3, if specified.
+   * @param y input array.
+   * @param x output array.
+   */
+  public void applyInverseTranspose(A2 a2, float[][] y, float[][] x) {
+    Array.zero(x);
+    float[] a = new float[_m];
+    int n1 = y[0].length;
+    int n2 = y.length;
+    int i1lo = min(_max1,n1);
+    int i1hi = min(n1,n1+_min1);
+    int i2lo = (i1lo<=i1hi)?min(_max2,n2):n2;
+    for (int i2=n2-1; i2>=i2lo; --i2) {
+      for (int i1=n1-1; i1>=i1hi; --i1) {
+        a2.get(i1,i2,a);
+        float xi = x[i2][i1] = (y[i2][i1]-x[i2][i1])/a[0];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          if (k1<n1)
+            x[k2][k1] += a[j]*xi;
+        }
+      }
+      for (int i1=i1hi-1; i1>=i1lo; --i1) {
+        a2.get(i1,i2,a);
+        float xi = x[i2][i1] = (y[i2][i1]-x[i2][i1])/a[0];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          x[k2][k1] += a[j]*xi;
+        }
+      }
+      for (int i1=i1lo-1; i1>=0; --i1) {
+        a2.get(i1,i2,a);
+        float xi = x[i2][i1] = (y[i2][i1]-x[i2][i1])/a[0];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          if (0<=k1)
+            x[k2][k1] += a[j]*xi;
+        }
+      }
+    }
+    for (int i2=i2lo-1; i2>=0; --i2) {
+      for (int i1=n1-1; i1>=0; --i1) {
+        a2.get(i1,i2,a);
+        float xi = x[i2][i1] = (y[i2][i1]-x[i2][i1])/a[0];
+        for (int j=1; j<_m; ++j) {
+          int k1 = i1-_lag1[j];
+          int k2 = i2-_lag2[j];
+          if (0<=k1 && k1<n1 && 0<=k2)
+            x[k2][k1] += a[j]*xi;
+        }
+      }
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////

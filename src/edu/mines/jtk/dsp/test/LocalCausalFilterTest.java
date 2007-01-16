@@ -82,6 +82,76 @@ public class LocalCausalFilterTest extends TestCase {
     }
   }
 
+  public void test2Random() {
+    int[] lag1 = {
+       0, 1, 2, 3, 4,
+      -4,-3,-2,-1, 0
+    };
+    int[] lag2 = {
+       0, 0, 0, 0, 0,
+       1, 1, 1, 1, 1
+    };
+    float[] aa = { 
+       1.79548454f, -0.64490664f, -0.03850411f, -0.01793403f, -0.00708972f,
+      -0.02290331f, -0.04141619f, -0.08457147f, -0.20031442f, -0.55659920f
+    };
+    final float[] ar = Array.mul(1.0f,aa);
+    final float[] as = Array.mul(2.0f,aa);
+    LocalCausalFilter lcf = new LocalCausalFilter(lag1,lag2);
+    LocalCausalFilter.A2 a2 = new LocalCausalFilter.A2() {
+      public void get(int i1, int i2, float[] a) {
+        if ((i1+i2)%2==0) {
+          Array.copy(ar,a);
+        } else {
+          Array.copy(as,a);
+        }
+      }
+    };
+    int n1 = 19;
+    int n2 = 21;
+    float tiny = n1*n2*10.0f*FLT_EPSILON;
+
+    { // y'Ax == x'A'y
+      float[][] x = randfloat(n1,n2);
+      float[][] y = randfloat(n1,n2);
+      float[][] ax = zerofloat(n1,n2);
+      float[][] ay = zerofloat(n1,n2);
+      lcf.apply(a2,x,ax);
+      lcf.applyTranspose(a2,y,ay);
+      float dyx = dot(y,ax);
+      float dxy = dot(x,ay);
+      assertEquals(dyx,dxy,tiny);
+    }
+
+    { // y'Bx == x'B'y (for B = inv(A))
+      float[][] x = randfloat(n1,n2);
+      float[][] y = randfloat(n1,n2);
+      float[][] bx = zerofloat(n1,n2);
+      float[][] by = zerofloat(n1,n2);
+      lcf.applyInverse(a2,x,bx);
+      lcf.applyInverseTranspose(a2,y,by);
+      float dyx = dot(y,bx);
+      float dxy = dot(x,by);
+      assertEquals(dyx,dxy,tiny);
+    }
+
+    { // x == BAx (for B = inv(A))
+      float[][] x = randfloat(n1,n2);
+      float[][] y = Array.copy(x);
+      lcf.apply(a2,y,y); // in-place
+      lcf.applyInverse(a2,y,y); // in-place
+      assertEqual(x,y);
+    }
+
+    { // x == A'B'x (for B = inv(A))
+      float[][] x = randfloat(n1,n2);
+      float[][] y = zerofloat(n1,n2);
+      lcf.applyInverseTranspose(a2,x,y); // *not* in-place
+      lcf.applyTranspose(a2,y,y); // in-place
+      assertEqual(x,y);
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
