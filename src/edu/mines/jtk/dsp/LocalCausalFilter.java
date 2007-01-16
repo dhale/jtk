@@ -15,8 +15,8 @@ import edu.mines.jtk.util.Check;
  * A multi-dimensional causal filter with locally variable coefficients.
  * The output samples of a causal filter depend only on present and past 
  * input samples. In two dimensions, causal filters are also called 
- * non-symmetric half-plane (NSHP) filters, and this concept can be
- * extended to higher dimensions.
+ * non-symmetric half-plane (NSHP) filters, and this notion of causal 
+ * can be extended to higher dimensions.
  * <p>
  * Local causal filters have coefficients that may vary from one output
  * sample to the next. Such a filter is <em>not</em> shift invariant. Its 
@@ -39,7 +39,9 @@ import edu.mines.jtk.util.Check;
 public class LocalCausalFilter {
 
   /**
-   * Interface for getting coefficients of 1-D filters.
+   * Interface for filter coefficients indexed in 1 dimension.
+   * Filter coefficients may vary with sample index, and will be got 
+   * through this interface for every output sample computed.
    */
   public interface A1 {
     
@@ -52,7 +54,9 @@ public class LocalCausalFilter {
   }
 
   /**
-   * Interface for getting coefficients of 2-D filters.
+   * Interface for filter coefficients indexed in 2 dimensions.
+   * Filter coefficients may vary with sample indices, and will be got 
+   * through this interface for every output sample computed.
    */
   public interface A2 {
     
@@ -63,6 +67,23 @@ public class LocalCausalFilter {
      * @param a array to be filled with coefficients.
      */
     public void get(int i1, int i2, float[] a);
+  }
+
+  /**
+   * Interface for filter coefficients indexed in 3 dimensions.
+   * Filter coefficients may vary with sample indices, and will be got 
+   * through this interface for every output sample computed.
+   */
+  public interface A3 {
+    
+    /**
+     * Gets local filter coefficients for the specified sample.
+     * @param i1 sample index in 1st dimension.
+     * @param i2 sample index in 2nd dimension.
+     * @param i3 sample index in 3rd dimension.
+     * @param a array to be filled with coefficients.
+     */
+    public void get(int i1, int i2, int i3, float[] a);
   }
 
   /**
@@ -106,12 +127,37 @@ public class LocalCausalFilter {
     initLags(lag1,lag2,lag3);
   }
 
+  /**
+   * Gets a copy of the lags in the 1st dimension.
+   * @return array of lags; by copy, not by reference.
+   */
+  public int[] getLag1() {
+    return Array.copy(_lag1);
+  }
+
+  /**
+   * Gets a copy of the lags in the 2nd dimension.
+   * @return array of lags; by copy, not by reference.
+   */
+  public int[] getLag2() {
+    return Array.copy(_lag2);
+  }
+
+  /**
+   * Gets a copy of the lags in the 3rd dimension.
+   * @return array of lags; by copy, not by reference.
+   */
+  public int[] getLag3() {
+    return Array.copy(_lag3);
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // 1-D
 
   /**
    * Applies this filter. 
    * Uses lag1; ignores lag2 or lag3, if specified.
+   * @param a1 filter coefficients.
    * @param x input array.
    * @param y output array.
    */
@@ -143,6 +189,7 @@ public class LocalCausalFilter {
   /**
    * Applies the transpose of this filter.
    * Uses lag1; ignores lag2 or lag3, if specified.
+   * @param a1 filter coefficients.
    * @param x input array.
    * @param y output array.
    */
@@ -174,6 +221,7 @@ public class LocalCausalFilter {
   /**
    * Applies the inverse of this filter.
    * Uses lag1; ignores lag2 or lag3, if specified.
+   * @param a1 filter coefficients.
    * @param y input array.
    * @param x output array.
    */
@@ -205,6 +253,7 @@ public class LocalCausalFilter {
   /**
    * Applies the inverse transpose of this filter.
    * Uses lag1; ignores lag2 or lag3, if specified.
+   * @param a1 filter coefficients.
    * @param y input array.
    * @param x output array.
    */
@@ -238,6 +287,7 @@ public class LocalCausalFilter {
   /**
    * Applies this filter. 
    * Uses lag1 and lag2; ignores lag3, if specified.
+   * @param a2 filter coefficients.
    * @param x input array.
    * @param y output array.
    */
@@ -300,6 +350,7 @@ public class LocalCausalFilter {
   /**
    * Applies the transpose of this filter. 
    * Uses lag1 and lag2; ignores lag3, if specified.
+   * @param a2 filter coefficients.
    * @param x input array.
    * @param y output array.
    */
@@ -362,6 +413,7 @@ public class LocalCausalFilter {
   /**
    * Applies the inverse of this filter. 
    * Uses lag1 and lag2; ignores lag3, if specified.
+   * @param a2 filter coefficients.
    * @param y input array.
    * @param x output array.
    */
@@ -424,6 +476,7 @@ public class LocalCausalFilter {
   /**
    * Applies the inverse transpose of this filter. 
    * Uses lag1 and lag2; ignores lag3, if specified.
+   * @param a2 filter coefficients.
    * @param y input array.
    * @param x output array.
    */
@@ -481,15 +534,421 @@ public class LocalCausalFilter {
   }
 
   ///////////////////////////////////////////////////////////////////////////
+  // 3-D
+
+  /**
+   * Applies this filter. 
+   * Uses lag1, lag2, and lag3.
+   * @param a3 filter coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(A3 a3, float[][][] x, float[][][] y) {
+    float[] a = new float[_m];
+    int n1 = x[0][0].length;
+    int n2 = x[0].length;
+    int n3 = x.length;
+    int i1lo = max(0,_max1);
+    int i1hi = min(n1,n1+_min1);
+    int i2lo = max(0,_max2);
+    int i2hi = min(n2,n2+_min2);
+    int i3lo = (i1lo<=i1hi && i2lo<=i2hi)?min(_max3,n3):n3;
+    for (int i3=n3-1; i3>=i3lo; --i3) {
+      for (int i2=n2-1; i2>=i2hi; --i2) {
+        for (int i1=n1-1; i1>=0; --i1) {
+          a3.get(i1,i2,i3,a);
+          float yi = a[0]*x[i3][i2][i1];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1 && k1<n1 && k2<n2)
+              yi += a[j]*x[k3][k2][k1];
+          }
+          y[i3][i2][i1] = yi;
+        }
+      }
+      for (int i2=i2hi-1; i2>=i2lo; --i2) {
+        for (int i1=n1-1; i1>=i1hi; --i1) {
+          a3.get(i1,i2,i3,a);
+          float yi = a[0]*x[i3][i2][i1];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (k1<n1)
+              yi += a[j]*x[k3][k2][k1];
+          }
+          y[i3][i2][i1] = yi;
+        }
+        for (int i1=i1hi-1; i1>=i1lo; --i1) {
+          a3.get(i1,i2,i3,a);
+          float yi = a[0]*x[i3][i2][i1];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            yi += a[j]*x[k3][k2][k1];
+          }
+          y[i3][i2][i1] = yi;
+        }
+        for (int i1=i1lo-1; i1>=0; --i1) {
+          a3.get(i1,i2,i3,a);
+          float yi = a[0]*x[i3][i2][i1];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1)
+              yi += a[j]*x[k3][k2][k1];
+          }
+          y[i3][i2][i1] = yi;
+        }
+      }
+      for (int i2=i2lo-1; i2>=0; --i2) {
+        for (int i1=n1-1; i1>=0; --i1) {
+          a3.get(i1,i2,i3,a);
+          float yi = a[0]*x[i3][i2][i1];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1 && k1<n1 && 0<=k2)
+              yi += a[j]*x[k3][k2][k1];
+          }
+          y[i3][i2][i1] = yi;
+        }
+      }
+    }
+    for (int i3=i3lo-1; i3>=0; --i3) {
+      for (int i2=n2-1; i2>=0; --i2) {
+        for (int i1=n1-1; i1>=0; --i1) {
+          a3.get(i1,i2,i3,a);
+          float yi = a[0]*x[i3][i2][i1];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1 && k1<n1 && 0<=k2 && k2<n2 && 0<=k3)
+              yi += a[j]*x[k3][k2][k1];
+          }
+          y[i3][i2][i1] = yi;
+        }
+      }
+    }
+  }
+
+  /**
+   * Applies the transpose of this filter. 
+   * Uses lag1, lag2, and lag3.
+   * @param a3 filter coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void applyTranspose(A3 a3, float[][][] x, float[][][] y) {
+    float[] a = new float[_m];
+    int n1 = x[0][0].length;
+    int n2 = x[0].length;
+    int n3 = x.length;
+    int i1lo = max(0,_max1);
+    int i1hi = min(n1,n1+_min1);
+    int i2lo = max(0,_max2);
+    int i2hi = min(n2,n2+_min2);
+    int i3lo = (i1lo<=i1hi && i2lo<=i2hi)?min(_max3,n3):n3;
+    for (int i3=0; i3<i3lo; ++i3) {
+      for (int i2=0; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = x[i3][i2][i1];
+          y[i3][i2][i1] = a[0]*xi;
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1 && k1<n1 && 0<=k2 && k2<n2 && 0<=k3)
+              y[k3][k2][k1] += a[j]*xi;
+          }
+        }
+      }
+    }
+    for (int i3=i3lo; i3<n3; ++i3) {
+      for (int i2=0; i2<i2lo; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = x[i3][i2][i1];
+          y[i3][i2][i1] = a[0]*xi;
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1 && k1<n1 && 0<=k2)
+              y[k3][k2][k1] += a[j]*xi;
+          }
+        }
+      }
+      for (int i2=i2lo; i2<i2hi; ++i2) {
+        for (int i1=0; i1<i1lo; ++i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = x[i3][i2][i1];
+          y[i3][i2][i1] = a[0]*xi;
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1)
+              y[k3][k2][k1] += a[j]*xi;
+          }
+        }
+        for (int i1=i1lo; i1<i1hi; ++i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = x[i3][i2][i1];
+          y[i3][i2][i1] = a[0]*xi;
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            y[k3][k2][k1] += a[j]*xi;
+          }
+        }
+        for (int i1=i1hi; i1<n1; ++i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = x[i3][i2][i1];
+          y[i3][i2][i1] = a[0]*xi;
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (k1<n1)
+              y[k3][k2][k1] += a[j]*xi;
+          }
+        }
+      }
+      for (int i2=i2hi; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = x[i3][i2][i1];
+          y[i3][i2][i1] = a[0]*xi;
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1 && k1<n1 && k2<n2)
+              y[k3][k2][k1] += a[j]*xi;
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Applies the inverse of this filter. 
+   * Uses lag1, lag2, and lag3.
+   * @param a3 filter coefficients.
+   * @param y output array.
+   * @param x input array.
+   */
+  public void applyInverse(A3 a3, float[][][] y, float[][][] x) {
+    float[] a = new float[_m];
+    int n1 = y[0][0].length;
+    int n2 = y[0].length;
+    int n3 = y.length;
+    int i1lo = max(0,_max1);
+    int i1hi = min(n1,n1+_min1);
+    int i2lo = max(0,_max2);
+    int i2hi = min(n2,n2+_min2);
+    int i3lo = (i1lo<=i1hi && i2lo<=i2hi)?min(_max3,n3):n3;
+    for (int i3=0; i3<i3lo; ++i3) {
+      for (int i2=0; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = 0.0f;
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1 && k1<n1 && 0<=k2 && k2<n2 && 0<=k3)
+              xi += a[j]*x[k3][k2][k1];
+          }
+          x[i3][i2][i1] = (y[i3][i2][i1]-xi)/a[0];
+        }
+      }
+    }
+    for (int i3=i3lo; i3<n3; ++i3) {
+      for (int i2=0; i2<i2lo; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = 0.0f;
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1 && k1<n1 && 0<=k2)
+              xi += a[j]*x[k3][k2][k1];
+          }
+          x[i3][i2][i1] = (y[i3][i2][i1]-xi)/a[0];
+        }
+      }
+      for (int i2=i2lo; i2<i2hi; ++i2) {
+        for (int i1=0; i1<i1lo; ++i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = 0.0f;
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1)
+              xi += a[j]*x[k3][k2][k1];
+          }
+          x[i3][i2][i1] = (y[i3][i2][i1]-xi)/a[0];
+        }
+        for (int i1=i1lo; i1<i1hi; ++i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = 0.0f;
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            xi += a[j]*x[k3][k2][k1];
+          }
+          x[i3][i2][i1] = (y[i3][i2][i1]-xi)/a[0];
+        }
+        for (int i1=i1hi; i1<n1; ++i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = 0.0f;
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (k1<n1)
+              xi += a[j]*x[k3][k2][k1];
+          }
+          x[i3][i2][i1] = (y[i3][i2][i1]-xi)/a[0];
+        }
+      }
+      for (int i2=i2hi; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = 0.0f;
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1 && k1<n1 && k2<n2)
+              xi += a[j]*x[k3][k2][k1];
+          }
+          x[i3][i2][i1] = (y[i3][i2][i1]-xi)/a[0];
+        }
+      }
+    }
+  }
+
+  /**
+   * Applies the inverse transpose of this filter. 
+   * Uses lag1, lag2, and lag3.
+   * @param a3 filter coefficients.
+   * @param y output array.
+   * @param x input array.
+   */
+  public void applyInverseTranspose(A3 a3, float[][][] y, float[][][] x) {
+    Array.zero(x);
+    float[] a = new float[_m];
+    int n1 = y[0][0].length;
+    int n2 = y[0].length;
+    int n3 = y.length;
+    int i1lo = max(0,_max1);
+    int i1hi = min(n1,n1+_min1);
+    int i2lo = max(0,_max2);
+    int i2hi = min(n2,n2+_min2);
+    int i3lo = (i1lo<=i1hi && i2lo<=i2hi)?min(_max3,n3):n3;
+    for (int i3=n3-1; i3>=i3lo; --i3) {
+      for (int i2=n2-1; i2>=i2hi; --i2) {
+        for (int i1=n1-1; i1>=0; --i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = x[i3][i2][i1] = (y[i3][i2][i1]-x[i3][i2][i1])/a[0];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1 && k1<n1 && k2<n2)
+              x[k3][k2][k1] += a[j]*xi;
+          }
+        }
+      }
+      for (int i2=i2hi-1; i2>=i2lo; --i2) {
+        for (int i1=n1-1; i1>=i1hi; --i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = x[i3][i2][i1] = (y[i3][i2][i1]-x[i3][i2][i1])/a[0];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (k1<n1)
+              x[k3][k2][k1] += a[j]*xi;
+          }
+        }
+        for (int i1=i1hi-1; i1>=i1lo; --i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = x[i3][i2][i1] = (y[i3][i2][i1]-x[i3][i2][i1])/a[0];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            x[k3][k2][k1] += a[j]*xi;
+          }
+        }
+        for (int i1=i1lo-1; i1>=0; --i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = x[i3][i2][i1] = (y[i3][i2][i1]-x[i3][i2][i1])/a[0];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1)
+              x[k3][k2][k1] += a[j]*xi;
+          }
+        }
+      }
+      for (int i2=i2lo-1; i2>=0; --i2) {
+        for (int i1=n1-1; i1>=0; --i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = x[i3][i2][i1] = (y[i3][i2][i1]-x[i3][i2][i1])/a[0];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1 && k1<n1 && 0<=k2)
+              x[k3][k2][k1] += a[j]*xi;
+          }
+        }
+      }
+    }
+    for (int i3=i3lo-1; i3>=0; --i3) {
+      for (int i2=n2-1; i2>=0; --i2) {
+        for (int i1=n1-1; i1>=0; --i1) {
+          a3.get(i1,i2,i3,a);
+          float xi = x[i3][i2][i1] = (y[i3][i2][i1]-x[i3][i2][i1])/a[0];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1-_lag1[j];
+            int k2 = i2-_lag2[j];
+            int k3 = i3-_lag3[j];
+            if (0<=k1 && k1<n1 && 0<=k2 && k2<n2 && 0<=k3)
+              x[k3][k2][k1] += a[j]*xi;
+          }
+        }
+      }
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private int _m;
-  private int _min1,_max1;
-  private int _min2,_max2;
-  private int _min3,_max3;
-  private int[] _lag1;
-  private int[] _lag2;
-  private int[] _lag3;
+  private int _m; // number of lags and filter coefficients
+  private int _min1,_max1; // min/max lags in 1st dimension
+  private int _min2,_max2; // min/max lags in 2nd dimension
+  private int _min3,_max3; // min/max lags in 3rd dimension
+  private int[] _lag1; // lags in 1st dimension
+  private int[] _lag2; // lags in 2nd dimension
+  private int[] _lag3; // lags in 3rd dimension
 
   private void initLags(int[] lag1) {
     Check.argument(lag1.length>0,"lag1.length>0");

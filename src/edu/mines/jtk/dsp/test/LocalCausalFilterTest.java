@@ -152,6 +152,89 @@ public class LocalCausalFilterTest extends TestCase {
     }
   }
 
+  public void test3Random() {
+    int[] lag1 = {
+                   0, 1, 2,
+            -2,-1, 0, 1, 2,
+            -2,-1, 0, 1, 2,
+            -2,-1, 0,
+    };
+    int[] lag2 = {
+                   0, 0, 0,      
+             1, 1, 1, 1, 1,      
+            -1,-1,-1,-1,-1,      
+             0, 0, 0,
+    };
+    int[] lag3 = {
+                   0, 0, 0,      
+             0, 0, 0, 0, 0,      
+             1, 1, 1, 1, 1,      
+             1, 1, 1,
+    };
+    float[] aa = {
+                                 2.3110454f, -0.4805547f, -0.0143204f, 
+      -0.0291793f, -0.1057476f, -0.4572746f, -0.0115732f, -0.0047283f, 
+      -0.0149963f, -0.0408317f, -0.0945958f, -0.0223166f, -0.0062781f, 
+      -0.0213786f, -0.0898909f, -0.4322719f
+    };
+    final float[] ar = Array.mul(1.0f,aa);
+    final float[] as = Array.mul(2.0f,aa);
+    LocalCausalFilter lcf = new LocalCausalFilter(lag1,lag2,lag3);
+    LocalCausalFilter.A3 a3 = new LocalCausalFilter.A3() {
+      public void get(int i1, int i2, int i3, float[] a) {
+        if ((i1+i2+i3)%2==0) {
+          Array.copy(ar,a);
+        } else {
+          Array.copy(as,a);
+        }
+      }
+    };
+    int n1 = 11;
+    int n2 = 13;
+    int n3 = 12;
+    float tiny = n1*n2*n3*10.0f*FLT_EPSILON;
+
+    { // y'Ax == x'A'y
+      float[][][] x = randfloat(n1,n2,n3);
+      float[][][] y = randfloat(n1,n2,n3);
+      float[][][] ax = zerofloat(n1,n2,n3);
+      float[][][] ay = zerofloat(n1,n2,n3);
+      lcf.apply(a3,x,ax);
+      lcf.applyTranspose(a3,y,ay);
+      float dyx = dot(y,ax);
+      float dxy = dot(x,ay);
+      assertEquals(dyx,dxy,tiny);
+    }
+
+    { // y'Bx == x'B'y (for B = inv(A))
+      float[][][] x = randfloat(n1,n2,n3);
+      float[][][] y = randfloat(n1,n2,n3);
+      float[][][] bx = zerofloat(n1,n2,n3);
+      float[][][] by = zerofloat(n1,n2,n3);
+      lcf.applyInverse(a3,x,bx);
+      lcf.applyInverseTranspose(a3,y,by);
+      float dyx = dot(y,bx);
+      float dxy = dot(x,by);
+      assertEquals(dyx,dxy,tiny);
+    }
+
+    { // x == BAx (for B = inv(A))
+      float[][][] x = randfloat(n1,n2,n3);
+      float[][][] y = Array.copy(x);
+      lcf.apply(a3,y,y); // in-place
+      lcf.applyInverse(a3,y,y); // in-place
+      assertEqual(x,y);
+    }
+
+    { // x == A'B'x (for B = inv(A))
+      float[][][] x = randfloat(n1,n2,n3);
+      float[][][] y = zerofloat(n1,n2,n3);
+      lcf.applyInverseTranspose(a3,x,y); // *not* in-place
+      lcf.applyTranspose(a3,y,y); // in-place
+      assertEqual(x,y);
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
