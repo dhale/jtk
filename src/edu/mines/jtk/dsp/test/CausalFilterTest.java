@@ -16,7 +16,7 @@ import edu.mines.jtk.util.Array;
 /**
  * Tests {@link edu.mines.jtk.dsp.CausalFilter}.
  * @author Dave Hale, Colorado School of Mines
- * @version 2006.10.13
+ * @version 2007.01.16
  */
 public class CausalFilterTest extends TestCase {
   public static void main(String[] args) {
@@ -65,8 +65,8 @@ public class CausalFilterTest extends TestCase {
 
     { // x == A'B'x (for B = inv(A))
       float[] x = randfloat(n);
-      float[] y = zerofloat(n);
-      cf.applyInverseTranspose(x,y); // *not* in-place
+      float[] y = Array.copy(x);
+      cf.applyInverseTranspose(y,y); // in-place
       cf.applyTranspose(y,y); // in-place
       assertEqual(x,y);
     }
@@ -124,8 +124,8 @@ public class CausalFilterTest extends TestCase {
 
     { // x == A'B'x (for B = inv(A))
       float[][] x = randfloat(n1,n2);
-      float[][] y = zerofloat(n1,n2);
-      cf.applyInverseTranspose(x,y); // *not* in-place
+      float[][] y = Array.copy(x);
+      cf.applyInverseTranspose(y,y); // in-place
       cf.applyTranspose(y,y); // in-place
       assertEqual(x,y);
     }
@@ -196,8 +196,8 @@ public class CausalFilterTest extends TestCase {
 
     { // x == A'B'x (for B = inv(A))
       float[][][] x = randfloat(n1,n2,n3);
-      float[][][] y = zerofloat(n1,n2,n3);
-      cf.applyInverseTranspose(x,y); // *not* in-place
+      float[][][] y = Array.copy(x);
+      cf.applyInverseTranspose(y,y); // in-place
       cf.applyTranspose(y,y); // in-place
       assertEqual(x,y);
     }
@@ -208,12 +208,12 @@ public class CausalFilterTest extends TestCase {
     int n = r.length;
     int[] lag1 = {0,1,2,3};
     CausalFilter cf = new CausalFilter(lag1);
-    cf.factorWilsonBurg(10,FLT_EPSILON,r);
+    cf.factorWilsonBurg(10,0.0f,r);
     float[] a = cf.getA();
-    assertEquals(24.0f,a[0],100*FLT_EPSILON);
-    assertEquals(26.0f,a[1],100*FLT_EPSILON);
-    assertEquals( 9.0f,a[2],100*FLT_EPSILON);
-    assertEquals( 1.0f,a[3],100*FLT_EPSILON);
+    assertEquals(24.0f,a[0],10*FLT_EPSILON);
+    assertEquals(26.0f,a[1],10*FLT_EPSILON);
+    assertEquals( 9.0f,a[2],10*FLT_EPSILON);
+    assertEquals( 1.0f,a[3],10*FLT_EPSILON);
   }
 
   public void testFactorLaplacian2() {

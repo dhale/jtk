@@ -524,7 +524,6 @@ public class CausalFilter {
    * @param x output array.
    */
   public void applyInverseTranspose(float[] y, float[] x) {
-    Array.zero(x);
     int n1 = y.length;
     int i1hi = max(n1-_max1,0);
     for (int i1=n1-1; i1>=i1hi; --i1) {
@@ -986,77 +985,77 @@ public class CausalFilter {
     for (int i3=0; i3<i3lo; ++i3) {
       for (int i2=0; i2<n2; ++i2) {
         for (int i1=0; i1<n1; ++i1) {
-          float xi = 0.0f;
+          float xi = y[i3][i2][i1];
           for (int j=1; j<_m; ++j) {
             int k1 = i1-_lag1[j];
             int k2 = i2-_lag2[j];
             int k3 = i3-_lag3[j];
             if (0<=k1 && k1<n1 && 0<=k2 && k2<n2 && 0<=k3)
-              xi += _a[j]*x[k3][k2][k1];
+              xi -= _a[j]*x[k3][k2][k1];
           }
-          x[i3][i2][i1] = (y[i3][i2][i1]-xi)*_a0i;
+          x[i3][i2][i1] = xi*_a0i;
         }
       }
     }
     for (int i3=i3lo; i3<n3; ++i3) {
       for (int i2=0; i2<i2lo; ++i2) {
         for (int i1=0; i1<n1; ++i1) {
-          float xi = 0.0f;
+          float xi = y[i3][i2][i1];
           for (int j=1; j<_m; ++j) {
             int k1 = i1-_lag1[j];
             int k2 = i2-_lag2[j];
             int k3 = i3-_lag3[j];
             if (0<=k1 && k1<n1 && 0<=k2)
-              xi += _a[j]*x[k3][k2][k1];
+              xi -= _a[j]*x[k3][k2][k1];
           }
-          x[i3][i2][i1] = (y[i3][i2][i1]-xi)*_a0i;
+          x[i3][i2][i1] = xi*_a0i;
         }
       }
       for (int i2=i2lo; i2<i2hi; ++i2) {
         for (int i1=0; i1<i1lo; ++i1) {
-          float xi = 0.0f;
+          float xi = y[i3][i2][i1];
           for (int j=1; j<_m; ++j) {
             int k1 = i1-_lag1[j];
             int k2 = i2-_lag2[j];
             int k3 = i3-_lag3[j];
             if (0<=k1)
-              xi += _a[j]*x[k3][k2][k1];
+              xi -= _a[j]*x[k3][k2][k1];
           }
-          x[i3][i2][i1] = (y[i3][i2][i1]-xi)*_a0i;
+          x[i3][i2][i1] = xi*_a0i;
         }
         for (int i1=i1lo; i1<i1hi; ++i1) {
-          float xi = 0.0f;
+          float xi = y[i3][i2][i1];
           for (int j=1; j<_m; ++j) {
             int k1 = i1-_lag1[j];
             int k2 = i2-_lag2[j];
             int k3 = i3-_lag3[j];
-            xi += _a[j]*x[k3][k2][k1];
+            xi -= _a[j]*x[k3][k2][k1];
           }
-          x[i3][i2][i1] = (y[i3][i2][i1]-xi)*_a0i;
+          x[i3][i2][i1] = xi*_a0i;
         }
         for (int i1=i1hi; i1<n1; ++i1) {
-          float xi = 0.0f;
+          float xi = y[i3][i2][i1];
           for (int j=1; j<_m; ++j) {
             int k1 = i1-_lag1[j];
             int k2 = i2-_lag2[j];
             int k3 = i3-_lag3[j];
             if (k1<n1)
-              xi += _a[j]*x[k3][k2][k1];
+              xi -= _a[j]*x[k3][k2][k1];
           }
-          x[i3][i2][i1] = (y[i3][i2][i1]-xi)*_a0i;
+          x[i3][i2][i1] = xi*_a0i;
         }
       }
       for (int i2=i2hi; i2<n2; ++i2) {
         for (int i1=0; i1<n1; ++i1) {
-          float xi = 0.0f;
+          float xi = y[i3][i2][i1];
           for (int j=1; j<_m; ++j) {
             int k1 = i1-_lag1[j];
             int k2 = i2-_lag2[j];
             int k3 = i3-_lag3[j];
             if (0<=k1 && k1<n1 && k2<n2)
-              xi += _a[j]*x[k3][k2][k1];
+              xi -= _a[j]*x[k3][k2][k1];
           }
-          x[i3][i2][i1] = (y[i3][i2][i1]-xi)*_a0i;
+          x[i3][i2][i1] = xi*_a0i;
         }
       }
     }
@@ -1069,83 +1068,88 @@ public class CausalFilter {
    * @param x input array.
    */
   public void applyInverseTranspose(float[][][] y, float[][][] x) {
-    Array.zero(x);
     int n1 = y[0][0].length;
     int n2 = y[0].length;
     int n3 = y.length;
-    int i1lo = max(0,_max1);
-    int i1hi = min(n1,n1+_min1);
-    int i2lo = max(0,_max2);
-    int i2hi = min(n2,n2+_min2);
-    int i3lo = (i1lo<=i1hi && i2lo<=i2hi)?min(_max3,n3):n3;
-    for (int i3=n3-1; i3>=i3lo; --i3) {
+    int i1lo = max(0,-_min1);
+    int i1hi = min(n1,n1-_max1);
+    int i2lo = max(0,-_min2);
+    int i2hi = min(n2,n2-_max2);
+    int i3hi = (i1lo<=i1hi && i2lo<=i2hi)?max(n3-_max3,0):0;
+    for (int i3=n3-1; i3>=i3hi; --i3) {
+      for (int i2=n2-1; i2>=0; --i2) {
+        for (int i1=n1-1; i1>=0; --i1) {
+          float xi = y[i3][i2][i1];
+          for (int j=1; j<_m; ++j) {
+            int k1 = i1+_lag1[j];
+            int k2 = i2+_lag2[j];
+            int k3 = i3+_lag3[j];
+            if (0<=k1 && k1<n1 && 0<=k2 && k2<n2 && k3<n3)
+              xi -= _a[j]*x[k3][k2][k1];
+          }
+          x[i3][i2][i1] = xi*_a0i;
+        }
+      }
+    }
+    for (int i3=i3hi-1; i3>=0; --i3) {
       for (int i2=n2-1; i2>=i2hi; --i2) {
         for (int i1=n1-1; i1>=0; --i1) {
-          float xi = x[i3][i2][i1] = (y[i3][i2][i1]-x[i3][i2][i1])*_a0i;
+          float xi = y[i3][i2][i1];
           for (int j=1; j<_m; ++j) {
-            int k1 = i1-_lag1[j];
-            int k2 = i2-_lag2[j];
-            int k3 = i3-_lag3[j];
+            int k1 = i1+_lag1[j];
+            int k2 = i2+_lag2[j];
+            int k3 = i3+_lag3[j];
             if (0<=k1 && k1<n1 && k2<n2)
-              x[k3][k2][k1] += _a[j]*xi;
+              xi -= _a[j]*x[k3][k2][k1];
           }
+          x[i3][i2][i1] = xi*_a0i;
         }
       }
       for (int i2=i2hi-1; i2>=i2lo; --i2) {
         for (int i1=n1-1; i1>=i1hi; --i1) {
-          float xi = x[i3][i2][i1] = (y[i3][i2][i1]-x[i3][i2][i1])*_a0i;
+          float xi = y[i3][i2][i1];
           for (int j=1; j<_m; ++j) {
-            int k1 = i1-_lag1[j];
-            int k2 = i2-_lag2[j];
-            int k3 = i3-_lag3[j];
+            int k1 = i1+_lag1[j];
+            int k2 = i2+_lag2[j];
+            int k3 = i3+_lag3[j];
             if (k1<n1)
-              x[k3][k2][k1] += _a[j]*xi;
+              xi -= _a[j]*x[k3][k2][k1];
           }
+          x[i3][i2][i1] = xi*_a0i;
         }
         for (int i1=i1hi-1; i1>=i1lo; --i1) {
-          float xi = x[i3][i2][i1] = (y[i3][i2][i1]-x[i3][i2][i1])*_a0i;
+          float xi = y[i3][i2][i1];
           for (int j=1; j<_m; ++j) {
-            int k1 = i1-_lag1[j];
-            int k2 = i2-_lag2[j];
-            int k3 = i3-_lag3[j];
-            x[k3][k2][k1] += _a[j]*xi;
+            int k1 = i1+_lag1[j];
+            int k2 = i2+_lag2[j];
+            int k3 = i3+_lag3[j];
+            xi -= _a[j]*x[k3][k2][k1];
           }
+          x[i3][i2][i1] = xi*_a0i;
         }
         for (int i1=i1lo-1; i1>=0; --i1) {
-          float xi = x[i3][i2][i1] = (y[i3][i2][i1]-x[i3][i2][i1])*_a0i;
+          float xi = y[i3][i2][i1];
           for (int j=1; j<_m; ++j) {
-            int k1 = i1-_lag1[j];
-            int k2 = i2-_lag2[j];
-            int k3 = i3-_lag3[j];
+            int k1 = i1+_lag1[j];
+            int k2 = i2+_lag2[j];
+            int k3 = i3+_lag3[j];
             if (0<=k1)
-              x[k3][k2][k1] += _a[j]*xi;
+              xi -= _a[j]*x[k3][k2][k1];
           }
+          x[i3][i2][i1] = xi*_a0i;
         }
       }
       for (int i2=i2lo-1; i2>=0; --i2) {
         for (int i1=n1-1; i1>=0; --i1) {
-          float xi = x[i3][i2][i1] = (y[i3][i2][i1]-x[i3][i2][i1])*_a0i;
+          float xi = y[i3][i2][i1];
           for (int j=1; j<_m; ++j) {
-            int k1 = i1-_lag1[j];
-            int k2 = i2-_lag2[j];
-            int k3 = i3-_lag3[j];
+            int k1 = i1+_lag1[j];
+            int k2 = i2+_lag2[j];
+            int k3 = i3+_lag3[j];
             if (0<=k1 && k1<n1 && 0<=k2)
-              x[k3][k2][k1] += _a[j]*xi;
+              xi -= _a[j]*x[k3][k2][k1];
           }
-        }
-      }
-    }
-    for (int i3=i3lo-1; i3>=0; --i3) {
-      for (int i2=n2-1; i2>=0; --i2) {
-        for (int i1=n1-1; i1>=0; --i1) {
-          float xi = x[i3][i2][i1] = (y[i3][i2][i1]-x[i3][i2][i1])*_a0i;
-          for (int j=1; j<_m; ++j) {
-            int k1 = i1-_lag1[j];
-            int k2 = i2-_lag2[j];
-            int k3 = i3-_lag3[j];
-            if (0<=k1 && k1<n1 && 0<=k2 && k2<n2 && 0<=k3)
-              x[k3][k2][k1] += _a[j]*xi;
-          }
+          x[i3][i2][i1] = xi*_a0i;
         }
       }
     }
