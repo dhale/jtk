@@ -11,16 +11,16 @@ import static edu.mines.jtk.util.MathPlus.*;
 import edu.mines.jtk.util.Check;
 
 /**
- * Searches along a line for a minimum of a continuously differentiable 
- * function of one or more variables. Uses values f(s) of the function and 
- * its directional derivative f'(s) (the dot product of a search-direction 
- * vector and the function's gradient) to find a step s that minimizes the 
- * function along the line constraining the search. The search assumes that 
+ * Searches along a line for a minimum of a continuously differentiable
+ * function of one or more variables. Uses values f(s) of the function and
+ * its directional derivative f'(s) (the dot product of a search-direction
+ * vector and the function's gradient) to find a step s that minimizes the
+ * function along the line constraining the search. The search assumes that
  * f'(0) &lt; 0, and searches for a positive s that minimizes f(s).
  * <p>
- * This implementation uses Mor'e and Thuente's algorithm with guaranteed 
+ * This implementation uses Mor'e and Thuente's algorithm with guaranteed
  * sufficient decrease. It iteratively searches for a step s that at each
- * iteration satisfies both a sufficient-decrease condition and a curvature 
+ * iteration satisfies both a sufficient-decrease condition and a curvature
  * condition.
  * <p>
  * The sufficient decrease condition (1) is
@@ -34,8 +34,8 @@ import edu.mines.jtk.util.Check;
  * for specified non-negative tolerances ftol and gtol.
  * <p>
  * Condition (1) ensures a sufficient decrease in the function f(s),
- * provided that s is not too small. Condition (2) ensures that s is not 
- * too small, and usually guarantees that s is near a local minimizer of 
+ * provided that s is not too small. Condition (2) ensures that s is not
+ * too small, and usually guarantees that s is near a local minimizer of
  * f. It is called a curvature condition because it implies that
  * <pre>
  *   f'(s) - f'(0) &gt; (1-gtol)*abs(f'(0)),
@@ -44,24 +44,24 @@ import edu.mines.jtk.util.Check;
  * <p>
  * The curvature condition (2) is especially important in a quasi-Newton
  * method for function minimization, because it guarantees that a
- * positive-definite quasi-Newton update is possible. If ftol is less than 
- * gtol and the function f(s) is bounded below, then there exists a step s 
+ * positive-definite quasi-Newton update is possible. If ftol is less than
+ * gtol and the function f(s) is bounded below, then there exists a step s
  * that satisfies both conditions. If such a step cannot be found, then
  * only the first sufficient-decrease condition (1) is satisfied.
  * <p>
- * Mor'e and Thuente's algorithm initially choses an interval [sa,sb] that 
- * contains a minimizer of a modified function 
+ * Mor'e and Thuente's algorithm initially choses an interval [sa,sb] that
+ * contains a minimizer of a modified function
  * <pre>
  *   h(s) = f(s) - f(0) - ftol*f'(0)*s
  * </pre>
- * If h(s) &lt;= 0 and f'(s) &gt;= 0 for some step s, then the interval 
+ * If h(s) &lt;= 0 and f'(s) &gt;= 0 for some step s, then the interval
  * [a,b] is chosen so that it contains a minimizer of f.
  * <p>
- * If no step can be found that satisfies both conditions, then the 
- * algorithm ends unconverged. In this case the step s satisifies only 
+ * If no step can be found that satisfies both conditions, then the
+ * algorithm ends unconverged. In this case the step s satisifies only
  * the sufficient-decrease condition.
  * <p>
- * References: 
+ * References:
  * <ul><li>
  * Mor'e, J.J., and Thuente, D.J., 1992, Line search algorithms with
  * guaranteed sufficient decrease: Preprint MCS-P330-1092, Argonne
@@ -71,7 +71,7 @@ import edu.mines.jtk.util.Check;
  * and dcsrch from MINPACK-2, 1993, Argonne National Laboratory and
  * University of Minnesota.
  * </li></ul>
- * 
+ *
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.09.02
  */
@@ -165,8 +165,9 @@ public class LineSearch {
 
   /**
    * Constructs a line search with specified tolerances.
+   * @param func Function to search.
    * @param stol non-negative relative tolerance for an acceptable step.
-   *  The search ends if the search interval [slo,shi] is smaller than 
+   *  The search ends if the search interval [slo,shi] is smaller than
    *  this tolerance times the upper bound shi.
    * @param ftol non-negative tolerance for sufficient-decrease condition (1).
    * @param gtol non-negative tolerance for curvature condition (2).
@@ -186,12 +187,15 @@ public class LineSearch {
 
   /**
    * Searches for a minimizing step.
-   * @param s current estimate of a satisfactory step. Must be positive. 
+   * @param s current estimate of a satisfactory step. Must be positive.
    * @param f value f(0) of the function f at s = 0.
    * @param g value f'(0) of the derivative of f at s = 0.
+   * @param smin Minimum value of s to be searched.
+   * @param smax Maximum value of s to be searched.
+   * @return the result of the line search.
    */
   public Result search(
-    double s, double f, double g, double smin, double smax) 
+    double s, double f, double g, double smin, double smax)
   {
     Check.argument(smin>=0.0,"smin>=0.0");
     Check.argument(smin<=smax,"smin<=smax");
@@ -218,7 +222,7 @@ public class LineSearch {
     double slo = 0.0;
     double shi = s*(1.0+SHI_FACTOR);
 
-    double[] fg = _func.evaluate(s); 
+    double[] fg = _func.evaluate(s);
     f = fg[0];
     g = fg[1];
     int neval = 1;
@@ -242,12 +246,12 @@ public class LineSearch {
       } else if (f<=ftest && abs(g)<=_gtol*(-ginit)) {
         ended = CONVERGED;
       }
-      
+
       // Else, if still searching, ...
       else {
 
-        // During the first stage, use a modified function to compute 
-        // the step if a lower function value has been obtained, but 
+        // During the first stage, use a modified function to compute
+        // the step if a lower function value has been obtained, but
         // the decrease is insufficient.
         if (stage1 && f<=fa && f>ftest) {
 
@@ -273,8 +277,8 @@ public class LineSearch {
           fb = fbm+sb*gtest;
           ga = gam+gtest;
           gb = gbm+gtest;
-        } 
-        
+        }
+
         // Otherwise, use the unmodified function f.
         else {
 
@@ -290,7 +294,7 @@ public class LineSearch {
 
         // Decide if a bisection step is needed.
         if (bracketed) {
-          if (abs(sb-sa)>=0.66*widthOld) 
+          if (abs(sb-sa)>=0.66*widthOld)
             s = sa+0.5*(sb-sa);
           widthOld = width;
           width = abs(sb-sa);
@@ -311,12 +315,12 @@ public class LineSearch {
 
         // If further progress is impossible, step s is best found so far.
         if ((bracketed && (s<=slo || s>=shi)) ||
-            (bracketed && shi-slo<=_stol*shi)) 
+            (bracketed && shi-slo<=_stol*shi))
           s = sa;
       }
 
       // Evaluate function f(s) and derivative f'(s).
-      fg = _func.evaluate(s); 
+      fg = _func.evaluate(s);
       f = fg[0];
       g = fg[1];
       ++neval;
@@ -339,8 +343,8 @@ public class LineSearch {
 
   // Updates a specified step interval, and returns an updated step.
   private double updateStep(
-    double sp, double fp, double gp, 
-    double smin, double smax, StepInterval si) 
+    double sp, double fp, double gp,
+    double smin, double smax, StepInterval si)
   {
     double sa = si.sa;
     double fa = si.fa;
@@ -361,7 +365,7 @@ public class LineSearch {
       double theta = 3.0*(fa-fp)/(sp-sa)+ga+gp;
       double s = max(abs(theta),abs(ga),abs(gp));
       double gamma = s*sqrt((theta/s)*(theta/s)-(ga/s)*(gp/s));
-      if (sp<sa) 
+      if (sp<sa)
         gamma = -gamma;
       double p = (gamma-ga)+theta;
       double q = ((gamma-ga)+gamma)+gp;
@@ -413,7 +417,7 @@ public class LineSearch {
       // The case gamma = 0 arises only if the cubic does not tend
       // to infinity in the direction of the step.
       double gamma = s*sqrt(max(0.0,(theta/s)*(theta/s)-(ga/s)*(gp/s)));
-      if (sp>sa) 
+      if (sp>sa)
         gamma = -gamma;
       double p = (gamma-gp)+theta;
       double q = (gamma+(ga-gp))+gamma;
@@ -428,7 +432,7 @@ public class LineSearch {
       }
       double spq = sp+(gp/(gp-ga))*(sa-sp);
 
-      // If a minimizer has been bracketed, ... 
+      // If a minimizer has been bracketed, ...
       if (bracketed) {
 
         // If the cubic step is closer to sp than the secant step, the
@@ -444,11 +448,11 @@ public class LineSearch {
           spf = max(sp+0.66*(sb-sp),spf);
         }
       }
-      
+
       // Else, if a minimizer has not been bracketed, ...
       else {
 
-        // If the cubic step is farther from sp than the secant step, 
+        // If the cubic step is farther from sp than the secant step,
         // the cubic step is taken, otherwise the secant step is taken.
         if (abs(spc-sp)>abs(spq-sp)) {
           spf = spc;
