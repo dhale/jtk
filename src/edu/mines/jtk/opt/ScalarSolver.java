@@ -344,7 +344,7 @@ public class ScalarSolver {
     }
 
     /** For sorting with Arrays.sort */
-    private class MyComparable implements Comparable {
+    private class MyComparable implements Comparable<MyComparable> {
       /** Array index */
       public int index = 0;
 
@@ -353,9 +353,8 @@ public class ScalarSolver {
       */
       public MyComparable(int index) {this.index = index;}
 
-      public int compareTo(Object o) {
-        MyComparable other = (MyComparable) o;
-        return s_almost.cmp(_values[index], _values[other.index]);
+      public int compareTo(MyComparable o) {
+        return s_almost.cmp(_values[index], _values[o.index]);
       }
     }
   }

@@ -63,11 +63,11 @@ public class VectMap implements VectContainer {
 
   // VectContainer
   public int[] getKeys() {
-    Set keys = _map.keySet();
+    Set<Integer> keys = _map.keySet();
     int[] result = new int[keys.size()];
-    Iterator iterator = keys.iterator();
-    for (int i=0; iterator.hasNext(); ++i) {
-      result[i] = ((Integer) iterator.next()).intValue();
+    int i=0;
+    for (Integer j: keys) {
+      result[i++] = j;
     }
     return result;
   }
