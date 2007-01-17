@@ -70,7 +70,7 @@ public class Localize {
       Test with java -Duser.language=ch
       @return Filtered string.
    */
-  public static String filter(String message, Class resourceClass) {
+  public static String filter(String message, Class<?> resourceClass) {
     ClassLoader cl = resourceClass.getClassLoader();
     if (cl == null) {
       LOG.warning("Could not get ClassLoader from "+resourceClass.getName());
