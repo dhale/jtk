@@ -32,6 +32,10 @@ import edu.mines.jtk.util.Check;
  * inverse. That inverse is a recursive all-pole filter, as described by
  * Claerbout, J., 1998, Multidimensional recursive filters via a helix: 
  * Geophysics, v. 63, n. 5, p. 1532-1541.
+ * <p>
+ * The filter and its transpose and inverse may all be applied in-place; 
+ * that is, the input and output arrays may be the same array. However,
+ * <em>the inverse-transpose filter cannot be applied in-place.</em>
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2007.01.15
@@ -152,11 +156,22 @@ public class LocalCausalFilter {
   }
 
   ///////////////////////////////////////////////////////////////////////////
+  // Note to programmers:
+  // The filter implementations below are optimized to minimize if-tests in
+  // inner loops. Each of the methods apply, applyTranspose, applyInverse 
+  // and applyInverseTranspose could be implemented much more simply by only 
+  // one set of nested loops. By splitting that set into multiple sections,
+  // we eliminate some if-tests for most iterations. This optimization is
+  // especially helpful in higher dimensions.
+
+  ///////////////////////////////////////////////////////////////////////////
   // 1-D
 
   /**
    * Applies this filter. 
    * Uses lag1; ignores lag2 or lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param a1 filter coefficients.
    * @param x input array.
    * @param y output array.
@@ -189,6 +204,8 @@ public class LocalCausalFilter {
   /**
    * Applies the transpose of this filter.
    * Uses lag1; ignores lag2 or lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param a1 filter coefficients.
    * @param x input array.
    * @param y output array.
@@ -221,6 +238,8 @@ public class LocalCausalFilter {
   /**
    * Applies the inverse of this filter.
    * Uses lag1; ignores lag2 or lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param a1 filter coefficients.
    * @param y input array.
    * @param x output array.
@@ -253,11 +272,15 @@ public class LocalCausalFilter {
   /**
    * Applies the inverse transpose of this filter.
    * Uses lag1; ignores lag2 or lag3, if specified.
+   * <p>
+   * <em>The inverse transpose cannot be applied in-place; 
+   * input and output arrays cannot be the same array.</em>
    * @param a1 filter coefficients.
    * @param y input array.
    * @param x output array.
    */
   public void applyInverseTranspose(A1 a1, float[] y, float[] x) {
+    Check.argument(x!=y,"x!=y");
     Array.zero(x);
     float[] a = new float[_m];
     int n1 = y.length;
@@ -287,6 +310,8 @@ public class LocalCausalFilter {
   /**
    * Applies this filter. 
    * Uses lag1 and lag2; ignores lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param a2 filter coefficients.
    * @param x input array.
    * @param y output array.
@@ -350,6 +375,8 @@ public class LocalCausalFilter {
   /**
    * Applies the transpose of this filter. 
    * Uses lag1 and lag2; ignores lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param a2 filter coefficients.
    * @param x input array.
    * @param y output array.
@@ -413,6 +440,8 @@ public class LocalCausalFilter {
   /**
    * Applies the inverse of this filter. 
    * Uses lag1 and lag2; ignores lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param a2 filter coefficients.
    * @param y input array.
    * @param x output array.
@@ -476,11 +505,15 @@ public class LocalCausalFilter {
   /**
    * Applies the inverse transpose of this filter. 
    * Uses lag1 and lag2; ignores lag3, if specified.
+   * <p>
+   * <em>The inverse transpose cannot be applied in-place; 
+   * input and output arrays cannot be the same array.</em>
    * @param a2 filter coefficients.
    * @param y input array.
    * @param x output array.
    */
   public void applyInverseTranspose(A2 a2, float[][] y, float[][] x) {
+    Check.argument(x!=y,"x!=y");
     Array.zero(x);
     float[] a = new float[_m];
     int n1 = y[0].length;
@@ -539,6 +572,8 @@ public class LocalCausalFilter {
   /**
    * Applies this filter. 
    * Uses lag1, lag2, and lag3.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param a3 filter coefficients.
    * @param x input array.
    * @param y output array.
@@ -641,6 +676,8 @@ public class LocalCausalFilter {
   /**
    * Applies the transpose of this filter. 
    * Uses lag1, lag2, and lag3.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param a3 filter coefficients.
    * @param x input array.
    * @param y output array.
@@ -743,6 +780,8 @@ public class LocalCausalFilter {
   /**
    * Applies the inverse of this filter. 
    * Uses lag1, lag2, and lag3.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param a3 filter coefficients.
    * @param y output array.
    * @param x input array.
@@ -845,11 +884,15 @@ public class LocalCausalFilter {
   /**
    * Applies the inverse transpose of this filter. 
    * Uses lag1, lag2, and lag3.
+   * <p>
+   * <em>The inverse transpose cannot be applied in-place; 
+   * input and output arrays cannot be the same array.</em>
    * @param a3 filter coefficients.
    * @param y output array.
    * @param x input array.
    */
   public void applyInverseTranspose(A3 a3, float[][][] y, float[][][] x) {
+    Check.argument(x!=y,"x!=y");
     Array.zero(x);
     float[] a = new float[_m];
     int n1 = y[0][0].length;

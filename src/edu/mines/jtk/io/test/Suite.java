@@ -21,7 +21,6 @@ public class Suite extends TestSuite {
 
     suite.addTestSuite(ArrayFileTest.class);
     suite.addTestSuite(DataFileTest.class);
-    suite.addTestSuite(SimpleFloat3Test.class);
 
     return suite;
   }

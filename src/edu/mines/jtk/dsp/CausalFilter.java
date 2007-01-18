@@ -27,6 +27,10 @@ import edu.mines.jtk.util.Check;
  * inverse. That inverse is a recursive all-pole filter, as described by
  * Claerbout, J., 1998, Multidimensional recursive filters via a helix: 
  * Geophysics, v. 63, n. 5, p. 1532-1541.
+ * <p>
+ * The filter and its transpose, inverse, and inverse-transpose may all 
+ * be applied in-place; that is, the input and output arrays may be the
+ * same array.
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2007.01.15
@@ -431,11 +435,22 @@ public class CausalFilter {
   }
 
   ///////////////////////////////////////////////////////////////////////////
+  // Note to programmers:
+  // The filter implementations below are optimized to minimize if-tests in
+  // inner loops. Each of the methods apply, applyTranspose, applyInverse 
+  // and applyInverseTranspose could be implemented much more simply by only 
+  // one set of nested loops. By splitting that set into multiple sections,
+  // we eliminate some if-tests for most iterations. This optimization is
+  // especially helpful in higher dimensions.
+
+  ///////////////////////////////////////////////////////////////////////////
   // 1-D
 
   /**
    * Applies this filter. 
    * Uses lag1; ignores lag2 or lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param x input array.
    * @param y output array.
    */
@@ -464,6 +479,8 @@ public class CausalFilter {
   /**
    * Applies the transpose of this filter.
    * Uses lag1; ignores lag2 or lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param x input array.
    * @param y output array.
    */
@@ -492,6 +509,8 @@ public class CausalFilter {
   /**
    * Applies the inverse of this filter.
    * Uses lag1; ignores lag2 or lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param y input array.
    * @param x output array.
    */
@@ -520,6 +539,8 @@ public class CausalFilter {
   /**
    * Applies the inverse transpose of this filter.
    * Uses lag1; ignores lag2 or lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param y input array.
    * @param x output array.
    */
@@ -551,6 +572,8 @@ public class CausalFilter {
   /**
    * Applies this filter. 
    * Uses lag1 and lag2; ignores lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param x input array.
    * @param y output array.
    */
@@ -608,6 +631,8 @@ public class CausalFilter {
   /**
    * Applies the transpose of this filter. 
    * Uses lag1 and lag2; ignores lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param x input array.
    * @param y output array.
    */
@@ -665,6 +690,8 @@ public class CausalFilter {
   /**
    * Applies the inverse of this filter. 
    * Uses lag1 and lag2; ignores lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param y input array.
    * @param x output array.
    */
@@ -722,6 +749,8 @@ public class CausalFilter {
   /**
    * Applies the inverse transpose of this filter. 
    * Uses lag1 and lag2; ignores lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param y input array.
    * @param x output array.
    */
@@ -782,6 +811,8 @@ public class CausalFilter {
   /**
    * Applies this filter. 
    * Uses lag1, lag2, and lag3.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param x input array.
    * @param y output array.
    */
@@ -876,6 +907,8 @@ public class CausalFilter {
   /**
    * Applies the transpose of this filter. 
    * Uses lag1, lag2, and lag3.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param x input array.
    * @param y output array.
    */
@@ -972,6 +1005,8 @@ public class CausalFilter {
    * Uses lag1, lag2, and lag3.
    * @param y output array.
    * @param x input array.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    */
   public void applyInverse(float[][][] y, float[][][] x) {
     int n1 = y[0][0].length;
@@ -1064,6 +1099,8 @@ public class CausalFilter {
   /**
    * Applies the inverse transpose of this filter. 
    * Uses lag1, lag2, and lag3.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
    * @param y output array.
    * @param x input array.
    */

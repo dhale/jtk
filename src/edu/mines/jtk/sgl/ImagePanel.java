@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.io.Float3;
 import edu.mines.jtk.ogl.GlTextureName;
 import edu.mines.jtk.util.*;
 
@@ -41,8 +40,36 @@ public class ImagePanel extends AxisAlignedPanel {
     _sy = sy;
     _sz = sz;
     _f3 = f3;
+    _clips = new Clips(_f3);
+    _clipMin = _clips.getClipMin();
+    _clipMax = _clips.getClipMax();
     _colorMap = new ColorMap(0.0,1.0,ColorMap.GRAY);
-    updateClips();
+    _colorMap.setValueRange(_clipMin,_clipMax);
+  }
+
+  /**
+   * Constructs an image panel with specified clips.
+   * @param sx sampling of the X axis.
+   * @param sy sampling of the Y axis.
+   * @param sz sampling of the Z axis.
+   * @param f3 the 3-D indexed floats to slice for images.
+   * @param clipMin the sample value corresponding to color model index 0.
+   * @param clipMax the sample value corresponding to color model index 255.
+   * @see #setClips(double,double)
+   */
+  public ImagePanel(
+    Sampling sx, Sampling sy, Sampling sz, Float3 f3,
+    double clipMin, double clipMax) 
+  {
+    _sx = sx;
+    _sy = sy;
+    _sz = sz;
+    _f3 = f3;
+    _clips = new Clips(clipMin,clipMax);
+    _clipMin = _clips.getClipMin();
+    _clipMax = _clips.getClipMax();
+    _colorMap = new ColorMap(0.0,1.0,ColorMap.GRAY);
+    _colorMap.setValueRange(_clipMin,_clipMax);
   }
 
   /**
@@ -55,7 +82,7 @@ public class ImagePanel extends AxisAlignedPanel {
   }
 
   /**
-   * Sets the index color model for this view.
+   * Sets the index color model for this panel.
    * The default color model is a black-to-white gray model.
    * @param colorModel the index color model.
    */
@@ -65,7 +92,7 @@ public class ImagePanel extends AxisAlignedPanel {
   }
 
   /**
-   * Gets the index color model for this view.
+   * Gets the index color model for this panel.
    * @return the index color model.
    */
   public IndexColorModel getColorModel() {
@@ -73,28 +100,22 @@ public class ImagePanel extends AxisAlignedPanel {
   }
 
   /**
-   * Sets the clips for this view. A pixels view maps values of the sampled 
-   * function f(x1,x2) to bytes, which are then used as indices into a 
-   * specified color model. This mapping from sample values to byte indices 
-   * is linear, and so depends on only these two clip values. The minimum clip 
-   * value corresponds to byte index 0, and the maximum clip value corresponds 
-   * to byte index 255. Sample values outside of the range (clipMin,clipMax)
-   * are clipped to lie inside this range.
+   * Sets the clips for this panel. An image panel maps image samples
+   * to bytes, which are then used as indices into a specified color 
+   * model. This mapping from sample values to byte indices is linear, 
+   * and so depends on only these two clip values. The minimum clip 
+   * value corresponds to byte index 0, and the maximum clip value 
+   * corresponds to byte index 255. Sample values outside of the range 
+   * [clipMin,clipMax] are clipped to lie inside this range.
    * <p>
    * Calling this method disables the computation of clips from percentiles.
    * Any clip values computed or specified previously will be forgotten.
    * @param clipMin the sample value corresponding to color model index 0.
    * @param clipMax the sample value corresponding to color model index 255.
    */
-  public void setClips(float clipMin, float clipMax) {
-    Check.argument(clipMin<clipMax,"clipMin<clipMax");
-    if (_clipMin!=clipMin || _clipMax!=clipMax) {
-      _usePercentiles = false;
-      _clipMin = clipMin;
-      _clipMax = clipMax;
-      _colorMap.setValueRange(_clipMin,_clipMax);
-      dirtyDraw();
-    }
+  public void setClips(double clipMin, double clipMax) {
+    _clips.setClips(clipMin,clipMax);
+    dirtyDraw();
   }
 
   /**
@@ -102,7 +123,7 @@ public class ImagePanel extends AxisAlignedPanel {
    * @return the minimum clip value.
    */
   public float getClipMin() {
-    return _clipMin;
+    return _clips.getClipMin();
   }
 
   /**
@@ -110,11 +131,11 @@ public class ImagePanel extends AxisAlignedPanel {
    * @return the maximum clip value.
    */
   public float getClipMax() {
-    return _clipMax;
+    return _clips.getClipMax();
   }
 
   /**
-   * Sets the percentiles used to compute clips for this view. The default 
+   * Sets the percentiles used to compute clips for this panel. The default 
    * percentiles are 0 and 100, which correspond to the minimum and maximum 
    * values of the sampled function f(x1,x2).
    * <p>
@@ -123,17 +144,9 @@ public class ImagePanel extends AxisAlignedPanel {
    * @param percMin the percentile corresponding to clipMin.
    * @param percMax the percentile corresponding to clipMax.
    */
-  public void setPercentiles(float percMin, float percMax) {
-    Check.argument(0.0f<=percMin,"0<=percMin");
-    Check.argument(percMin<percMax,"percMin<percMax");
-    Check.argument(percMax<=100.0f,"percMax<=100");
-    if (_percMin!=percMin || _percMax!=percMax) {
-      _percMin = percMin;
-      _percMax = percMax;
-      _usePercentiles = true;
-      updateClips();
-      dirtyDraw();
-    }
+  public void setPercentiles(double percMin, double percMax) {
+    _clips.setPercentiles(percMin,percMax);
+    dirtyDraw();
   }
 
   /**
@@ -141,7 +154,7 @@ public class ImagePanel extends AxisAlignedPanel {
    * @return the minimum percentile.
    */
   public float getPercentileMin() {
-    return _percMin;
+    return _clips.getPercentileMin();
   }
 
   /**
@@ -149,7 +162,7 @@ public class ImagePanel extends AxisAlignedPanel {
    * @return the maximum percentile.
    */
   public float getPercentileMax() {
-    return _percMax;
+    return _clips.getPercentileMax();
   }
 
   /**
@@ -172,6 +185,7 @@ public class ImagePanel extends AxisAlignedPanel {
   // protected
 
   protected void draw(DrawContext dc) {
+    updateClips();
     drawTextures();
   }
 
@@ -186,12 +200,10 @@ public class ImagePanel extends AxisAlignedPanel {
   private double _xmin,_ymin,_zmin; // minimum array coordinates
   private double _xmax,_ymax,_zmax; // maximum array coordinates
 
-  // Clips and percentiles.
-  private float _clipMin; // mapped to color model index 0
-  private float _clipMax; // mapped to color model index 255
-  private float _percMin = 0.0f; // may be used to compute _clipMin
-  private float _percMax = 100.0f; // may be used to compute _clipMax
-  private boolean _usePercentiles = true; // true, if using percentiles
+  // Clips.
+  Clips _clips;
+  float _clipMin;
+  float _clipMax;
 
   // Color map.
   private ColorMap _colorMap;
@@ -252,30 +264,14 @@ public class ImagePanel extends AxisAlignedPanel {
   float[][] _floats; // array[_ls][_lt] of image floats for one texture
 
   /**
-   * If using percentiles, computes corresponding clip values.
+   * Update the clip min/max for this panel.
    */
   private void updateClips() {
-    if (_usePercentiles) {
-      int nx = _sx.getCount();
-      int ny = _sy.getCount();
-      int nz = _sz.getCount();
-      int n = nx*ny*nz;
-      float[] a = new float[n];
-      _f3.get123(nz,ny,nx,0,0,0,a);
-      int kmin = (int)rint(_percMin*0.01*(n-1));
-      if (kmin<=0) {
-        _clipMin = Array.min(a);
-      } else {
-        Array.quickPartialSort(kmin,a);
-        _clipMin = a[kmin];
-      }
-      int kmax = (int)rint(_percMax*0.01*(n-1));
-      if (kmax>=n-1) {
-        _clipMax = Array.max(a);
-      } else {
-        Array.quickPartialSort(kmax,a);
-        _clipMax = a[kmax];
-      }
+    float clipMin = _clips.getClipMin();
+    float clipMax = _clips.getClipMax();
+    if (_clipMin!=clipMin || _clipMax!=clipMax) {
+      _clipMin = clipMin;
+      _clipMax = clipMax;
       _colorMap.setValueRange(_clipMin,_clipMax);
     }
   }
@@ -598,7 +594,7 @@ public class ImagePanel extends AxisAlignedPanel {
         int g = icm.getGreen(i);
         int b = icm.getBlue(i);
         int a = 255;
-        int p = ((r&0xff)<<0)|((g&0xff)<<8)|((b&0xff)<<16)|((a&0xff)<<24);
+        int p = (r&0xff)|((g&0xff)<<8)|((b&0xff)<<16)|((a&0xff)<<24);
         _pixels.put(is+it*_ls,p);
       }
     }

@@ -4,19 +4,17 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.io.test;
+package edu.mines.jtk.util.test;
 
 import java.util.Random;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.io.Float3;
-import edu.mines.jtk.io.SimpleFloat3;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.*;
 
 /**
- * Tests {@link edu.mines.jtk.io.SimpleFloat3}.
+ * Tests {@link edu.mines.jtk.util.SimpleFloat3}.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.05.24
  */

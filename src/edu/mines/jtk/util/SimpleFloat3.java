@@ -4,12 +4,11 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.io;
-
+package edu.mines.jtk.util;
 
 /**
  * A simple 3-D array of floats. Implements the generic interface 
- * {@link edu.mines.jtk.io.Float3} using a straightforward Java 3-D 
+ * {@link edu.mines.jtk.util.Float3} using a straightforward Java 3-D
  * array of floats.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.05.24

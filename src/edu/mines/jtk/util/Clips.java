@@ -7,7 +7,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.util;
 
 import static java.lang.Math.*;
-import edu.mines.jtk.io.Float3;
 
 /**
  * Clips (clipMin,clipMax) are lower and upper bounds for arrays of values.
