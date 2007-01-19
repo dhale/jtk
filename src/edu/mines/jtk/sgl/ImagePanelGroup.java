@@ -23,8 +23,8 @@ import edu.mines.jtk.util.*;
  * After constructing an image panel group, but before its image panels are 
  * drawn, one should set clips or percentiles. Otherwise, as each image panel 
  * is drawn for the first time, it will compute clip min and max values using 
- * default percentiles. Since all image panels in this group display the same 
- * array, much of this computation is redundant.
+ * default percentiles. Because all image panels in this group display the 
+ * same array, much of this computation is redundant.
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2007.01.18
@@ -53,7 +53,7 @@ public class ImagePanelGroup extends Group {
   public ImagePanelGroup(
     Sampling sx, Sampling sy, Sampling sz, Float3 f3, Axis[] axes) 
   {
-    _clips = new Clips(_f3);
+    _clips = new Clips(f3);
     addPanels(sx,sy,sz,f3,axes);
   }
 
@@ -150,6 +150,7 @@ public class ImagePanelGroup extends Group {
     _clips.setPercentiles(percMin,percMax);
     double clipMin = _clips.getClipMin();
     double clipMax = _clips.getClipMax();
+    System.out.println("clip min="+clipMin+" max="+clipMax);
     for (ImagePanel ip:_ipList)
       ip.setClips(clipMin,clipMax);
     _colorMap.setValueRange(clipMin,clipMax);

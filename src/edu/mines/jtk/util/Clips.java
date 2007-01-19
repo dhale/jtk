@@ -80,7 +80,6 @@ public class Clips {
   public Clips(double percMin, double percMax, float[] f) {
     _percMin = (float)percMin;
     _percMax = (float)percMax;
-    _clipsDirty = true;
     _f = f;
   }
 
@@ -94,7 +93,6 @@ public class Clips {
   public Clips(double percMin, double percMax, float[][] f) {
     _percMin = (float)percMin;
     _percMax = (float)percMax;
-    _clipsDirty = true;
     _f = f;
   }
 
@@ -108,7 +106,6 @@ public class Clips {
   public Clips(double percMin, double percMax, float[][][] f) {
     _percMin = (float)percMin;
     _percMax = (float)percMax;
-    _clipsDirty = true;
     _f = f;
   }
 
@@ -122,7 +119,6 @@ public class Clips {
   public Clips(double percMin, double percMax, Float3 f3) {
     _percMin = (float)percMin;
     _percMax = (float)percMax;
-    _clipsDirty = true;
     _f = f3;
   }
 
@@ -249,7 +245,7 @@ public class Clips {
           for (int i3=0; i3<n3; ++i3) {
             f3.get12(n1,n2,0,0,i3,a);
             _clipMin = min(_clipMin,Array.min(a));
-            _clipMax = max(_clipMax,Array.min(a));
+            _clipMax = max(_clipMax,Array.max(a));
           }
           clipsComputed = true;
         }
