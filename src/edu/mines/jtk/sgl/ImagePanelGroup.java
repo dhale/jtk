@@ -6,31 +6,28 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import static edu.mines.jtk.ogl.Gl.*;
-import static edu.mines.jtk.util.MathPlus.*;
-
 import java.awt.image.IndexColorModel;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.ogl.GlTextureName;
 import edu.mines.jtk.util.*;
 
 /**
  * A group of image panels that display a single 3-D array.
+ * Specifically, an image panel group contains one or more axis-aligned 
+ * frames, each containing one axis-aligned image panel child.
  * <p>
- * After constructing this group, but before its image panels are drawn, 
- * one should set clips or percentiles. Otherwise, as each image panel 
- * is drawn for the first time, it will compute clip min and max values 
- * using default percentiles. Since all image panels in this group display 
- * the same array, much of this computation is redundant.
+ * After constructing an image panel group, but before its image panels are 
+ * drawn, one should set clips or percentiles. Otherwise, as each image panel 
+ * is drawn for the first time, it will compute clip min and max values using 
+ * default percentiles. Since all image panels in this group display the same 
+ * array, much of this computation is redundant.
  *
  * @author Dave Hale, Colorado School of Mines
- * @version 2007.01.03
+ * @version 2007.01.18
  */
 public class ImagePanelGroup extends Group {
 
@@ -140,7 +137,7 @@ public class ImagePanelGroup extends Group {
   }
 
   /**
-   * Sets the percentiles used to compute clips for this panel. The default 
+   * Sets the percentiles used to compute clips for this group. The default 
    * percentiles are 0 and 100, which correspond to the minimum and maximum 
    * array values.
    * <p>
