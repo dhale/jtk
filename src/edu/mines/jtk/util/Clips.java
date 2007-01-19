@@ -24,10 +24,10 @@ import static java.lang.Math.*;
  * percMin=1% and percMax=99%, respectively. The default percentiles
  * percMin=0% and percMax=100% correspond to minimum and maximum values.
  * <p>
- * Clips can maintain a reference to an array of values, so that clips 
- * can be updated when percentiles are changed. If not using percentiles,
- * because clipMin and clipMax are specified explicitly, then these arrays 
- * are ignored.
+ * Clips maintain a reference to an array of values, so that clips can be 
+ * updated when percentiles are changed. If not using percentiles, because 
+ * clipMin and clipMax are specified explicitly, then these arrays are 
+ * ignored.
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2007.01.10
@@ -35,21 +35,7 @@ import static java.lang.Math.*;
 public class Clips {
 
   /**
-   * Constructs clips with specified clipMin and clipMax.
-   * Does not use percentiles for an array of values to compute clips.
-   * @param clipMin values &lt; clipMin will be clipped to clipMin.
-   * @param clipMax values &gt; clipMax will be clipped to clipMax.
-   */
-  public Clips(double clipMin, double clipMax) {
-    _usePercentiles = false;
-    _clipMin = (float)clipMin;
-    _clipMax = (float)clipMax;
-    _clipsDirty = false;
-    makeClipsValid();
-  }
-
-  /**
-   * Constructs clips for the specified array of values. 
+   * Constructs clips for the specified array. 
    * Uses default percentiles of 0.0 and 100.0.
    * @param f array of values; by reference, not by copy.
    */
@@ -58,7 +44,7 @@ public class Clips {
   }
 
   /**
-   * Constructs clips for the specified array of values. 
+   * Constructs clips for the specified array. 
    * Uses default percentiles of 0.0 and 100.0.
    * @param f array of values; by reference, not by copy.
    */
@@ -67,7 +53,7 @@ public class Clips {
   }
 
   /**
-   * Constructs clips for the specified array of values. 
+   * Constructs clips for the specified array. 
    * Uses default percentiles of 0.0 and 100.0.
    * @param f array of values; by reference, not by copy.
    */
@@ -76,7 +62,7 @@ public class Clips {
   }
 
   /**
-   * Constructs clips for the specified array of values. 
+   * Constructs clips for the specified array. 
    * Uses default percentiles of 0.0 and 100.0.
    * @param f3 abstract 3-D array of values; by reference, not by copy.
    */
@@ -85,7 +71,7 @@ public class Clips {
   }
 
   /**
-   * Constructs clips for the specified percentiles and array of values. 
+   * Constructs clips for the specified percentiles and array. 
    * Computation of clips is deferred until they are got.
    * @param percMin the percentile corresponding to clipMin.
    * @param percMax the percentile corresponding to clipMax.
@@ -99,7 +85,7 @@ public class Clips {
   }
 
   /**
-   * Constructs clips for the specified percentiles and array of values. 
+   * Constructs clips for the specified percentiles and array. 
    * Computation of clips is deferred until they are got.
    * @param percMin the percentile corresponding to clipMin.
    * @param percMax the percentile corresponding to clipMax.
@@ -113,7 +99,7 @@ public class Clips {
   }
 
   /**
-   * Constructs clips for the specified percentiles and array of values. 
+   * Constructs clips for the specified percentiles and array. 
    * Computation of clips is deferred until they are got.
    * @param percMin the percentile corresponding to clipMin.
    * @param percMax the percentile corresponding to clipMax.
@@ -127,7 +113,7 @@ public class Clips {
   }
 
   /**
-   * Constructs clips for the specified percentiles and array of values. 
+   * Constructs clips for the specified percentiles and array. 
    * Computation of clips is deferred until they are got.
    * @param percMin the percentile corresponding to clipMin.
    * @param percMax the percentile corresponding to clipMax.
@@ -141,7 +127,7 @@ public class Clips {
   }
 
   /**
-   * Sets the clips.
+   * Sets the clip min and max values explicitly.
    * Calling this method disables the computation of clips from percentiles.
    * Any clip values computed or specified previously will be forgotten.
    * @param clipMin values &lt; clipMin will be clipped to clipMin.
@@ -183,7 +169,12 @@ public class Clips {
    * maximum values in the array of values to be clipped.
    * <p>
    * Calling this method enables the computation of clips from percentiles.
-   * Any clip values specified or computed previously will be forgotten.
+   * Any clip min and max specified or computed previously will be forgotten.
+   * <p>
+   * Clip min and max values can only be computed if an array of values has
+   * been specified. If clips were constructed without such an array, then
+   * both percentiles and an array of values should be set to enable the
+   * use of percentiles.
    * @param percMin the percentile corresponding to clipMin.
    * @param percMax the percentile corresponding to clipMax.
    */
@@ -217,46 +208,6 @@ public class Clips {
     return _percMax;
   }
 
-  /**
-   * Sets the values for which to compute clips using percentiles.
-   * Computation of clips is deferred until they are got.
-   * @param f array of values; by reference, not by copy.
-   */
-  public void setValues(float[] f) {
-    _clipsDirty = true;
-    _f = f;
-  }
-
-  /**
-   * Sets the values for which to compute clips using percentiles.
-   * Computation of clips is deferred until they are got.
-   * @param f array of values; by reference, not by copy.
-   */
-  public void setValues(float[][] f) {
-    _clipsDirty = true;
-    _f = f;
-  }
-
-  /**
-   * Sets the values for which to compute clips using percentiles.
-   * Computation of clips is deferred until they are got.
-   * @param f array of values; by reference, not by copy.
-   */
-  public void setValues(float[][][] f) {
-    _clipsDirty = true;
-    _f = f;
-  }
-
-  /**
-   * Sets the values for which to compute clips using percentiles.
-   * Computation of clips is deferred until they are got.
-   * @param f3 abstract 3-D array of values; by reference, not by copy.
-   */
-  public void setValues(Float3 f3) {
-    _clipsDirty = true;
-    _f = f3;
-  }
-
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -266,7 +217,7 @@ public class Clips {
   private float _percMin = 0.0f; // may be used to compute _clipMin
   private float _percMax = 100.0f; // may be used to compute _clipMax
   private boolean _usePercentiles = true; // true, if using percentiles
-  private Object _f; // the float values
+  private Object _f; // array used to compute clips from percentiles
 
   private void updateClips() {
     if (_clipsDirty && _usePercentiles) {
@@ -337,6 +288,7 @@ public class Clips {
             Array.quickPartialSort(kmax,a);
             _clipMax = a[kmax];
           }
+          clipsComputed = true;
         }
       }
 

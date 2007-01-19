@@ -21,8 +21,8 @@ import edu.mines.jtk.util.*;
 
 /**
  * An axis-aligned panel that draws a 2-D image of a slice of a 3-D array.
- * The corner points of the image panel's frame determines which slice of
- * the 3-D array is drawn.
+ * The corner points of the image panel's axis-aligned frame determines 
+ * which slice of the 3-D array is drawn.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.06.04
  */
@@ -33,7 +33,7 @@ public class ImagePanel extends AxisAlignedPanel {
    * @param sx sampling of the X axis.
    * @param sy sampling of the Y axis.
    * @param sz sampling of the Z axis.
-   * @param f3 the 3-D indexed floats to slice for images.
+   * @param f3 abstract 3-D array of floats.
    */
   public ImagePanel(Sampling sx, Sampling sy, Sampling sz, Float3 f3) {
     _sx = sx;
@@ -41,35 +41,6 @@ public class ImagePanel extends AxisAlignedPanel {
     _sz = sz;
     _f3 = f3;
     _clips = new Clips(_f3);
-    _clipMin = _clips.getClipMin();
-    _clipMax = _clips.getClipMax();
-    _colorMap = new ColorMap(0.0,1.0,ColorMap.GRAY);
-    _colorMap.setValueRange(_clipMin,_clipMax);
-  }
-
-  /**
-   * Constructs an image panel with specified clips.
-   * @param sx sampling of the X axis.
-   * @param sy sampling of the Y axis.
-   * @param sz sampling of the Z axis.
-   * @param f3 the 3-D indexed floats to slice for images.
-   * @param clipMin the sample value corresponding to color model index 0.
-   * @param clipMax the sample value corresponding to color model index 255.
-   * @see #setClips(double,double)
-   */
-  public ImagePanel(
-    Sampling sx, Sampling sy, Sampling sz, Float3 f3,
-    double clipMin, double clipMax) 
-  {
-    _sx = sx;
-    _sy = sy;
-    _sz = sz;
-    _f3 = f3;
-    _clips = new Clips(clipMin,clipMax);
-    _clipMin = _clips.getClipMin();
-    _clipMax = _clips.getClipMax();
-    _colorMap = new ColorMap(0.0,1.0,ColorMap.GRAY);
-    _colorMap.setValueRange(_clipMin,_clipMax);
   }
 
   /**
@@ -88,6 +59,7 @@ public class ImagePanel extends AxisAlignedPanel {
    */
   public void setColorModel(IndexColorModel colorModel) {
     _colorMap.setColorModel(colorModel);
+    _texturesDirty = true;
     dirtyDraw();
   }
 
@@ -100,12 +72,12 @@ public class ImagePanel extends AxisAlignedPanel {
   }
 
   /**
-   * Sets the clips for this panel. An image panel maps image samples
+   * Sets the clips for this panel. An image panel maps array values
    * to bytes, which are then used as indices into a specified color 
-   * model. This mapping from sample values to byte indices is linear, 
+   * model. This mapping from array values to byte indices is linear, 
    * and so depends on only these two clip values. The minimum clip 
    * value corresponds to byte index 0, and the maximum clip value 
-   * corresponds to byte index 255. Sample values outside of the range 
+   * corresponds to byte index 255. Array values outside of the range 
    * [clipMin,clipMax] are clipped to lie inside this range.
    * <p>
    * Calling this method disables the computation of clips from percentiles.
@@ -115,6 +87,7 @@ public class ImagePanel extends AxisAlignedPanel {
    */
   public void setClips(double clipMin, double clipMax) {
     _clips.setClips(clipMin,clipMax);
+    _texturesDirty = true;
     dirtyDraw();
   }
 
@@ -137,7 +110,7 @@ public class ImagePanel extends AxisAlignedPanel {
   /**
    * Sets the percentiles used to compute clips for this panel. The default 
    * percentiles are 0 and 100, which correspond to the minimum and maximum 
-   * values of the sampled function f(x1,x2).
+   * array values.
    * <p>
    * Calling this method enables the computation of clips from percentiles.
    * Any clip values specified or computed previously will be forgotten.
@@ -146,6 +119,7 @@ public class ImagePanel extends AxisAlignedPanel {
    */
   public void setPercentiles(double percMin, double percMax) {
     _clips.setPercentiles(percMin,percMax);
+    _texturesDirty = true;
     dirtyDraw();
   }
 
@@ -185,7 +159,7 @@ public class ImagePanel extends AxisAlignedPanel {
   // protected
 
   protected void draw(DrawContext dc) {
-    updateClips();
+    updateClipMinMax();
     drawTextures();
   }
 
@@ -202,11 +176,11 @@ public class ImagePanel extends AxisAlignedPanel {
 
   // Clips.
   Clips _clips;
-  float _clipMin;
-  float _clipMax;
+  float _clipMin = 0.0f;
+  float _clipMax = 1.0f;
 
-  // Color map.
-  private ColorMap _colorMap;
+  // Color map with default gray color model.
+  private ColorMap _colorMap = new ColorMap(_clipMin,_clipMax,ColorMap.GRAY);
 
   // This panel can draw up to ns*nt samples sliced from nx*ny*nz samples
   // of an array. The dimensions ns and nt are chosen from array dimensions 
@@ -250,6 +224,7 @@ public class ImagePanel extends AxisAlignedPanel {
 
   // The texture cache; textures required for drawing are non-null.
   private GlTextureName[][] _tn; // array[_mt][_ms] of texture names
+  private boolean _texturesDirty = true; // do textures need updating?
 
   // The subset of samples that must be drawn depends on frame corner points.
   int _kxmin,_kymin,_kzmin; // min sample-in-array indices
@@ -264,15 +239,16 @@ public class ImagePanel extends AxisAlignedPanel {
   float[][] _floats; // array[_ls][_lt] of image floats for one texture
 
   /**
-   * Update the clip min/max for this panel.
+   * Update the clip min/max for this panel, if necessary.
    */
-  private void updateClips() {
+  private void updateClipMinMax() {
     float clipMin = _clips.getClipMin();
     float clipMax = _clips.getClipMax();
     if (_clipMin!=clipMin || _clipMax!=clipMax) {
       _clipMin = clipMin;
       _clipMax = clipMax;
       _colorMap.setValueRange(_clipMin,_clipMax);
+      _texturesDirty = true;
     }
   }
 
@@ -300,6 +276,10 @@ public class ImagePanel extends AxisAlignedPanel {
     if (_xmin!=xmin || _ymin!=ymin || _zmin!=zmin ||
         _xmax!=xmax || _ymax!=ymax || _zmax!=zmax)
       updateBoundsAndTextures(xmin,ymin,zmin,xmax,ymax,zmax);
+
+    // If necessary, update textures.
+    if (_texturesDirty)
+      updateTextures();
 
     // Prepare to draw textures.
     glShadeModel(GL_FLAT);
@@ -538,6 +518,23 @@ public class ImagePanel extends AxisAlignedPanel {
     _jtmin = jtmin;
     _jsmax = jsmax;
     _jtmax = jtmax;
+
+    // Textures now clean.
+    _texturesDirty = false;
+  }
+
+  private void updateTextures() {
+
+    // Reload only those textures already cached.
+    for (int jt=_jtmin; jt<=_jtmax; ++jt) {
+      for (int js=_jsmin; js<=_jsmax; ++js) {
+        if (_tn[jt][js]!=null)
+          loadTexture(js,jt);
+      }
+    }
+
+    // Textures now clean.
+    _texturesDirty = false;
   }
 
   private void disposeTextures() {
