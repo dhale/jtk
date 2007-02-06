@@ -598,6 +598,16 @@ public class PlotPanel extends IPanel {
   }
 
   /**
+   * Adds a view of arrays of (x1,x2) coordinates for multiple plot segments.
+   * The lengths of the specified arrays x1 and x2 must be equal.
+   * @param x1 array of arrays of x1 coordinates.
+   * @param x2 array of arrays of x2 coordinates.
+   */
+  public PointsView addPoints(float[][] x1, float[][] x2) {
+    return addPoints(0,0,x1,x2);
+  }
+
+  /**
    * Adds a points view of the arrays x1 and x2 of point (x1,x2) coordinates.
    * @param irow the tile row index.
    * @param icol the tile column index.
@@ -633,6 +643,19 @@ public class PlotPanel extends IPanel {
    */
   public PointsView addPoints(int irow, int icol, Sampling s1, float[] x2) {
     PointsView pv = new PointsView(s1,x2);
+    return addPointsView(irow,icol,pv);
+  }
+
+  /**
+   * Adds a view of arrays of (x1,x2) coordinates for multiple plot segments.
+   * The lengths of the specified arrays x1 and x2 must be equal.
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param x1 array of arrays of x1 coordinates.
+   * @param x2 array of arrays of x2 coordinates.
+   */
+  public PointsView addPoints(int irow, int icol, float[][] x1, float[][] x2) {
+    PointsView pv = new PointsView(x1,x2);
     return addPointsView(irow,icol,pv);
   }
 
