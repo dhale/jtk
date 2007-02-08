@@ -48,6 +48,15 @@ public class PlotPanel extends IPanel {
   private static final long serialVersionUID = 1L;
 
   /**
+   * Placement of labeled axes in mosaic.
+   */
+  public enum AxesPlacement {
+    LEFT_TOP,
+    LEFT_BOTTOM,
+    NONE
+  };
+
+  /**
    * Orientation of axes x1 and x2. For example, the default orientation 
    * X1RIGHT_X2UP corresponds to x1 increasing horizontally from left to 
    * right, and x2 increasing vertically from bottom to top.
@@ -83,29 +92,49 @@ public class PlotPanel extends IPanel {
     this(1,1,orientation);
   }
 
+  public PlotPanel(int nrow, int ncol, Orientation orientation) {
+    this(nrow,ncol,orientation,axesPlacement(orientation));
+  }
+  private static AxesPlacement axesPlacement(Orientation orientation) {
+    AxesPlacement axesPlacement;
+    if (orientation==Orientation.X1DOWN_X2RIGHT) {
+      axesPlacement = AxesPlacement.LEFT_TOP;
+    } else {
+      axesPlacement = AxesPlacement.LEFT_BOTTOM;
+    }
+    return axesPlacement;
+  }
+
   /**
    * Constructs a new plot panel with a mosaic of nrow by ncol tiles.
    * @param nrow the number of rows.
    * @param ncol the number of columns.
    * @param orientation the plot orientation.
+   * @param axesPlacement the placement of axes.
    */
-  public PlotPanel(int nrow, int ncol, Orientation orientation) {
+  public PlotPanel(
+    int nrow, int ncol, 
+    Orientation orientation, 
+    AxesPlacement axesPlacement)
+  {
     super();
     _orientation = orientation;
     this.setLayout(new GridBagLayout());
-    Set<Mosaic.AxesPlacement> axesPlacement;
-    if (orientation==Orientation.X1DOWN_X2RIGHT) {
-      axesPlacement = EnumSet.of(
+    Set<Mosaic.AxesPlacement> axesPlacementSet;
+    if (axesPlacement==AxesPlacement.LEFT_TOP) {
+      axesPlacementSet = EnumSet.of(
         Mosaic.AxesPlacement.LEFT,
         Mosaic.AxesPlacement.TOP
       );
-    } else {
-      axesPlacement = EnumSet.of(
+    } else if (axesPlacement==AxesPlacement.LEFT_BOTTOM) {
+      axesPlacementSet = EnumSet.of(
         Mosaic.AxesPlacement.LEFT,
         Mosaic.AxesPlacement.BOTTOM
       );
+    } else {
+      axesPlacementSet = EnumSet.noneOf(Mosaic.AxesPlacement.class);
     }
-    _mosaic = new Mosaic(nrow,ncol,axesPlacement);
+    _mosaic = new Mosaic(nrow,ncol,axesPlacementSet);
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridx = 0;
     gbc.gridy = 1;
