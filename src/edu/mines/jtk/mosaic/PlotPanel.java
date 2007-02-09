@@ -48,7 +48,8 @@ public class PlotPanel extends IPanel {
   private static final long serialVersionUID = 1L;
 
   /**
-   * Placement of labeled axes in mosaic.
+   * Placement of labeled axes in mosaic. The default axes placement
+   * is two axes placed depending on the plot orientation.
    */
   public enum AxesPlacement {
     LEFT_TOP,

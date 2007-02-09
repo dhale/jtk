@@ -180,11 +180,21 @@ public class Projector {
     _v0 = (v0a<v1a)?vmin:vmax;
     _v1 = (v0a<v1a)?vmax:vmin;
 
+    // Merged normalized coordinate bounds. We require that four 
+    // inequalities be satisfied:
+    //   u0a <= u0+r0a*(u1-u0) = (1-r0a)*u0+r0a*u1
+    //   u0b <= u0+r0b*(u1-u0) = (1-r0b)*u0+r0b*u1
+    //   u0+r1a*(u1-u0) = (1-r1a)*u0+r1a*u1 <= ua1
+    //   u0+r1b*(u1-u0) = (1-r1b)*u0+r1b*u1 <= ub1
+    // where r0a, r0b, r1a, and r1b are defined below.
     // If sign of B does not equal sign of A, flip B.
-    double ra = (v1a-v0a)/(_v1-_v0); 
-    double rb = (v1b-v0b)/(_v1-_v0);
-    if (rb<0.0) {
-      rb = -rb;
+    double r0a = (v0a-_v0)/(_v1-_v0); // 0 <= r0a <  1
+    double r0b = (v0b-_v0)/(_v1-_v0); // 0 <= r0b <  1
+    double r1a = (v1a-_v0)/(_v1-_v0); // 0 <  r1a <= 1
+    double r1b = (v1b-_v0)/(_v1-_v0); // 0 <  r1b <= 1
+    if (r1b<0.0) {
+      r0b = -r0b;
+      r1b = -r1b;
       double u0t = u0b;
       u0b = 1.0-u1b;
       u1b = 1.0-u0t;
@@ -192,23 +202,14 @@ public class Projector {
       v0b = v1b;
       v1b = v0t;
     }
-
-    // Merged normalized coordinate bounds. This is tricky. The merged 
-    // bound u0 equals the maximum of sa*u0a and sb*u0b, where sa and sb 
-    // are scale factors that depend on the difference u1-u0. Specifically 
-    // sa = ra*(u1-u0)/(u1a-u0a), and sb = rb*(u1-u0)/(u1b-u0b). It seems 
-    // that we cannot get u0 without knowing u0 and u1. However, we also 
-    // know that the merged margin 1-u1 equals the maximum of sa*(1-u1a)
-    // and sb*(1-u1b). So we have two linear equations that we solve for 
-    // the two unknowns u0 and u1. Note: 0 <= u0 < u1 <= 1 is invariant.
-    double ca = u0a*ra/(u1a-u0a);
-    double cb = u0b*rb/(u1b-u0b);
-    double c = max(ca,cb);
-    double da = (1.0-u1a)*ra/(u1a-u0a);
-    double db = (1.0-u1b)*rb/(u1b-u0b);
-    double d = max(da,db);
-    _u0 = c/(1.0+c+d);
-    _u1 = 1.0-d/(1.0+c+d);
+    double u0 = 0.0;
+    double u1 = 1.0;
+    do {
+      _u0 = u0;
+      _u1 = u1;
+      u0 = max((u0a-r0a*_u1)/(1.0-r0a),(u0b-r0b*_u1)/(1.0-r0b));
+      u1 = min((u1a-(1.0-r1a)*_u0)/r1a,(u1b-(1.0-r1b)*_u0)/r1b);
+    } while (_u0<u0 || u1<_u1);
 
     // Recompute shifts and scales.
     computeShiftsAndScales();
