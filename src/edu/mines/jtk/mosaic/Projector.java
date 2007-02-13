@@ -204,12 +204,16 @@ public class Projector {
     }
     double u0 = 0.0;
     double u1 = 1.0;
+    int niter = 0;
     do {
       _u0 = u0;
       _u1 = u1;
       u0 = max((u0a-r0a*_u1)/(1.0-r0a),(u0b-r0b*_u1)/(1.0-r0b));
       u1 = min((u1a-(1.0-r1a)*_u0)/r1a,(u1b-(1.0-r1b)*_u0)/r1b);
-    } while (_u0<u0 || u1<_u1);
+      ++niter;
+    } while ((_u0<u0 || u1<_u1) && niter<10);
+    assert niter<10:"niter<10";
+    assert 0.0<=_u0 && _u0<_u1 && _u1<=1.0:"_u0 and _u1 valid";
 
     // Recompute shifts and scales.
     computeShiftsAndScales();
