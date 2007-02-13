@@ -23,6 +23,8 @@ public class Suite extends TestSuite {
     suite.addTestSuite(FftComplexTest.class);
     suite.addTestSuite(FftRealTest.class);
     suite.addTestSuite(HistogramTest.class);
+    suite.addTestSuite(LocalCausalFilterTest.class);
+    suite.addTestSuite(LocalOrientFilterTest.class);
     suite.addTestSuite(Real1Test.class);
     suite.addTestSuite(Recursive2ndOrderFilterTest.class);
     suite.addTestSuite(SamplingTest.class);
