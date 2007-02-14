@@ -63,10 +63,57 @@ public class LocalOrientFilter {
   }
 
   /**
+   * Applies this filter to estimate orientation angles.
+   * @param x input array for 2-D image.
+   * @param theta orientation angle; -pi &lt;= theta &lt;= pi
+   */
+  public void applyForTheta(float[][] x, float[][] theta) {
+    apply(x,
+      theta,
+      null,null,
+      null,null,
+      null,null,
+      null);
+  }
+
+  /**
+   * Applies this filter to estimate normal vectors (1st eigenvectors).
+   * @param x input array for 2-D image.
+   * @param u1 1st component of normal vector.
+   * @param u2 2nd component of normal vector.
+   */
+  public void applyForNormal(float[][] x, float[][] u1, float[][] u2) {
+    apply(x,
+      null,
+      u1,u2,
+      null,null,
+      null,null,
+      null);
+  }
+
+  /**
+   * Applies this filter to estimate normal vectors and linearities.
+   * @param x input array for 2-D image.
+   * @param u1 1st component of normal vector.
+   * @param u2 2nd component of normal vector.
+   * @param el linearity in range [0,1].
+   */
+  public void applyForNormalLinear(float[][] x, 
+    float[][] u1, float[][] u2, float[][] el) 
+  {
+    apply(x,
+      null,
+      u1,u2,
+      null,null,
+      null,null,
+      el);
+  }
+
+  /**
    * Applies this filter for the specified image and outputs. All
    * outputs are optional and are computed for only non-null arrays.
    * @param x input array for 2-D image
-   * @param theta orientation angle = asin(u2).
+   * @param theta orientation angle = asin(u2); -pi &lt;= theta &lt;= pi
    * @param u1 1st component of 1st eigenvector.
    * @param u2 2nd component of 1st eigenvector.
    * @param v1 1st component of 2nd eigenvector.
@@ -155,6 +202,105 @@ public class LocalOrientFilter {
         if (el!=null) el[i2][i1] = (e[0]-e[1])/(e[0]+e[1]);
       }
     }
+  }
+
+  /**
+   * Applies this filter to estimate orientation angles.
+   * @param x input array for 3-D image.
+   * @param theta orientation dip angle; 0 &lt;= theta &lt;= pi/2.
+   * @param phi orientation azimuthal angle; -pi &lt;= phi &lt;= pi.
+   */
+  public void applyForThetaPhi(float[][][] x, 
+    float[][][] theta, float[][][] phi) 
+  {
+    apply(x,
+      theta,phi,
+      null,null,null,
+      null,null,null,
+      null,null,null,
+      null,null,null,
+      null,null);
+  }
+
+  /**
+   * Applies this filter to estimate normal vectors (1st eigenvectors).
+   * @param x input array for 3-D image.
+   * @param u1 1st component of normal vector.
+   * @param u2 2nd component of normal vector.
+   * @param u3 3rd component of normal vector.
+   */
+  public void applyForNormal(float[][][] x, 
+    float[][][] u1, float[][][] u2, float[][][] u3) 
+  {
+    apply(x,
+      null,null,
+      u1,u2,u3,
+      null,null,null,
+      null,null,null,
+      null,null,null,
+      null,null);
+  }
+
+  /**
+   * Applies this filter to estimate normal vectors and planarities.
+   * Normal vectors are 1st eigenvectors corresponding to largest eigenvalues.
+   * @param x input array for 3-D image.
+   * @param u1 1st component of normal vector.
+   * @param u2 2nd component of normal vector.
+   * @param u3 3rd component of normal vector.
+   * @param ep planarity in range [0,1].
+   */
+  public void applyForNormalPlanar(float[][][] x, 
+    float[][][] u1, float[][][] u2, float[][][] u3, float[][][] ep) 
+  {
+    apply(x,
+      null,null,
+      u1,u2,u3,
+      null,null,null,
+      null,null,null,
+      null,null,null,
+      ep,null);
+  }
+
+  /**
+   * Applies this filter to estimate inline vectors (3rd eigenvectors).
+   * @param x input array for 3-D image.
+   * @param w1 1st component of inline vector.
+   * @param w2 2nd component of inline vector.
+   * @param w3 3rd component of inline vector.
+   */
+  public void applyForInline(float[][][] x, 
+    float[][][] w1, float[][][] w2, float[][][] w3)
+  {
+    apply(x,
+      null,null,
+      null,null,null,
+      null,null,null,
+      w1,w2,w3,
+      null,null,null,
+      null,null);
+  }
+
+  /**
+   * Applies this filter to estimate inline vectors and linearities.
+   * Inline vectors are 3rd eigenvectors corresponding to smallest eigenvalues.
+   * @param x input array for 3-D image.
+   * @param w1 1st component of inline vector.
+   * @param w2 2nd component of inline vector.
+   * @param w3 3rd component of inline vector.
+   * @param el linearity in range [0,1].
+   */
+  public void applyForInlineLinear(float[][][] x, 
+    float[][][] w1, float[][][] w2, float[][][] w3,
+    float[][][] el) 
+  {
+    apply(x,
+      null,null,
+      null,null,null,
+      null,null,null,
+      w1,w2,w3,
+      null,null,null,
+      null,el);
   }
 
   /**
