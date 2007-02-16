@@ -27,7 +27,7 @@ public class LocalOrientFilterTest extends TestCase {
   public void test2() {
     double sigma = 8.0;
     int n1 = 1+4*(int)(3*sigma);
-    int n2 = n1;
+    int n2 = n1+2;
     LocalOrientFilter lof = new LocalOrientFilter(sigma);
     float pi = FLT_PI;
     float[] dips = {-0.49f*pi,-0.20f*pi,-0.01f,0.01f,0.20f*pi,0.49f*pi};
@@ -57,8 +57,8 @@ public class LocalOrientFilterTest extends TestCase {
   public void test3Planar() {
     double sigma = 6.0;
     int n1 = 1+2*(int)(3*sigma);
-    int n2 = n1;
-    int n3 = n1;
+    int n2 = n1+2;
+    int n3 = n2+2;
     LocalOrientFilter lof = new LocalOrientFilter(sigma);
     float pi = FLT_PI;
     float[] azis = {-0.99f*pi,-0.01f,0.01f,0.99f*pi};
@@ -102,8 +102,8 @@ public class LocalOrientFilterTest extends TestCase {
   public void test3Linear() {
     double sigma = 6.0;
     int n1 = 1+2*(int)(3*sigma);
-    int n2 = n1;
-    int n3 = n1;
+    int n2 = n1+2;
+    int n3 = n2+2;
     LocalOrientFilter lof = new LocalOrientFilter(sigma);
     float pi = FLT_PI;
     float[] azis = {-0.99f*pi,-0.01f,0.01f,0.99f*pi};
@@ -154,6 +154,13 @@ public class LocalOrientFilterTest extends TestCase {
         assertAbsEqual(sin(dip)*sin(azi),w3,0.10);
         assertEqual(0.0f,ep,0.25);
         assertEqual(1.0f,el,0.25);
+        /*
+        print("eu=",eu);
+        print("ev=",ev);
+        print("ew=",ew);
+        print("ep=",ep);
+        print("el=",el);
+        */
       }
     }
   }
@@ -176,5 +183,12 @@ public class LocalOrientFilterTest extends TestCase {
     int n2 = a[0].length;
     int n3 = a.length;
     assertEquals(abs(e),abs(a[n3/2][n2/2][n1/2]),tol);
+  }
+
+  private static void print(String s, float[][][] a) {
+    int n1 = a[0][0].length;
+    int n2 = a[0].length;
+    int n3 = a.length;
+    System.out.println(s+a[n3/2][n2/2][n1/2]);
   }
 }

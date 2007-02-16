@@ -171,9 +171,7 @@ public class LocalOrientFilter {
       _rgfSmoother.applyX0(h,g);
     }
 
-    // For each sample, the eigenvector corresponding to the largest
-    // eigenvalue is normal to the plane. The size of that eigenvalue
-    // is a measure of planarity in the interval [0,1].
+    // Compute eigenvectors, eigenvalues, and outputs that depend on them.
     float[][] a = new float[2][2];
     float[][] z = new float[2][2];
     float[] e = new float[2];
@@ -192,14 +190,16 @@ public class LocalOrientFilter {
         }
         float v1i = -u2i;
         float v2i = u1i;
+        float eui = e[0];
+        float evi = e[1];
         if (theta!=null) theta[i2][i1] = asin(u2i);
         if (u1!=null) u1[i2][i1] = u1i;
         if (u2!=null) u2[i2][i1] = u2i;
         if (v1!=null) v1[i2][i1] = v1i;
         if (v2!=null) v2[i2][i1] = v2i;
-        if (eu!=null) eu[i2][i1] = e[0];
-        if (ev!=null) ev[i2][i1] = e[1];
-        if (el!=null) el[i2][i1] = (e[0]-e[1])/(e[0]+e[1]);
+        if (eu!=null) eu[i2][i1] = eui;
+        if (ev!=null) ev[i2][i1] = evi;
+        if (el!=null) el[i2][i1] = (eui-evi)/(eui+evi);
       }
     }
   }
@@ -387,7 +387,7 @@ public class LocalOrientFilter {
     }
     
     // Smoothed gradient products comprise the structure tensor.
-    float[][][] h = (nt>3)?t[6]:new float[n3][n2][n1];
+    float[][][] h = (nt>6)?t[6]:new float[n3][n2][n1];
     float[][][][] gs = {g11,g22,g33,g12,g13,g23};
     for (float[][][] g:gs) {
       _rgfSmoother.apply0XX(g,h);
@@ -396,9 +396,7 @@ public class LocalOrientFilter {
       Array.copy(h,g);
     }
 
-    // For each sample, the eigenvector corresponding to the largest
-    // eigenvalue is normal to the plane. The size of that eigenvalue
-    // is a measure of planarity in the interval [0,1].
+    // Compute eigenvectors, eigenvalues, and outputs that depend on them.
     float[][] a = new float[3][3];
     float[][] z = new float[3][3];
     float[] e = new float[3];
@@ -434,6 +432,9 @@ public class LocalOrientFilter {
           float w1i = u2i*v3i-u3i*v2i;
           float w2i = u3i*v1i-u1i*v3i;
           float w3i = u1i*v2i-u2i*v1i;
+          float eui = e[0];
+          float evi = e[1];
+          float ewi = e[2];
           if (theta!=null) theta[i3][i2][i1] = acos(u1i);
           if (phi!=null) phi[i3][i2][i1] = atan2(u3i,u2i);
           if (u1!=null) u1[i3][i2][i1] = u1i;
@@ -445,11 +446,14 @@ public class LocalOrientFilter {
           if (w1!=null) w1[i3][i2][i1] = w1i;
           if (w2!=null) w2[i3][i2][i1] = w2i;
           if (w3!=null) w3[i3][i2][i1] = w3i;
-          if (eu!=null) eu[i3][i2][i1] = e[0];
-          if (ev!=null) ev[i3][i2][i1] = e[1];
-          if (ew!=null) ew[i3][i2][i1] = e[1];
-          if (ep!=null) ep[i3][i2][i1] = (e[0]-e[1])/(e[0]+e[1]);
-          if (el!=null) el[i3][i2][i1] = (e[1]-e[2])/(e[1]+e[2]);
+          if (eu!=null) eu[i3][i2][i1] = eui;
+          if (ev!=null) ev[i3][i2][i1] = evi;
+          if (ew!=null) ew[i3][i2][i1] = ewi;
+          if (ep!=null || el!=null) {
+            float epi = (eui-evi)/(eui+evi);
+            if (ep!=null) ep[i3][i2][i1] = epi;
+            if (el!=null) el[i3][i2][i1] = (eui-ewi)/(eui+ewi)-epi;
+          }
         }
       }
     }
