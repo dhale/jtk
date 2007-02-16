@@ -25,7 +25,7 @@ import edu.mines.jtk.util.Check;
  * convention keeps multiple panel children consistent as their frame is
  * moved and resized.
  * <p>
- * Panels do not typically constrol the geometry of their frame, but
+ * Panels do not typically control the geometry of their frame, but
  * they may set a box constraint on the corner points of that frame. 
  * For example, a panel may constrain those corner points to lie on a 
  * sampling grid. Only one constraint, the last one set, is applied. A
