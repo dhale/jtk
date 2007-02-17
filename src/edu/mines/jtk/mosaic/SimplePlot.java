@@ -280,6 +280,36 @@ public class SimplePlot extends PlotFrame {
   }
 
   /**
+   * Adds a points view of specified values f(x).
+   * Uses default sampling of x = 0, 1, 2, ....
+   * @param f array of sampled function values f(x).
+   * @return the points view.
+   */
+  public PointsView addPoints(double[] f) {
+    return addPoints(convertToFloat(f));
+  }
+
+  /**
+   * Adds a points view of a sampled function f(x).
+   * @param s the sampling of the x coordinate.
+   * @param f array of sampled function values f(x).
+   * @return the points view.
+   */
+  public PointsView addPoints(Sampling s, double[] f) {
+    return addPoints(s,convertToFloat(f));
+  }
+
+  /**
+   * Adds a points view of specified values (x,y).
+   * @param x array of x coordinates.
+   * @param y array of y coordinates.
+   * @return the points view.
+   */
+  public PointsView addPoints(double[] x, double[] y) {
+    return addPoints(convertToFloat(x),convertToFloat(y));
+  }
+
+  /**
    * Adds a sequence view with specified values f(x).
    * Uses default sampling of x = 0, 1, 2, ....
    * @param f array of sampled function values f(x).
@@ -297,6 +327,26 @@ public class SimplePlot extends PlotFrame {
    */
   public SequenceView addSequence(Sampling s, float[] f) {
     return _panel.addSequence(s,f);
+  }
+
+  /**
+   * Adds a sequence view with specified values f(x).
+   * Uses default sampling of x = 0, 1, 2, ....
+   * @param f array of sampled function values f(x).
+   * @return the sequence view.
+   */
+  public SequenceView addSequence(double[] f) {
+    return addSequence(convertToFloat(f));
+  }
+
+  /**
+   * Adds a sequence view with specified sampling and values f(x).
+   * @param s the sampling of the variable x.
+   * @param f array of sampled function values f(x).
+   * @return the sequence view.
+   */
+  public SequenceView addSequence(Sampling s, double[] f) {
+    return addSequence(s,convertToFloat(f));
   }
 
   /**
@@ -320,6 +370,29 @@ public class SimplePlot extends PlotFrame {
    */
   public PixelsView addPixels(Sampling s1, Sampling s2, float[][] f) {
     return _panel.addPixels(s1,s2,f);
+  }
+
+  /**
+   * Adds a pixels view of the specified sampled function f(x1,x2).
+   * Assumes zero first sample values and unit sampling intervals.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where
+   *  n1 = f[0].length and n2 = f.length.
+   * @return the pixels view.
+   */
+  public PixelsView addPixels(double[][] f) {
+    return addPixels(convertToFloat(f));
+  }
+
+  /**
+   * Adds a pixels view of the specified sampled function f(x1,x2).
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where
+   *  n1 = f[0].length and n2 = f.length.
+   * @return the pixels view.
+   */
+  public PixelsView addPixels(Sampling s1, Sampling s2, double[][] f) {
+    return addPixels(s1,s2,convertToFloat(f));
   }
 
   /**
