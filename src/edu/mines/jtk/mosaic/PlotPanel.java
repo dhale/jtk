@@ -120,6 +120,7 @@ public class PlotPanel extends IPanel {
   {
     super();
     _orientation = orientation;
+    _axesPlacement = axesPlacement;
     this.setLayout(new GridBagLayout());
     Set<Mosaic.AxesPlacement> axesPlacementSet;
     if (axesPlacement==AxesPlacement.LEFT_TOP) {
@@ -445,7 +446,7 @@ public class PlotPanel extends IPanel {
    * @param label the label.
    */
   public void setHLabel(int icol, String label) {
-    if (_orientation==Orientation.X1DOWN_X2RIGHT) {
+    if (_axesPlacement==AxesPlacement.LEFT_TOP) {
       _mosaic.getTileAxisTop(icol).setLabel(label);
     } else {
       _mosaic.getTileAxisBottom(icol).setLabel(label);
@@ -833,6 +834,7 @@ public class PlotPanel extends IPanel {
   private PixelsView _colorBarPixelsView;
   private Title _title;
   private Orientation _orientation;
+  private AxesPlacement _axesPlacement;
 
   /**
    * Internal class for plot title.

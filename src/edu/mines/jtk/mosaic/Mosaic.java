@@ -531,8 +531,11 @@ public class Mosaic extends IPanel {
         IPanel ip = (IPanel)c;
         ip.paintToRect(g2d,xc,yc,wc,hc);
         if (wtb>0.0f && ip instanceof Tile) {
-          g2d.setStroke(stb);
-          g2d.drawRect(xc-itb,yc-itb,wc+itb+itb-1,hc+itb+itb-1);
+          Tile tile = (Tile)ip;
+          if (tile.countTiledViews()>0) {
+            g2d.setStroke(stb);
+            g2d.drawRect(xc-itb,yc-itb,wc+itb+itb-1,hc+itb+itb-1);
+          }
         } else if (wab>0.0f && ip instanceof TileAxis) {
           g2d.setStroke(sab);
           g2d.drawRect(xc-iab,yc-iab,wc+iab+iab-1,hc+iab+iab-1);

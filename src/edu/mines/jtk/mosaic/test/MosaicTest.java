@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import edu.mines.jtk.mosaic.Mosaic;
+import edu.mines.jtk.mosaic.PointsView;
 import edu.mines.jtk.mosaic.TileZoomMode;
 
 /**
@@ -39,12 +40,19 @@ public class MosaicTest {
       Mosaic.AxesPlacement.BOTTOM,
       Mosaic.AxesPlacement.RIGHT
     );
+    float[] x1 = {0.0f,1.0f};
+    float[] x2 = {0.0f,1.0f};
     Mosaic mosaic = new Mosaic(nrow,ncol,axesPlacement);
     mosaic.setBackground(Color.WHITE);
     mosaic.setFont(new Font("SansSerif",Font.PLAIN,12));
     mosaic.setWidthMinimum(1,200);
     mosaic.setWidthElastic(1,200);
     mosaic.setHeightElastic(0,0);
+    for (int irow=0; irow<nrow; ++irow) {
+      for (int icol=0; icol<ncol; ++icol) {
+        mosaic.getTile(irow,icol).addTiledView(new PointsView(x1,x2));
+      }
+    }
     //Tile tile11 = mosaic.getTile(1,1);
     //tile11.setViewRectangle(new DRectangle(0.1,0.1,0.8,0.8));
 
