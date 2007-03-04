@@ -47,8 +47,8 @@ import edu.mines.jtk.util.Check;
  * The local linearity or planarity of features is determined by the
  * eigenvalues. For 2-D images with eigenvalues eu and ev (corresponding 
  * to the eigenvectors u and v), linearity is (eu-ev)/(eu+ev). For 3-D
- * images with eigenvalues eu, ev, and ew, planarity is (eu-ev)/(eu+ev)
- * and linearity is (ev-ew)/(ev+ew). Both linearity and planarity are
+ * images with eigenvalues eu, ev, and ew, planarity is (eu-ev)/(eu+ew)
+ * and linearity is (ev-ew)/(eu+ew). Both linearity and planarity are
  * in the range [0,1].
  *
  * @author Dave Hale, Colorado School of Mines
@@ -321,8 +321,8 @@ public class LocalOrientFilter {
    * @param eu largest eigenvalue corresponding to the eigenvector u.
    * @param ev middle eigenvalue corresponding to the eigenvector v.
    * @param ew smallest eigenvalue corresponding to the eigenvector w.
-   * @param ep (eu-ev)/(eu+ev), a measure of planarity.
-   * @param el (ev-ew)/(ev+ew), a measure of linearity.
+   * @param ep (eu-ev)/(eu+ew), a measure of planarity.
+   * @param el (ev-ew)/(eu+ew), a measure of linearity.
    */
   public void apply(float[][][] x,
     float[][][] theta, float[][][] phi,
@@ -450,9 +450,9 @@ public class LocalOrientFilter {
           if (ev!=null) ev[i3][i2][i1] = evi;
           if (ew!=null) ew[i3][i2][i1] = ewi;
           if (ep!=null || el!=null) {
-            float epi = (eui-evi)/(eui+evi);
-            if (ep!=null) ep[i3][i2][i1] = epi;
-            if (el!=null) el[i3][i2][i1] = (eui-ewi)/(eui+ewi)-epi;
+            float esi = 1.0f/(eui+ewi);
+            if (ep!=null) ep[i3][i2][i1] = (eui-evi)*esi;
+            if (el!=null) el[i3][i2][i1] = (evi-ewi)*esi;
           }
         }
       }
