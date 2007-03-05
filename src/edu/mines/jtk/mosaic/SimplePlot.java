@@ -589,6 +589,7 @@ public class SimplePlot extends PlotFrame {
     float[][] b = new float[n2][];
     for (int i2=0; i2<n2; ++i2) {
       int n1 = a[i2].length;
+      b[i2] = new float[n1];
       for (int i1=0; i1<n1; ++i1) {
         b[i2][i1] = (float)a[i2][i1];
       }
