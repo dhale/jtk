@@ -1279,4 +1279,90 @@ public class CausalFilter {
     _a0 = a[0];
     _a0i = 1.0f/a[0];
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // EXPERIMENTAL
+  /**
+   * Wilson-Burg factorization for inverse of specified 1-D auto-correlation.
+   * Modifies this filter using the iterative Wilson-Burg algorithm. If this 
+   * algorithm converges, the impulse response of this filter cascaded with 
+   * its transpose approximates the specified auto-correlation.
+   * @param maxiter maximum number of Wilson-Burg iterations.
+   * @param epsilon tolerance for convergence. Iterations have converged
+   *  when the change in all filter coefficients is less than this factor 
+   *  times the square root of the zero-lag of the auto correlation.
+   * @param r the auto-correlation. This 1-D array must have odd length.
+   *  The middle array element is the zero-lag of the auto-correlation,
+   *  and other elements are symmetric about the middle element.
+   * @exception IllegalStateException if Wilson-Burg iterations do not
+   *  converge within the specified maximum number of iterations.
+   */
+  private void factorInverseWilsonBurg(int maxiter, float epsilon, float[] r) {
+    Check.argument(r.length%2==1,"r.length is odd");
+
+    // Maximum length of this filter's impulse response A.
+    int m1 = _max1-_min1;
+
+    // Lengths for zero-padded auto-correlation. We must pad with zeros
+    // to reduce truncation of R*A' in Wilson-Burg iterations.
+    int n1 = r.length+m1;
+
+    // Indices of zero lag before and after padding with zeros.
+    int l1 = (r.length-1)/2;
+    int k1 = l1+m1;
+
+    // Workspace.
+    float[] s = new float[n1];
+    float[] t = new float[n1];
+    float[] u = new float[n1];
+
+    // S is -R padded with zeros to reduce truncation of -AA'R.
+    Array.copy(r.length,0,r,k1-l1,s);
+    for (int i1=0; i1<n1; ++i1)
+      s[i1] = -s[i1];
+
+    // Initial factor is minimum-phase and matches lag zero of 1/R.
+    //Array.zero(_a);
+    //_a[0] = 1.0f/sqrt(rsum);
+    _a0 = _a[0];
+    _a0i = 1.0f/_a[0];
+
+    // Loop for maximum iterations or until converged.
+    int niter;
+    boolean converged = false;
+    float eemax = s[k1]*epsilon;
+    for (niter=0; niter<maxiter && !converged; ++niter) {
+      Array.dump(_a); // for debugging only
+
+      // U(z) + U(1/z) = 3 - A(z)*A(1/z)*S(z)
+      this.applyTranspose(s,t);
+      this.apply(t,u);
+      Array.dump(u);
+      u[k1] += 3.0f;
+
+      // U(z) is the causal part we want; zero the anti-causal part.
+      u[k1] *= 0.5f;
+      for (int i1=0; i1<k1; ++i1)
+        u[i1] = 0.0f;
+
+      // The new A(z) is T(z)  = U(z)*A(z)
+      this.apply(u,t);
+      converged = true;
+      float asum = 0.0f;
+      for (int j=0; j<_m; ++j) {
+        int j1 = k1+_lag1[j];
+        if (0<=j1 && j1<n1) {
+          float aj = t[j1];
+          if (converged) {
+            float e = _a[j]-aj;
+            converged = e*e<=eemax;
+          }
+          _a[j] = aj;
+        }
+      }
+      _a0 = _a[0];
+      _a0i = 1.0f/_a[0];
+    }
+    Check.state(converged,"Wilson-Burg iterations converged");
+  }
 }

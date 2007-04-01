@@ -550,4 +550,53 @@ public class CausalFilterTest extends TestCase {
         for (int i1=0; i1<n1; ++i1)
           assertEquals(re[i3][i2][i1],ra[i3][i2][i1],tolerance);
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // EXPERIMENTAL
+
+  private void xtestGaussian() {
+    float sigma = 2.0f;
+    int n = 1+2*(int)(8*sigma);
+    int k = (n-1)/2;
+    float[] r = new float[n];
+    for (int i=0; i<n; ++i) {
+      float xn = (float)(i-k)/sigma;
+      r[i] = exp(-0.5f*xn*xn);
+    }
+    r = Array.mul(1.0f/Array.sum(r),r);
+    //r[k] *= 1.01f;
+    int[] lag1 = {0,1,2,3,4};
+    double dr1 = 1.12075;
+    double di1 = 1.27788;
+    double dr2 = 1.76952;
+    double di2 = 0.46611;
+    double r1 = 1.0/sqrt(dr1*dr1+di1*di1);
+    double r2 = 1.0/sqrt(dr2*dr2+di2*di2);
+    double s1 = atan2(di1,dr1);
+    double s2 = atan2(di2,dr2);
+    double a1 = -2.0*pow(r1,2.0/sigma)*cos(2.0*s1/sigma);
+    double a2 = pow(r1,4.0/sigma);
+    double b1 = -2.0*pow(r2,2.0/sigma)*cos(2.0*s2/sigma);
+    double b2 = pow(r2,4.0/sigma);
+    float[] a = new float[5];
+    a[0] = 1.0f;
+    a[1] = (float)(a1+b1);
+    a[2] = (float)(a2+a1*b1+b2);
+    a[3] = (float)(a1*b2+b1*a2);
+    a[4] = (float)(a2*b2);
+    a = Array.mul(1.0f/Array.sum(a),a);
+    CausalFilter cf = new CausalFilter(lag1,a);
+    /*
+    float[] s = Array.zerofloat(n);
+    float[] t = Array.zerofloat(n);
+    s[k] = 1.0f;
+    cf.applyInverseTranspose(s,t);
+    cf.applyInverse(t,s);
+    cf.apply(s,t);
+    cf.applyTranspose(t,s);
+    Array.dump(r);
+    Array.dump(s);
+    */
+    //cf.factorInverseWilsonBurg(10,FLT_EPSILON,r);
+  }
 }
