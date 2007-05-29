@@ -9,6 +9,7 @@ package edu.mines.jtk.dsp;
 import static java.lang.Math.*;
 
 import edu.mines.jtk.opt.BrentMinFinder;
+import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -939,6 +940,18 @@ public class SincInterpolator {
         _asinc[isinc][i] = (float)(sinc(x)*_kwin.evaluate(x));
       }
     }
+  }
+
+  /**
+   * Get a copy of the interpolation table.  Returns a copy of this
+   * interpolator's table of sinc interpolation coefficients.
+   * @return A copy of the table.
+   */
+  public float[][] getTable() {
+    if (_asinc==null)
+      makeTable();
+    assert _asinc != null;
+    return Array.copy(_asinc); 
   }
 
   private static double sinc(double x) {
