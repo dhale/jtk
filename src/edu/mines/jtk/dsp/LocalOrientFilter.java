@@ -46,9 +46,9 @@ import edu.mines.jtk.util.Check;
  * <p>
  * The local linearity or planarity of features is determined by the
  * eigenvalues. For 2-D images with eigenvalues eu and ev (corresponding 
- * to the eigenvectors u and v), linearity is (eu-ev)/(eu+ev). For 3-D
- * images with eigenvalues eu, ev, and ew, planarity is (eu-ev)/(eu+ew)
- * and linearity is (ev-ew)/(eu+ew). Both linearity and planarity are
+ * to the eigenvectors u and v), linearity is (eu-ev)/eu. For 3-D
+ * images with eigenvalues eu, ev, and ew, planarity is (eu-ev)/eu
+ * and linearity is (ev-ew)/eu. Both linearity and planarity are
  * in the range [0,1].
  *
  * @author Dave Hale, Colorado School of Mines
@@ -199,7 +199,7 @@ public class LocalOrientFilter {
         if (v2!=null) v2[i2][i1] = v2i;
         if (eu!=null) eu[i2][i1] = eui;
         if (ev!=null) ev[i2][i1] = evi;
-        if (el!=null) el[i2][i1] = (eui-evi)/(eui+evi);
+        if (el!=null) el[i2][i1] = (eui-evi)/eui;
       }
     }
   }
@@ -450,7 +450,7 @@ public class LocalOrientFilter {
           if (ev!=null) ev[i3][i2][i1] = evi;
           if (ew!=null) ew[i3][i2][i1] = ewi;
           if (ep!=null || el!=null) {
-            float esi = 1.0f/(eui+ewi);
+            float esi = 1.0f/eui;
             if (ep!=null) ep[i3][i2][i1] = (eui-evi)*esi;
             if (el!=null) el[i3][i2][i1] = (evi-ewi)*esi;
           }

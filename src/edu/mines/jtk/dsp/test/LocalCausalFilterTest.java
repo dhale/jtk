@@ -294,4 +294,124 @@ public class LocalCausalFilterTest extends TestCase {
         for (int i1=0; i1<n1; ++i1)
           assertEquals(re[i3][i2][i1],ra[i3][i2][i1],tolerance);
   }
+
+  /*
+  public void test1TwoPoles() {
+    final int n = 1001;
+    final float f = 0.0f;
+    final float c = cos(2.0f*FLT_PI*f);
+    final float[] r = new float[n];
+    float[] x = new float[n];
+    for (int i=0; i<n; ++i) {
+      x[i] = (i%(n/8)==1)?1.0f:0.0f;
+      r[i] = 0.1f+0.8f*sin(FLT_PI*i/(n-1));
+    }
+    int[] lag1 = {0,1,2};
+    LocalCausalFilter lcf = new LocalCausalFilter(lag1);
+    LocalCausalFilter.A1 a1 = new LocalCausalFilter.A1() {
+      public void get(int i, float[] a) {
+        a[0] = 1.0f;
+        a[1] = -2.0f*c*r[i];
+        a[2] = r[i]*r[i];
+      }
+    };
+    float[] y = new float[n];
+    float[] z = new float[n];
+    lcf.applyInverseTranspose(a1,x,z);
+    lcf.applyInverse(a1,z,z);
+    edu.mines.jtk.mosaic.SimplePlot.asSequence(z);
+    LocalCausalFilter.A12 a12 = new LocalCausalFilter.A12() {
+      public void get(int i, float[] s, float[][] a) {
+        float ft = (r[i]-_ftable)*_stable;
+        int it = (int)(ft);
+        s[1] = ft-it;
+        s[0] = 1.0f-s[1];
+        a[0] = _atable[it];
+        a[1] = _atable[it+1];
+        if (540<i &&  i<560)
+          System.out.println("i="+i+" it="+it+" s0="+s[0]+" s1="+s[1]);
+      }
+      private int _ntable = 19;
+      private float _dtable = 1.0f/(_ntable-1);
+      private float _ftable = 0.0f;
+      private float _stable = 0.999999f/_dtable;
+      private float[][] _atable = new float[_ntable][];
+      {
+        for (int itable=0; itable<_ntable; ++itable) {
+          float r = _ftable+itable*_dtable;
+          _atable[itable] = new float[]{1.0f,-2.0f*r*c,r*r};
+        }
+      }
+    };
+    LocalCausalFilter.A1 a1Average = new LocalCausalFilter.A1() {
+      public void get(int i, float[] a) {
+        float ft = (r[i]-_ftable)*_stable;
+        int it = (int)(ft);
+        float s1 = ft-it;
+        float s0 = 1.0f-s1;
+        float[] at0 = _atable[it];
+        float[] at1 = _atable[it];
+        a[0] = s0*at0[0]+s1*at1[0];
+        a[1] = s0*at0[1]+s1*at1[1];
+        a[2] = s0*at0[2]+s1*at1[2];
+      }
+      private int _ntable = 49;
+      private float _dtable = 1.0f/(_ntable-1);
+      private float _ftable = 0.0f;
+      private float _stable = 0.999999f/_dtable;
+      private float[][] _atable = new float[_ntable][];
+      {
+        for (int itable=0; itable<_ntable; ++itable) {
+          float r = _ftable+itable*_dtable;
+          _atable[itable] = new float[]{1.0f,-2.0f*r*c,r*r};
+        }
+      }
+    };
+    LocalCausalFilter.A1 a1Lo = new LocalCausalFilter.A1() {
+      public void get(int i, float[] a) {
+        float ft = (r[i]-_ftable)*_stable;
+        int it = (int)(ft);
+        float[] at = _atable[it];
+        a[0] = at[0];
+        a[1] = at[1];
+        a[2] = at[2];
+      }
+      private int _ntable = 19;
+      private float _dtable = 1.0f/(_ntable-1);
+      private float _ftable = 0.0f;
+      private float _stable = 0.999999f/_dtable;
+      private float[][] _atable = new float[_ntable][];
+      {
+        for (int itable=0; itable<_ntable; ++itable) {
+          float r = _ftable+itable*_dtable;
+          _atable[itable] = new float[]{1.0f,-2.0f*r*c,r*r};
+        }
+      }
+    };
+    LocalCausalFilter.A1 a1Hi = new LocalCausalFilter.A1() {
+      public void get(int i, float[] a) {
+        float ft = (r[i]-_ftable)*_stable;
+        int it = (int)(ft);
+        float[] at = _atable[it+1];
+        a[0] = at[0];
+        a[1] = at[1];
+        a[2] = at[2];
+      }
+      private int _ntable = 19;
+      private float _dtable = 1.0f/(_ntable-1);
+      private float _ftable = 0.0f;
+      private float _stable = 0.999999f/_dtable;
+      private float[][] _atable = new float[_ntable][];
+      {
+        for (int itable=0; itable<_ntable; ++itable) {
+          float r = _ftable+itable*_dtable;
+          _atable[itable] = new float[]{1.0f,-2.0f*r*c,r*r};
+        }
+      }
+    };
+    lcf.applyInverseTranspose(a1Average,x,z);
+    lcf.applyInverse(a1Average,z,z);
+    edu.mines.jtk.mosaic.SimplePlot.asSequence(z);
+  }
+  */
 }

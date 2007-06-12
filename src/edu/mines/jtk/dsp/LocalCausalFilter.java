@@ -1049,4 +1049,100 @@ public class LocalCausalFilter {
     _max2 = Array.max(lag2);
     _max3 = Array.max(lag3);
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // Testing interface for linear interpolation of table-driven filters.
+  // Not working, so keep private for now.
+
+  /**
+   * Interface for filter coefficients indexed in 1 dimension.
+   * Filter coefficients may vary with sample index, and will be got 
+   * through this interface for every output sample computed.
+   */
+  private interface A12 {
+    
+    /**
+     * Gets scale factors and filter coefficients for specified sample.
+     * @param i1 sample index in 1st dimension.
+     * @param s array[2] with two scale factors.
+     * @param a array[2][] with two arrays of filter coefficients.
+     */
+    public void get(int i1, float[] s, float[][] a);
+  }
+
+  /**
+   * Applies the inverse of this filter.
+   * Uses lag1; ignores lag2 or lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
+   * @param a12 scale factors and filter coefficients.
+   * @param y input array.
+   * @param x output array.
+   */
+  private void applyInverse(A12 a12, float[] y, float[] x) {
+    int n1 = y.length;
+    int mod1 = 1+_max1;
+    float[] t0 = new float[mod1];
+    float[] t1 = new float[mod1];
+    float[] s = new float[2];
+    float[][] a = new float[2][];
+    for (int i1=0,i1m=0; i1<n1; ++i1,i1m=i1%mod1) {
+      a12.get(i1,s,a);
+      float s0 = s[0];
+      float s1 = s[1];
+      float[] a0 = a[0];
+      float[] a1 = a[1];
+      float x0 = 0.0f;
+      float x1 = 0.0f;
+      for (int j=1; j<_m; ++j) {
+        int k1 = i1-_lag1[j];
+        if (0<=k1) {
+          int k1m = k1%mod1;
+          x0 += a0[j]*t0[k1m];
+          x1 += a1[j]*t1[k1m];
+        }
+      }
+      t0[i1m] = (y[i1]-x0)/a0[0]; 
+      t1[i1m] = (y[i1]-x1)/a1[0]; 
+      x[i1] = s0*t0[i1m]+s1*t1[i1m];
+    }
+  }
+
+  /**
+   * Applies the inverse-transpose of this filter.
+   * Uses lag1; ignores lag2 or lag3, if specified.
+   * <p>
+   * May be applied in-place; input and output arrays may be the same.
+   * @param a12 scale factors and filter coefficients.
+   * @param y input array.
+   * @param x output array.
+   */
+  private void applyInverseTranspose(A12 a12, float[] y, float[] x) {
+    int n1 = y.length;
+    int mod1 = 1+_max1;
+    float[] t0 = new float[mod1];
+    float[] t1 = new float[mod1];
+    float[] s = new float[2];
+    float[][] a = new float[2][];
+    for (int i1=n1-1,i1m=i1%mod1; i1>=0; --i1,i1m=i1%mod1) {
+      a12.get(i1,s,a);
+      float s0 = s[0];
+      float s1 = s[1];
+      float[] a0 = a[0];
+      float[] a1 = a[1];
+      float x0 = (s0*y[i1]-t0[i1m])/a0[0];
+      float x1 = (s1*y[i1]-t1[i1m])/a1[0];
+      x[i1] = x0+x1;
+      t0[i1m] = 0.0f;
+      t1[i1m] = 0.0f;
+      for (int j=1; j<_m; ++j) {
+        int k1 = i1-_lag1[j];
+        if (0<=k1) {
+          int k1m = k1%mod1;
+          t0[k1m] += a0[j]*x0;
+          t1[k1m] += a1[j]*x1;
+        }
+      }
+    }
+  }
 }
