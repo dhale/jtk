@@ -9,6 +9,7 @@ package edu.mines.jtk.dsp;
 import edu.mines.jtk.util.Array;
 import static edu.mines.jtk.util.MathPlus.*;
 
+
 import edu.mines.jtk.util.Check;
 
 /**
@@ -56,12 +57,42 @@ import edu.mines.jtk.util.Check;
  */
 public class LocalOrientFilter {
 
+  /**
+   * Constructor
+   * @param sigma width of Gaussian windowing filter in all dimensions.
+   */
   public LocalOrientFilter(double sigma) {
-    _sigma = sigma;
-    _rgfGradient = new RecursiveGaussianFilter(1.0);
-    _rgfSmoother = new RecursiveGaussianFilter(sigma);
+    this(sigma,sigma,sigma);
   }
 
+  
+  /**
+   * Constructor
+   * @param sigma1 Width of Gaussian windowing filter in 1st dimension.
+   * @param sigma23 Width of Gaussian windowing filter in 2nd dimension.
+   * and higher.
+   */
+  public LocalOrientFilter(double sigma1, double sigma2) {
+    this(sigma1,sigma2,sigma2);
+  }
+
+  /**
+   * Constructor
+   * @param sigma1 Width of Gaussian windowing filter in 1st dimension.
+   * @param sigma2 Width of Gaussian windowing filter in 2nd dimension.
+   * @param sigma3 Width of Gaussian windowing filter in 3rd dimension.
+   */
+  public LocalOrientFilter(double sigma1, double sigma2, double sigma3) {
+    _sigma1 = sigma1;
+    _sigma2 = sigma2;
+    _sigma3 = sigma3;
+    _rgfGradient = new RecursiveGaussianFilter(1.0);
+    _rgfSmoother1 = new RecursiveGaussianFilter(_sigma1);
+    _rgfSmoother2 = new RecursiveGaussianFilter(_sigma2);
+    _rgfSmoother3 = new RecursiveGaussianFilter(_sigma3);
+  }
+  
+  
   /**
    * Applies this filter to estimate orientation angles.
    * @param x input array for 2-D image.
@@ -167,8 +198,8 @@ public class LocalOrientFilter {
     float[][] h = (nt>3)?t[3]:new float[n2][n1];
     float[][][] gs = {g11,g22,g12};
     for (float[][] g:gs) {
-      _rgfSmoother.apply0X(g,h);
-      _rgfSmoother.applyX0(h,g);
+      _rgfSmoother1.apply0X(g,h);
+      _rgfSmoother2.applyX0(h,g);
     }
 
     // Compute eigenvectors, eigenvalues, and outputs that depend on them.
@@ -390,9 +421,9 @@ public class LocalOrientFilter {
     float[][][] h = (nt>6)?t[6]:new float[n3][n2][n1];
     float[][][][] gs = {g11,g22,g33,g12,g13,g23};
     for (float[][][] g:gs) {
-      _rgfSmoother.apply0XX(g,h);
-      _rgfSmoother.applyX0X(h,g);
-      _rgfSmoother.applyXX0(g,h);
+      _rgfSmoother1.apply0XX(g,h);
+      _rgfSmoother2.applyX0X(h,g);
+      _rgfSmoother3.applyXX0(g,h);
       Array.copy(h,g);
     }
 
@@ -462,7 +493,11 @@ public class LocalOrientFilter {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private double _sigma;
+  private double _sigma1;
+  private double _sigma2;
+  private double _sigma3;
   private RecursiveGaussianFilter _rgfGradient;
-  private RecursiveGaussianFilter _rgfSmoother;
+  private RecursiveGaussianFilter _rgfSmoother1;
+  private RecursiveGaussianFilter _rgfSmoother2;
+  private RecursiveGaussianFilter _rgfSmoother3;
 }
