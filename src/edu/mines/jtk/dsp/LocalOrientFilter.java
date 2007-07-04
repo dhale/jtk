@@ -30,8 +30,8 @@ import edu.mines.jtk.util.Check;
  * to the best fitting line, and the 1st component u1 of u is always 
  * non-negative. The 2nd eigenvector v is perpendicular to u such that 
  * the cross product u1*v2-u2*v1 = 1; that is, v1 = -u2 and v2 = u1. 
- * The angle theta = asin(u2) is the angle between the 1st eigenvector 
- * u and axis 1; -pi/2 &lt;= theta &lt;= pi/2.
+ * The angle theta = asin(u2) is the angle measured counter-clockwise 
+ * between the 1st eigenvector u and axis 1; -pi/2 &lt;= theta &lt;= pi/2.
  * <p>
  * The coordinate system for a 3-D image has three orthogonal axes 1, 2 
  * and 3, which correspond to the 1st, 2nd and 3rd indices of the array 
@@ -40,7 +40,8 @@ import edu.mines.jtk.util.Check;
  * eigenvector u is orthogonal to the best fitting plane, and the 1st 
  * component u1 of u is always non-negative. The 2nd eigenvector v is 
  * orthogonal to the best fitting line within the best fitting plane.
- * The 3rd eigenvector w is the cross product of u and v. The dip angle 
+ * The 3rd eigenvector w is the cross product of u and v and is aligned
+ * with the direction in which the images changes least. The dip angle 
  * theta = acos(u1) is the angle between the 1st eigenvector u and axis 1; 
  * 0 &lt;= theta &lt;= pi/2. The azimuthal angle phi = atan2(u3,u2)
  * is well-defined for only non-zero theta; -pi &lt;= phi &lt;= pi.
@@ -58,8 +59,8 @@ import edu.mines.jtk.util.Check;
 public class LocalOrientFilter {
 
   /**
-   * Constructor
-   * @param sigma width of Gaussian windowing filter in all dimensions.
+   * Constructs a filter with an isotropic Gaussian window.
+   * @param sigma width of window; same for all dimensions.
    */
   public LocalOrientFilter(double sigma) {
     this(sigma,sigma,sigma);
@@ -67,20 +68,19 @@ public class LocalOrientFilter {
 
   
   /**
-   * Constructor
-   * @param sigma1 Width of Gaussian windowing filter in 1st dimension.
-   * @param sigma23 Width of Gaussian windowing filter in 2nd dimension.
-   * and higher.
+   * Constructs a filter with an anisotropic Gaussian window.
+   * @param sigma1 width of window in 1st dimension.
+   * @param sigma2 width of window in 2nd and higher dimensions.
    */
   public LocalOrientFilter(double sigma1, double sigma2) {
     this(sigma1,sigma2,sigma2);
   }
 
   /**
-   * Constructor
-   * @param sigma1 Width of Gaussian windowing filter in 1st dimension.
-   * @param sigma2 Width of Gaussian windowing filter in 2nd dimension.
-   * @param sigma3 Width of Gaussian windowing filter in 3rd dimension.
+   * Constructs a filter with an anisotropic Gaussian window.
+   * @param sigma1 width of window in 1st dimension.
+   * @param sigma2 width of window in 2nd dimension.
+   * @param sigma3 width of window in 3rd and higher dimensions.
    */
   public LocalOrientFilter(double sigma1, double sigma2, double sigma3) {
     _sigma1 = sigma1;
@@ -91,7 +91,6 @@ public class LocalOrientFilter {
     _rgfSmoother2 = new RecursiveGaussianFilter(_sigma2);
     _rgfSmoother3 = new RecursiveGaussianFilter(_sigma3);
   }
-  
   
   /**
    * Applies this filter to estimate orientation angles.

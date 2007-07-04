@@ -595,6 +595,8 @@ public class RecursiveGaussianFilter {
       int m = y.length;
       float n0 = _n0[nd],  n1 = _n1[nd],  n2 = _n2[nd],  n3 = _n3[nd];
       float d1 = _d1[nd],  d2 = _d2[nd],  d3 = _d3[nd],  d4 = _d4[nd];
+      if (nd%2!=0) // if odd-derivative filter,
+        n0 = 0.0f; // it must be anti-symmetric
       float yim4 = 0.0f,  yim3 = 0.0f,  yim2 = 0.0f,  yim1 = 0.0f;
       float               xim3 = 0.0f,  xim2 = 0.0f,  xim1 = 0.0f;
       for (int i=0; i<m; ++i) {
@@ -632,6 +634,8 @@ public class RecursiveGaussianFilter {
       int m1 = y[0].length;
       float n0 = _n0[nd],  n1 = _n1[nd],  n2 = _n2[nd],  n3 = _n3[nd];
       float d1 = _d1[nd],  d2 = _d2[nd],  d3 = _d3[nd],  d4 = _d4[nd];
+      if (nd%2!=0) // if odd-derivative filter,
+        n0 = 0.0f; // it must be anti-symmetric
       float[] yim4 = new float[m1];
       float[] yim3 = new float[m1];
       float[] yim2 = new float[m1];
