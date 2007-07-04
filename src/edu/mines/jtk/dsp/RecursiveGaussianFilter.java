@@ -819,6 +819,7 @@ public class RecursiveGaussianFilter {
         _d3[i] = (float)d3;
         _d4[i] = (float)d4;
       }
+      _n0[1] = 0.0f; // 1st-derivative must be anti-symmetric
       scaleN(sigma);
     }
 
@@ -827,7 +828,6 @@ public class RecursiveGaussianFilter {
      * For example, the sum of the 0th-derivative filter coefficients
      * should be 1.0. The scale factors are computed from finite-length
      * approximations to the impulse responses of the three filters.
-     * Also ensure that 1st-derivative filter is anti-symmetric.
      */
     private void scaleN(double sigma) {
       int n = 1+2*(int)(10.0*sigma);
@@ -857,7 +857,6 @@ public class RecursiveGaussianFilter {
         _n2[i] /= s[i];
         _n3[i] /= s[i];
       }
-      _n0[1] = 0.0f; // 1st-derivative must be anti-symmetric
     }
   }
 
