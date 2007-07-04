@@ -595,8 +595,6 @@ public class RecursiveGaussianFilter {
       int m = y.length;
       float n0 = _n0[nd],  n1 = _n1[nd],  n2 = _n2[nd],  n3 = _n3[nd];
       float d1 = _d1[nd],  d2 = _d2[nd],  d3 = _d3[nd],  d4 = _d4[nd];
-      if (nd%2!=0) // if odd-derivative filter,
-        n0 = 0.0f; // it must be anti-symmetric
       float yim4 = 0.0f,  yim3 = 0.0f,  yim2 = 0.0f,  yim1 = 0.0f;
       float               xim3 = 0.0f,  xim2 = 0.0f,  xim1 = 0.0f;
       for (int i=0; i<m; ++i) {
@@ -634,8 +632,6 @@ public class RecursiveGaussianFilter {
       int m1 = y[0].length;
       float n0 = _n0[nd],  n1 = _n1[nd],  n2 = _n2[nd],  n3 = _n3[nd];
       float d1 = _d1[nd],  d2 = _d2[nd],  d3 = _d3[nd],  d4 = _d4[nd];
-      if (nd%2!=0) // if odd-derivative filter,
-        n0 = 0.0f; // it must be anti-symmetric
       float[] yim4 = new float[m1];
       float[] yim3 = new float[m1];
       float[] yim2 = new float[m1];
@@ -831,6 +827,7 @@ public class RecursiveGaussianFilter {
      * For example, the sum of the 0th-derivative filter coefficients
      * should be 1.0. The scale factors are computed from finite-length
      * approximations to the impulse responses of the three filters.
+     * Also ensure that 1st-derivative filter is anti-symmetric.
      */
     private void scaleN(double sigma) {
       int n = 1+2*(int)(10.0*sigma);
@@ -860,6 +857,7 @@ public class RecursiveGaussianFilter {
         _n2[i] /= s[i];
         _n3[i] /= s[i];
       }
+      _n0[1] = 0.0f; // 1st-derivative must be anti-symmetric
     }
   }
 
