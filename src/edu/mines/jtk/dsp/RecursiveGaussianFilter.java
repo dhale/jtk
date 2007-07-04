@@ -782,7 +782,7 @@ public class RecursiveGaussianFilter {
 
       // For 0th, 1st, and 2nd derivatives, ...
       for (int i=0; i<3; ++i) {
-        double n0 = a0[i]+c0[i];
+        double n0 = (i%2==0)?a0[i]+c0[i]:0.0;
         double n1 = exp(-b1[i]/sigma) * (
                       c1[i]*sin(w1[i]/sigma) -
                       (c0[i]+2.0*a0[i])*cos(w1[i]/sigma)) +
@@ -819,7 +819,6 @@ public class RecursiveGaussianFilter {
         _d3[i] = (float)d3;
         _d4[i] = (float)d4;
       }
-      _n0[1] = 0.0f; // 1st-derivative must be anti-symmetric
       scaleN(sigma);
     }
 
