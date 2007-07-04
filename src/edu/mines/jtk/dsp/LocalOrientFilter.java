@@ -68,7 +68,7 @@ public class LocalOrientFilter {
 
   
   /**
-   * Constructs a filter with an anisotropic Gaussian window.
+   * Constructs a filter with a possibly anisotropic Gaussian window.
    * @param sigma1 width of window in 1st dimension.
    * @param sigma2 width of window in 2nd and higher dimensions.
    */
@@ -77,7 +77,7 @@ public class LocalOrientFilter {
   }
 
   /**
-   * Constructs a filter with an anisotropic Gaussian window.
+   * Constructs a filter with a possibly anisotropic Gaussian window.
    * @param sigma1 width of window in 1st dimension.
    * @param sigma2 width of window in 2nd dimension.
    * @param sigma3 width of window in 3rd and higher dimensions.
