@@ -191,6 +191,19 @@ public class VectUtil {
       @return number of digits in precision.
    */
   public static int getTransposePrecision(VectConst data, VectConst model,
+                                          LinearTransform transform) {
+    return getTransposePrecision(data,model,
+                                 new LinearTransformWrapper(transform));
+  }
+
+  /** Return the number of significant digits in the dot product
+      when calculated with and without the transpose.
+      @param data Nonzero sample data
+      @param model A nonzero sample model.
+      @param transform The transform to test.
+      @return number of digits in precision.
+   */
+  public static int getTransposePrecision(VectConst data, VectConst model,
                                           Transform transform) {
     int precision = 200;
     boolean dampOnlyPerturbation = true; // results in a bigger b
