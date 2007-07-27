@@ -19,8 +19,8 @@ public class Threads {
    * actually construct any threads.
    * @return the array.
    */
-  public static Thread[] newArrayForThreads() {
-    return newArrayForThreads(2);
+  public static Thread[] makeArray() {
+    return makeArray(2);
   }
 
   /**
@@ -30,7 +30,7 @@ public class Threads {
    * @param multiple desired number of threads per processor.
    * @return the array, with length for at least one thread.
    */
-  public static Thread[] newArrayForThreads(double multiple) {
+  public static Thread[] makeArray(double multiple) {
     int processors = Runtime.getRuntime().availableProcessors();
     int nthread = Math.max(1,(int)(multiple*processors));
     return new Thread[nthread];
