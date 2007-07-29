@@ -14,25 +14,28 @@ package edu.mines.jtk.util;
 public class Threads {
 
   /**
-   * Returns a new array for threads. The length of the array is twice 
-   * the number of available processors. Note that this method does not 
-   * actually construct any threads.
+   * Returns a new array for threads. The length of the array equals the
+   * number of available processors (or cores). 
+   * <p>
+   * Note that this method does not actually construct any threads.
    * @return the array.
    */
   public static Thread[] makeArray() {
-    return makeArray(2);
+    return makeArray(1);
   }
 
   /**
-   * Returns a new array for threads. The length of the array is at least 
-   * one and is proportional to the number of available processors. Note 
-   * that this method does not actually construct any threads.
-   * @param multiple desired number of threads per processor.
+   * Returns a new array for threads. The length of the array is greater
+   * than zero and is proportional to the number of available processors 
+   * (or cores). 
+   * <p>
+   * Note that this method does not actually construct any threads.
+   * @param multiple desired number of threads per processor (or core).
    * @return the array, with length for at least one thread.
    */
   public static Thread[] makeArray(double multiple) {
-    int processors = Runtime.getRuntime().availableProcessors();
-    int nthread = Math.max(1,(int)(multiple*processors));
+    int nprocessors = Runtime.getRuntime().availableProcessors();
+    int nthread = Math.max(1,(int)(multiple*nprocessors));
     return new Thread[nthread];
   }
 
