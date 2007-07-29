@@ -10,9 +10,8 @@ import static edu.mines.jtk.util.MathPlus.*;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.dsp.CausalFilter;
-import edu.mines.jtk.util.Array;
-
+import edu.mines.jtk.dsp.*;
+import edu.mines.jtk.util.*;
 /**
  * Tests {@link edu.mines.jtk.dsp.CausalFilter}.
  * @author Dave Hale, Colorado School of Mines
@@ -347,7 +346,7 @@ public class CausalFilterTest extends TestCase {
     }
   }
 
-  public void xtestFactorPlane3Filter() {
+  public static void xtestFactorPlane3Filter() {
     /*
     int[] lag1 = {
                 0, 1, 2,
@@ -490,7 +489,7 @@ public class CausalFilterTest extends TestCase {
                         " lag3="+lag3[j]+
                         " amax="+amax[j]);
   }
-
+ 
   ///////////////////////////////////////////////////////////////////////////
   // private
 

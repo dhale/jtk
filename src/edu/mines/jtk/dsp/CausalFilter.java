@@ -195,7 +195,7 @@ public class CausalFilter {
     float[] u = new float[n1];
 
     // S is R padded with zeros to reduce truncation of R/(AA').
-    Array.copy(r.length,0,r,k1-l1,s);
+    Array.copy(l1+1+l1,0,r,k1-l1,s);
 
     // Initial factor is minimum-phase and matches lag zero of R.
     Array.zero(_a);
@@ -283,7 +283,7 @@ public class CausalFilter {
     float[][] u = new float[n2][n1];
 
     // S is R padded with zeros to reduce truncation of R/(AA').
-    Array.copy(r[0].length,r.length,0,0,r,k1-l1,k2-l2,s);
+    Array.copy(l1+1+l1,l2+1+l2,0,0,r,k1-l1,k2-l2,s);
 
     // Initial factor is minimum-phase and matches lag zero of R.
     Array.zero(_a);
@@ -380,7 +380,7 @@ public class CausalFilter {
     float[][][] u = new float[n3][n2][n1];
 
     // S is R padded with zeros to reduce truncation of R/(AA').
-    Array.copy(r[0][0].length,r[0].length,r.length,0,0,0,r,k1-l1,k2-l2,k3-l3,s);
+    Array.copy(l1+1+l1,l2+1+l2,l3+1+l3,0,0,0,r,k1-l1,k2-l2,k3-l3,s);
 
     // Initial factor is minimum-phase and matches lag zero of R.
     Array.zero(_a);
@@ -394,6 +394,8 @@ public class CausalFilter {
     float eemax = s[k3][k2][k1]*epsilon;
     for (niter=0; niter<maxiter && !converged; ++niter) {
       //Array.dump(_a); // for debugging only
+      //System.out.println("niter="+niter);
+      //checkA(this,r);
 
       // U(z) + U(1/z) = 1 + S(z)/(A(z)*A(1/z))
       this.applyInverseTranspose(s,t);
@@ -432,6 +434,15 @@ public class CausalFilter {
       _a0i = 1.0f/_a[0];
     }
     Check.state(converged,"Wilson-Burg iterations converged");
+  }
+  private static void checkA(CausalFilter cf, float[][][] r) {
+    float[][][] t = new float[21][21][21];
+    t[10][10][10] = 1.0f;
+    cf.apply(t,t);
+    cf.applyTranspose(t,t);
+    float[][][] s = Array.copy(3,3,3,9,9,9,t);
+    Array.dump(r);
+    Array.dump(s);
   }
 
   ///////////////////////////////////////////////////////////////////////////
