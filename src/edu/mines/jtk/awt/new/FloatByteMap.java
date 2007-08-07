@@ -96,16 +96,16 @@ public class FloatByteMap {
   }
 
   /**
-   * Returns the byte value corresponding to the specified float value.
+   * Gets the byte value corresponding to the specified float value.
    * @param f the float value to be mapped.
    * @return the unsigned byte value in the range [0,255].
    */
-  public int map(float f) {
+  public int getByte(float f) {
     if (_dirty)
       update();
-    if (f<_fmin) f = _fmin;
-    if (f>_fmax) f = _fmax;
-    return (int)((f-_fshift)*_fscale);
+    if (f<_flower) f = _flower;
+    if (f>_fupper) f = _fupper;
+    return (int)((f-_flower)*_fscale);
   }
 
   /**
@@ -170,15 +170,22 @@ public class FloatByteMap {
   // private
 
   private Clips _clips;
-  private float _fmin,_fmax,_fshift,_fscale;
+  private float _fmin,_fmax;
+  private float _flower,_fupper,_fscale;
   private boolean _dirty = true;
 
+  // Divide the range [fmin,fmax] into 256 equal intervals with df.
+  // Then fmin, fmin+df, fmin+2*df, ..., fmax-df are the left endpoints
+  // of the intervals mapped to indices 0, 1, 2, ..., 255. For completeness,
+  // we also map the value fmax to index 255. This method computes constants
+  // that support this mapping.
   private void update() {
     if (_dirty) {
       _fmin = (float)_clips.getClipMin();
       _fmax = (float)_clips.getClipMax();
-      _fscale = (256.0f-10.0f*Math.ulp(256.0f)/(_fmax-_fmin);
-      _fshift = _fmin;
+      _fscale = 256.0f/(_fmax-_fmin);
+      _flower = _fmin;
+      _fupper = _flower+255.5f/_fscale;
       _dirty = false;
     }
   }

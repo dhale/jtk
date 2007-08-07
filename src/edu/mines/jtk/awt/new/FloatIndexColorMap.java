@@ -47,20 +47,22 @@ public class FloatIndexColorMap extends ColorMap {
     return _fbm.map(f);
   }
 
+  /**
+   * Gets the color for the specified value.
+   * @param f the value to be mapped to a color.
+   * @return the pixel.
+   */
   public Color getColor(float f) {
     return _colors(getIndex(f));
   }
 
   /**
-   * Gets the color of 
+   * Gets the color (in standard ARGB format) for the specified value.
+   * @param f the value to be mapped to a color.
+   * @return the pixel.
    */
-  public int getRGB(float f) {
+  public int getARGB(float f) {
     return _icm.getRGB(getIndex(f));
-  }
-
-  private static void checkIndexColorModel(colorModel) {
-    Check.argument(colorModel.isValid(0),"0 is valid for color model");
-    Check.argument(colorModel.isValid(255),"255 is valid for color model");
   }
 
   /**
@@ -316,5 +318,10 @@ public class FloatIndexColorMap extends ColorMap {
     for (int i=0; i<n; ++i)
       b[i] = (byte)(f[i]*255.0f+0.5f);
     return b;
+  }
+
+  private static void checkIndexColorModel(colorModel) {
+    Check.argument(colorModel.isValid(0),"0 is valid for color model");
+    Check.argument(colorModel.isValid(255),"255 is valid for color model");
   }
 }
