@@ -15,8 +15,7 @@ import java.awt.image.*;
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.Array;
-import edu.mines.jtk.util.Check;
+import edu.mines.jtk.util.*;
 
 /**
  * A view of a sampled function f(x1,x2), displayed as a 2-D array of pixels.
@@ -77,7 +76,6 @@ public class PixelsView extends TiledView {
    *  n1 = f[0].length and n2 = f.length.
    */
   public PixelsView(float[][] f) {
-    init();
     set(f);
   }
 
@@ -89,7 +87,6 @@ public class PixelsView extends TiledView {
    *  n1 and n2 denote the number of samples in s1 and s2, respectively.
    */
   public PixelsView(Sampling s1, Sampling s2, float[][] f) {
-    init();
     set(s1,s2,f);
   }
 
@@ -119,8 +116,9 @@ public class PixelsView extends TiledView {
     _s1 = s1;
     _s2 = s2;
     _f = Array.copy(f);
-    updateClips();
+    _clips = new Clips(_f);
     updateSampling();
+    repaint();
   }
 
   /**
@@ -196,14 +194,8 @@ public class PixelsView extends TiledView {
    * @param clipMax the sample value corresponding to color model index 255.
    */
   public void setClips(float clipMin, float clipMax) {
-    Check.argument(clipMin<clipMax,"clipMin<clipMax");
-    if (_clipMin!=clipMin || _clipMax!=clipMax) {
-      _usePercentiles = false;
-      _clipMin = clipMin;
-      _clipMax = clipMax;
-      _colorMap.setValueRange(_clipMin,_clipMax);
-      repaint();
-    }
+    _clips.setClips(clipMin,clipMax);
+    repaint();
   }
 
   /**
@@ -211,7 +203,7 @@ public class PixelsView extends TiledView {
    * @return the minimum clip value.
    */
   public float getClipMin() {
-    return _clipMin;
+    return _clips.getClipMin();
   }
 
   /**
@@ -219,7 +211,7 @@ public class PixelsView extends TiledView {
    * @return the maximum clip value.
    */
   public float getClipMax() {
-    return _clipMax;
+    return _clips.getClipMax();
   }
 
   /**
@@ -233,16 +225,8 @@ public class PixelsView extends TiledView {
    * @param percMax the percentile corresponding to clipMax.
    */
   public void setPercentiles(float percMin, float percMax) {
-    Check.argument(0.0f<=percMin,"0<=percMin");
-    Check.argument(percMin<percMax,"percMin<percMax");
-    Check.argument(percMax<=100.0f,"percMax<=100");
-    if (_percMin!=percMin || _percMax!=percMax) {
-      _percMin = percMin;
-      _percMax = percMax;
-      _usePercentiles = true;
-      updateClips();
-      repaint();
-    }
+    _clips.setPercentiles(percMin,percMax);
+    repaint();
   }
 
   /**
@@ -250,7 +234,7 @@ public class PixelsView extends TiledView {
    * @return the minimum percentile.
    */
   public float getPercentileMin() {
-    return _percMin;
+    return _clips.getPercentileMin();
   }
 
   /**
@@ -258,7 +242,7 @@ public class PixelsView extends TiledView {
    * @return the maximum percentile.
    */
   public float getPercentileMax() {
-    return _percMax;
+    return _clips.getPercentileMax();
   }
 
   /**
@@ -278,6 +262,9 @@ public class PixelsView extends TiledView {
   }
 
   public void paint(Graphics2D g2d) {
+
+    // Ensure clips are correct.
+    updateClips();
 
     // Projectors and transcaler.
     Projector hp = getHorizontalProjector();
@@ -370,15 +357,13 @@ public class PixelsView extends TiledView {
   // Interpolation method.
   private Interpolation _interpolation = Interpolation.LINEAR;
 
-  // Clips and percentiles.
-  private float _clipMin; // mapped to color model index 0
-  private float _clipMax; // mapped to color model index 255
-  private float _percMin = 0.0f; // may be used to compute _clipMin
-  private float _percMax = 100.0f; // may be used to compute _clipMax
-  private boolean _usePercentiles = true; // true, if using percentiles
+  // Clips.
+  Clips _clips;
+  float _clipMin;
+  float _clipMax;
 
-  // Color map.
-  private ColorMap _colorMap;
+  // Color map with default gray color model.
+  private ColorMap _colorMap = new ColorMap(_clipMin,_clipMax,ColorMap.GRAY);
 
   // Sampling of the function f(x1,x2) in the pixel (x,y) coordinate system. 
   private boolean _transposed;
@@ -392,42 +377,14 @@ public class PixelsView extends TiledView {
   private double _fy;
 
   /**
-   * Initialization shared by all constructors.
-   */
-  private void init() {
-    _colorMap = new ColorMap(0.0,1.0,ColorMap.GRAY);
-  }
-
-  /**
-   * If using percentiles, computes corresponding clip values.
+   * Update the clips if necessary.
    */
   private void updateClips() {
-    if (_usePercentiles) {
-      int n1 = _s1.getCount();
-      int n2 = _s2.getCount();
-      int n = n1*n2;
-      float[] a = null;
-      if (_percMin!=0.0f || _percMax!=100.0f)
-        a = Array.flatten(_f);
-      int kmin = (int)rint(_percMin*0.01*(n-1));
-      if (kmin<=0) {
-        _clipMin = Array.min(_f);
-      } else {
-        Array.quickPartialSort(kmin,a);
-        _clipMin = a[kmin];
-      }
-      int kmax = (int)rint(_percMax*0.01*(n-1));
-      if (kmax>=n-1) {
-        _clipMax = Array.max(_f);
-      } else {
-        Array.quickPartialSort(kmax,a);
-        _clipMax = a[kmax];
-      }
-      if (_clipMin==_clipMax) {
-        double tiny = max(1.0,Math.ulp(1.0f)*abs(_clipMin));
-        _clipMin -= tiny;
-        _clipMax += tiny;
-      }
+    float clipMin = _clips.getClipMin();
+    float clipMax = _clips.getClipMax();
+    if (_clipMin!=clipMin || _clipMax!=clipMax) {
+      _clipMin = clipMin;
+      _clipMax = clipMax;
       _colorMap.setValueRange(_clipMin,_clipMax);
     }
   }

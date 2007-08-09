@@ -60,6 +60,15 @@ public class ColorMap {
   public static final IndexColorModel RED_WHITE_BLUE = getRedWhiteBlue();
 
   /**
+   * Constructs a color map for values in [0,1] the index color model.
+   * The integers 0 and 255 must be valid pixels for the color model.
+   * @param colorModel the index color model.
+   */
+  public ColorMap(IndexColorModel colorModel) {
+    this(0.0,1.0,colorModel);
+  }
+
+  /**
    * Constructs a color map for specified values and index color model.
    * The integers 0 and 255 must be valid pixels for the color model.
    * @param vmin the minimum value.

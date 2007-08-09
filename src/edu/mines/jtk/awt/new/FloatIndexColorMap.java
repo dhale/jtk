@@ -73,54 +73,6 @@ public class FloatIndexColorMap extends ColorMap {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private double _vmin = 0.0;
-  private double _vmax = 1.0;
-  private IndexColorModel _colorModel;
-  private Color[] _colors = new Color[256];
-  private EventListenerList _colorMapListeners = new EventListenerList();
-
-  private void fireColorMapChanged() {
-    Object[] listeners = _colorMapListeners.getListenerList();
-    for (int i=listeners.length-2; i>=0; i-=2) {
-      ColorMapListener cml = (ColorMapListener)listeners[i+1];
-      cml.colorMapChanged(this);
-    }
-  }
-
-  private void cacheColors() {
-    for (int index=0; index<256; ++index)
-      _colors[index] = new Color(_colorModel.getRGB(index));
-  }
-
-  private static byte[] getReds(Color[] color) {
-    int n = color.length;
-    byte[] r = new byte[n];
-    for (int i=0; i<n; ++i)
-      r[i] = (byte)color[i].getRed();
-    return r;
-  }
-
-  private static byte[] getGreens(Color[] color) {
-    int n = color.length;
-    byte[] g = new byte[n];
-    for (int i=0; i<n; ++i)
-      g[i] = (byte)color[i].getGreen();
-    return g;
-  }
-
-  private static byte[] getBlues(Color[] color) {
-    int n = color.length;
-    byte[] b = new byte[n];
-    for (int i=0; i<n; ++i)
-      b[i] = (byte)color[i].getBlue();
-    return b;
-  }
-
-  private static byte[] getBytes(float[] f) {
-    int n = f.length;
-    byte[] b = new byte[n];
-    for (int i=0; i<n; ++i)
-      b[i] = (byte)(f[i]*255.0f+0.5f);
-    return b;
-  }
+  private FloatByteMap _fbm;
+  private IndexColorModel _icm;
 }

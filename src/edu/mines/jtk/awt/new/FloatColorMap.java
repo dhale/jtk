@@ -1,4 +1,3 @@
-
 /****************************************************************************
 Copyright (c) 2007, Colorado School of Mines and others. All rights reserved.
 This program and accompanying materials are made available under the terms of
@@ -9,46 +8,118 @@ package edu.mines.jtk.awt;
 
 import java.awt.Color;
 import java.awt.image.IndexColorModel;
+import static java.lang.Math.*;
 
 import javax.swing.event.EventListenerList;
 
 import edu.mines.jtk.util.Check;
 
 /**
- * Transforms floats to color indices or components.
+ * Maps arrays of floats to colors.
  * <p>
- * (1) float to byte using clips/percentiles
- * (2) byte to RGB (if indexed) or 
+ * This mapping consists of two parts. Floats are first mapped to bytes,
+ * and then those bytes are mapped to colors.
  * <p>
+ * The first mapping from floats to bytes is linear between minimum and
+ * maximum clip values. Values below and above these min and max values 
+ * are clipped. Clips may be computed from percentiles or may be specified 
+ * explicitly. By default, the clip min and max values are the minimum
+ * and maximum values in specified arrays of floats.
+ * <p>
+ * The second mapping depends on the number of arrays of floats specified.
+ * When only one array is specified, each byte from the float-to-byte
+ * mapping is used as an index for an index color model with 256 colors.
+ * <p>
+ * When three arrays are specified, a float value from each of the three
+ * arrays is first mapped independently (using different float-to-byte
+ * maps, possibly with different clips) to obtain three bytes. These
+ * three bytes are then interpreted directly as color components in 
+ * either (red,green,blue) or (hue,saturation,brightness) color models. 
+ * Because each color component can have 256 values, millions of colors
+ * are possible.
+ * <p>
+ * When four arrays are specified, the mapping is the same as for three
+ * arrays, except that the fourth array corresponds to an alpha (opacity) 
+ * component.
+ * <p>
+ * An index color model may be useful even when three or four arrays are
+ * specified, by specifying one of the arrays to serve as a source of 
+ * of byte indices. This capability enables a single float value to be
+ * mapped to a color, even when three or four arrays of floats are
+ * specified. For example, if the index color model contained fully 
+ * saturated and bright colors with different hues, then one might
+ * specify the array corresponding to the hue component as the source
+ * of byte indices. The indexed colors might then be displayed in a color
+ * bar.
+ * <p>
+ * By default, direct color components with indices 0, 1, and 2 are red, 
+ * green, and blue, respectively. If HSB components are enabled, then 
+ * these same indices instead correspond to components hue, saturation, 
+ * and brightness. Enabling HSB adds an extra conversion step to the
+ * mapping from floats to colors. After three bytes are computed from
+ * three floats, these HSB byte values are then mapped to the nearest 
+ * RGB byte values. The hues corresponding to min/max byte values 0
+ * and 255 are red (0.00) and blue (0.67), but these hues may be 
+ * specified explicitly. This extra conversion step is never performed
+ * for indexed color mappings of single float values.
+ *
  * @author Dave Hale, Colorado School of Mines
- * @version 2007.08.05
+ * @version 2007.08.08
  */
-public abstract class FloatColorMap {
-public class FloatIndexColorMap extends FloatColorMap {
-
-public class FloatColorMap {
+public class FloatColorMap extends ColorMap {
 
   /**
-   * Constructs a color map for specified values and index color model.
-   * The integers 0 and 255 must be valid pixels for the color model.
-   * @param f array of floats.
-   * @param colorModel the index color model.
+   * Constructs a color map with only indexed colors.
+   * @param f an array of floats.
+   * @param icm the index color model.
    */
-  public FloatColorMap(float[] f, IndexColorModel colorModel) {
-    _iclips = new Clips(f);
+  public FloatColorMap(float[][] f, IndexColorModel icm) {
+    this(new float[][][]{f},0,icm);
   }
 
-  public FloatColors(float[] fr, float[] fg, float[] fb) {
-    _rclips = new Clips(fr);
-    _gclips = new Clips(fg);
-    _bclips = new Clips(fb);
+  /**
+   * Constructs a color map with more than one color components.
+   * @param f arrays of floats, one array for each color component.
+   * @param ic array index of the component for the index color model.
+   * @param icm the index color model corresponding to one component.
+   */
+  public FloatColorMap(float[][][] f, int ic, IndexColorModel icm) {
+    super(icm);
+    Check.argument(
+      f.length==1 || f.length==3 || f.length==4,
+      "number of arrays equals 1, 3, or 4");
+    _nc = f.length;
+    _ic = ic;
+    _fbm = new FloatByteMap[_nc];
+    for (int jc=0; jc<_nc; ++jc) {
+      _fbm[jc] = new FloatByteMap(f[jc]);
+    _fbmi0 = _fbm[0];
+    _fbmi1 = (_nc>1)?_fbm[1]:_fbm[0];
+    _fbmi2 = (_nc>1)?_fbm[2]:_fbm[0];
+    _fbmi3 = (_nc>3)?_fbm[3]:null;
   }
 
-  public FloatColors(float[] fa, float[] fr, float[] fg, float[] fb) {
-    _aclips = new Clips(fa);
-    _rclips = new Clips(fr);
-    _gclips = new Clips(fg);
-    _bclips = new Clips(fb);
+  /**
+   * Enables or disables HSB components. By default, color components 
+   * 0, 1, and 2 (if specified) correspond to red, green, and blue. If HSB
+   * components are enabled, these indices correspond to hue, saturation,
+   * and brightness. Then, as floats are mapped to colors, bytes for HSB
+   * are converted to RGB.
+   * @param hsb true, to enable HSB components; false, for RGB components.
+   */
+  public void setHSB(boolean hsb) {
+    _hsb = hsb;
+  }
+
+  /**
+   * Sets hue values corresponding to byte values 0 and 255.
+   * These hues are used only when HSB components are enabled.
+   * @param h000 hue corresponding to byte value 0; default is 0.00 (red).
+   * @param h255 hue corresponding to byte value 255; default is 0.67 (blue).
+   */
+  public void setHues(double hue000, double hue255) {
+    _hue000 = (float)hue000;
+    _hue255 = (float)hue255;
   }
 
   /**
@@ -57,201 +128,48 @@ public class FloatColorMap {
    * @return the index in the range [0,255].
    */
   public int getIndex(float f) {
-    updateIndexMapping();
-    return map(f,_imin,_imax,_ishift,_iscale);
+    return _fbmic.getByte(f);
   }
 
   /**
-   * Gets the alpha color component corresponding to the specified value.
-   * @param f the value to be mapped to alpha.
-   * @return the alpha in the range [0,255].
+   * Gets the 32-bit color in 0xAARRGGBB format for the specified value.
+   * @param f the value to be mapped to a color.
+   * @return the pixel.
    */
-  public int getAlpha(float f) {
-    updateDirectMapping();
-    return map(f,_amin,_amax,_ashift,_ascale);
+  public int getARGB(float f) {
+    return _icm.getRGB(getIndex(f));
   }
 
   /**
-   * Gets the red color component corresponding to the specified value.
-   * @param f the value to be mapped to red.
-   * @return the red in the range [0,255].
+   * Gets the 32-bit color in 0xAARRGGBB format for specified values.
+   * @param f0 the value for color component 0.
+   * @param f1 the value for color component 1.
+   * @param f2 the value for color component 2.
+   * @param f3 the value for color component 3.
+   * @return the color.
    */
-  public int getRed(float f) {
-    updateDirectMapping();
-    return map(f,_rmin,_rmax,_rshift,_rscale);
-  }
-
-  /**
-   * Gets the green color component corresponding to the specified value.
-   * @param f the value to be mapped to green.
-   * @return the green in the range [0,255].
-   */
-  public int getGreen(float f) {
-    updateDirectMapping();
-    return map(f,_gmin,_gmax,_gshift,_gscale);
-  }
-
-  /**
-   * Gets the blue color component corresponding to the specified value.
-   * @param f the value to be mapped to blue.
-   * @return the blue in the range [0,255].
-   */
-  public int getBlue(float f) {
-    updateDirectMapping();
-    return map(f,_bmin,_bmax,_bshift,_bscale);
-  }
-
-  /**
-   * Gets a packed integer pixel corresponding to the specified values.
-   * Packs the pixel as for BufferedImage.TYPE_INT_ARGB. For this type,
-   * bits 0:7 = red, bits 8:15 = green, bits 16:23 = blue, and bits 
-   * 24-31 = alpha.
-   * @param fa the value to be mapped to alpha.
-   * @param fr the value to be mapped to red.
-   * @param fg the value to be mapped to green.
-   * @param fb the value to be mapped to blue.
-   * @return the packed integer pixel.
-   */
-  public int getARGB(float fa, float fr, float fg, float fb) {
-    updateDirectMapping();
-    int a = map(f,_amin,_amax,_ashift,_ascale);
-    int r = map(f,_rmin,_rmax,_rshift,_rscale);
-    int g = map(f,_gmin,_gmax,_gshift,_gscale);
-    int b = map(f,_bmin,_bmax,_bshift,_bscale);
-    return (r&0xff)|((g&0xff)<<8)|((b&0xff)<<16)|((a&0xff)<<24);
-  }
-
-  /**
-   * Gets a packed integer pixel corresponding to the specified values.
-   * Packs the pixel as for BufferedImage.TYPE_INT_RGB. For this type,
-   * bits 0:7 = red, bits 8:15 = green, and bits 16:23 = blue.
-   * @param fr the value to be mapped to red.
-   * @param fg the value to be mapped to green.
-   * @param fb the value to be mapped to blue.
-   * @return the packed integer pixel.
-   */
-  public int getRGB(float fr, float fg, float fb) {
-    updateDirectMapping();
-    int r = map(f,_rmin,_rmax,_rshift,_rscale);
-    int g = map(f,_gmin,_gmax,_gshift,_gscale);
-    int b = map(f,_bmin,_bmax,_bshift,_bscale);
-    return (r&0xff)|((g&0xff)<<8)|((b&0xff)<<16);
-  }
-
-  /**
-   * Sets the clips for the color index mapping.
-   * Sets the clips for the red color component mapping.
-   * <p>
-   * Calling this method disables the computation of clips from percentiles.
-   * Any clip values computed or specified previously will be forgotten.
-   * @param clipMin the sample value corresponding to color model index 0.
-   * @param clipMax the sample value corresponding to color model index 255.
-   */
-  public void setClipsIndex(double clipMin, double clipMax) {
-    _iclips.setClips(clipMin,clipMax);
-  }
-
-  /**
-   * Gets the minimum clip value for the color index mapping.
-   * @return the minimum clip value.
-   */
-  public float getClipMinIndex() {
-    return _iclips.getClipMin();
-  }
-
-  /**
-   * Gets the maximum clip value for the color index mapping.
-   * @return the maximum clip value.
-   */
-  public float getClipMaxIndex() {
-    return _iclips.getClipMax();
-  }
-
-  /**
-   * Sets the percentiles used to compute clips for the color index mapping. 
-   * The default percentiles are 0 and 100, which correspond to the minimum 
-   * and maximum array values.
-   * <p>
-   * Calling this method enables the computation of clips from percentiles.
-   * Any clip values specified or computed previously will be forgotten.
-   * @param percMin the percentile corresponding to clipMin.
-   * @param percMax the percentile corresponding to clipMax.
-   */
-  public void setPercentilesIndex(double percMin, double percMax) {
-    _iclips.setPercentiles(percMin,percMax);
-    _texturesDirty = true;
-    dirtyDraw();
-  }
-
-  /**
-   * Gets the minimum percentile.
-   * @return the minimum percentile.
-   */
-  public float getPercentileMin() {
-    return _clips.getPercentileMin();
-  }
-
-  /**
-   * Gets the maximum percentile.
-   * @return the maximum percentile.
-   */
-  public float getPercentileMax() {
-    return _clips.getPercentileMax();
-  }
-
-  private boolean _indexed; // true if index color model; false if direct.
-  private Clips _iclips,_aclips,_rclips,_gclips,_bclips;
-  private float _imin,_imax,_ishift,_iscale; // float to index
-  private float _amin,_amax,_ashift,_ascale; // float to alpha
-  private float _rmin,_rmax,_rshift,_rscale; // float to red
-  private float _gmin,_gmax,_gshift,_gscale; // float to green
-  private float _bmin,_bmax,_bshift,_bscale; // float to blue
-  private boolean _indexMappingDirty;
-  private boolean _directMappingDirty;
-
-  private static void checkIndexColorModel(colorModel) {
-    Check.argument(colorModel.isValid(0),"0 is valid for color model");
-    Check.argument(colorModel.isValid(255),"255 is valid for color model");
-  }
-
-  private static int map(
-    float f, float fmin, float fmax, float fshift, float fscale)
-  {
-    if (f<fmin) f = fmin;
-    if (f>fmax) f = fmax;
-    return (int)((f-fshift)*fscale);
-  }
-
-  private void updateIndexMapping() {
-    if (_indexMappingDirty) {
-      _imin = _iclips.getClipMin();
-      _imax = _iclips.getClipMax();
-      _iscale = 256.0f/(_imax-_imin);
-      _ishift = _imin;
-      _indexMappingDirty = false;
+  public int getARGB(float f0, float f1, float f2, float f3) {
+    int i0 = _fbmi0.getByte(f0);
+    int i1 = _fbmi1.getByte(f1);
+    int i2 = _fbmi2.getByte(f2);
+    int i3 = (_fbmi3!=null)?_fbmi3.getByte(f3):0xff;
+    if (_hsb) {
+      return argbFromHsba(i0,i1,i2,i3);
+    } else {
+      return (i2) | (i1<<8) | (i0<<16) | (i3<<24);
     }
   }
 
-  private void updateDirectMapping() {
-    if (_directMappingDirty) {
-      _amin = _aclips.getClipMin();
-      _amax = _aclips.getClipMax();
-      _ascale = 256.0f/(_amax-_amin);
-      _ashift = _amin;
-      _rmin = _rclips.getClipMin();
-      _rmax = _rclips.getClipMax();
-      _rscale = 256.0f/(_rmax-_rmin);
-      _rshift = _rmin;
-      _gmin = _gclips.getClipMin();
-      _gmax = _gclips.getClipMax();
-      _gscale = 256.0f/(_gmax-_gmin);
-      _gshift = _gmin;
-      _bmin = _bclips.getClipMin();
-      _bmax = _bclips.getClipMax();
-      _bscale = 256.0f/(_bmax-_bmin);
-      _bshift = _bmin;
-      _directMappingDirty = false;
-    }
+  ///////////////////////////////////////////////////////////////////////////
+  // Override
+
+  /**
+   * Gets the color index corresponding to the specified value.
+   * @param f the value to be mapped to index.
+   * @return the index in the range [0,255].
+   */
+  public int getIndex(double v) {
+    return getIndex((float)v);
   }
 
   /**
@@ -259,7 +177,7 @@ public class FloatColorMap {
    * @return the minimum value.
    */
   public double getMinValue() {
-    return _vmin;
+    return _fbmic.getClipMin();
   }
 
   /**
@@ -267,244 +185,93 @@ public class FloatColorMap {
    * @return the maximum value.
    */
   public double getMaxValue() {
-    return _vmax;
-  }
-
-  /**
-   * Gets the index color model used by this color map.
-   * @return the index color model.
-   */
-  public IndexColorModel getColorModel() {
-    return _colorModel;
-  }
-
-  /**
-   * Gets the color corresponding to the specified value.
-   * @param v the value to be mapped to a color.
-   * @return the color.
-   */
-  public Color getColor(double v) {
-    return _colors[getIndex(v)];
-  }
-
-  /**
-   * Gets the index in the range [0,255] corresponding to the specified value.
-   * @param v the value to be mapped to an index.
-   * @return the index in the range [0,255].
-   */
-  public int getIndex(double v) {
-
-    v = Math.max(_vmin,Math.min(_vmax,v));
-    return (int)Math.round(255.0*(v-_vmin)/(_vmax-_vmin));
+    return _fbmic.getClipMax();
   }
 
   /**
    * Sets the min-max range of values mapped to colors. Values outside this 
-   * range are clipped. The default range is [0.0,1.0].
+   * range are clipped. The default range is the min and max clips in the 
+   * mapping from floats to bytes.
    * @param vmin the minimum value.
    * @param vmax the maximum value.
    */
   public void setValueRange(double vmin, double vmax) {
-    if (_vmin!=vmin || _vmax!=vmax) {
-      _vmin = vmin;
-      _vmax = vmax;
-      fireColorMapChanged();
+    if ((float)vmin!=getMinValue() || (float)vmax!=getMaxValue()) {
+      _fbmic.setClips((float)vmin,(float)vmax);
+      super.setValueRange(vmin,vmax);
     }
-  }
-
-  /**
-   * Sets the index color model for this color map.
-   * @param colorModel the index color model.
-   */
-  public void setColorModel(IndexColorModel colorModel) {
-    _colorModel = colorModel;
-    cacheColors();
-    fireColorMapChanged();
-  }
-
-  /**
-   * Adds the specified color map listener.
-   * Then notifies the listener that this colormap has changed.
-   * @param cml the listener.
-   */
-  public void addListener(ColorMapListener cml) {
-    _colorMapListeners.add(ColorMapListener.class,cml);
-    cml.colorMapChanged(this);
-  }
-
-  /**
-   * Removes the specified color map listener.
-   * @param cml the listener.
-   */
-  public void removeListener(ColorMapListener cml) {
-    _colorMapListeners.remove(ColorMapListener.class,cml);
-  }
-
-  /**
-   * Gets a linear gray black-to-white color model.
-   * @return the color model.
-   */
-  public static IndexColorModel getGray() {
-    return getGray(0.0,1.0);
-  }
-
-  /**
-   * Gets a linear gray color model for the specified gray levels. Gray
-   * levels equal to 0.0 and 1.0 correspond to colors black and white, 
-   * respectively.
-   * @param g0 the gray level corresponding to index value 0.
-   * @param g255 the gray level corresponding to index value 255.
-   * @return the color model.
-   */
-  public static IndexColorModel getGray(double g0, double g255) {
-    Color[] c = new Color[256];
-    for (int i=0; i<256; ++i) {
-      float g = (float)(g0+i*(g255-g0)/255.0);
-      c[i] = new Color(g,g,g);
-    }
-    return makeIndexColorModel(c);
-  }
-
-  /**
-   * Gets a red-to-blue color model like Matlab's jet color map.
-   * @return the color model.
-   */
-  public static IndexColorModel getJet() {
-    Color[] c = new Color[256];
-    for (int i=0; i<256; ++i) {
-      float x = (float)i/255.0f;
-      if (x<0.125f) {
-        float a = x/0.125f;
-        c[i] = new Color(0.0f,0.0f,0.5f+0.5f*a);
-      } else if (x<0.375f) {
-        float a = (x-0.125f)/0.25f;
-        c[i] = new Color(0.0f,a,1.0f);
-      } else if (x<0.625f) {
-        float a = (x-0.375f)/0.25f;
-        c[i] = new Color(a,1.0f,1.0f-a);
-      } else if (x<0.875f) {
-        float a = (x-0.625f)/0.25f;
-        c[i] = new Color(1.0f,1.0f-a,0.0f);
-      } else {
-        float a = (x-0.875f)/0.125f;
-        c[i] = new Color(1.0f-0.5f*a,0.0f,0.0f);
-      }
-    }
-    return makeIndexColorModel(c);
-  }
-
-  /**
-   * Gets a color model with eight complete cycles of hues.
-   * @return the color model.
-   */
-  public static IndexColorModel getPrism() {
-    return getHue(0.0,8.0);
-  }
-
-  /**
-   * Gets a red-to-blue linear hue color model.
-   * @return the color model.
-   */
-  public static IndexColorModel getHue() {
-    return getHue(0.0,0.67);
-  }
-
-  /**
-   * Gets a linear hue color model for the specified hues. Hues equal to 
-   * 0.00, 0.33, and 0.67, and 1.00 correspond approximately to the colors 
-   * red, green, blue, and red, respectively.
-   * @param h0 the hue corresponding to index value 0.
-   * @param h255 the hue corresponding to index value 255.
-   * @return the color model.
-   */
-  public static IndexColorModel getHue(double h0, double h255) {
-    Color[] c = new Color[256];
-    for (int i=0; i<256; ++i) {
-      float h = (float)(h0+i*(h255-h0)/255.0);
-      c[i] = Color.getHSBColor(h,1.0f,1.0f);
-    }
-    return makeIndexColorModel(c);
-  }
-
-  /**
-   * Gets a red-white-blue color model.
-   * @return the color model.
-   */
-  public static IndexColorModel getRedWhiteBlue() {
-    Color[] c = new Color[256];
-    for (int i=0; i<256; ++i) {
-      float x = (float)i/255.0f;
-      if (x<0.5f) {
-        float a = x/0.5f;
-        c[i] = new Color(1.0f,a,a);
-      } else {
-        float a = (x-0.5f)/0.5f;
-        c[i] = new Color(1.0f-a,1.0f-a,1.0f);
-      }
-    }
-    return makeIndexColorModel(c);
-  }
-
-  /**
-   * Returns an index color model for the specified array of 256 colors.
-   * @param c array[256] of colors.
-   * @return the index color model.
-   */
-  public static IndexColorModel makeIndexColorModel(Color[] c) {
-    return new IndexColorModel(8,256,getReds(c),getGreens(c),getBlues(c));
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private double _vmin = 0.0;
-  private double _vmax = 1.0;
-  private IndexColorModel _colorModel;
-  private Color[] _colors = new Color[256];
-  private EventListenerList _colorMapListeners = new EventListenerList();
+  private int _nc; // number of color components: 1, 3, or 4.
+  private int _ic; // array index of component for index color model
+  private FloatByteMap[] _fbm; // float-byte maps, one for each component
+  private FloatByteMap _fbmic; // the float-byte map for index color model
+  private FloatByteMap _fbmi0; // cached fbm[0]
+  private FloatByteMap _fbmi1; // cached fbm[1]
+  private FloatByteMap _fbmi2; // cached fbm[2]
+  private FloatByteMap _fbmi3; // cached fbm[3]
+  private boolean _hsb; // true if components are hue, sat, brightness
+  private float _hue000; // corresponds to byte value 000
+  private float _hue255; // corresponds to byte value 255
 
-  private void fireColorMapChanged() {
-    Object[] listeners = _colorMapListeners.getListenerList();
-    for (int i=listeners.length-2; i>=0; i-=2) {
-      ColorMapListener cml = (ColorMapListener)listeners[i+1];
-      cml.colorMapChanged(this);
+  private static int argbFromRgba(int r, int g, int b, int a) {
+    return (a<<24) | (r << 16) | (g << 8) | (b << 0);
+  }
+  private static int rgbFromRgb(int r, int g, int b) {
+    return 0xff000000 | (r << 16) | (g << 8) | (b << 0);
+  }
+  private static int argbFromHsba(int hu, int sa, int br, int al) {
+    return (al<<24) | rgbFromHsb(hu,sa,br);
+  }
+  private static int rgbFromHsb(int hu, int sa, int br) {
+    float scale = 1.0f/255.0f;
+    if (hu<0) hu += 256;
+    if (sa<0) sa += 256;
+    if (br<0) br += 256;
+    float hue = (float)(_hue000+(_hue255-_hue000)*hu*scale);
+    float sat = (float)sa*scale;
+    float bri = (float)br*scale;
+    int r = 0, g = 0, b = 0;
+    if (sat==0.0f) {
+      r = g = b = (int)(bri*255.0f+0.5f);
+    } else {
+      float h = (hue-(float)floor(hue))*6.0f;
+      float f = h-(float)floor(h);
+      float p = bri*(1.0f-sat);
+      float q = bri*(1.0f-sat*f);
+      float t = bri*(1.0f-sat*(1.0f-f));
+      switch ((int)h) {
+      case 0:
+        r = (int)(bri*255.0f+0.5f);
+        g = (int)(  t*255.0f+0.5f);
+        b = (int)(  p*255.0f+0.5f);
+        break;
+      case 1:
+        r = (int)(  q*255.0f+0.5f);
+        g = (int)(bri*255.0f+0.5f);
+        b = (int)(  p*255.0f+0.5f);
+        break;
+      case 2:
+        r = (int)(  p*255.0f+0.5f);
+        g = (int)(bri*255.0f+0.5f);
+        b = (int)(  t*255.0f+0.5f);
+      case 3:
+        r = (int)(  p*255.0f+0.5f);
+        g = (int)(  q*255.0f+0.5f);
+        b = (int)(bri*255.0f+0.5f);
+      case 4:
+        r = (int)(  t*255.0f+0.5f);
+        g = (int)(  p*255.0f+0.5f);
+        b = (int)(bri*255.0f+0.5f);
+      case 5:
+        r = (int)(bri*255.0f+0.5f);
+        g = (int)(  p*255.0f+0.5f);
+        b = (int)(  q*255.0f+0.5f);
+      }
     }
-  }
-
-  private void cacheColors() {
-    for (int index=0; index<256; ++index)
-      _colors[index] = new Color(_colorModel.getRGB(index));
-  }
-
-  private static byte[] getReds(Color[] color) {
-    int n = color.length;
-    byte[] r = new byte[n];
-    for (int i=0; i<n; ++i)
-      r[i] = (byte)color[i].getRed();
-    return r;
-  }
-
-  private static byte[] getGreens(Color[] color) {
-    int n = color.length;
-    byte[] g = new byte[n];
-    for (int i=0; i<n; ++i)
-      g[i] = (byte)color[i].getGreen();
-    return g;
-  }
-
-  private static byte[] getBlues(Color[] color) {
-    int n = color.length;
-    byte[] b = new byte[n];
-    for (int i=0; i<n; ++i)
-      b[i] = (byte)color[i].getBlue();
-    return b;
-  }
-
-  private static byte[] getBytes(float[] f) {
-    int n = f.length;
-    byte[] b = new byte[n];
-    for (int i=0; i<n; ++i)
-      b[i] = (byte)(f[i]*255.0f+0.5f);
-    return b;
+    return rgbFromRgb(r,g,b);
   }
 }

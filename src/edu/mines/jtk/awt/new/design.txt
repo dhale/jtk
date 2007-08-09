@@ -1,3 +1,24 @@
+ep el ei
+
+     ei
+    /  \
+   /    \
+  /      \
+ /        \
+ep---------el
+
+-1 <= ep-el <= 1
+
+0 for ep = el = 0.1, 0.2, ..., 0.5
+
+ew = 0, ev = 1, eu = 2 => ep = el = 0.50
+ew = 2, ev = 3, eu = 4 => ep = el = 0.25 
+
+ep = (eu-ev)/eu
+el = (ev-ew)/eu
+ei = ew/eu
+
+
 PixelsView 
   has array(s) of floats
     if one array, then index color
@@ -8,13 +29,53 @@ ColorMap
   has an index color model
   when min or max changes or when,
     fires ColorMapChanged event (received, say, by ColorBar)
+  values are set by views when clips change
 
 FloatByteMap
-  has clips (constructed with arrays)
+  has clips (constructed with arrays of floats)
+  forwards setClips, setPercentiles, etc.
   converts floats to bytes
 
-FloatIndexColorMap
+ColorMap
+  has min and max range values
+  has an index color model
+  when min or max changes or when,
+    fires ColorMapChanged event (received, say, by ColorBar)
 
+FloatIndexColorMap extends ColorMap
+  has IndexColorModel
+  has FloatByteMap
+    forwards setClips, setPercentiles, etc.
+  getARGB(float)
+  getABGR(float)
+
+FloatDirectColorMap extends ColorMap
+  has DirectColorModel
+    supports either RGB or HSB
+  has IndexColorModel 
+    used for a specified color component
+    for ColorMap implementation
+  has FloatByteMap[3] ([4], if alpha)
+    forwards setClips, setPercentiles, etc.
+  getARGB(float,float,float)
+  getARGB(float,float,float,float)
+  getABGR(float,float,float)
+  getAGBR(float,float,float,float)
+
+FloatColorMap extends ColorMap
+  has IndexColorModel 
+    used for a specified color component
+    for ColorMap implementation
+  may have a DirectColorModel
+  can convert HSB to RGB
+  has FloatByteMap[1], [3] or [4]
+    forwards setClips, setPercentiles, etc.
+  getARGB(float) uses IndexColorMap
+  getARGB(float,float,float) uses DirectColorMap
+  getARGB(float,float,float,float) uses DirectColorMap
+  getABGR(float)
+  getABGR(float,float,float)
+  getABGR(float,float,float,float)
 
 Methods for float-color mapping:
 setClips(clipMin,clipMax)
@@ -23,12 +84,9 @@ getClipMax
 setPercentiles
 getPercentileMin/Max
 
-setColorModel
-getColorModel
-
-setClips(int channel, double clipMin, double clipMax)
-getClipMin(int channel) // exception if channel unused
-getClipMax(int channel) // exception if channel unused
+setClips(int component, double clipMin, double clipMax)
+getClipMin(int component) // exception if component unused
+getClipMax(int component) // exception if component unused
 setPercentiles(...)
 
 16-bit index?

@@ -54,9 +54,7 @@ public class FloatByteMap {
    * @param f array of values; by reference, not by copy.
    */
   public FloatByteMap(double percMin, double percMax, float[] f) {
-    _percMin = (float)percMin;
-    _percMax = (float)percMax;
-    _f = f;
+    _clips = new Clips(percMin,percMax,f);
   }
 
   /**
@@ -66,9 +64,7 @@ public class FloatByteMap {
    * @param f array of values; by reference, not by copy.
    */
   public FloatByteMap(double percMin, double percMax, float[][] f) {
-    _percMin = (float)percMin;
-    _percMax = (float)percMax;
-    _f = f;
+    _clips = new Clips(percMin,percMax,f);
   }
 
   /**
@@ -78,9 +74,7 @@ public class FloatByteMap {
    * @param f array of values; by reference, not by copy.
    */
   public FloatByteMap(double percMin, double percMax, float[][][] f) {
-    _percMin = (float)percMin;
-    _percMax = (float)percMax;
-    _f = f;
+    _clips = new Clips(percMin,percMax,f);
   }
 
   /**
@@ -90,9 +84,7 @@ public class FloatByteMap {
    * @param f3 abstract 3-D array of values; by reference, not by copy.
    */
   public FloatByteMap(double percMin, double percMax, Float3 f3) {
-    _percMin = (float)percMin;
-    _percMax = (float)percMax;
-    _f = f3;
+    _clips = new Clips(percMin,percMax,f3);
   }
 
   /**
@@ -106,6 +98,61 @@ public class FloatByteMap {
     if (f<_flower) f = _flower;
     if (f>_fupper) f = _fupper;
     return (int)((f-_flower)*_fscale);
+  }
+
+  /**
+   * Gets byte values corresponding to specified float values.
+   * @param f input array of float values to be mapped.
+   * @param b output array of unsigned byte values in the range [0,255].
+   */
+  public void getBytes(float[] f, byte[] b) {
+    if (_dirty)
+      update();
+    int n = f.length;
+    for (int i=0; i<n; ++i) {
+      float fi = f[i];
+      if (fi<_flower) fi = _flower;
+      if (fi>_fupper) fi = _fupper;
+      b[i] = (byte)((fi-_flower)*_fscale);
+    }
+  }
+
+  /**
+   * Gets byte values corresponding to specified float values.
+   * @param f input array of float values to be mapped.
+   * @param b output array of unsigned byte values in the range [0,255].
+   */
+  public void getBytes(float[][] f, byte[][] b) {
+    int n = f.length;
+    for (int i=0; i<n; ++i)
+      getBytes(f[i],b[i]);
+  }
+
+  /**
+   * Gets byte values corresponding to specified float values.
+   * @param f input array of float values to be mapped.
+   * @param b output array of unsigned byte values in the range [0,255].
+   */
+  public void getBytes(float[][][] f, byte[][][] b) {
+    int n = f.length;
+    for (int i=0; i<n; ++i)
+      getBytes(f[i],b[i]);
+  }
+
+  /**
+   * Gets byte values corresponding to specified float values.
+   * @param f input array of float values to be mapped.
+   * @param b output array of unsigned byte values in the range [0,255].
+   */
+  public void getBytes(Float3 f3, byte[][][] b) {
+    int n1 = f3.getN1();
+    int n2 = f3.getN2();
+    int n3 = f3.getN3();
+    float[][] fi3 = new float[n2][n1];
+    for (int i3=0; i3<n3; ++i3) {
+      f3.get12(n1,n2,0,0,i3,fi3);
+      getBytes(fi3,b[i3]);
+    }
   }
 
   /**
@@ -124,7 +171,7 @@ public class FloatByteMap {
    * Gets the minimum clip value for this mapping.
    * @return the minimum clip value.
    */
-  public float getClipMinIndex() {
+  public float getClipMin() {
     return _clips.getClipMin();
   }
 
@@ -132,7 +179,7 @@ public class FloatByteMap {
    * Gets the maximum clip value for this mapping.
    * @return the maximum clip value.
    */
-  public float getClipMaxIndex() {
+  public float getClipMax() {
     return _clips.getClipMax();
   }
 
@@ -181,8 +228,8 @@ public class FloatByteMap {
   // that support this mapping.
   private void update() {
     if (_dirty) {
-      _fmin = (float)_clips.getClipMin();
-      _fmax = (float)_clips.getClipMax();
+      _fmin = _clips.getClipMin();
+      _fmax = _clips.getClipMax();
       _fscale = 256.0f/(_fmax-_fmin);
       _flower = _fmin;
       _fupper = _flower+255.5f/_fscale;
