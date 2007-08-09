@@ -29,7 +29,10 @@ public class LocalPredictionFilter {
    */
   public LocalPredictionFilter(double sigma) {
     Check.argument(sigma>=1.0,"sigma>=1.0");
-    _lcf = new LocalCorrelationFilter(sigma);
+    _lcf = new LocalCorrelationFilter(
+      LocalCorrelationFilter.Type.SYMMETRIC,
+      LocalCorrelationFilter.Window.GAUSSIAN,
+      sigma);
   }
 
   public float[][][] apply(int[] lag1, int[] lag2, float[][] f, float[][] g) {
@@ -304,7 +307,8 @@ public class LocalPredictionFilter {
       this.l1 = l1;
       this.l2 = l2;
       this.r = new float[n2][n1];
-      _lcf.apply(l1,l2,f,f,r);
+      _lcf.setInputs(f,f);
+      _lcf.correlate(l1,l2,r);
       if (l1==0 && l2==0) {
         for (int i2=0; i2<n2; ++i2) {
           for (int i1=0; i1<n1; ++i1) {
