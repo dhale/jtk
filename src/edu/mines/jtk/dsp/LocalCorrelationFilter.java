@@ -37,6 +37,11 @@ import static edu.mines.jtk.util.MathPlus.*;
  * For symmetric cross-correlation, normalization scale factors do not 
  * vary with lag, and therefore need not be applied before picking 
  * correlation peaks.
+ * <p>
+ * Two correlation windows are implemented: Gaussian and rectangular.
+ * Gaussian windows should be used for most applications. Rectangular
+ * windows are provided primarily for comparison, because they are so
+ * often used by others.
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.08.11
@@ -44,19 +49,19 @@ import static edu.mines.jtk.util.MathPlus.*;
 public class LocalCorrelationFilter {
 
   /**
-   * Cross-correlations windows.
-   */
-  public enum Window {
-    GAUSSIAN,
-    RECTANGLE
-  };
-
-  /**
    * Cross-correlations types.
    */
   public enum Type {
     SIMPLE,
     SYMMETRIC
+  };
+
+  /**
+   * Cross-correlations windows.
+   */
+  public enum Window {
+    GAUSSIAN,
+    RECTANGLE
   };
 
   /**
