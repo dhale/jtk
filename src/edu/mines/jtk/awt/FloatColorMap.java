@@ -8,11 +8,12 @@ package edu.mines.jtk.awt;
 
 import java.awt.Color;
 import java.awt.image.IndexColorModel;
+import javax.swing.event.EventListenerList;
 import static java.lang.Math.*;
 
-import javax.swing.event.EventListenerList;
 
 import edu.mines.jtk.util.Check;
+import edu.mines.jtk.util.FloatByteMap;
 
 /**
  * Maps arrays of floats to colors.
@@ -138,7 +139,7 @@ public class FloatColorMap extends ColorMap {
    * @return the pixel.
    */
   public int getARGB(float f) {
-    return _icm.getRGB(getIndex(f));
+    return getColorModel().getRGB(getIndex(f));
   }
 
   /**
@@ -230,21 +231,24 @@ public class FloatColorMap extends ColorMap {
   private float _hue000; // corresponds to byte value 000
   private float _hue255; // corresponds to byte value 255
 
-  private static int argbFromRgba(int r, int g, int b, int a) {
+  private int argbFromRgba(int r, int g, int b, int a) {
     return (a<<24) | (r << 16) | (g << 8) | b;
   }
-  private static int rgbFromRgb(int r, int g, int b) {
+
+  private int rgbFromRgb(int r, int g, int b) {
     return 0xff000000 | (r << 16) | (g << 8) | b;
   }
-  private static int argbFromHsba(int hu, int sa, int br, int al) {
+
+  private int argbFromHsba(int hu, int sa, int br, int al) {
     return (al<<24) | rgbFromHsb(hu,sa,br);
   }
-  private static int rgbFromHsb(int hu, int sa, int br) {
+
+  private int rgbFromHsb(int hu, int sa, int br) {
     float scale = 1.0f/255.0f;
     if (hu<0) hu += 256;
     if (sa<0) sa += 256;
     if (br<0) br += 256;
-    float hue = (float)(_hue000+(_hue255-_hue000)*hu*scale);
+    float hue = _hue000+(_hue255-_hue000)*hu*scale;
     float sat = (float)sa*scale;
     float bri = (float)br*scale;
     int r = 0, g = 0, b = 0;
@@ -271,18 +275,22 @@ public class FloatColorMap extends ColorMap {
         r = (int)(  p*255.0f+0.5f);
         g = (int)(bri*255.0f+0.5f);
         b = (int)(  t*255.0f+0.5f);
+        break;
       case 3:
         r = (int)(  p*255.0f+0.5f);
         g = (int)(  q*255.0f+0.5f);
         b = (int)(bri*255.0f+0.5f);
+        break;
       case 4:
         r = (int)(  t*255.0f+0.5f);
         g = (int)(  p*255.0f+0.5f);
         b = (int)(bri*255.0f+0.5f);
+        break;
       case 5:
         r = (int)(bri*255.0f+0.5f);
         g = (int)(  p*255.0f+0.5f);
         b = (int)(  q*255.0f+0.5f);
+        break;
       }
     }
     return rgbFromRgb(r,g,b);

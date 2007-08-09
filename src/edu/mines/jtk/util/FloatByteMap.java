@@ -106,15 +106,7 @@ public class FloatByteMap {
    * @param b output array of unsigned byte values in the range [0,255].
    */
   public void getBytes(float[] f, byte[] b) {
-    if (_dirty)
-      update();
-    int n = f.length;
-    for (int i=0; i<n; ++i) {
-      float fi = f[i];
-      if (fi<_flower) fi = _flower;
-      if (fi>_fupper) fi = _fupper;
-      b[i] = (byte)((fi-_flower)*_fscale);
-    }
+    getBytes(f,b,0);
   }
 
   /**
@@ -133,10 +125,36 @@ public class FloatByteMap {
    * @param f input array of float values to be mapped.
    * @param b output array of unsigned byte values in the range [0,255].
    */
+  public void getBytes(float[][] f, byte[] b) {
+    int n1 = f[0].length;
+    int n2 = f.length;
+    for (int i2=0; i2<n2; ++i2)
+      getBytes(f[i2],b,i2*n1);
+  }
+
+  /**
+   * Gets byte values corresponding to specified float values.
+   * @param f input array of float values to be mapped.
+   * @param b output array of unsigned byte values in the range [0,255].
+   */
   public void getBytes(float[][][] f, byte[][][] b) {
     int n = f.length;
     for (int i=0; i<n; ++i)
       getBytes(f[i],b[i]);
+  }
+
+  /**
+   * Gets byte values corresponding to specified float values.
+   * @param f input array of float values to be mapped.
+   * @param b output array of unsigned byte values in the range [0,255].
+   */
+  public void getBytes(float[][][] f, byte[] b) {
+    int n1 = f[0][0].length;
+    int n2 = f[0].length;
+    int n3 = f.length;
+    for (int i3=0; i3<n3; ++i3)
+      for (int i2=0; i2<n2; ++i2)
+        getBytes(f[i3][i2],b,i2*n1+i3*n1*n2);
   }
 
   /**
@@ -152,6 +170,23 @@ public class FloatByteMap {
     for (int i3=0; i3<n3; ++i3) {
       f3.get12(n1,n2,0,0,i3,fi3);
       getBytes(fi3,b[i3]);
+    }
+  }
+
+  /**
+   * Gets byte values corresponding to specified float values.
+   * @param f input array of float values to be mapped.
+   * @param b output array of unsigned byte values in the range [0,255].
+   */
+  public void getBytes(Float3 f3, byte[] b) {
+    int n1 = f3.getN1();
+    int n2 = f3.getN2();
+    int n3 = f3.getN3();
+    float[][] fi3 = new float[n2][n1];
+    for (int i3=0; i3<n3; ++i3) {
+      f3.get12(n1,n2,0,0,i3,fi3);
+      for (int i2=0; i2<n2; ++i2)
+        getBytes(fi3[i2],b,i2*n1+i3*n1*n2);
     }
   }
 
@@ -234,6 +269,18 @@ public class FloatByteMap {
       _flower = _fmin;
       _fupper = _flower+255.5f/_fscale;
       _dirty = false;
+    }
+  }
+
+  private void getBytes(float[] f, byte[] b, int j) {
+    if (_dirty)
+      update();
+    int n = f.length;
+    for (int i=0; i<n; ++i,++j) {
+      float fi = f[i];
+      if (fi<_flower) fi = _flower;
+      if (fi>_fupper) fi = _fupper;
+      b[j] = (byte)((fi-_flower)*_fscale);
     }
   }
 }
