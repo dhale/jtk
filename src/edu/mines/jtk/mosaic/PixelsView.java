@@ -439,6 +439,7 @@ public class PixelsView extends TiledView {
     // Image pixel sampling.
     int nx = wc;
     int ny = hc;
+    int nxy = nx*ny;
     double dx = (x1-x0)/max(1,nx-1);
     double dy = (y1-y0)/max(1,ny-1);
     double fx = x0;
@@ -446,18 +447,14 @@ public class PixelsView extends TiledView {
 
     // If only one component (using index color model) ...
     if (_nc==1) {
-
-      // Interpolate samples f(x1,x2) to obtain image bytes.
       byte[] b;
       if (_interpolation==Interpolation.LINEAR) {
         b = interpolateImageBytesLinear(0,nx,dx,fx,ny,dy,fy);
       } else {
         b = interpolateImageBytesNearest(0,nx,dx,fx,ny,dy,fy);
       }
-
-      // Draw image.
       ColorModel colorModel = _colorMap.getColorModel();
-      DataBuffer db = new DataBufferByte(b,nx*ny,0);
+      DataBuffer db = new DataBufferByte(b,nxy,0);
       int dataType = DataBuffer.TYPE_BYTE;
       int[] bitMasks = new int[]{0xff};
       SampleModel sm = new SinglePixelPackedSampleModel(
@@ -469,6 +466,8 @@ public class PixelsView extends TiledView {
 
     // else, if three or four components (using direct color model) ...
     else {
+      int[] i = Array.fillint((new java.util.Random()).nextInt(),nxy);
+      /*
       byte[][] b = new byte[_nc][];
       for (int ic=0; ic<_nc; ++ic) {
         if (_interpolation==Interpolation.LINEAR) {
@@ -477,7 +476,6 @@ public class PixelsView extends TiledView {
           b[ic] = interpolateImageBytesNearest(ic,nx,dx,fx,ny,dy,fy);
         }
       }
-      int nxy = nx*ny;
       int[] i = new int[nxy];
       if (_nc==3) {
         byte[] b0 = b[0], b1 = b[1], b2 = b[2];
@@ -494,11 +492,12 @@ public class PixelsView extends TiledView {
                    ((b1[ixy]&0xff)<< 8) | 
                    ((b2[ixy]&0xff)    );
       }
+      */
       DataBuffer db = new DataBufferInt(i,nxy,0);
       ColorModel colorModel = new DirectColorModel(32,
         0x00ff0000,
         0x0000ff00,
-        0x000000ff,
+        0x000000ff, 
         0xff000000);
       int[] bitMasks = new int[]{
         0x00ff0000,
