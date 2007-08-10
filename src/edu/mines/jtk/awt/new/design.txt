@@ -101,6 +101,40 @@ So instead,
   linearly map to HSB bytes
   convert HSB bytes to RGB bytes
 
+rgbrgb rrggbb
+000000 000000  black
+000001 000001  blue
+000010 000100  green
+000011 000101  cyan
+000100 010000  red
+000101 010001  magenta
+000110 010100  yellow
+000111 010101  gray
+...
+000000 000000  black
+000001 000001  blue
+000011 000101  cyan
+000010 000100  green
+000110 010100  yellow
+000100 010000  red
+000101 010001  magenta
+000111 010101  gray
+...
+
+     
+
+
+rrr ggg bbx
+000 000 00x
+000 001 00x
+001 000 00x
+001 001 00x
+000 000 01x
+000 010 00x
+010 000 00x
+000 001 01x
+001 000 01x
+001 001 01x
 
 
 

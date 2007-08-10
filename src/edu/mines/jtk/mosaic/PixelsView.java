@@ -18,31 +18,37 @@ import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
 
 /**
- * A view of a sampled function f(x1,x2), displayed as a 2-D array of pixels.
+ * A view of a sampled functions f(x1,x2), displayed as a 2-D array of pixels.
  * Sample values are converted to pixel colors in two steps. In the first
  * step, sample values are converted to unsigned bytes in the range [0,255].
  * In the second, step, these bytes are converted to pixel colors, through
  * a specified color model.
  * <p>
- * The first step is a mapping from sample values to unsigned byte indices.
+ * The first step is a mapping from sample values to unsigned byte values.
  * This mapping is linear, except for clipping, which ensures that no byte 
- * index lies outside the range [0,255]. The linear mapping is defined by 
+ * value lies outside the range [0,255]. The linear mapping is defined by 
  * two clip values, clipMin and clipMax. The minimum clip value clipMin 
  * corresponds to byte index 0, and the maximum clip value clipMax 
  * corresponds to byte index 255. Sample values less than clipMin are 
  * mapped to byte index 0; sample values greater than clipMax are mapped 
  * to byte index 255.
  * <p>
- * One byte index is computed for each pixel displayed by this view. 
+ * Pixel byte values are computed for every pixel displayed by this view. 
  * Because the view typically contains more (or fewer) pixels than samples, 
  * this first mapping often requires interpolation between sampled values of 
  * the function f(x1,x2). Either linear or nearest-neighbor interpolation
  * may be specified for this first step.
  * <p>
- * The second step is a table lookup. It uses the pixel bytes computed in 
- * the first mapping as indices in a specified index color model. This color
- * model converts a pixel index in the range [0,255] to a color.
+ * The second step depends on the number of sampled functions specified,
+ * either one, three or four. For one function, the byte values are indices 
+ * for a table of 256 colors (a color map) in a specified index color model.
  * See {@link edu.mines.jtk.awt.ColorMap} for more details.
+ * <p>
+ * For three (or four) functions, the byte values are interpreted directly
+ * as color components red, green, and blue (and alpha). In this case, any
+ * indexed color model specified is not used. The number of color components
+ * equals the number of sampled functions specified.
+ *
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.09.27
  */
@@ -76,6 +82,17 @@ public class PixelsView extends TiledView {
    *  n1 = f[0].length and n2 = f.length.
    */
   public PixelsView(float[][] f) {
+    this(new float[][][]{f});
+  }
+
+  /**
+   * Constructs a pixels view of the specified sampled functions f(x1,x2).
+   * Assumes zero first sample values and unit sampling intervals.
+   * @param f array[nc][n2][n1] of sampled function values f(x1,x2), where 
+   *  n1 = f[0].length, n2 = f.length, and nc is the number of functions
+   *  to be mapped to colors, either one, three, or four.
+   */
+  public PixelsView(float[][][] f) {
     set(f);
   }
 
@@ -87,6 +104,19 @@ public class PixelsView extends TiledView {
    *  n1 and n2 denote the number of samples in s1 and s2, respectively.
    */
   public PixelsView(Sampling s1, Sampling s2, float[][] f) {
+    this(s1,s2,new float[][][]{f});
+  }
+
+  /**
+   * Constructs a pixels view of the specified sampled functions f(x1,x2).
+   * Assumes zero first sample values and unit sampling intervals.
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
+   * @param f array[nc][n2][n1] of sampled function values f(x1,x2), where 
+   *  n1 = f[0].length, n2 = f.length, and nc is the number of functions
+   *  to be mapped to colors, either one, three, or four.
+   */
+  public PixelsView(Sampling s1, Sampling s2, float[][][] f) {
     set(s1,s2,f);
   }
 
@@ -97,7 +127,18 @@ public class PixelsView extends TiledView {
    *  n1 = f[0].length and n2 = f.length.
    */
   public void set(float[][] f) {
-    set(new Sampling(f[0].length),new Sampling(f.length),f);
+    set(new float[][][]{f});
+  }
+
+  /**
+   * Sets the sampled functions f(x1,x2) for this view.
+   * Assumes zero first sample values and unit sampling intervals.
+   * @param f array[nc][n2][n1] of sampled function values f(x1,x2), where 
+   *  n1 = f[0].length, n2 = f.length, and nc is the number of functions
+   *  to be mapped to colors, either one, three, or four.
+   */
+  public void set(float[][][] f) {
+    set(new Sampling(f[0][0].length),new Sampling(f[0].length),f);
   }
 
   /**
@@ -108,15 +149,35 @@ public class PixelsView extends TiledView {
    *  n1 and n2 denote the number of samples in s1 and s2, respectively.
    */
   public void set(Sampling s1, Sampling s2, float[][] f) {
+    set(s1,s2,new float[][][]{f});
+  }
+
+  /**
+   * Sets the sampled functions f(x1,x2) for this view.
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
+   * @param f array[nc][n2][n1] of sampled function values f(x1,x2), where
+   *  n1 and n2 denote the number of samples in s1 and s2, respectively,
+   *  and nc denotes the number of functions to be mapped to colors.
+   */
+  public void set(Sampling s1, Sampling s2, float[][][] f) {
     Check.argument(s1.isUniform(),"s1 is uniform");
     Check.argument(s2.isUniform(),"s2 is uniform");
     Check.argument(Array.isRegular(f),"f is regular");
-    Check.argument(s1.getCount()==f[0].length,"s1 consistent with f");
-    Check.argument(s2.getCount()==f.length,"s2 consistent with f");
+    Check.argument(s1.getCount()==f[0][0].length,"s1 consistent with f");
+    Check.argument(s2.getCount()==f[0].length,"s2 consistent with f");
+    Check.argument(
+      f.length==1 || f.length==3 || f.length==4,
+      "number of sampled functions is one, three, or four");
+    _nc = f.length;
     _s1 = s1;
     _s2 = s2;
     _f = Array.copy(f);
-    _clips = new Clips(_f);
+    _clips = new Clips[_nc];
+    for (int ic=0; ic<_nc; ++ic)
+      _clips[ic] = new Clips(_f[ic]);
+    _clipMin = new float[_nc];
+    _clipMax = new float[_nc];
     updateSampling();
     repaint();
   }
@@ -164,6 +225,7 @@ public class PixelsView extends TiledView {
   /**
    * Sets the index color model for this view.
    * The default color model is a black-to-white gray model.
+   * This index color model is not used for three or four components.
    * @param colorModel the index color model.
    */
   public void setColorModel(IndexColorModel colorModel) {
@@ -172,11 +234,11 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Gets the index color model for this view.
-   * @return the index color model.
+   * Gets the index color model used for this view.
+   * @return the index color model; null, of more than one component.
    */
   public IndexColorModel getColorModel() {
-    return _colorMap.getColorModel();
+    return (_nc==1)?_colorMap.getColorModel():null;
   }
 
   /**
@@ -194,7 +256,7 @@ public class PixelsView extends TiledView {
    * @param clipMax the sample value corresponding to color model index 255.
    */
   public void setClips(float clipMin, float clipMax) {
-    _clips.setClips(clipMin,clipMax);
+    _clips[0].setClips(clipMin,clipMax);
     repaint();
   }
 
@@ -203,7 +265,7 @@ public class PixelsView extends TiledView {
    * @return the minimum clip value.
    */
   public float getClipMin() {
-    return _clips.getClipMin();
+    return _clips[0].getClipMin();
   }
 
   /**
@@ -211,7 +273,7 @@ public class PixelsView extends TiledView {
    * @return the maximum clip value.
    */
   public float getClipMax() {
-    return _clips.getClipMax();
+    return _clips[0].getClipMax();
   }
 
   /**
@@ -225,7 +287,7 @@ public class PixelsView extends TiledView {
    * @param percMax the percentile corresponding to clipMax.
    */
   public void setPercentiles(float percMin, float percMax) {
-    _clips.setPercentiles(percMin,percMax);
+    _clips[0].setPercentiles(percMin,percMax);
     repaint();
   }
 
@@ -234,7 +296,7 @@ public class PixelsView extends TiledView {
    * @return the minimum percentile.
    */
   public float getPercentileMin() {
-    return _clips.getPercentileMin();
+    return _clips[0].getPercentileMin();
   }
 
   /**
@@ -242,7 +304,65 @@ public class PixelsView extends TiledView {
    * @return the maximum percentile.
    */
   public float getPercentileMax() {
-    return _clips.getPercentileMax();
+    return _clips[0].getPercentileMax();
+  }
+
+  /**
+   * Sets the clips for the specified component.
+   * @param ic the index of the component.
+   * @param clipMin the sample value corresponding to byte value 0.
+   * @param clipMax the sample value corresponding to byte value 255.
+   */
+  public void setClips(int ic, float clipMin, float clipMax) {
+    _clips[ic].setClips(clipMin,clipMax);
+    repaint();
+  }
+
+  /**
+   * Gets the minimum clip value for the specified component.
+   * @param ic the index of the component.
+   * @return the minimum clip value.
+   */
+  public float getClipMin(int ic) {
+    return _clips[ic].getClipMin();
+  }
+
+  /**
+   * Gets the maximum clip value for the specified component.
+   * @param ic the index of the component.
+   * @return the maximum clip value.
+   */
+  public float getClipMax(int ic) {
+    return _clips[ic].getClipMax();
+  }
+
+  /**
+   * Sets the percentiles for the specified component.
+   * @param ic the index of the component.
+   * @param percMin the percentile corresponding to clipMin.
+   * @param percMax the percentile corresponding to clipMax.
+   */
+  public void setPercentiles(int ic, float percMin, float percMax) {
+    _clips[ic].setPercentiles(percMin,percMax);
+    repaint();
+  }
+
+  /**
+   * Gets the minimum percentile for the specified component.
+   * @param ic the index of the component.
+   * @return the minimum percentile.
+   */
+  public float getPercentileMin(int ic) {
+    return _clips[ic].getPercentileMin();
+  }
+
+  /**
+   * Gets the maximum percentile for the specified component.
+   * @param ic the index of the component.
+   * @return the maximum percentile.
+   */
+  public float getPercentileMax(int ic) {
+    return _clips[ic].getPercentileMax();
   }
 
   /**
@@ -324,32 +444,84 @@ public class PixelsView extends TiledView {
     double fx = x0;
     double fy = y0;
 
-    // Interpolate samples f(x1,x2) to obtain image bytes.
-    byte[] b;
-    if (_interpolation==Interpolation.LINEAR) {
-      b = interpolateImageBytesLinear(nx,dx,fx,ny,dy,fy);
-    } else {
-      b = interpolateImageBytesNearest(nx,dx,fx,ny,dy,fy);
+    // If only one component (using index color model) ...
+    if (_nc==1) {
+
+      // Interpolate samples f(x1,x2) to obtain image bytes.
+      byte[] b;
+      if (_interpolation==Interpolation.LINEAR) {
+        b = interpolateImageBytesLinear(0,nx,dx,fx,ny,dy,fy);
+      } else {
+        b = interpolateImageBytesNearest(0,nx,dx,fx,ny,dy,fy);
+      }
+
+      // Draw image.
+      ColorModel colorModel = _colorMap.getColorModel();
+      DataBuffer db = new DataBufferByte(b,nx*ny,0);
+      int dataType = DataBuffer.TYPE_BYTE;
+      int[] bitMasks = new int[]{0xff};
+      SampleModel sm = new SinglePixelPackedSampleModel(
+        dataType,nx,ny,bitMasks);
+      WritableRaster wr = Raster.createWritableRaster(sm,db,null);
+      BufferedImage bi = new BufferedImage(colorModel,wr,false,null);
+      g2d.drawImage(bi,xc,yc,null);
     }
 
-    // Draw image.
-    ColorModel colorModel = _colorMap.getColorModel();
-    DataBuffer db = new DataBufferByte(b,nx*ny,0);
-    int dataType = DataBuffer.TYPE_BYTE;
-    int[] bitMasks = new int[]{0xff};
-    SampleModel sm = new SinglePixelPackedSampleModel(dataType,nx,ny,bitMasks);
-    WritableRaster wr = Raster.createWritableRaster(sm,db,null);
-    BufferedImage bi = new BufferedImage(colorModel,wr,false,null);
-    g2d.drawImage(bi,xc,yc,null);
+    // else, if three or four components (using direct color model) ...
+    else {
+      byte[][] b = new byte[_nc][];
+      for (int ic=0; ic<_nc; ++ic) {
+        if (_interpolation==Interpolation.LINEAR) {
+          b[ic] = interpolateImageBytesLinear(ic,nx,dx,fx,ny,dy,fy);
+        } else {
+          b[ic] = interpolateImageBytesNearest(ic,nx,dx,fx,ny,dy,fy);
+        }
+      }
+      int nxy = nx*ny;
+      int[] i = new int[nxy];
+      if (_nc==3) {
+        byte[] b0 = b[0], b1 = b[1], b2 = b[2];
+        for (int ixy=0; ixy<nxy; ++ixy)
+          i[ixy] = 0xff000000           | 
+                   ((b0[ixy]&0xff)<<16) | 
+                   ((b1[ixy]&0xff)<< 8) | 
+                   ((b2[ixy]&0xff)    );
+      } else {
+        byte[] b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+        for (int ixy=0; ixy<nxy; ++ixy)
+          i[ixy] = ((b3[ixy]&0xff)<<24) |
+                   ((b0[ixy]&0xff)<<16) | 
+                   ((b1[ixy]&0xff)<< 8) | 
+                   ((b2[ixy]&0xff)    );
+      }
+      DataBuffer db = new DataBufferInt(i,nxy,0);
+      ColorModel colorModel = new DirectColorModel(32,
+        0x00ff0000,
+        0x0000ff00,
+        0x000000ff,
+        0xff000000);
+      int[] bitMasks = new int[]{
+        0x00ff0000,
+        0x0000ff00,
+        0x000000ff,
+        0xff000000};
+      int dataType = DataBuffer.TYPE_INT;
+      SampleModel sm = new SinglePixelPackedSampleModel(
+        dataType,nx,ny,bitMasks);
+      WritableRaster wr = Raster.createWritableRaster(sm,db,null);
+      BufferedImage bi = new BufferedImage(colorModel,wr,false,null);
+      g2d.drawImage(bi,xc,yc,null);
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
   // The sampled floats.
+  private int _nc; // number of components
   private Sampling _s1; // sampling of 1st dimension
   private Sampling _s2; // sampling of 2nd dimension
-  private float[][] _f; // copy of array of floats
+  private float[][][] _f; // copy of array of floats
 
   // View orientation.
   private Orientation _orientation = Orientation.X1RIGHT_X2UP;
@@ -357,13 +529,13 @@ public class PixelsView extends TiledView {
   // Interpolation method.
   private Interpolation _interpolation = Interpolation.LINEAR;
 
-  // Clips.
-  Clips _clips;
-  float _clipMin;
-  float _clipMax;
+  // Clips, one for each component.
+  Clips[] _clips;
+  float[] _clipMin;
+  float[] _clipMax;
 
   // Color map with default gray color model.
-  private ColorMap _colorMap = new ColorMap(_clipMin,_clipMax,ColorMap.GRAY);
+  private ColorMap _colorMap = new ColorMap(ColorMap.GRAY);
 
   // Sampling of the function f(x1,x2) in the pixel (x,y) coordinate system. 
   private boolean _transposed;
@@ -380,12 +552,19 @@ public class PixelsView extends TiledView {
    * Update the clips if necessary.
    */
   private void updateClips() {
-    float clipMin = _clips.getClipMin();
-    float clipMax = _clips.getClipMax();
-    if (_clipMin!=clipMin || _clipMax!=clipMax) {
-      _clipMin = clipMin;
-      _clipMax = clipMax;
-      _colorMap.setValueRange(_clipMin,_clipMax);
+    if (_clipMin==null)
+      _clipMin = new float[_nc];
+    if (_clipMax==null)
+      _clipMax = new float[_nc];
+    for (int ic=0; ic<_nc; ++ic) {
+      float clipMin = _clips[ic].getClipMin();
+      float clipMax = _clips[ic].getClipMax();
+      if (_clipMin[ic]!=clipMin || _clipMax[ic]!=clipMax) {
+        _clipMin[ic] = clipMin;
+        _clipMax[ic] = clipMax;
+        if (_nc==1)
+          _colorMap.setValueRange(_clipMin[ic],_clipMax[ic]);
+      }
     }
   }
 
@@ -395,7 +574,7 @@ public class PixelsView extends TiledView {
    * orientation. If this sampling is transposed, then x1 corresponds to y 
    * and x2 corresponds to x; otherwise, x1 corresponds to x and x2 
    * corresponds to y. In either case, the coordinates (_fx,_fy) correspond
-   * to the sampled function value _f[0][0].
+   * to the sampled function value _f[ic][0][0].
    */
   private void updateSampling() {
     int n1 = _s1.getCount();
@@ -485,6 +664,7 @@ public class PixelsView extends TiledView {
    * buffered image.
    */
   private byte[] interpolateImageBytesLinear(
+    int ic,
     int nx, double dx, double fx,
     int ny, double dy, double fy)
   {
@@ -535,7 +715,7 @@ public class PixelsView extends TiledView {
           float[] temp = temp1;
           temp1 = temp2;
           temp2 = temp;
-          interpx(min(jy+1,_ny-1),nx,kf,wf,temp2);
+          interpx(ic,min(jy+1,_ny-1),nx,kf,wf,temp2);
         }
 
         // Else if temp1 is still useful, make it temp2 and compute temp1.
@@ -543,13 +723,13 @@ public class PixelsView extends TiledView {
           float[] temp = temp1;
           temp1 = temp2;
           temp2 = temp;
-          interpx(jy,nx,kf,wf,temp1);
+          interpx(ic,jy,nx,kf,wf,temp1);
         }
 
         // Else compute both temp1 and temp2. */
         else {
-          interpx(jy  ,nx,kf,wf,temp1);
-          interpx(min(jy+1,_ny-1),nx,kf,wf,temp2);
+          interpx(ic,             jy,nx,kf,wf,temp1);
+          interpx(ic,min(jy+1,_ny-1),nx,kf,wf,temp2);
         }                 
 
         // Remember index jy1 corresponding to temp1.
@@ -567,29 +747,32 @@ public class PixelsView extends TiledView {
    * Linear interpolation of one row of sampled floats to pixel resolution.
    * Also maps _clipMin to 0.0f, and _clipMax to 255.0f.
    */
-  private void interpx(int jy, int nx, int[] kf, float[] wf, float[] t) {
-    float fscale = 255.0f/(_clipMax-_clipMin);
-    float fshift = _clipMin;
+  private void interpx(
+    int ic, int jy, int nx, int[] kf, float[] wf, float[] t) 
+  {
+    float[][] fc = _f[ic];
+    float fscale = 255.0f/(_clipMax[ic]-_clipMin[ic]);
+    float fshift = _clipMin[ic];
     if (_transposed) {
       if (_nx==1) {
-        float fc = (_f[0][jy]-fshift)*fscale;
+        float f0 = (fc[0][jy]-fshift)*fscale;
         for (int ix=0; ix<nx; ++ix)
-          t[ix] = fc;
+          t[ix] = f0;
       } else {
         for (int ix=0; ix<nx; ++ix) {
           int kx = kf[ix];
           float wx = wf[ix];
-          float f1 = (_f[kx  ][jy]-fshift)*fscale;
-          float f2 = (_f[kx+1][jy]-fshift)*fscale;
+          float f1 = (fc[kx  ][jy]-fshift)*fscale;
+          float f2 = (fc[kx+1][jy]-fshift)*fscale;
           t[ix] = (1.0f-wx)*f1+wx*f2;
         }
       }
     } else {
-      float[] fjy = _f[jy];
+      float[] fjy = fc[jy];
       if (_nx==1) {
-        float fc = (fjy[0]-fshift)*fscale;
+        float f0 = (fjy[0]-fshift)*fscale;
         for (int ix=0; ix<nx; ++ix)
-          t[ix] = fc;
+          t[ix] = f0;
       } else {
         for (int ix=0; ix<nx; ++ix) {
           int kx = kf[ix];
@@ -626,6 +809,7 @@ public class PixelsView extends TiledView {
    * color-mapped buffered image.
    */
   private byte[] interpolateImageBytesNearest(
+    int ic,
     int nx, double dx, double fx,
     int ny, double dy, double fy)
   {
@@ -663,7 +847,7 @@ public class PixelsView extends TiledView {
 
       // If necessary, interpolate a new row of bytes.
       if (jy!=jytemp) {
-        interpx(jy,nx,kf,temp);
+        interpx(ic,jy,nx,kf,temp);
         jytemp = jy;
       }
 
@@ -678,13 +862,14 @@ public class PixelsView extends TiledView {
   /**
    * Nearest-neighbor interpolation of one row of sampled floats to pixels.
    */
-  private void interpx(int jy, int nx, int[] kf, byte[] b) {
-    float fscale = 255.0f/(_clipMax-_clipMin);
-    float fshift = _clipMin;
+  private void interpx(int ic, int jy, int nx, int[] kf, byte[] b) {
+    float[][] fc = _f[ic];
+    float fscale = 255.0f/(_clipMax[ic]-_clipMin[ic]);
+    float fshift = _clipMin[ic];
     if (_transposed) {
       for (int ix=0; ix<nx; ++ix) {
         int kx = kf[ix];
-        float fi = (_f[kx][jy]-fshift)*fscale;
+        float fi = (fc[kx][jy]-fshift)*fscale;
         if (fi<0.0f)
           fi = 0.0f;
         if (fi>255.0f)
@@ -692,7 +877,7 @@ public class PixelsView extends TiledView {
         b[ix] = (byte)(fi+0.5f);
       }
     } else {
-      float[] fjy = _f[jy];
+      float[] fjy = fc[jy];
       for (int ix=0; ix<nx; ++ix) {
         int kx = kf[ix];
         float fi = (fjy[kx]-fshift)*fscale;

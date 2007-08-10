@@ -599,6 +599,63 @@ public class PlotPanel extends IPanel {
   }
 
   /**
+   * Adds a pixels view of the specified sampled function f(x1,x2).
+   * Assumes zero first sample values and unit sampling intervals.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
+   *  n1 = f[0][0].length, n2 = f[0].length, and nc is the number 
+   *  of components.
+   * @return the pixels view.
+   */
+  public PixelsView addPixels(float[][][] f) {
+    return addPixels(0,0,f);
+  }
+
+  /**
+   * Adds a pixels view of the specified sampled function f(x1,x2).
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
+   *  n1 = f[0][0].length, n2 = f[0].length, and nc is the number 
+   *  of components.
+   * @return the pixels view.
+   */
+  public PixelsView addPixels(Sampling s1, Sampling s2, float[][][] f) {
+    return addPixels(0,0,s1,s2,f);
+  }
+
+  /**
+   * Adds a pixels view of the specified sampled function f(x1,x2).
+   * Assumes zero first sample values and unit sampling intervals.
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), 
+   *  n1 = f[0][0].length, n2 = f[0].length, and nc is the number 
+   *  of components.
+   * @return the pixels view.
+   */
+  public PixelsView addPixels(int irow, int icol, float[][][] f) {
+    PixelsView pv = new PixelsView(f);
+    return addPixelsView(irow,icol,pv);
+  }
+
+  /**
+   * Adds a pixels view of the specified sampled function f(x1,x2).
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), 
+   *  n1 = f[0][0].length, n2 = f[0].length, and nc is the number 
+   *  of components.
+   * @return the pixels view.
+   */
+  public PixelsView addPixels(
+    int irow, int icol, Sampling s1, Sampling s2, float[][][] f) {
+    PixelsView pv = new PixelsView(s1,s2,f);
+    return addPixelsView(irow,icol,pv);
+  }
+
+  /**
    * Adds a points view of the arrays x1 and x2 of point (x1,x2) coordinates.
    * @param x1 array of x1 coordinates.
    * @param x2 array of x2 coordinates.

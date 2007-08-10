@@ -21,6 +21,11 @@ import edu.mines.jtk.util.Array;
 public class PixelsViewTest {
 
   public static void main(String[] args) {
+    test1();
+    test2();
+  }
+
+  private static void test1() {
     int n1 = 11;
     int n2 = 11;
     float d1 = 1.0f/(float)max(1,n1-1);
@@ -54,6 +59,51 @@ public class PixelsViewTest {
     PlotFrame frame = new PlotFrame(panel);
     frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
     frame.setVisible(true);
-    frame.paintToPng(300,6,"junk.png");
+    //frame.paintToPng(300,6,"junk.png");
+  }
+
+  private static void test2() {
+    int n1 = 11;
+    int n2 = 11;
+    float d1 = 1.0f/(float)max(1,n1-1);
+    float d2 = 1.0f/(float)max(1,n2-1);
+    float[][] f0 = Array.rampfloat(0.0f,d1,d2,n1,n2);
+    float[][] f1 = Array.zerofloat(n1,n2);
+    float[][] f2 = Array.zerofloat(n1,n2);
+    //float[][] f1 = Array.rampfloat(0.0f,d1,d2,n1,n2);
+    //float[][] f2 = Array.rampfloat(0.0f,d1,d2,n1,n2);
+
+    Sampling s1 = new Sampling(n1,0.5,0.25*(n1-1));
+    Sampling s2 = new Sampling(n2,0.5,0.25*(n2-1));
+
+    PlotPanel panel = new PlotPanel(1,2);
+    PixelsView pv0 = panel.addPixels(0,0,new float[][][]{f0,f1,f2});
+    pv0.setInterpolation(PixelsView.Interpolation.NEAREST);
+    pv0.setPercentiles(0,0.0f,100.0f);
+    pv0.setClips(1,0.0f,2.0f);
+    pv0.setClips(2,0.0f,2.0f);
+
+    PixelsView pv0b = panel.addPixels(0,0,s1,s2,new float[][][]{f1,f0,f2});
+    pv0b.setInterpolation(PixelsView.Interpolation.LINEAR);
+    pv0b.setClips(0,0.0f,2.0f);
+    pv0b.setPercentiles(1,0.0f,100.0f);
+    pv0b.setClips(2,0.0f,2.0f);
+
+    PixelsView pv1 = panel.addPixels(0,1,new float[][][]{f0,f1,f2});
+    pv1.setInterpolation(PixelsView.Interpolation.LINEAR);
+    pv1.setPercentiles(0,0.0f,100.0f);
+    pv1.setClips(1,0.0f,2.0f);
+    pv1.setClips(2,0.0f,2.0f);
+
+    PixelsView pv1b = panel.addPixels(0,1,s1,s2,new float[][][]{f1,f0,f2});
+    pv1b.setInterpolation(PixelsView.Interpolation.NEAREST);
+    pv1b.setClips(0,0.0f,2.0f);
+    pv1b.setPercentiles(1,0.0f,100.0f);
+    pv1b.setClips(2,0.0f,2.0f);
+
+    PlotFrame frame = new PlotFrame(panel);
+    frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
+    frame.setVisible(true);
+    //frame.paintToPng(300,6,"junk.png");
   }
 }
