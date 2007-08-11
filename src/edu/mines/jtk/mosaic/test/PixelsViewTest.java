@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic.test;
 
+import java.awt.*;
 import static java.lang.Math.max;
 
 import edu.mines.jtk.awt.ColorMap;
@@ -79,26 +80,26 @@ public class PixelsViewTest {
     PlotPanel panel = new PlotPanel(1,2);
     PixelsView pv0 = panel.addPixels(0,0,new float[][][]{f0,f1,f2});
     pv0.setInterpolation(PixelsView.Interpolation.NEAREST);
-    pv0.setPercentiles(0,0.0f,100.0f);
+    pv0.setClips(0,0.0f,2.0f);
     pv0.setClips(1,0.0f,2.0f);
     pv0.setClips(2,0.0f,2.0f);
 
     PixelsView pv0b = panel.addPixels(0,0,s1,s2,new float[][][]{f1,f0,f2});
     pv0b.setInterpolation(PixelsView.Interpolation.LINEAR);
     pv0b.setClips(0,0.0f,2.0f);
-    pv0b.setPercentiles(1,0.0f,100.0f);
+    pv0b.setClips(1,0.0f,2.0f);
     pv0b.setClips(2,0.0f,2.0f);
 
-    PixelsView pv1 = panel.addPixels(0,1,new float[][][]{f0,f1,f2});
+    PixelsView pv1 = panel.addPixels(0,1,new float[][][]{f1,f2,f0});
     pv1.setInterpolation(PixelsView.Interpolation.LINEAR);
-    pv1.setPercentiles(0,0.0f,100.0f);
+    pv1.setClips(0,0.0f,2.0f);
     pv1.setClips(1,0.0f,2.0f);
     pv1.setClips(2,0.0f,2.0f);
 
     PixelsView pv1b = panel.addPixels(0,1,s1,s2,new float[][][]{f1,f0,f2});
     pv1b.setInterpolation(PixelsView.Interpolation.NEAREST);
     pv1b.setClips(0,0.0f,2.0f);
-    pv1b.setPercentiles(1,0.0f,100.0f);
+    pv1b.setClips(1,0.0f,2.0f);
     pv1b.setClips(2,0.0f,2.0f);
 
     PlotFrame frame = new PlotFrame(panel);

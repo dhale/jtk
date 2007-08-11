@@ -8,8 +8,7 @@ package edu.mines.jtk.mosaic;
 
 import static edu.mines.jtk.util.MathPlus.*;
 
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.*;
 
 import edu.mines.jtk.awt.ColorMap;
@@ -447,20 +446,19 @@ public class PixelsView extends TiledView {
 
     // If only one component (using index color model) ...
     if (_nc==1) {
-      byte[] b;
-      if (_interpolation==Interpolation.LINEAR) {
-        b = interpolateImageBytesLinear(0,nx,dx,fx,ny,dy,fy);
-      } else {
-        b = interpolateImageBytesNearest(0,nx,dx,fx,ny,dy,fy);
-      }
-      ColorModel colorModel = _colorMap.getColorModel();
+      float[][] f = _f[0];
+      float clipMin = _clipMin[0];
+      float clipMax = _clipMax[0];
+      byte[] b = (_interpolation==Interpolation.LINEAR) ?
+        interpolateImageBytesLinear(f,clipMin,clipMax,nx,dx,fx,ny,dy,fy) :
+        interpolateImageBytesNearest(f,clipMin,clipMax,nx,dx,fx,ny,dy,fy);
+      ColorModel cm = _colorMap.getColorModel();
       DataBuffer db = new DataBufferByte(b,nxy,0);
-      int dataType = DataBuffer.TYPE_BYTE;
-      int[] bitMasks = new int[]{0xff};
-      SampleModel sm = new SinglePixelPackedSampleModel(
-        dataType,nx,ny,bitMasks);
+      int dt = DataBuffer.TYPE_BYTE;
+      int[] bm = new int[]{0xff};
+      SampleModel sm = new SinglePixelPackedSampleModel(dt,nx,ny,bm);
       WritableRaster wr = Raster.createWritableRaster(sm,db,null);
-      BufferedImage bi = new BufferedImage(colorModel,wr,false,null);
+      BufferedImage bi = new BufferedImage(cm,wr,false,null);
       g2d.drawImage(bi,xc,yc,null);
     }
 
@@ -468,21 +466,43 @@ public class PixelsView extends TiledView {
     else {
       byte[][] b = new byte[_nc][];
       for (int ic=0; ic<_nc; ++ic) {
-        if (_interpolation==Interpolation.LINEAR) {
-          b[ic] = interpolateImageBytesLinear(ic,nx,dx,fx,ny,dy,fy);
-        } else {
-          b[ic] = interpolateImageBytesNearest(ic,nx,dx,fx,ny,dy,fy);
-        }
+        float[][] f = _f[ic];
+        float clipMin = _clipMin[ic];
+        float clipMax = _clipMax[ic];
+        b[ic] = (_interpolation==Interpolation.LINEAR) ?
+          interpolateImageBytesLinear(f,clipMin,clipMax,nx,dx,fx,ny,dy,fy) :
+          interpolateImageBytesNearest(f,clipMin,clipMax,nx,dx,fx,ny,dy,fy);
       }
+      ColorModel cm;
+      int[] bm;
       int[] i = new int[nxy];
       if (_nc==3) {
+        cm = new DirectColorModel(24,
+          0x00ff0000,
+          0x0000ff00,
+          0x000000ff);
+        bm = new int[]{
+          0x00ff0000,
+          0x0000ff00,
+          0x000000ff,
+        };
         byte[] b0 = b[0], b1 = b[1], b2 = b[2];
         for (int ixy=0; ixy<nxy; ++ixy)
-          i[ixy] = 0xff000000           | 
-                   ((b0[ixy]&0xff)<<16) | 
+          i[ixy] = ((b0[ixy]&0xff)<<16) | 
                    ((b1[ixy]&0xff)<< 8) | 
                    ((b2[ixy]&0xff)    );
       } else {
+        cm = new DirectColorModel(32,
+          0x00ff0000,
+          0x0000ff00,
+          0x000000ff, 
+          0xff000000);
+        bm = new int[]{
+          0x00ff0000,
+          0x0000ff00,
+          0x000000ff,
+          0xff000000,
+        };
         byte[] b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
         for (int ixy=0; ixy<nxy; ++ixy)
           i[ixy] = ((b3[ixy]&0xff)<<24) |
@@ -491,21 +511,10 @@ public class PixelsView extends TiledView {
                    ((b2[ixy]&0xff)    );
       }
       DataBuffer db = new DataBufferInt(i,nxy,0);
-      ColorModel colorModel = new DirectColorModel(32,
-        0x00ff0000,
-        0x0000ff00,
-        0x000000ff, 
-        0xff000000);
-      int[] bitMasks = new int[]{
-        0x00ff0000,
-        0x0000ff00,
-        0x000000ff,
-        0xff000000};
-      int dataType = DataBuffer.TYPE_INT;
-      SampleModel sm = new SinglePixelPackedSampleModel(
-        dataType,nx,ny,bitMasks);
+      int dt = DataBuffer.TYPE_INT;
+      SampleModel sm = new SinglePixelPackedSampleModel(dt,nx,ny,bm);
       WritableRaster wr = Raster.createWritableRaster(sm,db,null);
-      BufferedImage bi = new BufferedImage(colorModel,wr,false,null);
+      BufferedImage bi = new BufferedImage(cm,wr,false,null);
       g2d.drawImage(bi,xc,yc,null);
     }
   }
@@ -660,7 +669,7 @@ public class PixelsView extends TiledView {
    * buffered image.
    */
   private byte[] interpolateImageBytesLinear(
-    int ic,
+    float[][] f, float clipMin, float clipMax,
     int nx, double dx, double fx,
     int ny, double dy, double fy)
   {
@@ -711,7 +720,7 @@ public class PixelsView extends TiledView {
           float[] temp = temp1;
           temp1 = temp2;
           temp2 = temp;
-          interpx(ic,min(jy+1,_ny-1),nx,kf,wf,temp2);
+          interpx(f,clipMin,clipMax,min(jy+1,_ny-1),nx,kf,wf,temp2);
         }
 
         // Else if temp1 is still useful, make it temp2 and compute temp1.
@@ -719,13 +728,13 @@ public class PixelsView extends TiledView {
           float[] temp = temp1;
           temp1 = temp2;
           temp2 = temp;
-          interpx(ic,jy,nx,kf,wf,temp1);
+          interpx(f,clipMin,clipMax,jy,nx,kf,wf,temp1);
         }
 
         // Else compute both temp1 and temp2. */
         else {
-          interpx(ic,             jy,nx,kf,wf,temp1);
-          interpx(ic,min(jy+1,_ny-1),nx,kf,wf,temp2);
+          interpx(f,clipMin,clipMax,             jy,nx,kf,wf,temp1);
+          interpx(f,clipMin,clipMax,min(jy+1,_ny-1),nx,kf,wf,temp2);
         }                 
 
         // Remember index jy1 corresponding to temp1.
@@ -744,27 +753,27 @@ public class PixelsView extends TiledView {
    * Also maps _clipMin to 0.0f, and _clipMax to 255.0f.
    */
   private void interpx(
-    int ic, int jy, int nx, int[] kf, float[] wf, float[] t) 
+    float[][] f, float clipMin, float clipMax,
+    int jy, int nx, int[] kf, float[] wf, float[] t) 
   {
-    float[][] fc = _f[ic];
-    float fscale = 255.0f/(_clipMax[ic]-_clipMin[ic]);
-    float fshift = _clipMin[ic];
+    float fscale = 255.0f/(clipMax-clipMin);
+    float fshift = clipMin;
     if (_transposed) {
       if (_nx==1) {
-        float f0 = (fc[0][jy]-fshift)*fscale;
+        float fc = (f[0][jy]-fshift)*fscale;
         for (int ix=0; ix<nx; ++ix)
-          t[ix] = f0;
+          t[ix] = fc;
       } else {
         for (int ix=0; ix<nx; ++ix) {
           int kx = kf[ix];
           float wx = wf[ix];
-          float f1 = (fc[kx  ][jy]-fshift)*fscale;
-          float f2 = (fc[kx+1][jy]-fshift)*fscale;
+          float f1 = (f[kx  ][jy]-fshift)*fscale;
+          float f2 = (f[kx+1][jy]-fshift)*fscale;
           t[ix] = (1.0f-wx)*f1+wx*f2;
         }
       }
     } else {
-      float[] fjy = fc[jy];
+      float[] fjy = f[jy];
       if (_nx==1) {
         float f0 = (fjy[0]-fshift)*fscale;
         for (int ix=0; ix<nx; ++ix)
@@ -805,7 +814,7 @@ public class PixelsView extends TiledView {
    * color-mapped buffered image.
    */
   private byte[] interpolateImageBytesNearest(
-    int ic,
+    float[][] f, float clipMin, float clipMax,
     int nx, double dx, double fx,
     int ny, double dy, double fy)
   {
@@ -843,7 +852,7 @@ public class PixelsView extends TiledView {
 
       // If necessary, interpolate a new row of bytes.
       if (jy!=jytemp) {
-        interpx(ic,jy,nx,kf,temp);
+        interpx(f,clipMin,clipMax,jy,nx,kf,temp);
         jytemp = jy;
       }
 
@@ -858,14 +867,16 @@ public class PixelsView extends TiledView {
   /**
    * Nearest-neighbor interpolation of one row of sampled floats to pixels.
    */
-  private void interpx(int ic, int jy, int nx, int[] kf, byte[] b) {
-    float[][] fc = _f[ic];
-    float fscale = 255.0f/(_clipMax[ic]-_clipMin[ic]);
-    float fshift = _clipMin[ic];
+  private void interpx(
+    float[][] f, float clipMin, float clipMax, 
+    int jy, int nx, int[] kf, byte[] b) 
+  {
+    float fscale = 255.0f/(clipMax-clipMin);
+    float fshift = clipMin;
     if (_transposed) {
       for (int ix=0; ix<nx; ++ix) {
         int kx = kf[ix];
-        float fi = (fc[kx][jy]-fshift)*fscale;
+        float fi = (f[kx][jy]-fshift)*fscale;
         if (fi<0.0f)
           fi = 0.0f;
         if (fi>255.0f)
@@ -873,7 +884,7 @@ public class PixelsView extends TiledView {
         b[ix] = (byte)(fi+0.5f);
       }
     } else {
-      float[] fjy = fc[jy];
+      float[] fjy = f[jy];
       for (int ix=0; ix<nx; ++ix) {
         int kx = kf[ix];
         float fi = (fjy[kx]-fshift)*fscale;
