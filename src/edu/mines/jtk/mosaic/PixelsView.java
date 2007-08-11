@@ -466,8 +466,6 @@ public class PixelsView extends TiledView {
 
     // else, if three or four components (using direct color model) ...
     else {
-      int[] i = Array.fillint((new java.util.Random()).nextInt(),nxy);
-      /*
       byte[][] b = new byte[_nc][];
       for (int ic=0; ic<_nc; ++ic) {
         if (_interpolation==Interpolation.LINEAR) {
@@ -492,7 +490,6 @@ public class PixelsView extends TiledView {
                    ((b1[ixy]&0xff)<< 8) | 
                    ((b2[ixy]&0xff)    );
       }
-      */
       DataBuffer db = new DataBufferInt(i,nxy,0);
       ColorModel colorModel = new DirectColorModel(32,
         0x00ff0000,

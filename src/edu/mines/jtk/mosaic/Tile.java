@@ -245,7 +245,7 @@ public class Tile extends IPanel {
     // Set transcaler for the graphics rectangle.
     _ts = getTranscaler(w,h);
 
-    // Paint tiles.
+    // Paint tiled views.
     for (TiledView tv : _tvs) {
       Graphics2D gtv = (Graphics2D)g2d.create();
       tv.paint(gtv);
@@ -333,13 +333,18 @@ public class Tile extends IPanel {
    * Called by this tile's mosaic.
    */
   void setViewRect(DRectangle vr) {
-    _vr = new DRectangle(vr);
-    _vr.x = max(0.0,min(1.0,_vr.x));
-    _vr.y = max(0.0,min(1.0,_vr.y));
-    _vr.width = max(0.0,min(1.0-_vr.x,_vr.width));
-    _vr.height = max(0.0,min(1.0-_vr.y,_vr.height));
-    _ts.setMapping(_vr.x,_vr.y,_vr.x+_vr.width,_vr.y+_vr.height);
-    repaint();
+    if (_vr.x!=vr.x || 
+        _vr.y!=vr.y || 
+        _vr.width!=vr.width || 
+        _vr.height!=vr.height) {
+      _vr = new DRectangle(vr);
+      _vr.x = max(0.0,min(1.0,_vr.x));
+      _vr.y = max(0.0,min(1.0,_vr.y));
+      _vr.width = max(0.0,min(1.0-_vr.x,_vr.width));
+      _vr.height = max(0.0,min(1.0-_vr.y,_vr.height));
+      _ts.setMapping(_vr.x,_vr.y,_vr.x+_vr.width,_vr.y+_vr.height);
+      repaint();
+    }
   }
 
   /**
