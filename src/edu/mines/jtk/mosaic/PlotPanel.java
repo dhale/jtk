@@ -448,10 +448,11 @@ public class PlotPanel extends IPanel {
   public void setHLabel(int icol, String label) {
     if (_axesPlacement==AxesPlacement.LEFT_TOP) {
       _mosaic.getTileAxisTop(icol).setLabel(label);
-    } else {
+      adjustColorBar();
+    } else if (_axesPlacement==AxesPlacement.LEFT_BOTTOM) {
       _mosaic.getTileAxisBottom(icol).setLabel(label);
+      adjustColorBar();
     }
-    adjustColorBar();
   }
 
   /**
@@ -460,7 +461,9 @@ public class PlotPanel extends IPanel {
    * @param label the label.
    */
   public void setVLabel(int irow, String label) {
-    _mosaic.getTileAxisLeft(irow).setLabel(label);
+    if (_axesPlacement!=AxesPlacement.NONE) {
+      _mosaic.getTileAxisLeft(irow).setLabel(label);
+    }
   }
 
   /**
@@ -485,9 +488,9 @@ public class PlotPanel extends IPanel {
    * @param format the format.
    */
   public void setHFormat(int icol, String format) {
-    if (_orientation==Orientation.X1DOWN_X2RIGHT) {
+    if (_axesPlacement==AxesPlacement.LEFT_TOP) {
       _mosaic.getTileAxisTop(icol).setFormat(format);
-    } else {
+    } else if (_axesPlacement==AxesPlacement.LEFT_BOTTOM) {
       _mosaic.getTileAxisBottom(icol).setFormat(format);
     }
   }
@@ -498,7 +501,49 @@ public class PlotPanel extends IPanel {
    * @param format the format.
    */
   public void setVFormat(int irow, String format) {
-    _mosaic.getTileAxisLeft(irow).setFormat(format);
+    if (_axesPlacement!=AxesPlacement.NONE) {
+      _mosaic.getTileAxisLeft(irow).setFormat(format);
+    }
+  }
+
+  /**
+   * Sets the tic interval for the horizontal axis.
+   * @param interval the major labeled tic interval.
+   */
+  public void setHInterval(double interval) {
+    setHInterval(0,interval);
+  }
+
+  /**
+   * Sets the tic interval for the vertical axis.
+   * @param interval the major labeled tic interval.
+   */
+  public void setVInterval(double interval) {
+    setVInterval(0,interval);
+  }
+
+  /**
+   * Sets the tic interval for the horizontal axis in the specified column.
+   * @param icol the column index.
+   * @param interval the major labeled tic interval.
+   */
+  public void setHInterval(int icol, double interval) {
+    if (_axesPlacement==AxesPlacement.LEFT_TOP) {
+      _mosaic.getTileAxisTop(icol).setInterval(interval);
+    } else if (_axesPlacement==AxesPlacement.LEFT_BOTTOM) {
+      _mosaic.getTileAxisBottom(icol).setInterval(interval);
+    }
+  }
+
+  /**
+   * Sets the tic interval for the vertical axis in the specified column.
+   * @param irow the row index.
+   * @param interval the major labeled tic interval.
+   */
+  public void setVInterval(int irow, double interval) {
+    if (_axesPlacement!=AxesPlacement.NONE) {
+      _mosaic.getTileAxisLeft(irow).setInterval(interval);
+    }
   }
 
   /**
@@ -966,15 +1011,15 @@ public class PlotPanel extends IPanel {
     if (_colorBar!=null && _colorBarPixelsView!=null)
       _colorBarPixelsView.removeColorMapListener(_colorBar);
     _colorBarPixelsView = pv;
-    if (_orientation==Orientation.X1RIGHT_X2UP) {
-      _colorBarPixelsView.setOrientation(PixelsView.Orientation.X1RIGHT_X2UP);
-    } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      _colorBarPixelsView.setOrientation(PixelsView.Orientation.X1DOWN_X2RIGHT);
-    }
     if (_colorBar!=null)
       _colorBarPixelsView.addColorMapListener(_colorBar);
-    _mosaic.getTile(irow,icol).addTiledView(_colorBarPixelsView);
-    return _colorBarPixelsView;
+    if (_orientation==Orientation.X1RIGHT_X2UP) {
+      pv.setOrientation(PixelsView.Orientation.X1RIGHT_X2UP);
+    } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
+      pv.setOrientation(PixelsView.Orientation.X1DOWN_X2RIGHT);
+    }
+    _mosaic.getTile(irow,icol).addTiledView(pv);
+    return pv;
   }
 
   private PointsView addPointsView(int irow, int icol, PointsView pv) {
@@ -1007,6 +1052,8 @@ public class PlotPanel extends IPanel {
   /**
    * Called when the color bar in this panel may need resizing.
    * This implementation simply removes and adds any existing color bar.
+   * This method is necessary because we want the colorbar height to equal
+   * that of the tiles in the mosaic, but not including any tile axes.
    */
   private void adjustColorBar() {
     if (_colorBar!=null) {

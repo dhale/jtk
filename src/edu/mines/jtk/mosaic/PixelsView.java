@@ -17,36 +17,34 @@ import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
 
 /**
- * A view of a sampled functions f(x1,x2), displayed as a 2-D array of pixels.
- * Sample values are converted to pixel colors in two steps. In the first
- * step, sample values are converted to unsigned bytes in the range [0,255].
- * In the second, step, these bytes are converted to pixel colors, through
- * a specified color model.
+ * A view of sampled functions f(x1,x2), displayed as a 2-D array of pixels.
+ * Function values are converted to pixel colors in two steps. In the first
+ * step, these values are converted to unsigned bytes in the range [0,255].
+ * In the second step, those bytes are converted to pixel colors.
  * <p>
- * The first step is a mapping from sample values to unsigned byte values.
+ * The first step is a mapping from function values to unsigned byte values.
  * This mapping is linear, except for clipping, which ensures that no byte 
  * value lies outside the range [0,255]. The linear mapping is defined by 
  * two clip values, clipMin and clipMax. The minimum clip value clipMin 
- * corresponds to byte index 0, and the maximum clip value clipMax 
- * corresponds to byte index 255. Sample values less than clipMin are 
- * mapped to byte index 0; sample values greater than clipMax are mapped 
- * to byte index 255.
+ * corresponds to byte value 0, and the maximum clip value clipMax 
+ * corresponds to byte value 255. Sample values less than clipMin are 
+ * mapped to 0; sample values greater than clipMax are mapped to 255.
  * <p>
- * Pixel byte values are computed for every pixel displayed by this view. 
- * Because the view typically contains more (or fewer) pixels than samples, 
- * this first mapping often requires interpolation between sampled values of 
- * the function f(x1,x2). Either linear or nearest-neighbor interpolation
- * may be specified for this first step.
+ * Byte values are computed for every pixel displayed by this view. Because 
+ * the view typically contains more pixels than samples, this first mapping 
+ * often requires interpolation between sampled values of functions f(x1,x2). 
+ * Either linear or nearest-neighbor interpolation may be specified for this 
+ * first step.
  * <p>
- * The second step depends on the number of sampled functions specified,
- * either one, three or four. For one function, the byte values are indices 
- * for a table of 256 colors (a color map) in a specified index color model.
+ * The second step depends on the number (one, three, or four) of sampled 
+ * functions specified. For one function, the byte values are indices for 
+ * a table of 256 colors (a color map) in a specified index color model.
  * See {@link edu.mines.jtk.awt.ColorMap} for more details.
  * <p>
- * For three (or four) functions, the byte values are interpreted directly
- * as color components red, green, and blue (and alpha). In this case, any
- * indexed color model specified is not used. The number of color components
- * equals the number of sampled functions specified.
+ * For three (or four) sampled functions, the byte values are interpreted 
+ * directly as color components red, green, and blue (and alpha). In this 
+ * case, any indexed color model specified is not used. The number of color 
+ * components equals the number of sampled functions specified.
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.09.27
@@ -77,8 +75,8 @@ public class PixelsView extends TiledView {
   /**
    * Constructs a pixels view of the specified sampled function f(x1,x2).
    * Assumes zero first sample values and unit sampling intervals.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
-   *  n1 = f[0].length and n2 = f.length.
+   * Function values are converted to colors using an index color model.
+   * @param f array[n2][n1] of sampled function values f(x1,x2).
    */
   public PixelsView(float[][] f) {
     this(new float[][][]{f});
@@ -87,9 +85,9 @@ public class PixelsView extends TiledView {
   /**
    * Constructs a pixels view of the specified sampled functions f(x1,x2).
    * Assumes zero first sample values and unit sampling intervals.
-   * @param f array[nc][n2][n1] of sampled function values f(x1,x2), where 
-   *  n1 = f[0].length, n2 = f.length, and nc is the number of functions
-   *  to be mapped to colors, either one, three, or four.
+   * Function values are converted to colors using a direct color model.
+   * @param f array[nc][n2][n1] of sampled function values f(x1,x2),
+   *  where nc is the number (three or four) of color components.
    */
   public PixelsView(float[][][] f) {
     set(f);
@@ -97,10 +95,10 @@ public class PixelsView extends TiledView {
 
   /**
    * Constructs a pixels view of the specified sampled function f(x1,x2).
+   * Function values are converted to colors using an index color model.
    * @param s1 the sampling of the variable x1; must be uniform.
    * @param s2 the sampling of the variable x2; must be uniform.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), where
-   *  n1 and n2 denote the number of samples in s1 and s2, respectively.
+   * @param f array[n2][n1] of sampled function values f(x1,x2).
    */
   public PixelsView(Sampling s1, Sampling s2, float[][] f) {
     this(s1,s2,new float[][][]{f});
@@ -109,11 +107,11 @@ public class PixelsView extends TiledView {
   /**
    * Constructs a pixels view of the specified sampled functions f(x1,x2).
    * Assumes zero first sample values and unit sampling intervals.
+   * Function values are converted to colors using a direct color model.
    * @param s1 the sampling of the variable x1; must be uniform.
    * @param s2 the sampling of the variable x2; must be uniform.
-   * @param f array[nc][n2][n1] of sampled function values f(x1,x2), where 
-   *  n1 = f[0].length, n2 = f.length, and nc is the number of functions
-   *  to be mapped to colors, either one, three, or four.
+   * @param f array[nc][n2][n1] of sampled function values f(x1,x2),
+   *  where nc is the number (three or four) of color components.
    */
   public PixelsView(Sampling s1, Sampling s2, float[][][] f) {
     set(s1,s2,f);
@@ -121,9 +119,11 @@ public class PixelsView extends TiledView {
 
   /**
    * Sets the sampled function f(x1,x2) for this view.
-   * Assumes zero first sample values and unit sampling intervals.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
-   *  n1 = f[0].length and n2 = f.length.
+   * If compatible samplings for x1 and x2 have already been specified, 
+   * then this method uses them. Otherwise, this method assumes zero 
+   * first sample values and unit sampling intervals.
+   * Function values are converted to colors using an index color model.
+   * @param f array[n2][n1] of sampled function values f(x1,x2).
    */
   public void set(float[][] f) {
     set(new float[][][]{f});
@@ -131,21 +131,28 @@ public class PixelsView extends TiledView {
 
   /**
    * Sets the sampled functions f(x1,x2) for this view.
-   * Assumes zero first sample values and unit sampling intervals.
-   * @param f array[nc][n2][n1] of sampled function values f(x1,x2), where 
-   *  n1 = f[0].length, n2 = f.length, and nc is the number of functions
-   *  to be mapped to colors, either one, three, or four.
+   * If compatible samplings for x1 and x2 have already been specified, 
+   * then this method uses them. Otherwise, this method assumes zero 
+   * first sample values and unit sampling intervals.
+   * Function values are converted to colors using a direct color model.
+   * @param f array[nc][n2][n1] of sampled function values f(x1,x2),
+   *  where nc is the number (three or four) of color components.
    */
   public void set(float[][][] f) {
-    set(new Sampling(f[0][0].length),new Sampling(f[0].length),f);
+    if (_s1!=null && _s1.getCount()==f[0][0].length &&
+        _s2!=null && _s2.getCount()==f[0].length) {
+      set(_s1,_s2,f);
+    } else {
+      set(new Sampling(f[0][0].length),new Sampling(f[0].length),f);
+    }
   }
 
   /**
    * Sets the sampled function f(x1,x2) for this view.
+   * Function values are converted to colors using an index color model.
    * @param s1 the sampling of the variable x1; must be uniform.
    * @param s2 the sampling of the variable x2; must be uniform.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), where
-   *  n1 and n2 denote the number of samples in s1 and s2, respectively.
+   * @param f array[n2][n1] of sampled function values f(x1,x2).
    */
   public void set(Sampling s1, Sampling s2, float[][] f) {
     set(s1,s2,new float[][][]{f});
@@ -153,11 +160,12 @@ public class PixelsView extends TiledView {
 
   /**
    * Sets the sampled functions f(x1,x2) for this view.
+   * Function values are converted to colors using a direct color model.
    * @param s1 the sampling of the variable x1; must be uniform.
    * @param s2 the sampling of the variable x2; must be uniform.
-   * @param f array[nc][n2][n1] of sampled function values f(x1,x2), where
-   *  n1 and n2 denote the number of samples in s1 and s2, respectively,
-   *  and nc denotes the number of functions to be mapped to colors.
+   * @param f array[nc][n2][n1] of sampled function values f(x1,x2),
+   *  where nc is the number (three or four) of color components.
+   *  This number must equal that when this view was constructed.
    */
   public void set(Sampling s1, Sampling s2, float[][][] f) {
     Check.argument(s1.isUniform(),"s1 is uniform");
@@ -165,16 +173,19 @@ public class PixelsView extends TiledView {
     Check.argument(Array.isRegular(f),"f is regular");
     Check.argument(s1.getCount()==f[0][0].length,"s1 consistent with f");
     Check.argument(s2.getCount()==f[0].length,"s2 consistent with f");
-    Check.argument(
-      f.length==1 || f.length==3 || f.length==4,
+    Check.argument(_nc!=0 || f.length==1 || f.length==3 || f.length==4,
       "number of sampled functions is one, three, or four");
+    Check.argument(_nc==0 || _nc==f.length,
+      "number of sampled functions is same as when view constructed");
     _nc = f.length;
     _s1 = s1;
     _s2 = s2;
     _f = Array.copy(f);
-    _clips = new Clips[_nc];
-    for (int ic=0; ic<_nc; ++ic)
-      _clips[ic] = new Clips(_f[ic]);
+    if (_clips==null) {
+      _clips = new Clips[_nc];
+      for (int ic=0; ic<_nc; ++ic)
+        _clips[ic] = new Clips(_f[ic]);
+    }
     _clipMin = new float[_nc];
     _clipMax = new float[_nc];
     updateSampling();
@@ -222,9 +233,9 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Sets the index color model for this view.
-   * The default color model is a black-to-white gray model.
-   * This index color model is not used for three or four components.
+   * Sets the index color model for this view. For three or four color
+   * components, a direct color model is used instead of this index color 
+   * model. The default color model is a black-to-white gray model.
    * @param colorModel the index color model.
    */
   public void setColorModel(IndexColorModel colorModel) {
@@ -233,8 +244,9 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Gets the index color model used for this view.
-   * @return the index color model; null, of more than one component.
+   * Gets the index color model for this view.
+   * @return the index color model; null, if a direct color model is being 
+   * used (for multiple color components) instead of an index color model.
    */
   public IndexColorModel getColorModel() {
     return (_nc==1)?_colorMap.getColorModel():null;
@@ -244,31 +256,35 @@ public class PixelsView extends TiledView {
    * Sets the clips for this view. A pixels view maps values of the sampled 
    * function f(x1,x2) to bytes, which are then used as indices into a 
    * specified color model. This mapping from sample values to byte indices 
-   * is linear, and so depends on only these two clip values. The minimum clip 
+   * is linear, and depends on only these two clip values. The minimum clip 
    * value corresponds to byte index 0, and the maximum clip value corresponds 
    * to byte index 255. Sample values outside of the range (clipMin,clipMax)
    * are clipped to lie inside this range.
    * <p>
    * Calling this method disables the computation of clips from percentiles.
    * Any clip values computed or specified previously will be forgotten.
+   * <p>
+   * If multiple color components, sets clips for all components.
    * @param clipMin the sample value corresponding to color model index 0.
    * @param clipMax the sample value corresponding to color model index 255.
    */
   public void setClips(float clipMin, float clipMax) {
-    _clips[0].setClips(clipMin,clipMax);
-    repaint();
+    for (int ic=0; ic<_nc; ++ic)
+      setClips(ic,clipMin,clipMax);
   }
 
   /**
-   * Gets the minimum clip value.
+   * Gets the minimum clip value. If multiple color components, gets the 
+   * minimum clip value for only the first color component.
    * @return the minimum clip value.
    */
   public float getClipMin() {
-    return _clips[0].getClipMin();
+    return getClipMin(0);
   }
 
   /**
-   * Gets the maximum clip value.
+   * Gets the maximum clip value. If multiple color components, gets the 
+   * maximum clip value for only the first color component.
    * @return the maximum clip value.
    */
   public float getClipMax() {
@@ -282,16 +298,19 @@ public class PixelsView extends TiledView {
    * <p>
    * Calling this method enables the computation of clips from percentiles.
    * Any clip values specified or computed previously will be forgotten.
+   * <p>
+   * If multiple color components, sets percentiles for all components.
    * @param percMin the percentile corresponding to clipMin.
    * @param percMax the percentile corresponding to clipMax.
    */
   public void setPercentiles(float percMin, float percMax) {
-    _clips[0].setPercentiles(percMin,percMax);
-    repaint();
+    for (int ic=0; ic<_nc; ++ic)
+      setPercentiles(ic,percMin,percMax);
   }
 
   /**
-   * Gets the minimum percentile.
+   * Gets the minimum percentile. If multiple color components, gets the
+   * minimum percentile for only the first color component.
    * @return the minimum percentile.
    */
   public float getPercentileMin() {
@@ -299,7 +318,8 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Gets the maximum percentile.
+   * Gets the maximum percentile. If multiple color components, gets the
+   * maximum percentile for only the first color component.
    * @return the maximum percentile.
    */
   public float getPercentileMax() {
@@ -307,19 +327,20 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Sets the clips for the specified component.
-   * @param ic the index of the component.
+   * Sets the clips for the specified color component.
+   * @param ic the index (0, 1, 2, or 3) of the color component.
    * @param clipMin the sample value corresponding to byte value 0.
    * @param clipMax the sample value corresponding to byte value 255.
    */
   public void setClips(int ic, float clipMin, float clipMax) {
+    checkComponent(ic);
     _clips[ic].setClips(clipMin,clipMax);
     repaint();
   }
 
   /**
-   * Gets the minimum clip value for the specified component.
-   * @param ic the index of the component.
+   * Gets the minimum clip value for the specified color component.
+   * @param ic the index (0, 1, 2, or 3) of the color component.
    * @return the minimum clip value.
    */
   public float getClipMin(int ic) {
@@ -327,8 +348,8 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Gets the maximum clip value for the specified component.
-   * @param ic the index of the component.
+   * Gets the maximum clip value for the specified color component.
+   * @param ic the index (0, 1, 2, or 3) of the color component.
    * @return the maximum clip value.
    */
   public float getClipMax(int ic) {
@@ -336,8 +357,8 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Sets the percentiles for the specified component.
-   * @param ic the index of the component.
+   * Sets the percentiles for the specified color component.
+   * @param ic the index (0, 1, 2, or 3) of the color component.
    * @param percMin the percentile corresponding to clipMin.
    * @param percMax the percentile corresponding to clipMax.
    */
@@ -347,8 +368,8 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Gets the minimum percentile for the specified component.
-   * @param ic the index of the component.
+   * Gets the minimum percentile for the specified color component.
+   * @param ic the index (0, 1, 2, or 3) of the color component.
    * @return the minimum percentile.
    */
   public float getPercentileMin(int ic) {
@@ -356,8 +377,8 @@ public class PixelsView extends TiledView {
   }
 
   /**
-   * Gets the maximum percentile for the specified component.
-   * @param ic the index of the component.
+   * Gets the maximum percentile for the specified color component.
+   * @param ic the index (0, 1, 2, or 3) of the color component.
    * @return the maximum percentile.
    */
   public float getPercentileMax(int ic) {
@@ -553,6 +574,10 @@ public class PixelsView extends TiledView {
   private double _dy;
   private double _fy;
 
+  private void checkComponent(int ic) {
+    Check.argument(ic<_nc,"valid index for color component");
+  }
+
   /**
    * Update the clips if necessary.
    */
@@ -568,7 +593,7 @@ public class PixelsView extends TiledView {
         _clipMin[ic] = clipMin;
         _clipMax[ic] = clipMax;
         if (_nc==1)
-          _colorMap.setValueRange(_clipMin[ic],_clipMax[ic]);
+          _colorMap.setValueRange(clipMin,clipMax);
       }
     }
   }
@@ -750,7 +775,7 @@ public class PixelsView extends TiledView {
 
   /**
    * Linear interpolation of one row of sampled floats to pixel resolution.
-   * Also maps _clipMin to 0.0f, and _clipMax to 255.0f.
+   * Also maps clipMin to 0.0f, and clipMax to 255.0f.
    */
   private void interpx(
     float[][] f, float clipMin, float clipMax,

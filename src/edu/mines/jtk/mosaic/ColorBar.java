@@ -95,10 +95,10 @@ public class ColorBar extends IPanel implements ColorMapListener {
       _pixels = new PixelsView(va);
       _pixels.setOrientation(PixelsView.Orientation.X1RIGHT_X2UP);
       _pixels.setInterpolation(PixelsView.Interpolation.LINEAR);
-      _pixels.setClips(vmin,vmax);
       _tile.addTiledView(_pixels);
     }
     IndexColorModel icm = ColorMap.makeIndexColorModel(ca);
+    _pixels.setClips(vmin,vmax);
     _pixels.setColorModel(icm);
     Sampling s1 = new Sampling(1);
     Sampling s2 = vs;
