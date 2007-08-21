@@ -44,7 +44,7 @@ public class AtomicFloat extends Number implements java.io.Serializable {
 
   /**
    * Sets the value of this float.
-   * @param the new value.
+   * @param value the new value.
    */
   public final void set(float value) {
     _ai.set(i(value));

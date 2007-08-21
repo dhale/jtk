@@ -322,7 +322,9 @@ public class LocalCorrelationFilter {
 
   /**
    * Normalizes the cross-correlation for a specified lag.
-   * @param lag the lag.
+   * @param lag1 the lag in the 1st dimension.
+   * @param lag2 the lag in the 2nd dimension.
+   * @param lag3 the lag in the 3rd dimension.
    * @param c the cross-correlation to be modified.
    */
   public void normalize(int lag1, int lag2, int lag3, float[][][] c) {

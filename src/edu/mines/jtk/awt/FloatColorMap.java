@@ -115,8 +115,8 @@ public class FloatColorMap extends ColorMap {
   /**
    * Sets hue values corresponding to byte values 0 and 255.
    * These hues are used only when HSB components are enabled.
-   * @param h000 hue corresponding to byte value 0; default is 0.00 (red).
-   * @param h255 hue corresponding to byte value 255; default is 0.67 (blue).
+   * @param hue000 hue corresponding to byte value 0; default is 0.00 (red).
+   * @param hue255 hue corresponding to byte value 255; default is 0.67 (blue).
    */
   public void setHues(double hue000, double hue255) {
     _hue000 = (float)hue000;
@@ -179,7 +179,7 @@ public class FloatColorMap extends ColorMap {
 
   /**
    * Gets the color index corresponding to the specified value.
-   * @param f the value to be mapped to index.
+   * @param v the value to be mapped to index.
    * @return the index in the range [0,255].
    */
   public int getIndex(double v) {

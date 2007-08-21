@@ -159,7 +159,7 @@ public class FloatByteMap {
 
   /**
    * Gets byte values corresponding to specified float values.
-   * @param f input array of float values to be mapped.
+   * @param f3 input array of float values to be mapped.
    * @param b output array of unsigned byte values in the range [0,255].
    */
   public void getBytes(Float3 f3, byte[][][] b) {
@@ -175,7 +175,7 @@ public class FloatByteMap {
 
   /**
    * Gets byte values corresponding to specified float values.
-   * @param f input array of float values to be mapped.
+   * @param f3 input array of float values to be mapped.
    * @param b output array of unsigned byte values in the range [0,255].
    */
   public void getBytes(Float3 f3, byte[] b) {
