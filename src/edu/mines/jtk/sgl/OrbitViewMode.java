@@ -100,8 +100,10 @@ public class OrbitViewMode extends Mode {
         }
         view.setProjection(projection);
       
+      } 
+      
       // Scale.
-      } else if (e.isControlDown()) {
+      else if (e.isControlDown() || e.isAltDown()) { // Alt/Option for Mac
         double scale = view.getScale();
         if (kc==KeyEvent.VK_UP) {
           scale *= 0.9;
@@ -109,10 +111,10 @@ public class OrbitViewMode extends Mode {
           scale *= 1.1;
         }
         view.setScale(scale);
-      } else 
+      }
       
       // Translate.
-      if (e.isShiftDown()) {
+      else if (e.isShiftDown()) {
         Matrix44 viewToCube = _canvas.getViewToCube();
         Matrix44 unitSphereToView = _view.getUnitSphereToView();
         Matrix44 unitSphereToCube = viewToCube.times(unitSphereToView);
@@ -158,7 +160,7 @@ public class OrbitViewMode extends Mode {
 
   private MouseListener _ml = new MouseAdapter() {
     public void mousePressed(MouseEvent e) {
-      if (e.isControlDown()) {
+      if (e.isControlDown() || e.isAltDown()) { // Alt/Option for Mac
         beginScale(e);
         _scaling = true;
       } else if (e.isShiftDown()) {

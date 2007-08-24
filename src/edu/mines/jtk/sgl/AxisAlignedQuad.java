@@ -91,7 +91,7 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
       Plane plane = new Plane(origin,normal);
       MouseEvent event = dc.getMouseEvent();
       Matrix44 worldToPixel = dc.getWorldToPixel();
-      if (event.isControlDown()) {
+      if (event.isControlDown() || event.isAltDown()) { // Alt/Option for Mac
         _mouseConstrained = new MouseOnLine(event,origin,normal,worldToPixel);
       } else {
         _mouseConstrained = new MouseOnPlane(event,origin,plane,worldToPixel);

@@ -97,7 +97,7 @@ public class SelectDragMode extends Mode {
       else if (_selecting) {
 
         // If control select, toggle selection of the picked node.
-        if (e.isControlDown()) {
+        if (e.isControlDown() || e.isAltDown()) { // Alt/Option for Mac
           if (_selectable!=null)
             _selectable.setSelected(!_selectable.isSelected());
         }
