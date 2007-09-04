@@ -232,6 +232,23 @@ public class ColorMap {
   }
 
   /**
+   * Gets a linear gray color model for the specified gray levels. Gray
+   * levels equal to 0.0 and 1.0 correspond to colors black and white, 
+   * respectively.
+   * @param g0 the gray level corresponding to index value 0.
+   * @param g255 the gray level corresponding to index value 255.
+   * @return the color model.
+   */
+  public static IndexColorModel getGray(double g0, double g255, double alpha) {
+    Color[] c = new Color[256];
+    for (int i=0; i<256; ++i) {
+      float g = (float)(g0+i*(g255-g0)/255.0);
+      c[i] = new Color(g,g,g,(float)alpha);
+    }
+    return makeIndexColorModel(c);
+  }
+
+  /**
    * Gets a red-to-blue color model like Matlab's jet color map.
    * @return the color model.
    */
@@ -254,6 +271,34 @@ public class ColorMap {
       } else {
         float a = (x-0.875f)/0.125f;
         c[i] = new Color(1.0f-0.5f*a,0.0f,0.0f);
+      }
+    }
+    return makeIndexColorModel(c);
+  }
+
+  /**
+   * Gets a red-to-blue color model like Matlab's jet color map.
+   * @return the color model.
+   */
+  public static IndexColorModel getJet(double alpha) {
+    Color[] c = new Color[256];
+    for (int i=0; i<256; ++i) {
+      float x = (float)i/255.0f;
+      if (x<0.125f) {
+        float a = x/0.125f;
+        c[i] = new Color(0.0f,0.0f,0.5f+0.5f*a,(float)alpha);
+      } else if (x<0.375f) {
+        float a = (x-0.125f)/0.25f;
+        c[i] = new Color(0.0f,a,1.0f,(float)alpha);
+      } else if (x<0.625f) {
+        float a = (x-0.375f)/0.25f;
+        c[i] = new Color(a,1.0f,1.0f-a,(float)alpha);
+      } else if (x<0.875f) {
+        float a = (x-0.625f)/0.25f;
+        c[i] = new Color(1.0f,1.0f-a,0.0f,(float)alpha);
+      } else {
+        float a = (x-0.875f)/0.125f;
+        c[i] = new Color(1.0f-0.5f*a,0.0f,0.0f,(float)alpha);
       }
     }
     return makeIndexColorModel(c);
@@ -317,7 +362,13 @@ public class ColorMap {
    * @return the index color model.
    */
   public static IndexColorModel makeIndexColorModel(Color[] c) {
-    return new IndexColorModel(8,256,getReds(c),getGreens(c),getBlues(c));
+    if (hasAlpha(c)) {
+      return new IndexColorModel(8,256,
+        getReds(c),getGreens(c),getBlues(c));
+    } else {
+      return new IndexColorModel(8,256,
+        getReds(c),getGreens(c),getBlues(c),getAlphas(c));
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -364,6 +415,22 @@ public class ColorMap {
     for (int i=0; i<n; ++i)
       b[i] = (byte)color[i].getBlue();
     return b;
+  }
+
+  private static byte[] getAlphas(Color[] color) {
+    int n = color.length;
+    byte[] b = new byte[n];
+    for (int i=0; i<n; ++i)
+      b[i] = (byte)color[i].getAlpha();
+    return b;
+  }
+
+  private static boolean hasAlpha(Color[] color) {
+    int n = color.length;
+    for (int i=0; i<n; ++i)
+      if (color[i].getAlpha()!=255)
+        return true;
+    return false;
   }
 
   private static byte[] getBytes(float[] f) {

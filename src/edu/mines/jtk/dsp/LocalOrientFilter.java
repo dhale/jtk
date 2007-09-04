@@ -60,7 +60,7 @@ public class LocalOrientFilter {
 
   /**
    * Constructs a filter with an isotropic Gaussian window.
-   * @param sigma width of window; same for all dimensions.
+   * @param sigma half-width of window; same for all dimensions.
    */
   public LocalOrientFilter(double sigma) {
     this(sigma,sigma,sigma);
@@ -69,8 +69,8 @@ public class LocalOrientFilter {
   
   /**
    * Constructs a filter with a possibly anisotropic Gaussian window.
-   * @param sigma1 width of window in 1st dimension.
-   * @param sigma2 width of window in 2nd and higher dimensions.
+   * @param sigma1 half-width of window in 1st dimension.
+   * @param sigma2 half-width of window in 2nd and higher dimensions.
    */
   public LocalOrientFilter(double sigma1, double sigma2) {
     this(sigma1,sigma2,sigma2);
@@ -78,18 +78,74 @@ public class LocalOrientFilter {
 
   /**
    * Constructs a filter with a possibly anisotropic Gaussian window.
-   * @param sigma1 width of window in 1st dimension.
-   * @param sigma2 width of window in 2nd dimension.
-   * @param sigma3 width of window in 3rd and higher dimensions.
+   * @param sigma1 half-width of window in 1st dimension.
+   * @param sigma2 half-width of window in 2nd dimension.
+   * @param sigma3 half-width of window in 3rd and higher dimensions.
    */
   public LocalOrientFilter(double sigma1, double sigma2, double sigma3) {
-    _sigma1 = sigma1;
-    _sigma2 = sigma2;
-    _sigma3 = sigma3;
-    _rgfGradient = new RecursiveGaussianFilter(1.0);
-    _rgfSmoother1 = new RecursiveGaussianFilter(_sigma1);
-    _rgfSmoother2 = new RecursiveGaussianFilter(_sigma2);
-    _rgfSmoother3 = new RecursiveGaussianFilter(_sigma3);
+    _rgfSmoother1 = new RecursiveGaussianFilter(sigma1);
+    if (sigma2==sigma1) {
+      _rgfSmoother2 = _rgfSmoother1;
+    } else {
+      _rgfSmoother2 = new RecursiveGaussianFilter(sigma2);
+    }
+    if (sigma3==sigma2) {
+      _rgfSmoother3 = _rgfSmoother2;
+    } else {
+      _rgfSmoother3 = new RecursiveGaussianFilter(sigma3);
+    }
+    setGradientSmoothing(1.0);
+  }
+
+  /**
+   * Sets half-width of Gaussian derivative filter used to compute gradients.
+   * Typically, this half-width should not exceed one-fourth that of the
+   * the corresponding Gaussian window used to compute local averages of 
+   * gradient products.
+   * The default half-width for Gaussian derivatives is 1.0.
+   * @param sigma half-width of derivatives; same for all dimensions.
+   */
+  public void setGradientSmoothing(double sigma) {
+    setGradientSmoothing(sigma,sigma,sigma);
+  }
+
+  /**
+   * Sets half-widths of Gaussian derivative filters used to compute gradients.
+   * Typically, these half-widths should not exceed one-fourth those of the
+   * the corresponding Gaussian windows used to compute local averages of 
+   * gradient-squared tensors.
+   * The default half-widths for Gaussian derivatives is 1.0.
+   * @param sigma1 half-width of derivative in 1st dimension.
+   * @param sigma2 half-width of derivatives in 2nd and higher dimensions.
+   */
+  public void setGradientSmoothing(double sigma1, double sigma2) {
+    setGradientSmoothing(sigma1,sigma2,sigma2);
+  }
+
+  /**
+   * Sets half-widths of Gaussian derivative filters used to compute gradients.
+   * Typically, these half-widths should not exceed one-fourth those of the
+   * the corresponding Gaussian windows used to compute local averages of 
+   * gradient-squared tensors.
+   * The default half-widths for Gaussian derivatives is 1.0.
+   * @param sigma1 half-width of derivative in 1st dimension.
+   * @param sigma2 half-width of derivative in 2nd dimension.
+   * @param sigma3 half-width of derivatives in 3rd and higher dimensions.
+   */
+  public void setGradientSmoothing(
+    double sigma1, double sigma2, double sigma3) 
+  {
+    _rgfGradient1 = new RecursiveGaussianFilter(sigma1);
+    if (sigma2==sigma1) {
+      _rgfGradient2 = _rgfGradient1;
+    } else {
+      _rgfGradient2 = new RecursiveGaussianFilter(sigma2);
+    }
+    if (sigma3==sigma2) {
+      _rgfGradient3 = _rgfGradient2;
+    } else {
+      _rgfGradient3 = new RecursiveGaussianFilter(sigma3);
+    }
   }
   
   /**
@@ -176,8 +232,8 @@ public class LocalOrientFilter {
     int n2 = x.length;
     float[][] g1 = (nt>0)?t[0]:new float[n2][n1];
     float[][] g2 = (nt>1)?t[1]:new float[n2][n1];
-    _rgfGradient.apply1X(x,g1);
-    _rgfGradient.applyX1(x,g2);
+    _rgfGradient1.apply1X(x,g1);
+    _rgfGradient2.applyX1(x,g2);
 
     // Gradient products.
     float[][] g11 = g1;
@@ -389,9 +445,9 @@ public class LocalOrientFilter {
     float[][][] g1 = (nt>0)?t[0]:new float[n3][n2][n1];
     float[][][] g2 = (nt>1)?t[1]:new float[n3][n2][n1];
     float[][][] g3 = (nt>2)?t[2]:new float[n3][n2][n1];
-    _rgfGradient.apply1XX(x,g1);
-    _rgfGradient.applyX1X(x,g2);
-    _rgfGradient.applyXX1(x,g3);
+    _rgfGradient1.apply1XX(x,g1);
+    _rgfGradient2.applyX1X(x,g2);
+    _rgfGradient3.applyXX1(x,g3);
 
     // Gradient products.
     float[][][] g11 = g1;
@@ -492,10 +548,9 @@ public class LocalOrientFilter {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private double _sigma1;
-  private double _sigma2;
-  private double _sigma3;
-  private RecursiveGaussianFilter _rgfGradient;
+  private RecursiveGaussianFilter _rgfGradient1;
+  private RecursiveGaussianFilter _rgfGradient2;
+  private RecursiveGaussianFilter _rgfGradient3;
   private RecursiveGaussianFilter _rgfSmoother1;
   private RecursiveGaussianFilter _rgfSmoother2;
   private RecursiveGaussianFilter _rgfSmoother3;
