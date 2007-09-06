@@ -139,6 +139,10 @@ public class ColorBar extends IPanel implements ColorMapListener {
     paintToRect((Graphics2D)g,0,0,getWidth(),getHeight());
   }
 
+  protected Mosaic getMosaic() {
+    return _mosaic;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 

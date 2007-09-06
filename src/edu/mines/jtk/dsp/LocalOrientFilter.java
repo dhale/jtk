@@ -206,7 +206,7 @@ public class LocalOrientFilter {
    * @param v2 2nd component of 2nd eigenvector.
    * @param eu largest eigenvalue corresponding to the eigenvector u.
    * @param ev smallest eigenvalue corresponding to the eigenvector v.
-   * @param el (eu-ev)/(eu+ev), a measure of linearity.
+   * @param el (eu-ev)/eu, a measure of linearity.
    */
   public void apply(float[][] x,
     float[][] theta,
@@ -407,8 +407,8 @@ public class LocalOrientFilter {
    * @param eu largest eigenvalue corresponding to the eigenvector u.
    * @param ev middle eigenvalue corresponding to the eigenvector v.
    * @param ew smallest eigenvalue corresponding to the eigenvector w.
-   * @param ep (eu-ev)/(eu+ew), a measure of planarity.
-   * @param el (ev-ew)/(eu+ew), a measure of linearity.
+   * @param ep (eu-ev)/eu, a measure of planarity.
+   * @param el (ev-ew)/eu, a measure of linearity.
    */
   public void apply(float[][][] x,
     float[][][] theta, float[][][] phi,
