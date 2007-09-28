@@ -181,9 +181,11 @@ public class PixelsView extends TiledView {
     _s1 = s1;
     _s2 = s2;
     _f = Array.copy(f);
-    _clips = new Clips[_nc];
-    for (int ic=0; ic<_nc; ++ic)
-      _clips[ic] = new Clips(_f[ic]);
+    if (_clips==null) {
+      _clips = new Clips[_nc];
+      for (int ic=0; ic<_nc; ++ic)
+        _clips[ic] = new Clips(_f[ic]);
+    }
     _clipMin = new float[_nc];
     _clipMax = new float[_nc];
     updateSampling();
