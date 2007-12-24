@@ -9,9 +9,6 @@ package edu.mines.jtk.dsp;
 import edu.mines.jtk.util.Array;
 import static edu.mines.jtk.util.MathPlus.*;
 
-
-import edu.mines.jtk.util.Check;
-
 /**
  * Local estimates of orientations of features in images.
  * Methods of this class can compute for each image sample numerous

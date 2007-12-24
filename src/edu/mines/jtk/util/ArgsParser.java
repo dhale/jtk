@@ -336,11 +336,11 @@ public class ArgsParser {
     throw new OptionException("option --"+opt+" not recognized");
   }
 
-  private static String[] getStrings(ArrayList list) {
+  private static String[] getStrings(ArrayList<String> list) {
     int n = list.size();
     String[] a = new String[n];
     for (int i=0; i<n; ++i)
-      a[i] = (String)list.get(i);
+      a[i] = list.get(i);
     return a;
   }
 }

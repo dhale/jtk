@@ -192,8 +192,8 @@ public class ImagePanelGroup extends Group {
   // private
 
   // Sampled floats in an abstract 3-D array.
-  private Sampling _sx,_sy,_sz;
-  private Float3 _f3;
+  //private Sampling _sx,_sy,_sz;
+  //private Float3 _f3;
 
   // List of image panels.
   private ArrayList<ImagePanel> _ipList;
@@ -207,10 +207,10 @@ public class ImagePanelGroup extends Group {
   private void addPanels(
     Sampling sx, Sampling sy, Sampling sz, Float3 f3, Axis[] axes) 
   {
-    _sx = sx;
-    _sy = sy;
-    _sz = sz;
-    _f3 = f3;
+    //_sx = sx;
+    //_sy = sy;
+    //_sz = sz;
+    //_f3 = f3;
     int nx = sx.getCount();
     int ny = sy.getCount();
     int nz = sz.getCount();

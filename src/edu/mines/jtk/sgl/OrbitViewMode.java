@@ -29,7 +29,7 @@ public class OrbitViewMode extends Mode {
   public OrbitViewMode(ModeManager modeManager) {
     super(modeManager);
     setName("View");
-    Class cls = OrbitViewMode.class;
+    Class<OrbitViewMode> cls = OrbitViewMode.class;
     setIcon(loadIcon(cls,"resources/ViewHandIcon16.png"));
     setCursor(loadCursor(cls,"resources/ViewHandCursor16.png",3,2));
     setMnemonicKey(KeyEvent.VK_SPACE);

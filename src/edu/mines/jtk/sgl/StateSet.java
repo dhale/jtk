@@ -45,7 +45,7 @@ public class StateSet implements State {
    * @param stateClass the state class.
    * @return true; if this state contains such a state; false, otherwise.
    */
-  public boolean contains(Class stateClass) {
+  public boolean contains(Class<?> stateClass) {
     return find(stateClass)!=null;
   }
 
@@ -54,7 +54,7 @@ public class StateSet implements State {
    * @param stateClass the state class.
    * @return the state; null, if the set contains no such state.
    */
-  public State find(Class stateClass) {
+  public State find(Class<?> stateClass) {
     for (State s : _states) {
       if (s.getClass().equals(stateClass))
         return s;

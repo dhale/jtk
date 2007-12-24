@@ -204,7 +204,6 @@ public class CausalFilterTest extends TestCase {
 
   public void testFactorFomelExample() {
     float[] r = {24.0f,242.0f,867.0f,1334.0f,867.0f,242.0f,24.0f};
-    int n = r.length;
     int[] lag1 = {0,1,2,3};
     CausalFilter cf = new CausalFilter(lag1);
     cf.factorWilsonBurg(10,0.0f,r);
@@ -553,6 +552,7 @@ public class CausalFilterTest extends TestCase {
   ///////////////////////////////////////////////////////////////////////////
   // EXPERIMENTAL
 
+  /*
   private void xtestGaussian() {
     float sigma = 2.0f;
     int n = 1+2*(int)(8*sigma);
@@ -585,7 +585,6 @@ public class CausalFilterTest extends TestCase {
     a[4] = (float)(a2*b2);
     a = Array.mul(1.0f/Array.sum(a),a);
     CausalFilter cf = new CausalFilter(lag1,a);
-    /*
     float[] s = Array.zerofloat(n);
     float[] t = Array.zerofloat(n);
     s[k] = 1.0f;
@@ -595,7 +594,7 @@ public class CausalFilterTest extends TestCase {
     cf.applyTranspose(t,s);
     Array.dump(r);
     Array.dump(s);
-    */
     //cf.factorInverseWilsonBurg(10,FLT_EPSILON,r);
   }
+  */
 }

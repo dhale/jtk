@@ -1359,7 +1359,6 @@ public class CausalFilter {
       // The new A(z) is T(z)  = U(z)*A(z)
       this.apply(u,t);
       converged = true;
-      float asum = 0.0f;
       for (int j=0; j<_m; ++j) {
         int j1 = k1+_lag1[j];
         if (0<=j1 && j1<n1) {

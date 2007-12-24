@@ -164,7 +164,6 @@ public class MinimumPhaseFilterTest extends TestCase {
 
   public void testFactorFomelExample() {
     float[] r = {24.0f,242.0f,867.0f,1334.0f,867.0f,242.0f,24.0f};
-    int n = r.length;
     int[] lag1 = {0,1,2,3};
     MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1);
     mpf.factorWilsonBurg(10,0.0f,r);

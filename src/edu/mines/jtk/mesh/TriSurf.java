@@ -149,7 +149,7 @@ public class TriSurf {
       int nface = 0;
       FaceIterator fi = getFaces();
       while (fi.hasNext()) {
-        Face face = fi.next();
+        fi.next();
         ++nface;
       }
       return nface;
@@ -831,9 +831,9 @@ public class TriSurf {
         return _i.hasNext();
       }
       public final Face next() {
-        return (Face)_i.next();
+        return _i.next();
       }
-      private Iterator _i = _faceMap.values().iterator();
+      private Iterator<Face> _i = _faceMap.values().iterator();
     };
   }
 
@@ -961,7 +961,7 @@ public class TriSurf {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private static class EdgeFace implements Comparable {
+  private static class EdgeFace implements Comparable<EdgeFace> {
     Edge edge;
     Face face;
     double grade;
@@ -970,8 +970,7 @@ public class TriSurf {
       this.face = face;
       this.grade = grade;
     }
-    public int compareTo(Object object) {
-      EdgeFace other = (EdgeFace)object;
+    public int compareTo(EdgeFace other) {
       double gradeOther = other.grade;
       if (grade<gradeOther) {
         return -1;
@@ -1196,9 +1195,9 @@ public class TriSurf {
 
     // If the mark is about to overflow, we must zero all the marks.
     if (_faceMarkRed==FACE_MARK_MAX) {
-      Iterator fi = _faceMap.values().iterator();
+      Iterator<Face> fi = _faceMap.values().iterator();
       while (fi.hasNext()) {
-        Face face = (Face)fi.next();
+        Face face = fi.next();
         face._mark = 0;
       }
       _faceMarkRed = 0;

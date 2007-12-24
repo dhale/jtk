@@ -15,8 +15,9 @@ public class MaxHeap {
 
   public static void main(String[] args) {
     int m = 1024;
-    for (int n=1024; n<2000000000; n=(int)(1.1*n)) {
-      float[][] a = new float[n][1024];
+    for (int n=m; n<2000000000; n=(int)(1.1*n)) {
+      float[][] a = new float[n][m];
+      n = a.length;
       System.out.println("allocated n="+n+" kiB");
     }
   }

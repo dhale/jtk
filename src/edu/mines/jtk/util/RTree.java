@@ -1275,9 +1275,9 @@ public class RTree extends AbstractSet<Object> {
     }
     Object[] toArray() {
       Object[] boxs = new Object[_set.size()];
-      Iterator i = _set.iterator();
+      Iterator<BoxDistance> i = _set.iterator();
       for (int ibox=0; i.hasNext(); ++ibox)
-        boxs[ibox] = ((BoxDistance)i.next()).box;
+        boxs[ibox] = i.next().box;
       return boxs;
     }
     private int _k;

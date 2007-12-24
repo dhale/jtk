@@ -6,9 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.awt;
 
-import java.awt.Color;
 import java.awt.image.IndexColorModel;
-import javax.swing.event.EventListenerList;
 import static java.lang.Math.*;
 
 
@@ -90,7 +88,7 @@ public class FloatColorMap extends ColorMap {
       f.length==1 || f.length==3 || f.length==4,
       "number of arrays (color components) equals 1, 3, or 4");
     _nc = f.length;
-    _ic = ic;
+    //_ic = ic;
     _fbm = new FloatByteMap[_nc];
     for (int jc=0; jc<_nc; ++jc)
       _fbm[jc] = new FloatByteMap(f[jc]);
@@ -220,7 +218,7 @@ public class FloatColorMap extends ColorMap {
   // private
 
   private int _nc; // number of color components: 1, 3, or 4.
-  private int _ic; // array index of component for index color model
+  //private int _ic; // array index of component for index color model
   private FloatByteMap[] _fbm; // float-byte maps, one for each component
   private FloatByteMap _fbmic; // the float-byte map for index color model
   private FloatByteMap _fbmi0; // cached fbm[0]

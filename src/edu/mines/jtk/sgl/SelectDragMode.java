@@ -29,7 +29,7 @@ public class SelectDragMode extends Mode {
   public SelectDragMode(ModeManager modeManager) {
     super(modeManager);
     setName("Select");
-    Class cls = SelectDragMode.class;
+    Class<SelectDragMode> cls = SelectDragMode.class;
     setIcon(loadIcon(cls,"resources/SelectDragIcon16.png"));
     setCursor(loadCursor(cls,"resources/SelectDragCursor16.png",1,1));
     setMnemonicKey(KeyEvent.VK_S);

@@ -2380,9 +2380,9 @@ public class TetMesh implements Serializable {
         return _i.hasNext();
       }
       public final Edge next() {
-        return (Edge)_i.next();
+        return _i.next();
       }
-      private Iterator _i;
+      private Iterator<Edge> _i;
       {
         EdgeSet edgeSet = new EdgeSet(16*countNodes(),0.5f);
         ArrayList<Edge> edgeList = new ArrayList<Edge>(8*countNodes());
@@ -2478,9 +2478,9 @@ public class TetMesh implements Serializable {
         return _iterator.hasNext();
       }
       public final Node next() {
-        return (Node)_iterator.next();
+        return _iterator.next();
       }
-      private Iterator _iterator = null;
+      private Iterator<Node> _iterator = null;
       {
         // Find node nearest plane, and push its tet nabors onto a stack.
         Node node = findNodeNearestPlane(a,b,c,d);

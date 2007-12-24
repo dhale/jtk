@@ -85,7 +85,7 @@ public class RTreeTest extends TestCase {
     for (int i=0; i<n; ++i)
       rt.add(randomBox(0.2f));
 
-    Iterator rti = rt.iterator();
+    Iterator<Object> rti = rt.iterator();
     Object box = rti.next();
     rt.remove(box);
     rt.add(box);
@@ -282,9 +282,9 @@ public class RTreeTest extends TestCase {
     public Object[] findOverlapping(RTree.Boxed boxed) {
       boxed.getBounds(_amin,_amax);
       ArrayList<RTree.Boxed> list = new ArrayList<RTree.Boxed>();
-      Iterator i = _set.iterator();
+      Iterator<RTree.Boxed> i = _set.iterator();
       while (i.hasNext()) {
-        RTree.Boxed b = (RTree.Boxed)i.next();
+        RTree.Boxed b = i.next();
         b.getBounds(_bmin,_bmax);
         if (overlapsAB())
           list.add(b);
@@ -299,9 +299,9 @@ public class RTreeTest extends TestCase {
       for (int i=0; i<n; ++i) {
         float dmin = Float.MAX_VALUE;
         RTree.Boxed bmin = null;
-        Iterator si = _set.iterator();
+        Iterator<RTree.Boxed> si = _set.iterator();
         while (si.hasNext()) {
-          RTree.Boxed b = (RTree.Boxed)si.next();
+          RTree.Boxed b = si.next();
           if (list.contains(b))
             continue;
           float d = b.getDistanceSquared(point);
@@ -316,10 +316,10 @@ public class RTreeTest extends TestCase {
     }
     public Object[] findInSphere(float[] point, float radius) {
       ArrayList<RTree.Boxed> list = new ArrayList<RTree.Boxed>();
-      Iterator i = _set.iterator();
+      Iterator<RTree.Boxed> i = _set.iterator();
       float s = radius*radius;
       while (i.hasNext()) {
-        RTree.Boxed b = (RTree.Boxed)i.next();
+        RTree.Boxed b = i.next();
         if (b.getDistanceSquared(point)<s)
           list.add(b);
       }

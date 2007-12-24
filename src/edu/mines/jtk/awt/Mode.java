@@ -184,7 +184,7 @@ public abstract class Mode extends AbstractAction {
    * @param cls the class used to find the resource.
    * @param res the name of the resource that contains the icon.
    */
-  protected static Icon loadIcon(Class cls, String res) {
+  protected static Icon loadIcon(Class<?> cls, String res) {
     java.net.URL url = cls.getResource(res);
     return (url!=null)?new ImageIcon(url):null;
   }
@@ -197,7 +197,7 @@ public abstract class Mode extends AbstractAction {
    * @param x the x coordinate of the cursor hot spot
    * @param y the y coordinate of the cursor hot spot
    */
-  protected static Cursor loadCursor(Class cls, String res, int x, int y) {
+  protected static Cursor loadCursor(Class<?> cls, String res, int x, int y) {
     java.net.URL url = cls.getResource(res);
     if (url==null)
       return null;
