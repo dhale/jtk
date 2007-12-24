@@ -72,9 +72,9 @@ public class PlotPanelPixels3Test {
     Sampling s1 = new Sampling(n1);
     Sampling s2 = new Sampling(n2);
     Sampling s3 = new Sampling(n3);
-    float d1 = 1.0f/(float)max(1,n1-1);
-    float d2 = 1.0f/(float)max(1,n2-1);
-    float d3 = 1.0f/(float)max(1,n3-1);
+    //float d1 = 1.0f/(float)max(1,n1-1);
+    //float d2 = 1.0f/(float)max(1,n2-1);
+    //float d3 = 1.0f/(float)max(1,n3-1);
     //float[][][] f0 = Array.rampfloat(0.0f,d1,d2,d3,n1,n2,n3);
     //float[][][] f1 = Array.fillfloat(0.0f,n1,n2,n3);
     //float[][][] f2 = Array.fillfloat(0.0f,n1,n2,n3);

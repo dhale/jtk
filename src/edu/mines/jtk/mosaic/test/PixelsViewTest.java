@@ -6,7 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic.test;
 
-import java.awt.*;
 import static java.lang.Math.max;
 
 import edu.mines.jtk.awt.ColorMap;

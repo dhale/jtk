@@ -8,11 +8,6 @@ package edu.mines.jtk.mosaic;
 
 import java.awt.*;
 import java.awt.image.*;
-import java.awt.font.FontRenderContext;
-import java.awt.font.LineMetrics;
-import java.util.EnumSet;
-import java.util.Set;
-import static java.lang.Math.*;
 
 import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.Sampling;
@@ -626,7 +621,7 @@ public class PlotPanelPixels3 extends PlotPanel {
         Orientation.X1RIGHT_X3UP;
     }
     _orientation = orientation;
-    _axesPlacement = _axesPlacement;
+    _axesPlacement = axesPlacement;
     if (orientation==Orientation.X1DOWN_X2RIGHT) {
       _transpose23 = false;
       _p12 = addPixels(1,0,s1,s2,slice12());

@@ -152,10 +152,10 @@ public class IPanel extends JPanel {
     // the PNG file. We want that info, especially for high-res images.
     //File file = new File(fileName);
     //ImageIO.write(image,"png",file);
-    Iterator i = ImageIO.getImageWritersBySuffix("png");
+    Iterator<ImageWriter> i = ImageIO.getImageWritersBySuffix("png");
     if (!i.hasNext())
       throw new IOException("cannot get a PNG image writer");
-    ImageWriter iw = (ImageWriter)i.next();
+    ImageWriter iw = i.next();
     FileOutputStream fos = new FileOutputStream(fileName);
     ImageOutputStream ios = ImageIO.createImageOutputStream(fos);
     iw.setOutput(ios);
