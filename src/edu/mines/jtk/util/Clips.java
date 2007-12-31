@@ -123,6 +123,46 @@ public class Clips {
   }
 
   /**
+   * Sets the array of values for these clips.
+   * These values are used only when computing clips from percentiles.
+   * @param f array of values; by reference, not by copy.
+   */
+  public void setArray(float[] f) {
+    _f = f;
+    _clipsDirty = true;
+  }
+
+  /**
+   * Sets the array of values for these clips.
+   * These values are used only when computing clips from percentiles.
+   * @param f array of values; by reference, not by copy.
+   */
+  public void setArray(float[][] f) {
+    _f = f;
+    _clipsDirty = true;
+  }
+
+  /**
+   * Sets the array of values for these clips.
+   * These values are used only when computing clips from percentiles.
+   * @param f array of values; by reference, not by copy.
+   */
+  public void setArray(float[][][] f) {
+    _f = f;
+    _clipsDirty = true;
+  }
+
+  /**
+   * Sets the array of values for these clips.
+   * These values are used only when computing clips from percentiles.
+   * @param f array of values; by reference, not by copy.
+   */
+  public void setArray(Float3 f3) {
+    _f = f3;
+    _clipsDirty = true;
+  }
+
+  /**
    * Sets the clip min and max values explicitly.
    * Calling this method disables the computation of clips from percentiles.
    * Any clip values computed or specified previously will be forgotten.

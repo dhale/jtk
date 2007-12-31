@@ -40,6 +40,8 @@ public class PixelsViewTest {
     pv0.setInterpolation(PixelsView.Interpolation.NEAREST);
     pv0.setColorModel(ColorMap.JET);
     pv0.setPercentiles(0.0f,100.0f);
+    f = Array.mul(10.0f,f);
+    pv0.set(f);
 
     PixelsView pv0b = panel.addPixels(0,0,s1,s2,f);
     pv0b.setInterpolation(PixelsView.Interpolation.LINEAR);
@@ -50,6 +52,8 @@ public class PixelsViewTest {
     pv1.setInterpolation(PixelsView.Interpolation.LINEAR);
     pv1.setColorModel(ColorMap.GRAY);
     pv1.setPercentiles(0.0f,100.0f);
+    f = Array.mul(10.0f,f);
+    pv1.set(f);
 
     PixelsView pv1b = panel.addPixels(0,1,s1,s2,f);
     pv1b.setInterpolation(PixelsView.Interpolation.NEAREST);
@@ -82,6 +86,7 @@ public class PixelsViewTest {
     pv0.setClips(0,0.0f,2.0f);
     pv0.setClips(1,0.0f,2.0f);
     pv0.setClips(2,0.0f,2.0f);
+    pv0.set(new float[][][]{f0,f1,f2}); // should have no effect!
 
     PixelsView pv0b = panel.addPixels(0,0,s1,s2,new float[][][]{f1,f0,f2});
     pv0b.setInterpolation(PixelsView.Interpolation.LINEAR);

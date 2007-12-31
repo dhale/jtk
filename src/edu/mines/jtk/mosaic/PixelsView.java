@@ -181,25 +181,16 @@ public class PixelsView extends TiledView {
     _s1 = s1;
     _s2 = s2;
     _f = Array.copy(f);
-    // TODO: 
-    // Starting in version 760, you unconditionally create new instances of
-    // Clips which overwrite existing ones.  The effect we saw was that
-    // changing the clips would have no effect because the set method would
-    // blow them away before the repaint.
-    /* 
-    _clips = new Clips[_nc];
-    for (int ic=0; ic<_nc; ++ic)
-      _clips[ic] = new Clips(_f[ic]);
-    */
-    // Craig Artley made this mod, but it prevents dynamic updating of
-    // clips as data are set.
     if (_clips==null) {
       _clips = new Clips[_nc];
       for (int ic=0; ic<_nc; ++ic)
         _clips[ic] = new Clips(_f[ic]);
+    } else {
+      for (int ic=0; ic<_nc; ++ic)
+      _clips[ic].setArray(_f[ic]);
     }
-    _clipMin = new float[_nc];
-    _clipMax = new float[_nc];
+    _clipMin = null;
+    _clipMax = null;
     updateSampling();
     repaint();
   }
