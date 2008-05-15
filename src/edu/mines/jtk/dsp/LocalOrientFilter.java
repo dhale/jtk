@@ -518,6 +518,9 @@ public class LocalOrientFilter {
           float eui = e[0];
           float evi = e[1];
           float ewi = e[2];
+          if (ewi<0.0f) ewi = 0.0f;
+          if (evi<ewi) evi = ewi;
+          if (eui<evi) eui = evi;
           if (theta!=null) theta[i3][i2][i1] = acos(u1i);
           if (phi!=null) phi[i3][i2][i1] = atan2(u3i,u2i);
           if (u1!=null) u1[i3][i2][i1] = u1i;
@@ -533,7 +536,7 @@ public class LocalOrientFilter {
           if (ev!=null) ev[i3][i2][i1] = evi;
           if (ew!=null) ew[i3][i2][i1] = ewi;
           if (ep!=null || el!=null) {
-            float esi = 1.0f/eui;
+            float esi = (eui>0.0f)?1.0f/eui:1.0f;
             if (ep!=null) ep[i3][i2][i1] = (eui-evi)*esi;
             if (el!=null) el[i3][i2][i1] = (evi-ewi)*esi;
           }

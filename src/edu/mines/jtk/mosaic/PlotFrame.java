@@ -72,6 +72,7 @@ public class PlotFrame extends JFrame {
     this.setSize(_panelMain.getPreferredSize());
     this.add(_panelMain,BorderLayout.CENTER);
     this.setBackground(Color.WHITE);
+    this.setFont(new Font("Arial",Font.PLAIN,12));
     addModeManager();
   }
 
