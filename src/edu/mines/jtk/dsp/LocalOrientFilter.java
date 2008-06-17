@@ -229,8 +229,8 @@ public class LocalOrientFilter {
     int n2 = x.length;
     float[][] g1 = (nt>0)?t[0]:new float[n2][n1];
     float[][] g2 = (nt>1)?t[1]:new float[n2][n1];
-    _rgfGradient1.apply1X(x,g1);
-    _rgfGradient2.applyX1(x,g2);
+    _rgfGradient1.apply10(x,g1);
+    _rgfGradient2.apply01(x,g2);
 
     // Gradient products.
     float[][] g11 = g1;
@@ -442,9 +442,9 @@ public class LocalOrientFilter {
     float[][][] g1 = (nt>0)?t[0]:new float[n3][n2][n1];
     float[][][] g2 = (nt>1)?t[1]:new float[n3][n2][n1];
     float[][][] g3 = (nt>2)?t[2]:new float[n3][n2][n1];
-    _rgfGradient1.apply1XX(x,g1);
-    _rgfGradient2.applyX1X(x,g2);
-    _rgfGradient3.applyXX1(x,g3);
+    _rgfGradient1.apply100(x,g1);
+    _rgfGradient2.apply010(x,g2);
+    _rgfGradient3.apply001(x,g3);
 
     // Gradient products.
     float[][][] g11 = g1;
