@@ -78,7 +78,7 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
     @param lineSearchError is an acceptable fraction of imprecision
     in the scale factor for the line search. Recommend 0.001 or smaller.
     @param monitor Report progress here, if non-null.
-    @return Result of optimization
+    @return Result of optimization, using a cloned instance of referenceModel.
   */
   public static Vect solve (VectConst data,
                             VectConst referenceModel,

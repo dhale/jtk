@@ -25,7 +25,7 @@ public interface Vect extends VectConst {
       then scale, and add to a scaled version of this vector.
       (Useful for perturbing one vector with a constrained subspace.)
       This method should give the same result as add(),
-      if the other Vect is not an instance of the same class as this Vect.
+      if the other Vect is an instance of the same class as this Vect.
       This operation need not be supported for any any types
       other than this Vect.
       @param other The other vector to be projected, scaled, and added.
