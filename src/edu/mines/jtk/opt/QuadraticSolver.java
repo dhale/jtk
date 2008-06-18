@@ -160,9 +160,6 @@ public class QuadraticSolver {
                             boolean dampOnlyPerturbation,
                             int conjugateGradIterations,
                             Monitor monitor) {
-    //final int linearizationIterations = 1;
-    //final int lineSearchIterations = 0;
-    //final double lineSearchError = 0.;
     Transform transform = new LinearTransformWrapper(linearTransform);
     VectConst perturbModel = null;
     TransformQuadratic transformQuadratic =
