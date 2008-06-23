@@ -17,6 +17,7 @@ import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 
 import edu.mines.jtk.util.AxisTics;
+import edu.mines.jtk.util.StringUtil;
 
 /**
  * A tile axis in a mosaic. Tile axes may be placed along the top, left,
@@ -621,23 +622,7 @@ public class TileAxis extends IPanel {
   // Formats tic value, removing any trailing zeros after a decimal point.
   private String formatTic(double v) {
     String s = String.format(_format,v);
-    int len = s.length();
-    int iend = s.indexOf('e');
-    if (iend<0)
-      iend = s.indexOf('E');
-    if (iend<0)
-      iend = len;
-    int ibeg = iend;
-    if (s.indexOf('.')>0) {
-      while (ibeg>0 && s.charAt(ibeg-1)=='0')
-        --ibeg;
-      if (ibeg>0 && s.charAt(ibeg-1)=='.')
-        --ibeg;
-    }
-    if (ibeg<iend) {
-      String sb = s.substring(0,ibeg);
-      s = (iend<len)?sb+s.substring(iend,len):sb;
-    }
+    s = StringUtil.removeTrailingZeros(s);
     return s;
   }
 

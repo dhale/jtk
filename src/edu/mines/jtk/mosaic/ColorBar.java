@@ -73,6 +73,14 @@ public class ColorBar extends IPanel implements ColorMapListener {
     revalidate();
   }
 
+  /**
+   * Gets the tile used to display this color bar.
+   * @return the tile.
+   */
+  public Tile getTile() {
+    return _mosaic.getTile(0,0);
+  }
+
   public void colorMapChanged(ColorMap cm) {
     float vmin = (float)cm.getMinValue();
     float vmax = (float)cm.getMaxValue();
