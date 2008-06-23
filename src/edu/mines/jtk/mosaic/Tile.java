@@ -11,6 +11,7 @@ import static java.lang.Math.min;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -118,6 +119,24 @@ public class Tile extends IPanel {
    */
   public Transcaler getTranscaler() {
     return _ts;
+  }
+
+  /**
+   * Transforms a pixel x coordinate to a horizontal world coordinate.
+   * @param x the pixel x coordinate.
+   * @return the horizontal world coordinate.
+   */
+  public double pixelToWorldHorizontal(int x) {
+    return _hp.v(_ts.x(x));
+  }
+
+  /**
+   * Transforms a pixel y coordinate to a vertical world coordinate.
+   * @param y the pixel y coordinate.
+   * @return the vertical world coordinate.
+   */
+  public double pixelToWorldVertical(int y) {
+    return _vp.v(_ts.y(y));
   }
 
   /**

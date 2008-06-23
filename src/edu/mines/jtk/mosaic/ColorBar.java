@@ -78,7 +78,7 @@ public class ColorBar extends IPanel implements ColorMapListener {
    * @return the tile.
    */
   public Tile getTile() {
-    return _mosaic.getTile(0,0);
+    return _tile;
   }
 
   public void colorMapChanged(ColorMap cm) {
