@@ -236,6 +236,14 @@ public class PixelsView extends TiledView {
   }
 
   /**
+   * Gets the color map for this view.
+   * @return the color map.
+   */
+  public ColorMap getColorMap() {
+    return _colorMap;
+  }
+
+  /**
    * Sets the index color model for this view. For three or four color
    * components, a direct color model is used instead of this index color 
    * model. The default color model is a black-to-white gray model.

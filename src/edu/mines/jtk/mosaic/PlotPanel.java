@@ -197,21 +197,7 @@ public class PlotPanel extends IPanel {
         _colorBar.setWidthMinimum(_colorBarWidthMinimum);
       if (_colorBarPixelsView!=null) {
         _colorBarPixelsView.addColorMapListener(_colorBar);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-        gbc.weightx = 0;
-        gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.VERTICAL;
-        gbc.anchor = GridBagConstraints.WEST;
-        int top = _mosaic.getHeightAxesTop();
-        int left = 25;
-        int bottom = _mosaic.getHeightAxesBottom();
-        int right = 0;
-        gbc.insets = new Insets(top,left,bottom,right);
-        this.add(_colorBar,gbc);
+        this.add(_colorBar,makeColorBarConstraints());
         this.revalidate();
       }
     } else {
@@ -221,6 +207,15 @@ public class PlotPanel extends IPanel {
     return _colorBar;
   }
 
+  /**
+   * Sets a minimum width (in pixels) for a color bar.
+   * This method is useful when attempting to construct multiple plot 
+   * panels with the same layout. In this scenario, set this minimum
+   * equal to the width of the widest color bar. Then all color bars
+   * will have the same width. Those widths might otherwise vary as tic 
+   * and axes labels vary for the different panels.
+   * @param widthMinimum the minimum width.
+   */
   public void setColorBarWidthMinimum(int widthMinimum) {
     _colorBarWidthMinimum = widthMinimum;
     if (_colorBar!=null) {
@@ -228,7 +223,6 @@ public class PlotPanel extends IPanel {
       this.revalidate();
     }
   }
-  private int _colorBarWidthMinimum = 0;
 
   /**
    * Sets the format for major tic annotation of the color bar.
@@ -287,12 +281,11 @@ public class PlotPanel extends IPanel {
         gbc.gridheight = 1;
         gbc.weightx = 0;
         gbc.weighty = 0;
-        gbc.fill = GridBagConstraints.BOTH;
-        int top = 0;
-        int left = _mosaic.getWidthAxesLeft();
-        int bottom = 0;
-        int right = _mosaic.getWidthAxesRight();
-        gbc.insets = new Insets(top,left,bottom,right);
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets.top = 0;
+        gbc.insets.left = _mosaic.getWidthAxesLeft();
+        gbc.insets.bottom = 0;
+        gbc.insets.right = _mosaic.getWidthAxesRight();
         this.add(_title,gbc);
         this.revalidate();
       } else {
@@ -933,6 +926,7 @@ public class PlotPanel extends IPanel {
   private ColorBar _colorBar;
   private String _colorBarFormat;
   private String _colorBarLabel;
+  private int _colorBarWidthMinimum = 0;
   private PixelsView _colorBarPixelsView;
   private Title _title;
   private Orientation _orientation;
@@ -1057,8 +1051,27 @@ public class PlotPanel extends IPanel {
    */
   private void adjustColorBar() {
     if (_colorBar!=null) {
-      removeColorBar();
-      addColorBar(_colorBarLabel);
+      //removeColorBar();
+      //addColorBar(_colorBarLabel);
+      this.remove(_colorBar);
+      this.add(_colorBar,makeColorBarConstraints());
     }
+  }
+
+  private GridBagConstraints makeColorBarConstraints() {
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 1;
+    gbc.gridy = 1;
+    gbc.gridwidth = 1;
+    gbc.gridheight = 1;
+    gbc.weightx = 0;
+    gbc.weighty = 100;
+    gbc.fill = GridBagConstraints.VERTICAL;
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.insets.top = _mosaic.getHeightAxesTop();
+    gbc.insets.left = 25;
+    gbc.insets.bottom = _mosaic.getHeightAxesBottom();
+    gbc.insets.right = 0;
+    return gbc;
   }
 }
