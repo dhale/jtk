@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic.test;
 
 import java.awt.*;
+import javax.swing.SwingUtilities;
 import static java.lang.Math.max;
 
 import edu.mines.jtk.awt.ColorMap;
@@ -22,8 +23,12 @@ import edu.mines.jtk.util.Array;
 public class PlotPanelPixels3Test {
 
   public static void main(String[] args) {
-    test1();
-    test2();
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        test1();
+        test2();
+      }
+    });
   }
 
   private static void test1() {

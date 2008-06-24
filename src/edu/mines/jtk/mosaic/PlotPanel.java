@@ -1051,10 +1051,11 @@ public class PlotPanel extends IPanel {
    */
   private void adjustColorBar() {
     if (_colorBar!=null) {
-      //removeColorBar();
-      //addColorBar(_colorBarLabel);
-      this.remove(_colorBar);
-      this.add(_colorBar,makeColorBarConstraints());
+      GridBagLayout gbl = (GridBagLayout)this.getLayout();
+      gbl.setConstraints(_colorBar,makeColorBarConstraints());
+      revalidate();
+      //this.remove(_colorBar);
+      //this.add(_colorBar,makeColorBarConstraints());
     }
   }
 
