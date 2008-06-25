@@ -171,8 +171,8 @@ public class PlotPanel extends IPanel {
   /**
    * Adds the color bar with no label. The color bar paints the color map 
    * of the most recently added pixels view. To avoid confusion, a color 
-   * bar should perhaps not be added when this plot panel contains more 
-   * than one pixels view.
+   * bar should perhaps not be added when this plot panel contains multiple 
+   * pixels views with different color maps..
    * @return the color bar.
    */
   public ColorBar addColorBar() {
@@ -1002,11 +1002,16 @@ public class PlotPanel extends IPanel {
   }
 
   private PixelsView addPixelsView(int irow, int icol, PixelsView pv) {
-    if (_colorBar!=null && _colorBarPixelsView!=null)
-      _colorBarPixelsView.removeColorMapListener(_colorBar);
+    if (_colorBar!=null) {
+      pv.addColorMapListener(_colorBar);
+      if (_colorBarPixelsView==null) {
+        this.add(_colorBar,makeColorBarConstraints());
+        this.revalidate();
+      } else {
+        _colorBarPixelsView.removeColorMapListener(_colorBar);
+      }
+    }
     _colorBarPixelsView = pv;
-    if (_colorBar!=null)
-      _colorBarPixelsView.addColorMapListener(_colorBar);
     if (_orientation==Orientation.X1RIGHT_X2UP) {
       pv.setOrientation(PixelsView.Orientation.X1RIGHT_X2UP);
     } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
@@ -1053,7 +1058,9 @@ public class PlotPanel extends IPanel {
     if (_colorBar!=null) {
       GridBagLayout gbl = (GridBagLayout)this.getLayout();
       gbl.setConstraints(_colorBar,makeColorBarConstraints());
-      revalidate();
+      this.revalidate();
+      //this.remove(_colorBar);
+      //this.add(_colorBar,makeColorBarConstraints());
     }
   }
 
