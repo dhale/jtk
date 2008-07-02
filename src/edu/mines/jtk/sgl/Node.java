@@ -154,6 +154,16 @@ public abstract class Node {
     _states = states;
   }
 
+  /**
+   * Picks this node. This implementation does nothing. Implementations
+   * of this method in classes that extend this class may test the pick
+   * segment for intersection with node geometry. If an intersection is
+   * found, then a pick result should be added to the context.
+   * @param pc the pick context.
+   */
+  public void pick(PickContext pc) {
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
 
@@ -331,16 +341,6 @@ public abstract class Node {
    */
   protected void pickBegin(PickContext pc) {
     pc.pushNode(this);
-  }
-
-  /**
-   * Picks this node. This implementation does nothing. Implementations
-   * of this method in classes that extend this class may test the pick
-   * segment for intersection with node geometry. If an intersection is
-   * found, then a pick result should be added to the context.
-   * @param pc the pick context.
-   */
-  protected void pick(PickContext pc) {
   }
 
   /**

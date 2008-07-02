@@ -76,6 +76,16 @@ public class Group extends Node {
     return _childList.iterator();
   }
 
+  /**
+   * Picks this group. This implementation simply applies the pick process
+   * to its children.
+   * @param pc the pick context.
+   */
+  public void pick(PickContext pc) {
+    for (Node child : _childList)
+      child.pickApply(pc);
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
 
@@ -101,16 +111,6 @@ public class Group extends Node {
   protected void draw(DrawContext dc) {
     for (Node child : _childList)
       child.drawApply(dc);
-  }
-
-  /**
-   * Picks this group. This implementation simply applies the pick process
-   * to its children.
-   * @param pc the pick context.
-   */
-  protected void pick(PickContext pc) {
-    for (Node child : _childList)
-      child.pickApply(pc);
   }
   
   /**
