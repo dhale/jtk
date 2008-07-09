@@ -155,7 +155,7 @@ public class Clips {
   /**
    * Sets the array of values for these clips.
    * These values are used only when computing clips from percentiles.
-   * @param f array of values; by reference, not by copy.
+   * @param f3 array of values; by reference, not by copy.
    */
   public void setArray(Float3 f3) {
     _f = f3;
