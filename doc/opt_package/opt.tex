@@ -68,7 +68,7 @@ those models and transformations.
 
 For each new problem, I must implement two
 distinct Java interfaces.  The data and model
-are be encapsulated by two implementations of
+are encapsulated by two implementations of
 the \texttt{Vect} interface.  The simulation
 to be inverted must be encapsulated by
 \texttt{Transform} if non-linear, or by
@@ -138,7 +138,7 @@ supports only immutable operations.
 add methods that modify the state of the
 vector.
 
-Next we define an dot product (or inner
+Next we define a dot product (or inner
 product) for a normed vector space.  In
 vector notation, any two vectors from the
 same space can be dotted to produce a scalar:
@@ -209,7 +209,7 @@ are cached to disk.  \texttt{VectCache} is
 itself a \texttt{Vect}.  You may also want to
 implement a transform that distributes work
 to other nodes.  If neither of these
-situations are the case, you need not check
+situations are the case, you need not override
 the default serialization.
 
 Use the static method
@@ -373,8 +373,8 @@ this objective function.
 
 \begin{equation}
 \label{eq:obj}
-\min_{\mv} ~ [\dv - \fv (\mv) ] \cdot \Cni \cdot [\dv - \fv (\mv) ]
-            + \mv \cdot \Cmi \cdot \mv .
+\min_{\mv} ~ \{ [\dv - \fv (\mv) ] \cdot \Cni \cdot [\dv - \fv (\mv) ]
+            + \mv \cdot \Cmi \cdot \mv \} .
 \end{equation}
 
 \noindent The covariance matrices describe
@@ -479,7 +479,7 @@ example, seismic velocities may be
 constrained to a strict range of positive
 values.
 
-We also often have an partial inverse of our
+We also often have a partial inverse of our
 forward transform, perhaps from an analytic
 derivation that assumes our data are more
 evenly sampled.  Or we may know that a
@@ -666,7 +666,8 @@ initial state of this vector is ignored.
 Your \texttt{Transform} should be able to
 model your data from the reference model with
 \texttt{forwardNonlinear}, and should be able
-to use either model as perturbations in the
+to use an instance of the reference or
+perturbed model as perturbations in the
 \texttt{forwardLinearized} and
 \texttt{addTranspose} methods.
 
