@@ -322,7 +322,7 @@ public class TriangleGroup extends Group implements Selectable {
       glDisableClientState(GL_VERTEX_ARRAY);
     }
 
-    protected void pick(PickContext pc) {
+    public void pick(PickContext pc) {
       Segment ps = pc.getPickSegment();
       for (int it=0,jt=0; it<_nt; ++it) {
         double xi = _vb.get(jt++);

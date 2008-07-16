@@ -213,7 +213,7 @@ public class AxisAlignedFrame extends Group {
         glVertex3d(_p[2].x,_p[2].y,_p[2].z);
       } glEnd();
     }
-    protected void pick(PickContext pc) {
+    public void pick(PickContext pc) {
       pickOnFrame(pc);
     }
   }

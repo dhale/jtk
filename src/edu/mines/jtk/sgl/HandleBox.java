@@ -76,7 +76,7 @@ public class HandleBox extends Handle {
       glDrawArrays(GL_QUADS,0,24);
       glPopClientAttrib();
     }
-    protected void pick(PickContext pc) {
+    public void pick(PickContext pc) {
       Segment ps = pc.getPickSegment();
       for (int iside=0,index=0; iside<6; ++iside,index+=12) {
         double xa = _va[index+ 0];

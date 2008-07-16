@@ -65,6 +65,18 @@ public abstract class AxisAlignedPanel extends Node {
     return null;
   }
 
+  /**
+   * Picks this panel. This implementation delegates picking to its frame;
+   * or; if not in a frame, this implementation does nothing.
+   * <p>
+   * Panels that extend this class and that precisely fill their quad 
+   * frame when drawn may simply inherit this implementation.
+   */
+  public void pick(PickContext pc) {
+    if (_frame!=null)
+      _frame.pickOnFrame(pc);
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
 
@@ -82,18 +94,6 @@ public abstract class AxisAlignedPanel extends Node {
     } else {
       return _frame.computeBoundingSphereOfFrame(finite);
     }
-  }
-
-  /**
-   * Picks this panel. This implementation delegates picking to its frame;
-   * or; if not in a frame, this implementation does nothing.
-   * <p>
-   * Panels that extend this class and that precisely fill their quad 
-   * frame when drawn may simply inherit this implementation.
-   */
-  protected void pick(PickContext pc) {
-    if (_frame!=null)
-      _frame.pickOnFrame(pc);
   }
 
   ///////////////////////////////////////////////////////////////////////////

@@ -21,6 +21,30 @@ import edu.mines.jtk.util.Direct;
  */
 public class ColorCube extends Node implements Selectable {
 
+  public void pick(PickContext pc) {
+    Segment ps = pc.getPickSegment();
+    for (int iside=0; iside<6; ++iside) {
+      double xa = _va[12*iside+ 0];
+      double ya = _va[12*iside+ 1];
+      double za = _va[12*iside+ 2];
+      double xb = _va[12*iside+ 3];
+      double yb = _va[12*iside+ 4];
+      double zb = _va[12*iside+ 5];
+      double xc = _va[12*iside+ 6];
+      double yc = _va[12*iside+ 7];
+      double zc = _va[12*iside+ 8];
+      double xd = _va[12*iside+ 9];
+      double yd = _va[12*iside+10];
+      double zd = _va[12*iside+11];
+      Point3 p = ps.intersectWithTriangle(xa,ya,za,xb,yb,zb,xc,yc,zc);
+      Point3 q = ps.intersectWithTriangle(xa,ya,za,xc,yc,zc,xd,yd,zd);
+      if (p!=null)
+        pc.addResult(p);
+      if (q!=null)
+        pc.addResult(q);
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // protected
 
@@ -56,30 +80,6 @@ public class ColorCube extends Node implements Selectable {
       glDrawArrays(GL_QUADS,0,24);
     }
     glDisableClientState(GL_VERTEX_ARRAY);
-  }
-
-  protected void pick(PickContext pc) {
-    Segment ps = pc.getPickSegment();
-    for (int iside=0; iside<6; ++iside) {
-      double xa = _va[12*iside+ 0];
-      double ya = _va[12*iside+ 1];
-      double za = _va[12*iside+ 2];
-      double xb = _va[12*iside+ 3];
-      double yb = _va[12*iside+ 4];
-      double zb = _va[12*iside+ 5];
-      double xc = _va[12*iside+ 6];
-      double yc = _va[12*iside+ 7];
-      double zc = _va[12*iside+ 8];
-      double xd = _va[12*iside+ 9];
-      double yd = _va[12*iside+10];
-      double zd = _va[12*iside+11];
-      Point3 p = ps.intersectWithTriangle(xa,ya,za,xb,yb,zb,xc,yc,zc);
-      Point3 q = ps.intersectWithTriangle(xa,ya,za,xc,yc,zc,xd,yd,zd);
-      if (p!=null)
-        pc.addResult(p);
-      if (q!=null)
-        pc.addResult(q);
-    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
