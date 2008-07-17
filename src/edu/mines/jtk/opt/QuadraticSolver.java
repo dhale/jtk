@@ -169,7 +169,6 @@ public class QuadraticSolver {
     Vect result = quadraticSolver.solve(conjugateGradIterations, monitor);
     transformQuadratic.dispose();
     result.add(1, 1, referenceModel);
-    result.constrain();
     return result;
   }
 
