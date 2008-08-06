@@ -1,4 +1,4 @@
-#!/bin/sh xx
+#!/bin/sh
 
 # Where is the Mines JTK? (Where is your build.xml?)
 export MINES_JTK_HOME=~/box/jtk/trunk
