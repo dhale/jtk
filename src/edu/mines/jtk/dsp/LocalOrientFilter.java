@@ -80,16 +80,16 @@ public class LocalOrientFilter {
    * @param sigma3 half-width of window in 3rd and higher dimensions.
    */
   public LocalOrientFilter(double sigma1, double sigma2, double sigma3) {
-    _rgfSmoother1 = new RecursiveGaussianFilter(sigma1);
+    _rgfSmoother1 = (sigma1>=1.0)?new RecursiveGaussianFilter(sigma1):null;
     if (sigma2==sigma1) {
       _rgfSmoother2 = _rgfSmoother1;
     } else {
-      _rgfSmoother2 = new RecursiveGaussianFilter(sigma2);
+      _rgfSmoother2 = (sigma2>=1.0)?new RecursiveGaussianFilter(sigma2):null;
     }
     if (sigma3==sigma2) {
       _rgfSmoother3 = _rgfSmoother2;
     } else {
-      _rgfSmoother3 = new RecursiveGaussianFilter(sigma3);
+      _rgfSmoother3 = (sigma3>=1.0)?new RecursiveGaussianFilter(sigma3):null;
     }
     setGradientSmoothing(1.0);
   }
@@ -247,11 +247,21 @@ public class LocalOrientFilter {
     }
     
     // Smoothed gradient products comprise the structure tensor.
-    float[][] h = (nt>3)?t[3]:new float[n2][n1];
-    float[][][] gs = {g11,g22,g12};
-    for (float[][] g:gs) {
-      _rgfSmoother1.apply0X(g,h);
-      _rgfSmoother2.applyX0(h,g);
+    if (_rgfSmoother1!=null || _rgfSmoother2!=null) {
+      float[][] h = (nt>3)?t[3]:new float[n2][n1];
+      float[][][] gs = {g11,g22,g12};
+      for (float[][] g:gs) {
+        if (_rgfSmoother1!=null) {
+          _rgfSmoother1.apply0X(g,h);
+        } else {
+          Array.copy(g,h);
+        }
+        if (_rgfSmoother2!=null) {
+          _rgfSmoother2.applyX0(h,g);
+        } else {
+          Array.copy(h,g);
+        }
+      }
     }
 
     // Compute eigenvectors, eigenvalues, and outputs that depend on them.
@@ -470,13 +480,25 @@ public class LocalOrientFilter {
     }
     
     // Smoothed gradient products comprise the structure tensor.
-    float[][][] h = (nt>6)?t[6]:new float[n3][n2][n1];
-    float[][][][] gs = {g11,g22,g33,g12,g13,g23};
-    for (float[][][] g:gs) {
-      _rgfSmoother1.apply0XX(g,h);
-      _rgfSmoother2.applyX0X(h,g);
-      _rgfSmoother3.applyXX0(g,h);
-      Array.copy(h,g);
+    if (_rgfSmoother1!=null || _rgfSmoother2!=null || _rgfSmoother3!=null) {
+      float[][][] h = (nt>6)?t[6]:new float[n3][n2][n1];
+      float[][][][] gs = {g11,g22,g33,g12,g13,g23};
+      for (float[][][] g:gs) {
+        if (_rgfSmoother1!=null) {
+          _rgfSmoother1.apply0XX(g,h);
+        } else {
+          Array.copy(g,h);
+        }
+        if (_rgfSmoother2!=null) {
+          _rgfSmoother2.applyX0X(h,g);
+        } else {
+          Array.copy(h,g);
+        }
+        if (_rgfSmoother3!=null) {
+          _rgfSmoother3.applyXX0(g,h);
+          Array.copy(h,g);
+        }
+      }
     }
 
     // Compute eigenvectors, eigenvalues, and outputs that depend on them.
