@@ -63,8 +63,7 @@ public class TriangleGroup extends Group implements Selectable {
    * of triangles is nt = nv/3 = xyz.length/9.
    * <p>
    * The (r,g,b) components of colors are packed into the specified 
-   * array rgb. The number of colors is nc = rgb.length/3. The number
-   * of triangles is nt = nc/3 = rgb.length/9.
+   * array rgb. The number of colors equals the number of vertices.
    * <p>
    * Normal vectors may be computed for either vertices or triangles.
    * When computed for a vertex, a normal vector is the area-weighted 
@@ -75,7 +74,7 @@ public class TriangleGroup extends Group implements Selectable {
    * vectors are less costly to compute.
    * @param vn true, for vertex normals; false, for triangle normals.
    * @param xyz array[3*nv] of packed vertex coordinates.
-   * @param rgb array[3*nc] of packed color components.
+   * @param rgb array[3*nv] of packed color components.
    */
   public TriangleGroup(boolean vn, float[] xyz, float[] rgb) {
     int[] ijk = indexVertices(!vn,xyz);
@@ -113,18 +112,46 @@ public class TriangleGroup extends Group implements Selectable {
    * The (x,y,z) coordinates of vertices are packed into the specified 
    * array xyz. The number of vertices is nv = xyz.length/3.
    * <p>
-   * The (r,g,b) components of colors are packed into the specified 
-   * array rgb. The number of colors is nc = rgb.length/3.
+   * The (u,v,w) components of normal vectors are packed into the specified 
+   * array uvw. If not null, the number of normal vectors equals the number
+   * of vertices.
    * <p>
    * For any vertex with index iv, this method computes a normal vector 
    * as an area-weighted average of the normal vectors for all triangles 
    * specified with index iv.
    * @param ijk array[3*nt] of packed vertex indices.
    * @param xyz array[3*nv] of packed vertex coordinates.
-   * @param rgb array[3*nc] of packed color components.
+   * @param uvw array[3*nv] of packed normal vector components.
    */
-  public TriangleGroup(int[] ijk, float[] xyz, float[] rgb) {
-    float[] uvw = computeNormals(ijk,xyz);
+  public TriangleGroup(int[] ijk, float[] xyz, float[] uvw) {
+    this(ijk,xyz,uvw,null);
+  }
+
+  /**
+   * Constructs a triangle group with specified vertex coordinates
+   * and optional corresponding normal vectors and colors.
+   * <p>
+   * Triangles are specified by triplets of vertex indices (i,j,k), one 
+   * triplet per triangle, packed into the specified array of integers 
+   * ijk. The number of triangles is nt = ijk.length/3.
+   * <p>
+   * The (x,y,z) coordinates of vertices are packed into the specified 
+   * array xyz. The number of vertices is nv = xyz.length/3.
+   * <p>
+   * The (u,v,w) components of normal vectors are packed into the specified 
+   * array uvw. If not null, the number of normal vectors equals the number
+   * of vertices.
+   * <p>
+   * The (r,g,b) components of colors are packed into the specified array 
+   * rgb. If not null, the number of colors equals the number of vertices.
+   * @param ijk array[3*nt] of packed vertex indices.
+   * @param xyz array[3*nv] of packed vertex coordinates.
+   * @param uvw array[3*nv] of packed normal vector components.
+   * @param rgb array[3*nv] of packed color components.
+   */
+  public TriangleGroup(int[] ijk, float[] xyz, float[] uvw, float[] rgb) {
+    if (uvw==null)
+      uvw = computeNormals(ijk,xyz);
     buildTree(ijk,xyz,uvw,rgb);
   }
 
