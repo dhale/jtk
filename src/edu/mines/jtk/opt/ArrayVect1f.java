@@ -202,7 +202,7 @@ public class ArrayVect1f implements Vect {
   public void postCondition() {}
 
   // Serializable
-  private void writeObject(java.io.ObjectOutputStream out)
+  protected void writeObject(java.io.ObjectOutputStream out)
     throws IOException {
     out.writeObject(_data);
     out.writeDouble(_variance);
@@ -210,7 +210,7 @@ public class ArrayVect1f implements Vect {
   }
 
   // Serializable
-  private void readObject(java.io.ObjectInputStream in)
+  protected void readObject(java.io.ObjectInputStream in)
     throws IOException, ClassNotFoundException {
     _data = (float[]) in.readObject();
     _variance =  in.readDouble();

@@ -139,7 +139,7 @@ public class ArrayVect1fs implements Vect {
   }
 
   // Serializable
-  private void writeObject(java.io.ObjectOutputStream out)
+  protected void writeObject(java.io.ObjectOutputStream out)
     throws IOException {
     out.writeInt(_data.length);
     for (int i=0; i<_data.length; ++i) {
@@ -148,7 +148,7 @@ public class ArrayVect1fs implements Vect {
   }
 
   // Serializable
-  private void readObject(java.io.ObjectInputStream in)
+  protected void readObject(java.io.ObjectInputStream in)
     throws IOException, ClassNotFoundException {
     int length = in.readInt();
     _data = new ArrayVect1f[length];
