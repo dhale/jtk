@@ -16,7 +16,7 @@ import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
 
 /**
- * A group of image panels that display a single 3-D array.
+ * A group of image panels that display a single 3D array.
  * Specifically, an image panel group contains one or more axis-aligned 
  * frames, each containing one axis-aligned image panel child.
  * <p>
@@ -33,28 +33,65 @@ public class ImagePanelGroup extends Group {
 
   /**
    * Constructs an image panel group for all three axes.
-   * @param sx sampling of the X axis.
-   * @param sy sampling of the Y axis.
-   * @param sz sampling of the Z axis.
-   * @param f3 abstract 3-D array of floats.
+   * Assumes default unit sampling.
+   * @param f 3D array of floats.
    */
-  public ImagePanelGroup(Sampling sx, Sampling sy, Sampling sz, Float3 f3) {
-    this(sx,sy,sz,f3,new Axis[]{Axis.X,Axis.Y,Axis.Z});
+  public ImagePanelGroup(float[][][] f) {
+    this(new Sampling(f[0][0].length),
+         new Sampling(f[0].length),
+         new Sampling(f.length),
+         f);
+  }
+
+  /**
+   * Constructs an image panel group for all three axes.
+   * @param s1 sampling of 1st dimension (Z axis).
+   * @param s2 sampling of 2nd dimension (Y axis).
+   * @param s3 sampling of 3rd dimension (X axis).
+   * @param f 3D array of floats.
+   */
+  public ImagePanelGroup(Sampling s1, Sampling s2, Sampling s3, float[][][] f) {
+    this(s1,s2,s3,new SimpleFloat3(f));
+  }
+
+  /**
+   * Constructs an image panel group for all three axes.
+   * @param s1 sampling of 1st dimension (Z axis).
+   * @param s2 sampling of 2nd dimension (Y axis).
+   * @param s3 sampling of 3rd dimension (X axis).
+   * @param f abstract 3D array of floats.
+   */
+  public ImagePanelGroup(Sampling s1, Sampling s2, Sampling s3, Float3 f) {
+    this(s1,s2,s3,f,new Axis[]{Axis.X,Axis.Y,Axis.Z});
   }
 
   /**
    * Constructs image panel group for specified axes.
-   * @param sx sampling of the X axis.
-   * @param sy sampling of the Y axis.
-   * @param sz sampling of the Z axis.
-   * @param f3 abstract 3-D array of floats.
+   * @param s1 sampling of 1st dimension (Z axis).
+   * @param s2 sampling of 2nd dimension (Y axis).
+   * @param s3 sampling of 3rd dimension (X axis).
+   * @param f 3D array of floats.
    * @param axes array of axes, one for each image panel.
    */
   public ImagePanelGroup(
-    Sampling sx, Sampling sy, Sampling sz, Float3 f3, Axis[] axes) 
+    Sampling s1, Sampling s2, Sampling s3, float[][][] f, Axis[] axes) 
   {
-    _clips = new Clips(f3);
-    addPanels(sx,sy,sz,f3,axes);
+    this(s1,s2,s3,new SimpleFloat3(f),axes);
+  }
+
+  /**
+   * Constructs image panel group for specified axes.
+   * @param s1 sampling of 1st dimension (Z axis).
+   * @param s2 sampling of 2nd dimension (Y axis).
+   * @param s3 sampling of 3rd dimension (X axis).
+   * @param f abstract 3D array of floats.
+   * @param axes array of axes, one for each image panel.
+   */
+  public ImagePanelGroup(
+    Sampling s1, Sampling s2, Sampling s3, Float3 f, Axis[] axes) 
+  {
+    _clips = new Clips(f);
+    addPanels(s1,s2,s3,f,axes);
   }
 
   /**
@@ -191,35 +228,27 @@ public class ImagePanelGroup extends Group {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  // Sampled floats in an abstract 3-D array.
-  //private Sampling _sx,_sy,_sz;
-  //private Float3 _f3;
-
   // List of image panels.
   private ArrayList<ImagePanel> _ipList;
 
   // Clips.
-  Clips _clips;
+  private Clips _clips;
 
   // Color map.
   private ColorMap _colorMap = new ColorMap(0.0,1.0,ColorMap.GRAY);
 
   private void addPanels(
-    Sampling sx, Sampling sy, Sampling sz, Float3 f3, Axis[] axes) 
+    Sampling s1, Sampling s2, Sampling s3, Float3 f3, Axis[] axes) 
   {
-    //_sx = sx;
-    //_sy = sy;
-    //_sz = sz;
-    //_f3 = f3;
-    int nx = sx.getCount();
-    int ny = sy.getCount();
-    int nz = sz.getCount();
-    double dx = sx.getDelta();
-    double dy = sy.getDelta();
-    double dz = sz.getDelta();
-    double fx = sx.getFirst();
-    double fy = sy.getFirst();
-    double fz = sz.getFirst();
+    int nx = s3.getCount();
+    int ny = s2.getCount();
+    int nz = s1.getCount();
+    double dx = s3.getDelta();
+    double dy = s2.getDelta();
+    double dz = s1.getDelta();
+    double fx = s3.getFirst();
+    double fy = s2.getFirst();
+    double fz = s1.getFirst();
     double lx = fx+(nx-1)*dx;
     double ly = fy+(ny-1)*dy;
     double lz = fz+(nz-1)*dz;
@@ -229,7 +258,7 @@ public class ImagePanelGroup extends Group {
     _ipList = new ArrayList<ImagePanel>(np);
     for (int jp=0; jp<np; ++jp) {
       AxisAlignedQuad aaq = new AxisAlignedQuad(axes[jp],qmin,qmax);
-      ImagePanel ip = new ImagePanel(sx,sy,sz,f3);
+      ImagePanel ip = new ImagePanel(s1,s2,s3,f3);
       ip.setColorModel(getColorModel());
       aaq.getFrame().addChild(ip);
       this.addChild(aaq);

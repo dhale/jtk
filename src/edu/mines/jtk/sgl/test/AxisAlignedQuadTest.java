@@ -54,7 +54,7 @@ public class AxisAlignedQuadTest {
       }
     }
     Float3 f3 = new SimpleFloat3(a);
-    ImagePanel iop = new ImagePanel(sx,sy,sz,f3);
+    ImagePanel iop = new ImagePanel(sz,sy,sx,f3);
     aaf.addChild(iop);
 
     World world = new World();

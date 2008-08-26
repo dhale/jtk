@@ -21,27 +21,49 @@ import edu.mines.jtk.ogl.GlTextureName;
 import edu.mines.jtk.util.*;
 
 /**
- * An axis-aligned panel that draws a 2-D image of a slice of a 3-D array.
+ * An axis-aligned panel that draws a 2D image of a slice of a 3D array.
  * The corner points of the image panel's axis-aligned frame determines 
- * which slice of the 3-D array is drawn.
+ * which slice of the 3D array is drawn.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.06.04
  */
 public class ImagePanel extends AxisAlignedPanel {
 
   /**
-   * Constructs an image panel.
-   * @param sx sampling of the X axis.
-   * @param sy sampling of the Y axis.
-   * @param sz sampling of the Z axis.
-   * @param f3 abstract 3-D array of floats.
+   * Constructs an image panel with default unit sampling for 3D array.
+   * @param f 3D array of floats.
    */
-  public ImagePanel(Sampling sx, Sampling sy, Sampling sz, Float3 f3) {
-    _sx = sx;
-    _sy = sy;
-    _sz = sz;
-    _f3 = f3;
-    _clips = new Clips(_f3);
+  public ImagePanel(float[][][] f) {
+    this(new Sampling(f[0][0].length),
+         new Sampling(f[0].length),
+         new Sampling(f.length),
+         f);
+  }
+
+  /**
+   * Constructs an image panel for specified sampling and 3D array.
+   * @param s1 sampling of 1st dimension (Z axis).
+   * @param s2 sampling of 2nd dimension (Y axis).
+   * @param s3 sampling of 3rd dimension (X axis).
+   * @param f 3D array of floats.
+   */
+  public ImagePanel(Sampling s1, Sampling s2, Sampling s3, float[][][] f) {
+    this(s1,s2,s3,new SimpleFloat3(f));
+  }
+
+  /**
+   * Constructs an image panel for specified sampling and abstract 3D array.
+   * @param s1 sampling of 1st dimension (Z axis).
+   * @param s2 sampling of 2nd dimension (Y axis).
+   * @param s3 sampling of 3rd dimension (X axis).
+   * @param f abstract 3D array of floats.
+   */
+  public ImagePanel(Sampling s1, Sampling s2, Sampling s3, Float3 f) {
+    _sx = s3;
+    _sy = s2;
+    _sz = s1;
+    _f = f;
+    _clips = new Clips(_f);
   }
 
   /**
@@ -169,16 +191,16 @@ public class ImagePanel extends AxisAlignedPanel {
 
   private Axis _axis; // axis orthogonal to plane of this panel
   private Sampling _sx,_sy,_sz; // sampling of x, y, z axes
-  private Float3 _f3; // 3-D indexed floats
+  private Float3 _f; // 3D indexed floats
 
   // Coordinate bounds.
   private double _xmin,_ymin,_zmin; // minimum array coordinates
   private double _xmax,_ymax,_zmax; // maximum array coordinates
 
   // Clips.
-  Clips _clips;
-  float _clipMin = 0.0f;
-  float _clipMax = 1.0f;
+  private Clips _clips;
+  private float _clipMin = 0.0f;
+  private float _clipMax = 1.0f;
 
   // Color map with default gray color model.
   private ColorMap _colorMap = new ColorMap(_clipMin,_clipMax,ColorMap.GRAY);
@@ -217,27 +239,27 @@ public class ImagePanel extends AxisAlignedPanel {
   // are non-null.
 
   // Sampling of panels and textures, as described above.
-  int _ls,_lt; // numbers of samples per textures
-  int _ms,_mt; // numbers of textures in panel
-  int _ns,_nt; // numbers of samples in panel
-  double _ds,_dt; // sampling intervals in panel
-  double _fs,_ft; // first sample values in panel
+  private int _ls,_lt; // numbers of samples per textures
+  private int _ms,_mt; // numbers of textures in panel
+  private int _ns,_nt; // numbers of samples in panel
+  private double _ds,_dt; // sampling intervals in panel
+  private double _fs,_ft; // first sample values in panel
 
   // The texture cache; textures required for drawing are non-null.
   private GlTextureName[][] _tn; // array[_mt][_ms] of texture names
   private boolean _texturesDirty = true; // do textures need updating?
 
   // The subset of samples that must be drawn depends on frame corner points.
-  int _kxmin,_kymin,_kzmin; // min sample-in-array indices
-  int _kxmax,_kymax,_kzmax; // max sample-in-array indices
-  int _ksmin,_ktmin; // min sample-in-panel indices
-  int _ksmax,_ktmax; // max sample-in-panel indices
-  int _jsmin,_jtmin; // min texture-in-cache indices
-  int _jsmax,_jtmax; // max texture-in-cache indices
+  private int _kxmin,_kymin,_kzmin; // min sample-in-array indices
+  private int _kxmax,_kymax,_kzmax; // max sample-in-array indices
+  private int _ksmin,_ktmin; // min sample-in-panel indices
+  private int _ksmax,_ktmax; // max sample-in-panel indices
+  private int _jsmin,_jtmin; // min texture-in-cache indices
+  private int _jsmax,_jtmax; // max texture-in-cache indices
 
   // Used when creating/loading a texture.
-  IntBuffer _pixels; // array[_lt][_ls] of image pixels for one texture
-  float[][] _floats; // array[_ls][_lt] of image floats for one texture
+  private IntBuffer _pixels; // array[_lt][_ls] of image pixels for one texture
+  private float[][] _floats; // array[_ls][_lt] of image floats for one texture
 
   /**
    * Update the clip min/max for this panel, if necessary.
@@ -572,11 +594,11 @@ public class ImagePanel extends AxisAlignedPanel {
     int ls = min(_ls,_ns-ks);
     int lt = min(_lt,_nt-kt);
     if (_axis==Axis.X) {
-      _f3.get12(lt,ls,kt,ks,_kxmin,_floats);
+      _f.get12(lt,ls,kt,ks,_kxmin,_floats);
     } else if (_axis==Axis.Y) {
-      _f3.get13(lt,ls,kt,_kymin,ks,_floats);
+      _f.get13(lt,ls,kt,_kymin,ks,_floats);
     } else if (_axis==Axis.Z) {
-      _f3.get23(lt,ls,_kzmin,kt,ks,_floats);
+      _f.get23(lt,ls,_kzmin,kt,ks,_floats);
     }
     float fscale = 255.0f/(_clipMax-_clipMin);
     float fshift = _clipMin;

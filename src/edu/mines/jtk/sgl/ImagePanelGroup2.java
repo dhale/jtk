@@ -38,37 +38,84 @@ public class ImagePanelGroup2 extends Group {
 
   /**
    * Constructs an image panel group for all three axes.
+   * Assumes default unit sampling.
+   * Both 3D arrays of floats must have consistent dimensions.
+   * @param f1 1st 3D array of floats.
+   * @param f2 2nd 3D array of floats.
+   */
+  public ImagePanelGroup2(float[][][] f1, float[][][] f2) {
+    this(new Sampling(f1[0][0].length),
+         new Sampling(f1[0].length),
+         new Sampling(f1.length),
+         f1,f2);
+  }
+
+  /**
+   * Constructs an image panel group for all three axes.
    * Both 3D arrays of floats much be consistent with the specified sampling.
-   * @param sx sampling of the X axis.
-   * @param sy sampling of the Y axis.
-   * @param sz sampling of the Z axis.
+   * @param s1 sampling of 1st dimension (Z axis).
+   * @param s2 sampling of 2nd dimension (Y axis).
+   * @param s3 sampling of 3rd dimension (X axis).
    * @param f1 1st 3D array of floats.
    * @param f2 2nd 3D array of floats.
    */
   public ImagePanelGroup2(
-    Sampling sx, Sampling sy, Sampling sz, 
+    Sampling s1, Sampling s2, Sampling s3, 
+    float[][][] f1, float[][][] f2) 
+  {
+    this(s1,s2,s3,new SimpleFloat3(f1),new SimpleFloat3(f2));
+  }
+
+  /**
+   * Constructs an image panel group for all three axes.
+   * Both 3D arrays of floats much be consistent with the specified sampling.
+   * @param s1 sampling of 1st dimension (Z axis).
+   * @param s2 sampling of 2nd dimension (Y axis).
+   * @param s3 sampling of 3rd dimension (X axis).
+   * @param f1 1st abstract 3D array of floats.
+   * @param f2 2nd abstract 3D array of floats.
+   */
+  public ImagePanelGroup2(
+    Sampling s1, Sampling s2, Sampling s3, 
     Float3 f1, Float3 f2) 
   {
-    this(sx,sy,sz,f1,f2,new Axis[]{Axis.X,Axis.Y,Axis.Z});
+    this(s1,s2,s3,f1,f2,new Axis[]{Axis.X,Axis.Y,Axis.Z});
   }
 
   /**
    * Constructs an image panel group for specified axes.
    * Both 3D arrays of floats much be consistent with the specified sampling.
-   * @param sx sampling of the X axis.
-   * @param sy sampling of the Y axis.
-   * @param sz sampling of the Z axis.
+   * @param s1 sampling of 1st dimension (Z axis).
+   * @param s2 sampling of 2nd dimension (Y axis).
+   * @param s3 sampling of 3rd dimension (X axis).
    * @param f1 1st 3D array of floats.
    * @param f2 2nd 3D array of floats.
-   * @param axes array of axes, one for each pair of image panels.
+   * @param axes array of axes, one for each image panel.
    */
   public ImagePanelGroup2(
-    Sampling sx, Sampling sy, Sampling sz, 
+    Sampling s1, Sampling s2, Sampling s3, 
+    float[][][] f1, float[][][] f2, Axis[] axes) 
+  {
+    this(s1,s2,s3,new SimpleFloat3(f1),new SimpleFloat3(f2),axes);
+  }
+
+  /**
+   * Constructs an image panel group for specified axes.
+   * Both 3D arrays of floats much be consistent with the specified sampling.
+   * @param s1 sampling of 1st dimension (Z axis).
+   * @param s2 sampling of 2nd dimension (Y axis).
+   * @param s3 sampling of 3rd dimension (X axis).
+   * @param f1 1st abstract 3D array of floats.
+   * @param f2 2nd abstract 3D array of floats.
+   * @param axes array of axes, one for each image panel.
+   */
+  public ImagePanelGroup2(
+    Sampling s1, Sampling s2, Sampling s3, 
     Float3 f1, Float3 f2, Axis[] axes) 
   {
     _clips1 = new Clips(f1);
     _clips2 = new Clips(f2);
-    addPanels(sx,sy,sz,f1,f2,axes);
+    addPanels(s1,s2,s3,f1,f2,axes);
   }
 
   /**
@@ -341,43 +388,43 @@ public class ImagePanelGroup2 extends Group {
   private ArrayList<ImagePanel> _ip2List;
 
   // Clips.
-  Clips _clips1;
-  Clips _clips2;
+  private Clips _clips1;
+  private Clips _clips2;
 
   // Color maps.
   private ColorMap _colorMap1 = new ColorMap(0.0,1.0,ColorMap.GRAY);
   private ColorMap _colorMap2 = new ColorMap(0.0,1.0,ColorMap.getJet(0.5f));
 
   private static void checkSampling(
-    Sampling sx, Sampling sy, Sampling sz, Float3 f1, Float3 f2) 
+    Sampling s1, Sampling s2, Sampling s3, Float3 f1, Float3 f2) 
   {
-    Check.argument(f1.getN1()==sz.getCount(),
-                  "f1.getN1()==sz.getCount()");
-    Check.argument(f1.getN2()==sy.getCount(),
-                  "f1.getN2()==sy.getCount()");
-    Check.argument(f1.getN3()==sx.getCount(),
-                  "f1.getN3()==sx.getCount()");
-    Check.argument(f2.getN1()==sz.getCount(),
-                  "f2.getN1()==sz.getCount()");
-    Check.argument(f2.getN2()==sy.getCount(),
-                  "f2.getN2()==sy.getCount()");
-    Check.argument(f2.getN3()==sx.getCount(),
-                  "f2.getN3()==sx.getCount()");
+    Check.argument(f1.getN1()==s1.getCount(),
+                  "f1.getN1()==s1.getCount()");
+    Check.argument(f1.getN2()==s2.getCount(),
+                  "f1.getN2()==s2.getCount()");
+    Check.argument(f1.getN3()==s3.getCount(),
+                  "f1.getN3()==s3.getCount()");
+    Check.argument(f2.getN1()==s1.getCount(),
+                  "f2.getN1()==s1.getCount()");
+    Check.argument(f2.getN2()==s2.getCount(),
+                  "f2.getN2()==s2.getCount()");
+    Check.argument(f2.getN3()==s3.getCount(),
+                  "f2.getN3()==s3.getCount()");
   }
 
   private void addPanels(
-    Sampling sx, Sampling sy, Sampling sz, Float3 f1, Float3 f2, Axis[] axes) 
+    Sampling s1, Sampling s2, Sampling s3, Float3 f1, Float3 f2, Axis[] axes) 
   {
-    checkSampling(sx,sy,sz,f1,f2);
-    int nx = sx.getCount();
-    int ny = sy.getCount();
-    int nz = sz.getCount();
-    double dx = sx.getDelta();
-    double dy = sy.getDelta();
-    double dz = sz.getDelta();
-    double fx = sx.getFirst();
-    double fy = sy.getFirst();
-    double fz = sz.getFirst();
+    checkSampling(s1,s2,s3,f1,f2);
+    int nx = s3.getCount();
+    int ny = s2.getCount();
+    int nz = s1.getCount();
+    double dx = s3.getDelta();
+    double dy = s2.getDelta();
+    double dz = s1.getDelta();
+    double fx = s3.getFirst();
+    double fy = s2.getFirst();
+    double fz = s1.getFirst();
     double lx = fx+(nx-1)*dx;
     double ly = fy+(ny-1)*dy;
     double lz = fz+(nz-1)*dz;
@@ -389,19 +436,19 @@ public class ImagePanelGroup2 extends Group {
     PolygonState ps1 = new PolygonState();
     ps1.setPolygonOffset(1.0f,1.0f);
     ps1.setPolygonOffsetFill(true);
-    StateSet s1 = new StateSet();
-    s1.add(ps1);
+    StateSet ss1 = new StateSet();
+    ss1.add(ps1);
     BlendState bs2 = new BlendState();
     bs2.setFunction(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-    StateSet s2 = new StateSet();
-    s2.add(bs2);
+    StateSet ss2 = new StateSet();
+    ss2.add(bs2);
     for (int jp=0; jp<np; ++jp) {
       AxisAlignedQuad aaq = new AxisAlignedQuad(axes[jp],qmin,qmax);
       AxisAlignedFrame aaf = aaq.getFrame();
-      ImagePanel ip1 = new ImagePanel(sx,sy,sz,f1);
-      ImagePanel ip2 = new ImagePanel(sx,sy,sz,f2);
-      ip1.setStates(s1);
-      ip2.setStates(s2);
+      ImagePanel ip1 = new ImagePanel(s1,s2,s3,f1);
+      ImagePanel ip2 = new ImagePanel(s1,s2,s3,f2);
+      ip1.setStates(ss1);
+      ip2.setStates(ss2);
       ip1.setColorModel(getColorModel1());
       ip2.setColorModel(getColorModel2());
       aaf.addChild(ip1);
