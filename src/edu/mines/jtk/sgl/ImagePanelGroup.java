@@ -150,7 +150,7 @@ public class ImagePanelGroup extends Group {
     _clips.setPercentiles(percMin,percMax);
     double clipMin = _clips.getClipMin();
     double clipMax = _clips.getClipMax();
-    System.out.println("clip min="+clipMin+" max="+clipMax);
+    //System.out.println("clip min="+clipMin+" max="+clipMax);
     for (ImagePanel ip:_ipList)
       ip.setClips(clipMin,clipMax);
     _colorMap.setValueRange(clipMin,clipMax);
