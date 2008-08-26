@@ -161,7 +161,7 @@ public class SelectDragMode extends Mode {
 
   private PickResult pick(MouseEvent event) {
     ViewCanvas canvas = (ViewCanvas)event.getSource();
-    canvas.addMouseMotionListener(_mml);
+    //canvas.addMouseMotionListener(_mml); ??
     View view = canvas.getView();
     if (view==null)
       return null;

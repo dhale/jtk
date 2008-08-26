@@ -119,6 +119,22 @@ public class ImagePanelGroup2 extends Group {
   }
 
   /**
+   * Notifies this panel that values in the 1st 3D array have changed.
+   */
+  public void update1() {
+    for (ImagePanel ip:_ip1List)
+      ip.update();
+  }
+
+  /**
+   * Notifies this panel that values in the 2nd 3D array have changed.
+   */
+  public void update2() {
+    for (ImagePanel ip:_ip2List)
+      ip.update();
+  }
+
+  /**
    * Gets a 1st image panel in this group with the specified axis.
    * @param axis the axis.
    * @return the image panel; null, if none has the axis specified.

@@ -67,6 +67,14 @@ public class ImagePanel extends AxisAlignedPanel {
   }
 
   /**
+   * Notifies this panel that values in the referenced 3D array have changed.
+   */
+  public void update() {
+    _texturesDirty = true;
+    dirtyDraw();
+  }
+
+  /**
    * Gets a box constraint for this panel. The constraint is consistent
    * with the sampling of this image.
    * @return the box constraint.
