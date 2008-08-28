@@ -35,6 +35,7 @@ public class Suite extends TestSuite {
     suite.addTestSuite(QuantilerTest.class);
     suite.addTestSuite(SimpleFloat3Test.class);
     suite.addTestSuite(StopwatchTest.class);
+    suite.addTestSuite(UnitSphereSamplingTest.class);
     suite.addTestSuite(UnitsTest.class);
 
     return suite;
