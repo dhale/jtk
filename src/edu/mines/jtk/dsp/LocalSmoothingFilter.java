@@ -12,7 +12,11 @@ import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
- * Local smoothing filter with diffusion tensors.
+ * Local smoothing of images with diffusion tensors.
+ * Smoothing is performed by solving a sparse symmetric positive-definite
+ * system of equations: (I+G'DG)y = x, where G is an approximation to a
+ * gradient operator, G' is its adjoint, D contains diffusion tensor
+ * coefficients, x is an input image and y is an output image.
  * @author Dave Hale, Colorado School of Mines
  * @version 2008.08.27
  */
@@ -30,11 +34,23 @@ public class LocalSmoothingFilter {
     _niter = niter;
   }
 
+  /**
+   * Applies this filter for specified diffusion tensors.
+   * @param d diffusion tensors.
+   * @param x input array.
+   * @param y output array.
+   */
   public void apply(Tensors2 d, float[][] x, float[][] y) {
     Operator2 a = new LlfOperator2(_llf,d);
     solve(a,x,y);
   }
 
+  /**
+   * Applies this filter for specified diffusion tensors.
+   * @param d diffusion tensors.
+   * @param x input array.
+   * @param y output array.
+   */
   public void apply(Tensors3 d, float[][][] x, float[][][] y) {
     Operator3 a = new LlfOperator3(_llf,d);
     solve(a,x,y);
