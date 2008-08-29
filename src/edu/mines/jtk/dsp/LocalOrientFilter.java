@@ -14,7 +14,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * Methods of this class can compute for each image sample numerous
  * parameters related to orientation. All orientation information 
  * is derived from eigenvectors and eigenvalues of the structure tensor
- * (also called the "gradient squared tensor"). This tensor is equivalent 
+ * (also called the "gradient-squared tensor"). This tensor is equivalent 
  * to a matrix of 2nd partial derivatives of an autocorrelation evaluated 
  * at zero lag. In other words, orientation is here determined by the 
  * (2-D) ellipse or (3-D) ellipsoid that best fits the peak of the 
@@ -190,6 +190,27 @@ public class LocalOrientFilter {
       null,null,
       null,null,
       el);
+  }
+
+  /**
+   * Applies this filter to estimate 2-D structure tensors.
+   * @param x input array for 2-D image.
+   * @return structure tensors.
+   */
+  public EigenTensors2 applyForTensors(float[][] x) {
+    int n1 = x[0].length;
+    int n2 = x.length;
+    float[][] u1 = new float[n2][n1];
+    float[][] u2 = new float[n2][n1];
+    float[][] eu = new float[n2][n1];
+    float[][] ev = new float[n2][n1];
+    apply(x,
+      null,
+      u1,u2,
+      null,null,
+      eu,ev,
+      null);
+    return new EigenTensors2(u1,u2,eu,ev);
   }
 
   /**
@@ -394,6 +415,42 @@ public class LocalOrientFilter {
       w1,w2,w3,
       null,null,null,
       null,el);
+  }
+
+  /**
+   * Applies this filter to estimate compressed 3-D structure tensors.
+   * @param x input array for 3-D image.
+   * @return structure tensors.
+   */
+  public EigenTensors3 applyForTensors(float[][][] x) {
+    return applyForTensors(x,true);
+  }
+
+  /**
+   * Applies this filter to estimate 3-D structure tensors.
+   * @param x input array for 3-D image.
+   * @param compressed true, for compressed tensors; false, otherwise.
+   * @return structure tensors.
+   */
+  public EigenTensors3 applyForTensors(float[][][] x, boolean compressed) {
+    int n1 = x[0][0].length;
+    int n2 = x[0].length;
+    int n3 = x.length;
+    float[][][] u1 = new float[n3][n2][n1];
+    float[][][] u2 = new float[n3][n2][n1];
+    float[][][] w1 = new float[n3][n2][n1];
+    float[][][] w2 = new float[n3][n2][n1];
+    float[][][] eu = new float[n3][n2][n1];
+    float[][][] ev = new float[n3][n2][n1];
+    float[][][] ew = new float[n3][n2][n1];
+    apply(x,
+      null,null,
+      u1,u2,null,
+      null,null,null,
+      w1,w2,null,
+      eu,ev,ew,
+      null,null);
+    return new EigenTensors3(u1,u2,w1,w2,eu,ev,ew,compressed);
   }
 
   /**
