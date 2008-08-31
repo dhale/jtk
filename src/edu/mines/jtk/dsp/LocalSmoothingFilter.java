@@ -59,7 +59,7 @@ public class LocalSmoothingFilter {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private static final boolean PARALLEL = false;
+  private static final boolean PARALLEL = true;
 
   private float _small; // stop iterations when residuals are small
   private int _niter; // number of iterations

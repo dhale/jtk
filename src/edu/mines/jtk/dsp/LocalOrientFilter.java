@@ -6,7 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+//import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.Threads;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
@@ -540,6 +544,8 @@ public class LocalOrientFilter {
     float[][][] g12 = (nt>3)?t[3]:new float[n3][n2][n1];
     float[][][] g13 = (nt>4)?t[4]:new float[n3][n2][n1];
     float[][][] g23 = (nt>5)?t[5]:new float[n3][n2][n1];
+    computeGradientProducts(g1,g2,g3,g11,g12,g13,g22,g23,g33);
+    /*
     for (int i3=0; i3<n3; ++i3) {
       for (int i2=0; i2<n2; ++i2) {
         for (int i1=0; i1<n1; ++i1) {
@@ -555,6 +561,7 @@ public class LocalOrientFilter {
         }
       }
     }
+    */
     
     // Smoothed gradient products comprise the structure tensor.
     if (_rgfSmoother1!=null || _rgfSmoother2!=null || _rgfSmoother3!=null) {
@@ -579,6 +586,9 @@ public class LocalOrientFilter {
     }
 
     // Compute eigenvectors, eigenvalues, and outputs that depend on them.
+    solveEigenproblems(g11,g12,g13,g22,g23,g33,
+      theta,phi,u1,u2,u3,v1,v2,v3,w1,w2,w3,eu,ev,ew,ep,el);
+    /*
     float[][] a = new float[3][3];
     float[][] z = new float[3][3];
     float[] e = new float[3];
@@ -642,6 +652,7 @@ public class LocalOrientFilter {
         }
       }
     }
+    */
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -653,4 +664,134 @@ public class LocalOrientFilter {
   private RecursiveGaussianFilter _rgfSmoother1;
   private RecursiveGaussianFilter _rgfSmoother2;
   private RecursiveGaussianFilter _rgfSmoother3;
+
+  private void computeGradientProducts(
+    final float[][][] g1, final float[][][] g2, final float[][][] g3,
+    final float[][][] g11, final float[][][] g12, final float[][][] g13,
+    final float[][][] g22, final float[][][] g23, final float[][][] g33)
+  {
+    final int n1 = g1[0][0].length;
+    final int n2 = g1[0].length;
+    final int n3 = g1.length;
+    final AtomicInteger ai = new AtomicInteger();
+    Thread[] threads = Threads.makeArray();
+    for (int ithread=0; ithread<threads.length; ++ithread) {
+      threads[ithread] = new Thread(new Runnable() {
+        public void run() {
+          for (int i3=ai.getAndIncrement(); i3<n3; i3=ai.getAndIncrement()) {
+            for (int i2=0; i2<n2; ++i2) {
+              float[] g1i = g1[i3][i2];
+              float[] g2i = g2[i3][i2];
+              float[] g3i = g3[i3][i2];
+              float[] g11i = g11[i3][i2];
+              float[] g12i = g12[i3][i2];
+              float[] g13i = g13[i3][i2];
+              float[] g22i = g22[i3][i2];
+              float[] g23i = g23[i3][i2];
+              float[] g33i = g33[i3][i2];
+              for (int i1=0; i1<n1; ++i1) {
+                float g1ii = g1i[i1];
+                float g2ii = g2i[i1];
+                float g3ii = g3i[i1];
+                g11i[i1] = g1ii*g1ii;
+                g22i[i1] = g2ii*g2ii;
+                g33i[i1] = g3ii*g3ii;
+                g12i[i1] = g1ii*g2ii;
+                g13i[i1] = g1ii*g3ii;
+                g23i[i1] = g2ii*g3ii;
+              }
+            }
+          }
+        }
+      });
+    }
+    Threads.startAndJoin(threads);
+  }
+
+  private void solveEigenproblems(
+    final float[][][] g11, final float[][][] g12, final float[][][] g13,
+    final float[][][] g22, final float[][][] g23, final float[][][] g33,
+    final float[][][] theta, final float[][][] phi,
+    final float[][][] u1, final float[][][] u2, final float[][][] u3, 
+    final float[][][] v1, final float[][][] v2, final float[][][] v3, 
+    final float[][][] w1, final float[][][] w2, final float[][][] w3, 
+    final float[][][] eu, final float[][][] ev, final float[][][] ew, 
+    final float[][][] ep, final float[][][] el)
+  {
+    final int n1 = g11[0][0].length;
+    final int n2 = g11[0].length;
+    final int n3 = g11.length;
+    final AtomicInteger ai = new AtomicInteger();
+    Thread[] threads = Threads.makeArray();
+    for (int ithread=0; ithread<threads.length; ++ithread) {
+      threads[ithread] = new Thread(new Runnable() {
+        public void run() {
+          for (int i3=ai.getAndIncrement(); i3<n3; i3=ai.getAndIncrement()) {
+            float[][] a = new float[3][3];
+            float[][] z = new float[3][3];
+            float[] e = new float[3];
+            for (int i2=0; i2<n2; ++i2) {
+              for (int i1=0; i1<n1; ++i1) {
+                a[0][0] = g11[i3][i2][i1];
+                a[0][1] = g12[i3][i2][i1];
+                a[0][2] = g13[i3][i2][i1];
+                a[1][0] = g12[i3][i2][i1];
+                a[1][1] = g22[i3][i2][i1];
+                a[1][2] = g23[i3][i2][i1];
+                a[2][0] = g13[i3][i2][i1];
+                a[2][1] = g23[i3][i2][i1];
+                a[2][2] = g33[i3][i2][i1];
+                Eigen.solveSymmetric33(a,z,e);
+                float u1i = z[0][0];
+                float u2i = z[0][1];
+                float u3i = z[0][2];
+                float v1i = z[1][0];
+                float v2i = z[1][1];
+                float v3i = z[1][2];
+                if (u1i<0.0f) {
+                  u1i = -u1i;
+                  u2i = -u2i;
+                  u3i = -u3i;
+                }
+                if (v2i<0.0f) {
+                  v1i = -v1i;
+                  v2i = -v2i;
+                  v3i = -v3i;
+                }
+                float w1i = u2i*v3i-u3i*v2i;
+                float w2i = u3i*v1i-u1i*v3i;
+                float w3i = u1i*v2i-u2i*v1i;
+                float eui = e[0];
+                float evi = e[1];
+                float ewi = e[2];
+                if (ewi<0.0f) ewi = 0.0f;
+                if (evi<ewi) evi = ewi;
+                if (eui<evi) eui = evi;
+                if (theta!=null) theta[i3][i2][i1] = acos(u1i);
+                if (phi!=null) phi[i3][i2][i1] = atan2(u3i,u2i);
+                if (u1!=null) u1[i3][i2][i1] = u1i;
+                if (u2!=null) u2[i3][i2][i1] = u2i;
+                if (u3!=null) u3[i3][i2][i1] = u3i;
+                if (v1!=null) v1[i3][i2][i1] = v1i;
+                if (v2!=null) v2[i3][i2][i1] = v2i;
+                if (v3!=null) v3[i3][i2][i1] = v3i;
+                if (w1!=null) w1[i3][i2][i1] = w1i;
+                if (w2!=null) w2[i3][i2][i1] = w2i;
+                if (w3!=null) w3[i3][i2][i1] = w3i;
+                if (eu!=null) eu[i3][i2][i1] = eui;
+                if (ev!=null) ev[i3][i2][i1] = evi;
+                if (ew!=null) ew[i3][i2][i1] = ewi;
+                if (ep!=null || el!=null) {
+                  float esi = (eui>0.0f)?1.0f/eui:1.0f;
+                  if (ep!=null) ep[i3][i2][i1] = (eui-evi)*esi;
+                  if (el!=null) el[i3][i2][i1] = (evi-ewi)*esi;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    Threads.startAndJoin(threads);
+  }
 }

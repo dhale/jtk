@@ -103,8 +103,8 @@ public class LocalLaplacianFilter {
    * @param y input/output array. Must be distinct from the array x.
    */
   public void apply(Tensors3 d, float[][][] x, float[][][] y) {
-    applySerial(d,x,y);
-    //applyParallel(d,x,y);
+    //applySerial(d,x,y);
+    applyParallel(d,x,y);
   }
 
   ///////////////////////////////////////////////////////////////////////////
