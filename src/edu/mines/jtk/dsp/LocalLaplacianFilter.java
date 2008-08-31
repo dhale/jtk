@@ -74,7 +74,25 @@ public class LocalLaplacianFilter {
     for (int i2=1; i2<n2; ++i2) {
       for (int i1=1; i1<n1; ++i1) {
         d.getTensor(i1,i2,di);
-        apply(i1,i2,di,x,y);
+        float d11 = di[0]*_scale;
+        float d12 = di[1]*_scale;
+        float d22 = di[2]*_scale;
+        float x00 = x[i2  ][i1  ];
+        float x01 = x[i2  ][i1-1];
+        float x10 = x[i2-1][i1  ];
+        float x11 = x[i2-1][i1-1];
+        float xa = x00-x11;
+        float xb = x01-x10;
+        float x1 = 0.5f*(xa-xb);
+        float x2 = 0.5f*(xa+xb);
+        float y1 = d11*x1+d12*x2;
+        float y2 = d12*x1+d22*x2;
+        float ya = 0.5f*(y1+y2);
+        float yb = 0.5f*(y1-y2);
+        y[i2  ][i1  ] += ya;
+        y[i2  ][i1-1] -= yb;
+        y[i2-1][i1  ] += yb;
+        y[i2-1][i1-1] -= ya;
       }
     }
   }
@@ -85,39 +103,14 @@ public class LocalLaplacianFilter {
    * @param y input/output array. Must be distinct from the array x.
    */
   public void apply(Tensors3 d, float[][][] x, float[][][] y) {
-    //applySerial(d,x,y);
-    applyParallel(d,x,y);
+    applySerial(d,x,y);
+    //applyParallel(d,x,y);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
   private float _scale; // scale factor for diffusion coefficients
-
-  // Computes y = y+G'DGx for one sample.
-  private void apply(
-   int i1, int i2, float[] d, float[][] x, float[][] y) 
-  {
-    float d11 = d[0]*_scale;
-    float d12 = d[1]*_scale;
-    float d22 = d[2]*_scale;
-    float x00 = x[i2  ][i1  ];
-    float x01 = x[i2  ][i1-1];
-    float x10 = x[i2-1][i1  ];
-    float x11 = x[i2-1][i1-1];
-    float xa = x00-x11;
-    float xb = x01-x10;
-    float x1 = 0.5f*(xa-xb);
-    float x2 = 0.5f*(xa+xb);
-    float y1 = d11*x1+d12*x2;
-    float y2 = d12*x1+d22*x2;
-    float ya = 0.5f*(y1+y2);
-    float yb = 0.5f*(y1-y2);
-    y[i2  ][i1  ] += ya;
-    y[i2  ][i1-1] -= yb;
-    y[i2-1][i1  ] += yb;
-    y[i2-1][i1-1] -= ya;
-  }
 
   private void applySerial(Tensors3 d, float[][][] x, float[][][] y) {
     int n3 = x.length;

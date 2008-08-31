@@ -59,9 +59,8 @@ public class LocalSmoothingFilter {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private static final boolean PARALLEL = true;
+  private static final boolean PARALLEL = false;
 
-  private float _sigma; // maximum filter half-width
   private float _small; // stop iterations when residuals are small
   private int _niter; // number of iterations
   private LocalLaplacianFilter _llf;
@@ -240,7 +239,7 @@ public class LocalSmoothingFilter {
     return ad.get();
   }
 
-  // Computes y = y + ax.
+  // Computes y = y + a*x.
   private static void saxpy(float a, float[][] x, float[][] y) {
     int n1 = x[0].length;
     int n2 = x.length;
@@ -280,7 +279,7 @@ public class LocalSmoothingFilter {
     Threads.startAndJoin(threads);
   }
 
-  // Computes y = x + ay.
+  // Computes y = x + a*y.
   private static void sxpay(float a, float[][] x, float[][] y) {
     int n1 = x[0].length;
     int n2 = x.length;

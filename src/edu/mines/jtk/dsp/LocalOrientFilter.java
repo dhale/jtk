@@ -436,8 +436,8 @@ public class LocalOrientFilter {
     int n1 = x[0][0].length;
     int n2 = x[0].length;
     int n3 = x.length;
-    float[][][] u1 = new float[n3][n2][n1];
     float[][][] u2 = new float[n3][n2][n1];
+    float[][][] u3 = new float[n3][n2][n1];
     float[][][] w1 = new float[n3][n2][n1];
     float[][][] w2 = new float[n3][n2][n1];
     float[][][] eu = new float[n3][n2][n1];
@@ -445,11 +445,31 @@ public class LocalOrientFilter {
     float[][][] ew = new float[n3][n2][n1];
     apply(x,
       null,null,
-      u1,u2,null,
+      null,u2,u3,
       null,null,null,
       w1,w2,null,
       eu,ev,ew,
       null,null);
+
+    // Compute u1 such that u3 > 0.
+    float[][][] u1 = u3;
+    for (int i3=0; i3<n3; ++i3) {
+      for (int i2=0; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          float u2i = u2[i3][i2][i1];
+          float u3i = u3[i3][i2][i1];
+          float u1s = 1.0f-u2i*u2i-u3i*u3i;
+          float u1i = (u1s>0.0f)?sqrt(u1s):0.0f;
+          if (u3i<0.0f) {
+            u1i = -u1i;
+            u2i = -u2i;
+            u3i = -u3i;
+          }
+          u1[i3][i2][i1] = u1i;
+          u2[i3][i2][i1] = u2i;
+        }
+      }
+    }
     return new EigenTensors3(u1,u2,w1,w2,eu,ev,ew,compressed);
   }
 
