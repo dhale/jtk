@@ -124,6 +124,10 @@ public class ViewCanvas extends GlCanvas {
     return pixels.get(0);
   }
 
+  public void glInit() {
+    setSwapInterval(1);
+  }
+
   public void glPaint() {
     if (_view!=null)
       _view.draw(this);

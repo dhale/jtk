@@ -105,10 +105,7 @@ def makeTensors3(x):
   n1,n2,n3 = len(x[0][0]),len(x[0]),len(x)
   lof = LocalOrientFilter(8)
   d = lof.applyForTensors(x)
-  for i3 in range(n3):
-    for i2 in range(n2):
-      for i1 in range(n1):
-        d.setEigenvalues(i1,i2,i3,0.0,1.0,1.0)
+  d.setEigenvalues(0.0,1.0,1.0)
   return d
 
 #############################################################################

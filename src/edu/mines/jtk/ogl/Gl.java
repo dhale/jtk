@@ -24773,6 +24773,14 @@ public class Gl {
     return gl().isExtensionAvailable(extensionName);
   }
 
+  public static boolean isFunctionAvailable(String functionName) {
+    return gl().isFunctionAvailable(functionName);
+  }
+
+  public static void setSwapInterval(int interval) {
+    gl().setSwapInterval(interval);
+  }
+
   private static GL gl() {
     return GLContext.getCurrent().getGL();
   }

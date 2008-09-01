@@ -7,8 +7,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp;
 
 import java.io.*;
-import edu.mines.jtk.util.UnitSphereSampling;
 import edu.mines.jtk.io.*;
+import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.UnitSphereSampling;
+
 
 /**
  * An array of eigen-decompositions of tensors for 3D image processing.
@@ -377,6 +379,27 @@ public class EigenTensors3 implements Tensors3,Serializable {
     setEigenvectorU(i1,i2,i3,u);
     setEigenvectorW(i1,i2,i3,w);
     setEigenvalues(i1,i2,i3,au,av,aw);
+  }
+
+  /**
+   * Sets eigenvalues for all tensors.
+   * @param au eigenvalue au.
+   * @param av eigenvalue av.
+   * @param aw eigenvalue aw.
+   */
+  public void setEigenvalues(float au, float av, float aw) {
+    float as = au+av+aw;
+    if (_compressed) {
+      float ascale = (as>0.0f)?AS_SET/as:0.0f;
+      short bu = (short)(au*ascale+0.5f);
+      short bw = (short)(aw*ascale+0.5f);
+      Array.fill(bu,_bu);
+      Array.fill(bw,_bw);
+    } else {
+      Array.fill(au,_au);
+      Array.fill(aw,_aw);
+    }
+    Array.fill(as,_as);
   }
 
   /**

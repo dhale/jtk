@@ -6,6 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import edu.mines.jtk.util.Array;
+
 /**
  * An array of eigen-decompositions of tensors for 2D image processing.
  * Each tensor is a symmetric positive-semidefinite 2-by-2 matrix:
@@ -223,6 +225,16 @@ public class EigenTensors2 implements Tensors2 {
     float av = ev[1]; if (av<0.0f) av = 0.0f;
     setEigenvectorU(i1,i2,u);
     setEigenvalues(i1,i2,au,av);
+  }
+
+  /**
+   * Sets eigenvalues for all tensors.
+   * @param au eigenvalue au.
+   * @param av eigenvalue av.
+   */
+  public void setEigenvalues(float au, float av) {
+    Array.fill(au,_au);
+    Array.fill(av,_av);
   }
 
   /**
