@@ -309,4 +309,77 @@ public class Eigen {
       }
     }
   }
+
+  /**
+   * Computes eigenvalues and eigenvectors for a symmetric 3x3 matrix A.
+   * If the eigenvectors are placed in columns in a matrix V, and the 
+   * eigenvalues are placed in corresponding columns of a diagonal 
+   * matrix D, then AV = VD.
+   * @param a the symmetric matrix A.
+   * @param v the array of eigenvectors v[0], v[1], and v[2].
+   * @param d the array of eigenvalues d[0], d[1], and d[2].
+   */
+  public static void solveSymmetric33New(float[][] a, float[][] v, float[] d) {
+
+    // Copy matrix to local variables.
+    double a00 = a[0][0];
+    double a01 = a[0][1],  a11 = a[1][1];
+    double a02 = a[0][2],  a12 = a[1][2],  a22 = a[2][2];
+
+    // Principle invariants.
+    double p1 = a00+a11+a22;
+    double p2 = a00*a11-a01*a01 +
+                a00*a22-a02*a02 +
+                a11*a22-a12*a12;
+    double p3 = a00*(a11*a22-a12*a12) +
+                a01*(a02*a12-a01*a22) +
+                a02*(a01*a12-a02*a11);
+
+    // Eigenvalues.
+    double p1o3 = p1*ONE_THIRD;
+    double p2o3 = p2*ONE_THIRD;
+    double p1o3s = p1o3*p1o3;
+    double w = p1o3s-p2o3;
+    while (w<=0.0)
+      w += p1o3s*DBL_EPSILON;
+    double r = sqrt(w);
+    double s = p1o3*p1o3s-p1*p2*ONE_SIXTH+p3*ONE_HALF;
+    double t = acos((s/w)*(1.0/r))*ONE_THIRD;
+    double d0 = p1o3+2.0*r*cos(t);
+    double d1 = p1o3-2.0*r*cos(t+PIO3);
+    double d2 = p1-d0-d1;
+
+    // Eigenvectors. 
+    double a0 = a00-d0, b0 = a11-d0, c0 = a22-d0;
+    double v00 = (a01*a12-b0*a02)*(a02*a12-c0*a01);
+    double v01 = (a02*a12-c0*a01)*(a02*a01-a0*a12);
+    double v02 = (a01*a12-b0*a02)*(a02*a01-a0*a12);
+    double v0s = 1.0/sqrt(v00*v00+v01*v01+v02*v02);
+    v00 *= v0s;
+    v01 *= v0s;
+    v02 *= v0s;
+    double a1 = a00-d1, b1 = a11-d1, c1 = a22-d1;
+    double v10 = (a01*a12-b1*a02)*(a02*a12-c1*a01);
+    double v11 = (a02*a12-c1*a01)*(a02*a01-a1*a12);
+    double v12 = (a01*a12-b1*a02)*(a02*a01-a1*a12);
+    double v1s = 1.0/sqrt(v10*v10+v11*v11+v12*v12);
+    v10 *= v1s;
+    v11 *= v1s;
+    v12 *= v1s;
+    double v20 = v01*v12-v11*v02;
+    double v21 = v10*v02-v00*v12;
+    double v22 = v00*v11-v10*v01;
+
+    // Output.
+    v[0][0] = (float)v00;  v[0][1] = (float)v01;  v[0][2] = (float)v02;
+    v[1][0] = (float)v10;  v[1][1] = (float)v11;  v[1][2] = (float)v12;
+    v[2][0] = (float)v20;  v[2][1] = (float)v21;  v[2][2] = (float)v22;
+    d[0] = (float)d0;
+    d[1] = (float)d1;
+    d[2] = (float)d2;
+  }
+  private static final double ONE_HALF = 1.0/2.0;
+  private static final double ONE_THIRD = 1.0/3.0;
+  private static final double ONE_SIXTH = 1.0/6.0;
+  private static final double PIO3 = PI/3.0;
 }

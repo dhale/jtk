@@ -132,8 +132,10 @@ public class TriMesh implements Serializable {
      */
     private void setPosition(float x, float y) {
       assert _tri==null;
-      _x = perturb(x,y);
-      _y = perturb(y,x);
+      _x = perturb(x,0.450599f*y);
+      _y = perturb(y,0.298721f*x);
+      //_x = perturb(x,y);
+      //_y = perturb(y,x);
     }
   }
 
@@ -2258,6 +2260,146 @@ public class TriMesh implements Serializable {
     ++_triMarkRed;
     --_triMarkBlue;
   }
+
+  /**
+   * Interpolates a float property using Sibson's (natural neighbors) method.
+   * Extrapolation is not yet supported; if the specified point is not inside
+   * the mesh, this method returns a specified null value.
+   * @param x the x coordinate of the point at which to interpolate.
+   * @param y the y coordinate of the point at which to interpolate.
+   * @param map a property map containing float values for all nodes.
+   * @param fnull null value returned for points (x,y) outside the mesh.
+   * @return the interpolated float value.
+   */
+  public float interpolateSibson(
+    float x, float y, NodePropertyMap map, float fnull) 
+  {
+    double xp = x;
+    double yp = y;
+
+    // Where is the point?
+    PointLocation pl = locatePoint(xp,yp);
+
+    // If point is on a node, then interpolation is trivial.
+    if (pl.isOnNode())
+      return (Float)map.get(pl.node());
+
+    // If point is outside, simply return zero.
+    // (Extrapolation is not yet supported.)
+    if (pl.isOutside())
+      return fnull;
+
+    // Get a list of tris that are not Delaunay with respect to the 
+    // specified point (x,y). That is, these tris have circumcircles 
+    // that contain the point, and the list begins with the tri that
+    // contains the point.
+    clearTriMarks();
+    Tri tri = pl.tri();
+    TriList triList = new TriList();
+    getTrisNotDelaunayForPointInside(xp,yp,tri,triList);
+
+    // Arrays for four circumcenters of triangles.
+    double[] c0 = new double[2];
+    double[] c1 = new double[2];
+    double[] c2 = new double[2];
+    double[] cv = new double[2];
+
+    // Sums of signed areas and float values.
+    double as = 0.0f;
+    double fs = 0.0f;
+    
+    // For all tris in the list, ...
+    int ntri = triList.ntri();
+    Tri[] tris = triList.tris();
+    for (int itri=0; itri<ntri; ++itri) {
+
+      // The three nodes of one tri.
+      Node n0 = tri._n0;
+      Node n1 = tri._n1;
+      Node n2 = tri._n2;
+      double x0 = n0._x, y0 = n0._y;
+      double x1 = n1._x, y1 = n1._y;
+      double x2 = n2._x, y2 = n2._y;
+
+      // Centers of four circles.
+      Geometry.centerCircle(x1,y1,x2,y2,xp,yp,c0);
+      Geometry.centerCircle(x2,y2,x0,y0,xp,yp,c1);
+      Geometry.centerCircle(x0,y0,x1,y1,xp,yp,c2);
+      Geometry.centerCircle(x0,y0,x1,y1,x2,y2,cv);
+
+      // Accumulate signed areas and float values.
+      double a0 = area(c1,c2,cv);
+      double a1 = area(c2,c0,cv);
+      double a2 = area(c0,c1,cv);
+      float f0 = (Float)map.get(n0);
+      float f1 = (Float)map.get(n1);
+      float f2 = (Float)map.get(n2);
+      as += a0+a1+a2;
+      fs += a0*f0+a1*f1+a2*f2;
+    }
+
+    // Return interpolated value normalized by total area.
+    return (float)(fs/as);
+  }
+  private double area(double[] cj, double[] ck, double[] cv) {
+    double xj = cj[0]-cv[0];
+    double yj = cj[1]-cv[1];
+    double xk = ck[0]-cv[0];
+    double yk = ck[1]-cv[1];
+    return 0.5*(xj*yk-yj*xk);
+  }
+  private void getTrisNotDelaunayForPointInside(
+    double x, double y, Tri tri, TriList tl) 
+  {
+    if (tri!=null && !isMarked(tri)) {
+      mark(tri);
+      Node n0 = tri._n0;
+      Node n1 = tri._n1;
+      Node n2 = tri._n2;
+      if (inCircle(n0,n1,n2,x,y)) {
+        tl.add(tri);
+        Tri t0 = tri._t0;
+        Tri t1 = tri._t1;
+        Tri t2 = tri._t2;
+        getTrisNotDelaunayForPointInside(x,y,t0,tl);
+        getTrisNotDelaunayForPointInside(x,y,t1,tl);
+        getTrisNotDelaunayForPointInside(x,y,t2,tl);
+      }
+    }
+  }
+  /* This may (or may not) be useful for extrapolation.
+  private void getTrisNotDelaunayForPointOutside(
+    double x, double y, Tri tri, TriList tl) 
+  {
+    if (tri!=null && !isMarked(tri)) {
+      mark(tri);
+      Node n0 = tri._n0;
+      Node n1 = tri._n1;
+      Node n2 = tri._n2;
+      Tri t0 = tri._t0;
+      Tri t1 = tri._t1;
+      Tri t2 = tri._t2;
+      if (t0==null && leftOfLine(n2,n1,x,y)) {
+        getTrisNotDelaunayForPointOutside(x,y,getNextTriOnHull(tri,n1,n0),tl);
+        getTrisNotDelaunayForPointOutside(x,y,getNextTriOnHull(tri,n2,n0),tl);
+      }
+      if (t1==null && leftOfLine(n0,n2,x,y)) {
+        getTrisNotDelaunayForPointOutside(x,y,getNextTriOnHull(tri,n2,n1),tl);
+        getTrisNotDelaunayForPointOutside(x,y,getNextTriOnHull(tri,n0,n1),tl);
+      }
+      if (t2==null && leftOfLine(n1,n0,x,y)) {
+        getTrisNotDelaunayForPointOutside(x,y,getNextTriOnHull(tri,n0,n2),tl);
+        getTrisNotDelaunayForPointOutside(x,y,getNextTriOnHull(tri,n1,n2),tl);
+      }
+      if (inCircle(n0,n1,n2,x,y)) {
+        tl.add(tri);
+        getTrisNotDelaunayForPointOutside(x,y,t0,tl);
+        getTrisNotDelaunayForPointOutside(x,y,t1,tl);
+        getTrisNotDelaunayForPointOutside(x,y,t2,tl);
+      }
+    }
+  }
+  */
 
   /**
    * Validates the internal consistency of the mesh.

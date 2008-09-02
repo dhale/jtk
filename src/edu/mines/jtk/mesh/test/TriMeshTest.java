@@ -25,6 +25,48 @@ public class TriMeshTest extends TestCase {
     junit.textui.TestRunner.run(suite);
   }
 
+  public void testInterpolateSibson() {
+    float xmin = -0.1f;
+    float xmax =  1.1f;
+    float ymin = -0.1f;
+    float ymax =  1.1f;
+    /*
+    float xmin =  0.1f;
+    float xmax =  0.9f;
+    float ymin =  0.1f;
+    float ymax =  0.9f;
+    */
+    TriMesh.Node n0 = new TriMesh.Node(xmin,ymin);
+    TriMesh.Node n1 = new TriMesh.Node(xmax,ymin);
+    TriMesh.Node n2 = new TriMesh.Node(xmin,ymax);
+    TriMesh.Node n3 = new TriMesh.Node(xmax,ymax);
+    TriMesh tm = new TriMesh();
+    tm.addNode(n0);
+    tm.addNode(n1);
+    tm.addNode(n2);
+    tm.addNode(n3);
+    TriMesh.NodePropertyMap map = tm.getNodePropertyMap("f");
+    map.put(n0,new Float(0.0f));
+    map.put(n1,new Float(1.0f));
+    map.put(n2,new Float(1.0f));
+    map.put(n3,new Float(2.0f));
+    int nx = 101;
+    int ny = 101;
+    float[][] f = new float[nx][ny];
+    float fnull = 0.0f;
+    for (int ix=0; ix<nx; ++ix) {
+      float x = (float)(ix)/(float)(nx-1);
+      for (int iy=0; iy<ny; ++iy) {
+        float y = (float)(iy)/(float)(ny-1);
+        float fe = (x-xmin)/(xmax-xmin)+(y-ymin)/(ymax-ymin);
+        float fa = f[ix][iy] = tm.interpolateSibson(x,y,map,fnull);
+        if (fa!=fnull)
+          assertEquals(fe,fa,0.0001);
+      }
+    }
+    //edu.mines.jtk.mosaic.SimplePlot.asPixels(f);
+  }
+
   public void testNabors() {
     TriMesh tm = new TriMesh();
     TriMesh.Node n0 = new TriMesh.Node(1.0f,0.0f);
