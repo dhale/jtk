@@ -41,27 +41,41 @@ public class EigenTest extends TestCase {
   }
 
   public void testSymmetric33() {
+    float[][] v = new float[3][3];
+    float[] d = new float[3];
     int nrand = 100;
     for (int irand=0; irand<nrand; ++irand) {
       float[][] a = Array.randfloat(3,3);
       a = Array.add(a,Array.transpose(a));
-      float[][] v = new float[3][3];
-      float[] d = new float[3];
       Eigen.solveSymmetric33(a,v,d);
       check(a,v,d);
     }
+    Eigen.solveSymmetric33(A100,v,d);
+    check(A100,v,d);
+    Eigen.solveSymmetric33(A110,v,d);
+    check(A110,v,d);
+    Eigen.solveSymmetric33(A111,v,d);
+    check(A111,v,d);
   }
 
   public void testSymmetric33New() {
-    int nrand = 100;
+    int nrand = 0;
+    float[][] v = new float[3][3];
+    float[] d = new float[3];
     for (int irand=0; irand<nrand; ++irand) {
       float[][] a = Array.randfloat(3,3);
       a = Array.add(a,Array.transpose(a));
-      float[][] v = new float[3][3];
-      float[] d = new float[3];
       Eigen.solveSymmetric33New(a,v,d);
       check(a,v,d);
     }
+    /*
+    Eigen.solveSymmetric33New(A100,v,d);
+    check(A100,v,d);
+    Eigen.solveSymmetric33New(A110,v,d);
+    check(A110,v,d);
+    Eigen.solveSymmetric33New(A111,v,d);
+    check(A111,v,d);
+    */
   }
 
   private void check(float[][] a, float[][] v, float[] d) {

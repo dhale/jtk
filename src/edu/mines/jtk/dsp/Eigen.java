@@ -348,6 +348,7 @@ public class Eigen {
     double d0 = p1o3+2.0*r*cos(t);
     double d1 = p1o3-2.0*r*cos(t+PIO3);
     double d2 = p1-d0-d1;
+    System.out.println("d0="+d0+" d1="+d1+" d2="+d2);
 
     // Eigenvectors. 
     double a0 = a00-d0, b0 = a11-d0, c0 = a22-d0;
@@ -358,6 +359,7 @@ public class Eigen {
     v00 *= v0s;
     v01 *= v0s;
     v02 *= v0s;
+    System.out.println("v00="+v00+" v01="+v01+" v02="+v02);
     double a1 = a00-d1, b1 = a11-d1, c1 = a22-d1;
     double v10 = (a01*a12-b1*a02)*(a02*a12-c1*a01);
     double v11 = (a02*a12-c1*a01)*(a02*a01-a1*a12);
@@ -366,9 +368,11 @@ public class Eigen {
     v10 *= v1s;
     v11 *= v1s;
     v12 *= v1s;
+    System.out.println("v10="+v10+" v11="+v11+" v12="+v12);
     double v20 = v01*v12-v11*v02;
     double v21 = v10*v02-v00*v12;
     double v22 = v00*v11-v10*v01;
+    System.out.println("v20="+v20+" v21="+v21+" v22="+v22);
 
     // Output.
     v[0][0] = (float)v00;  v[0][1] = (float)v01;  v[0][2] = (float)v02;
