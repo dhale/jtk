@@ -727,9 +727,9 @@ public class LocalOrientFilter {
       threads[ithread] = new Thread(new Runnable() {
         public void run() {
           for (int i3=ai.getAndIncrement(); i3<n3; i3=ai.getAndIncrement()) {
-            float[][] a = new float[3][3];
-            float[][] z = new float[3][3];
-            float[] e = new float[3];
+            double[][] a = new double[3][3];
+            double[][] z = new double[3][3];
+            double[] e = new double[3];
             for (int i2=0; i2<n2; ++i2) {
               for (int i1=0; i1<n1; ++i1) {
                 a[0][0] = g11[i3][i2][i1];
@@ -742,12 +742,12 @@ public class LocalOrientFilter {
                 a[2][1] = g23[i3][i2][i1];
                 a[2][2] = g33[i3][i2][i1];
                 Eigen.solveSymmetric33(a,z,e);
-                float u1i = z[0][0];
-                float u2i = z[0][1];
-                float u3i = z[0][2];
-                float v1i = z[1][0];
-                float v2i = z[1][1];
-                float v3i = z[1][2];
+                float u1i = (float)z[0][0];
+                float u2i = (float)z[0][1];
+                float u3i = (float)z[0][2];
+                float v1i = (float)z[1][0];
+                float v2i = (float)z[1][1];
+                float v3i = (float)z[1][2];
                 if (u1i<0.0f) {
                   u1i = -u1i;
                   u2i = -u2i;
@@ -761,9 +761,9 @@ public class LocalOrientFilter {
                 float w1i = u2i*v3i-u3i*v2i;
                 float w2i = u3i*v1i-u1i*v3i;
                 float w3i = u1i*v2i-u2i*v1i;
-                float eui = e[0];
-                float evi = e[1];
-                float ewi = e[2];
+                float eui = (float)e[0];
+                float evi = (float)e[1];
+                float ewi = (float)e[2];
                 if (ewi<0.0f) ewi = 0.0f;
                 if (evi<ewi) evi = ewi;
                 if (eui<evi) eui = evi;

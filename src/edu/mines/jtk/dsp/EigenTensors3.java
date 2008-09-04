@@ -363,21 +363,27 @@ public class EigenTensors3 implements Tensors3,Serializable {
     int i1, int i2, int i3, 
     float a11, float a12, float a13, float a22, float a23, float a33)
   {
-    float[][] aa = {
+    double[][] aa = {
       {a11,a12,a13},
       {a12,a22,a23},
       {a13,a23,a33}
     };
-    float[][] vv = new float[3][3];
-    float[] ev = new float[3];
+    double[][] vv = new double[3][3];
+    double[] ev = new double[3];
     Eigen.solveSymmetric33(aa,vv,ev);
-    float[] u = vv[0];
-    float[] w = vv[2];
-    float au = ev[0]; if (au<0.0f) au = 0.0f;
-    float av = ev[1]; if (av<0.0f) av = 0.0f;
-    float aw = ev[2]; if (aw<0.0f) aw = 0.0f;
-    setEigenvectorU(i1,i2,i3,u);
-    setEigenvectorW(i1,i2,i3,w);
+    double[] u = vv[0];
+    double[] w = vv[2];
+    float u1 = (float)u[0];
+    float u2 = (float)u[1];
+    float u3 = (float)u[2];
+    float w1 = (float)w[0];
+    float w2 = (float)w[1];
+    float w3 = (float)w[2];
+    float au = (float)ev[0]; if (au<0.0f) au = 0.0f;
+    float av = (float)ev[1]; if (av<0.0f) av = 0.0f;
+    float aw = (float)ev[2]; if (aw<0.0f) aw = 0.0f;
+    setEigenvectorU(i1,i2,i3,u1,u2,u3);
+    setEigenvectorW(i1,i2,i3,w1,w2,w3);
     setEigenvalues(i1,i2,i3,au,av,aw);
   }
 

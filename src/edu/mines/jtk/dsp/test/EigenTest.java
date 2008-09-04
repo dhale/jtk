@@ -30,22 +30,22 @@ public class EigenTest extends TestCase {
 
   public void testSymmetric22() {
     int nrand = 100;
+    double[][] v = new double[2][2];
+    double[] d = new double[2];
     for (int irand=0; irand<nrand; ++irand) {
-      float[][] a = Array.randfloat(2,2);
+      double[][] a = Array.randdouble(2,2);
       a = Array.add(a,Array.transpose(a));
-      float[][] v = new float[2][2];
-      float[] d = new float[2];
       Eigen.solveSymmetric22(a,v,d);
       check(a,v,d);
     }
   }
 
   public void testSymmetric33() {
-    float[][] v = new float[3][3];
-    float[] d = new float[3];
+    double[][] v = new double[3][3];
+    double[] d = new double[3];
     int nrand = 100;
     for (int irand=0; irand<nrand; ++irand) {
-      float[][] a = Array.randfloat(3,3);
+      double[][] a = Array.randdouble(3,3);
       a = Array.add(a,Array.transpose(a));
       Eigen.solveSymmetric33(a,v,d);
       check(a,v,d);
@@ -53,60 +53,60 @@ public class EigenTest extends TestCase {
   }
 
   public void testSymmetric33Special() {
-    float[][] v = new float[3][3];
-    float[] d = new float[3];
-    float[][][] as = {A100,A110,A111};
-    for (float[][] a:as) {
+    double[][] v = new double[3][3];
+    double[] d = new double[3];
+    double[][][] as = {ASMALL,A100,A110,A111};
+    for (double[][] a:as) {
       Eigen.solveSymmetric33(a,v,d);
       check(a,v,d);
     }
   }
 
-  private void check(float[][] a, float[][] v, float[] d) {
+  private void check(double[][] a, double[][] v, double[] d) {
     int n = a.length;
     for (int k=0; k<n; ++k) {
       assertTrue(k==0 || d[k-1]>=d[k]);
       for (int i=0; i<n; ++i) {
-        float av = 0.0f;
+        double av = 0.0f;
         for (int j=0; j<n; ++j) {
           av += a[i][j]*v[k][j];
         }
-        float vd = v[k][i]*d[k];
-        assertEquals(av,vd,0.001);
+        double vd = v[k][i]*d[k];
+        assertEquals(av,vd,0.0001);
       }
     }
   }
 
-  private static final float[][] A100 = {
-    {1.0f,0.0f,0.0f},
-    {0.0f,0.0f,0.0f},
-    {0.0f,0.0f,0.0f}
+  private static final double[][] A100 = {
+    {1.0,0.0,0.0},
+    {0.0,0.0,0.0},
+    {0.0,0.0,0.0}
   };
-  private static final float[][] A110 = {
-    {1.0f,0.0f,0.0f},
-    {0.0f,1.0f,0.0f},
-    {0.0f,0.0f,0.0f}
+  private static final double[][] A110 = {
+    {1.0,0.0,0.0},
+    {0.0,1.0,0.0},
+    {0.0,0.0,0.0}
   };
-  private static final float[][] A111 = {
-    {1.0f,0.0f,0.0f},
-    {0.0f,1.0f,0.0f},
-    {0.0f,0.0f,1.0f}
+  private static final double[][] A111 = {
+    {1.0,0.0,0.0},
+    {0.0,1.0,0.0},
+    {0.0,0.0,1.0}
   };
-  private static final float[][] AA = {
-    {-1.08876e-13f,  1.87872e-17f,  1.29275e-16f},
-    { 1.87872e-17f, -7.65274e-15f, -1.13984e-14f},
-    { 1.29275e-16f, -1.13984e-14f, -2.53222e-14f}
+  private static final double[][] ASMALL = {
+    {-1.08876e-13,  1.87872e-17,  1.29275e-16},
+    { 1.87872e-17, -7.65274e-15, -1.13984e-14},
+    { 1.29275e-16, -1.13984e-14, -2.53222e-14}
   };
 
   private static void benchSymmetric33() {
-    int nrand = 1000000;
-    float[][][] a = new float[nrand][][];
+    int nrand = 10000;
+    double[][][] a = new double[nrand][][];
     for (int irand=0; irand<nrand; ++irand) {
-      a[irand] = Array.randfloat(3,3);
+      a[irand] = Array.randdouble(3,3);
       a[irand] = Array.add(a[irand],Array.transpose(a[irand]));
     }
-    float[][] v = new float[3][3];
-    float[] d = new float[3];
+    double[][] v = new double[3][3];
+    double[] d = new double[3];
     Stopwatch s = new Stopwatch();
     int nloop,rate;
     double maxtime = 2.0;

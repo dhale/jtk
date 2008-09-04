@@ -103,7 +103,7 @@ public class Eigen {
 
     // If off-diagonal element is non-zero, zero it with a Jacobi rotation.
     if (a01!=0.0) {
-      double tiny = 0.1f*sqrt(DBL_EPSILON); // avoid overflow in r*r below
+      double tiny = 0.1*sqrt(DBL_EPSILON); // avoid overflow in r*r below
       double c,r,s,t,u,vpr,vqr;
       u = a11-a00;
       if (abs(a01)<tiny*abs(u)) {
@@ -118,7 +118,7 @@ public class Eigen {
       r = t*a01;
       a00 -= r;
       a11 += r;
-      a01 = 0.0f;
+      a01 = 0.0;
       vpr = v00;
       vqr = v10;
       v00 = vpr-s*(vqr+vpr*u);
@@ -155,20 +155,20 @@ public class Eigen {
    * @param v the array of eigenvectors v[0], v[1], and v[2].
    * @param d the array of eigenvalues d[0], d[1], and d[2].
    */
-  public static void solveSymmetric33(float[][] a, float[][] v, float[] d) {
+  public static void solveSymmetric33(double[][] a, double[][] v, double[] d) {
     solveSymmetric33Hybrid(a,v,d);
   }
 
   /**
    * Sorts eigenvalues d and eigenvectors v in descending order.
    */
-  private static void sortDescending33(float[][] v, float[] d) {
+  private static void sortDescending33(double[][] v, double[] d) {
     for (int i=0; i<3; ++i) {
       for (int j=i; j>0 && d[j-1]<d[j]; --j) {
-        float dj = d[j];
+        double dj = d[j];
         d[j] = d[j-1];
         d[j-1] = dj;
-        float[] vj = v[j];
+        double[] vj = v[j];
         v[j] = v[j-1];
         v[j-1] = vj;
       }
@@ -182,14 +182,12 @@ public class Eigen {
 
   private static final double ONE_THIRD = 1.0/3.0;
   private static final double ONE_OVER_SQRT3 = 1.0/sqrt(3.0);
-  //private static final float OMEGA_MIN = 0.1f*sqrt(Float.MAX_VALUE);
-  private static final float OMEGA_MIN = 0.0f;
 
   /**
    * Computes eigenvalues of a symmetric 3x3 matrix using Cardano's
    * analytical method.
    */
-  private static void getEigenvaluesSymmetric33(float[][] a, float[] d) {
+  private static void getEigenvaluesSymmetric33(double[][] a, double[] d) {
     double a00 = a[0][0],
            a01 = a[0][1], a11 = a[1][1],
            a02 = a[0][2], a12 = a[1][2], a22 = a[2][2];
@@ -208,9 +206,9 @@ public class Eigen {
     double c = sqrtp*cos(phi);
     double s = ONE_OVER_SQRT3*sqrtp*sin(phi);
     double dt = ONE_THIRD*(m-c);
-    d[0] = (float)(dt+c);
-    d[1] = (float)(dt+s);
-    d[2] = (float)(dt-s);
+    d[0] = dt+c;
+    d[1] = dt+s;
+    d[2] = dt-s;
   }
 
   /**
@@ -221,7 +219,7 @@ public class Eigen {
    * uses a slower but more accurate QL algorithm.
    */
   private static void solveSymmetric33Hybrid(
-    float[][] a, float[][] v, float[] d) 
+    double[][] a, double[][] v, double[] d) 
   {
     getEigenvaluesSymmetric33(a,d);
     double a00 = a[0][0],
@@ -240,7 +238,7 @@ public class Eigen {
     } else {
       u = sqrt(t);
     }
-    double error = 256.0*FLT_EPSILON*(n0+u)*(n1+u);
+    double error = 256.0*DBL_EPSILON*(n0+u)*(n1+u);
     double v10 = a01*a12-a02*a11;
     double v11 = a02*a01-a12*a00;
     double v12 = a01*a01;
@@ -287,19 +285,19 @@ public class Eigen {
     double v22 = v00*v11-v01*v10;
 
     // Return eigenvectors.
-    v[0][0] = (float)v00;  v[0][1] = (float)v01;  v[0][2] = (float)v02;
-    v[1][0] = (float)v10;  v[1][1] = (float)v11;  v[1][2] = (float)v12;
-    v[2][0] = (float)v20;  v[2][1] = (float)v21;  v[2][2] = (float)v22;
+    v[0][0] = v00;  v[0][1] = v01;  v[0][2] = v02;
+    v[1][0] = v10;  v[1][1] = v11;  v[1][2] = v12;
+    v[2][0] = v20;  v[2][1] = v21;  v[2][2] = v22;
   }
 
   /**
    * Kopp's solver for eigenvalues and eigenvectors via QL decomposition.
    */
   private static void solveSymmetric33Ql(
-    float[][] a, float[][] v, float[] d) 
+    double[][] a, double[][] v, double[] d) 
   {
     // Reduce A to tri-diagonal form.
-    float[] e = new float[3];
+    double[] e = new double[3];
     reduceSymmetric33(a,v,d,e);
 
     // Loop over off-diagonal elements e[0] and e[1].
@@ -317,55 +315,55 @@ public class Eigen {
         // Converged if off-diagonal element e[l] is insignificant.
         int m;
         for (m=l; m<2; ++m) {
-          float g = abs(d[m])+abs(d[m+1]);
+          double g = abs(d[m])+abs(d[m+1]);
           if (abs(e[m])+g==g)
             break;
         }
         if (m==l)
           break;
 
-        float g = (d[l+1]-d[l])/(e[l]+e[l]);
-        float r = sqrt(g*g+1.0f);
-        if (g>0.0f) {
+        double g = (d[l+1]-d[l])/(e[l]+e[l]);
+        double r = sqrt(g*g+1.0);
+        if (g>0.0) {
           g = d[m]-d[l]+e[l]/(g+r);
         } else {
           g = d[m]-d[l]+e[l]/(g-r);
         }
-        float s = 1.0f;
-        float c = 1.0f;
-        float p = 0.0f;
+        double s = 1.0;
+        double c = 1.0;
+        double p = 0.0;
         for (int i=m-1; i>=l; --i) {
-          float f = s*e[i];
-          float b = c*e[i];
+          double f = s*e[i];
+          double b = c*e[i];
           if (abs(f)>abs(g)) {
             c = g/f;
-            r = sqrt(c*c+1.0f);
+            r = sqrt(c*c+1.0);
             e[i+1] = f*r;
-            s = 1.0f/r;
+            s = 1.0/r;
             c *= s;
           } else {
             s = f/g;
-            r = sqrt(s*s+1.0f);
+            r = sqrt(s*s+1.0);
             e[i+1] = g*r;
-            c = 1.0f/r;
+            c = 1.0/r;
             s *= c; 
           }
           g = d[i+1]-p;
-          r = (d[i]-g)*s+2.0f*c*b;
+          r = (d[i]-g)*s+2.0*c*b;
           p = s*r;
           d[i+1] = g+p;
           g = c*r-b;
 
           // Update eigenvectors.
           for (int k=0; k<3; ++k) {
-            float t = v[i+1][k];
+            double t = v[i+1][k];
             v[i+1][k] = s*v[i][k]+c*t;
             v[i  ][k] = c*v[i][k]-s*t;
           }
         }
         d[l] -= p;
         e[l] = g;
-        e[m] = 0.0f;
+        e[m] = 0.0;
       }
     }
     sortDescending33(v,d);
@@ -377,38 +375,38 @@ public class Eigen {
    * Householder transformations are stored in the matrix v.
    */
   private static void reduceSymmetric33(
-    float[][] a, float[][] v, float[] d, float[] e) 
+    double[][] a, double[][] v, double[] d, double[] e) 
   {
-    float a00 = a[0][0],
-          a01 = a[0][1], a11 = a[1][1],
-          a02 = a[0][2], a12 = a[1][2], a22 = a[2][2];
-    float v11 = 1.0f;
-    float v12 = 0.0f;
-    float v21 = 0.0f;
-    float v22 = 1.0f;
-    float h = a01*a01+a02*a02;
-    float g = (a01>0.0f)?-sqrt(h):sqrt(h);
-    float e0 = g;
-    float f = g*a01;
-    float u1 = a01-g;
-    float u2 = a02;
-    float omega = h-f;
-    float d0,d1,d2,e1,s,q1,q2;
-    if (omega>OMEGA_MIN) {
-      omega = 1.0f/omega;
-      s = 0.0f;
+    double a00 = a[0][0],
+           a01 = a[0][1], a11 = a[1][1],
+           a02 = a[0][2], a12 = a[1][2], a22 = a[2][2];
+    double v11 = 1.0;
+    double v12 = 0.0;
+    double v21 = 0.0;
+    double v22 = 1.0;
+    double h = a01*a01+a02*a02;
+    double g = (a01>0.0)?-sqrt(h):sqrt(h);
+    double e0 = g;
+    double f = g*a01;
+    double u1 = a01-g;
+    double u2 = a02;
+    double omega = h-f;
+    double d0,d1,d2,e1,s,q1,q2;
+    if (omega>0.0) {
+      omega = 1.0/omega;
+      s = 0.0;
       f = a11*u1+a12*u2;
       q1 = omega*f;
       s += u1*f;
       f = a12*u1+a22*u2;
       q2 = omega*f;
       s += u2*f;
-      s *= 0.5f*omega*omega;
+      s *= 0.5*omega*omega;
       q1 -= s*u1;
       q2 -= s*u2;
       d0 = a00;
-      d1 = a11-2.0f*q1*u1;
-      d2 = a22-2.0f*q2*u2;
+      d1 = a11-2.0*q1*u1;
+      d2 = a22-2.0*q2*u2;
       f = omega*u1;
       v11 -= f*u1;
       v12 -= f*u2;
@@ -427,9 +425,9 @@ public class Eigen {
     d[2] = d2;
     e[0] = e0;
     e[1] = e1;
-    v[0][0] = 1.0f;  v[0][1] = 0.0f;  v[0][2] = 0.0f;
-    v[1][0] = 0.0f;  v[1][1] =  v11;  v[1][2] =  v12;
-    v[2][0] = 0.0f;  v[2][1] =  v21;  v[2][2] =  v22;
+    v[0][0] = 1.0;  v[0][1] = 0.0;  v[0][2] = 0.0;
+    v[1][0] = 0.0;  v[1][1] = v11;  v[1][2] = v12;
+    v[2][0] = 0.0;  v[2][1] = v21;  v[2][2] = v22;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -442,32 +440,32 @@ public class Eigen {
    * Deprecated.
    */
   public static void solveSymmetric33Jacobi(
-    float[][] a, float[][] v, float[] d) 
+    double[][] a, double[][] v, double[] d) 
   {
 
     // Copy matrix to local variables.
-    float a00 = a[0][0];
-    float a01 = a[0][1],  a11 = a[1][1];
-    float a02 = a[0][2],  a12 = a[1][2],  a22 = a[2][2];
+    double a00 = a[0][0],
+           a01 = a[0][1],  a11 = a[1][1],
+           a02 = a[0][2],  a12 = a[1][2],  a22 = a[2][2];
 
     // Initial eigenvectors. 
-    float v00 = 1.0f,     v01 = 0.0f,     v02 = 0.0f;
-    float v10 = 0.0f,     v11 = 1.0f,     v12 = 0.0f;
-    float v20 = 0.0f,     v21 = 0.0f,     v22 = 1.0f;
+    double v00 = 1.0,  v01 = 0.0,  v02 = 0.0,
+           v10 = 0.0,  v11 = 1.0,  v12 = 0.0,
+           v20 = 0.0,  v21 = 0.0,  v22 = 1.0;
 
     // Tiny constant to avoid overflow of r*r (in computation of t) below.
-    float tiny = 0.1f*sqrt(FLT_EPSILON);
+    double tiny = 0.1*sqrt(DBL_EPSILON);
     
     // Absolute values of off-diagonal elements.
-    float aa01 = abs(a01);
-    float aa02 = abs(a02);
-    float aa12 = abs(a12);
+    double aa01 = abs(a01);
+    double aa02 = abs(a02);
+    double aa12 = abs(a12);
 
     // Apply Jacobi rotations until all off-diagonal elements are zero.
     // Count rotations, just in case this does not converge.
-    for (int nrot=0; aa01+aa02+aa12>0.0f; ++nrot) {
+    for (int nrot=0; aa01+aa02+aa12>0.0; ++nrot) {
       Check.state(nrot<100,"number of Jacobi rotations is less than 100");
-      float c,r,s,t,u,vpr,vqr,apr,aqr;
+      double c,r,s,t,u,vpr,vqr,apr,aqr;
 
       // If a01 is the largest off-diagonal element, ...
       if (aa01>=aa02 && aa01>=aa12) {
@@ -475,16 +473,16 @@ public class Eigen {
         if (abs(a01)<tiny*abs(u)) {
           t = a01/u;
         } else {
-          r = 0.5f*u/a01;
-          t = (r>=0.0f)?1.0f/(r+sqrt(1.0f+r*r)):1.0f/(r-sqrt(1.0f+r*r));
+          r = 0.5*u/a01;
+          t = (r>=0.0)?1.0/(r+sqrt(1.0+r*r)):1.0/(r-sqrt(1.0+r*r));
         }
-        c = 1.0f/sqrt(1.0f+t*t);
+        c = 1.0/sqrt(1.0+t*t);
         s = t*c;
-        u = s/(1.0f+c);
+        u = s/(1.0+c);
         r = t*a01;
         a00 -= r;
         a11 += r;
-        a01 = 0.0f;
+        a01 = 0.0;
         apr = a02;
         aqr = a12;
         a02 = apr-s*(aqr+apr*u);
@@ -509,16 +507,16 @@ public class Eigen {
         if (abs(a02)<tiny*abs(u)) {
           t = a02/u;
         } else {
-          r = 0.5f*u/a02;
-          t = (r>=0.0f)?1.0f/(r+sqrt(1.0f+r*r)):1.0f/(r-sqrt(1.0f+r*r));
+          r = 0.5*u/a02;
+          t = (r>=0.0)?1.0/(r+sqrt(1.0+r*r)):1.0/(r-sqrt(1.0+r*r));
         }
-        c = 1.0f/sqrt(1.0f+t*t);
+        c = 1.0/sqrt(1.0+t*t);
         s = t*c;
-        u = s/(1.0f+c);
+        u = s/(1.0+c);
         r = t*a02;
         a00 -= r;
         a22 += r;
-        a02 = 0.0f;
+        a02 = 0.0;
         apr = a01;
         aqr = a12;
         a01 = apr-s*(aqr+apr*u);
@@ -543,16 +541,16 @@ public class Eigen {
         if (abs(a12)<tiny*abs(u)) {
           t = a12/u;
         } else {
-          r = 0.5f*u/a12;
-          t = (r>=0.0f)?1.0f/(r+sqrt(1.0f+r*r)):1.0f/(r-sqrt(1.0f+r*r));
+          r = 0.5*u/a12;
+          t = (r>=0.0)?1.0/(r+sqrt(1.0+r*r)):1.0/(r-sqrt(1.0+r*r));
         }
-        c = 1.0f/sqrt(1.0f+t*t);
+        c = 1.0/sqrt(1.0+t*t);
         s = t*c;
-        u = s/(1.0f+c);
+        u = s/(1.0+c);
         r = t*a12;
         a11 -= r;
         a22 += r;
-        a12 = 0.0f;
+        a12 = 0.0;
         apr = a01;
         aqr = a02;
         a01 = apr-s*(aqr+apr*u);
