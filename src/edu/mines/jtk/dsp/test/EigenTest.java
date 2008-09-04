@@ -58,26 +58,6 @@ public class EigenTest extends TestCase {
     check(A111,v,d);
   }
 
-  public void testSymmetric33New() {
-    int nrand = 0;
-    float[][] v = new float[3][3];
-    float[] d = new float[3];
-    for (int irand=0; irand<nrand; ++irand) {
-      float[][] a = Array.randfloat(3,3);
-      a = Array.add(a,Array.transpose(a));
-      Eigen.solveSymmetric33New(a,v,d);
-      check(a,v,d);
-    }
-    /*
-    Eigen.solveSymmetric33New(A100,v,d);
-    check(A100,v,d);
-    Eigen.solveSymmetric33New(A110,v,d);
-    check(A110,v,d);
-    Eigen.solveSymmetric33New(A111,v,d);
-    check(A111,v,d);
-    */
-  }
-
   private void check(float[][] a, float[][] v, float[] d) {
     int n = a.length;
     for (int k=0; k<n; ++k) {
@@ -119,8 +99,7 @@ public class EigenTest extends TestCase {
     float[][] v = new float[3][3];
     float[] d = new float[3];
     Stopwatch s = new Stopwatch();
-    int nloop;
-    double rate;
+    int nloop,rate;
     double maxtime = 2.0;
     s.reset();
     s.start();
@@ -130,17 +109,18 @@ public class EigenTest extends TestCase {
       }
     }
     s.stop();
-    rate = (double)nloop*(double)nrand/s.time();
-    System.out.println("old: rate="+rate);
+    rate = (int)((double)nloop*(double)nrand/s.time());
+    System.out.println("Number of 3x3 eigen-decompositions per second");
+    System.out.println("new: rate="+rate);
     s.reset();
     s.start();
     for (nloop=0; s.time()<maxtime; ++nloop) {
       for (int irand=0; irand<nrand; ++irand) {
-        Eigen.solveSymmetric33New(a[irand],v,d);
+        Eigen.solveSymmetric33Jacobi(a[irand],v,d);
       }
     }
     s.stop();
-    rate = (double)nloop*(double)nrand/s.time();
-    System.out.println("new: rate="+rate);
+    rate = (int)((double)nloop*(double)nrand/s.time());
+    System.out.println("old: rate="+rate);
   }
 }

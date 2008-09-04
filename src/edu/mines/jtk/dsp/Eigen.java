@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2006, Colorado School of Mines and others. All rights reserved.
+Copyright (c) 2008, Colorado School of Mines and others. All rights reserved.
 This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
@@ -14,7 +14,7 @@ import edu.mines.jtk.util.Check;
  * Special-purpose eigensolvers for digital signal processing.
  * Methods of this class solve small eigen-problems efficiently.
  * @author Dave Hale, Colorado School of Mines
- * @version 2006.01.31
+ * @version 2008.09.04
  */
 public class Eigen {
 
@@ -156,6 +156,287 @@ public class Eigen {
    * @param d the array of eigenvalues d[0], d[1], and d[2].
    */
   public static void solveSymmetric33(float[][] a, float[][] v, float[] d) {
+    solveSymmetric33Hybrid(a,v,d);
+  }
+
+  /**
+   * Sorts eigenvalues d and eigenvectors v in descending order.
+   */
+  private static void sortDescending33(float[][] v, float[] d) {
+    for (int i=0; i<3; ++i) {
+      for (int j=i; j>0 && d[j-1]<d[j]; --j) {
+        float dj = d[j];
+        d[j] = d[j-1];
+        d[j-1] = dj;
+        float[] vj = v[j];
+        v[j] = v[j-1];
+        v[j-1] = vj;
+      }
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // Kopp's hybrid method. (See Kopp, J., 2008, Efficient numerical
+  // diagonalization of hermitian 3x3 matrices: International Journal
+  // of Modern Physics, C 19, 523-548.)
+
+  private static final double ONE_THIRD = 1.0/3.0;
+  private static final double ONE_OVER_SQRT3 = 1.0/sqrt(3.0);
+
+  /**
+   * Computes eigenvalues of a symmetric 3x3 matrix using Cardano's
+   * analytical method.
+   */
+  private static void getEigenvaluesSymmetric33(float[][] a, float[] d) {
+    double a00 = a[0][0],
+           a01 = a[0][1], a11 = a[1][1],
+           a02 = a[0][2], a12 = a[1][2], a22 = a[2][2];
+    double de = a01*a12;
+    double dd = a01*a01;
+    double ee = a12*a12;
+    double ff = a02*a02;
+    double m = a00+a11+a22;
+    double c1 = (a00*a11+a00*a22+a11*a22)-(dd+ee+ff);
+    double c0 = a22*dd+a00*ee+a11*ff-a00*a11*a22-2.0*a02*de;
+    double p = m*m-3.0*c1;
+    double q = m*(p-1.5*c1)-13.5*c0; // 13.5 = 27/2
+    double t = 27.0*(0.25*c1*c1*(p-c1)+c0*(q+6.75*c0)); // 6.75 = 27/4
+    double phi = ONE_THIRD*atan2(sqrt(abs(t)),q);
+    double sqrtp = sqrt(abs(p));
+    double c = sqrtp*cos(phi);
+    double s = ONE_OVER_SQRT3*sqrtp*sin(phi);
+    double dt = ONE_THIRD*(m-c);
+    d[0] = (float)(dt+c);
+    d[1] = (float)(dt+s);
+    d[2] = (float)(dt-s);
+  }
+
+  /**
+   * Implementation of Kopp's hybrid method for real symmetric 3x3 matrices.
+   * Computes eigenvalues and eigenvectors using Cardano's analytical method
+   * for the eigenvalues and, typically, an analytical vector cross-product
+   * algorithm for the eigenvectors. When necessary for accuracy, this method
+   * uses a slower but more accurate QL algorithm.
+   */
+  private static void solveSymmetric33Hybrid(
+    float[][] a, float[][] v, float[] d) 
+  {
+    getEigenvaluesSymmetric33(a,d);
+    double a00 = a[0][0],
+           a01 = a[0][1], a11 = a[1][1],
+           a02 = a[0][2], a12 = a[1][2], a22 = a[2][2];
+    double d0 = d[0], d1 = d[1], d2 = d[2];
+    double n0 = a00*a00+a01*a01+a02*a02;
+    double n1 = a01*a01+a11*a11+a12*a12;
+    double t = abs(d0);
+    double u = abs(d1);
+    if (u>t) t = u;
+    u = abs(d2);
+    if (u>t) t = u;
+    if (t<1.0) {
+      u = t;
+    } else {
+      u = sqrt(t);
+    }
+    double error = 256.0*FLT_EPSILON*(n0+u)*(n1+u);
+    double v10 = a01*a12-a02*a11;
+    double v11 = a02*a01-a12*a00;
+    double v12 = a01*a01;
+
+    // Compute 1st eigenvector via v0 = (A-d0)*e1 x (A-d0)*e2.
+    double v00 = v10+a02*d0;
+    double v01 = v11+a12*d0;
+    double v02 = (a00-d0)*(a11-d0)-v12;
+    double v0s = v00*v00+v01*v01+v02*v02;
+
+    // If vectors are nearly linearly dependent, or if large cancellation
+    // may have occured in the calculation of A-d0, fall back to the QL 
+    // algorithm. This case should be rare.
+    if (v0s<=error) {
+      solveSymmetric33Ql(a,v,d);
+      return;
+    } else {
+      v0s = sqrt(1.0/v0s);
+      v00 *= v0s;
+      v01 *= v0s;
+      v02 *= v0s;
+    }
+
+    // Compute 2nd eigenvector via v1 = (A-d1)*e1 x (A-d1)*e2.
+    v10 = v10+a02*d1;
+    v11 = v11+a12*d1;
+    v12 = (a00-d1)*(a11-d1)-v12;
+    double v1s = v10*v10+v11*v11+v12*v12;
+
+    // Same check as above but now for 2nd eigenvector.
+    if (v1s<=error) {
+      solveSymmetric33Ql(a,v,d);
+      return;
+    } else {
+      v1s = sqrt(1.0/v1s);
+      v10 *= v1s;
+      v11 *= v1s;
+      v12 *= v1s;
+    }
+
+    // 3rd eigenvector via v2 = v0 x v1
+    double v20 = v01*v12-v02*v11;
+    double v21 = v02*v10-v00*v12;
+    double v22 = v00*v11-v01*v10;
+
+    // Return eigenvectors.
+    v[0][0] = (float)v00;  v[0][1] = (float)v01;  v[0][2] = (float)v02;
+    v[1][0] = (float)v10;  v[1][1] = (float)v11;  v[1][2] = (float)v12;
+    v[2][0] = (float)v20;  v[2][1] = (float)v21;  v[2][2] = (float)v22;
+  }
+
+  /**
+   * Kopp's solver for eigenvalues and eigenvectors via QL decomposition.
+   */
+  private static void solveSymmetric33Ql(
+    float[][] a, float[][] v, float[] d) 
+  {
+    // Reduce A to tri-diagonal form.
+    float[] e = new float[3];
+    reduceSymmetric33(a,v,d,e);
+
+    // Loop over off-diagonal elements e[0] and e[1].
+    for (int l=0; l<2; ++l) {
+
+      // While not converged and number of iterations not too large.
+      for (int niter=0; niter<=100; ++niter) {
+        Check.state(niter<100,"number of QL iterations is less than 100");
+
+        // Converged if off-diagonal element e[l] is insignificant.
+        int m;
+        for (m=l; m<2; ++m) {
+          float g = abs(d[m])+abs(d[m+1]);
+          if (abs(e[m])+g==g)
+            break;
+        }
+        if (m==l)
+          break;
+
+        float g = (d[l+1]-d[l])/(e[l]+e[l]);
+        float r = sqrt(g*g+1.0f);
+        if (g>0.0f) {
+          g = d[m]-d[l]+e[l]/(g+r);
+        } else {
+          g = d[m]-d[l]+e[l]/(g-r);
+        }
+        float s = 1.0f;
+        float c = 1.0f;
+        float p = 0.0f;
+        for (int i=m-1; i>=l; --i) {
+          float f = s*e[i];
+          float b = c*e[i];
+          if (abs(f)>abs(g)) {
+            c = g/f;
+            r = sqrt(c*c+1.0f);
+            e[i+1] = f*r;
+            s = 1.0f/r;
+            c *= s;
+          } else {
+            s = f/g;
+            r = sqrt(s*s+1.0f);
+            e[i+1] = g*r;
+            c = 1.0f/r;
+            s *= c; 
+          }
+          g = d[i+1]-p;
+          r = (d[i]-g)*s+2.0f*c*b;
+          p = s*r;
+          d[i+1] = g+p;
+          g = c*r-b;
+
+          // Update eigenvectors.
+          for (int k=0; k<3; ++k) {
+            float t = v[i+1][k];
+            v[i+1][k] = s*v[i][k]+c*t;
+            v[i  ][k] = c*v[i][k]-s*t;
+          }
+        }
+        d[l] -= p;
+        e[l] = g;
+        e[m] = 0.0f;
+      }
+    }
+    sortDescending33(v,d);
+  }
+
+  /**
+   * Kopp's tridiagonal reduction for real symmetric 3x3 matrices.
+   * Diagonal is {d[0],d[1],d[2]} and super-diagonal is {e[0],e[1]}.
+   * Householder transformations are stored in the matrix v.
+   */
+  private static void reduceSymmetric33(
+    float[][] a, float[][] v, float[] d, float[] e) 
+  {
+    float a00 = a[0][0],
+          a01 = a[0][1], a11 = a[1][1],
+          a02 = a[0][2], a12 = a[1][2], a22 = a[2][2];
+    float v11 = 1.0f;
+    float v12 = 0.0f;
+    float v21 = 0.0f;
+    float v22 = 1.0f;
+    float h = a01*a01+a02*a02;
+    float g = (a01>0.0f)?-sqrt(h):sqrt(h);
+    float e0 = g;
+    float f = g*a01;
+    float u1 = a01-g;
+    float u2 = a02;
+    float omega = h-f;
+    float d0,d1,d2,e1,s,q1,q2;
+    if (omega>0.0f) {
+      omega = 1.0f/omega;
+      s = 0.0f;
+      f = a11*u1+a12*u2;
+      q1 = omega*f;
+      s += u1*f;
+      f = a12*u1+a22*u2;
+      q2 = omega*f;
+      s += u2*f;
+      s *= 0.5f*omega*omega;
+      q1 -= s*u1;
+      q2 -= s*u2;
+      d0 = a00;
+      d1 = a11-2.0f*q1*u1;
+      d2 = a22-2.0f*q2*u2;
+      f = omega*u1;
+      v11 -= f*u1;
+      v12 -= f*u2;
+      f = omega*u2;
+      v21 -= f*u1;
+      v22 -= f*u2;
+      e1 = a12-q1*u2-u1*q2;
+    } else {
+      d0 = a00;
+      d1 = a11;
+      d2 = a22;
+      e1 = a12;
+    }
+    d[0] = d0;
+    d[1] = d1;
+    d[2] = d2;
+    e[0] = e0;
+    e[1] = e1;
+    v[0][0] = 1.0f;  v[0][1] = 0.0f;  v[0][2] = 0.0f;
+    v[1][0] = 0.0f;  v[1][1] =  v11;  v[1][2] =  v12;
+    v[2][0] = 0.0f;  v[2][1] =  v21;  v[2][2] =  v22;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // Old iterative Jacobi method for symmetric 3x3 matrices. For random 
+  // matrices, this Jacobi solver is about 6 times slower than the current
+  // hybrid method.
+
+  /**
+   * Old iterative Jacobi solver. Slower than the current solver.
+   * Deprecated.
+   */
+  public static void solveSymmetric33Jacobi(
+    float[][] a, float[][] v, float[] d) 
+  {
 
     // Copy matrix to local variables.
     float a00 = a[0][0];
@@ -298,92 +579,6 @@ public class Eigen {
     v[2][0] = v20;  v[2][1] = v21;  v[2][2] = v22;
 
     // Sort eigenvalues (and eigenvectors) in descending order.
-    for (int i=0; i<3; ++i) {
-      for (int j=i; j>0 && d[j-1]<d[j]; --j) {
-        float dj = d[j];
-        d[j] = d[j-1];
-        d[j-1] = dj;
-        float[] vj = v[j];
-        v[j] = v[j-1];
-        v[j-1] = vj;
-      }
-    }
+    sortDescending33(v,d);
   }
-
-  /**
-   * Computes eigenvalues and eigenvectors for a symmetric 3x3 matrix A.
-   * If the eigenvectors are placed in columns in a matrix V, and the 
-   * eigenvalues are placed in corresponding columns of a diagonal 
-   * matrix D, then AV = VD.
-   * @param a the symmetric matrix A.
-   * @param v the array of eigenvectors v[0], v[1], and v[2].
-   * @param d the array of eigenvalues d[0], d[1], and d[2].
-   */
-  public static void solveSymmetric33New(float[][] a, float[][] v, float[] d) {
-
-    // Copy matrix to local variables.
-    double a00 = a[0][0];
-    double a01 = a[0][1],  a11 = a[1][1];
-    double a02 = a[0][2],  a12 = a[1][2],  a22 = a[2][2];
-
-    // Principle invariants.
-    double p1 = a00+a11+a22;
-    double p2 = a00*a11-a01*a01 +
-                a00*a22-a02*a02 +
-                a11*a22-a12*a12;
-    double p3 = a00*(a11*a22-a12*a12) +
-                a01*(a02*a12-a01*a22) +
-                a02*(a01*a12-a02*a11);
-
-    // Eigenvalues.
-    double p1o3 = p1*ONE_THIRD;
-    double p2o3 = p2*ONE_THIRD;
-    double p1o3s = p1o3*p1o3;
-    double w = p1o3s-p2o3;
-    while (w<=0.0)
-      w += p1o3s*DBL_EPSILON;
-    double r = sqrt(w);
-    double s = p1o3*p1o3s-p1*p2*ONE_SIXTH+p3*ONE_HALF;
-    double t = acos((s/w)*(1.0/r))*ONE_THIRD;
-    double d0 = p1o3+2.0*r*cos(t);
-    double d1 = p1o3-2.0*r*cos(t+PIO3);
-    double d2 = p1-d0-d1;
-    System.out.println("d0="+d0+" d1="+d1+" d2="+d2);
-
-    // Eigenvectors. 
-    double a0 = a00-d0, b0 = a11-d0, c0 = a22-d0;
-    double v00 = (a01*a12-b0*a02)*(a02*a12-c0*a01);
-    double v01 = (a02*a12-c0*a01)*(a02*a01-a0*a12);
-    double v02 = (a01*a12-b0*a02)*(a02*a01-a0*a12);
-    double v0s = 1.0/sqrt(v00*v00+v01*v01+v02*v02);
-    v00 *= v0s;
-    v01 *= v0s;
-    v02 *= v0s;
-    System.out.println("v00="+v00+" v01="+v01+" v02="+v02);
-    double a1 = a00-d1, b1 = a11-d1, c1 = a22-d1;
-    double v10 = (a01*a12-b1*a02)*(a02*a12-c1*a01);
-    double v11 = (a02*a12-c1*a01)*(a02*a01-a1*a12);
-    double v12 = (a01*a12-b1*a02)*(a02*a01-a1*a12);
-    double v1s = 1.0/sqrt(v10*v10+v11*v11+v12*v12);
-    v10 *= v1s;
-    v11 *= v1s;
-    v12 *= v1s;
-    System.out.println("v10="+v10+" v11="+v11+" v12="+v12);
-    double v20 = v01*v12-v11*v02;
-    double v21 = v10*v02-v00*v12;
-    double v22 = v00*v11-v10*v01;
-    System.out.println("v20="+v20+" v21="+v21+" v22="+v22);
-
-    // Output.
-    v[0][0] = (float)v00;  v[0][1] = (float)v01;  v[0][2] = (float)v02;
-    v[1][0] = (float)v10;  v[1][1] = (float)v11;  v[1][2] = (float)v12;
-    v[2][0] = (float)v20;  v[2][1] = (float)v21;  v[2][2] = (float)v22;
-    d[0] = (float)d0;
-    d[1] = (float)d1;
-    d[2] = (float)d2;
-  }
-  private static final double ONE_HALF = 1.0/2.0;
-  private static final double ONE_THIRD = 1.0/3.0;
-  private static final double ONE_SIXTH = 1.0/6.0;
-  private static final double PIO3 = PI/3.0;
 }
