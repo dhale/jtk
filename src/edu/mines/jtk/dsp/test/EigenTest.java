@@ -50,12 +50,16 @@ public class EigenTest extends TestCase {
       Eigen.solveSymmetric33(a,v,d);
       check(a,v,d);
     }
-    Eigen.solveSymmetric33(A100,v,d);
-    check(A100,v,d);
-    Eigen.solveSymmetric33(A110,v,d);
-    check(A110,v,d);
-    Eigen.solveSymmetric33(A111,v,d);
-    check(A111,v,d);
+  }
+
+  public void testSymmetric33Special() {
+    float[][] v = new float[3][3];
+    float[] d = new float[3];
+    float[][][] as = {A100,A110,A111};
+    for (float[][] a:as) {
+      Eigen.solveSymmetric33(a,v,d);
+      check(a,v,d);
+    }
   }
 
   private void check(float[][] a, float[][] v, float[] d) {
@@ -87,6 +91,11 @@ public class EigenTest extends TestCase {
     {1.0f,0.0f,0.0f},
     {0.0f,1.0f,0.0f},
     {0.0f,0.0f,1.0f}
+  };
+  private static final float[][] AA = {
+    {-1.08876e-13f,  1.87872e-17f,  1.29275e-16f},
+    { 1.87872e-17f, -7.65274e-15f, -1.13984e-14f},
+    { 1.29275e-16f, -1.13984e-14f, -2.53222e-14f}
   };
 
   private static void benchSymmetric33() {

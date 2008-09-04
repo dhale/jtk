@@ -182,6 +182,8 @@ public class Eigen {
 
   private static final double ONE_THIRD = 1.0/3.0;
   private static final double ONE_OVER_SQRT3 = 1.0/sqrt(3.0);
+  //private static final float OMEGA_MIN = 0.1f*sqrt(Float.MAX_VALUE);
+  private static final float OMEGA_MIN = 0.0f;
 
   /**
    * Computes eigenvalues of a symmetric 3x3 matrix using Cardano's
@@ -305,6 +307,11 @@ public class Eigen {
 
       // While not converged and number of iterations not too large.
       for (int niter=0; niter<=100; ++niter) {
+        if (niter==100) {
+          System.out.println("A ="); edu.mines.jtk.util.Array.dump(a);
+          System.out.println("V ="); edu.mines.jtk.util.Array.dump(v);
+          System.out.println("d ="); edu.mines.jtk.util.Array.dump(d);
+        }
         Check.state(niter<100,"number of QL iterations is less than 100");
 
         // Converged if off-diagonal element e[l] is insignificant.
@@ -387,7 +394,7 @@ public class Eigen {
     float u2 = a02;
     float omega = h-f;
     float d0,d1,d2,e1,s,q1,q2;
-    if (omega>0.0f) {
+    if (omega>OMEGA_MIN) {
       omega = 1.0f/omega;
       s = 0.0f;
       f = a11*u1+a12*u2;
