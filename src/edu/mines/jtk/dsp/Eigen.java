@@ -279,7 +279,7 @@ public class Eigen {
       v12 *= v1s;
     }
 
-    // 3rd eigenvector via v2 = v0 x v1
+    // Compute 3rd eigenvector via v2 = v0 x v1
     double v20 = v01*v12-v02*v11;
     double v21 = v02*v10-v00*v12;
     double v22 = v00*v11-v01*v10;
@@ -312,7 +312,7 @@ public class Eigen {
         }
         Check.state(niter<100,"number of QL iterations is less than 100");
 
-        // Converged if off-diagonal element e[l] is insignificant.
+        // If off-diagonal element e[l] is insignificant, then converged.
         int m;
         for (m=l; m<2; ++m) {
           double g = abs(d[m])+abs(d[m+1]);
@@ -322,6 +322,7 @@ public class Eigen {
         if (m==l)
           break;
 
+        // Compute Householder transformation.
         double g = (d[l+1]-d[l])/(e[l]+e[l]);
         double r = sqrt(g*g+1.0);
         if (g>0.0) {
