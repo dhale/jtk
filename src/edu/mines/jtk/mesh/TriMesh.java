@@ -98,6 +98,7 @@ public class TriMesh implements Serializable {
       return _tri;
     }
 
+    @Override
     public String toString() {
       return "("+x()+","+y()+")";
     }
@@ -659,6 +660,7 @@ public class TriMesh implements Serializable {
       return Geometry.leftOfLine(_a._x,_a._y,_b._x,_b._y,x,y)<0.0;
     }
 
+    @Override
     public boolean equals(Object object) {
       if (object==this)
         return true;
@@ -669,6 +671,7 @@ public class TriMesh implements Serializable {
       return false;
     }
 
+    @Override
     public int hashCode() {
       return _a._hash^_b._hash;
     }
