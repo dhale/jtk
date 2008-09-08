@@ -54,7 +54,6 @@ public class EigenTensors2 implements Tensors2 {
    * @param u2 array of 2nd components of u.
    * @param au array of 1D eigenvalues.
    * @param av array of 2D eigenvalues.
-   * @param compressed true, for compressed tensors; false, otherwise.
    */
   public EigenTensors2(
     float[][] u1, float[][] u2,
@@ -277,7 +276,7 @@ public class EigenTensors2 implements Tensors2 {
    * The specified vector is assumed to have length one.
    * @param i1 index for 1st dimension.
    * @param i2 index for 2nd dimension.
-   * @param array {u1,u2} of eigenvector components.
+   * @param u {u1,u2} of eigenvector components.
    */
   public void setEigenvectorU(int i1, int i2, float[] u) {
     setEigenvectorU(i1,i2,u[0],u[1]);

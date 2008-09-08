@@ -479,7 +479,7 @@ public class EigenTensors3 implements Tensors3,Serializable {
    * @param i1 index for 1st dimension.
    * @param i2 index for 2nd dimension.
    * @param i3 index for 3rd dimension.
-   * @param array {u1,u2,u3} of eigenvector components.
+   * @param u {u1,u2,u3} of eigenvector components.
    */
   public void setEigenvectorU(int i1, int i2, int i3, float[] u) {
     setEigenvectorU(i1,i2,i3,u[0],u[1],u[2]);
@@ -521,7 +521,7 @@ public class EigenTensors3 implements Tensors3,Serializable {
    * @param i1 index for 1st dimension.
    * @param i2 index for 2nd dimension.
    * @param i3 index for 3rd dimension.
-   * @param array {w1,w2,w3} of eigenvector components.
+   * @param w {w1,w2,w3} of eigenvector components.
    */
   public void setEigenvectorW(int i1, int i2, int i3, float[] w) {
     setEigenvectorW(i1,i2,i3,w[0],w[1],w[2]);

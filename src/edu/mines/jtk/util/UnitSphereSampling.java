@@ -290,7 +290,7 @@ public class UnitSphereSampling {
    * @param x x-coordinate of the point.
    * @param y y-coordinate of the point.
    * @param z z-coordinate of the point.
-   * @param abc array {ia,ib,ic} of sample indices.
+   * @param iabc array {ia,ib,ic} of sample indices.
    * @return array {wa,wb,wc} of weights.
    */
   public float[] getWeights(float x, float y, float z, int[] iabc) {
@@ -324,7 +324,7 @@ public class UnitSphereSampling {
    * Then the weight wa is proportional to the volume of the tetrahedron 
    * formed by points p, b, c, and o.
    * @param xyz array {x,y,z} of point coordinates.
-   * @param abc array {ia,ib,ic} of sample indices.
+   * @param iabc array {ia,ib,ic} of sample indices.
    * @return array {wa,wb,wc} of weights.
    */
   public float[] getWeights(float[] xyz, int[] iabc) {
