@@ -2274,7 +2274,157 @@ public class TriMesh implements Serializable {
    * @param fnull null value returned for points (x,y) outside the mesh.
    * @return the interpolated float value.
    */
-  public float interpolateSibson(
+  public synchronized float interpolateSibson(
+    float x, float y, NodePropertyMap map, float fnull) 
+  {
+    // The point p = (x,y).
+    double xp = x;
+    double yp = y;
+
+    // Where is the point?
+    PointLocation pl = locatePoint(xp,yp);
+
+    // If point is on a node, then interpolation is trivial.
+    if (pl.isOnNode())
+      return (Float)map.get(pl.node());
+
+    // If point is outside, simply return zero.
+    // (Extrapolation is not yet supported.)
+    if (pl.isOutside())
+      return fnull;
+
+
+    // Build a set of Delaunay edges for the specified point p = (x,y).
+    // These are edges of triangles with circumcircles that contain p,
+    // and that would survive if a new node was added at point p. The
+    // edges form a polygon around the point p.
+    _edgeSet.clear();
+    clearTriMarks();
+    getDelaunayEdgesAround(xp,yp,pl.tri());
+
+    // Array used to get circumcenters.
+    double[] center = new double[2];
+
+    // Sum of all areas and area-weighted float values.
+    double as = 0.0f;
+    double fs = 0.0f;
+
+    // Get nodes a, b, and c, and triangle (a,b,c) from first edge in set.
+    // The edge a->b is opposite node c in the tri (a,b,c).
+    _edgeSet.first();
+    Node na = _edgeSet.a;
+    Node nb = _edgeSet.b;
+    Node nc = _edgeSet.c;
+    Tri tri = _edgeSet.abc;
+
+    // Remember the first node a, so we know when done looping over nodes.
+    Node fa = na;
+
+    // For all nodes a in the polygon of Delaunay edges around p, ...
+    do {
+
+      // Float value for current node a.
+      float fn = (Float)map.get(na);
+
+      // Circumcenter p0 of triangle (a,b,p).
+      Geometry.centerCircle(na._x,na._y,nb._x,nb._y,xp,yp,center);
+      double x0 = center[0];
+      double y0 = center[1];
+      double xs = x0;
+      double ys = y0;
+
+      // Circumcenter p1 of triangle (a,b,c).
+      tri.centerCircle(center);
+      double x1 = center[0];
+      double y1 = center[1];
+
+      // Initialize computation of area for current node a. No factor 0.5
+      // is required here, because we will later divide by the total area.
+      double an = x0*y1-x1*y0;
+
+      // For all non-Delaunay edges a->b around node a, ...
+      for (;;) {
+        
+        // Replace circumcenter p0 with previous circumcenter p1.
+        x0 = x1;
+        y0 = y1;
+
+        // If edge is in fact Delaunay, then accumulate area for 
+        // circumcenter p1 of (a,c,p) and break; else accumulate 
+        // area for circumcenter p1 of next tri (a,b,c).
+        if (_edgeSet.contains(tri,nb)) {
+          Geometry.centerCircle(na._x,na._y,nc._x,nc._y,xp,yp,center);
+          x1 = center[0];
+          y1 = center[1];
+          an += x0*y1-x1*y0;
+          break;
+        } else {
+          Tri triNabor = tri.triNabor(nb);
+          Node nodeNabor = tri.nodeNabor(triNabor);
+          nb = nc;
+          nc = nodeNabor;
+          tri = triNabor;
+          tri.centerCircle(center);
+          x1 = center[0];
+          y1 = center[1];
+          an += x0*y1-x1*y0;
+        }
+      }
+
+      // Complete accumulation of area for current node a, and update sums.
+      an += x1*ys-xs*y1;
+      as += an;
+      fs += fn*an;
+
+      // Next nodes a, b, and c for triangle (a,b,c).
+      Node nt = nc;
+      nc = nb;
+      nb = na;
+      na = nt;
+    } while (na!=fa);
+
+    // Return interpolated value normalized by total area.
+    return (float)(fs/as);
+  }
+  // This method is used for Sibson interpolation. It works much like
+  // the method getDelaunayEdgesInside, but (1) does not kill any tris,
+  // and (2) adds edges instead of edge mates to the edge set.
+  private void getDelaunayEdgesAround(double xp, double yp, Tri tri) {
+    if (tri!=null && !isMarked(tri)) {
+      mark(tri);
+      Node n0 = tri._n0;
+      Node n1 = tri._n1;
+      Node n2 = tri._n2;
+      if (inCircle(n0,n1,n2,xp,yp)) {
+        Tri t0 = tri._t0;
+        Tri t1 = tri._t1;
+        Tri t2 = tri._t2;
+        _edgeSet.add(tri,n0);
+        _edgeSet.add(tri,n1);
+        _edgeSet.add(tri,n2);
+        getDelaunayEdgesAround(xp,yp,t0);
+        getDelaunayEdgesAround(xp,yp,t1);
+        getDelaunayEdgesAround(xp,yp,t2);
+      }
+    }
+  }
+
+  /**
+   * Interpolates a float property using Sibson's (natural neighbors) method.
+   * Extrapolation is not yet supported; if the specified point is not inside
+   * the mesh, this method returns a specified null value.
+   * <p>
+   * This implementation is based on an algorithm published by Sambridge 
+   * et al., who note that it fails for points (x,y) on Delaunay edges.
+   * Due to rounding errors, it also fails for points near those edges.
+   * Therefore, this method is private and exists only for testing.
+   * @param x the x coordinate of the point at which to interpolate.
+   * @param y the y coordinate of the point at which to interpolate.
+   * @param map a property map containing float values for all nodes.
+   * @param fnull null value returned for points (x,y) outside the mesh.
+   * @return the interpolated float value.
+   */
+  private float interpolateSibsonSambridge(
     float x, float y, NodePropertyMap map, float fnull) 
   {
     double xp = x;
@@ -2344,13 +2494,6 @@ public class TriMesh implements Serializable {
     // Return interpolated value normalized by total area.
     return (float)(fs/as);
   }
-  private double area(double[] cj, double[] ck, double[] cv) {
-    double xj = cj[0]-cv[0];
-    double yj = cj[1]-cv[1];
-    double xk = ck[0]-cv[0];
-    double yk = ck[1]-cv[1];
-    return 0.5*(xj*yk-yj*xk);
-  }
   private void getTrisNotDelaunayForPointInside(
     double x, double y, Tri tri, TriList tl) 
   {
@@ -2370,39 +2513,13 @@ public class TriMesh implements Serializable {
       }
     }
   }
-  /* This may (or may not) be useful for extrapolation.
-  private void getTrisNotDelaunayForPointOutside(
-    double x, double y, Tri tri, TriList tl) 
-  {
-    if (tri!=null && !isMarked(tri)) {
-      mark(tri);
-      Node n0 = tri._n0;
-      Node n1 = tri._n1;
-      Node n2 = tri._n2;
-      Tri t0 = tri._t0;
-      Tri t1 = tri._t1;
-      Tri t2 = tri._t2;
-      if (t0==null && leftOfLine(n2,n1,x,y)) {
-        getTrisNotDelaunayForPointOutside(x,y,getNextTriOnHull(tri,n1,n0),tl);
-        getTrisNotDelaunayForPointOutside(x,y,getNextTriOnHull(tri,n2,n0),tl);
-      }
-      if (t1==null && leftOfLine(n0,n2,x,y)) {
-        getTrisNotDelaunayForPointOutside(x,y,getNextTriOnHull(tri,n2,n1),tl);
-        getTrisNotDelaunayForPointOutside(x,y,getNextTriOnHull(tri,n0,n1),tl);
-      }
-      if (t2==null && leftOfLine(n1,n0,x,y)) {
-        getTrisNotDelaunayForPointOutside(x,y,getNextTriOnHull(tri,n0,n2),tl);
-        getTrisNotDelaunayForPointOutside(x,y,getNextTriOnHull(tri,n1,n2),tl);
-      }
-      if (inCircle(n0,n1,n2,x,y)) {
-        tl.add(tri);
-        getTrisNotDelaunayForPointOutside(x,y,t0,tl);
-        getTrisNotDelaunayForPointOutside(x,y,t1,tl);
-        getTrisNotDelaunayForPointOutside(x,y,t2,tl);
-      }
-    }
+  private double area(double[] cj, double[] ck, double[] cv) {
+    double xj = cj[0]-cv[0];
+    double yj = cj[1]-cv[1];
+    double xk = ck[0]-cv[0];
+    double yk = ck[1]-cv[1];
+    return 0.5*(xj*yk-yj*xk);
   }
-  */
 
   /**
    * Validates the internal consistency of the mesh.
@@ -3778,6 +3895,32 @@ public class TriMesh implements Serializable {
     }
 
     /**
+     * Determines whether this set contains the edge of the specified tri 
+     * opposite the specified node. If true, sets the current edge to that
+     * found; otherwise, simply returns false.
+     * @param tri the tri that references nodes in the edge.
+     * @param node the other node in the tri that is not in the edge.
+     * @return true, if the edge is in this set; false, otherwise.
+     */
+    boolean contains(Tri tri, Node node) {
+      if (node==tri._n0) {
+        _index = indexOfMate(tri._n2,tri._n1); // index of edge 1->2
+      } else if (node==tri._n1) {
+        _index = indexOfMate(tri._n0,tri._n2); // index of edge 2->0
+      } else if (node==tri._n2) {
+        _index = indexOfMate(tri._n1,tri._n0); // index of edge 0->1
+      } else {
+        assert false:"node is referenced by tri";
+        return false;
+      }
+      if (_filled[_index]) {
+        setCurrent();
+        return true;
+      }
+      return false;
+    }
+
+    /**
      * Adds the edge of the specified tri that is opposite the specified node,
      * unless its mate is in the set, in which case that mate is removed.
      * Sets the current edge to the edge added or the mate removed.
@@ -3854,6 +3997,14 @@ public class TriMesh implements Serializable {
      */
     boolean isEmpty() {
       return _n>0;
+    }
+
+    /**
+     * Returns the number of edges in this set.
+     * @return the number of edges.
+     */
+    int count() {
+      return _n;
     }
 
     /**

@@ -237,6 +237,26 @@ public class EigenTensors3 implements Tensors3,Serializable {
   }
 
   /**
+   * Gets eigenvalues for all tensors.
+   * @param au array of eigenvalues au.
+   * @param av array of eigenvalues av.
+   * @param aw array of eigenvalues aw.
+   */
+  public void getEigenvalues(float[][][] au, float[][][] av, float[][][] aw) {
+    float[] auvw = new float[3];
+    for (int i3=0; i3<_n3; ++i3) {
+      for (int i2=0; i2<_n2; ++i2) {
+        for (int i1=0; i1<_n1; ++i1) {
+          getEigenvalues(i1,i2,i3,auvw);
+          au[i3][i2][i1] = auvw[0];
+          av[i3][i2][i1] = auvw[1];
+          aw[i3][i2][i1] = auvw[2];
+        }
+      }
+    }
+  }
+
+  /**
    * Gets the eigenvector u for the tensor with specified indices.
    * @param i1 index for 1st dimension.
    * @param i2 index for 2nd dimension.
@@ -406,6 +426,25 @@ public class EigenTensors3 implements Tensors3,Serializable {
       Array.fill(aw,_aw);
     }
     Array.fill(as,_as);
+  }
+
+  /**
+   * Sets eigenvalues for all tensors.
+   * @param au array of eigenvalues au.
+   * @param av array of eigenvalues av.
+   * @param aw array of eigenvalues aw.
+   */
+  public void setEigenvalues(float[][][] au, float[][][] av, float[][][] aw) {
+    for (int i3=0; i3<_n3; ++i3) {
+      for (int i2=0; i2<_n2; ++i2) {
+        for (int i1=0; i1<_n1; ++i1) {
+          float aui = au[i3][i2][i1];
+          float avi = av[i3][i2][i1];
+          float awi = aw[i3][i2][i1];
+          setEigenvalues(i1,i2,i3,aui,avi,awi);
+        }
+      }
+    }
   }
 
   /**

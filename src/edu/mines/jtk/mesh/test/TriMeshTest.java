@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.mesh.TriMesh;
+import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Stopwatch;
 
 /**
@@ -26,16 +27,45 @@ public class TriMeshTest extends TestCase {
   }
 
   public void testInterpolateSibson() {
-    float xmin = -0.1f;
-    float xmax =  1.1f;
-    float ymin = -0.1f;
-    float ymax =  1.1f;
-    /*
-    float xmin =  0.1f;
-    float xmax =  0.9f;
-    float ymin =  0.1f;
-    float ymax =  0.9f;
-    */
+
+    // Linear function.
+    testInterpolateSibson(new Function() {
+      public float eval(float x, float y) {
+        return 1.0f+x+y;
+      }
+    });
+
+    // Quadratic.
+    testInterpolateSibson(new Function() {
+      public float eval(float x, float y) {
+        return 1.0f+x+y+x*x+x*y+y*y;
+      }
+    });
+  }
+
+  // A function f(x,y) defined on [0,1]x[0,1].
+  interface Function {
+    public float eval(float x, float y);
+  }
+
+  // Bilinear interpolation.
+  private float interpolateBilinear(
+    float xp, float yp, float x0, float y0, float x1, float y1,
+    float f00, float f10, float f01, float f11)
+  {
+    float w00 = (x1-xp)/(x1-x0) * (y1-yp)/(y1-y0);
+    float w10 = (xp-x0)/(x1-x0) * (y1-yp)/(y1-y0);
+    float w01 = (x1-xp)/(x1-x0) * (yp-y0)/(y1-y0);
+    float w11 = (xp-x0)/(x1-x0) * (yp-y0)/(y1-y0);
+    return w00*f00+w10*f10+w01*f01+w11*f11;
+  }
+
+  // Tests Sibson interpolation for a specified function.
+  private void testInterpolateSibson(Function f) {
+    float xmin = -0.000001f; // ensure [0,1]x[0,1] lies inside mesh
+    float xmax =  1.000001f;
+    float ymin = -0.000001f;
+    float ymax =  1.000001f;
     TriMesh.Node n0 = new TriMesh.Node(xmin,ymin);
     TriMesh.Node n1 = new TriMesh.Node(xmax,ymin);
     TriMesh.Node n2 = new TriMesh.Node(xmin,ymax);
@@ -46,25 +76,32 @@ public class TriMeshTest extends TestCase {
     tm.addNode(n2);
     tm.addNode(n3);
     TriMesh.NodePropertyMap map = tm.getNodePropertyMap("f");
-    map.put(n0,new Float(0.0f));
-    map.put(n1,new Float(1.0f));
-    map.put(n2,new Float(1.0f));
-    map.put(n3,new Float(2.0f));
+    float f0 = f.eval(n0.x(),n0.y());
+    float f1 = f.eval(n1.x(),n1.y());
+    float f2 = f.eval(n2.x(),n2.y());
+    float f3 = f.eval(n3.x(),n3.y());
+    map.put(n0,new Float(f0));
+    map.put(n1,new Float(f1));
+    map.put(n2,new Float(f2));
+    map.put(n3,new Float(f3));
     int nx = 101;
     int ny = 101;
-    float[][] f = new float[nx][ny];
+    float[][] fe = new float[nx][ny];
+    float[][] fa = new float[nx][ny];
     float fnull = 0.0f;
     for (int ix=0; ix<nx; ++ix) {
       float x = (float)(ix)/(float)(nx-1);
       for (int iy=0; iy<ny; ++iy) {
         float y = (float)(iy)/(float)(ny-1);
-        float fe = (x-xmin)/(xmax-xmin)+(y-ymin)/(ymax-ymin);
-        float fa = f[ix][iy] = tm.interpolateSibson(x,y,map,fnull);
-        if (fa!=fnull)
-          assertEquals(fe,fa,0.0001);
+        fe[ix][iy] = interpolateBilinear(x,y,xmin,ymin,xmax,ymax,f0,f1,f2,f3);
+        fa[ix][iy] = tm.interpolateSibson(x,y,map,fnull);
       }
     }
-    //edu.mines.jtk.mosaic.SimplePlot.asPixels(f);
+    float[][] e = Array.sub(fa,fe);
+    //edu.mines.jtk.mosaic.SimplePlot.asPixels(e);
+    float emax = Array.max(Array.abs(e));
+    //System.out.println("emax="+emax);
+    assertEquals(0.0,emax,0.0001);
   }
 
   public void testNabors() {
