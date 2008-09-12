@@ -98,9 +98,9 @@ public class TriMeshTest extends TestCase {
       }
     }
     float[][] e = Array.sub(fa,fe);
-    //edu.mines.jtk.mosaic.SimplePlot.asPixels(e);
+    edu.mines.jtk.mosaic.SimplePlot.asPixels(e);
     float emax = Array.max(Array.abs(e));
-    //System.out.println("emax="+emax);
+    System.out.println("emax="+emax);
     assertEquals(0.0,emax,0.0001);
   }
 
