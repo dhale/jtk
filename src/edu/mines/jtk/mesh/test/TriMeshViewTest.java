@@ -25,23 +25,9 @@ public class TriMeshViewTest {
   public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        testSimple();
         testSquare();
       }
     });
-  }
-
-  public static void testSimple() {
-    TriMesh tm = new TriMesh();
-    TriMesh.Node n0 = new TriMesh.Node(0.0f,0.0f);
-    TriMesh.Node n1 = new TriMesh.Node(1.0f,0.0f);
-    TriMesh.Node n2 = new TriMesh.Node(0.0f,1.0f);
-    TriMesh.Node n3 = new TriMesh.Node(0.3f,0.3f);
-    tm.addNode(n0);
-    tm.addNode(n1);
-    tm.addNode(n2);
-    tm.addNode(n3);
-    plot(tm);
   }
 
   public static void testSquare() {

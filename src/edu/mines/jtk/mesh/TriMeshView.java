@@ -392,12 +392,12 @@ public class TriMeshView extends TiledView {
             if (cbc==null) cbc = _triLineColor;
             if (cca==null) cca = _triLineColor;
           }
-          double xaa = xshift+na.x()*xscale;
-          double yaa = yshift+na.y()*yscale;
-          double xbb = xshift+nb.x()*xscale;
-          double ybb = yshift+nb.y()*yscale;
-          double xcc = xshift+nc.x()*xscale;
-          double ycc = yshift+nc.y()*yscale;
+          double xaa = xshift+x(na)*xscale;
+          double yaa = yshift+y(na)*yscale;
+          double xbb = xshift+x(nb)*xscale;
+          double ybb = yshift+y(nb)*yscale;
+          double xcc = xshift+x(nc)*xscale;
+          double ycc = yshift+y(nc)*yscale;
           int xa = (int)xaa;
           int ya = (int)yaa;
           int xb = (int)xbb;
@@ -527,12 +527,12 @@ public class TriMeshView extends TiledView {
             cb = (Color)colorMap.get(nb);
             cc = (Color)colorMap.get(nc);
           }
-          pa[0] = na.x();
-          pa[1] = na.y();
-          pb[0] = nb.x();
-          pb[1] = nb.y();
-          pc[0] = nc.x();
-          pc[1] = nc.y();
+          pa[0] = x(na);
+          pa[1] = y(na);
+          pb[0] = x(nb);
+          pb[1] = y(nb);
+          pc[0] = x(nc);
+          pc[1] = y(nc);
           circumcenter(pa,pb,pc,qc);
           int x1 = (int)(xshift+qc[0]*xscale);
           int y1 = (int)(yshift+qc[1]*yscale);
@@ -540,8 +540,8 @@ public class TriMeshView extends TiledView {
             TriMesh.Tri ta = tri.triNabor(na);
             if (ta!=null && _mesh.isInner(ta)) {
               TriMesh.Node nn = tri.nodeNabor(ta);
-              pn[0] = nn.x();
-              pn[1] = nn.y();
+              pn[0] = x(nn);
+              pn[1] = y(nn);
               circumcenter(pn,pc,pb,qc);
               int x2 = (int)(xshift+qc[0]*xscale);
               int y2 = (int)(yshift+qc[1]*yscale);
@@ -555,7 +555,7 @@ public class TriMeshView extends TiledView {
               int ys = (int)(yshift+yb*yscale);
               int xt = (int)(xshift+xc*xscale);
               int yt = (int)(yshift+yc*yscale);
-              drawLine(g2d,path,xs,ys,xt,yt);
+              //drawLine(g2d,path,xs,ys,xt,yt);
               int x2 = (int)(xshift+0.5f*(xb+xc)*xscale);
               int y2 = (int)(yshift+0.5f*(yb+yc)*yscale);
               drawLine(g2d,path,x1,y1,x2,y2);
@@ -565,8 +565,8 @@ public class TriMeshView extends TiledView {
             TriMesh.Tri tb = tri.triNabor(nb);
             if (tb!=null && _mesh.isInner(tb)) {
               TriMesh.Node nn = tri.nodeNabor(tb);
-              pn[0] = nn.x();
-              pn[1] = nn.y();
+              pn[0] = x(nn);
+              pn[1] = y(nn);
               circumcenter(pn,pa,pc,qc);
               int x2 = (int)(xshift+qc[0]*xscale);
               int y2 = (int)(yshift+qc[1]*yscale);
@@ -580,7 +580,7 @@ public class TriMeshView extends TiledView {
               int ys = (int)(yshift+ya*yscale);
               int xt = (int)(xshift+xc*xscale);
               int yt = (int)(yshift+yc*yscale);
-              drawLine(g2d,path,xs,ys,xt,yt);
+              //drawLine(g2d,path,xs,ys,xt,yt);
               int x2 = (int)(xshift+0.5f*(xa+xc)*xscale);
               int y2 = (int)(yshift+0.5f*(ya+yc)*yscale);
               drawLine(g2d,path,x1,y1,x2,y2);
@@ -590,8 +590,8 @@ public class TriMeshView extends TiledView {
             TriMesh.Tri tc = tri.triNabor(nc);
             if (tc!=null && _mesh.isInner(tc)) {
               TriMesh.Node nn = tri.nodeNabor(tc);
-              pn[0] = nn.x();
-              pn[1] = nn.y();
+              pn[0] = x(nn);
+              pn[1] = y(nn);
               circumcenter(pn,pb,pa,qc);
               int x2 = (int)(xshift+qc[0]*xscale);
               int y2 = (int)(yshift+qc[1]*yscale);
@@ -605,7 +605,7 @@ public class TriMeshView extends TiledView {
               int ys = (int)(yshift+ya*yscale);
               int xt = (int)(xshift+xb*xscale);
               int yt = (int)(yshift+yb*yscale);
-              drawLine(g2d,path,xs,ys,xt,yt);
+              //drawLine(g2d,path,xs,ys,xt,yt);
               int x2 = (int)(xshift+0.5f*(xa+xb)*xscale);
               int y2 = (int)(yshift+0.5f*(ya+yb)*yscale);
               drawLine(g2d,path,x1,y1,x2,y2);
@@ -634,8 +634,16 @@ public class TriMeshView extends TiledView {
       TriMesh.NodeIterator ni = _mesh.getNodes();
       while (ni.hasNext()) {
         TriMesh.Node node = ni.next();
-        int x = (int)(xshift+node.x()*xscale);
-        int y = (int)(yshift+node.y()*yscale);
+        float xn,yn;
+        if (_orientation==Orientation.XRIGHT_YUP) {
+          xn = node.x();
+          yn = node.y();
+        } else {
+          xn = node.y();
+          yn = node.x();
+        }
+        int x = (int)(xshift+xn*xscale);
+        int y = (int)(yshift+yn*yscale);
         if (colorMap!=null) {
           Color color = (Color)colorMap.get(node);
           if (color!=null) {
@@ -684,21 +692,20 @@ public class TriMeshView extends TiledView {
 
   private Orientation _orientation = Orientation.XRIGHT_YUP;
 
-  private void setDefaultMesh() {
-    Random r = new Random(314159);
-    TriMesh tm = new TriMesh();
-    int n = 100;
-    float s = 100.0f;
-    tm.addNode(new TriMesh.Node(  0.0f,  0.0f));
-    tm.addNode(new TriMesh.Node(100.0f,  0.0f));
-    tm.addNode(new TriMesh.Node(  0.0f,100.0f));
-    tm.addNode(new TriMesh.Node(100.0f,100.0f));
-    for (int i=0; i<n; ++i) {
-      float x = s*r.nextFloat();
-      float y = s*r.nextFloat();
-      tm.addNode(new TriMesh.Node(x,y));
+  private float x(TriMesh.Node node) {
+    if (_orientation==Orientation.XRIGHT_YUP) {
+      return node.x();
+    } else {
+      return node.y();
     }
-    setMesh(tm);
+  }
+
+  private float y(TriMesh.Node node) {
+    if (_orientation==Orientation.XRIGHT_YUP) {
+      return node.y();
+    } else {
+      return node.x();
+    }
   }
 
   /**
