@@ -2264,26 +2264,66 @@ public class TriMesh implements Serializable {
     --_triMarkBlue;
   }
 
+  /**
+   * Sibson coordinates, used in natural-neighbor interpolation.
+   * The Voronoi polygon of any node added to a Delaunay tri mesh will 
+   * overlap the polygons of its natural neighbors that existed before
+   * the node was added. The Sibson coordinate of each such neighbor
+   * equals the area of overlap divided by the total area of the Voronoi 
+   * polygon of the added node. The Sibson coordinates for any point can 
+   * be computed without explicitly adding (and then removing) a node at 
+   * that point.
+   */
   public class SibsonCoordinates {
+
+    /**
+     * Gets the nodes that are natural neighbors.
+     */
     public Iterator<Node> getNodes() {
       return _nlist.iterator();
     }
+
+    /**
+     * Gets the areas corresponding to the natural-neighbor nodes.
+     */
     public Iterator<Float> getAreas() {
       return _alist.iterator();
     }
+
+    /**
+     * Gets the total of all areas.
+     */
     public float getAreaTotal() {
       return _atotal;
     }
+
+    /**
+     * Returns the number of nodes that are natural neighbors.
+     */
+    public int countNodes() {
+      return _ntotal;
+    }
+
     void append(Node n, float a) {
       _alist.add(a);
       _nlist.add(n);
       _atotal += a;
+      _ntotal += 1;
     }
     private ArrayList<Node> _nlist = new ArrayList<Node>(6);
     private ArrayList<Float> _alist = new ArrayList<Float>(6);
     private float _atotal = 0.0f;
+    private int _ntotal = 0;
   }
-  public synchronized SibsonCoordinates getSibsonCoordinates(float x, float y) {
+
+  /**
+   * Gets Sibson coordinates for a point with specified coordinates.
+   * @param x the x coordinate of a point.
+   * @param y the y coordinate of a point.
+   * @return the Sibson coordinates for the point.
+   */
+  public synchronized SibsonCoordinates getSibsonCoordinates(float x, float y) 
+  {
     SibsonCoordinates sc = new SibsonCoordinates();
 
     // The point p = (x,y).
@@ -2390,8 +2430,92 @@ public class TriMesh implements Serializable {
     return sc;
   }
 
+  public synchronized float interpolateSibson0(
+    float x, float y, NodePropertyMap map, float fnull) 
+  {
+    SibsonCoordinates sc = getSibsonCoordinates(x,y);
+    if (sc==null)
+      return fnull;
+    Iterator<Node> nodes = sc.getNodes();
+    Iterator<Float> areas = sc.getAreas();
+    float fs = 0.0f;
+    float as = 0.0f;
+    while (nodes.hasNext()) {
+      Node n = nodes.next();
+      float a = areas.next();
+      float f = (Float)map.get(n);
+      fs += a*f;
+      as += a;
+    }
+    return fs/as;
+  }
+
+  public synchronized void estimateGradients(
+    NodePropertyMap fmap, NodePropertyMap fgmap) 
+  {
+    int nnode = countNodes();
+    Node[] nodes = new Node[nnode];
+    NodeIterator ni = getNodes();
+    for (int inode=0; inode<nnode; ++inode)
+      nodes[inode] = ni.next();
+    for (int inode=0; inode<nnode; ++inode) {
+      Node n = nodes[inode];
+      float fn = (Float)fmap.get(n);
+      float xn = n.x();
+      float yn = n.y();
+      removeNode(n);
+      SibsonCoordinates sc = getSibsonCoordinates(xn,yn);
+      if (sc!=null) {
+        Iterator<Node> mi = sc.getNodes();
+        Iterator<Float> ai = sc.getAreas();
+        int nn = sc.countNodes();
+        double hxx=0.0,hxy=0.0,hyy=0.0,px=0.0,py=0.0;
+        for (int in=0; in<nn; ++in) {
+          Node m = mi.next();
+          double a = ai.next();
+          double fm = (Float)fmap.get(m);
+          double xm = m.x();
+          double ym = m.y();
+          double df = fn-fm;
+          double dx = xn-xm;
+          double dy = yn-ym;
+          double ds = 1.0/(dx*dx+dy*dy);
+          hxx += ds*dx*dx;
+          hxy += ds*dx*dx;
+          hyy += ds*dy*dy;
+          px += ds*dx*df;
+          py += ds*dy*df;
+        }
+        double det = hxx*hyy-hxy*hxy;
+        double gxn = (hyy*px-hxy*py)/det;
+        double gyn = (hxx*py-hxy*px)/det;
+      }
+      addNode(n);
+    }
+  }
+
+  public synchronized float interpolateSibson1(
+    float x, float y, NodePropertyMap map, float fnull) 
+  {
+    SibsonCoordinates sc = getSibsonCoordinates(x,y);
+    if (sc==null)
+      return fnull;
+    Iterator<Node> nodes = sc.getNodes();
+    Iterator<Float> areas = sc.getAreas();
+    float fs = 0.0f;
+    float as = 0.0f;
+    while (nodes.hasNext()) {
+      Node n = nodes.next();
+      float a = areas.next();
+      float f = (Float)map.get(n);
+      fs += a*f;
+      as += a;
+    }
+    return fs/as;
+  }
+
   /**
-   * Interpolates a float property using Sibson's (natural neighbors) method.
+   * Interpolates a float property using Sibson's (natural-neighbors) method.
    * Extrapolation is not yet supported; if the specified point is not inside
    * the mesh, this method returns a specified null value.
    * @param x the x coordinate of the point at which to interpolate.
@@ -2432,8 +2556,8 @@ public class TriMesh implements Serializable {
     double[] center = new double[2];
 
     // Sum of all areas and area-weighted float values.
-    double as = 0.0f;
-    double fs = 0.0f;
+    double as = 0.0;
+    double fs = 0.0;
 
     // Get nodes a, b, and c, and triangle (a,b,c) from first edge in set.
     // The edge a->b is opposite node c in the tri (a,b,c).
