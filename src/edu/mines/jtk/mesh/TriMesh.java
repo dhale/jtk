@@ -2264,6 +2264,132 @@ public class TriMesh implements Serializable {
     --_triMarkBlue;
   }
 
+  public class SibsonCoordinates {
+    public Iterator<Node> getNodes() {
+      return _nlist.iterator();
+    }
+    public Iterator<Float> getAreas() {
+      return _alist.iterator();
+    }
+    public float getAreaTotal() {
+      return _atotal;
+    }
+    void append(Node n, float a) {
+      _alist.add(a);
+      _nlist.add(n);
+      _atotal += a;
+    }
+    private ArrayList<Node> _nlist = new ArrayList<Node>(6);
+    private ArrayList<Float> _alist = new ArrayList<Float>(6);
+    private float _atotal = 0.0f;
+  }
+  public synchronized SibsonCoordinates getSibsonCoordinates(float x, float y) {
+    SibsonCoordinates sc = new SibsonCoordinates();
+
+    // The point p = (x,y).
+    double xp = x;
+    double yp = y;
+
+    // Where is the point?
+    PointLocation pl = locatePoint(xp,yp);
+
+    // If point is on a node, then coordinates are trivial.
+    if (pl.isOnNode()) {
+      sc.append(pl.node(),1.0f);
+      return sc;
+    }
+
+    // Extrapolation is not supported.
+    if (pl.isOutside())
+      return null;
+
+
+    // Build a set of Delaunay edges for the specified point p = (x,y).
+    // These are edges of triangles with circumcircles that contain p,
+    // and that would survive if a new node was added at point p. The
+    // edges form a polygon around the point p.
+    _edgeSet.clear();
+    clearTriMarks();
+    getDelaunayEdgesAround(xp,yp,pl.tri());
+
+    // Array used to get circumcenters.
+    double[] center = new double[2];
+
+    // Get nodes a, b, and c, and triangle (a,b,c) from first edge in set.
+    // The edge a->b is opposite node c in the tri (a,b,c).
+    _edgeSet.first();
+    Node na = _edgeSet.a;
+    Node nb = _edgeSet.b;
+    Node nc = _edgeSet.c;
+    Tri tri = _edgeSet.abc;
+
+    // Remember the first node a, so we know when done looping over nodes.
+    Node fa = na;
+
+    // For all nodes a in the polygon of Delaunay edges around p, ...
+    do {
+
+      // Circumcenter p0 of triangle (a,b,p).
+      Geometry.centerCircle(na._x,na._y,nb._x,nb._y,xp,yp,center);
+      double x0 = center[0];
+      double y0 = center[1];
+      double xs = x0;
+      double ys = y0;
+
+      // Circumcenter p1 of triangle (a,b,c).
+      tri.centerCircle(center);
+      double x1 = center[0];
+      double y1 = center[1];
+
+      // Initialize computation of area for current node a.
+      double an = x0*y1-x1*y0;
+
+      // For all non-Delaunay edges a->b around node a, ...
+      for (;;) {
+        
+        // Replace circumcenter p0 with previous circumcenter p1.
+        x0 = x1;
+        y0 = y1;
+
+        // If edge is in fact Delaunay, then accumulate area for 
+        // circumcenter p1 of (a,c,p) and break; else accumulate 
+        // area for circumcenter p1 of next tri (a,b,c).
+        if (_edgeSet.contains(tri,nb)) {
+          Geometry.centerCircle(na._x,na._y,nc._x,nc._y,xp,yp,center);
+          x1 = center[0];
+          y1 = center[1];
+          an += x0*y1-x1*y0;
+          break;
+        } else {
+          Tri triNabor = tri.triNabor(nb);
+          Node nodeNabor = tri.nodeNabor(triNabor);
+          nb = nc;
+          nc = nodeNabor;
+          tri = triNabor;
+          tri.centerCircle(center);
+          x1 = center[0];
+          y1 = center[1];
+          an += x0*y1-x1*y0;
+        }
+      }
+
+      // Complete accumulation of area for current node a.
+      an += x1*ys-xs*y1;
+
+      // Append node a and area to Sibson coordinates.
+      sc.append(na,(float)an);
+
+      // Next nodes a, b, and c for triangle (a,b,c).
+      Node nt = nc;
+      nc = nb;
+      nb = na;
+      na = nt;
+    } while (na!=fa);
+
+    // Return Sibson coordinates.
+    return sc;
+  }
+
   /**
    * Interpolates a float property using Sibson's (natural neighbors) method.
    * Extrapolation is not yet supported; if the specified point is not inside
