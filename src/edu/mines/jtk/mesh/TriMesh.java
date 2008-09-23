@@ -2317,10 +2317,10 @@ public class TriMesh implements Serializable {
   }
 
   /**
-   * Gets Sibson coordinates for a point with specified coordinates.
+   * Gets Sibson coordinates for a specified point (x,y).
    * @param x the x coordinate of a point.
    * @param y the y coordinate of a point.
-   * @return the Sibson coordinates for the point.
+   * @return the Sibson coordinates for the point (x,y).
    */
   public synchronized SibsonCoordinates getSibsonCoordinates(float x, float y) 
   {
@@ -2430,8 +2430,16 @@ public class TriMesh implements Serializable {
     return sc;
   }
 
+  /**
+   * Sibson's C0 natural-neighbor interpolation.
+   * @param x the x coordinate at which to interpolate.
+   * @param y the y coordinate at which to interpolate.
+   * @param fmap map for function values f stored in Floats.
+   * @param fnull null value returned for points (x,y) outside the mesh.
+   * @return the interpolated float value.
+   */
   public synchronized float interpolateSibson0(
-    float x, float y, NodePropertyMap map, float fnull) 
+    float x, float y, NodePropertyMap fmap, float fnull) 
   {
     SibsonCoordinates sc = getSibsonCoordinates(x,y);
     if (sc==null)
@@ -2443,13 +2451,79 @@ public class TriMesh implements Serializable {
     while (nodes.hasNext()) {
       Node n = nodes.next();
       float a = areas.next();
-      float f = (Float)map.get(n);
+      float f = (Float)fmap.get(n);
       fs += a*f;
       as += a;
     }
     return fs/as;
   }
 
+  /**
+   * Sibson's C1 natural-neighbor interpolation.
+   * Requires gradients as well as function values at mesh nodes.
+   * @param x the x coordinate at which to interpolate.
+   * @param y the y coordinate at which to interpolate.
+   * @param fgmap map for function and gradient stored in arrays {f,gx,gy}.
+   * @param fnull null value returned for points (x,y) outside the mesh.
+   * @return the interpolated float value.
+   */
+  public synchronized float interpolateSibson1(
+    float x, float y, NodePropertyMap fgmap, float fnull) 
+  {
+    SibsonCoordinates sc = getSibsonCoordinates(x,y);
+    if (sc==null)
+      return fnull;
+    if (sc.countNodes()==1.0) {
+      Iterator<Node> nodes = sc.getNodes();
+      Node n = nodes.next();
+      float[] fg = (float[])fgmap.get(n);
+      float f = fg[0];
+      return f;
+    }
+    float as = sc.getAreaTotal();
+    Iterator<Node> nodes = sc.getNodes();
+    Iterator<Float> areas = sc.getAreas();
+    float fs = 0.0f;
+    float es = 0.0f;
+    float wds = 0.0f;
+    float wdds = 0.0f;
+    float wods = 0.0f;
+    while (nodes.hasNext()) {
+      Node n = nodes.next();
+      float a = areas.next();
+      float w = a/as;
+      float xn = n.x();
+      float yn = n.y();
+      float dx = x-xn;
+      float dy = y-yn;
+      float dd = dx*dx+dy*dy;
+      float d = sqrt(dd);
+      float wd = w*d;
+      float wod = w/d;
+      float wdd = w*dd;
+      float[] fg = (float[])fgmap.get(n);
+      float f = fg[0];
+      float gx = fg[1];
+      float gy = fg[2];
+      es += wod*(f+gx*dx+gy*dy);
+      fs += w*f;
+      wds += wd;
+      wdds += wdd;
+      wods += wod;
+    }
+    es /= wods;
+    float alpha = wds/wods;
+    float beta = wdds;
+    return (alpha*fs+beta*es)/(alpha+beta);
+  }
+
+  /**
+   * Estimate gradients of a function specified at nodes of this mesh.
+   * Uses Sibson's weighted least-squares method based on his natural
+   * neighbor coordinates.
+   * @param fmap map for function values f stored in Floats.
+   * @param fgmap map for function and gradient stored in arrays {f,gx,gy}.
+   */
   public synchronized void estimateGradients(
     NodePropertyMap fmap, NodePropertyMap fgmap) 
   {
@@ -2460,12 +2534,15 @@ public class TriMesh implements Serializable {
       nodes[inode] = ni.next();
     for (int inode=0; inode<nnode; ++inode) {
       Node n = nodes[inode];
-      float fn = (Float)fmap.get(n);
-      float xn = n.x();
-      float yn = n.y();
+      double fn = (Float)fmap.get(n);
+      double xn = n.x();
+      double yn = n.y();
       removeNode(n);
-      SibsonCoordinates sc = getSibsonCoordinates(xn,yn);
-      if (sc!=null) {
+      SibsonCoordinates sc = getSibsonCoordinates((float)xn,(float)yn);
+      if (sc==null) {
+        float[] fg = {(float)fn,0.0f,0.0f};
+        fgmap.put(n,fg);
+      } else {
         Iterator<Node> mi = sc.getNodes();
         Iterator<Float> ai = sc.getAreas();
         int nn = sc.countNodes();
@@ -2481,7 +2558,7 @@ public class TriMesh implements Serializable {
           double dy = yn-ym;
           double ds = 1.0/(dx*dx+dy*dy);
           hxx += ds*dx*dx;
-          hxy += ds*dx*dx;
+          hxy += ds*dx*dy;
           hyy += ds*dy*dy;
           px += ds*dx*df;
           py += ds*dy*df;
@@ -2489,29 +2566,11 @@ public class TriMesh implements Serializable {
         double det = hxx*hyy-hxy*hxy;
         double gxn = (hyy*px-hxy*py)/det;
         double gyn = (hxx*py-hxy*px)/det;
+        float[] fg = {(float)fn,(float)gxn,(float)gyn};
+        fgmap.put(n,fg);
       }
       addNode(n);
     }
-  }
-
-  public synchronized float interpolateSibson1(
-    float x, float y, NodePropertyMap map, float fnull) 
-  {
-    SibsonCoordinates sc = getSibsonCoordinates(x,y);
-    if (sc==null)
-      return fnull;
-    Iterator<Node> nodes = sc.getNodes();
-    Iterator<Float> areas = sc.getAreas();
-    float fs = 0.0f;
-    float as = 0.0f;
-    while (nodes.hasNext()) {
-      Node n = nodes.next();
-      float a = areas.next();
-      float f = (Float)map.get(n);
-      fs += a*f;
-      as += a;
-    }
-    return fs/as;
   }
 
   /**
