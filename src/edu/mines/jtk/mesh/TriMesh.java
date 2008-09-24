@@ -2310,8 +2310,8 @@ public class TriMesh implements Serializable {
       _atotal += a;
       _ntotal += 1;
     }
-    private ArrayList<Node> _nlist = new ArrayList<Node>(6);
-    private ArrayList<Float> _alist = new ArrayList<Float>(6);
+    private ArrayList<Node> _nlist = new ArrayList<Node>(16);
+    private ArrayList<Float> _alist = new ArrayList<Float>(16);
     private float _atotal = 0.0f;
     private int _ntotal = 0;
   }
@@ -2332,12 +2332,6 @@ public class TriMesh implements Serializable {
 
     // Where is the point?
     PointLocation pl = locatePoint(xp,yp);
-
-    // If point is on a node, then coordinates are trivial.
-    if (pl.isOnNode()) {
-      sc.append(pl.node(),1.0f);
-      return sc;
-    }
 
     // Extrapolation is not supported.
     if (pl.isOutside())
@@ -2473,38 +2467,33 @@ public class TriMesh implements Serializable {
     SibsonCoordinates sc = getSibsonCoordinates(x,y);
     if (sc==null)
       return fnull;
-    if (sc.countNodes()==1.0) {
-      Iterator<Node> nodes = sc.getNodes();
-      Node n = nodes.next();
-      float[] fg = (float[])fgmap.get(n);
-      float f = fg[0];
-      return f;
-    }
-    float as = sc.getAreaTotal();
     Iterator<Node> nodes = sc.getNodes();
     Iterator<Float> areas = sc.getAreas();
-    float fs = 0.0f;
-    float es = 0.0f;
-    float wds = 0.0f;
-    float wdds = 0.0f;
-    float wods = 0.0f;
+    double as = sc.getAreaTotal();
+    double fs = 0.0;
+    double es = 0.0;
+    double wds = 0.0;
+    double wdds = 0.0;
+    double wods = 0.0;
     while (nodes.hasNext()) {
       Node n = nodes.next();
-      float a = areas.next();
-      float w = a/as;
-      float xn = n.x();
-      float yn = n.y();
-      float dx = x-xn;
-      float dy = y-yn;
-      float dd = dx*dx+dy*dy;
-      float d = sqrt(dd);
-      float wd = w*d;
-      float wod = w/d;
-      float wdd = w*dd;
       float[] fg = (float[])fgmap.get(n);
-      float f = fg[0];
-      float gx = fg[1];
-      float gy = fg[2];
+      double f = fg[0];
+      double gx = fg[1];
+      double gy = fg[2];
+      double a = areas.next();
+      double w = a/as;
+      double xn = n.x();
+      double yn = n.y();
+      double dx = x-xn;
+      double dy = y-yn;
+      double dd = dx*dx+dy*dy;
+      if (dd==0.0)
+        return (float)f;
+      double d = sqrt(dd);
+      double wd = w*d;
+      double wod = w/d;
+      double wdd = w*dd;
       es += wod*(f+gx*dx+gy*dy);
       fs += w*f;
       wds += wd;
@@ -2512,9 +2501,9 @@ public class TriMesh implements Serializable {
       wods += wod;
     }
     es /= wods;
-    float alpha = wds/wods;
-    float beta = wdds;
-    return (alpha*fs+beta*es)/(alpha+beta);
+    double alpha = wds/wods;
+    double beta = wdds;
+    return (float)((alpha*fs+beta*es)/(alpha+beta));
   }
 
   /**
