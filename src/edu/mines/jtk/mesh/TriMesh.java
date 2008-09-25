@@ -2445,6 +2445,9 @@ public class TriMesh implements Serializable {
     while (nodes.hasNext()) {
       Node n = nodes.next();
       float a = areas.next();
+      //a = 3.0f*a*a-2.0f*a*a*a;
+      //a = 2.0f*a-a*a;
+      //a = a*a;
       float f = (Float)fmap.get(n);
       fs += a*f;
       as += a;
