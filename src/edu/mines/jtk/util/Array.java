@@ -10548,6 +10548,96 @@ public class Array {
   };
 
   ///////////////////////////////////////////////////////////////////////////
+  // clip
+
+  public static float[] clip(float rxmin, float rxmax, float[] rx) {
+    int n1 = rx.length;
+    float[] ry = new float[n1];
+    clip(rxmin,rxmax,rx,ry);
+    return ry;
+  }
+  public static float[][] clip(float rxmin, float rxmax, float[][] rx) {
+    int n2 = rx.length;
+    float[][] ry = new float[n2][];
+    for (int i2=0; i2<n2; ++i2)
+      ry[i2] = clip(rxmin,rxmax,rx[i2]);
+    return ry;
+  }
+  public static float[][][] clip(float rxmin, float rxmax, float[][][] rx) {
+    int n3 = rx.length;
+    float[][][] ry = new float[n3][][];
+    for (int i3=0; i3<n3; ++i3)
+      ry[i3] = clip(rxmin,rxmax,rx[i3]);
+    return ry;
+  }
+  public static void clip(
+    float rxmin, float rxmax, float[] rx, float[] ry) 
+  {
+    int n1 = rx.length;
+    for (int i1=0; i1<n1; ++i1) {
+      float rxi = rx[i1];
+      ry[i1] = (rxi<rxmin)?rxmin:(rxi>rxmax)?rxmax:rxi;
+    }
+  }
+  public static void clip(
+    float rxmin, float rxmax, float[][] rx, float[][] ry) 
+  {
+    int n2 = rx.length;
+    for (int i2=0; i2<n2; ++i2)
+      clip(rxmin,rxmax,rx[i2],ry[i2]);
+  }
+  public static void clip(
+    float rxmin, float rxmax, float[][][] rx, float[][][] ry) 
+  {
+    int n3 = rx.length;
+    for (int i3=0; i3<n3; ++i3)
+      clip(rxmin,rxmax,rx[i3],ry[i3]);
+  }
+  public static double[] clip(double rxmin, double rxmax, double[] rx) {
+    int n1 = rx.length;
+    double[] ry = new double[n1];
+    clip(rxmin,rxmax,rx,ry);
+    return ry;
+  }
+  public static double[][] clip(double rxmin, double rxmax, double[][] rx) {
+    int n2 = rx.length;
+    double[][] ry = new double[n2][];
+    for (int i2=0; i2<n2; ++i2)
+      ry[i2] = clip(rxmin,rxmax,rx[i2]);
+    return ry;
+  }
+  public static double[][][] clip(double rxmin, double rxmax, double[][][] rx) {
+    int n3 = rx.length;
+    double[][][] ry = new double[n3][][];
+    for (int i3=0; i3<n3; ++i3)
+      ry[i3] = clip(rxmin,rxmax,rx[i3]);
+    return ry;
+  }
+  public static void clip(
+    double rxmin, double rxmax, double[] rx, double[] ry) 
+  {
+    int n1 = rx.length;
+    for (int i1=0; i1<n1; ++i1) {
+      double rxi = rx[i1];
+      ry[i1] = (rxi<rxmin)?rxmin:(rxi>rxmax)?rxmax:rxi;
+    }
+  }
+  public static void clip(
+    double rxmin, double rxmax, double[][] rx, double[][] ry) 
+  {
+    int n2 = rx.length;
+    for (int i2=0; i2<n2; ++i2)
+      clip(rxmin,rxmax,rx[i2],ry[i2]);
+  }
+  public static void clip(
+    double rxmin, double rxmax, double[][][] rx, double[][][] ry) 
+  {
+    int n3 = rx.length;
+    for (int i3=0; i3<n3; ++i3)
+      clip(rxmin,rxmax,rx[i3],ry[i3]);
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
   // pow
 
   public static float[] pow(float[] rx, float ra) {
