@@ -70,6 +70,7 @@ import java.util.Random;
  * exp - exponential
  * log - natural logarithm
  * log10 - logarithm base 10
+ * clip - clip values to be within specified min/max bounds
  * pow - raise to a specified power
  * sgn - sign (1 if positive, -1 if negative, 0 if zero)
  * </pre><pre>
