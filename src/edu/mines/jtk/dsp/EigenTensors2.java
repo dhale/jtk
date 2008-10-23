@@ -142,6 +142,16 @@ public class EigenTensors2 implements Tensors2 {
   }
 
   /**
+   * Gets eigenvalues for all tensors.
+   * @param au array of eigenvalues au.
+   * @param av array of eigenvalues av.
+   */
+  public void getEigenvalues(float[][] au, float[][] av) {
+    Array.copy(_au,au);
+    Array.copy(_av,av);
+  }
+
+  /**
    * Gets the eigenvector u for the tensor with specified indices.
    * @param i1 index for 1st dimension.
    * @param i2 index for 2nd dimension.
@@ -256,6 +266,16 @@ public class EigenTensors2 implements Tensors2 {
    */
   public void setEigenvalues(int i1, int i2, float[] a) {
     setEigenvalues(i1,i2,a[0],a[1]);
+  }
+
+  /**
+   * Sets eigenvalues for all tensors.
+   * @param au array of eigenvalues au.
+   * @param av array of eigenvalues av.
+   */
+  public void setEigenvalues(float[][] au, float[][] av) {
+    Array.copy(au,_au);
+    Array.copy(av,_av);
   }
 
   /**

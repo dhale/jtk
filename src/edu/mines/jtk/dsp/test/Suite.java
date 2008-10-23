@@ -20,6 +20,8 @@ public class Suite extends TestSuite {
     TestSuite suite = new TestSuite();
 
     suite.addTestSuite(EigenTest.class);
+    suite.addTestSuite(EigenTensors2Test.class);
+    suite.addTestSuite(EigenTensors3Test.class);
     suite.addTestSuite(FftComplexTest.class);
     suite.addTestSuite(FftRealTest.class);
     suite.addTestSuite(HistogramTest.class);
