@@ -20,39 +20,45 @@ def main(args):
   return
 
 def doTargetExample2():
-  n1,n2 = 315,315
-  scale = 100
+  sigma = 10.0
+  scale = 0.5*sigma*sigma
   small = 0.01
   niter = 100
+  n1,n2 = 315,315
   x = makeRandomImage2(n1,n2)
   plot2(x)
   t = makeTargetImage2(n1,n2)
   d = makeTensors2(t)
-  lsf = LocalSmoothingFilter(scale,small,niter)
+  lsf = LocalSmoothingFilter(small,niter)
   y = Array.zerofloat(n1,n2)
-  lsf.apply(d,x,y)
+  lsf.apply(d,scale,x,y)
   plot2(y)
 
 def doTargetExample3():
-  n1,n2,n3 = 101,101,101
-  scale = 100
+  sigma = 10.0
+  scale = 0.5*sigma*sigma
   small = 0.01
   niter = 100
+  n1,n2,n3 = 101,101,101
   x = makeRandomImage3(n1,n2,n3)
   #plot3(x)
   t = makeTargetImage3(n1,n2,n3)
   #plot3(t)
   d = makeTensors3(t)
-  lsf = LocalSmoothingFilter(scale,small,niter)
+  lsf = LocalSmoothingFilter(small,niter)
   y = Array.zerofloat(n1,n2,n3)
-  lsf.apply(d,x,y)
+  lsf.apply(d,scale,x,y)
   plot3(y)
 
 def makeRandomImage2(n1,n2):
-  return smooth2(Array.sub(Array.randfloat(n1,n2),0.5))
+  r = Array.sub(Array.randfloat(n1,n2),0.5)
+  r = smooth2(r)
+  return r
 
 def makeRandomImage3(n1,n2,n3):
-  return smooth3(Array.sub(Array.randfloat(n1,n2,n3),0.5))
+  r = Array.sub(Array.randfloat(n1,n2,n3),0.5)
+  r = smooth3(r)
+  return r
 
 def makeTargetImage2(n1,n2):
   k = 0.3
@@ -116,13 +122,9 @@ def plot2(f):
   sp.setSize(750,750)
   pv = sp.addPixels(f)
 
-def plot3(f,clip=0.0):
+def plot3(f):
   world = World()
   ipg = ImagePanelGroup(f)
-  if clip!=0.0:
-    ipg.setClips(-clip,clip)
-  else:
-    ipg.setPercentiles(0.0,100.0)
   world.addChild(ipg)
   frame = TestFrame(world)
   frame.setVisible(True)
