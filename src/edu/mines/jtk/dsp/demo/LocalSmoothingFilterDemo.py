@@ -30,7 +30,8 @@ def doTargetExample2():
   t = makeTargetImage2(n1,n2)
   d = makeTensors2(t)
   lsf = LocalSmoothingFilter(small,niter)
-  y = Array.zerofloat(n1,n2)
+  y = Array.copy(x)
+  #y = Array.zerofloat(n1,n2)
   lsf.apply(d,scale,x,y)
   plot2(y)
 
@@ -46,7 +47,8 @@ def doTargetExample3():
   #plot3(t)
   d = makeTensors3(t)
   lsf = LocalSmoothingFilter(small,niter)
-  y = Array.zerofloat(n1,n2,n3)
+  y = Array.copy(x)
+  #y = Array.zerofloat(n1,n2,n3)
   lsf.apply(d,scale,x,y)
   plot3(y)
 

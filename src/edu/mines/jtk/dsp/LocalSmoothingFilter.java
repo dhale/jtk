@@ -33,16 +33,27 @@ import static edu.mines.jtk.util.MathPlus.*;
  * For low wavenumbers the output of this filter approximates the solution 
  * to an anisotropic inhomogeneous diffusion equation, where the filter 
  * input x corresponds to the initial condition at time t = 0 and filter 
- * output y corresponds to the solution at time t = 1.
+ * output y corresponds to the solution at some later time t.
+ *
  * @author Dave Hale, Colorado School of Mines
  * @version 2008.11.16
  */
 public class LocalSmoothingFilter {
 
   /**
-   * Constructs a local smoothing filter.
-   * @param small stop when L2 norm of residuals decreases by this factor.
-   * @param niter stop when number of iterations exceeds this number.
+   * Constructs a local smoothing filter with default parameters.
+   * The default parameter small is 0.01 and the default maximum 
+   * number of iterations is 100.
+   */
+  public LocalSmoothingFilter() {
+    this(0.01,100);
+  }
+
+  /**
+   * Constructs a local smoothing filter with specified iteration parameters.
+   * @param small stop when norm of residuals is less than this factor times
+   *  the norm of the input array.
+   * @param niter stop when number of iterations exceeds this limit.
    */
   public LocalSmoothingFilter(double small, int niter) {
     _small = (float)small;
@@ -131,7 +142,7 @@ public class LocalSmoothingFilter {
   private static final boolean PARALLEL = true; // false for single-threaded
   private static final boolean SMOOTH = true; // false for I instead of S'S
 
-  private float _small; // stop iterations when ratio of residuals is small
+  private float _small; // stop iterations when residuals are small
   private int _niter; // number of iterations
 
   /**
@@ -487,9 +498,6 @@ public class LocalSmoothingFilter {
     trace("solve: delta="+delta);
     int iter;
     for (iter=0; iter<_niter && delta>deltaSmall; ++iter) {
-      //trace("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
-      //trace("  r min="+Array.min(r)+" max="+Array.max(r));
-      //trace("  x min="+Array.min(x)+" max="+Array.max(x));
       a.apply(d,q);
       float dq = sdot(d,q);
       float alpha = delta/dq;
@@ -691,7 +699,7 @@ public class LocalSmoothingFilter {
     Threads.startAndJoin(threads);
   }
 
-  private static final boolean TRACE = true;
+  private static final boolean TRACE = false;
   private static void trace(String s) {
     if (TRACE)
       System.out.println(s);
