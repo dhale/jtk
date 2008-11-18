@@ -15,9 +15,31 @@ from edu.mines.jtk.util import *
 # functions
 
 def main(args):
-  doTargetExample2()
-  doTargetExample3()
+  doSimpleExample1()
+  #doTargetExample2()
+  #doTargetExample3()
   return
+
+def doSimpleExample1():
+  n1 = 315
+  sigma = 10.0
+  c = 0.5*sigma*sigma;
+  s = Array.abs(Array.rampfloat(1.0,-2.0/(n1-1),n1))
+  s = Array.mul(s,s)
+  x = Array.zerofloat(n1)
+  x[1*n1/8] = 1.0
+  x[2*n1/8] = 1.0
+  x[3*n1/8] = 1.0
+  x[4*n1/8] = 1.0
+  x[5*n1/8] = 1.0
+  x[6*n1/8] = 1.0
+  x[7*n1/8] = 1.0
+  lsf = LocalSmoothingFilter()
+  y = Array.zerofloat(n1)
+  lsf.apply(c,s,x,y)
+  SimplePlot.asPoints(s);
+  SimplePlot.asPoints(x);
+  SimplePlot.asPoints(y);
 
 def doTargetExample2():
   sigma = 10.0

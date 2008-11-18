@@ -61,6 +61,61 @@ public class LocalSmoothingFilter {
   }
 
   /**
+   * Applies this filter for specified constant scale factor.
+   * Local smoothing for 1D arrays is a special case that requires no tensors. 
+   * All tensors are implicitly scalar values equal to one, so that filtering 
+   * is determined entirely by the specified constant scale factor.
+   * @param c constant scale factor.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float c, float[] x, float[] y) {
+    apply(c,null,x,y);
+  }
+
+  /**
+   * Applies this filter for specified scale factors.
+   * Local smoothing for 1D arrays is a special case that requires no tensors. 
+   * All tensors are implicitly scalar values equal to one, so that filtering 
+   * is determined entirely by the specified scale factors.
+   * @param c constant scale factor.
+   * @param s array of scale factors.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float c, float[] s, float[] x, float[] y) {
+    int n1 = x.length;
+
+    // Sub-diagonal e of SPD tridiagonal matrix I+G'DG; e[0] = e[n1] = 0.0.
+    float[] e = new float[n1+1];
+    c = -c;
+    if (s!=null) {
+      for (int i1=1; i1<n1; ++i1)
+        e[i1] = c*(s[i1-1]+s[i1]);
+    } else {
+      for (int i1=1; i1<n1; ++i1)
+        e[i1] = c;
+    }
+
+
+    // Work array w overwrites sub-diagonal array e.
+    float[] w = e;
+
+    // Solve tridiagonal system of equations (I+G'DG)y = x.
+    float t = 1.0f-e[0]-e[1];
+    y[0] = x[0]/t;
+    for (int i1=1; i1<n1; ++i1) {
+      float di = 1.0f-e[i1]-e[i1+1]; // diagonal element
+      float ei = e[i1]; // sub-diagonal element
+      w[i1] = ei/t;
+      t = di-ei*w[i1];
+      y[i1] = (x[i1]-ei*y[i1-1])/t;
+    }
+    for (int i1=n1-1; i1>0; --i1)
+      y[i1-1] -= w[i1]*y[i1];
+  }
+
+  /**
    * Applies this filter for specified tensor coefficients.
    * @param d tensor coefficients.
    * @param x input array.
