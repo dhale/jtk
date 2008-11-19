@@ -15,12 +15,58 @@ from edu.mines.jtk.util import *
 # functions
 
 def main(args):
-  doSimpleExample1()
+  doInterpExample1()
+  #doSmoothExample1()
   #doTargetExample2()
   #doTargetExample3()
   return
 
-def doSimpleExample1():
+def getNearestNeighbors(t,x,n1):
+  """Returns a sampled distance map d and nearest neighbor interpolant y 
+     for specified lists t and x that define a sampled function x(t). 
+     n1 is the number of samples in the returned 1D arrays d and y."""
+  nt = len(t)
+  d = Array.zerofloat(n1)
+  y = Array.zerofloat(n1)
+  for i1 in range(n1):
+    kt = Array.binarySearch(t,i1)
+    if kt<0:
+      kt = -1-kt
+    if kt>=nt:
+      kt = nt-1
+    di = abs(t[kt]-i1)
+    if kt>0:
+      dm = abs(t[kt-1]-i1)
+      if dm<di:
+        di = dm
+        kt -= 1
+    d[i1] = di
+    y[i1] = x[kt];
+  return d,y
+
+def doInterpExample1():
+  """An example of 1D interpolation using local smoothing of a sampled
+     nearest-neighbor interpolant."""
+  n1 = 315
+  t = [ 10.0, 100.0, 170.0, 200.0, 250.0]
+  x = [  1.0,   2.0,   2.7,   3.0,   2.0]
+  d,y = getNearestNeighbors(t,x,n1)
+  lsf = LocalSmoothingFilter()
+  c = 0.5 # this choice corresponds to linear interpolation
+  s = Array.mul(d,d) # squaring the distances makes interpolation smoother
+  z = Array.zerofloat(n1)
+  lsf.apply(c,s,y,z)
+  #SimplePlot.asPoints(d)
+  #SimplePlot.asPoints(s)
+  sp = SimplePlot()
+  pvx = sp.addPoints(t,x)
+  pvx.setMarkStyle(PointsView.Mark.HOLLOW_CIRCLE)
+  pvx.setLineStyle(PointsView.Line.NONE)
+  pvy = sp.addPoints(y)
+  pvy.setLineStyle(PointsView.Line.DASH)
+  pvz = sp.addPoints(z)
+
+def doSmoothExample1():
   n1 = 315
   sigma = 10.0
   c = 0.5*sigma*sigma;
@@ -77,6 +123,18 @@ def doTargetExample3():
 def makeRandomImage2(n1,n2):
   r = Array.sub(Array.randfloat(n1,n2),0.5)
   r = smooth2(r)
+  return r
+
+def makeBlockyImage2(n1,n2):
+  r = Array.zerofloat(n1,n2)
+  for i2 in range(0,n2/2):
+    for i1 in range(n1):
+      r[i2][i1] = 1.0
+  for i2 in range(n2/2,n2):
+    for i1 in range(0,n1/2):
+      r[i2][i1] = 2.0
+    for i1 in range(n1/2,n1):
+      r[i2][i1] = 3.0
   return r
 
 def makeRandomImage3(n1,n2,n3):

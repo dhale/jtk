@@ -88,11 +88,12 @@ public class LocalSmoothingFilter {
 
     // Sub-diagonal e of SPD tridiagonal matrix I+G'DG; e[0] = e[n1] = 0.0.
     float[] e = new float[n1+1];
-    c = -c;
     if (s!=null) {
+      c = -0.5f*c;
       for (int i1=1; i1<n1; ++i1)
-        e[i1] = c*(s[i1-1]+s[i1]);
+        e[i1] = c*(s[i1]+s[i1-1]);
     } else {
+      c = -c;
       for (int i1=1; i1<n1; ++i1)
         e[i1] = c;
     }
@@ -524,6 +525,7 @@ public class LocalSmoothingFilter {
     trace("solve: delta="+delta);
     int iter;
     for (iter=0; iter<_niter && delta>deltaSmall; ++iter) {
+      //trace("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
       a.apply(d,q);
       float dq = sdot(d,q);
       float alpha = delta/dq;
@@ -754,7 +756,7 @@ public class LocalSmoothingFilter {
     Threads.startAndJoin(threads);
   }
 
-  private static final boolean TRACE = false;
+  private static final boolean TRACE = true;
   private static void trace(String s) {
     if (TRACE)
       System.out.println(s);
