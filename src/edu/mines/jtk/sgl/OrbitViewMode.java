@@ -80,6 +80,17 @@ public class OrbitViewMode extends Mode {
       if (kc==KeyEvent.VK_HOME) {
         view.reset();
 
+      // End.
+      } else if (kc==KeyEvent.VK_END) {
+        float azimuth = (float)view.getAzimuth();
+        float elevation = (float)view.getElevation();
+        float scale = (float)view.getScale();
+        Vector3 t = view.getTranslate();
+        System.out.println("OrbitView: azimuth="+azimuth);
+        System.out.println("           elevation="+elevation);
+        System.out.println("           scale="+scale);
+        System.out.println("           translate=("+t.x+","+t.y+","+t.z+")");
+
       // Z shrink.
       } else if (kc==KeyEvent.VK_PAGE_DOWN) {
         Tuple3 s = view.getAxesScale();

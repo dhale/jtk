@@ -11,6 +11,7 @@ import static edu.mines.jtk.ogl.Gl.*;
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 
+import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.Direct;
 
 /**
@@ -80,6 +81,82 @@ public class TriangleGroup extends Group implements Selectable {
     int[] ijk = indexVertices(!vn,xyz);
     float[] uvw = computeNormals(ijk,xyz);
     buildTree(ijk,xyz,uvw,rgb);
+  }
+
+  /**
+   * Constructs a triangle group for a sampled function z = f(x,y).
+   * @param vn true, for vertex normals; false, for triangle normals.
+   * @param sx sampling of x coordinates; may be non-uniform.
+   * @param sy sampling of y coordinates; may be non-uniform.
+   * @param z array[nx][ny] of z coordinates z = f(x,y).
+   */
+  public TriangleGroup(boolean vn, Sampling sx, Sampling sy, float[][] z) {
+    this(vn,makeVertices(sx,sy,z));
+  }
+
+  /**
+   * Constructs a triangle group for a sampled function z = f(x,y).
+   * @param vn true, for vertex normals; false, for triangle normals.
+   * @param sx sampling of x coordinates; may be non-uniform.
+   * @param sy sampling of y coordinates; may be non-uniform.
+   * @param z array[nx][ny] of z coordinates z = f(x,y).
+   * @param r array[nx][ny] of red color components.
+   * @param g array[nx][ny] of green color components.
+   * @param b array[nx][ny] of blue color components.
+   */
+  public TriangleGroup(
+    boolean vn, Sampling sx, Sampling sy, float[][] z,
+    float[][] r, float[][] g, float[][] b)
+  {
+    this(vn,makeVertices(sx,sy,z),makeColors(r,g,b));
+  }
+  private static float[] makeVertices(Sampling sx, Sampling sy, float[][] z) {
+    int nx = sx.getCount()-1;
+    int ny = sy.getCount()-1;
+    float[] xyz = new float[3*6*nx*ny];
+    for (int ix=0,i=0; ix<nx; ++ix) {
+      float x0 = (float)sx.getValue(ix  );
+      float x1 = (float)sx.getValue(ix+1);
+      for (int iy=0; iy<ny; ++iy) {
+        float y0 = (float)sy.getValue(iy  );
+        float y1 = (float)sy.getValue(iy+1);
+        xyz[i++] = x0;  xyz[i++] = y0;  xyz[i++] = z[ix  ][iy  ];
+        xyz[i++] = x0;  xyz[i++] = y1;  xyz[i++] = z[ix  ][iy+1];
+        xyz[i++] = x1;  xyz[i++] = y0;  xyz[i++] = z[ix+1][iy  ];
+        xyz[i++] = x1;  xyz[i++] = y0;  xyz[i++] = z[ix+1][iy  ];
+        xyz[i++] = x0;  xyz[i++] = y1;  xyz[i++] = z[ix  ][iy+1];
+        xyz[i++] = x1;  xyz[i++] = y1;  xyz[i++] = z[ix+1][iy+1];
+      }
+    }
+    return xyz;
+  }
+  private static float[] makeColors(float[][] r, float[][] g, float[][] b) {
+    int nx = r.length-1;
+    int ny = r[0].length-1;
+    float[] rgb = new float[3*6*nx*ny];
+    for (int ix=0,i=0; ix<nx; ++ix) {
+      for (int iy=0; iy<ny; ++iy) {
+        rgb[i++] = r[ix  ][iy  ];
+        rgb[i++] = g[ix  ][iy  ];
+        rgb[i++] = b[ix  ][iy  ];
+        rgb[i++] = r[ix  ][iy+1];
+        rgb[i++] = g[ix  ][iy+1];
+        rgb[i++] = b[ix  ][iy+1];
+        rgb[i++] = r[ix+1][iy  ];
+        rgb[i++] = g[ix+1][iy  ];
+        rgb[i++] = b[ix+1][iy  ];
+        rgb[i++] = r[ix+1][iy  ];
+        rgb[i++] = g[ix+1][iy  ];
+        rgb[i++] = b[ix+1][iy  ];
+        rgb[i++] = r[ix  ][iy+1];
+        rgb[i++] = g[ix  ][iy+1];
+        rgb[i++] = b[ix  ][iy+1];
+        rgb[i++] = r[ix+1][iy+1];
+        rgb[i++] = g[ix+1][iy+1];
+        rgb[i++] = b[ix+1][iy+1];
+      }
+    }
+    return rgb;
   }
 
   /**

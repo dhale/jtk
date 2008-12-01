@@ -390,7 +390,7 @@ public class OrbitView extends View {
     if (_stopwatch.time()>2.0) {
       _stopwatch.stop();
       int rate = (int)(_ndraw/_stopwatch.time());
-      System.out.println("OrbitView: draw frames/second = "+rate);
+      trace("OrbitView: draw frame/s = "+rate);
       _ndraw = 0;
       _stopwatch.restart();
     }
@@ -424,5 +424,9 @@ public class OrbitView extends View {
   private void updateView() {
     updateTransforms();
     repaint();
+  }
+
+  private static void trace(String s) {
+    System.out.println(s);
   }
 }

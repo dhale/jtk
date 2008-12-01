@@ -1,5 +1,6 @@
 import sys
 from math import *
+from java.awt import *
 from java.lang import *
 from java.util import *
 from javax.swing import *
@@ -48,23 +49,25 @@ def doInterpExample1():
   """An example of 1D interpolation using local smoothing of a sampled
      nearest-neighbor interpolant."""
   n1 = 315
-  t = [ 10.0, 100.0, 170.0, 200.0, 250.0]
+  t = [ 60.0, 100.0, 170.0, 200.0, 250.0]
   x = [  1.0,   2.0,   2.7,   3.0,   2.0]
   d,y = getNearestNeighbors(t,x,n1)
-  lsf = LocalSmoothingFilter()
-  c = 0.5 # this choice corresponds to linear interpolation
-  s = Array.mul(d,d) # squaring the distances makes interpolation smoother
-  z = Array.zerofloat(n1)
-  lsf.apply(c,s,y,z)
-  #SimplePlot.asPoints(d)
-  #SimplePlot.asPoints(s)
+  #d = Array.clip(0.0,25.0,d)
+  s = Array.mul(d,d)
+  SimplePlot.asPoints(d)
+  SimplePlot.asPoints(s)
   sp = SimplePlot()
   pvx = sp.addPoints(t,x)
   pvx.setMarkStyle(PointsView.Mark.HOLLOW_CIRCLE)
   pvx.setLineStyle(PointsView.Line.NONE)
   pvy = sp.addPoints(y)
   pvy.setLineStyle(PointsView.Line.DASH)
-  pvz = sp.addPoints(z)
+  lsf = LocalSmoothingFilter()
+  for c,color in [(0.1,Color.RED),(0.3,Color.GREEN),(0.5,Color.BLUE)]:
+    z = Array.zerofloat(n1)
+    lsf.apply(c,s,y,z)
+    pvz = sp.addPoints(z)
+    pvz.setLineColor(color)
 
 def doSmoothExample1():
   n1 = 315
