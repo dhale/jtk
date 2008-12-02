@@ -71,7 +71,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  * arrays of 3D, rather than 2D arrays.
  *
  * @author John Mathewson, Colorado School of Mines
- * @version 2008.10.28
+ * @version 2008.12.01
  */
 public class SteerablePyramid {
 
@@ -800,7 +800,7 @@ public class SteerablePyramid {
     int nf2 = cf.length;
     int nf1 = cf[0].length/2;
     int ir,ii;
-    double m1 = (double)(nf1-1)/2.0;
+    double m1 = (double)(nf1-1);
     double m2 = (double)(nf2-1)/2.0;
     double w1,w2;
     double mf1 = 1.0/m1;
@@ -810,7 +810,7 @@ public class SteerablePyramid {
     float b;
     for (int i2=0; i2<nf2; ++i2) {
       for (int i1=0; i1<nf1; ++i1) {
-        w1 = ((double)i1-m1)*mf1;
+        w1 = ((double)i1)*mf1;
         w2 = ((double)i2-m2)*mf2;
         wd = sqrt(w1*w1+w2*w2);
         ir = 2*i1;
@@ -841,7 +841,7 @@ public class SteerablePyramid {
     int nf2 = cf[0].length;
     int nf1 = cf[0][0].length/2;
     int ir,ii;
-    double m1 = (double)(nf1-1)/2.0;
+    double m1 = (double)(nf1-1);
     double m2 = (double)(nf2-1)/2.0;
     double m3 = (double)(nf3-1)/2.0;
     double w1,w2,w3;
@@ -854,7 +854,7 @@ public class SteerablePyramid {
     for (int i3=0; i3<nf3; ++i3) {
       for (int i2=0; i2<nf2; ++i2) {
         for (int i1=0; i1<nf1; ++i1) {
-          w1 = ((double)i1-m1)*mf1;
+          w1 = ((double)i1)*mf1;
           w2 = ((double)i2-m2)*mf2;
           w3 = ((double)i3-m3)*mf3;
           wd = Math.sqrt(w1*w1+w2*w2+w3*w3);
@@ -888,7 +888,7 @@ public class SteerablePyramid {
   private void applySteerableFilter(int dir,float[][] cfin,float[][] cfout) {
     int nf2 = cfin.length;
     int nf1 = cfin[0].length/2;
-    int m1 = (nf1-1)/2;
+    int m1 = nf1-1;
     int m2 = (nf2-1)/2;
     double mf1 = 1.0/(double)m1;
     double mf2 = 1.0/(double)m2;
@@ -900,7 +900,7 @@ public class SteerablePyramid {
       for (int i1=0; i1<nf1; ++i1) {
         ir = 2*i1;
         ii = ir+1;
-        w1 = (double)(i1-m1)*mf1;
+        w1 = (double)(i1)*mf1;
         w2 = (double)(i2-m2)*mf2;
         theta = atan2(w1,w2);
         c = (float)cos(theta-thetan);
@@ -925,7 +925,7 @@ public class SteerablePyramid {
     int nf2 = cfin[0].length;
     int nf1 = cfin[0][0].length/2;
     int ir,ii;
-    double m1 = (double)(nf1-1)/2.0;
+    double m1 = (double)(nf1-1);
     double m2 = (double)(nf2-1)/2.0;
     double m3 = (double)(nf3-1)/2.0;
     double v1=0.0,v2=0.0,v3=0.0;
@@ -942,7 +942,7 @@ public class SteerablePyramid {
     for (int i3=0; i3<nf3; ++i3) {
       for (int i2=0; i2<nf2; ++i2) {
         for (int i1=0; i1<nf1; ++i1) {
-          w1 = (double)i1-m1;
+          w1 = (double)i1;
           w2 = (double)i2-m2;
           w3 = (double)i3-m3;
           ir = 2*i1;
@@ -960,8 +960,8 @@ public class SteerablePyramid {
      * Following section is to avoid divide-by-zero.
      * It sets amplitude to zero for zero wavenumber.
      */
-    if ((int)m1*2 == nf1 && (int)m2*2 == nf2 && (int)m3*2 == nf3) {
-      ir = (int)(2.0*m1);
+    if ((int)m2*2 == nf2 && (int)m3*2 == nf3) {
+      ir = 0;
       ii = ir+1;
       cfout[(int)m3][(int)m2][ir] = 0.0f;
       cfout[(int)m3][(int)m2][ii] = 0.0f;
@@ -1401,7 +1401,7 @@ public class SteerablePyramid {
    * the input image.
    */
   private float[][] ftForward(int level,float[][] x) {
-    FftComplex fft1;
+    FftReal fft1;
     FftComplex fft2;
     int ny2 = x.length;
     int ny1 = x[0].length;
@@ -1409,19 +1409,17 @@ public class SteerablePyramid {
     int lfactor = (int)pow(2.0,(double)level);
     int nl2 = (n2-1)/lfactor+1;
     int nl1 = (n1-1)/lfactor+1;
-    int nf1 = FftComplex.nfftSmall(nl1+mpad*2);
+    int nf1 = FftReal.nfftSmall(nl1+mpad*2);
+    int nf1c = nf1/2+1;
     int nf2 = FftComplex.nfftSmall(nl2+mpad*2);
     float[][] xr = Array.zerofloat(nf1,nf2);
     Array.copy(ny1,ny2,0,0,x,mpad,mpad,xr);
-    float[][] xi = Array.zerofloat(nf1,nf2);
-    float[][] cx = Array.cmplx(xr,xi);
-    float[][] rx = Array.zerofloat(nf1,nf2);
-    fft1 = new FftComplex(nf1);
+    float[][] cx = Array.czerofloat(nf1c,nf2);
+    fft1 = new FftReal(nf1);
     fft2 = new FftComplex(nf2);
-    flipSign(1,cx);
-    fft1.complexToComplex1(1,nf2,cx,cx);
+    fft1.realToComplex1(1,nf2,xr,cx);
     flipSign(2,cx);
-    fft2.complexToComplex2(1,nf1,cx,cx);
+    fft2.complexToComplex2(1,nf1c,cx,cx);
     return cx;
   }
   
@@ -1433,7 +1431,7 @@ public class SteerablePyramid {
    * the input image.
    */
   private float[][][] ftForward(int level,float[][][] x) {
-    FftComplex fft1;
+    FftReal fft1;
     FftComplex fft2;
     FftComplex fft3;
     int ny3 = x.length;
@@ -1446,20 +1444,19 @@ public class SteerablePyramid {
     int nl1 = (n1-1)/lfactor+1;
     int nf3 = FftComplex.nfftSmall(nl3+mpad*2);
     int nf2 = FftComplex.nfftSmall(nl2+mpad*2);
-    int nf1 = FftComplex.nfftSmall(nl1+mpad*2);
+    int nf1 = FftReal.nfftSmall(nl1+mpad*2);
+    int nf1c = nf1/2+1;
     float[][][] xr = Array.zerofloat(nf1,nf2,nf3);
     Array.copy(ny1,ny2,ny3,0,0,0,x,mpad,mpad,mpad,xr);
-    float[][][] xi = Array.zerofloat(nf1,nf2,nf3);
-    float[][][] cx = Array.cmplx(xr,xi);
-    fft1 = new FftComplex(nf1);
+    float[][][] cx = Array.czerofloat(nf1c,nf2,nf3);
+    fft1 = new FftReal(nf1);
     fft2 = new FftComplex(nf2);
     fft3 = new FftComplex(nf3);
-    flipSign(1, cx);
-    fft1.complexToComplex1(1,nf2,nf3,cx,cx);
+    fft1.realToComplex1(1,nf2,nf3,xr,cx);
     flipSign(2, cx);
-    fft2.complexToComplex2(1,nf1,nf3,cx,cx);
+    fft2.complexToComplex2(1,nf1c,nf3,cx,cx);
     flipSign(3, cx);
-    fft3.complexToComplex3(1,nf1,nf2,cx,cx);
+    fft3.complexToComplex3(1,nf1c,nf2,cx,cx);
     return cx;
   }
   
@@ -1474,23 +1471,23 @@ public class SteerablePyramid {
    */
   private void ftInverse(int lev,int dir,
                          float[][] cf,float spyr[][][][]) {
-    FftComplex fft1;
+    FftReal fft1;
     FftComplex fft2;
     int nf2 = cf.length;
-    int nf1 = cf[0].length/2;
+    int nf1c = cf[0].length/2;
+    int nf1 = (nf1c-1)*2;
     int mpad = round(20.0f/(1.0f+(float)lev));
     int lfactor = (int)pow(2.0,(double)lev);
     int nl2 = (n2-1)/lfactor+1;
     int nl1 = (n1-1)/lfactor+1;
-    fft1 = new FftComplex(nf1);
+    fft1 = new FftReal(nf1);
     fft2 = new FftComplex(nf2);
-    fft2.complexToComplex2(-1,nf1,cf,cf);
+    fft2.complexToComplex2(-1,nf1c,cf,cf);
     flipSign(2,cf);
-    fft2.scale(nf1,nf2,cf);
-    fft1.complexToComplex1(-1,nf2,cf,cf);
-    flipSign(1,cf);
+    fft2.scale(nf1c,nf2,cf);
+    fft1.complexToReal1(-1,nf2,cf,cf);
     fft1.scale(nf1,nf2,cf);
-    Array.copy(nl1,nl2,mpad*2,mpad,2,1,cf,0,0,1,1,spyr[lev][dir]);
+    Array.copy(nl1,nl2,mpad,mpad,1,1,cf,0,0,1,1,spyr[lev][dir]);
   }
   
   /**
@@ -1504,30 +1501,30 @@ public class SteerablePyramid {
    */
   private void ftInverse(int lev,int dir,
                          float[][][] cf,float spyr[][][][][]) {
-    FftComplex fft1;
+    FftReal fft1;
     FftComplex fft2;
     FftComplex fft3;
     int nf3 = cf.length;
     int nf2 = cf[0].length;
-    int nf1 = cf[0][0].length/2;
+    int nf1c = cf[0][0].length/2;
+    int nf1 = (nf1c-1)*2;
     int mpad = round(20.0f/(1.0f+(float)lev));
     int lfactor = (int)pow(2.0,(double)lev);
     int nl3 = (n3-1)/lfactor+1;
     int nl2 = (n2-1)/lfactor+1;
     int nl1 = (n1-1)/lfactor+1;
-    fft1 = new FftComplex(nf1);
+    fft1 = new FftReal(nf1);
     fft2 = new FftComplex(nf2);
     fft3 = new FftComplex(nf3);
-    fft3.complexToComplex3(-1,nf1,nf2,cf,cf);
+    fft3.complexToComplex3(-1,nf1c,nf2,cf,cf);
     flipSign(3, cf);
-    fft3.scale(nf1,nf2,nf3,cf);
-    fft2.complexToComplex2(-1,nf1,nf3,cf,cf);
+    fft3.scale(nf1c,nf2,nf3,cf);
+    fft2.complexToComplex2(-1,nf1c,nf3,cf,cf);
     flipSign(2, cf);
-    fft2.scale(nf1,nf2,nf3,cf);
-    fft1.complexToComplex1(-1,nf2,nf3,cf,cf);
-    flipSign(1, cf);
+    fft2.scale(nf1c,nf2,nf3,cf);
+    fft1.complexToReal1(-1,nf2,nf3,cf,cf);
     fft1.scale(nf1,nf2,nf3,cf);
-    Array.copy(nl1,nl2,nl3,mpad*2,mpad,mpad,2,1,1,cf,
+    Array.copy(nl1,nl2,nl3,mpad,mpad,mpad,1,1,1,cf,
         0,0,0,1,1,1,spyr[lev][dir]);
   }
   
@@ -1620,4 +1617,3 @@ public class SteerablePyramid {
     }
   }
 }
-
