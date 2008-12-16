@@ -45,7 +45,7 @@ widthColorBar = 200
 pngDir = "./png/"
 dataDir = "./data/"
 
-spyr = SteerablePyramid_3a(0.5,1.0)
+spyr = SteerablePyramid(0.5,1.0)
 #############################################################################
 # functions
 # Uncomment one of the following lines in main to run.
