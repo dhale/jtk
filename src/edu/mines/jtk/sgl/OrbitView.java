@@ -328,7 +328,15 @@ public class OrbitView extends View {
       } else if (ao==AxesOrientation.XOUT_YRIGHT_ZUP) {
         _worldToUnitSphere.timesEquals(Matrix44.rotateY(-90.0));
         _worldToUnitSphere.timesEquals(Matrix44.rotateX(-90.0));
+      } else if (ao==AxesOrientation.XDOWN_YRIGHT_ZOUT) {
+        _worldToUnitSphere.timesEquals(Matrix44.rotateZ(-90.0));
+      } else if (ao==AxesOrientation.XUP_YLEFT_ZOUT) {
+        _worldToUnitSphere.timesEquals(Matrix44.rotateZ(90.0));
+      } else if (ao==AxesOrientation.XUP_YRIGHT_ZOUT) {
+        _worldToUnitSphere.timesEquals(Matrix44.rotateZ(90.0));
+        sy = -sy;
       }
+
       _worldToUnitSphere.timesEquals(Matrix44.scale(sx,sy,sz));
       _worldToUnitSphere.timesEquals(Matrix44.translate(tx,ty,tz));
     }
