@@ -117,6 +117,29 @@ public class PointsView extends TiledView {
   }
 
   /**
+   * Constructs a view of points (x1,x2,x3) with a single plot segment.
+   * The lengths of the specified arrays x1 and x2 must be equal.
+   * If x3 is not null, its length must equal that of x1 and x2.
+   * @param x1 array of x1 coordinates.
+   * @param x2 array of x2 coordinates.
+   * @param x3 array of x3 coordinates; null, if none.
+   */
+  public PointsView(float[] x1, float[] x2, float[] x3) {
+    set(x1,x2,x3);
+  }
+
+  /**
+   * Constructs a view of points (x1,x2,x3) with multiple plot segments.
+   * The lengths of the specified arrays x1 and x2 must be equal.
+   * If x3 is not null, its length must equal that of x1 and x2.
+   * @param x1 array of arrays of x1 coordinates.
+   * @param x2 array of arrays of x2 coordinates.
+   */
+  public PointsView(float[][] x1, float[][] x2, float[][] x3) {
+    set(x1,x2,x3);
+  }
+
+  /**
    * Sets (x1,x2) coordinates for a sampled function x2(x1).
    * @param s1 the sampling of x1 coordinates.
    * @param x2 array of x2 coordinates.
@@ -137,15 +160,32 @@ public class PointsView extends TiledView {
    * @param x2 array of x2 coordinates.
    */
   public void set(float[] x1, float[] x2) {
+    set(x1,x2,null);
+  }
+
+  /**
+   * Sets arrays of (x1,x2,x3) coordinates for a single plot segment.
+   * The lengths of the specified arrays x1 and x2 must be equal.
+   * If x3 is not null, its length must equal that of x1 and x2.
+   * @param x1 array of x1 coordinates.
+   * @param x2 array of x2 coordinates.
+   * @param x3 array of x3 coordinates; null, if none.
+   */
+  public void set(float[] x1, float[] x2, float[] x3) {
     Check.argument(x1.length==x2.length,"x1.length equals x2.length");
+    if (x3!=null)
+      Check.argument(x1.length==x3.length,"x1.length equals x3.length");
     _ns = 1;
     _nx.clear();
     _x1.clear();
     _x2.clear();
+    _x3.clear();
     _nxmax = x1.length;
     _nx.add(x1.length);
     _x1.add(Array.copy(x1));
     _x2.add(Array.copy(x2));
+    if (x3!=null)
+      _x3.add(Array.copy(x3));
     updateBestProjectors();
     repaint();
   }
@@ -157,11 +197,26 @@ public class PointsView extends TiledView {
    * @param x2 array of arrays of x2 coordinates.
    */
   public void set(float[][] x1, float[][] x2) {
+    set(x1,x2,null);
+  }
+
+  /**
+   * Sets array of arrays of (x1,x2,x3) coordinates for multiple plot segments.
+   * The lengths of the specified arrays x1 and x2 must be equal.
+   * If x3 is not null, its length must equal that of x1 and x2.
+   * @param x1 array of arrays of x1 coordinates.
+   * @param x2 array of arrays of x2 coordinates.
+   * @param x3 array of arrays of x3 coordinates; null, if none.
+   */
+  public void set(float[][] x1, float[][] x2, float[][] x3) {
     Check.argument(x1.length==x2.length,"x1.length equals x2.length");
+    if (x3!=null)
+      Check.argument(x1.length==x3.length,"x1.length equals x3.length");
     _ns = x1.length;
     _nx.clear();
     _x1.clear();
     _x2.clear();
+    _x3.clear();
     _nxmax = 0;
     for (int is=0; is<_ns; ++is) {
       Check.argument(x1[is].length==x2[is].length,
@@ -170,6 +225,8 @@ public class PointsView extends TiledView {
       _nx.add(x1[is].length);
       _x1.add(Array.copy(x1[is]));
       _x2.add(Array.copy(x2[is]));
+      if (x3!=null)
+        _x3.add(Array.copy(x3[is]));
     }
     updateBestProjectors();
     repaint();
@@ -360,6 +417,16 @@ public class PointsView extends TiledView {
     }
   }
 
+  /**
+   * Sets the format used for text labels.
+   * The default format is "%1.4G".
+   * @param format the text format.
+   */
+  public void setTextFormat(String format) {
+    _textFormat = format;
+    repaint();
+  }
+
   public void paint(Graphics2D g2d) {
     g2d.setRenderingHint(
       RenderingHints.KEY_ANTIALIASING,
@@ -429,6 +496,11 @@ public class PointsView extends TiledView {
       gmark.setStroke(bs);
     }
 
+    // Graphics context for text labels.
+    Graphics2D gtext = null;
+    if (_x3.size()>0)
+      gtext = (Graphics2D)g2d.create();
+
     // Arrays for (x,y) coordinates.
     int[] x = new int[_nxmax];
     int[] y = new int[_nxmax];
@@ -464,6 +536,12 @@ public class PointsView extends TiledView {
           paintHollowSquare(gmark,markSize,n,x,y);
         }
       }
+
+      // Draw text labels.
+      if (gtext!=null) {
+        float[] z = _x3.get(is);
+        paintLabel(gtext,markSize,n,x,y,z);
+      }
     }
   }
 
@@ -471,9 +549,10 @@ public class PointsView extends TiledView {
   // private
 
   int _ns; // number of segments
-  ArrayList<Integer> _nx = new ArrayList<Integer>(); // numbers of (x1,x2)
+  ArrayList<Integer> _nx = new ArrayList<Integer>(); // numbers of (x1,x2,x3)
   ArrayList<float[]> _x1 = new ArrayList<float[]>(); // arrays of x1
   ArrayList<float[]> _x2 = new ArrayList<float[]>(); // arrays of x2
+  ArrayList<float[]> _x3 = new ArrayList<float[]>(); // arrays of x3
   int _nxmax; // maximum number of points in a segment
   private Orientation _orientation = Orientation.X1RIGHT_X2UP;
   private Line _lineStyle = Line.SOLID;
@@ -482,6 +561,7 @@ public class PointsView extends TiledView {
   private Mark _markStyle = Mark.NONE;
   private float _markSize = -1.0f;
   private Color _markColor = null;
+  private String _textFormat = "%1.4G";
 
   /**
    * Called when we might new realignment.
@@ -635,5 +715,16 @@ public class PointsView extends TiledView {
     int xy = wh/2;
     for (int i=0; i<n; ++i)
       g2d.drawRect(x[i]-xy,y[i]-xy,wh-1,wh-1);
+  }
+  
+  private void paintLabel(
+    Graphics2D g2d, int s, int n, int[] x, int[] y, float[] z) 
+  {
+    s /= 2;
+    for (int i=0; i<n; ++i) {
+      int xi = x[i];
+      int yi = y[i];
+      g2d.drawString(String.format(_textFormat,z[i]),xi+s,yi-s);
+    }
   }
 }

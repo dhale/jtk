@@ -2717,7 +2717,6 @@ public class TriMesh implements Serializable {
    * <p>
    * This implementation is based on an algorithm published by Sambridge 
    * et al., who note that it fails for points (x,y) on Delaunay edges.
-   * Due to rounding errors, it also fails for points near those edges.
    * Therefore, this method is private and exists only for testing.
    * @param x the x coordinate of the point at which to interpolate.
    * @param y the y coordinate of the point at which to interpolate.
@@ -2759,8 +2758,8 @@ public class TriMesh implements Serializable {
     double[] cv = new double[2];
 
     // Sums of signed areas and float values.
-    double as = 0.0f;
-    double fs = 0.0f;
+    double as = 0.0;
+    double fs = 0.0;
     
     // For all tris in the list, ...
     int ntri = triList.ntri();
@@ -2768,6 +2767,7 @@ public class TriMesh implements Serializable {
     for (int itri=0; itri<ntri; ++itri) {
 
       // The three nodes of one tri.
+      tri = tris[itri];
       Node n0 = tri._n0;
       Node n1 = tri._n1;
       Node n2 = tri._n2;

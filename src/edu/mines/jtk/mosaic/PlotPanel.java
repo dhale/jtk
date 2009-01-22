@@ -704,6 +704,17 @@ public class PlotPanel extends IPanel {
   }
 
   /**
+   * Adds a points view of arrays x1, x2 and x3 of point (x1,x2,x3) coordinates.
+   * @param x1 array of x1 coordinates.
+   * @param x2 array of x2 coordinates.
+   * @param x3 array of x3 coordinates.
+   * @return the points view.
+   */
+  public PointsView addPoints(float[] x1, float[] x2, float[] x3) {
+    return addPoints(0,0,x1,x2,x3);
+  }
+
+  /**
    * Adds a points view of (x1,x2) with specified x2 coordinates.
    * The corresponding coordinates x1 are assumed to be 0, 1, 2, ....
    * @param x2 array of x2 coordinates.
@@ -743,6 +754,22 @@ public class PlotPanel extends IPanel {
    */
   public PointsView addPoints(int irow, int icol, float[] x1, float[] x2) {
     PointsView pv = new PointsView(x1,x2);
+    return addPointsView(irow,icol,pv);
+  }
+
+  /**
+   * Adds a points view of arrays x1, x2 and x3 of point (x1,x2,x3) coordinates.
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param x1 array of x1 coordinates.
+   * @param x2 array of x2 coordinates.
+   * @param x3 array of x3 coordinates.
+   * @return the points view.
+   */
+  public PointsView addPoints(
+    int irow, int icol, float[] x1, float[] x2, float[] x3) 
+  {
+    PointsView pv = new PointsView(x1,x2,x3);
     return addPointsView(irow,icol,pv);
   }
 
