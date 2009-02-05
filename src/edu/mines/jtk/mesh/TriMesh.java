@@ -2724,7 +2724,7 @@ public class TriMesh implements Serializable {
    * @param fnull null value returned for points (x,y) outside the mesh.
    * @return the interpolated float value.
    */
-  private float interpolateSibsonSambridge(
+  public float interpolateSambridge(
     float x, float y, NodePropertyMap map, float fnull) 
   {
     double xp = x;
