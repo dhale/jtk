@@ -157,7 +157,7 @@ public class ArrayVect1f implements Vect {
     for (int i=0; /*Math.max(_firstSample,rhs._firstSample)//breaks transpose*/
          i<_data.length;
          ++i) {
-      result += _data[i] * rhs._data[i];
+      result += (double)_data[i] * rhs._data[i];
     }
     return result;
   }

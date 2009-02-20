@@ -172,7 +172,7 @@ public class ArrayVect2f implements Vect {
     double result = 0.;
     for (int i=0; i<_data.length; ++i) {
       for (int j=0; j<_data[i].length; ++j) {
-        result += this._data[i][j] * rhs._data[i][j];
+        result += (double) this._data[i][j] * rhs._data[i][j];
       }
     }
     return result;

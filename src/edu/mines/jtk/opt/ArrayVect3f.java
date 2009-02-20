@@ -142,7 +142,7 @@ public class ArrayVect3f implements Vect {
     for (int i=0; i<_data.length; ++i) {
       for (int j=0; j<_data[0].length; ++j) {
         for (int k=0; k<_data[0][0].length; ++k) {
-          result += _data[i][j][k] * rhs._data[i][j][k];
+          result += (double) _data[i][j][k] * rhs._data[i][j][k];
         }
       }
     }
