@@ -156,8 +156,12 @@ public class Eigen {
    * @param d the array of eigenvalues d[0], d[1], and d[2].
    */
   public static void solveSymmetric33(double[][] a, double[][] v, double[] d) {
-    solveSymmetric33Hybrid(a,v,d);
+    //solveSymmetric33Hybrid(a,v,d); // errors too big in random tests
+    solveSymmetric33Jacobi(a,v,d); // slow but more accurate
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // private
 
   /**
    * Sorts eigenvalues d and eigenvectors v in descending order.
@@ -195,17 +199,17 @@ public class Eigen {
     double dd = a01*a01;
     double ee = a12*a12;
     double ff = a02*a02;
-    double m = a00+a11+a22;
+    double c2 = a00+a11+a22;
     double c1 = (a00*a11+a00*a22+a11*a22)-(dd+ee+ff);
     double c0 = a22*dd+a00*ee+a11*ff-a00*a11*a22-2.0*a02*de;
-    double p = m*m-3.0*c1;
-    double q = m*(p-1.5*c1)-13.5*c0; // 13.5 = 27/2
+    double p = c2*c2-3.0*c1;
+    double q = c2*(p-1.5*c1)-13.5*c0; // 13.5 = 27/2
     double t = 27.0*(0.25*c1*c1*(p-c1)+c0*(q+6.75*c0)); // 6.75 = 27/4
     double phi = ONE_THIRD*atan2(sqrt(abs(t)),q);
     double sqrtp = sqrt(abs(p));
     double c = sqrtp*cos(phi);
     double s = ONE_OVER_SQRT3*sqrtp*sin(phi);
-    double dt = ONE_THIRD*(m-c);
+    double dt = ONE_THIRD*(c2-c);
     d[0] = dt+c;
     d[1] = dt+s;
     d[2] = dt-s;
@@ -438,7 +442,6 @@ public class Eigen {
 
   /**
    * Old iterative Jacobi solver. Slower than the current solver.
-   * Deprecated.
    */
   public static void solveSymmetric33Jacobi(
     double[][] a, double[][] v, double[] d) 

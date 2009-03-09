@@ -56,6 +56,13 @@ public class EigenTensors3Test extends TestCase {
     }
   }
 
+  private static boolean badEigenvalues(float[] a, float[] b, double e) {
+    for (int i=0; i<3; ++i)
+      if (Math.abs(a[i]-b[i])>e)
+        return true;
+    return false;
+  }
+
   public void testIO() throws IOException,ClassNotFoundException {
 
     // Make random eigen-tensors.

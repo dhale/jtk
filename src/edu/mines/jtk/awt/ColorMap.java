@@ -50,6 +50,16 @@ public class ColorMap {
   public static final IndexColorModel HUE = getHue();
 
   /**
+   * Color model for hues from red to blue. 
+   */
+  public static final IndexColorModel HUE_RED_TO_BLUE = getHueRedToBlue();
+
+  /**
+   * Color model for hues from blue to red. 
+   */
+  public static final IndexColorModel HUE_BLUE_TO_RED = getHueBlueToRed();
+
+  /**
    * Color model for eight complete cycles of hues.
    */
   public static final IndexColorModel PRISM = getPrism();
@@ -277,6 +287,22 @@ public class ColorMap {
    */
   public static IndexColorModel getHue() {
     return getHue(0.0,0.67);
+  }
+
+  /**
+   * Gets a red-to-blue linear hue color model.
+   * @return the color model.
+   */
+  public static IndexColorModel getHueRedToBlue() {
+    return getHue(0.0,0.67);
+  }
+
+  /**
+   * Gets a blue-to-red linear hue color model.
+   * @return the color model.
+   */
+  public static IndexColorModel getHueBlueToRed() {
+    return getHue(0.67,0.0);
   }
 
   /**

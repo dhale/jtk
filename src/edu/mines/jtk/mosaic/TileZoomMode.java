@@ -6,8 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import static java.lang.Math.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -64,7 +63,36 @@ public class TileZoomMode extends Mode {
 
   private MouseListener _ml = new MouseAdapter() {;
     public void mousePressed(MouseEvent e) {
-      beginZoom(e);
+      if (e.isControlDown() && e.isAltDown()) {
+        Object source = e.getSource();
+        if (source instanceof Tile) {
+          Tile tile = (Tile)source;
+          Container frame = tile.getTopLevelAncestor();
+          Projector hp = tile.getHorizontalProjector();
+          Projector vp = tile.getVerticalProjector();
+          DRectangle r = tile.getViewRectangle();
+          double fwidth = frame.getWidth();
+          double fheight = frame.getHeight();
+          double fratio = fwidth/fheight; 
+          double pwidth = tile.getWidth();
+          double pheight = tile.getHeight();
+          double pratio = pwidth/pheight; 
+          double vwidth = abs(hp.v(r.x)-hp.v(r.x+r.width));
+          double vheight = abs(vp.v(r.y)-vp.v(r.y+r.height));
+          double vratio = vwidth/vheight; 
+          System.out.printf("Tile: frame width  = %1d%n",(int)fwidth);
+          System.out.printf("      frame height = %1d%n",(int)fheight);
+          System.out.printf("      frame ratio  = %1.4g%n",fratio);
+          System.out.printf("      pixel width  = %1d%n",(int)pwidth);
+          System.out.printf("      pixel height = %1d%n",(int)pheight);
+          System.out.printf("      pixel ratio  = %1.4g%n",pratio);
+          System.out.printf("      value width  = %1.4g%n",vwidth);
+          System.out.printf("      value height = %1.4g%n",vheight);
+          System.out.printf("      value ratio  = %1.4g%n",vratio);
+        }
+      } else {
+        beginZoom(e);
+      }
     }
     public void mouseReleased(MouseEvent e) {
       endZoom(e);
