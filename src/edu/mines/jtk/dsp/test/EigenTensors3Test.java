@@ -24,14 +24,15 @@ public class EigenTensors3Test extends TestCase {
   }
 
   public static void testRandom() {
-    testRandom(true,1.0,1.0e-3);
-    testRandom(false,0.1,1.0e-6);
+    testRandom(true,1.0,1.0e-3,1.0e-2);
+    testRandom(false,0.1,1.0e-6,1.0e-3);
   }
 
   private static void testRandom(
-    boolean compressed, double errorAngle, double errorValue) 
+    boolean compressed, 
+    double errorAngle, double errorValue, double errorTensor) 
   {
-    int n1 = 3, n2 = 4, n3 = 5;
+    int n1 = 19, n2 = 20, n3 = 21;
     EigenTensors3 et = new EigenTensors3(n1,n2,n3,compressed);
     for (int i3=0; i3<n3; ++i3) {
       for (int i2=0; i2<n2; ++i2) {
@@ -46,21 +47,13 @@ public class EigenTensors3Test extends TestCase {
           c = et.getEigenvectorU(i1,i2,i3); checkEigenvectors(u,c,errorAngle);
           c = et.getEigenvectorW(i1,i2,i3); checkEigenvectors(w,c,errorAngle);
           c = et.getEigenvalues(i1,i2,i3); checkEigenvalues(a,c,errorValue);
-          errorAngle *= 2.0;
-          et.setTensor(i1,i2,i3,et.getTensor(i1,i2,i3));
-          c = et.getEigenvectorU(i1,i2,i3); checkEigenvectors(u,c,errorAngle);
-          c = et.getEigenvectorW(i1,i2,i3); checkEigenvectors(w,c,errorAngle);
-          c = et.getEigenvalues(i1,i2,i3); checkEigenvalues(a,c,errorValue);
+          float[] t1 = et.getTensor(i1,i2,i3);
+          et.setTensor(i1,i2,i3,t1);
+          float[] t2 = et.getTensor(i1,i2,i3);
+          checkTensors(t1,t2,errorTensor);
         }
       }
     }
-  }
-
-  private static boolean badEigenvalues(float[] a, float[] b, double e) {
-    for (int i=0; i<3; ++i)
-      if (Math.abs(a[i]-b[i])>e)
-        return true;
-    return false;
   }
 
   public void testIO() throws IOException,ClassNotFoundException {
@@ -115,9 +108,8 @@ public class EigenTensors3Test extends TestCase {
     }
   }
   private void assertEqual(float[] e, float[] a) {
-    assertEquals(e[0],a[0],0.0);
-    assertEquals(e[1],a[1],0.0);
-    assertEquals(e[2],a[2],0.0);
+    for (int i=0; i<e.length; ++i)
+      assertEquals(e[i],a[i],0.0);
   }
 
   private static void checkEigenvalues(float[] a, float[] b, double e) {
@@ -136,6 +128,11 @@ public class EigenTensors3Test extends TestCase {
       System.out.println("actual:"); Array.dump(v);
     }
     assertEquals(1.0,uv,ce);
+  }
+
+  private static void checkTensors(float[] s, float[] t, double e) {
+    for (int i=0; i<6; ++i)
+      assertEquals(s[i],t[i],e);
   }
 
   private static java.util.Random r = new java.util.Random();

@@ -30,7 +30,7 @@ public class EigenTest extends TestCase {
   }
 
   public void testSymmetric22() {
-    int nrand = 100;
+    int nrand = 10000;
     double[][] v = new double[2][2];
     double[] d = new double[2];
     for (int irand=0; irand<nrand; ++irand) {
@@ -46,9 +46,9 @@ public class EigenTest extends TestCase {
     double[] d = new double[3];
     int nrand = 10000;
     for (int irand=0; irand<nrand; ++irand) {
-      double[][] a = makeRandomSymmetric33();
       //double[][] a = Array.randdouble(3,3);
       //a = Array.add(a,Array.transpose(a));
+      double[][] a = makeRandomSymmetric33();
       Eigen.solveSymmetric33(a,v,d);
       check(a,v,d);
     }
@@ -57,7 +57,7 @@ public class EigenTest extends TestCase {
   public void testSymmetric33Special() {
     double[][] v = new double[3][3];
     double[] d = new double[3];
-    double[][][] as = {ASMALL,A100,A110,A111};
+    double[][][] as = {ASMALL,A100,A110,A111,ATEST1};
     for (double[][] a:as) {
       Eigen.solveSymmetric33(a,v,d);
       check(a,v,d);
@@ -98,6 +98,11 @@ public class EigenTest extends TestCase {
     {-1.08876e-13,  1.87872e-17,  1.29275e-16},
     { 1.87872e-17, -7.65274e-15, -1.13984e-14},
     { 1.29275e-16, -1.13984e-14, -2.53222e-14}
+  };
+  private static final double[][] ATEST1 = {
+    { 0.54957539, -0.00555262,  0.09809611},
+    {-0.00555262,  0.41839826, -0.00414489},  
+    { 0.09809611, -0.00414489,  0.49139029}
   };
 
   private static Random r = new Random();
@@ -204,16 +209,16 @@ public class EigenTest extends TestCase {
     s.stop();
     rate = (int)((double)nloop*(double)nrand/s.time());
     System.out.println("Number of 3x3 eigen-decompositions per second");
-    System.out.println("new: rate="+rate);
+    System.out.println("jacobi: rate="+rate);
     s.reset();
     s.start();
     for (nloop=0; s.time()<maxtime; ++nloop) {
       for (int irand=0; irand<nrand; ++irand) {
-        Eigen.solveSymmetric33Jacobi(a[irand],v,d);
+        Eigen.solveSymmetric33Fast(a[irand],v,d);
       }
     }
     s.stop();
     rate = (int)((double)nloop*(double)nrand/s.time());
-    System.out.println("old: rate="+rate);
+    System.out.println("hybrid: rate="+rate);
   }
 }

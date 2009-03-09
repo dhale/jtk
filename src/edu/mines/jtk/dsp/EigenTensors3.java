@@ -390,7 +390,8 @@ public class EigenTensors3 implements Tensors3,Serializable {
     };
     double[][] vv = new double[3][3];
     double[] ev = new double[3];
-    Eigen.solveSymmetric33(aa,vv,ev);
+    //Eigen.solveSymmetric33Fast(aa,vv,ev); // is fast method accurate enough?
+    Eigen.solveSymmetric33(aa,vv,ev); // slow but accurate!
     double[] u = vv[0];
     double[] w = vv[2];
     float u1 = (float)u[0];

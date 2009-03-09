@@ -156,8 +156,25 @@ public class Eigen {
    * @param d the array of eigenvalues d[0], d[1], and d[2].
    */
   public static void solveSymmetric33(double[][] a, double[][] v, double[] d) {
-    //solveSymmetric33Hybrid(a,v,d); // errors too big in random tests
     solveSymmetric33Jacobi(a,v,d); // slow but more accurate
+  }
+
+  /**
+   * Computes eigenvalues and eigenvectors for a symmetric 3x3 matrix A.
+   * If the eigenvectors are placed in columns in a matrix V, and the 
+   * eigenvalues are placed in corresponding columns of a diagonal 
+   * matrix D, then AV = VD.
+   * <p>
+   * This method is typically faster but not as accurate when eigenvalues
+   * differ by more than a few orders of magnitude.
+   * @param a the symmetric matrix A.
+   * @param v the array of eigenvectors v[0], v[1], and v[2].
+   * @param d the array of eigenvalues d[0], d[1], and d[2].
+   */
+  public static void solveSymmetric33Fast(
+    double[][] a, double[][] v, double[] d) 
+  {
+    solveSymmetric33Hybrid(a,v,d);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -437,13 +454,13 @@ public class Eigen {
 
   ///////////////////////////////////////////////////////////////////////////
   // Old iterative Jacobi method for symmetric 3x3 matrices. For random 
-  // matrices, this Jacobi solver is about 6 times slower than the current
+  // matrices, this Jacobi solver is about 6 times slower than the 
   // hybrid method.
 
   /**
    * Old iterative Jacobi solver. Slower than the current solver.
    */
-  public static void solveSymmetric33Jacobi(
+  private static void solveSymmetric33Jacobi(
     double[][] a, double[][] v, double[] d) 
   {
 
