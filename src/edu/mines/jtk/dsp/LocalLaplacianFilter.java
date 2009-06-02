@@ -6,7 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.mines.jtk.util.*;

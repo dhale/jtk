@@ -176,7 +176,6 @@ public class Plane {
 
   private double _a,_b,_c,_d;
 
-  @SuppressWarnings("unused")
   private Plane() {
   }
 

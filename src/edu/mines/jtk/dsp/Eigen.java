@@ -245,7 +245,7 @@ public class Eigen {
     getEigenvaluesSymmetric33(a,d);
     double a00 = a[0][0],
            a01 = a[0][1], a11 = a[1][1],
-           a02 = a[0][2], a12 = a[1][2], a22 = a[2][2];
+           a02 = a[0][2], a12 = a[1][2]; // a22 = a[2][2]; unused here
     double d0 = d[0], d1 = d[1], d2 = d[2];
     double n0 = a00*a00+a01*a01+a02*a02;
     double n1 = a01*a01+a11*a11+a12*a12;

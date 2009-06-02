@@ -300,8 +300,7 @@ public class SteerablePyramid {
       float[] lo11 = Array.zerofloat(m1);
       float[] lo12 = Array.zerofloat(m2);
       float[] lo13 = Array.zerofloat(m3);
-      SincInterpolator si = new SincInterpolator();
-      si = si.fromErrorAndFrequency(0.001,0.4);
+      SincInterpolator si = SincInterpolator.fromErrorAndFrequency(0.001,0.4);
       si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
       for (int i3=0; i3<nl3; i3=i3+2) {
         j3 = i3/2;
@@ -501,7 +500,6 @@ public class SteerablePyramid {
     double sigmac = 0.5*sigma;
     double[] f = Array.zerodouble(NDIR3);
     double[][] abcf = Array.zerodouble(4,3);
-    double e0,e1;
     int i1a,i2a,i3a,i1c,i2c,i3c;
     // Parameters to select estimation for locally planar or linear features
     int abcindx = 2;
@@ -607,7 +605,6 @@ public class SteerablePyramid {
                 float[][][][][] attr, float[][][][][] spyr) {
     float ai,bi,ci,wi;
     float scal = 0.0f;
-    double theta = 0.0;
     int j0 = 0;
     int j1 = 0;
     int j2 = 0;
@@ -925,7 +922,7 @@ public class SteerablePyramid {
     int nf2 = cfin[0].length;
     int nf1 = cfin[0][0].length/2;
     int ir,ii;
-    double m1 = (double)(nf1-1);
+    //double m1 = (double)(nf1-1); // not used
     double m2 = (double)(nf2-1)/2.0;
     double m3 = (double)(nf3-1)/2.0;
     double v1=0.0,v2=0.0,v3=0.0;

@@ -9,7 +9,6 @@ package edu.mines.jtk.dsp;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Local smoothing of images with tensor filter coefficients.

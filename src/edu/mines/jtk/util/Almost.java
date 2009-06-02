@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 */
 public class Almost implements Serializable, Comparator<Number> {
   static final long serialVersionUID = 1;
-  @SuppressWarnings("unused")
     private static final Logger LOG
     = Logger.getLogger(Almost.class.getName());
 

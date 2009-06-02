@@ -85,7 +85,7 @@ public class MakeGl {
   private static void guts(BufferedReader br, BufferedWriter bw) 
     throws IOException 
   {
-    String input,output,name,par;
+    String input,output,name;
     for (input=br.readLine(); input!=null; input=br.readLine()) {
       if (input.startsWith("public")) {
         if (!input.startsWith("public static"))

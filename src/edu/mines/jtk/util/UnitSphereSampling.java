@@ -679,10 +679,8 @@ public class UnitSphereSampling {
     int npoint = 10;
     for (int ipoint=0; ipoint<npoint; ++ipoint) {
       float[] p = randomPoint();
-      int i = uss.getIndex(p);
       int[] iabc = uss.getTriangle(p);
       int ia = iabc[0], ib = iabc[1], ic = iabc[2];
-      float[] q = uss.getPoint(i);
       float[] qa = uss.getPoint(ia);
       float[] qb = uss.getPoint(ib);
       float[] qc = uss.getPoint(ic);

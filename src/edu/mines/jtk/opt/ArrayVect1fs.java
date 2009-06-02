@@ -20,8 +20,7 @@ public class ArrayVect1fs implements Vect {
   /** Array of wrapped data */
   protected ArrayVect1f[] _data = null;
 
-  @SuppressWarnings("unused")
-    private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+  private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
 
   /** Wrap an array of ArrayVect1f's
       @param data Wrap this array of ArrayVect1f's.

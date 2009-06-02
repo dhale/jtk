@@ -593,7 +593,6 @@ public class EigenTensors3 implements Tensors3,Serializable {
     return (c3s>0.0f)?(float)Math.sqrt(c3s):0.0f;
   }
 
-  @SuppressWarnings("unchecked")
   private void readObject(ObjectInputStream ois)
     throws IOException, ClassNotFoundException 
   {

@@ -26,8 +26,7 @@ public class ArrayVect1 implements Vect {
   private double[] _data = null;
   /** variance */
   private double _variance = 1.;
-  @SuppressWarnings("unused")
-    private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+  private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   private static final long serialVersionUID = 1L;
 
   /** Construct from an array of data.

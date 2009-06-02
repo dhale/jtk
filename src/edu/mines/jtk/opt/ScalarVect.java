@@ -16,8 +16,7 @@ public class ScalarVect implements Vect {
   protected double _value = 0;
   /** variance for value */
   protected double _variance = 1.;
-  @SuppressWarnings("unused")
-    private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+  private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   private static final long serialVersionUID = 1L;
 
   /** Specify the initial value

@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 public class GaussNewtonSolver {
   private static boolean s_expensiveDebug = false;
 
-  @SuppressWarnings("unused")
 private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   /**
     Solve nonquadratic objective function with Gauss Newton iterations.

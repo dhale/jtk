@@ -6,11 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util.test;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import java.util.Random;
 import static java.lang.Math.*;
 
 import edu.mines.jtk.util.UnitSphereSampling;
@@ -89,7 +87,6 @@ public class UnitSphereSamplingTest extends TestCase {
 
     // Interpolate and track errors.
     float emax = 0.0f;
-    float[] pmax = null;
     int npoint = 10000;
     for (int ipoint=0; ipoint<npoint; ++ipoint) {
       float[] p = randomPoint();
@@ -108,7 +105,6 @@ public class UnitSphereSamplingTest extends TestCase {
       float e = abs(g-f);
       if (e>emax) {
         emax = e;
-        pmax = p;
       }
     }
     assertTrue(emax<error);
@@ -125,6 +121,7 @@ public class UnitSphereSamplingTest extends TestCase {
       int i = uss.getIndex(p);
       int[] abc = uss.getTriangle(p);
       int ia = abc[0], ib = abc[1], ic = abc[2];
+      /*
       float[] q = uss.getPoint(i);
       float[] qa = uss.getPoint(ia);
       float[] qb = uss.getPoint(ib);
@@ -133,6 +130,7 @@ public class UnitSphereSamplingTest extends TestCase {
       float da = distanceOnSphere(p,qa);
       float db = distanceOnSphere(p,qb);
       float dc = distanceOnSphere(p,qc);
+       */
       assertTrue(i==ia || i==ib || i==ic);
     }
   }
@@ -142,13 +140,15 @@ public class UnitSphereSamplingTest extends TestCase {
     int npoint = 10;
     for (int ipoint=0; ipoint<npoint; ++ipoint) {
       float[] p = randomPoint();
-      int i = uss.getIndex(p);
       int[] iabc = uss.getTriangle(p);
+      /*
       int ia = iabc[0], ib = iabc[1], ic = iabc[2];
+      int i = uss.getIndex(p);
       float[] q = uss.getPoint(i);
       float[] qa = uss.getPoint(ia);
       float[] qb = uss.getPoint(ib);
       float[] qc = uss.getPoint(ic);
+      */
       float[] wabc = uss.getWeights(p,iabc);
       float wa = wabc[0], wb = wabc[1], wc = wabc[2];
       assertEquals(1.0,wa+wb+wc,0.00001);
@@ -167,8 +167,8 @@ public class UnitSphereSamplingTest extends TestCase {
     UnitSphereSampling uss = new UnitSphereSampling(nbits);
     int npoint = 100000;
     float dmax = 0.0f;
-    float[] pmax = null;
-    float[] qmax = null;
+    //float[] pmax = null;
+    //float[] qmax = null;
     for (int ipoint=0; ipoint<npoint; ++ipoint) {
       float[] p = randomPoint();
       int i = uss.getIndex(p);
@@ -176,12 +176,12 @@ public class UnitSphereSamplingTest extends TestCase {
       float d = distanceOnSphere(p,q);
       if (d>dmax) {
         dmax = d;
-        pmax = p;
-        qmax = q;
+        //pmax = p;
+        //qmax = q;
       }
     }
-    float dmaxDegrees = (float)(dmax*180.0/PI);
     /*
+    float dmaxDegrees = (float)(dmax*180.0/PI);
     trace("npoint="+npoint+" dmax="+dmax+" degrees="+dmaxDegrees);
     trace("pmax=");
     edu.mines.jtk.util.Array.dump(pmax);

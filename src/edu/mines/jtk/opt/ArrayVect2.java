@@ -23,8 +23,7 @@ import edu.mines.jtk.util.Almost;
 */
 
 public class ArrayVect2 implements Vect {
-  @SuppressWarnings("unused")
-    private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+  private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   private static final long serialVersionUID = 1L;
 
   /** wrapped data */

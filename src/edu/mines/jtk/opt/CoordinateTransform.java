@@ -46,8 +46,7 @@ import java.util.logging.Logger;
     @author W.S. Harlan
 */
 public class CoordinateTransform {
-  @SuppressWarnings("unused")
-    private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+  private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
 
   private int _nout = 0;
   private int _nin = 0;

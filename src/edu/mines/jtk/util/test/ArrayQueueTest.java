@@ -2,7 +2,6 @@ package edu.mines.jtk.util.test;
 
 import java.util.Random;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 

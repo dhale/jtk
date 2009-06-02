@@ -2536,12 +2536,10 @@ public class TriMesh implements Serializable {
         fgmap.put(n,fg);
       } else {
         Iterator<Node> mi = sc.getNodes();
-        Iterator<Float> ai = sc.getAreas();
         int nn = sc.countNodes();
         double hxx=0.0,hxy=0.0,hyy=0.0,px=0.0,py=0.0;
         for (int in=0; in<nn; ++in) {
           Node m = mi.next();
-          double a = ai.next();
           double fm = (Float)fmap.get(m);
           double xm = m.x();
           double ym = m.y();

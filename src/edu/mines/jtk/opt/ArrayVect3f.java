@@ -30,8 +30,7 @@ public class ArrayVect3f implements Vect {
   /** variance for all samples */
   protected double _variance = 1.;
 
-  @SuppressWarnings("unused")
-    private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+  private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   private static final long serialVersionUID = 1L;
 
   /** Wrap an array as a Vect.

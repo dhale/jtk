@@ -9,7 +9,6 @@ package edu.mines.jtk.sgl;
 import static edu.mines.jtk.ogl.Gl.*;
 import static edu.mines.jtk.util.MathPlus.*;
 
-import java.awt.Transparency;
 import java.awt.image.IndexColorModel;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -313,7 +312,6 @@ public class ImagePanel extends AxisAlignedPanel {
       updateTextures();
 
     // Prepare to draw textures.
-    IndexColorModel icm = getColorModel();
     glShadeModel(GL_FLAT);
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);

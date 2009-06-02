@@ -9,7 +9,6 @@ package edu.mines.jtk.sgl;
 import static edu.mines.jtk.ogl.Gl.*;
 
 import java.nio.FloatBuffer;
-import java.util.HashMap;
 
 import edu.mines.jtk.util.Direct;
 

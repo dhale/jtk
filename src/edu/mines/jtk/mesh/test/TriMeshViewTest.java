@@ -7,13 +7,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mesh.test;
 
 import java.awt.Color;
-import java.io.*;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import edu.mines.jtk.mesh.*;
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.*;
+
 
 /**
  * Tests {@link edu.mines.jtk.mesh.TriMeshView}.
@@ -52,7 +51,7 @@ public class TriMeshViewTest {
     panel.setHLabel("x");
     panel.setVLabel("y");
     Mosaic mosaic = panel.getMosaic();
-    panel.getMosaic().getTile(0,0).addTiledView(tmv);
+    mosaic.getTile(0,0).addTiledView(tmv);
     PlotFrame frame = new PlotFrame(panel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(700,700);

@@ -36,7 +36,6 @@ public class ArrayVect1f implements Vect {
       Earlier samples should be constrained to zero. */
   protected int _firstSample = 0;
 
-  @SuppressWarnings("unused")
   private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
 
   /** Construct from an array of data.

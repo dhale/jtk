@@ -16,8 +16,7 @@ import edu.mines.jtk.util.Almost;
  */
 public class VectArray implements VectContainer {
   private static final long serialVersionUID = 1L;
-  @SuppressWarnings("unused") private static final Logger LOG
-    = Logger.getLogger("edu.mines.jtk.opt");
+  private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   private Vect[] _vect = null;
   private int[] _keys = null;
 

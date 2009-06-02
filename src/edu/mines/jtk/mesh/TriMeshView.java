@@ -551,11 +551,13 @@ public class TriMeshView extends TiledView {
               float yb = pb[1];
               float xc = pc[0];
               float yc = pc[1];
+              /*
               int xs = (int)(xshift+xb*xscale);
               int ys = (int)(yshift+yb*yscale);
               int xt = (int)(xshift+xc*xscale);
               int yt = (int)(yshift+yc*yscale);
-              //drawLine(g2d,path,xs,ys,xt,yt);
+              drawLine(g2d,path,xs,ys,xt,yt);
+              */
               int x2 = (int)(xshift+0.5f*(xb+xc)*xscale);
               int y2 = (int)(yshift+0.5f*(yb+yc)*yscale);
               drawLine(g2d,path,x1,y1,x2,y2);
@@ -576,11 +578,13 @@ public class TriMeshView extends TiledView {
               float ya = pa[1];
               float xc = pc[0];
               float yc = pc[1];
+              /*
               int xs = (int)(xshift+xa*xscale);
               int ys = (int)(yshift+ya*yscale);
               int xt = (int)(xshift+xc*xscale);
               int yt = (int)(yshift+yc*yscale);
-              //drawLine(g2d,path,xs,ys,xt,yt);
+              drawLine(g2d,path,xs,ys,xt,yt);
+              */
               int x2 = (int)(xshift+0.5f*(xa+xc)*xscale);
               int y2 = (int)(yshift+0.5f*(ya+yc)*yscale);
               drawLine(g2d,path,x1,y1,x2,y2);
@@ -601,11 +605,13 @@ public class TriMeshView extends TiledView {
               float ya = pa[1];
               float xb = pb[0];
               float yb = pb[1];
+              /*
               int xs = (int)(xshift+xa*xscale);
               int ys = (int)(yshift+ya*yscale);
               int xt = (int)(xshift+xb*xscale);
               int yt = (int)(yshift+yb*yscale);
-              //drawLine(g2d,path,xs,ys,xt,yt);
+              drawLine(g2d,path,xs,ys,xt,yt);
+              */
               int x2 = (int)(xshift+0.5f*(xa+xb)*xscale);
               int y2 = (int)(yshift+0.5f*(ya+yb)*yscale);
               drawLine(g2d,path,x1,y1,x2,y2);
