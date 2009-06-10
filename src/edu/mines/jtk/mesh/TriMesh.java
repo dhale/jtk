@@ -270,17 +270,21 @@ public class TriMesh implements Serializable {
      * @return radius-squared of circumcircle.
      */
     public double centerCircle(double[] c) {
-      double x0 = _n0._x;
-      double y0 = _n0._y;
-      double x1 = _n1._x;
-      double y1 = _n1._y;
-      double x2 = _n2._x;
-      double y2 = _n2._y;
-      Geometry.centerCircle(x0,y0,x1,y1,x2,y2,c);
-      double xc = c[0];
-      double yc = c[1];
-      double dx = xc-x2;
-      double dy = yc-y2;
+      if (hasCenter()) {
+        c[0] = _xc;
+        c[1] = _yc;
+      } else {
+        double x0 = _n0._x;
+        double y0 = _n0._y;
+        double x1 = _n1._x;
+        double y1 = _n1._y;
+        double x2 = _n2._x;
+        double y2 = _n2._y;
+        Geometry.centerCircle(x0,y0,x1,y1,x2,y2,c);
+        setCenter(c[0],c[1]);
+      }
+      double dx = _xc-_n2._x;
+      double dy = _yc-_n2._y;
       return dx*dx+dy*dy;
     }
 
@@ -384,6 +388,11 @@ public class TriMesh implements Serializable {
     private static final int OUTER_BIT = 2;
 
     /**
+     * Center bit. If set, then the center for this tri is valid.
+     */
+    private static final int CENTER_BIT = 4;
+
+    /**
      * Constant factor used to compute tri quality.
      */
     private static double QUALITY_FACTOR = 2.0/sqrt(3.0);
@@ -416,7 +425,7 @@ public class TriMesh implements Serializable {
     /**
      * Coordinates of tri's center (typically, the circumcenter).
      */
-    //private transient double _xc,_yc;
+    private transient double _xc,_yc;
 
     /**
      * Constructs a new tri.
@@ -473,6 +482,16 @@ public class TriMesh implements Serializable {
 
     private final boolean isOuter() {
       return (_bits&OUTER_BIT)!=0;
+    }
+
+    private final void setCenter(double xc, double yc) {
+      _xc = xc;
+      _yc = yc;
+      _bits |= CENTER_BIT;
+    }
+
+    private final boolean hasCenter() {
+      return (_bits&CENTER_BIT)!=0;
     }
 
     /**
@@ -2409,6 +2428,7 @@ public class TriMesh implements Serializable {
 
       // Complete accumulation of area for current node a.
       an += x1*ys-xs*y1;
+      an *= 0.5;
 
       // Append node a and area to Sibson coordinates.
       sc.append(na,(float)an);
@@ -2722,7 +2742,7 @@ public class TriMesh implements Serializable {
    * @param fnull null value returned for points (x,y) outside the mesh.
    * @return the interpolated float value.
    */
-  public float interpolateSambridge(
+  private float interpolateSambridge(
     float x, float y, NodePropertyMap map, float fnull) 
   {
     double xp = x;
