@@ -2645,36 +2645,30 @@ public class TriMesh implements Serializable {
       // Float value for current node a.
       float fn = (Float)map.get(na);
 
-      // Circumcenter p0 of triangle (a,b,p).
+      // Circumcenter ps of triangle (a,b,p) is the local origin.
       Geometry.centerCircle(na._x,na._y,nb._x,nb._y,xp,yp,center);
-      double x0 = center[0];
-      double y0 = center[1];
-      double xs = x0;
-      double ys = y0;
+      double xs = center[0];
+      double ys = center[1];
 
-      // Circumcenter p1 of triangle (a,b,c).
+      // Circumcenter p0 of triangle (a,b,c), shifted by (xs,ys).
       tri.centerCircle(center);
-      double x1 = center[0];
-      double y1 = center[1];
+      double x0 = center[0]-xs;
+      double y0 = center[1]-ys;
 
-      // Initialize computation of area for current node a. No factor 0.5
-      // is required here, because we will later divide by the total area.
-      double an = x0*y1-x1*y0;
+      // Area for current node a.
+      double an = 0.0;
 
       // For all non-Delaunay edges a->b around node a, ...
-      for (;;) {
+      double x1,y1;
+      for(;;) {
         
-        // Replace circumcenter p0 with previous circumcenter p1.
-        x0 = x1;
-        y0 = y1;
-
-        // If edge is in fact Delaunay, then accumulate area for 
-        // circumcenter p1 of (a,c,p) and break; else accumulate 
-        // area for circumcenter p1 of next tri (a,b,c).
+        // Circumcenter p1 of the next triangle. If edge is in fact
+        // Delaunay, then this is the last triangle (a,c,p). Else,
+        // it is a triangle (a,b,c). Either way, accumulate area.
         if (_edgeSet.contains(tri,nb)) {
           Geometry.centerCircle(na._x,na._y,nc._x,nc._y,xp,yp,center);
-          x1 = center[0];
-          y1 = center[1];
+          x1 = center[0]-xs;
+          y1 = center[1]-ys;
           an += x0*y1-x1*y0;
           break;
         } else {
@@ -2684,14 +2678,17 @@ public class TriMesh implements Serializable {
           nc = nodeNabor;
           tri = triNabor;
           tri.centerCircle(center);
-          x1 = center[0];
-          y1 = center[1];
+          x1 = center[0]-xs;
+          y1 = center[1]-ys;
           an += x0*y1-x1*y0;
         }
+        
+        // Next circumcenter p0 is the current circumcenter p1.
+        x0 = x1;
+        y0 = y1;
       }
 
-      // Complete accumulation of area for current node a, and update sums.
-      an += x1*ys-xs*y1;
+      // Update sums with area (actually, 2*area) of current node a.
       as += an;
       fs += fn*an;
 
@@ -2709,22 +2706,23 @@ public class TriMesh implements Serializable {
   // the method getDelaunayEdgesInside, but (1) does not kill any tris,
   // and (2) adds edges instead of edge mates to the edge set.
   private void getDelaunayEdgesAround(double xp, double yp, Tri tri) {
-    if (tri!=null && !isMarked(tri)) {
-      mark(tri);
-      Node n0 = tri._n0;
-      Node n1 = tri._n1;
-      Node n2 = tri._n2;
-      if (inCircle(n0,n1,n2,xp,yp)) {
-        Tri t0 = tri._t0;
-        Tri t1 = tri._t1;
-        Tri t2 = tri._t2;
-        _edgeSet.add(tri,n0);
-        _edgeSet.add(tri,n1);
-        _edgeSet.add(tri,n2);
+    mark(tri);
+    Node n0 = tri._n0;
+    Node n1 = tri._n1;
+    Node n2 = tri._n2;
+    if (inCircle(n0,n1,n2,xp,yp)) {
+      Tri t0 = tri._t0;
+      Tri t1 = tri._t1;
+      Tri t2 = tri._t2;
+      _edgeSet.add(tri,n0);
+      _edgeSet.add(tri,n1);
+      _edgeSet.add(tri,n2);
+      if (t0!=null && !isMarked(t0))
         getDelaunayEdgesAround(xp,yp,t0);
+      if (t1!=null && !isMarked(t1))
         getDelaunayEdgesAround(xp,yp,t1);
+      if (t2!=null && !isMarked(t2))
         getDelaunayEdgesAround(xp,yp,t2);
-      }
     }
   }
 
