@@ -13,25 +13,43 @@ import edu.mines.jtk.mesh.*;
 import edu.mines.jtk.util.*;
 
 /**
- * Sibson's natural neighbor interpolation for 2D functions f(x1,x2).
- * Sibson's interpolant at any point (x1,x2) is a weighted sum of values 
- * for a nearby subset of samples, the so-called "natural neighbors" of 
- * that point.
+ * Sibson interpolation of scattered samples of 2D functions f(x1,x2).
+ * Sibson's (1981) interpolant at any point (x1,x2) is a weighted sum of 
+ * values for a nearby subset of samples, the so-called natural neighbors
+ * of that point. Sibson interpolation is often called "natural neighbor
+ * interpolation."
  *
- * The basic Sibson interpolant is C1 (that is, it's gradient is continuous) 
+ * The basic Sibson interpolant is C1 --- it's gradient is continuous ---
  * at all points (x1,x2) except at the sample points, where it is C0. Sibson
- * als described an extension of his method that is everywhere C1, but that
- * extension is not yet implemented here.
+ * (1981) also described an extension of his method that is everywhere C1 
+ * (and therefore smoother), but that extension is not yet implemented here.
  *
- * The interpolation weights are positive areas of overlapping Voronoi
- * polygons, normalized so that they sum to one for any interpolation 
- * point (x1,x2). Various implementations of Sibson's method differ 
- * primarily in how those areas are computed.
+ * The interpolation weights, also called "Sibson coordinates", are positive 
+ * areas of overlapping Voronoi polygons, normalized so that they sum to one 
+ * for any interpolation point (x1,x2). Various implementations of Sibson
+ * interpolation differ primarily in how those areas are computed.
  * 
  * References:
+ * <ul><li>
+ * Braun, J. and M. Sambridge, 1995, A numerical method for solving partial
+ * differential equations on highly irregular evolving grids: Nature, 376,
+ * 655--660.
+ * </li><li>
+ * Lasserre J.B., 1983, An analytical expression and an algorithm for the 
+ * volume of a convex polyhedron in R^n: Journal of Optimization Theory 
+ * and Applications, 39, 363--377.
+ * </li><li>
+ * Sambridge, M., J. Braun, and H. McQueen, 1995, Geophysical
+ * parameterization and interpolation of irregular data using
+ * natural neighbors.
+ * </li><li>
  * Sibson, R., 1981, A brief description of natural neighbor interpolation, 
  * in V. Barnett, ed., Interpreting Multivariate Data, John Wiley and Sons,
- * 21-36.
+ * 21--36.
+ * </li><li>
+ * Watson, D.F., 1992, Contouring: a guide to the analysis and display
+ * of spatial data: Pergamon, Oxford.
+ * </li></ul>
  * 
  * @author Dave Hale, Colorado School of Mines
  * @version 2009.06.13
@@ -39,23 +57,49 @@ import edu.mines.jtk.util.*;
 public class SibsonInterpolator2 {
 
   /**
-   * The implementation method.
-   * The Watson-Sambridge algorithm computes areas using what Watson
-   * calls compound signed decomposition.
-   * The Braun-Sambridge method uses Lasserre's algorithm to compute 
-   * areas of polygons. 
-   * The Hale-Liang method uses Voronoi vertices (circumcenters of
-   * Delaunay triangles) to compute those areas.
+   * The implementation method. Methods differ in the algorithm by which 
+   * Sibson coordinates (polygon areas) are computed for natural neighbors.
    */
   public enum Method {
-    WATSON_SAMBRIDGE,
+   /**
+    * The Hale-Liang method.
+    * Developed by Dave Hale and Luming Liang at the Colorado School of
+    * Mines. Accurate and fast, this method is the default.
+    */
+    HALE_LIANG,
+   /**
+    * The Braun-Sambridge method. Developed by Braun and Sambridge (1995),
+    * this method uses Lasserre's (1983) method for computing the areas of
+    * polygons without computing their vertices. This method is accurate but
+    * significantly slower than the other methods provided here.
+    */
     BRAUN_SAMBRIDGE,
-    HALE_LIANG
+   /**
+    * The Watson-Sambridge algorithm. Developed by Watson (1992) and
+    * described further by Sambridge et al. (1995). Though simplest to
+    * implement, this method is inaccurate (sometimes wildly so) at 
+    * interpolation points (x1,x2) that lie on or near edges of a Delaunay 
+    * triangulation of the scattered sample points. Not recommended.
+    */
+    WATSON_SAMBRIDGE,
+  }
+
+  /**
+   * Constructs an interpolator with specified samples.
+   * Uses the most accurate and efficient implementation.
+   * @param f array of sample values f(x1,x2).
+   * @param x1 array of sample x1 coordinates.
+   * @param x2 array of sample x2 coordinates.
+   */
+  public SibsonInterpolator2(float[] f, float[] x1, float[] x2) {
+    this(Method.HALE_LIANG,f,x1,x2);
   }
 
   /**
    * Constructs an interpolator with specified method and samples.
-   * @param method the method.
+   * This constructor is provided primarily for testing.
+   * The default Hale-Liang method is fast and accurate.
+   * @param method the implementation method.
    * @param f array of sample values f(x1,x2).
    * @param x1 array of sample x1 coordinates.
    * @param x2 array of sample x2 coordinates.
@@ -64,23 +108,12 @@ public class SibsonInterpolator2 {
     Method method, float[] f, float[] x1, float[] x2) 
   {
     if (method==Method.WATSON_SAMBRIDGE) {
-      _impl = new SambridgeWatsonImpl(f,x1,x2);
+      _impl = new WatsonSambridgeImpl(f,x1,x2);
     } else if (method==Method.BRAUN_SAMBRIDGE) {
       _impl = new BraunSambridgeImpl(f,x1,x2);
     } else if (method==Method.HALE_LIANG) {
       _impl = new HaleLiangImpl(f,x1,x2);
     }
-  }
-
-  /**
-   * Constructs an interpolator with specified samples.
-   * Uses the most efficient implementation method.
-   * @param f array of sample values f(x1,x2).
-   * @param x1 array of sample x1 coordinates.
-   * @param x2 array of sample x2 coordinates.
-   */
-  public SibsonInterpolator2(float[] f, float[] x1, float[] x2) {
-    this(Method.HALE_LIANG,f,x1,x2);
   }
 
   /**
@@ -139,9 +172,9 @@ public class SibsonInterpolator2 {
 
   ///////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////
-  private static class SambridgeWatsonImpl extends Implementation {
+  private static class WatsonSambridgeImpl extends Implementation {
 
-    public SambridgeWatsonImpl(float[] f, float[] x1, float[] x2) {
+    public WatsonSambridgeImpl(float[] f, float[] x1, float[] x2) {
       int n = f.length;
       _mesh = new TriMesh();
       for (int i=0; i<n; ++i) {
