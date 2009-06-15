@@ -85,10 +85,6 @@ public class SibsonInterpolator2Test extends TestCase {
     }
   }
 
-  private static void assertEquals(double e, double a) {
-    assertEquals(e,a,1.0e-10);
-  }
- 
   private static void plot(final String method,
     final float[][] g, final float[] x1, final float[] x2) 
   {

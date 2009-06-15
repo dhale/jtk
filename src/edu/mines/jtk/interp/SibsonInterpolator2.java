@@ -6,8 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.interp;
 
-import java.util.ArrayList;
-
 import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.mesh.*;
 import edu.mines.jtk.util.*;
@@ -24,8 +22,8 @@ import edu.mines.jtk.util.*;
  * (1981) also described an extension of his method that is everywhere C1 
  * (and therefore smoother), but that extension is not yet implemented here.
  *
- * The interpolation weights, also called "Sibson coordinates", are positive 
- * areas of overlapping Voronoi polygons, normalized so that they sum to one 
+ * The interpolation weights, also called "Sibson coordinates", are areas
+ * of overlapping Voronoi polygons, normalized so that they sum to one 
  * for any interpolation point (x1,x2). Various implementations of Sibson
  * interpolation differ primarily in how those areas are computed.
  * 
@@ -69,17 +67,18 @@ public class SibsonInterpolator2 {
     HALE_LIANG,
    /**
     * The Braun-Sambridge method. Developed by Braun and Sambridge (1995),
-    * this method uses Lasserre's (1983) method for computing the areas of
-    * polygons without computing their vertices. This method is accurate but
-    * significantly slower than the other methods provided here.
+    * this method uses Lasserre's (1983) algorithm for computing the areas 
+    * of polygons without computing their vertices. This method is slower
+    * slower than the other methods provided here. It may also suffer from 
+    * numerical instability due to divisions in Lasserre's algorithm.
     */
     BRAUN_SAMBRIDGE,
    /**
     * The Watson-Sambridge algorithm. Developed by Watson (1992) and
     * described further by Sambridge et al. (1995). Though simplest to
     * implement, this method is inaccurate (sometimes wildly so) at 
-    * interpolation points (x1,x2) that lie on or near edges of a Delaunay 
-    * triangulation of the scattered sample points. Not recommended.
+    * interpolation points (x1,x2) that lie on or near edges of a 
+    * Delaunay triangulation of the scattered sample points.
     */
     WATSON_SAMBRIDGE,
   }
@@ -558,8 +557,7 @@ public class SibsonInterpolator2 {
         Geometry.centerCircle(xp,yp,xb,yb,xc,yc,_center);
         tdata.xa = _center[0];
         tdata.ya = _center[1];
-        setOrigin(nb,tdata.xa,tdata.ya);
-        setOrigin(nc,tdata.xa,tdata.ya);
+        setOrigin(nb,nc,tdata.xa,tdata.ya);
       } else {
         TriData adata = (TriData)ta.data;
         tdata.xa = adata.xt;
@@ -575,8 +573,7 @@ public class SibsonInterpolator2 {
         Geometry.centerCircle(xp,yp,xc,yc,xa,ya,_center);
         tdata.xb = _center[0];
         tdata.yb = _center[1];
-        setOrigin(nc,tdata.xb,tdata.yb);
-        setOrigin(na,tdata.xb,tdata.yb);
+        setOrigin(nc,na,tdata.xb,tdata.yb);
       } else {
         TriData bdata = (TriData)tb.data;
         tdata.xb = bdata.xt;
@@ -592,8 +589,7 @@ public class SibsonInterpolator2 {
         Geometry.centerCircle(xp,yp,xa,ya,xb,yb,_center);
         tdata.xc = _center[0];
         tdata.yc = _center[1];
-        setOrigin(na,tdata.xc,tdata.yc);
-        setOrigin(nb,tdata.xc,tdata.yc);
+        setOrigin(na,nb,tdata.xc,tdata.yc);
       } else {
         TriData cdata = (TriData)tc.data;
         tdata.xc = cdata.xt;
@@ -606,11 +602,14 @@ public class SibsonInterpolator2 {
       if (rc) makeLists(xp,yp,tc);
     }
 
-    // Sets the locate origin for the specified node.
-    private static void setOrigin(TriMesh.Node node, double x0, double y0) {
-      NodeData nd = (NodeData)node.data;
-      nd.x0 = x0;
-      nd.y0 = y0;
+    // Sets the locate origin for the specified nodes.
+    private static void setOrigin(
+      TriMesh.Node nodeA, TriMesh.Node nodeB, double x0, double y0) 
+    {
+      NodeData nda = (NodeData)nodeA.data;
+      NodeData ndb = (NodeData)nodeB.data;
+      nda.x0 = x0; nda.y0 = y0;
+      ndb.x0 = x0; ndb.y0 = y0;
     }
 
     // If unmarked, prepare a natural neighbor node for interpolation.
@@ -714,93 +713,5 @@ public class SibsonInterpolator2 {
       }
       return (float)(anum/aden);
     }
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // testing
-
-  public static void main(String[] args) {
-    float[][] fx = makeRandomData(100);
-    float[] f = fx[0];
-    float[] x1 = fx[1];
-    float[] x2 = fx[2];
-    int n1 = 501; double d1 = 0.5/(n1-1); double f1 = 0.25;
-    int n2 = 501; double d2 = 0.5/(n2-1); double f2 = 0.25;
-    Sampling s1 = new Sampling(n1,d1,f1);
-    Sampling s2 = new Sampling(n2,d2,f2);
-    float[][] g;
-    Stopwatch sw = new Stopwatch();
-    for (int iter=0; iter<1; ++iter) {
-      sw.restart();
-      g = testInterpolateNew(f,x1,x2,s1,s2);
-      sw.stop();
-      System.out.println("new: "+sw.time());
-      if (iter==0) plot(g);
-      sw.restart();
-      g = testInterpolateOld(f,x1,x2,s1,s2);
-      sw.stop();
-      System.out.println("old: "+sw.time());
-      if (iter==0) plot(g);
-    }
-  }
-  private static float[][] makeRandomData(int n) {
-    java.util.Random r = new java.util.Random();
-    float[] f = new float[n];
-    float[] x1 = new float[n];
-    float[] x2 = new float[n];
-    for (int i=0; i<n; ++i) {
-      x1[i] = r.nextFloat();
-      x2[i] = r.nextFloat();
-      f[i] = (float)(Math.sin(Math.PI*x1[i])*Math.sin(Math.PI*x2[i]));
-    }
-    return new float[][]{f,x1,x2};
-  }
-  private static float[][] testInterpolateNew(
-    float[] f, float[] x1, float[] x2, Sampling s1, Sampling s2)
-  {
-    SibsonInterpolator2.Method method = 
-      SibsonInterpolator2.Method.WATSON_SAMBRIDGE;
-      //SibsonInterpolator2.Method.BRAUN_SAMBRIDGE;
-      //SibsonInterpolator2.Method.HALE_LIANG;
-    SibsonInterpolator2 si = new SibsonInterpolator2(method,f,x1,x2);
-    float[][] g = si.interpolate(s1,s2);
-    return g;
-  }
-  private static float[][] testInterpolateOld(
-    float[] f, float[] x1, float[] x2, Sampling s1, Sampling s2)
-  {
-    float[][] g = interpolateSibsonOld(f,x1,x2,s1,s2);
-    return g;
-  }
-  private static float[][] interpolateSibsonOld(
-    float[] f, float[] x, float[] y, Sampling sx, Sampling sy)
-  {
-    int n = x.length;
-    int nx = sx.getCount();
-    int ny = sy.getCount();
-    float[][] fi = new float[ny][nx];
-    TriMesh mesh = new TriMesh();
-    TriMesh.NodePropertyMap zmap = mesh.getNodePropertyMap("z");
-    for (int i=0; i<n; ++i) {
-      TriMesh.Node node = new TriMesh.Node(x[i],y[i]);
-      if (mesh.addNode(node))
-        zmap.put(node,new Float(f[i]));
-    }
-    float znull = 0.0f; // values assigned to points outside convex hull
-    for (int iy=0; iy<ny; ++iy) {
-      float yi = (float)sy.getValue(iy);
-      for (int ix=0; ix<nx; ++ix) {
-        float xi = (float)sx.getValue(ix);
-        fi[iy][ix] = mesh.interpolateSibson(xi,yi,zmap,znull);
-      }
-    }
-    return fi;
-  }
-  private static void plot(float[][] g) {
-    System.out.println("min="+Array.min(g)+" max="+Array.max(g));
-    edu.mines.jtk.mosaic.SimplePlot sp = 
-      new edu.mines.jtk.mosaic.SimplePlot();
-    edu.mines.jtk.mosaic.PixelsView pv = sp.addPixels(g);
-    pv.setColorModel(edu.mines.jtk.awt.ColorMap.PRISM);
   }
 }
