@@ -53,6 +53,14 @@ import edu.mines.jtk.util.Check;
  * edge, and the fourth node is left of the plane defined by the 
  * first three nodes.
  * <p>
+ * Nodes are constructed with float coordinates that are stored internally 
+ * as perturbed doubles. This perturbation minimizes the likelihood that 
+ * four or more nodes are exactly co-planar, or that five or more nodes 
+ * lie exactly on the circumsphere of any tet in the mesh. Only the least 
+ * significant bits of the double coordinates are altered, so that casting 
+ * the perturbed doubles to floats always yields the float coordinates 
+ * with which nodes are constructed.
+ * <p>
  * A tet mesh is serializable. When written to an object output stream,
  * a tet mesh writes its nodes and tets so that any references to them 
  * from serialized objects not in the mesh will remain valid.
@@ -129,6 +137,30 @@ public class TetMesh implements Serializable {
      */
     public final float z() {
       return (float)_z;
+    }
+
+    /**
+     * Returns the x coordinate of this node as a perturbed double.
+     * @return the x coordinate.
+     */
+    public final double xp() { 
+      return _x; 
+    }
+
+    /**
+     * Returns the y coordinate of this node as a perturbed double.
+     * @return the y coordinate.
+     */
+    public final double yp() { 
+      return _y; 
+    }
+
+    /**
+     * Returns the z coordinate of this node as a perturbed double.
+     * @return the z coordinate.
+     */
+    public final double zp() { 
+      return _z; 
     }
 
     /**

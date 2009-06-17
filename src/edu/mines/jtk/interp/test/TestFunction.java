@@ -33,6 +33,20 @@ abstract class TestFunction {
     };
   }
 
+  public static TestFunction makeLinear() {
+    return new TestFunction() {
+      public float f(float x1) {
+        return x1;
+      }
+      public float f(float x1, float x2) {
+        return x1+x2;
+      }
+      public float f(float x1, float x2, float x3) {
+        return x1+x2+x3;
+      }
+    };
+  }
+
   public abstract float f(float x1);
   public abstract float f(float x1, float x2);
   public abstract float f(float x1, float x2, float x3);

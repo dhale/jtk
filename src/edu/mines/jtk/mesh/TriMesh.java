@@ -34,6 +34,14 @@ import edu.mines.jtk.util.Check;
  * edges of the tri. Tris on the convex hull of the mesh have one or more
  * null nabors. Each nabor is labelled by the node opposite its edge. For
  * example, the tri nabor 0 (or A) is opposite the node 0 (or A).
+ * <p>
+ * Nodes are constructed with float coordinates that are stored internally 
+ * as perturbed doubles. This perturbation minimizes the likelihood that 
+ * four or more nodes are exactly co-planar, or that five or more nodes 
+ * lie exactly on the circumsphere of any tet in the mesh. Only the least 
+ * significant bits of the double coordinates are altered, so that casting 
+ * the perturbed doubles to floats always yields the float coordinates 
+ * with which nodes are constructed.
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.03.08, 2006.08.02
@@ -88,6 +96,22 @@ public class TriMesh implements Serializable {
      */
     public final float y() {
       return (float)_y;
+    }
+
+    /**
+     * Returns the x coordinate of this node as a perturbed double.
+     * @return the x coordinate.
+     */
+    public final double xp() { 
+      return _x; 
+    }
+
+    /**
+     * Returns the y coordinate of this node as a perturbed double.
+     * @return the y coordinate.
+     */
+    public final double yp() { 
+      return _y; 
     }
 
     /**
