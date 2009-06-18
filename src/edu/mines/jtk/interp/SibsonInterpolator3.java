@@ -112,7 +112,7 @@ public class SibsonInterpolator3 {
     Method method, float[] f, float[] x1, float[] x2, float[] x3) 
   {
     if (method==Method.WATSON_SAMBRIDGE) {
-      //_impl = new WatsonSambridgeImpl(f,x1,x2,x3);
+      _impl = new WatsonSambridgeImpl(f,x1,x2,x3);
     } else if (method==Method.BRAUN_SAMBRIDGE) {
       _impl = new BraunSambridgeImpl(f,x1,x2,x3);
     } else if (method==Method.HALE_LIANG) {
@@ -182,123 +182,147 @@ public class SibsonInterpolator3 {
 
   ///////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////
-  /*
   private static class WatsonSambridgeImpl extends Implementation {
 
-    public WatsonSambridgeImpl(float[] f, float[] x1, float[] x2) {
+    public WatsonSambridgeImpl(float[] f, float[] x1, float[] x2, float[] x3) {
       int n = f.length;
-      _mesh = new TriMesh();
+      _mesh = new TetMesh();
       for (int i=0; i<n; ++i) {
-        TriMesh.Node node = new TriMesh.Node(x1[i],x2[i]);
+        TetMesh.Node node = new TetMesh.Node(x1[i],x2[i],x3[i]);
         if (_mesh.addNode(node)) {
           NodeData ndata = new NodeData();
           node.data = ndata;
           ndata.f = f[i];
         }
       }
-      _triList = new TriMesh.TriList();
+      _tetList = new TetMesh.TetList();
     }
 
-    public float interpolate(float x1, float x2) {
+    public float interpolate(float x1, float x2, float x3) {
 
-      // Find natural neighbor tris of the interpolation point (x1,x2). 
+      // Find natural neighbor tets of the interpolation point (x1,x2,x3). 
       // If none, skip this point (outside convex hull).
-      boolean gotTriList = makeTriList(x1,x2);
-      if (!gotTriList)
+      boolean gotTetList = makeTetList(x1,x2,x3);
+      if (!gotTetList)
         return _fnull;
       double xp = x1;
       double yp = x2;
+      double zp = x3;
 
       // Sums for numerator and denominator.
-      double anum = 0.0;
-      double aden = 0.0;
+      double vnum = 0.0;
+      double vden = 0.0;
       
-      // For all tris in the list, ...
-      int ntri = _triList.ntri();
-      TriMesh.Tri[] tris = _triList.tris();
-      for (int itri=0; itri<ntri; ++itri) {
-        TriMesh.Tri tri = tris[itri];
+      // For all tets in the list, ...
+      int ntet = _tetList.ntet();
+      TetMesh.Tet[] tets = _tetList.tets();
+      for (int itet=0; itet<ntet; ++itet) {
+        TetMesh.Tet tet = tets[itet];
 
-        // The three nodes of one tri.
-        TriMesh.Node na = tri.nodeA();
-        TriMesh.Node nb = tri.nodeB();
-        TriMesh.Node nc = tri.nodeC();
-        double xa = na.x(), ya = na.y();
-        double xb = nb.x(), yb = nb.y();
-        double xc = nc.x(), yc = nc.y();
+        // The three nodes of one tet.
+        TetMesh.Node na = tet.nodeA();
+        TetMesh.Node nb = tet.nodeB();
+        TetMesh.Node nc = tet.nodeC();
+        TetMesh.Node nd = tet.nodeD();
+        double xa = na.xp(), ya = na.yp(), za = na.zp();
+        double xb = nb.xp(), yb = nb.yp(), zb = nb.zp();
+        double xc = nc.xp(), yc = nc.yp(), zc = nc.zp();
+        double xd = nd.xp(), yd = nd.yp(), zd = nd.zp();
 
         // Four circumcenters.
-        Geometry.centerCircle(xb,yb,xc,yc,xp,yp,_ca);
-        Geometry.centerCircle(xc,yc,xa,ya,xp,yp,_cb);
-        Geometry.centerCircle(xa,ya,xb,yb,xp,yp,_cc);
-        Geometry.centerCircle(xa,ya,xb,yb,xc,yc,_cv);
+        Geometry.centerSphere(xp,yp,zp,xb,yb,zb,xc,yc,zc,xd,yd,zd,_ca);
+        Geometry.centerSphere(xp,yp,zp,xa,ya,za,xd,yd,zd,xc,yc,zc,_cb);
+        Geometry.centerSphere(xp,yp,zp,xa,ya,za,xb,yb,zb,xd,yd,zd,_cc);
+        Geometry.centerSphere(xp,yp,zp,xa,ya,za,xc,yc,zc,xb,yb,zb,_cd);
+        Geometry.centerSphere(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,_cv);
 
         // Accumulate signed areas and float values.
-        double aa = area(_cb,_cc,_cv);
-        double ab = area(_cc,_ca,_cv);
-        double ac = area(_ca,_cb,_cv);
+        double va = volume(_cv,_cb,_cc,_cd);
+        double vb = volume(_cv,_ca,_cd,_cc);
+        double vc = volume(_cv,_ca,_cb,_cd);
+        double vd = volume(_cv,_ca,_cc,_cb);
         float fa = ((NodeData)na.data).f;
         float fb = ((NodeData)nb.data).f;
         float fc = ((NodeData)nc.data).f;
-        anum += aa*fa+ab*fb+ac*fc;
-        aden += aa+ab+ac;
+        float fd = ((NodeData)nd.data).f;
+        vnum += va*fa+vb*fb+vc*fc+vd*fd;
+        vden += va+vb+vc+vd;
       }
 
       // The interpolated value.
-      return (float)(anum/aden);
+      return (float)(vnum/vden);
     }
 
     private static class NodeData {
-      float f,gx,gy; // function values and gradient
+      float f,gx,gy,gz; // function values and gradient
     }
 
-    private TriMesh _mesh; // Delaunay tri mesh
-    private double[] _ca = new double[2]; // circumcenter of fake tri bcp
-    private double[] _cb = new double[2]; // circumcenter of fake tri cap
-    private double[] _cc = new double[2]; // circumcenter of fake tri abp
-    private double[] _cv = new double[2]; // circumcenter of tri abc
-    private TriMesh.TriList _triList; // list of natural neighbor tris
+    private TetMesh _mesh; // Delaunay tet mesh
+    private double[] _ca = new double[3]; // circumcenter of fake tet pbcd
+    private double[] _cb = new double[3]; // circumcenter of fake tet padc
+    private double[] _cc = new double[3]; // circumcenter of fake tet pabd
+    private double[] _cd = new double[3]; // circumcenter of fake tet pacb
+    private double[] _cv = new double[3]; // circumcenter of tet abcd
+    private TetMesh.TetList _tetList; // list of natural neighbor tets
 
-    private boolean makeTriList(float x, float y) {
-      _triList.clear();
-      TriMesh.PointLocation pl = _mesh.locatePoint(x,y);
+    private boolean makeTetList(float x, float y, float z) {
+      _tetList.clear();
+      TetMesh.PointLocation pl = _mesh.locatePoint(x,y,z);
       if (pl.isOutside())
         return false;
-      _mesh.clearTriMarks();
-      makeTriList(x,y,pl.tri());
+      _mesh.clearTetMarks();
+      makeTetList(x,y,z,pl.tet());
       return true;
     }
-    private void makeTriList(double xp, double yp, TriMesh.Tri tri) {
-      if (tri==null || _mesh.isMarked(tri))
+    private void makeTetList(
+      double xp, double yp, double zp, TetMesh.Tet tet) 
+    {
+      if (tet==null || _mesh.isMarked(tet))
         return;
-      _mesh.mark(tri);
-      if (inCircle(xp,yp,tri)) {
-        _triList.add(tri);
-        makeTriList(xp,yp,tri.triA());
-        makeTriList(xp,yp,tri.triB());
-        makeTriList(xp,yp,tri.triC());
+      _mesh.mark(tet);
+      if (inSphere(xp,yp,zp,tet)) {
+        _tetList.add(tet);
+        makeTetList(xp,yp,zp,tet.tetA());
+        makeTetList(xp,yp,zp,tet.tetB());
+        makeTetList(xp,yp,zp,tet.tetC());
+        makeTetList(xp,yp,zp,tet.tetD());
       }
     }
-    private double area(double[] cj, double[] ck, double[] cv) {
-      double xj = cj[0]-cv[0];
-      double yj = cj[1]-cv[1];
-      double xk = ck[0]-cv[0];
-      double yk = ck[1]-cv[1];
-      return 0.5*(xj*yk-yj*xk);
+    private double volume(double[] ci, double[] cj, double[] ck, double[] cv) {
+      double xv = cv[0];
+      double yv = cv[1];
+      double zv = cv[2];
+      double xi = ci[0]-xv;
+      double yi = ci[1]-yv;
+      double zi = ci[2]-zv;
+      double xj = cj[0]-xv;
+      double yj = cj[1]-yv;
+      double zj = cj[2]-zv;
+      double xk = ck[0]-xv;
+      double yk = ck[1]-yv;
+      double zk = ck[2]-zv;
+      return xi*(yj*zk-yk*zj)+yi*(zj*xk-zk*xj)+zi*(xj*yk-xk*yj);
     }
-    private boolean inCircle(double xp, double yp, TriMesh.Tri tri) {
-      if (tri==null)
+    private boolean inSphere(
+      double xp, double yp, double zp, TetMesh.Tet tet) 
+    {
+      if (tet==null)
         return false;
-      TriMesh.Node na = tri.nodeA();
-      TriMesh.Node nb = tri.nodeB();
-      TriMesh.Node nc = tri.nodeC();
-      double xa = na.x(), ya = na.y();
-      double xb = nb.x(), yb = nb.y();
-      double xc = nc.x(), yc = nc.y();
-      return Geometry.inCircleFast(xa,ya,xb,yb,xc,yc,xp,yp)>0;
+      TetMesh.Node na = tet.nodeA();
+      TetMesh.Node nb = tet.nodeB();
+      TetMesh.Node nc = tet.nodeC();
+      TetMesh.Node nd = tet.nodeD();
+      double xa = na.xp(), ya = na.yp(), za = na.zp();
+      double xb = nb.xp(), yb = nb.yp(), zb = nb.zp();
+      double xc = nc.xp(), yc = nc.yp(), zc = nc.zp();
+      double xd = nd.xp(), yd = nd.yp(), zd = nd.zp();
+      return Geometry.inSphereFast(xa,ya,za,
+                                   xb,yb,zb,
+                                   xc,yc,zc,
+                                   xd,yd,zd,
+                                   xp,yp,zp)>0;
     }
   }
-  */
 
   ///////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////

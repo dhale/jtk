@@ -39,7 +39,7 @@ public class SibsonInterpolator3Test extends TestCase {
     float[] x1 = { 1.0f,-1.0f,-1.0f, 1.0f};
     float[] x2 = {-1.0f, 1.0f,-1.0f, 1.0f};
     float[] x3 = {-1.0f,-1.0f, 1.0f, 1.0f};
-    SibsonInterpolator3.Method[] methods = {HL,BS};
+    SibsonInterpolator3.Method[] methods = {HL,BS,WS};
     SibsonInterpolator3 si = new SibsonInterpolator3(methods[0],f,x1,x2,x3);
     assertValue(si, 0.0f, 0.0f, 0.0f, 0.0f);
     assertValue(si, 0.5f, 0.0f, 0.0f, 0.5f);
@@ -53,7 +53,7 @@ public class SibsonInterpolator3Test extends TestCase {
     float[] x1 = {-1.0f, 1.0f,-1.0f, 1.0f,-1.0f, 1.0f,-1.0f, 1.0f};
     float[] x2 = {-1.0f,-1.0f, 1.0f, 1.0f,-1.0f,-1.0f, 1.0f, 1.0f};
     float[] x3 = {-1.0f,-1.0f,-1.0f,-1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-    SibsonInterpolator3.Method[] methods = {HL,BS};
+    SibsonInterpolator3.Method[] methods = {HL,BS,WS};
     SibsonInterpolator3 si = new SibsonInterpolator3(methods[0],f,x1,x2,x3);
     assertValue(si,-0.5f,-0.5f,-0.5f,-1.5f);
     assertValue(si, 0.5f,-0.5f,-0.5f,-0.5f);
@@ -104,11 +104,11 @@ public class SibsonInterpolator3Test extends TestCase {
 
   // Number of scattered samples to be interpolated. The cube of some 
   // integer is a good choice for both uniform and random sampling.
-  //private static final int NS = 27;
-  private static final int NS = 125;
-  //private static final int NS = 1000;
+  //private static final int NS = 27; // = 3*3*3
+  private static final int NS = 125; // = 5*5*5
+  //private static final int NS = 1000; // 10*10*10
 
-  // Uniform sampling used in interpolation.
+  // Uniform sampling for points at which to interpolate.
   //private static final int NX = 41; // some samples on the convex hull
   //private static final double DX = (XMAX-XMIN)/(NX-1);
   //private static final double FX = XMIN;
@@ -149,7 +149,7 @@ public class SibsonInterpolator3Test extends TestCase {
   private static void testMethods(TestFunction tf, float[][] fx) {
     float[] f = fx[0], x1 = fx[1], x2 = fx[2], x3 = fx[3];
     System.out.println();
-    SibsonInterpolator3.Method[] methods = {HL,BS};
+    SibsonInterpolator3.Method[] methods = {HL,WS,BS};
     for (int i=0; i<methods.length; ++i) {
       SibsonInterpolator3.Method method = methods[i];
       SibsonInterpolator3 si = new SibsonInterpolator3(method,f,x1,x2,x3);
