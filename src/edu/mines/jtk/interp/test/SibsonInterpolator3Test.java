@@ -35,12 +35,16 @@ public class SibsonInterpolator3Test extends TestCase {
   }
 
   public void testSimpleTet() {
+    testSimpleTet(HL);
+    testSimpleTet(BS);
+    testSimpleTet(WS);
+  }
+  private void testSimpleTet(SibsonInterpolator3.Method m) {
     float[] f  = {-1.0f,-1.0f,-1.0f, 3.0f};
     float[] x1 = { 1.0f,-1.0f,-1.0f, 1.0f};
     float[] x2 = {-1.0f, 1.0f,-1.0f, 1.0f};
     float[] x3 = {-1.0f,-1.0f, 1.0f, 1.0f};
-    SibsonInterpolator3.Method[] methods = {HL,BS,WS};
-    SibsonInterpolator3 si = new SibsonInterpolator3(methods[0],f,x1,x2,x3);
+    SibsonInterpolator3 si = new SibsonInterpolator3(m,f,x1,x2,x3);
     assertValue(si, 0.0f, 0.0f, 0.0f, 0.0f);
     assertValue(si, 0.5f, 0.0f, 0.0f, 0.5f);
     assertValue(si, 0.0f, 0.5f, 0.0f, 0.5f);
@@ -49,12 +53,17 @@ public class SibsonInterpolator3Test extends TestCase {
   }
 
   public void testSimpleCube() {
+    testSimpleCube(HL);
+    testSimpleCube(BS);
+    testSimpleCube(WS);
+  }
+  private void testSimpleCube(SibsonInterpolator3.Method m) {
     float[] f  = {-3.0f,-1.0f,-1.0f, 1.0f,-1.0f, 1.0f, 1.0f, 3.0f};
     float[] x1 = {-1.0f, 1.0f,-1.0f, 1.0f,-1.0f, 1.0f,-1.0f, 1.0f};
     float[] x2 = {-1.0f,-1.0f, 1.0f, 1.0f,-1.0f,-1.0f, 1.0f, 1.0f};
     float[] x3 = {-1.0f,-1.0f,-1.0f,-1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
-    SibsonInterpolator3.Method[] methods = {HL,BS,WS};
-    SibsonInterpolator3 si = new SibsonInterpolator3(methods[0],f,x1,x2,x3);
+    SibsonInterpolator3 si = new SibsonInterpolator3(m,f,x1,x2,x3);
+    if (m!=WS) assertValue(si, 0.0f, 0.0f, 0.0f, 0.0f); // WS -> NaN
     assertValue(si,-0.5f,-0.5f,-0.5f,-1.5f);
     assertValue(si, 0.5f,-0.5f,-0.5f,-0.5f);
     assertValue(si,-0.5f, 0.5f,-0.5f,-0.5f);
@@ -66,24 +75,26 @@ public class SibsonInterpolator3Test extends TestCase {
   }
 
   public void testLinear() {
+    testLinear(HL);
+    //testLinear(BS); // BS too slow
+    //testLinear(WS); // WS too inaccurate
+  }
+  private void testLinear(SibsonInterpolator3.Method m) {
     TestFunction tf = TestFunction.makeLinear();
     float[][] fx = tf.sampleUniform3(NS,XMIN,XMAX,XMIN,XMAX,XMIN,XMAX);
     float[] f = fx[0], x1 = fx[1], x2 = fx[2], x3 = fx[3];
-    SibsonInterpolator3.Method[] methods = {HL};
-    for (SibsonInterpolator3.Method m:methods) {
-      SibsonInterpolator3 si = new SibsonInterpolator3(m,f,x1,x2,x3);
-      int n1 = NX, n2 = NX, n3 = NX;
-      Sampling s1 = SX, s2 = SX, s3 = SX;
-      float[][][] g = si.interpolate(s1,s2,s3);
-      for (int i3=0; i3<n3; ++i3) {
-        float x3i = (float)s3.getValue(i3);
-        for (int i2=0; i2<n2; ++i2) {
-          float x2i = (float)s2.getValue(i2);
-          for (int i1=0; i1<n1; ++i1) {
-            float x1i = (float)s1.getValue(i1);
-            float fe = x1i+x2i+x3i;
-            assertEquals(fe,g[i3][i2][i1]);
-          }
+    SibsonInterpolator3 si = new SibsonInterpolator3(m,f,x1,x2,x3);
+    int n1 = NX, n2 = NX, n3 = NX;
+    Sampling s1 = SX, s2 = SX, s3 = SX;
+    float[][][] g = si.interpolate(s1,s2,s3);
+    for (int i3=0; i3<n3; ++i3) {
+      float x3i = (float)s3.getValue(i3);
+      for (int i2=0; i2<n2; ++i2) {
+        float x2i = (float)s2.getValue(i2);
+        for (int i1=0; i1<n1; ++i1) {
+          float x1i = (float)s1.getValue(i1);
+          float fe = tf.f(x1i,x2i,x3i);
+          assertEquals(fe,g[i3][i2][i1]);
         }
       }
     }
@@ -156,7 +167,7 @@ public class SibsonInterpolator3Test extends TestCase {
       si.setNullValue(1.0f);
       double tmin = Double.MAX_VALUE;
       float[][][] g = null;
-      for (int iter=0; iter<1; ++iter) {
+      for (int iter=0; iter<3; ++iter) {
         Stopwatch sw = new Stopwatch();
         sw.start();
         g = si.interpolate(SX,SX,SX);

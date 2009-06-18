@@ -37,8 +37,8 @@ import edu.mines.jtk.util.Check;
  * <p>
  * Nodes are constructed with float coordinates that are stored internally 
  * as perturbed doubles. This perturbation minimizes the likelihood that 
- * four or more nodes are exactly co-planar, or that five or more nodes 
- * lie exactly on the circumsphere of any tet in the mesh. Only the least 
+ * three or more nodes are exactly co-linear, or that four or more nodes 
+ * lie exactly on the circumcircle of any tri in the mesh. Only the least 
  * significant bits of the double coordinates are altered, so that casting 
  * the perturbed doubles to floats always yields the float coordinates 
  * with which nodes are constructed.
