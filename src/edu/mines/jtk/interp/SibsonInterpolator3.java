@@ -228,6 +228,39 @@ public class SibsonInterpolator3 {
     _fnull = fnull;
   }
 
+  public void setOuterBox(
+    float x1min, float x1max,
+    float x2min, float x2max,
+    float x3min, float x3max) 
+  {
+    Check.argument(x1min<x1max,"x1min<x1max");
+    Check.argument(x2min<x2max,"x2min<x2max");
+    Check.argument(x3min<x3max,"x3min<x3max");
+    x1min -= (x1max-x1min); x1max += (x1max-x1min);
+    x2min -= (x2max-x2min); x2max += (x2max-x2min);
+    x3min -= (x3max-x3min); x3max += (x3max-x3min);
+    //x1min -= Math.ulp(x1min); x1max += Math.ulp(x1max);
+    //x2min -= Math.ulp(x2min); x2max += Math.ulp(x2max);
+    //x3min -= Math.ulp(x3min); x3max += Math.ulp(x3max);
+    float[] x1s = {x1min,x1max,x1min,x1max,x1min,x1max,x1min,x1max};
+    float[] x2s = {x2min,x2min,x2max,x2max,x2min,x2min,x2max,x2max};
+    float[] x3s = {x3min,x3min,x3min,x3min,x3max,x3max,x3max,x3max};
+    for (int i=0; i<8; ++i) {
+      float x1 = x1s[i], x2 = x2s[i], x3 = x3s[i];
+      TetMesh.PointLocation pl = _mesh.locatePoint(x1,x2,x3);
+      if (pl.isOutside()) {
+        _mesh.addNode(new TetMesh.Node(x1,x2,x3));
+      }
+    }
+  }
+
+  public void setOuterBox(Sampling s1, Sampling s2, Sampling s3)
+  {
+    setOuterBox((float)s1.getFirst(),(float)s1.getLast(),
+                (float)s2.getFirst(),(float)s2.getLast(),
+                (float)s3.getFirst(),(float)s3.getLast());
+  }
+
   /**
    * Returns a value interpolated at the specified point.
    * @param x1 the x1 coordinate of the point.
@@ -339,9 +372,19 @@ public class SibsonInterpolator3 {
   private static double volume(TetMesh.Node node) {
     return data(node).volume;
   }
-  private static void accumulateVolume(TetMesh.Node node, double v) {
+
+  // This method is used by VolumeAccumulator implementations defined below.
+  // Note that it accumulates volumes for only those nodes with data. In
+  // other words, it accumulates no volume for ghost nodes.
+  private static double accumulateVolume(
+    TetMesh.Node node, double v, double vsum) 
+  {
     NodeData data = data(node);
-    data.volume += v;
+    if (data!=null) {
+      data.volume += v;
+      vsum += v;
+    }
+    return vsum;
   }
 
   private float _fnull; // null value when interpolation not feasible
@@ -424,7 +467,9 @@ public class SibsonInterpolator3 {
       return;
     _mesh.mark(node);
     _nodeList.add(node);
-    ((NodeData)node.data).volume = 0.0;
+    NodeData data = data(node);
+    if (data!=null)
+      data.volume = 0.0;
   }
   private boolean needTet(double xp, double yp, double zp, TetMesh.Tet tet) {
     if (tet==null || _mesh.isMarked(tet))
@@ -447,9 +492,11 @@ public class SibsonInterpolator3 {
     TetMesh.Node[] nodes = _nodeList.nodes();
     for (int inode=0; inode<nnode; ++inode) {
       TetMesh.Node node = nodes[inode];
-      float f = f(node);
-      double v = volume(node);
-      vfsum += v*f;
+      if (data(node)!=null) {
+        float f = f(node);
+        double v = volume(node);
+        vfsum += v*f;
+      }
     }
     return (float)(vfsum/vsum);
   }
@@ -465,6 +512,8 @@ public class SibsonInterpolator3 {
     double wods = 0.0;
     for (int inode=0; inode<nnode; ++inode) {
       TetMesh.Node n = nodes[inode];
+      if (data(n)==null)
+        continue;
       double f = f(n);
       double gx = gx(n);
       double gy = gy(n);
@@ -515,6 +564,8 @@ public class SibsonInterpolator3 {
     for (int inode=0; inode<nnode; ++inode) {
       TetMesh.Node n = nodes[inode];
       NodeData data = data(n);
+      if (data==null)
+        continue;
       double fn = data.f;
       double xn = n.xp();
       double yn = n.yp();
@@ -530,6 +581,8 @@ public class SibsonInterpolator3 {
         double px = 0.0, py = 0.0, pz = 0.0;
         for (int im=0; im<nm; ++im) {
           TetMesh.Node m = ms[im];
+          if (data(m)==null)
+            continue;
           double fm = f(m);
           double wm = volume(m);
           double xm = m.xp();
@@ -603,11 +656,10 @@ public class SibsonInterpolator3 {
         double vb = volume(_ca,_cd,_cc,_cv);
         double vc = volume(_ca,_cb,_cd,_cv);
         double vd = volume(_ca,_cc,_cb,_cv);
-        accumulateVolume(na,va);
-        accumulateVolume(nb,vb);
-        accumulateVolume(nc,vc);
-        accumulateVolume(nd,vd);
-        vsum += va+vb+vc+vd;
+        vsum = accumulateVolume(na,va,vsum);
+        vsum = accumulateVolume(nb,vb,vsum);
+        vsum = accumulateVolume(nc,vc,vsum);
+        vsum = accumulateVolume(nd,vd,vsum);
       }
       return vsum;
     }
@@ -643,7 +695,6 @@ public class SibsonInterpolator3 {
         double x1j = jnode.xp();
         double x2j = jnode.yp();
         double x3j = jnode.zp();
-        double fj = ((NodeData)jnode.data).f;
 
         // Clear the polygon for the j'th natural neighbor.
         _lv.clear();
@@ -685,8 +736,7 @@ public class SibsonInterpolator3 {
 
         // Volume of polygon for this natural neighbor.
         double vj = _lv.getVolume();
-        accumulateVolume(jnode,vj);
-        vsum += vj;
+        vsum = accumulateVolume(jnode,vj,vsum);
       }
       return vsum;
     }
@@ -721,8 +771,10 @@ public class SibsonInterpolator3 {
 
     private void addVolume(TetMesh.Node node, double v) {
       NodeData data = data(node);
-      data.volume += v;
-      _vsum += v;
+      if (data!=null) {
+        data.volume += v;
+        _vsum += v;
+      }
     }
 
     private void processTets(

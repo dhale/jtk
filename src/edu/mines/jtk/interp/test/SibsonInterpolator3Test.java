@@ -27,7 +27,7 @@ import edu.mines.jtk.util.*;
 public class SibsonInterpolator3Test extends TestCase {
   public static void main(String[] args) {
     if (args.length>=1 && args[0].equals("bench")) {
-      benchSine();
+      benchMethods();
     } else {
       TestSuite suite = new TestSuite(SibsonInterpolator3Test.class);
       junit.textui.TestRunner.run(suite);
@@ -100,8 +100,9 @@ public class SibsonInterpolator3Test extends TestCase {
     }
   }
 
-  public static void benchSine() {
+  public static void benchMethods() {
     TestFunction tf = TestFunction.makeSine();
+    //TestFunction tf = TestFunction.makeLinear();
     testScattered(tf);
     testUniform(tf);
   }
@@ -160,12 +161,13 @@ public class SibsonInterpolator3Test extends TestCase {
   private static void testMethods(TestFunction tf, float[][] fx) {
     float[] f = fx[0], x1 = fx[1], x2 = fx[2], x3 = fx[3];
     System.out.println();
-    //SibsonInterpolator3.Method[] methods = {HL,WS,BS};
-    SibsonInterpolator3.Method[] methods = {HL};
+    SibsonInterpolator3.Method[] methods = {HL,WS,BS};
+    //SibsonInterpolator3.Method[] methods = {HL};
     for (int i=0; i<methods.length; ++i) {
       SibsonInterpolator3.Method method = methods[i];
       SibsonInterpolator3 si = new SibsonInterpolator3(method,f,x1,x2,x3);
       si.setNullValue(1.0f);
+      si.setOuterBox(SX,SX,SX);
       si.setGradientExtent(1.0);
       double tmin = Double.MAX_VALUE;
       float[][][] g = null;
