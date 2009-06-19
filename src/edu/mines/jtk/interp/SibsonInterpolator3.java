@@ -21,8 +21,11 @@ import edu.mines.jtk.util.*;
  *
  * The basic Sibson interpolant is C1 --- it's gradient is continuous --- at 
  * all points (x1,x2,x3) except at the sample points, where it is C0. Sibson
- * (1981) also described an extension of his method that is everywhere C1 
- * (and therefore smoother), but that extension is not yet implemented here.
+ * (1981) also described an extension of his method that is everywhere C1 and
+ * therefore smoother). This method requires gradients at the sample points, 
+ * and these gradients are estimated if not specified explicitly. Use of the 
+ * gradients is controlled by a smoothness parameter. When this parameter is
+ * zero (the default), then the basic Sibson interpolant is used.
  *
  * The interpolation weights, also called "Sibson coordinates", are volumes 
  * of overlapping Voronoi polyhedra, normalized so that they sum to one for 
@@ -71,7 +74,7 @@ public class SibsonInterpolator3 {
    /**
     * The Braun-Sambridge method. Developed by Braun and Sambridge (1995),
     * this method uses Lasserre's (1983) algorithm for computing the volumes 
-    * of polyhedra without computing their vertices. This method is slower
+    * of polyhedra without computing their vertices. This method is much
     * slower than the other methods provided here. It may also suffer from 
     * numerical instability due to divisions in Lasserre's algorithm.
     */
@@ -79,21 +82,24 @@ public class SibsonInterpolator3 {
    /**
     * The Watson-Sambridge algorithm. Developed by Watson (1992) and
     * described further by Sambridge et al. (1995). Though simplest to
-    * implement, this method is inaccurate (sometimes wildly so) at 
-    * interpolation points (x1,x2,x3) that lie on or near edges of a 
+    * implement and fast, this method is inaccurate (sometimes wildly so) 
+    * at interpolation points (x1,x2,x3) that lie on or near edges of a 
     * Delaunay triangulation of the scattered sample points. 
     */
     WATSON_SAMBRIDGE,
   }
 
   /**
-   * A sample index and corresponding interpolation weight.
+   * Sample index and corresponding interpolation weight (Sibson coordinate).
    */
   public static class IndexWeight {
-    /** Index for one sample; corresponds to arrays passed to constructor. */
+
+    /** Index for one sample. */
     public int index;
-    /** Interpolation weight for one sample; should be in range [0,1].*/
+
+    /** Interpolation weight for one sample; in the range [0,1].*/
     public float weight;
+
     IndexWeight(int index, float weight) {
       this.index = index;
       this.weight = weight;
@@ -101,9 +107,21 @@ public class SibsonInterpolator3 {
   }
 
   /**
+   * Constructs an interpolator with specified sample coordinates.
+   * Function values f(x1,x2,x3) are not set and are assumed to be zero.
+   * Uses the most accurate and efficient implementation.
+   * @param x1 array of sample x1 coordinates.
+   * @param x2 array of sample x2 coordinates.
+   * @param x3 array of sample x3 coordinates.
+   */
+  public SibsonInterpolator3(float[] x1, float[] x2, float[] x3) {
+    this(Method.HALE_LIANG,null,x1,x2,x3);
+  }
+
+  /**
    * Constructs an interpolator with specified samples.
    * Uses the most accurate and efficient implementation.
-   * @param f array of sample values f(x1,x2).
+   * @param f array of sample values f(x1,x2,x3).
    * @param x1 array of sample x1 coordinates.
    * @param x2 array of sample x2 coordinates.
    * @param x3 array of sample x3 coordinates.
@@ -113,11 +131,27 @@ public class SibsonInterpolator3 {
   }
 
   /**
+   * Constructs an interpolator with specified method and sample coordinates.
+   * Function values f(x1,x2,x3) are not set and are assumed to be zero.
+   * This constructor is provided primarily for testing.
+   * The default Hale-Liang method is accurate and fast.
+   * @param method the implementation method.
+   * @param x1 array of sample x1 coordinates.
+   * @param x2 array of sample x2 coordinates.
+   * @param x3 array of sample x3 coordinates.
+   */
+  public SibsonInterpolator3(
+    Method method, float[] x1, float[] x2, float[] x3) 
+  {
+    this(method,null,x1,x2,x3);
+  }
+
+  /**
    * Constructs an interpolator with specified method and samples.
    * This constructor is provided primarily for testing.
-   * The default Hale-Liang method is fast and accurate.
+   * The default Hale-Liang method is accurate and fast.
    * @param method the implementation method.
-   * @param f array of sample values f(x1,x2).
+   * @param f array of sample values f(x1,x2,x3).
    * @param x1 array of sample x1 coordinates.
    * @param x2 array of sample x2 coordinates.
    * @param x3 array of sample x3 coordinates.
@@ -138,6 +172,52 @@ public class SibsonInterpolator3 {
   }
 
   /**
+   * Sets gradients for all samples. If the gradient extent is currently 
+   * zero, then this method also sets the gradient extent to 0.5. To later
+   * ignore gradients that have been set, the gradient extent can be reset
+   * to zero.
+   * @param g1 array of 1st components of gradients.
+   * @param g2 array of 2nd components of gradients.
+   * @param g3 array of 3rd components of gradients.
+   */
+  public void setGradients(float[] g1, float[] g2, float[] g3) {
+    int nnode = _mesh.countNodes();
+    TetMesh.NodeIterator ni = _mesh.getNodes();
+    while (ni.hasNext()) {
+      TetMesh.Node n = ni.next();
+      int index = n.index;
+      NodeData data = data(n);
+      data.gx = g1[index];
+      data.gy = g2[index];
+      data.gz = g3[index];
+    }
+    _haveGradients = true;
+    if (_gradientExtent==0.0)
+      _gradientExtent = 0.5;
+  }
+
+  /**
+   * Sets the extent of gradients for this interpolator. The default 
+   * gradient extent is zero, which implies no use of gradients and
+   * a basic Sibson interpolant that is smooth (C1) everywhere except 
+   * at the specified sample points (where it is C0).
+   * <p>
+   * If the gradient extent is set to a non-zero value, and if gradients 
+   * have not been set explicitly, then this method will also estimate 
+   * gradients for all samples as described by Sibson (1981).
+   * <p>
+   * Sibson's (1981) original formulation corresponds to an extent of 0.5. 
+   * Larger values cause the interpolant to more rapidly approach a linear 
+   * function near each sample point location.
+   * @param gradientExtent the gradient extent.
+   */
+  public void setGradientExtent(double gradientExtent) {
+    if (!_haveGradients && gradientExtent>=0.0)
+      computeGradients();
+    _gradientExtent = gradientExtent;
+  }
+
+  /**
    * Sets the null value for this interpolator.
    * This null value is returned when interpolation is not feasible;
    * e.g., when the interpolate point lies outside the convex hull of 
@@ -149,30 +229,6 @@ public class SibsonInterpolator3 {
   }
 
   /**
-   * Gets sample indices and interpolation weights for the specified point.
-   * @param x1 the x1 coordinate of the point.
-   * @param x2 the x2 coordinate of the point.
-   * @param x3 the x3 coordinate of the point.
-   * @return array of sample indices and weights; null if none.
-   */
-  public IndexWeight[] getIndexWeights(float x1, float x2, float x3) {
-    float wsum = (float)computeVolumes(x1,x2,x3);
-    if (wsum==0.0f)
-      return null;
-    float wscl = 1.0f/wsum;
-    int nnode = _nodeList.nnode();
-    TetMesh.Node[] nodes = _nodeList.nodes();
-    IndexWeight[] iw = new IndexWeight[nnode];
-    for (int inode=0; inode<nnode; ++inode) {
-      TetMesh.Node node = nodes[inode];
-      int i = node.index;
-      float w = (float)volume(node)*wscl;
-      iw[inode] = new IndexWeight(i,w);
-    }
-    return iw;
-  }
-
-  /**
    * Returns a value interpolated at the specified point.
    * @param x1 the x1 coordinate of the point.
    * @param x2 the x2 coordinate of the point.
@@ -181,18 +237,13 @@ public class SibsonInterpolator3 {
    */
   public float interpolate(float x1, float x2, float x3) {
     double vsum = computeVolumes(x1,x2,x3);
-    if (vsum==0.0)
+    if (vsum<=0.0)
       return _fnull;
-    double vfsum = 0.0;
-    int nnode = _nodeList.nnode();
-    TetMesh.Node[] nodes = _nodeList.nodes();
-    for (int inode=0; inode<nnode; ++inode) {
-      TetMesh.Node node = nodes[inode];
-      float f = f(node);
-      double v = volume(node);
-      vfsum += v*f;
+    if (_haveGradients && _gradientExtent>0.0) {
+      return interpolate1(vsum,x1,x2,x3);
+    } else {
+      return interpolate0(vsum,x1,x2,x3);
     }
-    return (float)(vfsum/vsum);
   }
 
   /**
@@ -220,7 +271,37 @@ public class SibsonInterpolator3 {
     return f;
   }
 
-  
+  /**
+   * Gets sample indices and interpolation weights for the specified point.
+   * Given a point (x1,x2,x3), the sample indices represent the natural
+   * neighbors of that point, and the interpolation weights are its Sibson
+   * coordinates. Indices correspond to the arrays that are specified when
+   * constructing this interpolator.
+   * <p>
+   * Indices and weights are especially useful in applications where they 
+   * can be reused, say, to interpolate multiple function values at a 
+   * single point.
+   * @param x1 the x1 coordinate of the point.
+   * @param x2 the x2 coordinate of the point.
+   * @param x3 the x3 coordinate of the point.
+   * @return array of sample indices and weights; null if none.
+   */
+  public IndexWeight[] getIndexWeights(float x1, float x2, float x3) {
+    float wsum = (float)computeVolumes(x1,x2,x3);
+    if (wsum==0.0f)
+      return null;
+    float wscl = 1.0f/wsum;
+    int nnode = _nodeList.nnode();
+    TetMesh.Node[] nodes = _nodeList.nodes();
+    IndexWeight[] iw = new IndexWeight[nnode];
+    for (int inode=0; inode<nnode; ++inode) {
+      TetMesh.Node node = nodes[inode];
+      int i = node.index;
+      float w = (float)volume(node)*wscl;
+      iw[inode] = new IndexWeight(i,w);
+    }
+    return iw;
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
@@ -269,6 +350,8 @@ public class SibsonInterpolator3 {
   private TetMesh.NodeList _nodeList; // list of natural neighbor nodes
   private TetMesh.TetList _tetList; // list of natural neighbor tets
   private VolumeAccumulator _va; // accumulates Sibson's volumes
+  private boolean _haveGradients; // true if mesh nodes have gradients
+  private double _gradientExtent; // extent of gradients
 
   private static void extrapolate(
     TetMesh mesh, Sampling s1, Sampling s2, Sampling s3)
@@ -279,7 +362,7 @@ public class SibsonInterpolator3 {
   private TetMesh makeMesh(
     float[] f, float[] x1, float[] x2, float[] x3) 
   {
-    int n = f.length;
+    int n = x1.length;
     TetMesh mesh = new TetMesh();
     for (int i=0; i<n; ++i) {
       TetMesh.Node node = new TetMesh.Node(x1[i],x2[i],x3[i]);
@@ -287,7 +370,8 @@ public class SibsonInterpolator3 {
         NodeData data = new NodeData();
         node.data = data;
         node.index = i;
-        data.f = f[i];
+        if (f!=null) 
+          data.f = f[i];
       }
     }
     return mesh;
@@ -356,16 +440,24 @@ public class SibsonInterpolator3 {
     return Geometry.inSphere(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,xp,yp,zp)>0.0;
   }
 
-  // C1 interpolation using node gradients.
-  private float interpolate1(double x, double y, double z) {
+  // C0 interpolation; does not use gradients.
+  private float interpolate0(double vsum, double x, double y, double z) {
+    double vfsum = 0.0;
     int nnode = _nodeList.nnode();
     TetMesh.Node[] nodes = _nodeList.nodes();
-    double vs = 0.0;
     for (int inode=0; inode<nnode; ++inode) {
-      TetMesh.Node n = nodes[inode];
-      double v = volume(n);
-      vs += v;
+      TetMesh.Node node = nodes[inode];
+      float f = f(node);
+      double v = volume(node);
+      vfsum += v*f;
     }
+    return (float)(vfsum/vsum);
+  }
+
+  // C1 interpolation; uses gradients.
+  private float interpolate1(double vsum, double x, double y, double z) {
+    int nnode = _nodeList.nnode();
+    TetMesh.Node[] nodes = _nodeList.nodes();
     double fs = 0.0;
     double es = 0.0;
     double wds = 0.0;
@@ -378,7 +470,7 @@ public class SibsonInterpolator3 {
       double gy = gy(n);
       double gz = gz(n);
       double v = volume(n);
-      double w = v/vs;
+      double w = v/vsum;
       double xn = n.xp();
       double yn = n.yp();
       double zn = n.zp();
@@ -388,7 +480,12 @@ public class SibsonInterpolator3 {
       double dd = dx*dx+dy*dy+dz*dz;
       if (dd==0.0)
         return (float)f;
-      double d = Math.sqrt(dd);
+      double d = dd;
+      if (_gradientExtent==1.0) {
+        d = Math.sqrt(dd);
+      } else if (_gradientExtent!=2.0) {
+        d = Math.pow(dd,_gradientExtent);
+      }
       double wd = w*d;
       double wod = w/d;
       double wdd = w*dd;
@@ -404,6 +501,78 @@ public class SibsonInterpolator3 {
     return (float)((alpha*fs+beta*es)/(alpha+beta));
   }
 
+  // Computes gradient vectors for each node in the mesh. Uses Sibson's 
+  // (1981) method, which yields gradients that will interpolate precisely 
+  // a spherical quadratic of the form f(x) = f + g'x + h*x'x, for scalars
+  // f and h and gradient vector g. This function f(x) is called a spherical
+  // Gradients for nodes on the convex hull are not modified by this method.
+  private void computeGradients() {
+    int nnode = _mesh.countNodes();
+    TetMesh.Node[] nodes = new TetMesh.Node[nnode];
+    TetMesh.NodeIterator ni = _mesh.getNodes();
+    for (int inode=0; inode<nnode; ++inode)
+      nodes[inode] = ni.next();
+    for (int inode=0; inode<nnode; ++inode) {
+      TetMesh.Node n = nodes[inode];
+      NodeData data = data(n);
+      double fn = data.f;
+      double xn = n.xp();
+      double yn = n.yp();
+      double zn = n.zp();
+      _mesh.removeNode(n);
+      double vsum = computeVolumes((float)xn,(float)yn,(float)zn);
+      if (vsum>0.0) {
+        int nm = _nodeList.nnode();
+        TetMesh.Node[] ms = _nodeList.nodes();
+        double hxx = 0.0, hxy = 0.0, hxz = 0.0,
+                          hyy = 0.0, hyz = 0.0,
+                                     hzz = 0.0;
+        double px = 0.0, py = 0.0, pz = 0.0;
+        for (int im=0; im<nm; ++im) {
+          TetMesh.Node m = ms[im];
+          double fm = f(m);
+          double wm = volume(m);
+          double xm = m.xp();
+          double ym = m.yp();
+          double zm = m.zp();
+          double df = fn-fm;
+          double dx = xn-xm;
+          double dy = yn-ym;
+          double dz = zn-zm;
+          double ds = wm/(dx*dx+dy*dy+dz*dz);
+          hxx += ds*dx*dx; // 3x3 symmetric positive-definite matrix
+          hxy += ds*dx*dy;
+          hxz += ds*dx*dz;
+          hyy += ds*dy*dy;
+          hyz += ds*dy*dz;
+          hzz += ds*dz*dz;
+          px += ds*dx*df; // right-hand-side column vector
+          py += ds*dy*df;
+          pz += ds*dz*df;
+        }
+        double lxx = Math.sqrt(hxx); // Cholesky decomposition
+        double lxy = hxy/lxx;
+        double lxz = hxz/lxx;
+        double dyy = hyy-lxy*lxy;
+        double lyy = Math.sqrt(dyy);
+        double lyz = (hyz-lxz*lxy)/lyy;
+        double dzz = hzz-lxz*lxz-lyz*lyz;
+        double lzz = Math.sqrt(dzz);
+        double qx = px/lxx; // forward elimination
+        double qy = (py-lxy*qx)/lyy;
+        double qz = (pz-lxz*qx-lyz*qy)/lzz;
+        double gz = qz/lzz; // back substitution
+        double gy = (qy-lyz*gz)/lyy;
+        double gx = (qx-lxy*gy-lxz*gz)/lxx;
+        data.gx = (float)gx;
+        data.gy = (float)gy;
+        data.gz = (float)gz;
+      }
+      _mesh.addNode(n);
+    }
+    _haveGradients = true;
+  }
+ 
   ///////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////
   private static class WatsonSambridge implements VolumeAccumulator {
@@ -542,8 +711,8 @@ public class SibsonInterpolator3 {
     {
       _vsum = 0.0;
       processTets(xp,yp,zp,mesh,tetList);
-      processFaces(xp,yp,zp);
-      return _vsum;
+      boolean ok = processFaces(xp,yp,zp);
+      return (ok)?_vsum:0.0;
     }
 
     private FaceList _faceList = new FaceList(); // list of tet faces

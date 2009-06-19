@@ -117,7 +117,7 @@ public class SibsonInterpolator3Test extends TestCase {
   // integer is a good choice for both uniform and random sampling.
   //private static final int NS = 27; // = 3*3*3
   private static final int NS = 125; // = 5*5*5
-  //private static final int NS = 1000; // 10*10*10
+  //private static final int NS = 1331; // 11*11*11
 
   // Uniform sampling for points at which to interpolate.
   //private static final int NX = 41; // some samples on the convex hull
@@ -160,11 +160,13 @@ public class SibsonInterpolator3Test extends TestCase {
   private static void testMethods(TestFunction tf, float[][] fx) {
     float[] f = fx[0], x1 = fx[1], x2 = fx[2], x3 = fx[3];
     System.out.println();
-    SibsonInterpolator3.Method[] methods = {HL,WS,BS};
+    //SibsonInterpolator3.Method[] methods = {HL,WS,BS};
+    SibsonInterpolator3.Method[] methods = {HL};
     for (int i=0; i<methods.length; ++i) {
       SibsonInterpolator3.Method method = methods[i];
       SibsonInterpolator3 si = new SibsonInterpolator3(method,f,x1,x2,x3);
       si.setNullValue(1.0f);
+      si.setGradientExtent(1.0);
       double tmin = Double.MAX_VALUE;
       float[][][] g = null;
       for (int iter=0; iter<3; ++iter) {
@@ -212,6 +214,7 @@ public class SibsonInterpolator3Test extends TestCase {
         plot.setColorModel(ColorMap.JET);
         plot.setLineColor(Color.BLACK);
         plot.setInterpolation(PixelsView.Interpolation.NEAREST);
+        plot.setClips(0.0f,1.0f);
         PlotFrame frame = new PlotFrame(plot);
         frame.setSize(800,760);
         frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
