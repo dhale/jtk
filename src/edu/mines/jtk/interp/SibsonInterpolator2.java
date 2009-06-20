@@ -6,6 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.interp;
 
+import java.util.ArrayList;
+
 import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.mesh.*;
 import edu.mines.jtk.util.*;
@@ -16,17 +18,41 @@ import edu.mines.jtk.util.*;
  * values for a nearby subset of samples, the so-called natural neighbors
  * of that point. Sibson interpolation is often called "natural neighbor
  * interpolation."
- *
- * The basic Sibson interpolant is C1 --- it's gradient is continuous ---
- * at all points (x1,x2) except at the sample points, where it is C0. Sibson
- * (1981) also described an extension of his method that is everywhere C1 
- * (and therefore smoother), but that extension is not yet implemented here.
- *
- * The interpolation weights, also called "Sibson coordinates", are areas
- * of overlapping Voronoi polygons, normalized so that they sum to one 
- * for any interpolation point (x1,x2). Various implementations of Sibson
+ * <p>
+ * The interpolation weights, also called "Sibson coordinates", are areas 
+ * of overlapping Voronoi polygons, normalized so that they sum to one for 
+ * any interpolation point (x1,x2). Various implementations of Sibson 
  * interpolation differ primarily in how those areas are computed.
- * 
+ * <p>
+ * The basic Sibson interpolant is C1 (that is, it's gradient is continuous) 
+ * at all points (x1,x2) except at the sample points, where it is C0. 
+ * Sibson (1981) also described an extension of his interpolant that is 
+ * everywhere C1 and therefore smoother. This smoother interpolant requires 
+ * gradients at the sample points, and those gradients can be estimated or
+ * specified explicitly.
+ * <p>
+ * The use of gradients is controlled by a gradient power. If this power 
+ * is zero (the default), then gradients are not used. Sibson's (1981) 
+ * smoother C1 interpolant corresponds to a power of 1.0. Larger powers 
+ * cause the interpolant to more rapidly approach the linear functions 
+ * defined by the values specified and gradients specified or computed 
+ * for each sample point.
+ * <p>
+ * Sibson's interpolant is undefined at points on or outside the convex 
+ * hull of sample points. In this sense, Sibson interpolation does not 
+ * extrapolate; the interpolant is implicitly bounded by the convex hull,
+ * and null values are returned when attempting to interpolate outside
+ * those bounds.
+ * <p>
+ * To extend the interpolant outside the convex hull, this class enables
+ * bounds to be set explicitly. When bounds are set, extra ghost samples 
+ * are added far outside the convex hull. These ghost samples have no 
+ * values, but they create a larger convex hull so that Sibson coordinates 
+ * can be computed anywhere within the specified bounds. While often useful,
+ * this extrapolation feature should be used with caution, because the 
+ * added ghost samples may alter the Sibson interpolant at points inside 
+ * the original convex hull.
+ * <p>
  * References:
  * <ul><li>
  * Braun, J. and M. Sambridge, 1995, A numerical method for solving partial
@@ -50,7 +76,7 @@ import edu.mines.jtk.util.*;
  * </li></ul>
  * 
  * @author Dave Hale, Colorado School of Mines
- * @version 2009.06.13
+ * @version 2009.06.14
  */
 public class SibsonInterpolator2 {
 
@@ -62,13 +88,13 @@ public class SibsonInterpolator2 {
    /**
     * The Hale-Liang method.
     * Developed by Dave Hale and Luming Liang at the Colorado School of
-    * Mines. Accurate and fast, this method is the default.
+    * Mines. Accurate, robust and fast, this method is the default.
     */
     HALE_LIANG,
    /**
     * The Braun-Sambridge method. Developed by Braun and Sambridge (1995),
     * this method uses Lasserre's (1983) algorithm for computing the areas 
-    * of polygons without computing their vertices. This method is slower
+    * of polygons without computing their vertices. This method is much
     * slower than the other methods provided here. It may also suffer from 
     * numerical instability due to divisions in Lasserre's algorithm.
     */
@@ -76,11 +102,39 @@ public class SibsonInterpolator2 {
    /**
     * The Watson-Sambridge algorithm. Developed by Watson (1992) and
     * described further by Sambridge et al. (1995). Though simplest to
-    * implement, this method is inaccurate (sometimes wildly so) at 
-    * interpolation points (x1,x2) that lie on or near edges of a 
-    * Delaunay triangulation of the scattered sample points.
+    * implement and fast, this method is inaccurate (sometimes wildly so) 
+    * at interpolation points (x1,x2) that lie on or near edges of a 
+    * Delaunay triangulation of the scattered sample points. 
     */
     WATSON_SAMBRIDGE,
+  }
+
+  /**
+   * Sample index and corresponding interpolation weight (Sibson coordinate).
+   */
+  public static class IndexWeight {
+
+    /** Index for one sample. */
+    public int index;
+
+    /** Interpolation weight for one sample; in the range [0,1].*/
+    public float weight;
+
+    IndexWeight(int index, float weight) {
+      this.index = index;
+      this.weight = weight;
+    }
+  }
+
+  /**
+   * Constructs an interpolator with specified sample coordinates.
+   * Function values f(x1,x2) are not set and are assumed to be zero.
+   * Uses the most accurate and efficient implementation.
+   * @param x1 array of sample x1 coordinates.
+   * @param x2 array of sample x2 coordinates.
+   */
+  public SibsonInterpolator2(float[] x1, float[] x2) {
+    this(Method.HALE_LIANG,null,x1,x2);
   }
 
   /**
@@ -95,9 +149,22 @@ public class SibsonInterpolator2 {
   }
 
   /**
+   * Constructs an interpolator with specified method and sample coordinates.
+   * Function values f(x1,x2) are not set and are assumed to be zero.
+   * This constructor is provided primarily for testing.
+   * The default Hale-Liang method is accurate and fast.
+   * @param method the implementation method.
+   * @param x1 array of sample x1 coordinates.
+   * @param x2 array of sample x2 coordinates.
+   */
+  public SibsonInterpolator2(Method method, float[] x1, float[] x2) {
+    this(method,null,x1,x2);
+  }
+
+  /**
    * Constructs an interpolator with specified method and samples.
    * This constructor is provided primarily for testing.
-   * The default Hale-Liang method is fast and accurate.
+   * The default Hale-Liang method is accurate and fast.
    * @param method the implementation method.
    * @param f array of sample values f(x1,x2).
    * @param x1 array of sample x1 coordinates.
@@ -106,23 +173,146 @@ public class SibsonInterpolator2 {
   public SibsonInterpolator2(
     Method method, float[] f, float[] x1, float[] x2) 
   {
+    _mesh = makeMesh(f,x1,x2);
+    _nodeList = new TriMesh.NodeList();
+    _triList = new TriMesh.TriList();
     if (method==Method.WATSON_SAMBRIDGE) {
-      _impl = new WatsonSambridgeImpl(f,x1,x2);
+      _va = new WatsonSambridge();
     } else if (method==Method.BRAUN_SAMBRIDGE) {
-      _impl = new BraunSambridgeImpl(f,x1,x2);
+      _va = new BraunSambridge();
     } else if (method==Method.HALE_LIANG) {
-      _impl = new HaleLiangImpl(f,x1,x2);
+      _va = new HaleLiang();
     }
   }
 
   /**
+   * Sets gradients for all samples. If the gradient power is currently 
+   * zero, then this method also sets the gradient power to one. To later
+   * ignore gradients that have been set, the gradient power can be reset
+   * to zero.
+   * @param g1 array of 1st components of gradients.
+   * @param g2 array of 2nd components of gradients.
+   */
+  public void setGradients(float[] g1, float[] g2) {
+    int nnode = _mesh.countNodes();
+    TriMesh.NodeIterator ni = _mesh.getNodes();
+    while (ni.hasNext()) {
+      TriMesh.Node n = ni.next();
+      int index = n.index;
+      NodeData data = data(n);
+      data.gx = g1[index];
+      data.gy = g2[index];
+    }
+    _haveGradients = true;
+    if (_gradientPower==0.0)
+      _gradientPower = 1.0;
+  }
+
+  /**
+   * Sets the power of gradients for this interpolator. The default 
+   * gradient power is zero, which implies no use of gradients and
+   * a basic Sibson interpolant that is smooth (C1) everywhere except 
+   * at the specified sample points (where it is C0).
+   * <p>
+   * If the gradient power is set to a non-zero value, and if gradients 
+   * have not been set explicitly, then this method will also estimate 
+   * gradients for all samples, as described by Sibson (1981).
+   * <p>
+   * If bounds are set explicitly, gradient estimates can be improved 
+   * by setting the bounds <em>before</em> calling this method.
+   * @param gradientPower the gradient power.
+   */
+  public void setGradientPower(double gradientPower) {
+    if (!_haveGradients && gradientPower>=0.0)
+      computeGradients();
+    _gradientPower = gradientPower;
+  }
+
+  /**
    * Sets the null value for this interpolator.
-   * This null value is returned when an attempt is made to 
-   * interpolate outside the convex hull of sample coordinates.
+   * This null value is returned when interpolation is attempted at a
+   * point that lies outside the bounds of this interpolator. Those 
+   * bounds are by default the convex hull of the sample points, but 
+   * may also be set explicitly. The default null value is zero.
    * @param fnull the null value.
    */
   public void setNullValue(float fnull) {
-    _impl.setNullValue(fnull);
+    _fnull = fnull;
+  }
+
+  /**
+   * Sets a bounding box for this interpolator.
+   * Sibson interpolation is undefined for points (x1,x2) outside the 
+   * convex hull of sample points, so the default bounds are that convex 
+   * hull. This method enables extrapolation for points outside the convex 
+   * hull, while restricting interpolation to points inside the box.
+   * <p>
+   * If gradients are to be computed (not specified explicitly), it is best 
+   * to set bounds by calling this method before computing gradients.
+   * @param x1min lower bound on x1.
+   * @param x1max upper bound on x1.
+   * @param x2min lower bound on x2.
+   * @param x2max upper bound on x2.
+   */
+  public void setBounds(float x1min, float x1max, float x2min, float x2max) {
+
+    // Remember the specified bounding box.
+    _xmin = x1min; _xmax = x1max;
+    _ymin = x2min; _ymax = x2max;
+    _useBoundingBox = true;
+
+    // Now compute coordinates for ghost nodes. Push these far outside the
+    // box, to reduce their influence when interpolating inside the box.
+    float scale = 0.1f;
+    x1min -= scale*(x1max-x1min); x1max += scale*(x1max-x1min);
+    x2min -= scale*(x2max-x2min); x2max += scale*(x2max-x2min);
+    float[] x1g = {x1min,x1max,x1min,x1max};
+    float[] x2g = {x2min,x2min,x2max,x2max};
+
+    // Add ghost nodes with null data if outside the convex hull.
+    for (int i=0; i<4; ++i) {
+      float x1 = x1g[i], x2 = x2g[i];
+      TriMesh.PointLocation pl = _mesh.locatePoint(x1,x2);
+      if (pl.isOutside())
+        _mesh.addNode(new TriMesh.Node(x1,x2));
+    }
+  }
+
+  /**
+   * Sets bounds for this interpolator using specified samplings.
+   * Values interpolated within the bounding box of these samplings
+   * are never null, even when the interpolation point (x1,x2) 
+   * lies outside that box.
+   * <p>
+   * If gradients are to be computed (not specified explicitly), it is best 
+   * to set bounds by calling this method before computing gradients.
+   * @param s1 sampling of x1.
+   * @param s2 sampling of x2.
+   */
+  public void setBounds(Sampling s1, Sampling s2) {
+    setBounds((float)s1.getFirst(),(float)s1.getLast(),
+              (float)s2.getFirst(),(float)s2.getLast());
+  }
+
+  /**
+   * If bounds have been set explicitly, this method unsets them,
+   * so that the convex hull of sample points will be used instead.
+   */
+  public void useConvexHullBounds() {
+    _useBoundingBox = false;
+
+    // Make a list of all ghost nodes.
+    ArrayList<TriMesh.Node> gnodes = new ArrayList<TriMesh.Node>(4);
+    TriMesh.NodeIterator ni = _mesh.getNodes();
+    while (ni.hasNext()) {
+      TriMesh.Node n = ni.next();
+      if (data(n)==null)
+        gnodes.add(n);
+    }
+
+    // Remove the ghost nodes from the mesh.
+    for (TriMesh.Node gnode:gnodes)
+      _mesh.removeNode(gnode);
   }
 
   /**
@@ -132,7 +322,14 @@ public class SibsonInterpolator2 {
    * @return the interpolated value.
    */
   public float interpolate(float x1, float x2) {
-    return _impl.interpolate(x1,x2);
+    double asum = computeAreas(x1,x2);
+    if (asum<=0.0)
+      return _fnull;
+    if (_haveGradients && _gradientPower>0.0) {
+      return interpolate1(asum,x1,x2);
+    } else {
+      return interpolate0(asum,x1,x2);
+    }
   }
 
   /**
@@ -155,192 +352,386 @@ public class SibsonInterpolator2 {
     return f;
   }
 
+  /**
+   * Gets sample indices and interpolation weights for the specified point.
+   * Given a point (x1,x2), the sample indices represent the natural
+   * neighbors of that point, and the interpolation weights are its Sibson
+   * coordinates. Indices correspond to the arrays that are specified when
+   * constructing this interpolator.
+   * <p>
+   * Indices and weights are especially useful in applications where they 
+   * can be reused, say, to interpolate multiple function values at a 
+   * single point.
+   * @param x1 the x1 coordinate of the point.
+   * @param x2 the x2 coordinate of the point.
+   * @return array of sample indices and weights; null if none.
+   */
+  public IndexWeight[] getIndexWeights(float x1, float x2) {
+    float wsum = (float)computeAreas(x1,x2);
+    if (wsum==0.0f)
+      return null;
+    float wscl = 1.0f/wsum;
+    int nnode = _nodeList.nnode();
+    TriMesh.Node[] nodes = _nodeList.nodes();
+    IndexWeight[] iw = new IndexWeight[nnode];
+    for (int inode=0; inode<nnode; ++inode) {
+      TriMesh.Node node = nodes[inode];
+      int i = node.index;
+      float w = (float)area(node)*wscl;
+      iw[inode] = new IndexWeight(i,w);
+    }
+    return iw;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  // All implementations extend this abstract base class.
-  private abstract static class Implementation {
-    public abstract float interpolate(float x1, float x2);
-    public void setNullValue(float fnull) {
-      _fnull = fnull;
-    }
-    protected float _fnull;
+  // Given a point (xp,yp) at which to interpolate, an implementation of 
+  // natural neighbor interpolation must accumulate areas for all natural 
+  // neighbor nodes in the the specified node list. It must also return 
+  // the total area accumulated for all nodes.
+  private interface AreaAccumulator {
+    public double accumulateAreas(
+      double xp, double yp,
+      TriMesh mesh, TriMesh.NodeList nodeList, TriMesh.TriList triList);
   }
 
-  private Implementation _impl;
+  // Data associated with all nodes in the tri mesh.
+  private static class NodeData {
+    float f,gx,gy; // function values and gradient
+    double area; // area for Sibson weight
+  }
+  private static NodeData data(TriMesh.Node node) {
+    return (NodeData)node.data;
+  }
+  private static float f(TriMesh.Node node) {
+    return data(node).f;
+  }
+  private static float gx(TriMesh.Node node) {
+    return data(node).gx;
+  }
+  private static float gy(TriMesh.Node node) {
+    return data(node).gy;
+  }
+  private static double area(TriMesh.Node node) {
+    return data(node).area;
+  }
 
-  ///////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////
-  private static class WatsonSambridgeImpl extends Implementation {
+  // This method is used by AreaAccumulator implementations defined below.
+  // Note that it accumulates areas for only those nodes with data. In
+  // other words, it accumulates no area for ghost nodes.
+  private static double accumulateArea(
+    TriMesh.Node node, double a, double asum) 
+  {
+    NodeData data = data(node);
+    if (data!=null) {
+      data.area += a;
+      asum += a;
+    }
+    return asum;
+  }
 
-    public WatsonSambridgeImpl(float[] f, float[] x1, float[] x2) {
-      int n = f.length;
-      _mesh = new TriMesh();
-      for (int i=0; i<n; ++i) {
-        TriMesh.Node node = new TriMesh.Node(x1[i],x2[i]);
-        if (_mesh.addNode(node)) {
-          NodeData ndata = new NodeData();
-          node.data = ndata;
-          ndata.f = f[i];
-        }
-      }
-      _triList = new TriMesh.TriList();
+  private TriMesh _mesh; // the mesh
+  private TriMesh.NodeList _nodeList; // list of natural neighbor nodes
+  private TriMesh.TriList _triList; // list of natural neighbor tris
+  private AreaAccumulator _va; // accumulates Sibson's areas
+  private boolean _haveGradients; // true if mesh nodes have gradients
+  private double _gradientPower; // power of gradients
+  private float _fnull; // returned when interpolation point out of bounds
+  private float _xmin,_xmax,_ymin,_ymax; // bounding box
+  private boolean _useBoundingBox; // true if using bounding box
+
+  // Returns a tri mesh built from specified scattered samples.
+  private TriMesh makeMesh(float[] f, float[] x, float[] y) {
+    int n = x.length;
+
+    // Find bounding box for sample points.
+    float xmin = x[0], xmax = x[0];
+    float ymin = y[0], ymax = y[0];
+    for (int i=1; i<n; ++i) {
+      if (x[i]<xmin) xmin = x[i]; if (x[i]>xmax) xmax = x[i];
+      if (y[i]<ymin) ymin = y[i]; if (y[i]>ymax) ymax = y[i];
     }
 
-    public float interpolate(float x1, float x2) {
+    // Construct the mesh with nodes at sample points.
+    TriMesh mesh = new TriMesh();
+    for (int i=0; i<n; ++i) {
+      float xi = x[i];
+      float yi = y[i];
 
-      // Find natural neighbor tris of the interpolation point (x1,x2). 
-      // If none, skip this point (outside convex hull).
-      boolean gotTriList = makeTriList(x1,x2);
-      if (!gotTriList)
-        return _fnull;
-      double xp = x1;
-      double yp = x2;
+      // Push out slightly any points that are on the bounding box.
+      // This perturbation enlarges slightly the convex hull of the sample
+      // points, and thereby compensates for rounding errors that would 
+      // otherwise cause interpolation points on the convex hull to appear 
+      // outside the hull.
+      if (xi==xmin) xi -= Math.ulp(xi); if (xi==xmax) xi += Math.ulp(xi);
+      if (yi==ymin) yi -= Math.ulp(yi); if (yi==ymax) yi += Math.ulp(yi);
 
-      // Sums for numerator and denominator.
-      double anum = 0.0;
-      double aden = 0.0;
-      
-      // For all tris in the list, ...
-      int ntri = _triList.ntri();
-      TriMesh.Tri[] tris = _triList.tris();
+      // Add a new node to the mesh, unless one already exists there.
+      TriMesh.Node node = new TriMesh.Node(xi,yi);
+      if (mesh.addNode(node)) {
+        NodeData data = new NodeData();
+        node.data = data;
+        node.index = i;
+        if (f!=null) 
+          data.f = f[i];
+      }
+    }
+    return mesh;
+  }
+
+  // Computes Sibson areas for the specified point (x,y).
+  // Returns true, if successful; false, otherwise.
+  private double computeAreas(float x, float y) {
+    if (!inBounds(x,y))
+      return 0.0;
+    if (!getNaturalNabors(x,y))
+      return 0.0;
+    return _va.accumulateAreas(x,y,_mesh,_nodeList,_triList);
+  }
+
+  // Returns true if not using bounding box or if point is inside the box.
+  private boolean inBounds(float x, float y) {
+    return !_useBoundingBox ||
+           _xmin<=x && x<=_xmax &&
+           _ymin<=y && y<=_ymax;
+  }
+
+  // Gets lists of natural neighbor nodes and tris of point (x,y).
+  // Before building the lists, node and tri marks are cleared. Then,
+  // as nodes and tris are added to the lists, they are marked, and 
+  // node areas are initialized to zero.
+  // Returns true, if the lists are not empty; false, otherwise.
+  private boolean getNaturalNabors(float x, float y) {
+    _mesh.clearNodeMarks();
+    _mesh.clearTriMarks();
+    _nodeList.clear();
+    _triList.clear();
+    TriMesh.PointLocation pl = _mesh.locatePoint(x,y);
+    if (pl.isOutside())
+      return false;
+    addTri(x,y,pl.tri());
+    return true;
+  }
+  private void addTri(double xp, double yp, TriMesh.Tri tri) {
+    _mesh.mark(tri);
+    _triList.add(tri);
+    addNode(tri.nodeA());
+    addNode(tri.nodeB());
+    addNode(tri.nodeC());
+    TriMesh.Tri ta = tri.triA();
+    TriMesh.Tri tb = tri.triB();
+    TriMesh.Tri tc = tri.triC();
+    if (needTri(xp,yp,ta)) addTri(xp,yp,ta);
+    if (needTri(xp,yp,tb)) addTri(xp,yp,tb);
+    if (needTri(xp,yp,tc)) addTri(xp,yp,tc);
+  }
+  private void addNode(TriMesh.Node node) {
+    if (_mesh.isMarked(node))
+      return;
+    _mesh.mark(node);
+    _nodeList.add(node);
+    NodeData data = data(node);
+    if (data!=null)
+      data.area = 0.0;
+  }
+  private boolean needTri(double xp, double yp, TriMesh.Tri tri) {
+    if (tri==null || _mesh.isMarked(tri))
+      return false;
+    TriMesh.Node na = tri.nodeA();
+    TriMesh.Node nb = tri.nodeB();
+    TriMesh.Node nc = tri.nodeC();
+    double xa = na.xp(), ya = na.yp();
+    double xb = nb.xp(), yb = nb.yp();
+    double xc = nc.xp(), yc = nc.yp();
+    return Geometry.inCircle(xa,ya,xb,yb,xc,yc,xp,yp)>0.0;
+  }
+
+  // C0 interpolation; does not use gradients.
+  private float interpolate0(double asum, double x, double y) {
+    double afsum = 0.0;
+    int nnode = _nodeList.nnode();
+    TriMesh.Node[] nodes = _nodeList.nodes();
+    for (int inode=0; inode<nnode; ++inode) {
+      TriMesh.Node node = nodes[inode];
+      if (data(node)!=null) {
+        float f = f(node);
+        double a = area(node);
+        afsum += a*f;
+      }
+    }
+    return (float)(afsum/asum);
+  }
+
+  // C1 interpolation; uses gradients.
+  private float interpolate1(double asum, double x, double y) {
+    int nnode = _nodeList.nnode();
+    TriMesh.Node[] nodes = _nodeList.nodes();
+    double fs = 0.0;
+    double es = 0.0;
+    double wds = 0.0;
+    double wdds = 0.0;
+    double wods = 0.0;
+    for (int inode=0; inode<nnode; ++inode) {
+      TriMesh.Node n = nodes[inode];
+      if (data(n)==null)
+        continue;
+      double f = f(n);
+      double gx = gx(n);
+      double gy = gy(n);
+      double a = area(n);
+      double w = a/asum;
+      double xn = n.xp();
+      double yn = n.yp();
+      double dx = x-xn;
+      double dy = y-yn;
+      double dd = dx*dx+dy*dy;
+      if (dd==0.0)
+        return (float)f;
+      double d = Math.pow(dd,0.5*_gradientPower);
+      double wd = w*d;
+      double wod = w/d;
+      double wdd = w*dd;
+      es += wod*(f+gx*dx+gy*dy);
+      fs += w*f;
+      wds += wd;
+      wdds += wdd;
+      wods += wod;
+    }
+    es /= wods;
+    double alpha = wds/wods;
+    double beta = wdds;
+    return (float)((alpha*fs+beta*es)/(alpha+beta));
+  }
+
+  // Computes gradient vectors for each node in the mesh. Uses Sibson's 
+  // (1981) method, which yields gradients that will interpolate precisely 
+  // a spherical quadratic of the form f(x) = f + g'x + h*x'x, for scalars
+  // f and h and gradient vector g. Gradients for nodes on the convex hull 
+  // are not modified by this method.
+  private void computeGradients() {
+    int nnode = _mesh.countNodes();
+    TriMesh.Node[] nodes = new TriMesh.Node[nnode];
+    TriMesh.NodeIterator ni = _mesh.getNodes();
+    for (int inode=0; inode<nnode; ++inode)
+      nodes[inode] = ni.next();
+    for (int inode=0; inode<nnode; ++inode) {
+      TriMesh.Node n = nodes[inode];
+      NodeData data = data(n);
+      if (data==null)
+        continue;
+      double fn = data.f;
+      double xn = n.xp();
+      double yn = n.yp();
+      _mesh.removeNode(n);
+      double asum = computeAreas((float)xn,(float)yn);
+      if (asum>0.0) {
+        int nm = _nodeList.nnode();
+        TriMesh.Node[] ms = _nodeList.nodes();
+        double hxx = 0.0, hxy = 0.0, hyy = 0.0;
+        double px = 0.0, py = 0.0;
+        for (int im=0; im<nm; ++im) {
+          TriMesh.Node m = ms[im];
+          if (data(m)==null)
+            continue;
+          double fm = f(m);
+          double wm = area(m);
+          double xm = m.xp();
+          double ym = m.yp();
+          double df = fn-fm;
+          double dx = xn-xm;
+          double dy = yn-ym;
+          double ds = wm/(dx*dx+dy*dy);
+          hxx += ds*dx*dx; // 2x2 symmetric positive-definite matrix
+          hxy += ds*dx*dy;
+          hyy += ds*dy*dy;
+          px += ds*dx*df; // right-hand-side column vector
+          py += ds*dy*df;
+        }
+        double lxx = Math.sqrt(hxx); // Cholesky decomposition
+        double lxy = hxy/lxx;
+        double dyy = hyy-lxy*lxy;
+        double lyy = Math.sqrt(dyy);
+        double qx = px/lxx; // forward elimination
+        double qy = (py-lxy*qx)/lyy;
+        double gy = qy/lyy; // back substitution
+        double gx = (qx-lxy*gy)/lxx;
+        data.gx = (float)gx;
+        data.gy = (float)gy;
+      }
+      _mesh.addNode(n);
+    }
+    _haveGradients = true;
+  }
+ 
+  ///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
+  private static class WatsonSambridge implements AreaAccumulator {
+
+    public double accumulateAreas(
+      double xp, double yp,
+      TriMesh mesh, TriMesh.NodeList nodeList, TriMesh.TriList triList)
+    {
+      double asum = 0.0;
+      int ntri = triList.ntri();
+      TriMesh.Tri[] tris = triList.tris();
       for (int itri=0; itri<ntri; ++itri) {
         TriMesh.Tri tri = tris[itri];
-
-        // The three nodes of one tri.
         TriMesh.Node na = tri.nodeA();
         TriMesh.Node nb = tri.nodeB();
         TriMesh.Node nc = tri.nodeC();
-        double xa = na.x(), ya = na.y();
-        double xb = nb.x(), yb = nb.y();
-        double xc = nc.x(), yc = nc.y();
-
-        // Four circumcenters.
-        Geometry.centerCircle(xb,yb,xc,yc,xp,yp,_ca);
-        Geometry.centerCircle(xc,yc,xa,ya,xp,yp,_cb);
-        Geometry.centerCircle(xa,ya,xb,yb,xp,yp,_cc);
-        Geometry.centerCircle(xa,ya,xb,yb,xc,yc,_cv);
-
-        // Accumulate signed areas and float values.
-        double aa = area(_cb,_cc,_cv);
-        double ab = area(_cc,_ca,_cv);
-        double ac = area(_ca,_cb,_cv);
-        float fa = ((NodeData)na.data).f;
-        float fb = ((NodeData)nb.data).f;
-        float fc = ((NodeData)nc.data).f;
-        anum += aa*fa+ab*fb+ac*fc;
-        aden += aa+ab+ac;
+        double xa = na.xp(), ya = na.yp();
+        double xb = nb.xp(), yb = nb.yp();
+        double xc = nc.xp(), yc = nc.yp();
+        Geometry.centerCircle(xp,yp,xb,yb,xc,yc,_ca);
+        Geometry.centerCircle(xp,yp,xc,yc,xa,ya,_cb);
+        Geometry.centerCircle(xp,yp,xa,ya,xb,yb,_cc);
+        Geometry.centerCircle(xa,ya,xb,yb,xc,yc,_ct);
+        double aa = area(_cb,_cc,_ct);
+        double ab = area(_cc,_ca,_ct);
+        double ac = area(_ca,_cb,_ct);
+        asum = accumulateArea(na,aa,asum);
+        asum = accumulateArea(nb,ab,asum);
+        asum = accumulateArea(nc,ac,asum);
       }
-
-      // The interpolated value.
-      return (float)(anum/aden);
+      return asum;
     }
-
-    private static class NodeData {
-      float f,gx,gy; // function values and gradient
-    }
-
-    private TriMesh _mesh; // Delaunay tri mesh
-    private double[] _ca = new double[2]; // circumcenter of fake tri bcp
-    private double[] _cb = new double[2]; // circumcenter of fake tri cap
-    private double[] _cc = new double[2]; // circumcenter of fake tri abp
-    private double[] _cv = new double[2]; // circumcenter of tri abc
-    private TriMesh.TriList _triList; // list of natural neighbor tris
-
-    private boolean makeTriList(float x, float y) {
-      _triList.clear();
-      TriMesh.PointLocation pl = _mesh.locatePoint(x,y);
-      if (pl.isOutside())
-        return false;
-      _mesh.clearTriMarks();
-      makeTriList(x,y,pl.tri());
-      return true;
-    }
-    private void makeTriList(double xp, double yp, TriMesh.Tri tri) {
-      if (tri==null || _mesh.isMarked(tri))
-        return;
-      _mesh.mark(tri);
-      if (inCircle(xp,yp,tri)) {
-        _triList.add(tri);
-        makeTriList(xp,yp,tri.triA());
-        makeTriList(xp,yp,tri.triB());
-        makeTriList(xp,yp,tri.triC());
-      }
-    }
-    private double area(double[] cj, double[] ck, double[] cv) {
-      double xj = cj[0]-cv[0];
-      double yj = cj[1]-cv[1];
-      double xk = ck[0]-cv[0];
-      double yk = ck[1]-cv[1];
-      return 0.5*(xj*yk-yj*xk);
-    }
-    private boolean inCircle(double xp, double yp, TriMesh.Tri tri) {
-      if (tri==null)
-        return false;
-      TriMesh.Node na = tri.nodeA();
-      TriMesh.Node nb = tri.nodeB();
-      TriMesh.Node nc = tri.nodeC();
-      double xa = na.x(), ya = na.y();
-      double xb = nb.x(), yb = nb.y();
-      double xc = nc.x(), yc = nc.y();
-      return Geometry.inCircleFast(xa,ya,xb,yb,xc,yc,xp,yp)>0;
+    private double[] _ca = new double[2]; // circumcenter of fake tri pbc
+    private double[] _cb = new double[2]; // circumcenter of fake tri pca
+    private double[] _cc = new double[2]; // circumcenter of fake tri pab
+    private double[] _ct = new double[2]; // circumcenter of real tri abc
+    private double area(double[] ci, double[] cj, double[] ct) {
+      double xt = ct[0],    yt = ct[1];
+      double xi = ci[0]-xt, yi = ci[1]-yt;
+      double xj = cj[0]-xt, yj = cj[1]-yt;
+      return xi*yj-xj*yi;
     }
   }
 
   ///////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////
-  private static class BraunSambridgeImpl extends Implementation {
+  private static class BraunSambridge implements AreaAccumulator {
 
-    public BraunSambridgeImpl(float[] f, float[] x1, float[] x2) {
-      int n = f.length;
-      _mesh = new TriMesh();
-      for (int i=0; i<n; ++i) {
-        TriMesh.Node node = new TriMesh.Node(x1[i],x2[i]);
-        if (_mesh.addNode(node)) {
-          NodeData ndata = new NodeData();
-          node.data = ndata;
-          ndata.f = f[i];
-        }
-      }
-      int nnode = _mesh.countNodes();
-      TriMesh.NodeIterator ni = _mesh.getNodes();
-      while (ni.hasNext()) {
-        TriMesh.Node node = ni.next();
-        NodeData ndata = (NodeData)node.data;
-        ndata.nabors = _mesh.getNodeNabors(node);
-      }
-      _nodeList = new TriMesh.NodeList();
-    }
-
-    public float interpolate(float x1, float x2) {
-      double x1i = x1;
-      double x2i = x2;
-
-      // Find all natural neighbors of the interpolation point (x1,x2). 
-      // If none, skip this point (outside convex hull).
-      boolean gotNabors = getNaturalNabors(x1,x2);
-      if (!gotNabors)
-        return _fnull;
-
-      // Sums for numerator and denominator.
-      double anum = 0.0;
-      double aden = 0.0;
+    public double accumulateAreas(
+      double x1i, double x2i,
+      TriMesh mesh, TriMesh.NodeList nodeList, TriMesh.TriList triList)
+    {
+      double asum = 0.0;
 
       // For all natural neighbors, ...
-      int nnabor = _nodeList.nnode();
-      TriMesh.Node[] nabors = _nodeList.nodes();
-      for (int j=0; j<nnabor; ++j) {
-        TriMesh.Node jnode = nabors[j];
-        double x1j = jnode.x();
-        double x2j = jnode.y();
-        double fj = ((NodeData)jnode.data).f;
+      int nnode = nodeList.nnode();
+      TriMesh.Node[] nodes = nodeList.nodes();
+      for (int j=0; j<nnode; ++j) {
+        TriMesh.Node jnode = nodes[j];
+        double x1j = jnode.xp();
+        double x2j = jnode.yp();
 
         // Clear the polygon for the j'th natural neighbor.
         _lv.clear();
 
-        // Add half-plane of points closer to (x1i,x2i) than (x1j,x2j).
-        // For this half-plane we set b = 0, which is equivalent to 
-        // making the midpoint (x1s,x2s) the origin for the polygon.
+        // Add half-space of points closer to point pi than to point pj.
+        // For this half-space we set b = 0, which is equivalent to 
+        // making the midpoint ps the origin for the polygon.
         // A half-space with b = 0 speeds up Lassere's algorithm.
         double x1s = 0.5*(x1j+x1i);
         double x2s = 0.5*(x2j+x2i);
@@ -349,18 +740,18 @@ public class SibsonInterpolator2 {
         _lv.addHalfSpace(x1d,x2d,0.0); // note b = 0 here
 
         // For all other natural neighbors, ...
-        for (int k=0; k<nnabor; ++k) {
+        for (int k=0; k<nnode; ++k) {
           if (j==k) continue;
-          TriMesh.Node knode = nabors[k];
+          TriMesh.Node knode = nodes[k];
 
           // Skip pair if they are not node neighbors in the mesh.
-          if (!nodesAreNabors(jnode,knode))
+          if (mesh.findTri(jnode,knode)==null)
             continue;
 
-          // Add half-plane of points closer to (x1j,x2j) than (x1k,x2k).
-          // Here we must account for the shift (x1s,x2s) described above.
-          double x1k = knode.x();
-          double x2k = knode.y();
+          // Add half-space of points closer to pj than pk. 
+          // Here we must account for the shift ps described above.
+          double x1k = knode.xp();
+          double x2k = knode.yp();
           double x1e = x1k-x1j;
           double x2e = x2k-x2j;
           double x1t = 0.5*(x1k+x1j)-x1s;
@@ -370,348 +761,210 @@ public class SibsonInterpolator2 {
 
         // Area of polygon for this natural neighbor.
         double aj = _lv.getVolume();
-
-        // Accumulate numerator and denominator.
-        anum += aj*fj;
-        aden += aj;
+        asum = accumulateArea(jnode,aj,asum);
       }
-
-      // The interpolated value.
-      return (float)(anum/aden);
+      return asum;
     }
-    private static float f(TriMesh.Node node) {
-      return ((NodeData)node.data).f;
-    }
-    private boolean nodesAreNabors(TriMesh.Node jnode, TriMesh.Node knode) {
-      TriMesh.Node[] nabors = ((NodeData)jnode.data).nabors;
-      int nnabor = nabors.length;
-      for (int jnabor=0; jnabor<nnabor; ++jnabor)
-        if (nabors[jnabor]==knode)
-          return true;
-      return false;
-    }
-
-    private static class NodeData {
-      float f,gx,gy; // function values and gradient
-      TriMesh.Node[] nabors; // cached node nabors
-    }
-
-    private float _fnull; // null value when interpolation impossible
-    private TriMesh _mesh; // Delaunay tri mesh
-    private TriMesh.NodeList _nodeList; // natural neighbor nodes
-    private LasserreVolume _lv = new LasserreVolume(2); // for polygon areas
-    private double[] _center = new double[2];
-    private boolean getNaturalNabors(float x, float y) {
-      _nodeList.clear();
-      TriMesh.PointLocation pl = _mesh.locatePoint(x,y);
-      if (pl.isOutside())
-        return false;
-      _mesh.clearNodeMarks();
-      _mesh.clearTriMarks();
-      getNaturalNeighbors(x,y,pl.tri());
-      return true;
-    }
-    private void getNaturalNeighbors(
-      double xp, double yp, TriMesh.Tri tri) 
-    {
-      if (tri!=null && !_mesh.isMarked(tri)) {
-        _mesh.mark(tri);
-        double rs = tri.centerCircle(_center);
-        double xc = _center[0];
-        double yc = _center[1];
-        double dx = xp-xc;
-        double dy = yp-yc;
-        if (dx*dx+dy*dy<rs) {
-          TriMesh.Node na = tri.nodeA(), nb = tri.nodeB(), nc = tri.nodeC();
-          TriMesh.Tri  ta = tri.triA(),  tb = tri.triB(),  tc = tri.triC();
-          if (!_mesh.isMarked(na)) {
-            _mesh.mark(na); 
-            _nodeList.add(na);
-          }
-          if (!_mesh.isMarked(nb)) {
-            _mesh.mark(nb); 
-            _nodeList.add(nb);
-          }
-          if (!_mesh.isMarked(nc)) {
-            _mesh.mark(nc); 
-            _nodeList.add(nc);
-          }
-          getNaturalNeighbors(xp,yp,ta);
-          getNaturalNeighbors(xp,yp,tb);
-          getNaturalNeighbors(xp,yp,tc);
-        }
-      }
-    }
+    private LasserreVolume _lv = new LasserreVolume(2);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////
-  // A two-step method developed by Dave Hale and Luming Liang at Colorado
-  // School of Mines. The first step is to build lists of natural-neighbor
-  // tris and nodes, while also computing and storing information such as
-  // Voronoi vertices, circumcenters of natural-neighbor triangles, and a 
-  // local origin for each natural-neighbor node. In the second step, this
-  // information is used to compute polygon areas, which are then used to
-  // compute an area-weighted average of natural-neighbor sample values.
-  private static class HaleLiangImpl extends Implementation {
+  // An implementation developed by Dave Hale and Luming Liang at Colorado
+  // School of Mines. The first step is to process the natural-neighbor 
+  // tris while accumulating polygon areas for natural-neighbor nodes.
+  // During this first step, edges bounding the region of natural-neighbor
+  // tris are stored in a list. In the second step, that list of edges is 
+  // processed to complete the computation of areas.
+  // All geometric computations are performed in a shifted coordinate
+  // system in which the interpolation point (xp,yp) is the origin.
+  private static class HaleLiang implements AreaAccumulator {
 
-    public HaleLiangImpl(float[] f, float[] x1, float[] x2) {
-      int n = f.length;
-      _mesh = new TriMesh();
-      for (int i=0; i<n; ++i) {
-        TriMesh.Node node = new TriMesh.Node(x1[i],x2[i]);
-        if (_mesh.addNode(node)) {
-          NodeData ndata = new NodeData();
-          node.data = ndata;
-          ndata.f = f[i];
-        }
-      }
-      TriMesh.TriIterator ti = _mesh.getTris();
-      while (ti.hasNext()) {
-        TriMesh.Tri tri = ti.next();
-        TriData tdata = new TriData();
-        tri.data = tdata;
-        tdata.rs = tri.centerCircle(_center);
-        tdata.xt = _center[0];
-        tdata.yt = _center[1];
-      }
-      _nodeList = new TriMesh.NodeList();
-      _triList = new TriMesh.TriList();
-    }
-
-    public float interpolate(float x1, float x2) {
-      boolean gotLists = makeLists(x1,x2);
-      if (!gotLists)
-        return _fnull;
-      return processLists();
-    }
-
-    private static class NodeData {
-      float f,gx,gy; // function values and gradient
-      double x0,y0; // local origins when computing polygon areas
-      double area; // area for Sibson weight
-    }
-
-    private static class TriData {
-      double rs; // radius squared of circumcircle of tri
-      double xt,yt; // center of tri
-      double xa,ya; // center opposite node A
-      double xb,yb; // center opposite node B
-      double xc,yc; // center opposite node C
-      boolean ra,rb,rc; // true, if corresponding center is for a real tri
-    }
-
-    private float _fnull; // null value
-    private TriMesh _mesh; // the Delaunay tri mesh
-    private TriMesh.NodeList _nodeList; // list of natural neighbors
-    private TriMesh.TriList _triList; // list of natural neighbor tris
-    private double[] _center = new double[2]; // a circumcircle center
-
-    // Recursively makes lists of natural neighbor tris and nodes for the
-    // point (x,y). As each tri is added to the list, a set of four 
-    // circumcenters are stored in its Object data. One of these is the 
-    // circumcenter of the tri. The three other circumcenters correspond 
-    // to the three neighbor tris opposite the tri's nodes A, B, and C.
-    // For example, if the circumcircle of a non-null neighbor tri opposite
-    // node A contains the point (x,y), then the corresponding circumcenter 
-    // of that neighbor tri is stored in the set. Otherwise, the circumcenter
-    // of a virtual tri (not in the mesh), comprising the point (x,y) and
-    // the nodes B and C, is stored. 
-    // Circumcenters of virtual tris are vertices of a virtual Voronoi 
-    // polygon for the point (x,y). While building the tri list, this 
-    // method also assigns to their nodes points (x0,y0) that will serve
-    // as local origins when accumulating polygon areas. The nodes are 
-    // also added to the node list.
-    private boolean makeLists(float x, float y) {
-      _nodeList.clear();
-      _triList.clear();
-      TriMesh.PointLocation pl = _mesh.locatePoint(x,y);
-      if (pl.isOutside())
-        return false;
-      _mesh.clearNodeMarks();
-      _mesh.clearTriMarks();
-      makeLists(x,y,pl.tri());
-      return true;
-    }
-    private void makeLists(double xp, double yp, TriMesh.Tri tri) {
-      if (tri==null || _mesh.isMarked(tri))
-        return;
-      TriData tdata = (TriData)tri.data;
-      _mesh.mark(tri);
-      _triList.add(tri);
-
-      // Prepare natural neighbor nodes for interpolation.
-      TriMesh.Node na = tri.nodeA();
-      TriMesh.Node nb = tri.nodeB();
-      TriMesh.Node nc = tri.nodeC();
-      prepareNode(na);
-      prepareNode(nb);
-      prepareNode(nc);
-      
-      // Neighbor tri opposite node A, may not be a real tri in the mesh.
-      TriMesh.Tri ta = tri.triA();
-      boolean ra = tdata.ra = inCircle(xp,yp,ta);
-      if (!ra) {
-        double xb = nb.x(), yb = nb.y();
-        double xc = nc.x(), yc = nc.y();
-        Geometry.centerCircle(xp,yp,xb,yb,xc,yc,_center);
-        tdata.xa = _center[0];
-        tdata.ya = _center[1];
-        setOrigin(nb,nc,tdata.xa,tdata.ya);
-      } else {
-        TriData adata = (TriData)ta.data;
-        tdata.xa = adata.xt;
-        tdata.ya = adata.yt;
-      }
-
-      // Neighbor tri opposite node B, may not be a real tri in the mesh.
-      TriMesh.Tri tb = tri.triB();
-      boolean rb = tdata.rb = inCircle(xp,yp,tb);
-      if (!rb) {
-        double xc = nc.x(), yc = nc.y();
-        double xa = na.x(), ya = na.y();
-        Geometry.centerCircle(xp,yp,xc,yc,xa,ya,_center);
-        tdata.xb = _center[0];
-        tdata.yb = _center[1];
-        setOrigin(nc,na,tdata.xb,tdata.yb);
-      } else {
-        TriData bdata = (TriData)tb.data;
-        tdata.xb = bdata.xt;
-        tdata.yb = bdata.yt;
-      }
-
-      // Neighbor tri opposite node C; may not be a real tri in the mesh.
-      TriMesh.Tri tc = tri.triC();
-      boolean rc = tdata.rc = inCircle(xp,yp,tc);
-      if (!rc) {
-        double xa = na.x(), ya = na.y();
-        double xb = nb.x(), yb = nb.y();
-        Geometry.centerCircle(xp,yp,xa,ya,xb,yb,_center);
-        tdata.xc = _center[0];
-        tdata.yc = _center[1];
-        setOrigin(na,nb,tdata.xc,tdata.yc);
-      } else {
-        TriData cdata = (TriData)tc.data;
-        tdata.xc = cdata.xt;
-        tdata.yc = cdata.yt;
-      }
-
-      // Recursively add any real (not virtual) neighbor tris to the list.
-      if (ra) makeLists(xp,yp,ta);
-      if (rb) makeLists(xp,yp,tb);
-      if (rc) makeLists(xp,yp,tc);
-    }
-
-    // Sets the locate origin for the specified nodes.
-    private static void setOrigin(
-      TriMesh.Node nodeA, TriMesh.Node nodeB, double x0, double y0) 
+    public double accumulateAreas(
+      double xp, double yp,
+      TriMesh mesh, TriMesh.NodeList nodeList, TriMesh.TriList triList)
     {
-      NodeData nda = (NodeData)nodeA.data;
-      NodeData ndb = (NodeData)nodeB.data;
-      nda.x0 = x0; nda.y0 = y0;
-      ndb.x0 = x0; ndb.y0 = y0;
+      _asum = 0.0;
+      processTris(xp,yp,mesh,triList);
+      boolean ok = processEdges(xp,yp);
+      return (ok)?_asum:0.0;
     }
 
-    // If unmarked, prepare a natural neighbor node for interpolation.
-    private void prepareNode(TriMesh.Node node) {
-      if (!_mesh.isMarked(node)) {
-        _mesh.mark(node);
-        _nodeList.add(node);
-        NodeData ndata = (NodeData)node.data;
-        ndata.area = 0.0;
+    private EdgeList _edgeList = new EdgeList(); // list of tri edges
+    private double[] _xy = new double[2]; // a circumsphere center
+    private double _asum; // sum of all node areas
+
+    private void addArea(TriMesh.Node node, double a) {
+      NodeData data = data(node);
+      if (data!=null) {
+        data.area += a;
+        _asum += a;
       }
     }
 
-    // Returns true if point (xp,yp) is inside the circumcircle of the tri.
-    private boolean inCircle(double xp, double yp, TriMesh.Tri tri) {
-      if (tri==null)
-        return false;
-      TriData tdata = (TriData)tri.data;
-      double rs = tdata.rs;
-      double xt = tdata.xt;
-      double yt = tdata.yt;
-      double dx = xp-xt;
-      double dy = yp-yt;
-      return dx*dx+dy*dy<rs;
-    }
-
-    // Processes the natural neighbor tri and node lists. Computes 
-    // areas of polygons associated with each natural neighbor node,
-    // and then uses those areas to weight natural neighbor values.
-    private float processLists() {
-      int ntri = _triList.ntri();
-      TriMesh.Tri[] tris = _triList.tris();
+    // Processes all natural-neighbor tris.
+    private void processTris(
+      double xp, double yp,
+      TriMesh mesh, TriMesh.TriList triList) 
+    {
+      _edgeList.clear();
+      int ntri = triList.ntri();
+      TriMesh.Tri[] tris = triList.tris();
       for (int itri=0; itri<ntri; ++itri) {
         TriMesh.Tri tri = tris[itri];
+        TriMesh.Tri ta = tri.triA();
+        TriMesh.Tri tb = tri.triB();
+        TriMesh.Tri tc = tri.triC();
         TriMesh.Node na = tri.nodeA();
         TriMesh.Node nb = tri.nodeB();
         TriMesh.Node nc = tri.nodeC();
-        TriData tdata = (TriData)tri.data;
-        NodeData nadata = (NodeData)na.data;
-        NodeData nbdata = (NodeData)nb.data;
-        NodeData ncdata = (NodeData)nc.data;
-        double xa = tdata.xa, ya = tdata.ya;
-        double xb = tdata.xb, yb = tdata.yb;
-        double xc = tdata.xc, yc = tdata.yc;
-        double xt = tdata.xt, yt = tdata.yt;
-        boolean ra = tdata.ra, rb = tdata.rb, rc = tdata.rc;
-        double xa0 = nadata.x0, ya0 = nadata.y0;
-        double xb0 = nbdata.x0, yb0 = nbdata.y0;
-        double xc0 = ncdata.x0, yc0 = ncdata.y0;
-        double fa = nadata.f, fb = nbdata.f, fc = ncdata.f;
-        double x1,y1,x2,y2,area;
+        tri.centerCircle(_xy);
+        double xt = _xy[0]-xp, yt = _xy[1]-yp;
+        processTriNabor(xp,yp,xt,yt,mesh,ta,nb,nc);
+        processTriNabor(xp,yp,xt,yt,mesh,tb,nc,na);
+        processTriNabor(xp,yp,xt,yt,mesh,tc,na,nb);
+      }
+    }
+    private void processTriNabor(
+      double xp, double yp,
+      double xt, double yt,
+      TriMesh mesh, TriMesh.Tri ta,
+      TriMesh.Node nb, TriMesh.Node nc)
+    {
+      boolean saveEdge = true;
+      if (ta!=null && mesh.isMarked(ta)) {
+        ta.centerCircle(_xy);
+        double xa = _xy[0]-xp;
+        double ya = _xy[1]-yp;
+        double xy = xt*ya-xa*yt;
+        addArea(nc,xy);
+        saveEdge = false;
+      }
+      if (saveEdge)
+        addEdge(xp,yp,xt,yt,nb,nc);
+    }
 
-        // Edge a->b (and perhaps b->a), opposite node c.
-        x1 = xc-xa0; y1 = yc-ya0;
-        x2 = xt-xa0; y2 = yt-ya0;
-        area = x1*y2-x2*y1;
-        nadata.area += area;
-        if (!rc) {
-          x1 = xt-xb0; y1 = yt-yb0;
-          x2 = xc-xb0; y2 = yc-yb0;
-          area = x1*y2-x2*y1;
-          nbdata.area += area;
-        }
+    // A edge has two nodes and both fake and real circumcenters.
+    // After all edges have been added to the edge list, each edge
+    // will also have a neighbor edge. Node B of the edge equals
+    // node A of the neighbor edge.
+    private static class Edge {
+      TriMesh.Node na,nb; // two nodes of this edge
+      double xf,yf; // circumcenter of fake tri pab
+      double xr,yr; // circumcenter of real tri abc
+      Edge nabor; // neighbor of this edge
+    }
 
-        // Edge b->c (and perhaps c->b), opposite node a.
-        x1 = xa-xb0; y1 = ya-yb0;
-        x2 = xt-xb0; y2 = yt-yb0;
-        area = x1*y2-x2*y1;
-        nbdata.area += area;
-        if (!ra) {
-          x1 = xt-xc0; y1 = yt-yc0;
-          x2 = xa-xc0; y2 = ya-yc0;
-          area = x1*y2-x2*y1;
-          ncdata.area += area;
-        }
+    // Computes fake circumcenter and adds edge to the edge list.
+    private void addEdge(
+      double xp, double yp,
+      double xr, double yr, 
+      TriMesh.Node na, TriMesh.Node nb)
+    {
+      double xa = na.xp(), ya = na.yp();
+      double xb = nb.xp(), yb = nb.yp();
+      Geometry.centerCircle(xp,yp,xa,ya,xb,yb,_xy);
+      double xf = _xy[0]-xp, yf = _xy[1]-yp;
+      _edgeList.add(na,nb,xf,yf,xr,yr);
+    }
 
-        // Edge c->a (and perhaps a->c), opposite node b.
-        x1 = xb-xc0; y1 = yb-yc0;
-        x2 = xt-xc0; y2 = yt-yc0;
-        area = x1*y2-x2*y1;
-        ncdata.area += area;
-        if (!rb) {
-          x1 = xt-xa0; y1 = yt-ya0;
-          x2 = xb-xa0; y2 = yb-ya0;
-          area = x1*y2-x2*y1;
-          nadata.area += area;
+    // Determines whether all edges in the edge set have exactly two
+    // neighbor edges. Should always be true, except for points (x,y)
+    // that lie on (over very near?) the convex hull of the mesh.
+    private boolean edgeNaborsOk(double xp, double yp) {
+      int nedge = _edgeList.nedge();
+      ArrayList<Edge> edges = _edgeList.edges();
+      for (int iedge=0; iedge<nedge; ++iedge) {
+        Edge edge = edges.get(iedge);
+        if (edge.nabor==null) {
+          //System.out.println("null edge nabor: x="+xp+" y="+yp);
+          return false;
         }
       }
+      return true;
+    }
 
-      // Return area-weighted sum of values.
-      double anum = 0.0;
-      double aden = 0.0;
-      int nnode = _nodeList.nnode();
-      TriMesh.Node[] nodes = _nodeList.nodes();
-      for (int inode=0; inode<nnode; ++inode) {
-        TriMesh.Node node = nodes[inode];
-        NodeData ndata = (NodeData)node.data;
-        float f = ndata.f;
-        double area = ndata.area;
-        anum += area*f;
-        aden += area;
+    // Processes all edges in the edge list.
+    private boolean processEdges(double xp, double yp) {
+      if (!edgeNaborsOk(xp,yp))
+        return false;
+      int nedge = _edgeList.nedge();
+      ArrayList<Edge> edges = _edgeList.edges();
+      for (int iedge=0; iedge<nedge; ++iedge)
+        processEdge(xp,yp,edges.get(iedge));
+      return true;
+    }
+
+    // Processes one edge.
+    private void processEdge(double xp, double yp, Edge edge) {
+
+      // Coordinates of two edge nodes, shifted for local origin.
+      TriMesh.Node na = edge.na, nb = edge.nb;
+      double xa = na.xp()-xp, ya = na.yp()-yp;
+      double xb = nb.xp()-xp, yb = nb.yp()-yp;
+
+      // Accumulate areas for the Voronoi edge through the tri edge.
+      double x1 = edge.xf;
+      double y1 = edge.yf;
+      double x2 = edge.xr;
+      double y2 = edge.yr;
+      double xy = x1*y2-x2*y1;
+      addArea(na, xy); 
+      addArea(nb,-xy);
+
+     // Accumulate area for Voronoi edge between tri edge and its neighbor.
+      Edge nabor = edge.nabor; 
+      x2 = nabor.xf; 
+      y2 = nabor.yf; 
+      xy = x1*y2-x2*y1;
+      addArea(nb,xy);
+    }
+
+    // A list of edges that represent the boundary of the Voronoi
+    // polygon of the point (x,y) at which to interpolate.
+    // As edges are added to this list, we hook them up to their
+    // edge neighbors if already in the list. Therefore, after 
+    // all edges have been added to the list, each edge should have 
+    // an edge neighbor.
+    private static class EdgeList {
+      private int _nedge;
+      private ArrayList<Edge> _edges = new ArrayList<Edge>(12);
+      int nedge() {
+        return _nedge;
       }
-      return (float)(anum/aden);
+      ArrayList<Edge> edges() {
+        return _edges;
+      }
+      void clear() {
+        _nedge = 0;
+      }
+      void add(
+        TriMesh.Node na, TriMesh.Node nb,
+        double xf, double yf,
+        double xr, double yr)
+      {
+        if (_nedge==_edges.size()) // rarely must we construct a
+          _edges.add(new Edge()); // new edge like this, because we
+        Edge edge = _edges.get(_nedge); // can reuse an existing edge
+        Edge nabor = null;
+        int nfound = 0;
+        for (int iedge=0; iedge<_nedge && nfound<2; ++iedge) {
+          Edge edgei = _edges.get(iedge);
+          if (nb==edgei.na) {
+            nabor = edgei;
+            ++nfound;
+          }
+          if (na==edgei.nb) {
+            edgei.nabor = edge;
+            ++nfound;
+          }
+        }
+        edge.na = na; edge.nb = nb;
+        edge.xf = xf; edge.yf = yf;
+        edge.xr = xr; edge.yr = yr;
+        edge.nabor = nabor;
+        ++_nedge;
+      }
     }
   }
 }

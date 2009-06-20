@@ -9,7 +9,7 @@ package edu.mines.jtk.mesh.test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.mesh.LasserreVolume;
+import edu.mines.jtk.interp.LasserreVolume;
 
 /**
  * Tests {@link edu.mines.jtk.mesh.LasserreVolume}.

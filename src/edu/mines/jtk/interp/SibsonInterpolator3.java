@@ -18,20 +18,41 @@ import edu.mines.jtk.util.*;
  * values for a nearby subset of samples, the so-called natural neighbors
  * of that point. Sibson interpolation is often called "natural neighbor
  * interpolation."
- *
- * The basic Sibson interpolant is C1 --- it's gradient is continuous --- at 
- * all points (x1,x2,x3) except at the sample points, where it is C0. Sibson
- * (1981) also described an extension of his method that is everywhere C1 and
- * therefore smoother). This method requires gradients at the sample points, 
- * and these gradients are estimated if not specified explicitly. Use of the 
- * gradients is controlled by a smoothness parameter. When this parameter is
- * zero (the default), then the basic Sibson interpolant is used.
- *
+ * <p>
  * The interpolation weights, also called "Sibson coordinates", are volumes 
  * of overlapping Voronoi polyhedra, normalized so that they sum to one for 
  * any interpolation point (x1,x2,x3). Various implementations of Sibson 
  * interpolation differ primarily in how those volumes are computed.
- * 
+ * <p>
+ * The basic Sibson interpolant is C1 (that is, it's gradient is continuous) 
+ * at all points (x1,x2,x3) except at the sample points, where it is C0. 
+ * Sibson (1981) also described an extension of his interpolant that is 
+ * everywhere C1 and therefore smoother. This smoother interpolant requires 
+ * gradients at the sample points, and those gradients can be estimated or
+ * specified explicitly.
+ * <p>
+ * The use of gradients is controlled by a gradient power. If this power 
+ * is zero (the default), then gradients are not used. Sibson's (1981) 
+ * smoother C1 interpolant corresponds to a power of 1.0. Larger powers 
+ * cause the interpolant to more rapidly approach the linear functions 
+ * defined by the values specified and gradients specified or computed 
+ * for each sample point.
+ * <p>
+ * Sibson's interpolant is undefined at points on or outside the convex 
+ * hull of sample points. In this sense, Sibson interpolation does not 
+ * extrapolate; the interpolant is implicitly bounded by the convex hull,
+ * and null values are returned when attempting to interpolate outside
+ * those bounds.
+ * <p>
+ * To extend the interpolant outside the convex hull, this class enables
+ * bounds to be set explicitly. When bounds are set, extra ghost samples 
+ * are added far outside the convex hull. These ghost samples have no 
+ * values, but they create a larger convex hull so that Sibson coordinates 
+ * can be computed anywhere within the specified bounds. While often useful,
+ * this extrapolation feature should be used with caution, because the 
+ * added ghost samples may alter the Sibson interpolant at points inside 
+ * the original convex hull.
+ * <p>
  * References:
  * <ul><li>
  * Braun, J. and M. Sambridge, 1995, A numerical method for solving partial
@@ -172,9 +193,9 @@ public class SibsonInterpolator3 {
   }
 
   /**
-   * Sets gradients for all samples. If the gradient extent is currently 
-   * zero, then this method also sets the gradient extent to 0.5. To later
-   * ignore gradients that have been set, the gradient extent can be reset
+   * Sets gradients for all samples. If the gradient power is currently 
+   * zero, then this method also sets the gradient power to one. To later
+   * ignore gradients that have been set, the gradient power can be reset
    * to zero.
    * @param g1 array of 1st components of gradients.
    * @param g2 array of 2nd components of gradients.
@@ -192,73 +213,126 @@ public class SibsonInterpolator3 {
       data.gz = g3[index];
     }
     _haveGradients = true;
-    if (_gradientExtent==0.0)
-      _gradientExtent = 0.5;
+    if (_gradientPower==0.0)
+      _gradientPower = 1.0;
   }
 
   /**
-   * Sets the extent of gradients for this interpolator. The default 
-   * gradient extent is zero, which implies no use of gradients and
+   * Sets the power of gradients for this interpolator. The default 
+   * gradient power is zero, which implies no use of gradients and
    * a basic Sibson interpolant that is smooth (C1) everywhere except 
    * at the specified sample points (where it is C0).
    * <p>
-   * If the gradient extent is set to a non-zero value, and if gradients 
+   * If the gradient power is set to a non-zero value, and if gradients 
    * have not been set explicitly, then this method will also estimate 
-   * gradients for all samples as described by Sibson (1981).
+   * gradients for all samples, as described by Sibson (1981).
    * <p>
-   * Sibson's (1981) original formulation corresponds to an extent of 0.5. 
-   * Larger values cause the interpolant to more rapidly approach a linear 
-   * function near each sample point location.
-   * @param gradientExtent the gradient extent.
+   * If bounds are set explicitly, gradient estimates can be improved 
+   * by setting the bounds <em>before</em> calling this method.
+   * @param gradientPower the gradient power.
    */
-  public void setGradientExtent(double gradientExtent) {
-    if (!_haveGradients && gradientExtent>=0.0)
+  public void setGradientPower(double gradientPower) {
+    if (!_haveGradients && gradientPower>=0.0)
       computeGradients();
-    _gradientExtent = gradientExtent;
+    _gradientPower = gradientPower;
   }
 
   /**
    * Sets the null value for this interpolator.
-   * This null value is returned when interpolation is not feasible;
-   * e.g., when the interpolate point lies outside the convex hull of 
-   * sample coordinates. The default null value is zero.
+   * This null value is returned when interpolation is attempted at a
+   * point that lies outside the bounds of this interpolator. Those 
+   * bounds are by default the convex hull of the sample points, but 
+   * may also be set explicitly. The default null value is zero.
    * @param fnull the null value.
    */
   public void setNullValue(float fnull) {
     _fnull = fnull;
   }
 
-  public void setOuterBox(
+  /**
+   * Sets a bounding box for this interpolator.
+   * Sibson interpolation is undefined for points (x1,x2,x3) outside the 
+   * convex hull of sample points, so the default bounds are that convex 
+   * hull. This method enables extrapolation for points outside the convex 
+   * hull, while restricting interpolation to points inside the box.
+   * <p>
+   * If gradients are to be computed (not specified explicitly), it is best 
+   * to set bounds by calling this method before computing gradients.
+   * @param x1min lower bound on x1.
+   * @param x1max upper bound on x1.
+   * @param x2min lower bound on x2.
+   * @param x2max upper bound on x2.
+   * @param x3min lower bound on x3.
+   * @param x3max upper bound on x3.
+   */
+  public void setBounds(
     float x1min, float x1max,
     float x2min, float x2max,
     float x3min, float x3max) 
   {
-    Check.argument(x1min<x1max,"x1min<x1max");
-    Check.argument(x2min<x2max,"x2min<x2max");
-    Check.argument(x3min<x3max,"x3min<x3max");
-    x1min -= (x1max-x1min); x1max += (x1max-x1min);
-    x2min -= (x2max-x2min); x2max += (x2max-x2min);
-    x3min -= (x3max-x3min); x3max += (x3max-x3min);
-    //x1min -= Math.ulp(x1min); x1max += Math.ulp(x1max);
-    //x2min -= Math.ulp(x2min); x2max += Math.ulp(x2max);
-    //x3min -= Math.ulp(x3min); x3max += Math.ulp(x3max);
-    float[] x1s = {x1min,x1max,x1min,x1max,x1min,x1max,x1min,x1max};
-    float[] x2s = {x2min,x2min,x2max,x2max,x2min,x2min,x2max,x2max};
-    float[] x3s = {x3min,x3min,x3min,x3min,x3max,x3max,x3max,x3max};
+    // Remember the specified bounding box.
+    _xmin = x1min; _xmax = x1max;
+    _ymin = x2min; _ymax = x2max;
+    _zmin = x3min; _zmax = x3max;
+    _useBoundingBox = true;
+
+    // Now compute coordinates for ghost nodes. Push these far outside the
+    // box, to reduce their influence when interpolating inside the box.
+    float scale = 1.0f;
+    x1min -= scale*(x1max-x1min); x1max += scale*(x1max-x1min);
+    x2min -= scale*(x2max-x2min); x2max += scale*(x2max-x2min);
+    x3min -= scale*(x3max-x3min); x3max += scale*(x3max-x3min);
+    float[] x1g = {x1min,x1max,x1min,x1max,x1min,x1max,x1min,x1max};
+    float[] x2g = {x2min,x2min,x2max,x2max,x2min,x2min,x2max,x2max};
+    float[] x3g = {x3min,x3min,x3min,x3min,x3max,x3max,x3max,x3max};
+
+    // Add ghost nodes with null data if outside the convex hull.
     for (int i=0; i<8; ++i) {
-      float x1 = x1s[i], x2 = x2s[i], x3 = x3s[i];
+      float x1 = x1g[i], x2 = x2g[i], x3 = x3g[i];
       TetMesh.PointLocation pl = _mesh.locatePoint(x1,x2,x3);
-      if (pl.isOutside()) {
+      if (pl.isOutside())
         _mesh.addNode(new TetMesh.Node(x1,x2,x3));
-      }
     }
   }
 
-  public void setOuterBox(Sampling s1, Sampling s2, Sampling s3)
+  /**
+   * Sets bounds for this interpolator using specified samplings.
+   * Values interpolated within the bounding box of these samplings
+   * are never null, even when the interpolation point (x1,x2,x3) 
+   * lies outside that box.
+   * <p>
+   * If gradients are to be computed (not specified explicitly), it is best 
+   * to set bounds by calling this method before computing gradients.
+   * @param s1 sampling of x1.
+   * @param s2 sampling of x2.
+   * @param s3 sampling of x3.
+   */
+  public void setBounds(Sampling s1, Sampling s2, Sampling s3)
   {
-    setOuterBox((float)s1.getFirst(),(float)s1.getLast(),
-                (float)s2.getFirst(),(float)s2.getLast(),
-                (float)s3.getFirst(),(float)s3.getLast());
+    setBounds((float)s1.getFirst(),(float)s1.getLast(),
+              (float)s2.getFirst(),(float)s2.getLast(),
+              (float)s3.getFirst(),(float)s3.getLast());
+  }
+
+  /**
+   * If bounds have been set explicitly, this method unsets them,
+   * so that the convex hull of sample points will be used instead.
+   */
+  public void useConvexHullBounds() {
+    _useBoundingBox = false;
+
+    // Make a list of all ghost nodes.
+    ArrayList<TetMesh.Node> gnodes = new ArrayList<TetMesh.Node>(8);
+    TetMesh.NodeIterator ni = _mesh.getNodes();
+    while (ni.hasNext()) {
+      TetMesh.Node n = ni.next();
+      if (data(n)==null)
+        gnodes.add(n);
+    }
+
+    // Remove the ghost nodes from the mesh.
+    for (TetMesh.Node gnode:gnodes)
+      _mesh.removeNode(gnode);
   }
 
   /**
@@ -272,7 +346,7 @@ public class SibsonInterpolator3 {
     double vsum = computeVolumes(x1,x2,x3);
     if (vsum<=0.0)
       return _fnull;
-    if (_haveGradients && _gradientExtent>0.0) {
+    if (_haveGradients && _gradientPower>0.0) {
       return interpolate1(vsum,x1,x2,x3);
     } else {
       return interpolate0(vsum,x1,x2,x3);
@@ -387,28 +461,48 @@ public class SibsonInterpolator3 {
     return vsum;
   }
 
-  private float _fnull; // null value when interpolation not feasible
-  private boolean _extrap; // true, for extrapolation; false, otherwise
   private TetMesh _mesh; // the mesh
   private TetMesh.NodeList _nodeList; // list of natural neighbor nodes
   private TetMesh.TetList _tetList; // list of natural neighbor tets
   private VolumeAccumulator _va; // accumulates Sibson's volumes
   private boolean _haveGradients; // true if mesh nodes have gradients
-  private double _gradientExtent; // extent of gradients
-
-  private static void extrapolate(
-    TetMesh mesh, Sampling s1, Sampling s2, Sampling s3)
-  {
-  }
+  private double _gradientPower; // power of gradients
+  private float _fnull; // returned when interpolation point out of bounds
+  private float _xmin,_xmax,_ymin,_ymax,_zmin,_zmax; // bounding box
+  private boolean _useBoundingBox; // true if using bounding box
 
   // Returns a tet mesh built from specified scattered samples.
-  private TetMesh makeMesh(
-    float[] f, float[] x1, float[] x2, float[] x3) 
-  {
-    int n = x1.length;
+  private TetMesh makeMesh(float[] f, float[] x, float[] y, float[] z) {
+    int n = x.length;
+
+    // Find bounding box for sample points.
+    float xmin = x[0], xmax = x[0];
+    float ymin = y[0], ymax = y[0];
+    float zmin = z[0], zmax = z[0];
+    for (int i=1; i<n; ++i) {
+      if (x[i]<xmin) xmin = x[i]; if (x[i]>xmax) xmax = x[i];
+      if (y[i]<ymin) ymin = y[i]; if (y[i]>ymax) ymax = y[i];
+      if (z[i]<zmin) zmin = z[i]; if (z[i]>zmax) zmax = z[i];
+    }
+
+    // Construct the mesh with nodes at sample points.
     TetMesh mesh = new TetMesh();
     for (int i=0; i<n; ++i) {
-      TetMesh.Node node = new TetMesh.Node(x1[i],x2[i],x3[i]);
+      float xi = x[i];
+      float yi = y[i];
+      float zi = z[i];
+
+      // Push out slightly any points that are on the bounding box.
+      // This perturbation enlarges slightly the convex hull of the sample
+      // points, and thereby compensates for rounding errors that would 
+      // otherwise cause interpolation points on the convex hull to appear 
+      // outside the hull.
+      if (xi==xmin) xi -= Math.ulp(xi); if (xi==xmax) xi += Math.ulp(xi);
+      if (yi==ymin) yi -= Math.ulp(yi); if (yi==ymax) yi += Math.ulp(yi);
+      if (zi==zmin) zi -= Math.ulp(zi); if (zi==zmax) zi += Math.ulp(zi);
+
+      // Add a new node to the mesh, unless one already exists there.
+      TetMesh.Node node = new TetMesh.Node(xi,yi,zi);
       if (mesh.addNode(node)) {
         NodeData data = new NodeData();
         node.data = data;
@@ -423,9 +517,19 @@ public class SibsonInterpolator3 {
   // Computes Sibson volumes for the specified point (x,y,z).
   // Returns true, if successful; false, otherwise.
   private double computeVolumes(float x, float y, float z) {
+    if (!inBounds(x,y,z))
+      return 0.0;
     if (!getNaturalNabors(x,y,z))
       return 0.0;
     return _va.accumulateVolumes(x,y,z,_mesh,_nodeList,_tetList);
+  }
+
+  // Returns true if not using bounding box or if point is inside the box.
+  private boolean inBounds(float x, float y, float z) {
+    return !_useBoundingBox ||
+           _xmin<=x && x<=_xmax &&
+           _ymin<=y && y<=_ymax &&
+           _zmin<=z && z<=_zmax;
   }
 
   // Gets lists of natural neighbor nodes and tets of point (x,y,z).
@@ -444,9 +548,7 @@ public class SibsonInterpolator3 {
     addTet(x,y,z,pl.tet());
     return true;
   }
-  private void addTet(
-    double xp, double yp, double zp, TetMesh.Tet tet)
-  {
+  private void addTet(double xp, double yp, double zp, TetMesh.Tet tet) {
     _mesh.mark(tet);
     _tetList.add(tet);
     addNode(tet.nodeA());
@@ -529,12 +631,7 @@ public class SibsonInterpolator3 {
       double dd = dx*dx+dy*dy+dz*dz;
       if (dd==0.0)
         return (float)f;
-      double d = dd;
-      if (_gradientExtent==1.0) {
-        d = Math.sqrt(dd);
-      } else if (_gradientExtent!=2.0) {
-        d = Math.pow(dd,_gradientExtent);
-      }
+      double d = Math.pow(dd,0.5*_gradientPower);
       double wd = w*d;
       double wod = w/d;
       double wdd = w*dd;
@@ -553,8 +650,8 @@ public class SibsonInterpolator3 {
   // Computes gradient vectors for each node in the mesh. Uses Sibson's 
   // (1981) method, which yields gradients that will interpolate precisely 
   // a spherical quadratic of the form f(x) = f + g'x + h*x'x, for scalars
-  // f and h and gradient vector g. This function f(x) is called a spherical
-  // Gradients for nodes on the convex hull are not modified by this method.
+  // f and h and gradient vector g. Gradients for nodes on the convex hull 
+  // are not modified by this method.
   private void computeGradients() {
     int nnode = _mesh.countNodes();
     TetMesh.Node[] nodes = new TetMesh.Node[nnode];
@@ -651,11 +748,11 @@ public class SibsonInterpolator3 {
         Geometry.centerSphere(xp,yp,zp,xa,ya,za,xd,yd,zd,xc,yc,zc,_cb);
         Geometry.centerSphere(xp,yp,zp,xa,ya,za,xb,yb,zb,xd,yd,zd,_cc);
         Geometry.centerSphere(xp,yp,zp,xa,ya,za,xc,yc,zc,xb,yb,zb,_cd);
-        Geometry.centerSphere(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,_cv);
-        double va = volume(_cb,_cc,_cd,_cv);
-        double vb = volume(_ca,_cd,_cc,_cv);
-        double vc = volume(_ca,_cb,_cd,_cv);
-        double vd = volume(_ca,_cc,_cb,_cv);
+        Geometry.centerSphere(xa,ya,za,xb,yb,zb,xc,yc,zc,xd,yd,zd,_ct);
+        double va = volume(_cb,_cc,_cd,_ct);
+        double vb = volume(_ca,_cd,_cc,_ct);
+        double vc = volume(_ca,_cb,_cd,_ct);
+        double vd = volume(_ca,_cc,_cb,_ct);
         vsum = accumulateVolume(na,va,vsum);
         vsum = accumulateVolume(nb,vb,vsum);
         vsum = accumulateVolume(nc,vc,vsum);
@@ -667,12 +764,12 @@ public class SibsonInterpolator3 {
     private double[] _cb = new double[3]; // circumcenter of fake tet padc
     private double[] _cc = new double[3]; // circumcenter of fake tet pabd
     private double[] _cd = new double[3]; // circumcenter of fake tet pacb
-    private double[] _cv = new double[3]; // circumcenter of real tet abcd
-    private double volume(double[] ci, double[] cj, double[] ck, double[] cv) {
-      double xv = cv[0],    yv = cv[1],    zv = cv[2];
-      double xi = ci[0]-xv, yi = ci[1]-yv, zi = ci[2]-zv;
-      double xj = cj[0]-xv, yj = cj[1]-yv, zj = cj[2]-zv;
-      double xk = ck[0]-xv, yk = ck[1]-yv, zk = ck[2]-zv;
+    private double[] _ct = new double[3]; // circumcenter of real tet abcd
+    private double volume(double[] ci, double[] cj, double[] ck, double[] ct) {
+      double xt = ct[0],    yt = ct[1],    zt = ct[2];
+      double xi = ci[0]-xt, yi = ci[1]-yt, zi = ci[2]-zt;
+      double xj = cj[0]-xt, yj = cj[1]-yt, zj = cj[2]-zt;
+      double xk = ck[0]-xt, yk = ck[1]-yt, zk = ck[2]-zt;
       return xi*(yj*zk-yk*zj)+yi*(zj*xk-zk*xj)+zi*(xj*yk-xk*yj);
     }
   }
@@ -696,12 +793,12 @@ public class SibsonInterpolator3 {
         double x2j = jnode.yp();
         double x3j = jnode.zp();
 
-        // Clear the polygon for the j'th natural neighbor.
+        // Clear the polyhedron for the j'th natural neighbor.
         _lv.clear();
 
         // Add half-space of points closer to point pi than to point pj.
         // For this half-space we set b = 0, which is equivalent to 
-        // making the midpoint ps the origin for the polygon.
+        // making the midpoint ps the origin for the polyhedron.
         // A half-space with b = 0 speeds up Lassere's algorithm.
         double x1s = 0.5*(x1j+x1i);
         double x2s = 0.5*(x2j+x2i);
@@ -734,7 +831,7 @@ public class SibsonInterpolator3 {
           _lv.addHalfSpace(x1e,x2e,x3e,x1e*x1t+x2e*x2t+x3e*x3t);
         }
 
-        // Volume of polygon for this natural neighbor.
+        // Volume of polyhedron for this natural neighbor.
         double vj = _lv.getVolume();
         vsum = accumulateVolume(jnode,vj,vsum);
       }
@@ -777,6 +874,7 @@ public class SibsonInterpolator3 {
       }
     }
 
+    // Processes all natural-neighbor tets.
     private void processTets(
       double xp, double yp, double zp, 
       TetMesh mesh, TetMesh.TetList tetList) 
@@ -861,7 +959,7 @@ public class SibsonInterpolator3 {
       for (int iface=0; iface<nface; ++iface) {
         Face face = faces.get(iface);
         if (face.fa==null || face.fb==null || face.fc==null) {
-          //System.out.println("null face nabor: x="+x+" y="+y+" z="+z);
+          //System.out.println("null face nabor: x="+xp+" y="+yp+" z="+zp);
           return false;
         }
       }
@@ -927,7 +1025,7 @@ public class SibsonInterpolator3 {
     // exactly three face neighbors.
     private static class FaceList {
       private int _nface;
-      private ArrayList<Face> _faces = new ArrayList<Face>();
+      private ArrayList<Face> _faces = new ArrayList<Face>(48);
       int nface() {
         return _nface;
       }

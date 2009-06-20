@@ -33,10 +33,10 @@ public class SibsonInterpolator2Test extends TestCase {
   private static final float XMAX = 1.0f;
 
   // Number of scattered samples to be interpolated.
-  private static final int NS = 100;
+  private static final int NS = 121;
 
   // Uniform sampling used in interpolation.
-  private static final int NX = 501;
+  private static final int NX = 201;
   private static final double DX = (XMAX-XMIN)/(NX-1);
   private static final double FX = XMIN;
   private static final Sampling SX = new Sampling(NX,DX,FX);
@@ -51,6 +51,7 @@ public class SibsonInterpolator2Test extends TestCase {
 
   public void testSine() {
     TestFunction tf = TestFunction.makeSine();
+    //TestFunction tf = TestFunction.makeLinear();
     testScattered(tf);
     testUniform(tf);
   }
@@ -68,9 +69,13 @@ public class SibsonInterpolator2Test extends TestCase {
   private void testMethods(TestFunction tf, float[][] fx) {
     float[] f = fx[0], x1 = fx[1], x2 = fx[2];
     SibsonInterpolator2.Method[] methods = {HL,BS,WS};
+    //SibsonInterpolator2.Method[] methods = {HL};
     for (int i=0; i<methods.length; ++i) {
       SibsonInterpolator2.Method method = methods[i];
       SibsonInterpolator2 si = new SibsonInterpolator2(method,f,x1,x2);
+      si.setNullValue(1.0f);
+      //si.setBounds(SX,SX);
+      si.setGradientPower(1.0);
       double tmin = Double.MAX_VALUE;
       float[][] g = null;
       for (int iter=0; iter<3; ++iter) {
@@ -96,9 +101,12 @@ public class SibsonInterpolator2Test extends TestCase {
         sp.setSize(700,745);
         PixelsView pv = sp.addPixels(SX,SX,g);
         pv.setColorModel(ColorMap.JET);
+        pv.setInterpolation(PixelsView.Interpolation.NEAREST);
+        //pv.setClips(0.0f,1.0f);
         PointsView px = sp.addPoints(x1,x2);
         px.setLineStyle(PointsView.Line.NONE);
         px.setMarkStyle(PointsView.Mark.FILLED_CIRCLE);
+        px.setMarkSize(6);
       }
     });
   }

@@ -4,7 +4,7 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.mesh;
+package edu.mines.jtk.interp;
 
 import java.util.ArrayList;
 import edu.mines.jtk.util.Check;
