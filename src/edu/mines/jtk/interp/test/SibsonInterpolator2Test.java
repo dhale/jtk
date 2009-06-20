@@ -33,7 +33,7 @@ public class SibsonInterpolator2Test extends TestCase {
   private static final float XMAX = 1.0f;
 
   // Number of scattered samples to be interpolated.
-  private static final int NS = 121;
+  private static final int NS = 49;
 
   // Uniform sampling used in interpolation.
   private static final int NX = 201;
@@ -74,7 +74,7 @@ public class SibsonInterpolator2Test extends TestCase {
       SibsonInterpolator2.Method method = methods[i];
       SibsonInterpolator2 si = new SibsonInterpolator2(method,f,x1,x2);
       si.setNullValue(1.0f);
-      //si.setBounds(SX,SX);
+      si.setBounds(SX,SX);
       si.setGradientPower(1.0);
       double tmin = Double.MAX_VALUE;
       float[][] g = null;
@@ -102,7 +102,7 @@ public class SibsonInterpolator2Test extends TestCase {
         PixelsView pv = sp.addPixels(SX,SX,g);
         pv.setColorModel(ColorMap.JET);
         pv.setInterpolation(PixelsView.Interpolation.NEAREST);
-        //pv.setClips(0.0f,1.0f);
+        pv.setClips(0.0f,1.0f);
         PointsView px = sp.addPoints(x1,x2);
         px.setLineStyle(PointsView.Line.NONE);
         px.setMarkStyle(PointsView.Mark.FILLED_CIRCLE);

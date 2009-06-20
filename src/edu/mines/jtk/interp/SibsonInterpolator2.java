@@ -9,6 +9,7 @@ package edu.mines.jtk.interp;
 import java.util.ArrayList;
 
 import edu.mines.jtk.dsp.*;
+import edu.mines.jtk.la.*;
 import edu.mines.jtk.mesh.*;
 import edu.mines.jtk.util.*;
 
@@ -255,27 +256,23 @@ public class SibsonInterpolator2 {
    * @param x2max upper bound on x2.
    */
   public void setBounds(float x1min, float x1max, float x2min, float x2max) {
+    Check.argument(x1min<x1max,"x1min<x1max");
+    Check.argument(x2min<x2max,"x2min<x2max");
 
     // Remember the specified bounding box.
     _xmin = x1min; _xmax = x1max;
     _ymin = x2min; _ymax = x2max;
     _useBoundingBox = true;
 
-    // Now compute coordinates for ghost nodes. Push these far outside the
-    // box, to reduce their influence when interpolating inside the box.
+    // Now compute coordinates for ghost nodes.
     float scale = 0.1f;
     x1min -= scale*(x1max-x1min); x1max += scale*(x1max-x1min);
     x2min -= scale*(x2max-x2min); x2max += scale*(x2max-x2min);
+
+    // Add the ghost nodes to the mesh.
     float[] x1g = {x1min,x1max,x1min,x1max};
     float[] x2g = {x2min,x2min,x2max,x2max};
-
-    // Add ghost nodes with null data if outside the convex hull.
-    for (int i=0; i<4; ++i) {
-      float x1 = x1g[i], x2 = x2g[i];
-      TriMesh.PointLocation pl = _mesh.locatePoint(x1,x2);
-      if (pl.isOutside())
-        _mesh.addNode(new TriMesh.Node(x1,x2));
-    }
+    addGhostNodes(x1g,x2g);
   }
 
   /**
@@ -300,19 +297,7 @@ public class SibsonInterpolator2 {
    */
   public void useConvexHullBounds() {
     _useBoundingBox = false;
-
-    // Make a list of all ghost nodes.
-    ArrayList<TriMesh.Node> gnodes = new ArrayList<TriMesh.Node>(4);
-    TriMesh.NodeIterator ni = _mesh.getNodes();
-    while (ni.hasNext()) {
-      TriMesh.Node n = ni.next();
-      if (data(n)==null)
-        gnodes.add(n);
-    }
-
-    // Remove the ghost nodes from the mesh.
-    for (TriMesh.Node gnode:gnodes)
-      _mesh.removeNode(gnode);
+    removeGhostNodes();
   }
 
   /**
@@ -322,6 +307,8 @@ public class SibsonInterpolator2 {
    * @return the interpolated value.
    */
   public float interpolate(float x1, float x2) {
+    if (!inBounds(x1,x2))
+      return _fnull;
     double asum = computeAreas(x1,x2);
     if (asum<=0.0)
       return _fnull;
@@ -367,6 +354,8 @@ public class SibsonInterpolator2 {
    * @return array of sample indices and weights; null if none.
    */
   public IndexWeight[] getIndexWeights(float x1, float x2) {
+    if (!inBounds(x1,x2))
+      return null;
     float wsum = (float)computeAreas(x1,x2);
     if (wsum==0.0f)
       return null;
@@ -400,6 +389,7 @@ public class SibsonInterpolator2 {
   private static class NodeData {
     float f,gx,gy; // function values and gradient
     double area; // area for Sibson weight
+    boolean ghost; // true if ghost node
   }
   private static NodeData data(TriMesh.Node node) {
     return (NodeData)node.data;
@@ -416,6 +406,9 @@ public class SibsonInterpolator2 {
   private static double area(TriMesh.Node node) {
     return data(node).area;
   }
+  private static boolean ghost(TriMesh.Node node) {
+    return data(node).ghost;
+  }
 
   // This method is used by AreaAccumulator implementations defined below.
   // Note that it accumulates areas for only those nodes with data. In
@@ -424,10 +417,8 @@ public class SibsonInterpolator2 {
     TriMesh.Node node, double a, double asum) 
   {
     NodeData data = data(node);
-    if (data!=null) {
-      data.area += a;
-      asum += a;
-    }
+    data.area += a;
+    asum += a;
     return asum;
   }
 
@@ -480,11 +471,89 @@ public class SibsonInterpolator2 {
     return mesh;
   }
 
+  // Adds ghost nodes to the mesh with estimated values and gradients.
+  // The arrays x[ng] and y[ng] contain coordinates of ng ghost nodes.
+  // Function values and gradients are computed by inverse-distance 
+  // weighted least-squares fitting of function values for real nodes.
+  private void addGhostNodes(float[] x, float[] y) {
+    int ng = x.length;
+    int nn = _mesh.countNodes();
+
+    // Construct ng systems of nn equations for 3 fitting parameters
+    DMatrix[] a = new DMatrix[ng];
+    DMatrix[] b = new DMatrix[ng];
+    for (int ig=0; ig<ng; ++ig) {
+      a[ig] = new DMatrix(nn,3); // nn equations for 3 parameters
+      b[ig] = new DMatrix(nn,1); // nn function values to fit
+    }
+    TriMesh.NodeIterator ni = _mesh.getNodes();
+    for (int in=0; in<nn; ++in) {
+      TriMesh.Node n = ni.next();
+      double fn = f(n);
+      double xn = n.xp();
+      double yn = n.yp();
+      for (int ig=0; ig<ng; ++ig) {
+        double xg = x[ig];
+        double yg = y[ig];
+        double dx = xn-xg;
+        double dy = yn-yg;
+        double wn = 1.0/Math.sqrt(dx*dx+dy*dy);
+        a[ig].set(in,0,wn);
+        a[ig].set(in,1,wn*dx);
+        a[ig].set(in,2,wn*dy);
+        b[ig].set(in,0,wn*fn);
+      }
+    }
+
+    // Construct and add ghost nodes that are outside the convex hull.
+    // For each ghost node added, use weighted least-squares fitting to
+    // estimate the function value and gradient.
+    for (int ig=0; ig<ng; ++ig) {
+      float xg = x[ig];
+      float yg = y[ig];
+      TriMesh.PointLocation pl = _mesh.locatePoint(xg,yg);
+      if (pl.isOutside()) {
+        TriMesh.Node n = new TriMesh.Node(xg,yg);
+        _mesh.addNode(n);
+        NodeData data = new NodeData();
+        n.data = data;
+        DMatrixQrd qrd = new DMatrixQrd(a[ig]);
+        if (qrd.isFullRank()) { // if more than three nodes (or what?), ...
+          DMatrix s = qrd.solve(b[ig]);
+          data.f = (float)s.get(0,0);
+          data.gx = (float)s.get(1,0);
+          data.gy = (float)s.get(2,0);
+        } else { // otherwise, just use value of nearest node
+          TriMesh.Node m = _mesh.findNodeNearest(xg,yg);
+          data.f = f(m);
+          data.gx = 0.0f;
+          data.gy = 0.0f;
+        }
+        data.ghost = true;
+      }
+    }
+  }
+
+  // Removes any ghost nodes from the mesh.
+  private void removeGhostNodes() {
+
+    // First make a list of all ghost nodes.
+    ArrayList<TriMesh.Node> gnodes = new ArrayList<TriMesh.Node>(4);
+    TriMesh.NodeIterator ni = _mesh.getNodes();
+    while (ni.hasNext()) {
+      TriMesh.Node n = ni.next();
+      if (ghost(n))
+        gnodes.add(n);
+    }
+
+    // Then remove the ghost nodes from the mesh.
+    for (TriMesh.Node gnode:gnodes)
+      _mesh.removeNode(gnode);
+  }
+
   // Computes Sibson areas for the specified point (x,y).
   // Returns true, if successful; false, otherwise.
   private double computeAreas(float x, float y) {
-    if (!inBounds(x,y))
-      return 0.0;
     if (!getNaturalNabors(x,y))
       return 0.0;
     return _va.accumulateAreas(x,y,_mesh,_nodeList,_triList);
@@ -532,8 +601,7 @@ public class SibsonInterpolator2 {
     _mesh.mark(node);
     _nodeList.add(node);
     NodeData data = data(node);
-    if (data!=null)
-      data.area = 0.0;
+    data.area = 0.0;
   }
   private boolean needTri(double xp, double yp, TriMesh.Tri tri) {
     if (tri==null || _mesh.isMarked(tri))
@@ -554,11 +622,9 @@ public class SibsonInterpolator2 {
     TriMesh.Node[] nodes = _nodeList.nodes();
     for (int inode=0; inode<nnode; ++inode) {
       TriMesh.Node node = nodes[inode];
-      if (data(node)!=null) {
-        float f = f(node);
-        double a = area(node);
-        afsum += a*f;
-      }
+      float f = f(node);
+      double a = area(node);
+      afsum += a*f;
     }
     return (float)(afsum/asum);
   }
@@ -574,8 +640,6 @@ public class SibsonInterpolator2 {
     double wods = 0.0;
     for (int inode=0; inode<nnode; ++inode) {
       TriMesh.Node n = nodes[inode];
-      if (data(n)==null)
-        continue;
       double f = f(n);
       double gx = gx(n);
       double gy = gy(n);
@@ -617,9 +681,9 @@ public class SibsonInterpolator2 {
       nodes[inode] = ni.next();
     for (int inode=0; inode<nnode; ++inode) {
       TriMesh.Node n = nodes[inode];
-      NodeData data = data(n);
-      if (data==null)
+      if (ghost(n))
         continue;
+      NodeData data = data(n);
       double fn = data.f;
       double xn = n.xp();
       double yn = n.yp();
@@ -632,8 +696,6 @@ public class SibsonInterpolator2 {
         double px = 0.0, py = 0.0;
         for (int im=0; im<nm; ++im) {
           TriMesh.Node m = ms[im];
-          if (data(m)==null)
-            continue;
           double fm = f(m);
           double wm = area(m);
           double xm = m.xp();
@@ -796,10 +858,8 @@ public class SibsonInterpolator2 {
 
     private void addArea(TriMesh.Node node, double a) {
       NodeData data = data(node);
-      if (data!=null) {
-        data.area += a;
-        _asum += a;
-      }
+      data.area += a;
+      _asum += a;
     }
 
     // Processes all natural-neighbor tris.
