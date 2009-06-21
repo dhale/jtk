@@ -83,7 +83,7 @@ public class SibsonInterpolator3 {
 
   /**
    * The implementation method. Methods differ in the algorithm by which 
-   * Sibson coordinates (polyhedral volumes) are computed for natural 
+   * Sibson coordinates (polyhedron volumes) are computed for natural 
    * neighbors.
    */
   public enum Method {
@@ -227,7 +227,7 @@ public class SibsonInterpolator3 {
    * gradients for all samples, as described by Sibson (1981).
    * <p>
    * If bounds are set explicitly, gradient estimates can be improved 
-   * by setting the bounds <em>before</em> calling this method.
+   * by setting the bounds before calling this method.
    * @param gradientPower the gradient power.
    */
   public void setGradientPower(double gradientPower) {
@@ -269,6 +269,10 @@ public class SibsonInterpolator3 {
     float x2min, float x2max,
     float x3min, float x3max) 
   {
+    Check.argument(x1min<x1max,"x1min<x1max");
+    Check.argument(x2min<x2max,"x2min<x2max");
+    Check.argument(x3min<x3max,"x3min<x3max");
+
     // Remember the specified bounding box.
     _xmin = x1min; _xmax = x1max;
     _ymin = x2min; _ymax = x2max;
@@ -619,8 +623,6 @@ public class SibsonInterpolator3 {
           data.gx = (float)s.get(1,0);
           data.gy = (float)s.get(2,0);
           data.gz = (float)s.get(3,0);
-          System.out.println("ig="+ig+" gx="+data.gx+
-                             " gy="+data.gy+" gz="+data.gz); 
         } else { // otherwise, just use value of nearest node
           TetMesh.Node m = _mesh.findNodeNearest(xg,yg,zg);
           data.f = f(m);
@@ -1088,10 +1090,8 @@ public class SibsonInterpolator3 {
       ArrayList<Face> faces = _faceList.faces();
       for (int iface=0; iface<nface; ++iface) {
         Face face = faces.get(iface);
-        if (face.fa==null || face.fb==null || face.fc==null) {
-          //System.out.println("null face nabor: x="+xp+" y="+yp+" z="+zp);
+        if (face.fa==null || face.fb==null || face.fc==null)
           return false;
-        }
       }
       return true;
     }

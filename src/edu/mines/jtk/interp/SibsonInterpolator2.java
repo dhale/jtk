@@ -224,7 +224,7 @@ public class SibsonInterpolator2 {
    * gradients for all samples, as described by Sibson (1981).
    * <p>
    * If bounds are set explicitly, gradient estimates can be improved 
-   * by setting the bounds <em>before</em> calling this method.
+   * by setting the bounds before calling this method.
    * @param gradientPower the gradient power.
    */
   public void setGradientPower(double gradientPower) {
