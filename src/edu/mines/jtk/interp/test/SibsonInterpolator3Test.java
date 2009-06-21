@@ -89,7 +89,7 @@ public class SibsonInterpolator3Test extends TestCase {
     int n1 = NX, n2 = NX, n3 = NX;
     Sampling s1 = SX, s2 = SX, s3 = SX;
     float[][][] g = si.interpolate(s1,s2,s3);
-    plot(m,g);
+    //plot(m,g);
     for (int i3=0; i3<n3; ++i3) {
       float x3i = (float)s3.getValue(i3);
       for (int i2=0; i2<n2; ++i2) {
@@ -104,8 +104,8 @@ public class SibsonInterpolator3Test extends TestCase {
   }
 
   public static void benchMethods() {
-    TestFunction tf = TestFunction.makeSine();
-    //TestFunction tf = TestFunction.makeLinear();
+    //TestFunction tf = TestFunction.makeSine();
+    TestFunction tf = TestFunction.makeLinear();
     testScattered(tf);
     testUniform(tf);
   }
@@ -164,8 +164,8 @@ public class SibsonInterpolator3Test extends TestCase {
   private static void testMethods(TestFunction tf, float[][] fx) {
     float[] f = fx[0], x1 = fx[1], x2 = fx[2], x3 = fx[3];
     System.out.println();
-    SibsonInterpolator3.Method[] methods = {HL,WS,BS};
-    //SibsonInterpolator3.Method[] methods = {HL};
+    //SibsonInterpolator3.Method[] methods = {HL,WS,BS};
+    SibsonInterpolator3.Method[] methods = {HL};
     for (int i=0; i<methods.length; ++i) {
       SibsonInterpolator3.Method method = methods[i];
       SibsonInterpolator3 si = new SibsonInterpolator3(method,f,x1,x2,x3);

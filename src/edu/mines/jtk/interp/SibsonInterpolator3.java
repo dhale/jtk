@@ -9,6 +9,7 @@ package edu.mines.jtk.interp;
 import java.util.ArrayList;
 
 import edu.mines.jtk.dsp.*;
+import edu.mines.jtk.la.*;
 import edu.mines.jtk.mesh.*;
 import edu.mines.jtk.util.*;
 
@@ -180,7 +181,7 @@ public class SibsonInterpolator3 {
   public SibsonInterpolator3(
     Method method, float[] f, float[] x1, float[] x2, float[] x3) 
   {
-    _mesh = makeMesh(f,x1,x2,x3);
+    makeMesh(f,x1,x2,x3);
     _nodeList = new TetMesh.NodeList();
     _tetList = new TetMesh.TetList();
     if (method==Method.WATSON_SAMBRIDGE) {
@@ -202,15 +203,13 @@ public class SibsonInterpolator3 {
    * @param g3 array of 3rd components of gradients.
    */
   public void setGradients(float[] g1, float[] g2, float[] g3) {
-    int nnode = _mesh.countNodes();
-    TetMesh.NodeIterator ni = _mesh.getNodes();
-    while (ni.hasNext()) {
-      TetMesh.Node n = ni.next();
-      int index = n.index;
-      NodeData data = data(n);
-      data.gx = g1[index];
-      data.gy = g2[index];
-      data.gz = g3[index];
+    int n = g1.length;
+    for (int i=0; i<n; ++i) {
+      TetMesh.Node node = _nodes[i];
+      NodeData data = data(node);
+      data.gx = g1[i];
+      data.gy = g2[i];
+      data.gz = g3[i];
     }
     _haveGradients = true;
     if (_gradientPower==0.0)
@@ -233,7 +232,7 @@ public class SibsonInterpolator3 {
    */
   public void setGradientPower(double gradientPower) {
     if (!_haveGradients && gradientPower>=0.0)
-      computeGradients();
+      estimateGradients();
     _gradientPower = gradientPower;
   }
 
@@ -276,23 +275,15 @@ public class SibsonInterpolator3 {
     _zmin = x3min; _zmax = x3max;
     _useBoundingBox = true;
 
-    // Now compute coordinates for ghost nodes. Push these far outside the
-    // box, to reduce their influence when interpolating inside the box.
-    float scale = 1.0f;
+    // Compute coordinates for ghost nodes, and add them to the mesh.
+    float scale = 0.1f;
     x1min -= scale*(x1max-x1min); x1max += scale*(x1max-x1min);
     x2min -= scale*(x2max-x2min); x2max += scale*(x2max-x2min);
     x3min -= scale*(x3max-x3min); x3max += scale*(x3max-x3min);
     float[] x1g = {x1min,x1max,x1min,x1max,x1min,x1max,x1min,x1max};
     float[] x2g = {x2min,x2min,x2max,x2max,x2min,x2min,x2max,x2max};
     float[] x3g = {x3min,x3min,x3min,x3min,x3max,x3max,x3max,x3max};
-
-    // Add ghost nodes with null data if outside the convex hull.
-    for (int i=0; i<8; ++i) {
-      float x1 = x1g[i], x2 = x2g[i], x3 = x3g[i];
-      TetMesh.PointLocation pl = _mesh.locatePoint(x1,x2,x3);
-      if (pl.isOutside())
-        _mesh.addNode(new TetMesh.Node(x1,x2,x3));
-    }
+    addGhostNodes(x1g,x2g,x3g);
   }
 
   /**
@@ -320,19 +311,7 @@ public class SibsonInterpolator3 {
    */
   public void useConvexHullBounds() {
     _useBoundingBox = false;
-
-    // Make a list of all ghost nodes.
-    ArrayList<TetMesh.Node> gnodes = new ArrayList<TetMesh.Node>(8);
-    TetMesh.NodeIterator ni = _mesh.getNodes();
-    while (ni.hasNext()) {
-      TetMesh.Node n = ni.next();
-      if (data(n)==null)
-        gnodes.add(n);
-    }
-
-    // Remove the ghost nodes from the mesh.
-    for (TetMesh.Node gnode:gnodes)
-      _mesh.removeNode(gnode);
+    removeGhostNodes();
   }
 
   /**
@@ -343,10 +322,12 @@ public class SibsonInterpolator3 {
    * @return the interpolated value.
    */
   public float interpolate(float x1, float x2, float x3) {
+    if (!inBounds(x1,x2,x3))
+      return _fnull;
     double vsum = computeVolumes(x1,x2,x3);
     if (vsum<=0.0)
       return _fnull;
-    if (_haveGradients && _gradientPower>0.0) {
+    if (usingGradients()) {
       return interpolate1(vsum,x1,x2,x3);
     } else {
       return interpolate0(vsum,x1,x2,x3);
@@ -394,6 +375,8 @@ public class SibsonInterpolator3 {
    * @return array of sample indices and weights; null if none.
    */
   public IndexWeight[] getIndexWeights(float x1, float x2, float x3) {
+    if (!inBounds(x1,x2,x3))
+      return null;
     float wsum = (float)computeVolumes(x1,x2,x3);
     if (wsum==0.0f)
       return null;
@@ -408,6 +391,61 @@ public class SibsonInterpolator3 {
       iw[inode] = new IndexWeight(i,w);
     }
     return iw;
+  }
+
+  /**
+   * Interpolates at the i'th sample point without using the i'th sample.
+   * This method implements leave-one-out cross-validation. The difference
+   * between the i'th sample value and the returned interpolated value is
+   * a measure of error at the i'th sample.
+   * <p>
+   * This method does not recompute gradients that may have been estimated 
+   * using the sample to be validated. Therefore, validation should be 
+   * performed without using gradients. 
+   * <p> 
+   * This method does not recompute values for ghost nodes that may have 
+   * been constructed using the value of the sample to be validated. And 
+   * if bounds have not been set explicitly, then this method will return 
+   * a null values if the validated sample is on the convex hull.
+   * @param i the index of the sample to validate.
+   * @return the value interpolated at the validated sample point.
+   */
+  public float validate(int i) {
+    return validate(new int[]{i})[0];
+  }
+
+  /**
+   * Interpolates at specified sample points without using those samples.
+   * This method implements a form of cross-validation. Differences
+   * between the values of the specified samples and the returned 
+   * interpolated values are measures of errors for those samples.
+   * <p>
+   * This method does not recompute gradients that may have been estimated 
+   * using the samples to be validated. Therefore, validation should be 
+   * performed without using gradients. 
+   * <p> 
+   * This method does not recompute values for ghost nodes that may have 
+   * been constructed using values of samples to be validated. And if
+   * bounds have not been set explicitly, then this method will return 
+   * null values for validated samples on the convex hull.
+   * @param i array of indices of samples to validate.
+   * @return array of values interpolated at validated sample points.
+   */
+  public float[] validate(int[] i) {
+    int nv = i.length;
+    for (int iv=0; iv<nv; ++iv)
+      _mesh.removeNode(_nodes[iv]);
+    float[] fv = new float[nv];
+    for (int iv=0; iv<nv; ++iv) {
+      TetMesh.Node node = _nodes[iv];
+      float xn = node.x();
+      float yn = node.y();
+      float zn = node.z();
+      fv[iv] = interpolate(xn,yn,zn);
+    }
+    for (int iv=0; iv<nv; ++iv)
+      _mesh.addNode(_nodes[iv]);
+    return fv;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -446,6 +484,9 @@ public class SibsonInterpolator3 {
   private static double volume(TetMesh.Node node) {
     return data(node).volume;
   }
+  private static boolean ghost(TetMesh.Node node) {
+    return node.index<0;
+  }
 
   // This method is used by VolumeAccumulator implementations defined below.
   // Note that it accumulates volumes for only those nodes with data. In
@@ -454,14 +495,13 @@ public class SibsonInterpolator3 {
     TetMesh.Node node, double v, double vsum) 
   {
     NodeData data = data(node);
-    if (data!=null) {
-      data.volume += v;
-      vsum += v;
-    }
+    data.volume += v;
+    vsum += v;
     return vsum;
   }
 
   private TetMesh _mesh; // the mesh
+  private TetMesh.Node[] _nodes; // array of real (not ghost) nodes
   private TetMesh.NodeList _nodeList; // list of natural neighbor nodes
   private TetMesh.TetList _tetList; // list of natural neighbor tets
   private VolumeAccumulator _va; // accumulates Sibson's volumes
@@ -472,7 +512,7 @@ public class SibsonInterpolator3 {
   private boolean _useBoundingBox; // true if using bounding box
 
   // Returns a tet mesh built from specified scattered samples.
-  private TetMesh makeMesh(float[] f, float[] x, float[] y, float[] z) {
+  private void makeMesh(float[] f, float[] x, float[] y, float[] z) {
     int n = x.length;
 
     // Find bounding box for sample points.
@@ -485,40 +525,133 @@ public class SibsonInterpolator3 {
       if (z[i]<zmin) zmin = z[i]; if (z[i]>zmax) zmax = z[i];
     }
 
+    // Array of nodes, one for each specified sample.
+    _nodes = new TetMesh.Node[n];
+
     // Construct the mesh with nodes at sample points.
-    TetMesh mesh = new TetMesh();
+    _mesh = new TetMesh();
     for (int i=0; i<n; ++i) {
       float xi = x[i];
       float yi = y[i];
       float zi = z[i];
 
-      // Push out slightly any points that are on the bounding box.
-      // This perturbation enlarges slightly the convex hull of the sample
-      // points, and thereby compensates for rounding errors that would 
-      // otherwise cause interpolation points on the convex hull to appear 
-      // outside the hull.
+      // Push out slightly any points that are on the bounding box. This 
+      // perturbation inflates the convex hull of sample points, so that 
+      // interpolation can be performed at points that would otherwise be 
+      // on (or, due to rounding errors, outside) the convex hull.
       if (xi==xmin) xi -= Math.ulp(xi); if (xi==xmax) xi += Math.ulp(xi);
       if (yi==ymin) yi -= Math.ulp(yi); if (yi==ymax) yi += Math.ulp(yi);
       if (zi==zmin) zi -= Math.ulp(zi); if (zi==zmax) zi += Math.ulp(zi);
 
       // Add a new node to the mesh, unless one already exists there.
       TetMesh.Node node = new TetMesh.Node(xi,yi,zi);
-      if (mesh.addNode(node)) {
-        NodeData data = new NodeData();
-        node.data = data;
-        node.index = i;
-        if (f!=null) 
-          data.f = f[i];
+      boolean added = _mesh.addNode(node);
+      Check.argument(added,"each sample has unique coordinates");
+      NodeData data = new NodeData();
+      node.data = data;
+      node.index = i;
+      if (f!=null) 
+        data.f = f[i];
+      _nodes[i] = node;
+    }
+  }
+
+  // Returns true if gradients are being used in interpolation.
+  private boolean usingGradients() {
+    return _haveGradients && _gradientPower>0.0;
+  }
+
+  // Adds ghost nodes to the mesh with estimated values and gradients.
+  // Arrays x[ng], y[ng] and z[ng] contain coordinates of ng ghost nodes.
+  // Function values and gradients are computed by inverse-distance 
+  // weighted least-squares fitting of function values for real nodes.
+  private void addGhostNodes(float[] x, float[] y, float[] z) {
+    int ng = x.length;
+    int nn = _nodes.length;
+
+    // Construct ng systems of nn equations for 4 fitting parameters
+    DMatrix[] a = new DMatrix[ng];
+    DMatrix[] b = new DMatrix[ng];
+    for (int ig=0; ig<ng; ++ig) {
+      a[ig] = new DMatrix(nn,4); // nn equations for 4 parameters
+      b[ig] = new DMatrix(nn,1); // nn function values to fit
+    }
+    for (int in=0; in<nn; ++in) {
+      TetMesh.Node n = _nodes[in];
+      double fn = f(n);
+      double xn = n.xp();
+      double yn = n.yp();
+      double zn = n.zp();
+      for (int ig=0; ig<ng; ++ig) {
+        double xg = x[ig];
+        double yg = y[ig];
+        double zg = z[ig];
+        double dx = xn-xg;
+        double dy = yn-yg;
+        double dz = zn-zg;
+        double wn = 1.0/Math.sqrt(dx*dx+dy*dy+dz*dz);
+        a[ig].set(in,0,wn);
+        a[ig].set(in,1,wn*dx);
+        a[ig].set(in,2,wn*dy);
+        a[ig].set(in,3,wn*dz);
+        b[ig].set(in,0,wn*fn);
       }
     }
-    return mesh;
+
+    // Construct and add ghost nodes that are outside the convex hull.
+    // For each ghost node added, use weighted least-squares fitting to
+    // estimate the function value and gradient.
+    for (int ig=0; ig<ng; ++ig) {
+      float xg = x[ig];
+      float yg = y[ig];
+      float zg = z[ig];
+      TetMesh.PointLocation pl = _mesh.locatePoint(xg,yg,zg);
+      if (pl.isOutside()) {
+        TetMesh.Node n = new TetMesh.Node(xg,yg,zg);
+        n.index = -1-ig; // ghost nodes have negative indices
+        _mesh.addNode(n);
+        NodeData data = new NodeData();
+        n.data = data;
+        DMatrixQrd qrd = new DMatrixQrd(a[ig]);
+        if (qrd.isFullRank()) { // if more than three nodes (or what?), ...
+          DMatrix s = qrd.solve(b[ig]);
+          data.f = (float)s.get(0,0);
+          data.gx = (float)s.get(1,0);
+          data.gy = (float)s.get(2,0);
+          data.gz = (float)s.get(3,0);
+          System.out.println("ig="+ig+" gx="+data.gx+
+                             " gy="+data.gy+" gz="+data.gz); 
+        } else { // otherwise, just use value of nearest node
+          TetMesh.Node m = _mesh.findNodeNearest(xg,yg,zg);
+          data.f = f(m);
+          data.gx = 0.0f;
+          data.gy = 0.0f;
+          data.gz = 0.0f;
+        }
+      }
+    }
+  }
+
+  // Removes any ghost nodes from the mesh.
+  private void removeGhostNodes() {
+
+    // First make a list of all ghost nodes.
+    ArrayList<TetMesh.Node> gnodes = new ArrayList<TetMesh.Node>(8);
+    TetMesh.NodeIterator ni = _mesh.getNodes();
+    while (ni.hasNext()) {
+      TetMesh.Node n = ni.next();
+      if (ghost(n))
+        gnodes.add(n);
+    }
+
+    // Then remove the ghost nodes from the mesh.
+    for (TetMesh.Node gnode:gnodes)
+      _mesh.removeNode(gnode);
   }
 
   // Computes Sibson volumes for the specified point (x,y,z).
   // Returns true, if successful; false, otherwise.
   private double computeVolumes(float x, float y, float z) {
-    if (!inBounds(x,y,z))
-      return 0.0;
     if (!getNaturalNabors(x,y,z))
       return 0.0;
     return _va.accumulateVolumes(x,y,z,_mesh,_nodeList,_tetList);
@@ -570,8 +703,7 @@ public class SibsonInterpolator3 {
     _mesh.mark(node);
     _nodeList.add(node);
     NodeData data = data(node);
-    if (data!=null)
-      data.volume = 0.0;
+    data.volume = 0.0;
   }
   private boolean needTet(double xp, double yp, double zp, TetMesh.Tet tet) {
     if (tet==null || _mesh.isMarked(tet))
@@ -647,80 +779,80 @@ public class SibsonInterpolator3 {
     return (float)((alpha*fs+beta*es)/(alpha+beta));
   }
 
-  // Computes gradient vectors for each node in the mesh. Uses Sibson's 
-  // (1981) method, which yields gradients that will interpolate precisely 
-  // a spherical quadratic of the form f(x) = f + g'x + h*x'x, for scalars
-  // f and h and gradient vector g. Gradients for nodes on the convex hull 
-  // are not modified by this method.
-  private void computeGradients() {
-    int nnode = _mesh.countNodes();
-    TetMesh.Node[] nodes = new TetMesh.Node[nnode];
-    TetMesh.NodeIterator ni = _mesh.getNodes();
+  // Estimates gradient vectors for real (not ghost) nodes in the mesh. 
+  // Uses Sibson's (1981) method, which yields gradients that will 
+  // interpolate precisely a spherical quadratic of the form 
+  // f(x) = f + g'x + h*x'x, for scalars f and h and gradient vector g. 
+  // Gradients for nodes on the convex hull are not modified by this method.
+  private void estimateGradients() {
+    int nnode = _nodes.length;
     for (int inode=0; inode<nnode; ++inode)
-      nodes[inode] = ni.next();
-    for (int inode=0; inode<nnode; ++inode) {
-      TetMesh.Node n = nodes[inode];
-      NodeData data = data(n);
-      if (data==null)
-        continue;
-      double fn = data.f;
-      double xn = n.xp();
-      double yn = n.yp();
-      double zn = n.zp();
-      _mesh.removeNode(n);
-      double vsum = computeVolumes((float)xn,(float)yn,(float)zn);
-      if (vsum>0.0) {
-        int nm = _nodeList.nnode();
-        TetMesh.Node[] ms = _nodeList.nodes();
-        double hxx = 0.0, hxy = 0.0, hxz = 0.0,
-                          hyy = 0.0, hyz = 0.0,
-                                     hzz = 0.0;
-        double px = 0.0, py = 0.0, pz = 0.0;
-        for (int im=0; im<nm; ++im) {
-          TetMesh.Node m = ms[im];
-          if (data(m)==null)
-            continue;
-          double fm = f(m);
-          double wm = volume(m);
-          double xm = m.xp();
-          double ym = m.yp();
-          double zm = m.zp();
-          double df = fn-fm;
-          double dx = xn-xm;
-          double dy = yn-ym;
-          double dz = zn-zm;
-          double ds = wm/(dx*dx+dy*dy+dz*dz);
-          hxx += ds*dx*dx; // 3x3 symmetric positive-definite matrix
-          hxy += ds*dx*dy;
-          hxz += ds*dx*dz;
-          hyy += ds*dy*dy;
-          hyz += ds*dy*dz;
-          hzz += ds*dz*dz;
-          px += ds*dx*df; // right-hand-side column vector
-          py += ds*dy*df;
-          pz += ds*dz*df;
-        }
-        double lxx = Math.sqrt(hxx); // Cholesky decomposition
-        double lxy = hxy/lxx;
-        double lxz = hxz/lxx;
-        double dyy = hyy-lxy*lxy;
-        double lyy = Math.sqrt(dyy);
-        double lyz = (hyz-lxz*lxy)/lyy;
-        double dzz = hzz-lxz*lxz-lyz*lyz;
-        double lzz = Math.sqrt(dzz);
-        double qx = px/lxx; // forward elimination
-        double qy = (py-lxy*qx)/lyy;
-        double qz = (pz-lxz*qx-lyz*qy)/lzz;
-        double gz = qz/lzz; // back substitution
-        double gy = (qy-lyz*gz)/lyy;
-        double gx = (qx-lxy*gy-lxz*gz)/lxx;
-        data.gx = (float)gx;
-        data.gy = (float)gy;
-        data.gz = (float)gz;
-      }
-      _mesh.addNode(n);
-    }
+      estimateGradient(_nodes[inode]);
     _haveGradients = true;
+  }
+
+  // Estimates the gradient for one node. This method temporarily
+  // removes the node from from the mesh, and then adds it back,
+  // after computing the gradient. Gradients for nodes on the convex
+  // hull are not modified.
+  private void estimateGradient(TetMesh.Node n) {
+    NodeData data = data(n);
+    double fn = data.f;
+    double xn = n.xp();
+    double yn = n.yp();
+    double zn = n.zp();
+    _mesh.removeNode(n);
+    double vsum = computeVolumes((float)xn,(float)yn,(float)zn);
+    if (vsum>0.0) {
+      int nm = _nodeList.nnode();
+      TetMesh.Node[] ms = _nodeList.nodes();
+      double hxx = 0.0, hxy = 0.0, hxz = 0.0,
+                        hyy = 0.0, hyz = 0.0,
+                                   hzz = 0.0;
+      double px = 0.0, py = 0.0, pz = 0.0;
+      for (int im=0; im<nm; ++im) {
+        TetMesh.Node m = ms[im];
+        if (data(m)==null)
+          continue;
+        double fm = f(m);
+        double wm = volume(m);
+        double xm = m.xp();
+        double ym = m.yp();
+        double zm = m.zp();
+        double df = fn-fm;
+        double dx = xn-xm;
+        double dy = yn-ym;
+        double dz = zn-zm;
+        double ds = wm/(dx*dx+dy*dy+dz*dz);
+        hxx += ds*dx*dx; // 3x3 symmetric positive-definite matrix
+        hxy += ds*dx*dy;
+        hxz += ds*dx*dz;
+        hyy += ds*dy*dy;
+        hyz += ds*dy*dz;
+        hzz += ds*dz*dz;
+        px += ds*dx*df; // right-hand-side column vector
+        py += ds*dy*df;
+        pz += ds*dz*df;
+      }
+      double lxx = Math.sqrt(hxx); // Cholesky decomposition
+      double lxy = hxy/lxx;
+      double lxz = hxz/lxx;
+      double dyy = hyy-lxy*lxy;
+      double lyy = Math.sqrt(dyy);
+      double lyz = (hyz-lxz*lxy)/lyy;
+      double dzz = hzz-lxz*lxz-lyz*lyz;
+      double lzz = Math.sqrt(dzz);
+      double qx = px/lxx; // forward elimination
+      double qy = (py-lxy*qx)/lyy;
+      double qz = (pz-lxz*qx-lyz*qy)/lzz;
+      double gz = qz/lzz; // back substitution
+      double gy = (qy-lyz*gz)/lyy;
+      double gx = (qx-lxy*gy-lxz*gz)/lxx;
+      data.gx = (float)gx;
+      data.gy = (float)gy;
+      data.gz = (float)gz;
+    }
+    _mesh.addNode(n);
   }
  
   ///////////////////////////////////////////////////////////////////////////
@@ -868,10 +1000,8 @@ public class SibsonInterpolator3 {
 
     private void addVolume(TetMesh.Node node, double v) {
       NodeData data = data(node);
-      if (data!=null) {
-        data.volume += v;
-        _vsum += v;
-      }
+      data.volume += v;
+      _vsum += v;
     }
 
     // Processes all natural-neighbor tets.

@@ -131,6 +131,7 @@ public class SibsonInterpolator2 {
    * Constructs an interpolator with specified sample coordinates.
    * Function values f(x1,x2) are not set and are assumed to be zero.
    * Uses the most accurate and efficient implementation.
+   * Coordinates for each sample must be unique.
    * @param x1 array of sample x1 coordinates.
    * @param x2 array of sample x2 coordinates.
    */
@@ -141,6 +142,7 @@ public class SibsonInterpolator2 {
   /**
    * Constructs an interpolator with specified samples.
    * Uses the most accurate and efficient implementation.
+   * Coordinates for each sample must be unique.
    * @param f array of sample values f(x1,x2).
    * @param x1 array of sample x1 coordinates.
    * @param x2 array of sample x2 coordinates.
@@ -152,6 +154,8 @@ public class SibsonInterpolator2 {
   /**
    * Constructs an interpolator with specified method and sample coordinates.
    * Function values f(x1,x2) are not set and are assumed to be zero.
+   * Coordinates for each sample must be unique.
+   * <p>
    * This constructor is provided primarily for testing.
    * The default Hale-Liang method is accurate and fast.
    * @param method the implementation method.
@@ -164,6 +168,8 @@ public class SibsonInterpolator2 {
 
   /**
    * Constructs an interpolator with specified method and samples.
+   * Coordinates for each sample must be unique.
+   * <p>
    * This constructor is provided primarily for testing.
    * The default Hale-Liang method is accurate and fast.
    * @param method the implementation method.
@@ -174,7 +180,7 @@ public class SibsonInterpolator2 {
   public SibsonInterpolator2(
     Method method, float[] f, float[] x1, float[] x2) 
   {
-    _mesh = makeMesh(f,x1,x2);
+    makeMesh(f,x1,x2);
     _nodeList = new TriMesh.NodeList();
     _triList = new TriMesh.TriList();
     if (method==Method.WATSON_SAMBRIDGE) {
@@ -195,14 +201,12 @@ public class SibsonInterpolator2 {
    * @param g2 array of 2nd components of gradients.
    */
   public void setGradients(float[] g1, float[] g2) {
-    int nnode = _mesh.countNodes();
-    TriMesh.NodeIterator ni = _mesh.getNodes();
-    while (ni.hasNext()) {
-      TriMesh.Node n = ni.next();
-      int index = n.index;
-      NodeData data = data(n);
-      data.gx = g1[index];
-      data.gy = g2[index];
+    int n = g1.length;
+    for (int i=0; i<n; ++i) {
+      TriMesh.Node node = _nodes[i];
+      NodeData data = data(node);
+      data.gx = g1[i];
+      data.gy = g2[i];
     }
     _haveGradients = true;
     if (_gradientPower==0.0)
@@ -225,7 +229,7 @@ public class SibsonInterpolator2 {
    */
   public void setGradientPower(double gradientPower) {
     if (!_haveGradients && gradientPower>=0.0)
-      computeGradients();
+      estimateGradients();
     _gradientPower = gradientPower;
   }
 
@@ -264,12 +268,10 @@ public class SibsonInterpolator2 {
     _ymin = x2min; _ymax = x2max;
     _useBoundingBox = true;
 
-    // Now compute coordinates for ghost nodes.
+    // Compute coordinates for ghost nodes, and add them to the mesh.
     float scale = 0.1f;
     x1min -= scale*(x1max-x1min); x1max += scale*(x1max-x1min);
     x2min -= scale*(x2max-x2min); x2max += scale*(x2max-x2min);
-
-    // Add the ghost nodes to the mesh.
     float[] x1g = {x1min,x1max,x1min,x1max};
     float[] x2g = {x2min,x2min,x2max,x2max};
     addGhostNodes(x1g,x2g);
@@ -312,7 +314,7 @@ public class SibsonInterpolator2 {
     double asum = computeAreas(x1,x2);
     if (asum<=0.0)
       return _fnull;
-    if (_haveGradients && _gradientPower>0.0) {
+    if (usingGradients()) {
       return interpolate1(asum,x1,x2);
     } else {
       return interpolate0(asum,x1,x2);
@@ -372,6 +374,60 @@ public class SibsonInterpolator2 {
     return iw;
   }
 
+  /**
+   * Interpolates at the i'th sample point without using the i'th sample.
+   * This method implements leave-one-out cross-validation. The difference
+   * between the i'th sample value and the returned interpolated value is
+   * a measure of error at the i'th sample.
+   * <p>
+   * This method does not recompute gradients that may have been estimated 
+   * using the sample to be validated. Therefore, validation should be 
+   * performed without using gradients. 
+   * <p> 
+   * This method does not recompute values for ghost nodes that may have 
+   * been constructed using the value of the sample to be validated. And 
+   * if bounds have not been set explicitly, then this method will return 
+   * a null values if the validated sample is on the convex hull.
+   * @param i the index of the sample to validate.
+   * @return the value interpolated at the validated sample point.
+   */
+  public float validate(int i) {
+    return validate(new int[]{i})[0];
+  }
+
+  /**
+   * Interpolates at specified sample points without using those samples.
+   * This method implements a form of cross-validation. Differences
+   * between the values of the specified samples and the returned 
+   * interpolated values are measures of errors for those samples.
+   * <p>
+   * This method does not recompute gradients that may have been estimated 
+   * using the samples to be validated. Therefore, validation should be 
+   * performed without using gradients. 
+   * <p> 
+   * This method does not recompute values for ghost nodes that may have 
+   * been constructed using values of samples to be validated. And if
+   * bounds have not been set explicitly, then this method will return 
+   * null values for validated samples on the convex hull.
+   * @param i array of indices of samples to validate.
+   * @return array of values interpolated at validated sample points.
+   */
+  public float[] validate(int[] i) {
+    int nv = i.length;
+    for (int iv=0; iv<nv; ++iv)
+      _mesh.removeNode(_nodes[iv]);
+    float[] fv = new float[nv];
+    for (int iv=0; iv<nv; ++iv) {
+      TriMesh.Node node = _nodes[iv];
+      float xn = node.x();
+      float yn = node.y();
+      fv[iv] = interpolate(xn,yn);
+    }
+    for (int iv=0; iv<nv; ++iv)
+      _mesh.addNode(_nodes[iv]);
+    return fv;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -389,7 +445,6 @@ public class SibsonInterpolator2 {
   private static class NodeData {
     float f,gx,gy; // function values and gradient
     double area; // area for Sibson weight
-    boolean ghost; // true if ghost node
   }
   private static NodeData data(TriMesh.Node node) {
     return (NodeData)node.data;
@@ -407,7 +462,7 @@ public class SibsonInterpolator2 {
     return data(node).area;
   }
   private static boolean ghost(TriMesh.Node node) {
-    return data(node).ghost;
+    return node.index<0;
   }
 
   // This method is used by AreaAccumulator implementations defined below.
@@ -423,6 +478,7 @@ public class SibsonInterpolator2 {
   }
 
   private TriMesh _mesh; // the mesh
+  private TriMesh.Node[] _nodes; // array of real (not ghost) nodes
   private TriMesh.NodeList _nodeList; // list of natural neighbor nodes
   private TriMesh.TriList _triList; // list of natural neighbor tris
   private AreaAccumulator _va; // accumulates Sibson's areas
@@ -432,8 +488,8 @@ public class SibsonInterpolator2 {
   private float _xmin,_xmax,_ymin,_ymax; // bounding box
   private boolean _useBoundingBox; // true if using bounding box
 
-  // Returns a tri mesh built from specified scattered samples.
-  private TriMesh makeMesh(float[] f, float[] x, float[] y) {
+  // Builds the tri mesh from specified scattered samples.
+  private void makeMesh(float[] f, float[] x, float[] y) {
     int n = x.length;
 
     // Find bounding box for sample points.
@@ -444,31 +500,38 @@ public class SibsonInterpolator2 {
       if (y[i]<ymin) ymin = y[i]; if (y[i]>ymax) ymax = y[i];
     }
 
+    // Array of nodes, one for each specified sample.
+    _nodes = new TriMesh.Node[n];
+
     // Construct the mesh with nodes at sample points.
-    TriMesh mesh = new TriMesh();
+    _mesh = new TriMesh();
     for (int i=0; i<n; ++i) {
       float xi = x[i];
       float yi = y[i];
 
-      // Push out slightly any points that are on the bounding box.
-      // This perturbation enlarges slightly the convex hull of the sample
-      // points, and thereby compensates for rounding errors that would 
-      // otherwise cause interpolation points on the convex hull to appear 
-      // outside the hull.
+      // Push out slightly any points that are on the bounding box. This 
+      // perturbation inflates the convex hull of sample points, so that 
+      // interpolation can be performed at points that would otherwise be 
+      // on (or, due to rounding errors, outside) the convex hull.
       if (xi==xmin) xi -= Math.ulp(xi); if (xi==xmax) xi += Math.ulp(xi);
       if (yi==ymin) yi -= Math.ulp(yi); if (yi==ymax) yi += Math.ulp(yi);
 
-      // Add a new node to the mesh, unless one already exists there.
+      // Add a new node to the mesh.
       TriMesh.Node node = new TriMesh.Node(xi,yi);
-      if (mesh.addNode(node)) {
-        NodeData data = new NodeData();
-        node.data = data;
-        node.index = i;
-        if (f!=null) 
-          data.f = f[i];
-      }
+      boolean added = _mesh.addNode(node);
+      Check.argument(added,"each sample has unique coordinates");
+      NodeData data = new NodeData();
+      node.data = data;
+      node.index = i;
+      if (f!=null) 
+        data.f = f[i];
+      _nodes[i] = node;
     }
-    return mesh;
+  }
+
+  // Returns true if gradients are being used in interpolation.
+  private boolean usingGradients() {
+    return _haveGradients && _gradientPower>0.0;
   }
 
   // Adds ghost nodes to the mesh with estimated values and gradients.
@@ -514,6 +577,7 @@ public class SibsonInterpolator2 {
       TriMesh.PointLocation pl = _mesh.locatePoint(xg,yg);
       if (pl.isOutside()) {
         TriMesh.Node n = new TriMesh.Node(xg,yg);
+        n.index = -1-ig; // ghost nodes have negative indices
         _mesh.addNode(n);
         NodeData data = new NodeData();
         n.data = data;
@@ -529,7 +593,6 @@ public class SibsonInterpolator2 {
           data.gx = 0.0f;
           data.gy = 0.0f;
         }
-        data.ghost = true;
       }
     }
   }
@@ -668,62 +731,62 @@ public class SibsonInterpolator2 {
     return (float)((alpha*fs+beta*es)/(alpha+beta));
   }
 
-  // Computes gradient vectors for each node in the mesh. Uses Sibson's 
-  // (1981) method, which yields gradients that will interpolate precisely 
-  // a spherical quadratic of the form f(x) = f + g'x + h*x'x, for scalars
-  // f and h and gradient vector g. Gradients for nodes on the convex hull 
-  // are not modified by this method.
-  private void computeGradients() {
-    int nnode = _mesh.countNodes();
-    TriMesh.Node[] nodes = new TriMesh.Node[nnode];
-    TriMesh.NodeIterator ni = _mesh.getNodes();
+  // Estimates gradient vectors for real (not ghost) nodes in the mesh. 
+  // Uses Sibson's (1981) method, which yields gradients that will 
+  // interpolate precisely a spherical quadratic of the form 
+  // f(x) = f + g'x + h*x'x, for scalars f and h and gradient vector g. 
+  // Gradients for nodes on the convex hull are not modified by this method.
+  private void estimateGradients() {
+    int nnode = _nodes.length;
     for (int inode=0; inode<nnode; ++inode)
-      nodes[inode] = ni.next();
-    for (int inode=0; inode<nnode; ++inode) {
-      TriMesh.Node n = nodes[inode];
-      if (ghost(n))
-        continue;
-      NodeData data = data(n);
-      double fn = data.f;
-      double xn = n.xp();
-      double yn = n.yp();
-      _mesh.removeNode(n);
-      double asum = computeAreas((float)xn,(float)yn);
-      if (asum>0.0) {
-        int nm = _nodeList.nnode();
-        TriMesh.Node[] ms = _nodeList.nodes();
-        double hxx = 0.0, hxy = 0.0, hyy = 0.0;
-        double px = 0.0, py = 0.0;
-        for (int im=0; im<nm; ++im) {
-          TriMesh.Node m = ms[im];
-          double fm = f(m);
-          double wm = area(m);
-          double xm = m.xp();
-          double ym = m.yp();
-          double df = fn-fm;
-          double dx = xn-xm;
-          double dy = yn-ym;
-          double ds = wm/(dx*dx+dy*dy);
-          hxx += ds*dx*dx; // 2x2 symmetric positive-definite matrix
-          hxy += ds*dx*dy;
-          hyy += ds*dy*dy;
-          px += ds*dx*df; // right-hand-side column vector
-          py += ds*dy*df;
-        }
-        double lxx = Math.sqrt(hxx); // Cholesky decomposition
-        double lxy = hxy/lxx;
-        double dyy = hyy-lxy*lxy;
-        double lyy = Math.sqrt(dyy);
-        double qx = px/lxx; // forward elimination
-        double qy = (py-lxy*qx)/lyy;
-        double gy = qy/lyy; // back substitution
-        double gx = (qx-lxy*gy)/lxx;
-        data.gx = (float)gx;
-        data.gy = (float)gy;
-      }
-      _mesh.addNode(n);
-    }
+      estimateGradient(_nodes[inode]);
     _haveGradients = true;
+  }
+
+  // Estimates the gradient for one node. This method temporarily
+  // removes the node from from the mesh, and then adds it back,
+  // after computing the gradient. Gradients for nodes on the convex
+  // hull are not modified.
+  private void estimateGradient(TriMesh.Node n) {
+    NodeData data = data(n);
+    double fn = data.f;
+    double xn = n.xp();
+    double yn = n.yp();
+    _mesh.removeNode(n);
+    double asum = computeAreas((float)xn,(float)yn);
+    if (asum>0.0) {
+      int nm = _nodeList.nnode();
+      TriMesh.Node[] ms = _nodeList.nodes();
+      double hxx = 0.0, hxy = 0.0, hyy = 0.0;
+      double px = 0.0, py = 0.0;
+      for (int im=0; im<nm; ++im) {
+        TriMesh.Node m = ms[im];
+        double fm = f(m);
+        double wm = area(m);
+        double xm = m.xp();
+        double ym = m.yp();
+        double df = fn-fm;
+        double dx = xn-xm;
+        double dy = yn-ym;
+        double ds = wm/(dx*dx+dy*dy);
+        hxx += ds*dx*dx; // 2x2 symmetric positive-definite matrix
+        hxy += ds*dx*dy;
+        hyy += ds*dy*dy;
+        px += ds*dx*df; // right-hand-side column vector
+        py += ds*dy*df;
+      }
+      double lxx = Math.sqrt(hxx); // Cholesky decomposition
+      double lxy = hxy/lxx;
+      double dyy = hyy-lxy*lxy;
+      double lyy = Math.sqrt(dyy);
+      double qx = px/lxx; // forward elimination
+      double qy = (py-lxy*qx)/lyy;
+      double gy = qy/lyy; // back substitution
+      double gx = (qx-lxy*gy)/lxx;
+      data.gx = (float)gx;
+      data.gy = (float)gy;
+    }
+    _mesh.addNode(n);
   }
  
   ///////////////////////////////////////////////////////////////////////////
@@ -905,17 +968,19 @@ public class SibsonInterpolator2 {
     }
 
     // A edge has two nodes and both fake and real circumcenters.
-    // After all edges have been added to the edge list, each edge
-    // will also have a neighbor edge. Node B of the edge equals
-    // node A of the neighbor edge.
+    // After all edges have been added to the edge list, they form
+    // a Voronoi polygon, and the edges are in counter-clockwise 
+    // (CCW) order around the interpolation point, and each edge has 
+    // a reference to its CCW neighbor. Node B of one edge equals 
+    // node A of its neighbor edge.
     private static class Edge {
       TriMesh.Node na,nb; // two nodes of this edge
       double xf,yf; // circumcenter of fake tri pab
       double xr,yr; // circumcenter of real tri abc
-      Edge eb; // neighbor of this edge (references node B)
+      Edge eb; // CCW neighbor of this edge
     }
 
-    // Computes fake circumcenter and adds edge to the edge list.
+    // Computes a fake circumcenter and adds an edge to the edge list.
     private void addEdge(
       double xp, double yp,
       double xr, double yr, 
@@ -928,18 +993,16 @@ public class SibsonInterpolator2 {
       _edgeList.add(na,nb,xf,yf,xr,yr);
     }
 
-    // Determines whether all edges in the edge set have exactly two
-    // neighbor edges. Should always be true, except for points (x,y)
-    // that lie on (over very near?) the convex hull of the mesh.
+    // Determines whether all edges in the edge set have a non-null
+    // neighbor edge. This should always be true, except for points 
+    // (x,y) that lie on (over very near?) the convex hull of the mesh.
     private boolean edgeNaborsOk(double xp, double yp) {
       int nedge = _edgeList.nedge();
       ArrayList<Edge> edges = _edgeList.edges();
       for (int iedge=0; iedge<nedge; ++iedge) {
         Edge edge = edges.get(iedge);
-        if (edge.eb==null) {
-          //System.out.println("null edge nabor: x="+xp+" y="+yp);
+        if (edge.eb==null)
           return false;
-        }
       }
       return true;
     }
@@ -985,7 +1048,7 @@ public class SibsonInterpolator2 {
     // As edges are added to this list, we hook them up to their
     // edge neighbors if already in the list. Therefore, after 
     // all edges have been added to the list, each edge should have 
-    // an edge neighbor.
+    // two edge neighbors, but has a reference to only one of them.
     private static class EdgeList {
       private int _nedge;
       private ArrayList<Edge> _edges = new ArrayList<Edge>(12);
