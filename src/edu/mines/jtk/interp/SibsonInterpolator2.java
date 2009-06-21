@@ -36,8 +36,7 @@ import edu.mines.jtk.util.*;
  * is zero (the default), then gradients are not used. Sibson's (1981) 
  * smoother C1 interpolant corresponds to a power of 1.0. Larger powers 
  * cause the interpolant to more rapidly approach the linear functions 
- * defined by the values specified and gradients specified or computed 
- * for each sample point.
+ * defined by the values and gradients at the sample points.
  * <p>
  * Sibson's interpolant is undefined at points on or outside the convex 
  * hull of sample points. In this sense, Sibson interpolation does not 
@@ -47,12 +46,13 @@ import edu.mines.jtk.util.*;
  * <p>
  * To extend the interpolant outside the convex hull, this class enables
  * bounds to be set explicitly. When bounds are set, extra ghost samples 
- * are added far outside the convex hull. These ghost samples have no 
- * values, but they create a larger convex hull so that Sibson coordinates 
- * can be computed anywhere within the specified bounds. While often useful,
- * this extrapolation feature should be used with caution, because the 
- * added ghost samples may alter the Sibson interpolant at points inside 
- * the original convex hull.
+ * are added outside the convex hull. These ghost samples have values and 
+ * gradients computed by weighted least-squares fitting of nearby samples
+ * but they create a larger convex hull so that Sibson coordinates can be
+ * computed anywhere within the specified bounds. While often useful, this 
+ * extrapolation feature should be used with care, because the added ghost 
+ * samples may alter the Sibson interpolant at points inside the original 
+ * convex hull.
  * <p>
  * References:
  * <ul><li>
@@ -912,7 +912,7 @@ public class SibsonInterpolator2 {
       TriMesh.Node na,nb; // two nodes of this edge
       double xf,yf; // circumcenter of fake tri pab
       double xr,yr; // circumcenter of real tri abc
-      Edge nabor; // neighbor of this edge
+      Edge eb; // neighbor of this edge (references node B)
     }
 
     // Computes fake circumcenter and adds edge to the edge list.
@@ -936,7 +936,7 @@ public class SibsonInterpolator2 {
       ArrayList<Edge> edges = _edgeList.edges();
       for (int iedge=0; iedge<nedge; ++iedge) {
         Edge edge = edges.get(iedge);
-        if (edge.nabor==null) {
+        if (edge.eb==null) {
           //System.out.println("null edge nabor: x="+xp+" y="+yp);
           return false;
         }
@@ -973,9 +973,9 @@ public class SibsonInterpolator2 {
       addArea(nb,-xy);
 
      // Accumulate area for Voronoi edge between tri edge and its neighbor.
-      Edge nabor = edge.nabor; 
-      x2 = nabor.xf; 
-      y2 = nabor.yf; 
+      Edge eb = edge.eb; 
+      x2 = eb.xf; 
+      y2 = eb.yf; 
       xy = x1*y2-x2*y1;
       addArea(nb,xy);
     }
@@ -1006,23 +1006,23 @@ public class SibsonInterpolator2 {
         if (_nedge==_edges.size()) // rarely must we construct a
           _edges.add(new Edge()); // new edge like this, because we
         Edge edge = _edges.get(_nedge); // can reuse an existing edge
-        Edge nabor = null;
+        Edge eb = null;
         int nfound = 0;
         for (int iedge=0; iedge<_nedge && nfound<2; ++iedge) {
           Edge edgei = _edges.get(iedge);
           if (nb==edgei.na) {
-            nabor = edgei;
+            eb = edgei;
             ++nfound;
           }
           if (na==edgei.nb) {
-            edgei.nabor = edge;
+            edgei.eb = edge;
             ++nfound;
           }
         }
         edge.na = na; edge.nb = nb;
         edge.xf = xf; edge.yf = yf;
         edge.xr = xr; edge.yr = yr;
-        edge.nabor = nabor;
+        edge.eb = eb;
         ++_nedge;
       }
     }

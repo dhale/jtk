@@ -35,8 +35,7 @@ import edu.mines.jtk.util.*;
  * is zero (the default), then gradients are not used. Sibson's (1981) 
  * smoother C1 interpolant corresponds to a power of 1.0. Larger powers 
  * cause the interpolant to more rapidly approach the linear functions 
- * defined by the values specified and gradients specified or computed 
- * for each sample point.
+ * defined by the values and gradients at the sample points.
  * <p>
  * Sibson's interpolant is undefined at points on or outside the convex 
  * hull of sample points. In this sense, Sibson interpolation does not 
@@ -46,12 +45,13 @@ import edu.mines.jtk.util.*;
  * <p>
  * To extend the interpolant outside the convex hull, this class enables
  * bounds to be set explicitly. When bounds are set, extra ghost samples 
- * are added far outside the convex hull. These ghost samples have no 
- * values, but they create a larger convex hull so that Sibson coordinates 
- * can be computed anywhere within the specified bounds. While often useful,
- * this extrapolation feature should be used with caution, because the 
- * added ghost samples may alter the Sibson interpolant at points inside 
- * the original convex hull.
+ * are added outside the convex hull. These ghost samples have values and 
+ * gradients computed by weighted least-squares fitting of nearby samples
+ * but they create a larger convex hull so that Sibson coordinates can be
+ * computed anywhere within the specified bounds. While often useful, this 
+ * extrapolation feature should be used with care, because the added ghost 
+ * samples may alter the Sibson interpolant at points inside the original 
+ * convex hull.
  * <p>
  * References:
  * <ul><li>
