@@ -431,16 +431,6 @@ public class SibsonInterpolator2 {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  // Given a point (xp,yp) at which to interpolate, an implementation of 
-  // natural neighbor interpolation must accumulate areas for all natural 
-  // neighbor nodes in the the specified node list. It must also return 
-  // the total area accumulated for all nodes.
-  private interface AreaAccumulator {
-    public double accumulateAreas(
-      double xp, double yp,
-      TriMesh mesh, TriMesh.NodeList nodeList, TriMesh.TriList triList);
-  }
-
   // Data associated with all nodes in the tri mesh.
   private static class NodeData {
     float f,gx,gy; // function values and gradient
@@ -463,18 +453,6 @@ public class SibsonInterpolator2 {
   }
   private static boolean ghost(TriMesh.Node node) {
     return node.index<0;
-  }
-
-  // This method is used by AreaAccumulator implementations defined below.
-  // Note that it accumulates areas for only those nodes with data. In
-  // other words, it accumulates no area for ghost nodes.
-  private static double accumulateArea(
-    TriMesh.Node node, double a, double asum) 
-  {
-    NodeData data = data(node);
-    data.area += a;
-    asum += a;
-    return asum;
   }
 
   private TriMesh _mesh; // the mesh
@@ -540,7 +518,7 @@ public class SibsonInterpolator2 {
   // weighted least-squares fitting of function values for real nodes.
   private void addGhostNodes(float[] x, float[] y) {
     int ng = x.length;
-    int nn = _mesh.countNodes();
+    int nn = _nodes.length;
 
     // Construct ng systems of nn equations for 3 fitting parameters
     DMatrix[] a = new DMatrix[ng];
@@ -549,9 +527,8 @@ public class SibsonInterpolator2 {
       a[ig] = new DMatrix(nn,3); // nn equations for 3 parameters
       b[ig] = new DMatrix(nn,1); // nn function values to fit
     }
-    TriMesh.NodeIterator ni = _mesh.getNodes();
     for (int in=0; in<nn; ++in) {
-      TriMesh.Node n = ni.next();
+      TriMesh.Node n = _nodes[in];
       double fn = f(n);
       double xn = n.xp();
       double yn = n.yp();
@@ -788,16 +765,40 @@ public class SibsonInterpolator2 {
     }
     _mesh.addNode(n);
   }
+
+  ///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
+  // Given a point (xp,yp) at which to interpolate, an implementation of 
+  // natural neighbor interpolation must accumulate areas for all natural 
+  // neighbor nodes in the the specified node list. This abstract base
+  // class maintains the total area accumulated for all nodes.
+  private static abstract class AreaAccumulator {
+    public abstract double accumulateAreas(
+      double xp, double yp,
+      TriMesh mesh, TriMesh.NodeList nodeList, TriMesh.TriList triList);
+    protected void clear() {
+      _sum = 0.0;
+    }
+    protected double sum() {
+      return _sum;
+    }
+    protected void accumulate(TriMesh.Node node, double area) {
+      NodeData data = data(node);
+      data.area += area;
+      _sum += area;
+    }
+    private double _sum;
+  }
  
   ///////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////
-  private static class WatsonSambridge implements AreaAccumulator {
+  private static class WatsonSambridge extends AreaAccumulator {
 
     public double accumulateAreas(
       double xp, double yp,
       TriMesh mesh, TriMesh.NodeList nodeList, TriMesh.TriList triList)
     {
-      double asum = 0.0;
+      clear();
       int ntri = triList.ntri();
       TriMesh.Tri[] tris = triList.tris();
       for (int itri=0; itri<ntri; ++itri) {
@@ -815,11 +816,11 @@ public class SibsonInterpolator2 {
         double aa = area(_cb,_cc,_ct);
         double ab = area(_cc,_ca,_ct);
         double ac = area(_ca,_cb,_ct);
-        asum = accumulateArea(na,aa,asum);
-        asum = accumulateArea(nb,ab,asum);
-        asum = accumulateArea(nc,ac,asum);
+        accumulate(na,aa);
+        accumulate(nb,ab);
+        accumulate(nc,ac);
       }
-      return asum;
+      return sum();
     }
     private double[] _ca = new double[2]; // circumcenter of fake tri pbc
     private double[] _cb = new double[2]; // circumcenter of fake tri pca
@@ -835,13 +836,13 @@ public class SibsonInterpolator2 {
 
   ///////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////
-  private static class BraunSambridge implements AreaAccumulator {
+  private static class BraunSambridge extends AreaAccumulator {
 
     public double accumulateAreas(
       double x1i, double x2i,
       TriMesh mesh, TriMesh.NodeList nodeList, TriMesh.TriList triList)
     {
-      double asum = 0.0;
+      clear();
 
       // For all natural neighbors, ...
       int nnode = nodeList.nnode();
@@ -886,9 +887,9 @@ public class SibsonInterpolator2 {
 
         // Area of polygon for this natural neighbor.
         double aj = _lv.getVolume();
-        asum = accumulateArea(jnode,aj,asum);
+        accumulate(jnode,aj);
       }
-      return asum;
+      return sum();
     }
     private LasserreVolume _lv = new LasserreVolume(2);
   }
@@ -903,27 +904,20 @@ public class SibsonInterpolator2 {
   // processed to complete the computation of areas.
   // All geometric computations are performed in a shifted coordinate
   // system in which the interpolation point (xp,yp) is the origin.
-  private static class HaleLiang implements AreaAccumulator {
+  private static class HaleLiang extends AreaAccumulator {
 
     public double accumulateAreas(
       double xp, double yp,
       TriMesh mesh, TriMesh.NodeList nodeList, TriMesh.TriList triList)
     {
-      _asum = 0.0;
+      clear();
       processTris(xp,yp,mesh,triList);
       boolean ok = processEdges(xp,yp);
-      return (ok)?_asum:0.0;
+      return (ok)?sum():0.0;
     }
 
     private EdgeList _edgeList = new EdgeList(); // list of tri edges
     private double[] _xy = new double[2]; // a circumsphere center
-    private double _asum; // sum of all node areas
-
-    private void addArea(TriMesh.Node node, double a) {
-      NodeData data = data(node);
-      data.area += a;
-      _asum += a;
-    }
 
     // Processes all natural-neighbor tris.
     private void processTris(
@@ -960,7 +954,7 @@ public class SibsonInterpolator2 {
         double xa = _xy[0]-xp;
         double ya = _xy[1]-yp;
         double xy = xt*ya-xa*yt;
-        addArea(nc,xy);
+        accumulate(nc,xy);
         saveEdge = false;
       }
       if (saveEdge)
@@ -1032,15 +1026,15 @@ public class SibsonInterpolator2 {
       double x2 = edge.xr;
       double y2 = edge.yr;
       double xy = x1*y2-x2*y1;
-      addArea(na, xy); 
-      addArea(nb,-xy);
+      accumulate(na, xy); 
+      accumulate(nb,-xy);
 
      // Accumulate area for Voronoi edge between tri edge and its neighbor.
       Edge eb = edge.eb; 
       x2 = eb.xf; 
       y2 = eb.yf; 
       xy = x1*y2-x2*y1;
-      addArea(nb,xy);
+      accumulate(nb,xy);
     }
 
     // A list of edges that represent the boundary of the Voronoi
@@ -1072,13 +1066,13 @@ public class SibsonInterpolator2 {
         Edge eb = null;
         int nfound = 0;
         for (int iedge=0; iedge<_nedge && nfound<2; ++iedge) {
-          Edge edgei = _edges.get(iedge);
-          if (nb==edgei.na) {
-            eb = edgei;
+          Edge ei = _edges.get(iedge);
+          if (nb==ei.na) {
+            eb = ei;
             ++nfound;
           }
-          if (na==edgei.nb) {
-            edgei.eb = edge;
+          if (na==ei.nb) {
+            ei.eb = edge;
             ++nfound;
           }
         }

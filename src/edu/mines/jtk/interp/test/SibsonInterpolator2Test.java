@@ -33,7 +33,7 @@ public class SibsonInterpolator2Test extends TestCase {
   private static final float XMAX = 1.0f;
 
   // Number of scattered samples to be interpolated.
-  private static final int NS = 49;
+  private static final int NS = 25;
 
   // Uniform sampling used in interpolation.
   private static final int NX = 201;
@@ -68,8 +68,8 @@ public class SibsonInterpolator2Test extends TestCase {
 
   private void testMethods(TestFunction tf, float[][] fx) {
     float[] f = fx[0], x1 = fx[1], x2 = fx[2];
-    SibsonInterpolator2.Method[] methods = {HL,BS,WS};
-    //SibsonInterpolator2.Method[] methods = {HL};
+    //SibsonInterpolator2.Method[] methods = {HL,BS,WS};
+    SibsonInterpolator2.Method[] methods = {HL};
     for (int i=0; i<methods.length; ++i) {
       SibsonInterpolator2.Method method = methods[i];
       SibsonInterpolator2 si = new SibsonInterpolator2(method,f,x1,x2);
@@ -100,8 +100,8 @@ public class SibsonInterpolator2Test extends TestCase {
         sp.setTitle(method);
         sp.setSize(700,745);
         PixelsView pv = sp.addPixels(SX,SX,g);
-        pv.setColorModel(ColorMap.JET);
-        pv.setInterpolation(PixelsView.Interpolation.NEAREST);
+        pv.setColorModel(ColorMap.PRISM);
+        pv.setInterpolation(PixelsView.Interpolation.LINEAR);
         pv.setClips(0.0f,1.0f);
         PointsView px = sp.addPoints(x1,x2);
         px.setLineStyle(PointsView.Line.NONE);

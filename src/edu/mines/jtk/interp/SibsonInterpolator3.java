@@ -455,16 +455,6 @@ public class SibsonInterpolator3 {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  // Given a point (xp,yp,zp) at which to interpolate, an implementation 
-  // of natural neighbor interpolation must accumulate volumes for all 
-  // natural neighbor nodes in the the specified node list. It must also
-  // return the total volume accumulated for all nodes.
-  private interface VolumeAccumulator {
-    public double accumulateVolumes(
-      double xp, double yp, double zp,
-      TetMesh mesh, TetMesh.NodeList nodeList, TetMesh.TetList tetList);
-  }
-
   // Data associated with all nodes in the tet mesh.
   private static class NodeData {
     float f,gx,gy,gz; // function values and gradient
@@ -490,18 +480,6 @@ public class SibsonInterpolator3 {
   }
   private static boolean ghost(TetMesh.Node node) {
     return node.index<0;
-  }
-
-  // This method is used by VolumeAccumulator implementations defined below.
-  // Note that it accumulates volumes for only those nodes with data. In
-  // other words, it accumulates no volume for ghost nodes.
-  private static double accumulateVolume(
-    TetMesh.Node node, double v, double vsum) 
-  {
-    NodeData data = data(node);
-    data.volume += v;
-    vsum += v;
-    return vsum;
   }
 
   private TetMesh _mesh; // the mesh
@@ -728,11 +706,9 @@ public class SibsonInterpolator3 {
     TetMesh.Node[] nodes = _nodeList.nodes();
     for (int inode=0; inode<nnode; ++inode) {
       TetMesh.Node node = nodes[inode];
-      if (data(node)!=null) {
-        float f = f(node);
-        double v = volume(node);
-        vfsum += v*f;
-      }
+      float f = f(node);
+      double v = volume(node);
+      vfsum += v*f;
     }
     return (float)(vfsum/vsum);
   }
@@ -748,8 +724,6 @@ public class SibsonInterpolator3 {
     double wods = 0.0;
     for (int inode=0; inode<nnode; ++inode) {
       TetMesh.Node n = nodes[inode];
-      if (data(n)==null)
-        continue;
       double f = f(n);
       double gx = gx(n);
       double gy = gy(n);
@@ -814,8 +788,6 @@ public class SibsonInterpolator3 {
       double px = 0.0, py = 0.0, pz = 0.0;
       for (int im=0; im<nm; ++im) {
         TetMesh.Node m = ms[im];
-        if (data(m)==null)
-          continue;
         double fm = f(m);
         double wm = volume(m);
         double xm = m.xp();
@@ -856,16 +828,40 @@ public class SibsonInterpolator3 {
     }
     _mesh.addNode(n);
   }
- 
+
   ///////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////
-  private static class WatsonSambridge implements VolumeAccumulator {
+  // Given a point (xp,yp,zp) at which to interpolate, an implementation of 
+  // natural neighbor interpolation must accumulate volumes for all natural 
+  // neighbor nodes in the the specified node list. This abstract base
+  // class maintains the total volume accumulated for all nodes.
+  private static abstract class VolumeAccumulator {
+    public abstract double accumulateVolumes(
+      double xp, double yp, double zp,
+      TetMesh mesh, TetMesh.NodeList nodeList, TetMesh.TetList tetList);
+    protected void clear() {
+      _sum = 0.0;
+    }
+    protected double sum() {
+      return _sum;
+    }
+    protected void accumulate(TetMesh.Node node, double volume) {
+      NodeData data = data(node);
+      data.volume += volume;
+      _sum += volume;
+    }
+    private double _sum;
+  }
+  
+  ///////////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////
+  private static class WatsonSambridge extends VolumeAccumulator {
 
     public double accumulateVolumes(
       double xp, double yp, double zp,
       TetMesh mesh, TetMesh.NodeList nodeList, TetMesh.TetList tetList)
     {
-      double vsum = 0.0;
+      clear();
       int ntet = tetList.ntet();
       TetMesh.Tet[] tets = tetList.tets();
       for (int itet=0; itet<ntet; ++itet) {
@@ -887,12 +883,12 @@ public class SibsonInterpolator3 {
         double vb = volume(_ca,_cd,_cc,_ct);
         double vc = volume(_ca,_cb,_cd,_ct);
         double vd = volume(_ca,_cc,_cb,_ct);
-        vsum = accumulateVolume(na,va,vsum);
-        vsum = accumulateVolume(nb,vb,vsum);
-        vsum = accumulateVolume(nc,vc,vsum);
-        vsum = accumulateVolume(nd,vd,vsum);
+        accumulate(na,va);
+        accumulate(nb,vb);
+        accumulate(nc,vc);
+        accumulate(nd,vd);
       }
-      return vsum;
+      return sum();
     }
     private double[] _ca = new double[3]; // circumcenter of fake tet pbcd
     private double[] _cb = new double[3]; // circumcenter of fake tet padc
@@ -910,13 +906,13 @@ public class SibsonInterpolator3 {
 
   ///////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////
-  private static class BraunSambridge implements VolumeAccumulator {
+  private static class BraunSambridge extends VolumeAccumulator {
 
     public double accumulateVolumes(
       double x1i, double x2i, double x3i,
       TetMesh mesh, TetMesh.NodeList nodeList, TetMesh.TetList tetList)
     {
-      double vsum = 0.0;
+      clear();
 
       // For all natural neighbors, ...
       int nnode = nodeList.nnode();
@@ -967,9 +963,9 @@ public class SibsonInterpolator3 {
 
         // Volume of polyhedron for this natural neighbor.
         double vj = _lv.getVolume();
-        vsum = accumulateVolume(jnode,vj,vsum);
+        accumulate(jnode,vj);
       }
-      return vsum;
+      return sum();
     }
     private LasserreVolume _lv = new LasserreVolume(3);
   }
@@ -984,27 +980,20 @@ public class SibsonInterpolator3 {
   // processed to complete the computation of volumes.
   // All geometric computations are performed in a shifted coordinate
   // system in which the interpolation point (xp,yp,zp) is the origin.
-  private static class HaleLiang implements VolumeAccumulator {
+  private static class HaleLiang extends VolumeAccumulator {
 
     public double accumulateVolumes(
       double xp, double yp, double zp,
       TetMesh mesh, TetMesh.NodeList nodeList, TetMesh.TetList tetList)
     {
-      _vsum = 0.0;
+      clear();
       processTets(xp,yp,zp,mesh,tetList);
       boolean ok = processFaces(xp,yp,zp);
-      return (ok)?_vsum:0.0;
+      return (ok)?sum():0.0;
     }
 
     private FaceList _faceList = new FaceList(); // list of tet faces
     private double[] _xyz = new double[3]; // a circumsphere center
-    private double _vsum; // sum of all node volumes
-
-    private void addVolume(TetMesh.Node node, double v) {
-      NodeData data = data(node);
-      data.volume += v;
-      _vsum += v;
-    }
 
     // Processes all natural-neighbor tets.
     private void processTets(
@@ -1049,9 +1038,9 @@ public class SibsonInterpolator3 {
         double xdc = xd+xc, ydc = yd+yc, zdc = zd+zc;
         double xcb = xc+xb, ycb = yc+yb, zcb = zc+zb;
         double xyz = yt*za-ya*zt, yzx = zt*xa-za*xt, zxy = xt*ya-xa*yt;
-        addVolume(nb,xbd*xyz+ybd*yzx+zbd*zxy);
-        addVolume(nd,xdc*xyz+ydc*yzx+zdc*zxy);
-        addVolume(nc,xcb*xyz+ycb*yzx+zcb*zxy);
+        accumulate(nb,xbd*xyz+ybd*yzx+zbd*zxy);
+        accumulate(nd,xdc*xyz+ydc*yzx+zdc*zxy);
+        accumulate(nc,xcb*xyz+ycb*yzx+zcb*zxy);
         saveFace = false;
       }
       if (saveFace)
@@ -1128,23 +1117,23 @@ public class SibsonInterpolator3 {
       double vab = xab*xyz+yab*yzx+zab*zxy;
       double vbc = xbc*xyz+ybc*yzx+zbc*zxy;
       double vca = xca*xyz+yca*yzx+zca*zxy;
-      addVolume(na,vab); addVolume(nb,-vab); // here we
-      addVolume(nb,vbc); addVolume(nc,-vbc); // must go
-      addVolume(nc,vca); addVolume(na,-vca); // both ways!
+      accumulate(na,vab); accumulate(nb,-vab); // here we
+      accumulate(nb,vbc); accumulate(nc,-vbc); // must go
+      accumulate(nc,vca); accumulate(na,-vca); // both ways!
 
      // Accumulate volumes for Voronoi edges between face neighbors.
       Face fa = face.fa; x2 = fa.xf; y2 = fa.yf; z2 = fa.zf;
       xyz = y1*z2-y2*z1; yzx = z1*x2-z2*x1; zxy = x1*y2-x2*y1;
-      addVolume(nb,xb *xyz+yb *yzx+zb *zxy);
-      addVolume(nc,xbc*xyz+ybc*yzx+zbc*zxy);
+      accumulate(nb,xb *xyz+yb *yzx+zb *zxy);
+      accumulate(nc,xbc*xyz+ybc*yzx+zbc*zxy);
       Face fb = face.fb; x2 = fb.xf; y2 = fb.yf; z2 = fb.zf;
       xyz = y1*z2-y2*z1; yzx = z1*x2-z2*x1; zxy = x1*y2-x2*y1;
-      addVolume(nc,xc *xyz+yc *yzx+zc *zxy);
-      addVolume(na,xca*xyz+yca*yzx+zca*zxy);
+      accumulate(nc,xc *xyz+yc *yzx+zc *zxy);
+      accumulate(na,xca*xyz+yca*yzx+zca*zxy);
       Face fc = face.fc; x2 = fc.xf; y2 = fc.yf; z2 = fc.zf;
       xyz = y1*z2-y2*z1; yzx = z1*x2-z2*x1; zxy = x1*y2-x2*y1;
-      addVolume(na,xa *xyz+ya *yzx+za *zxy);
-      addVolume(nb,xab*xyz+yab*yzx+zab*zxy);
+      accumulate(na,xa *xyz+ya *yzx+za *zxy);
+      accumulate(nb,xab*xyz+yab*yzx+zab*zxy);
     }
 
     // A list of faces that represent the boundary of the Voronoi

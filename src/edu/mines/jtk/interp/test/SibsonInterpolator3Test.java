@@ -104,8 +104,8 @@ public class SibsonInterpolator3Test extends TestCase {
   }
 
   public static void benchMethods() {
-    //TestFunction tf = TestFunction.makeSine();
-    TestFunction tf = TestFunction.makeLinear();
+    TestFunction tf = TestFunction.makeSine();
+    //TestFunction tf = TestFunction.makeLinear();
     testScattered(tf);
     testUniform(tf);
   }
@@ -220,7 +220,7 @@ public class SibsonInterpolator3Test extends TestCase {
         plot.setColorModel(ColorMap.JET);
         plot.setLineColor(Color.BLACK);
         plot.setInterpolation(PixelsView.Interpolation.NEAREST);
-        //plot.setClips(0.0f,1.0f);
+        plot.setClips(0.0f,1.0f);
         PlotFrame frame = new PlotFrame(plot);
         frame.setSize(800,760);
         frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
