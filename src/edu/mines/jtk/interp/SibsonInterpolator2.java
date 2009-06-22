@@ -269,11 +269,15 @@ public class SibsonInterpolator2 {
     _useBoundingBox = true;
 
     // Compute coordinates for ghost nodes, and add them to the mesh.
-    float scale = 0.1f;
-    x1min -= scale*(x1max-x1min); x1max += scale*(x1max-x1min);
-    x2min -= scale*(x2max-x2min); x2max += scale*(x2max-x2min);
-    float[] x1g = {x1min,x1max,x1min,x1max};
-    float[] x2g = {x2min,x2min,x2max,x2max};
+    float scale = 1.0f;
+    float x1avg = 0.5f*(x1min+x1max);
+    float x2avg = 0.5f*(x2min+x2max);
+    float x1pad = scale*(x1max-x1min);
+    float x2pad = scale*(x2max-x2min);
+    x1min -= x1pad; x1max += x1pad;
+    x2min -= x2pad; x2max += x2pad;
+    float[] x1g = {x1min,x1max,x1avg,x1avg};
+    float[] x2g = {x2avg,x2avg,x2min,x2max};
     addGhostNodes(x1g,x2g);
   }
 
@@ -783,6 +787,7 @@ public class SibsonInterpolator2 {
       return _sum;
     }
     protected void accumulate(TriMesh.Node node, double area) {
+      if (ghost(node)) return; // ignore ghost nodes!
       NodeData data = data(node);
       data.area += area;
       _sum += area;

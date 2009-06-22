@@ -147,7 +147,8 @@ abstract class TestFunction {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
-  private Random _random = new Random(314159);
+  //private Random _random = new Random(314159);
+  private Random _random = new Random();
   private float randomFloat() {
     return _random.nextFloat();
   }

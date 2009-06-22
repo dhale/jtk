@@ -33,7 +33,7 @@ public class SibsonInterpolator2Test extends TestCase {
   private static final float XMAX = 1.0f;
 
   // Number of scattered samples to be interpolated.
-  private static final int NS = 25;
+  private static final int NS = 49;
 
   // Uniform sampling used in interpolation.
   private static final int NX = 201;
@@ -49,24 +49,50 @@ public class SibsonInterpolator2Test extends TestCase {
   private static SibsonInterpolator2.Method WS = 
     SibsonInterpolator2.Method.WATSON_SAMBRIDGE;
 
-  public void testSine() {
-    TestFunction tf = TestFunction.makeSine();
-    //TestFunction tf = TestFunction.makeLinear();
-    testScattered(tf);
-    testUniform(tf);
+  public void testAll() {
+    doSimpleTriangle();
+    doSimpleSquare();
+    TestFunction tf;
+    tf = TestFunction.makeSine();
+    doScattered(tf);
+    doUniform(tf);
+    tf = TestFunction.makeLinear();
+    doScattered(tf);
+    doUniform(tf);
   }
 
-  private void testScattered(TestFunction tf) {
+  private void doScattered(TestFunction tf) {
     float[][] fx = tf.sampleScattered2(NS,XMIN,XMAX,XMIN,XMAX);
-    testMethods(tf,fx);
+    doMethods(tf,fx);
   }
 
-  private void testUniform(TestFunction tf) {
+  private void doUniform(TestFunction tf) {
     float[][] fx = tf.sampleUniform2(NS,XMIN,XMAX,XMIN,XMAX);
-    testMethods(tf,fx);
+    doMethods(tf,fx);
   }
 
-  private void testMethods(TestFunction tf, float[][] fx) {
+  private void doSimpleTriangle() {
+    float xmin = XMIN+0.35f*(XMAX-XMIN);
+    float xmax = XMAX-0.35f*(XMAX-XMIN);
+    float xavg = 0.5f*(xmin+xmax);
+    float[] x1 = {xmin,xmax,xavg};
+    float[] x2 = {xmin,xmin,xmax};
+    float[] f =  {xmin+xmin,xmax+xmin,xavg+xmax};
+    float[][] fx = {f,x1,x2};
+    doMethods(null,fx);
+  }
+
+  private void doSimpleSquare() {
+    float xmin = XMIN+0.35f*(XMAX-XMIN);
+    float xmax = XMAX-0.35f*(XMAX-XMIN);
+    float[] x1 = {xmin,xmax,xmin,xmax};
+    float[] x2 = {xmin,xmin,xmax,xmax};
+    float[] f =  {xmin+xmin,xmax+xmin,xmin+xmax,xmax+xmax};
+    float[][] fx = {f,x1,x2};
+    doMethods(null,fx);
+  }
+
+  private void doMethods(TestFunction tf, float[][] fx) {
     float[] f = fx[0], x1 = fx[1], x2 = fx[2];
     //SibsonInterpolator2.Method[] methods = {HL,BS,WS};
     SibsonInterpolator2.Method[] methods = {HL};
@@ -100,9 +126,9 @@ public class SibsonInterpolator2Test extends TestCase {
         sp.setTitle(method);
         sp.setSize(700,745);
         PixelsView pv = sp.addPixels(SX,SX,g);
-        pv.setColorModel(ColorMap.PRISM);
+        pv.setColorModel(ColorMap.JET);
         pv.setInterpolation(PixelsView.Interpolation.LINEAR);
-        pv.setClips(0.0f,1.0f);
+        //pv.setClips(0.0f,1.0f);
         PointsView px = sp.addPoints(x1,x2);
         px.setLineStyle(PointsView.Line.NONE);
         px.setMarkStyle(PointsView.Mark.FILLED_CIRCLE);
