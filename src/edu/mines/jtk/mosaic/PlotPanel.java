@@ -42,7 +42,7 @@ import edu.mines.jtk.util.Check;
  * orientation is X1DOWN_X2RIGHT, which is useful when the x1 axis 
  * corresponds to, say, a depth coordinate z.
  * @author Dave Hale, Colorado School of Mines
- * @version 2005.12.25
+ * @version 2009.06.19
  */
 public class PlotPanel extends IPanel {
   private static final long serialVersionUID = 1L;
@@ -813,6 +813,29 @@ public class PlotPanel extends IPanel {
   }
 
   /**
+   * Adds a contours view with the function f(x1,x2).
+   * Function f(x1,x2) assumed to have uniform sampling.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where
+   * n1 = f[0].length and n2 = f.length.
+   */
+  public ContoursView addContours(float[][] f) {
+    return addContours(0,0,f);
+  }
+
+  /** 
+   * Adds a contours view with the function f(x1,x2).
+   * Function f(x1,x2) assumed to have uniform sampling.
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param f array[n2][n1] of sampline function values f(x1,x2), where
+   * n1 = f[0].length and n2 = f.length.
+   */
+  public ContoursView addContours(int irow, int icol, float[][] f) {
+    ContoursView cv = new ContoursView(f);
+    return addContoursView(irow, icol, cv);
+  }
+
+  /**
    * Adds a sequence view with specified values f(x).
    * Uses default sampling of x = 0, 1, 2, ....
    * @param f array of sampled function values f(x).
@@ -1056,6 +1079,16 @@ public class PlotPanel extends IPanel {
     }
     _mosaic.getTile(irow,icol).addTiledView(pv);
     return pv;
+  }
+
+  private ContoursView addContoursView(int irow, int icol, ContoursView cv) {
+    if (_orientation==Orientation.X1RIGHT_X2UP) {
+      cv.setOrientation(ContoursView.Orientation.X1RIGHT_X2UP);
+    } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
+      cv.setOrientation(ContoursView.Orientation.X1DOWN_X2RIGHT);
+    }
+    _mosaic.getTile(irow,icol).addTiledView(cv);
+    return cv;
   }
 
   private SequenceView addSequenceView(int irow, int icol, SequenceView sv) {

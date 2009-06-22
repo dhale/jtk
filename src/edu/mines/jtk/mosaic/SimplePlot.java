@@ -34,7 +34,7 @@ import edu.mines.jtk.dsp.Sampling;
  *   plot.setHLabel("array index");
  * </code></pre>
  * @author Dave Hale, Colorado School of Mines
- * @version 2006.12.26
+ * @version 2009.06.19
  */
 public class SimplePlot extends PlotFrame {
   private static final long serialVersionUID = 1L;
@@ -231,6 +231,18 @@ public class SimplePlot extends PlotFrame {
   }
 
   /**
+   * Returns a new plot with a contours view of a sampled function f(x1,x2).
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where
+   *  n1 = f[0].length and n2 = f.length.
+   * @return the plot.
+   */
+  public static SimplePlot asContours(float[][] f) {
+    SimplePlot plot = new SimplePlot(Origin.UPPER_LEFT);
+    plot.addContours(f);
+    return plot;
+  }
+
+  /**
    * Adds a grid view.
    * @return the grid view.
    */
@@ -395,6 +407,15 @@ public class SimplePlot extends PlotFrame {
     return addPixels(s1,s2,convertToFloat(f));
   }
 
+  /**
+   * Adds a contours view of the specified sample function f(x1,x2).
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where
+   *  n2 = f[0].length and n2 = f.length.
+   */
+  public ContoursView addContours(float[][] f) {
+    return _panel.addContours(f);
+  }
+  
   /**
    * Adds the color bar with no label. The color bar paints the color map
    * of the most recently added pixels view. To avoid confusion, a color

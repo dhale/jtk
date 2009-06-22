@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2006, Colorado School of Mines and others. All rights reserved.
+Copyright (c) 2009, Colorado School of Mines and others. All rights reserved.
 This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
@@ -8,20 +8,25 @@ package edu.mines.jtk.mosaic;
 
 import static edu.mines.jtk.util.MathPlus.*;
 
-import java.awt.Graphics2D;
+import java.awt.*;
+import java.awt.image.IndexColorModel;
+import java.awt.image.ColorModel;
 import java.util.ArrayList;
+import java.util.Iterator;
 
+import edu.mines.jtk.awt.ColorMap;
+import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Check;
+import edu.mines.jtk.util.AxisTics;
+import edu.mines.jtk.util.Clips;
 
 /**
  * A view of a sampled function f(x1,x2), displayed with contour lines.
  * <p>
- * <em>NOT YET IMPLEMENTED!</em>
- * <p>
- * @author Dave Hale, Colorado School of Mines
- * @version 2006.01.02
+ * @author Dave Hale and Chris Engelsma, Colorado School of Mines
+ * @version 2009.06.18
  */
 public class ContoursView extends TiledView {
 
@@ -35,8 +40,16 @@ public class ContoursView extends TiledView {
     X1DOWN_X2RIGHT
   }
 
+  public enum Line {
+    DEFAULT,
+    SOLID,
+    DASH,
+    DOT,
+    DASH_DOT,
+  }
+
   /**
-   * Constructs a pixels view of the specified sampled function f(x1,x2).
+   * Constructs a contours view of the specified sampled function f(x1,x2).
    * Assumes zero first sample values and unit sampling intervals.
    * @param f array[n2][n1] of sampled function values f(x1,x2), where 
    *  n1 = f[0].length and n2 = f.length.
@@ -46,7 +59,7 @@ public class ContoursView extends TiledView {
   }
 
   /**
-   * Constructs a pixels view of the specified sampled function f(x1,x2).
+   * Constructs a contours view of the specified sampled function f(x1,x2).
    * @param s1 the sampling of the variable x1; must be uniform.
    * @param s2 the sampling of the variable x2; must be uniform.
    * @param f array[n2][n1] of sampled function values f(x1,x2), where
@@ -77,15 +90,18 @@ public class ContoursView extends TiledView {
     Check.argument(s1.isUniform(),"s1 is uniform");
     Check.argument(s2.isUniform(),"s2 is uniform");
     Check.argument(Array.isRegular(f),"f is regular");
-    Check.argument(s1.getCount()==f[0].length,"s1 consistent with f");
+    Check.argument(s1.getCount()==f[0].length,"s1 consistent with f"); 
     Check.argument(s2.getCount()==f.length,"s2 consistent with f");
     _s1 = s1;
     _s2 = s2;
     _f = Array.copy(f);
-    updateClips();
-    updateSampling();
-    updateContours();
+    _clips = new Clips(f);
+    updateArraySampling();
+    _cs = null;
+    _cl = null;
   }
+
+ 
 
   /**
    * Sets the orientation of sample axes.
@@ -94,7 +110,7 @@ public class ContoursView extends TiledView {
   public void setOrientation(Orientation orientation) {
     if (_orientation!=orientation) {
       _orientation = orientation;
-      updateSampling();
+      updateArraySampling();
       repaint();
     }
   }
@@ -108,22 +124,150 @@ public class ContoursView extends TiledView {
   }
 
   /**
-   * Sets the clips for this view. Contour lines are not plotted for
-   * function values f(x1,x2) outside the specified min-max range.
-   * <p>
-   * Calling this method disables the computation of clips from percentiles.
-   * Any clip values computed or specified previously will be forgotten.
-   * @param clipMin the sample value corresponding to color map byte index 0.
-   * @param clipMax the sample value corresponding to color map byte index 255.
+   * Sets the contour line style.
+   * The default style is solid.
+   * @param style the line style.
    */
-  public void setClips(float clipMin, float clipMax) {
-    Check.argument(clipMin<clipMax,"clipMin<clipMax");
-    if (_clipMin!=clipMin || _clipMax!=clipMax) {
-      _clipMin = clipMin;
-      _clipMax = clipMax;
-      _usePercentiles = false;
+  public void setLineStyle(Line style) {
+    if (_lineStyle!=style) {
+      _lineStyle = style;
       repaint();
     }
+  }
+
+  /**
+   * Sets the contour line style for negative-valued contours.
+   * By default, all contours share the same line style.
+   * @param style the line style.
+   */
+  public void setLineStyleNegative(Line style) {
+    if (_lineStyleNegative!=style) {
+      _lineStyleNegative = style;
+      repaint();
+    }
+  }
+
+  /**
+   * Sets the contour line width.
+   * The default width is zero, for the thinnest lines.
+   * @param width the line width.
+   */
+  public void setLineWidth(float width) {
+    if (_lineWidth!=width) {
+      _lineWidth = width;
+      updateBestProjectors();
+      repaint();
+    }
+  }
+
+  /**
+   * Sets the color of each contour line to the specified color.
+   * @param color the contour line color.
+   */
+  public void setLineColor(Color color) {
+    _lineColor = color;
+    repaint();
+  }
+
+  /**
+   * Sets the color model used to map contour values to colors.
+   * If set, then byte 0 of the color model corresponds to the minimum 
+   * clip value, and byte 255 corresponds to the maximum clip value.
+   * If not set, then all contour lines have the same color.
+   * @param colorModel the color model.
+   */
+  public void setColorModel(IndexColorModel colorModel) {
+    _lineColor = null;
+    _colorMap.setColorModel(colorModel);
+    repaint();
+  }
+
+  /**
+   * Enables or disables automatically computed readable contour values. 
+   * Here, readable values are multiples of 1, 2, and 5 times some 
+   * power of ten. If enabled, then any specified number of contours
+   * serves as an upper bound on the number of contour values.
+   * Readable contour values are the default.
+   * @param readableContours true, for readable contours; false, otherwise.
+   */
+  public void setReadableContours(boolean readableContours) {
+    if (_readableContours!=readableContours) {
+      _readableContours = readableContours;
+      _cs = null;
+      _cl = null;
+      repaint();
+    }
+  }
+
+  /**
+   * Sets the number of contour values. 
+   * If readable contours are enabled, then this number is an upper bound,
+   * and the actual number of contours may be less than this number.
+   * Otherwise, if readable contours are disabled, then contour values 
+   * will be evenly spaced between, but not including, the minimum and 
+   * maximum clip values. The default number of contour values is 25.
+   * @param n the number of contour values.
+   */
+  public void setContours(int n) {
+    _nc = n;
+    _cs = null;
+    _cl = null;
+    repaint();
+  }
+
+  /**
+   * Sets the contour values to those in the specified array.
+   * If this method is called, then clips (or percentiles) are not used 
+   * to determine contour values, and readable contours are disabled.
+   * @param c the array of contour values.
+   */
+  public void setContours(float[] c) {
+    double[] cd = new double[c.length];
+    for (int i=0; i<c.length; ++i) 
+      cd[i] = (double)c[i];
+    setContours(new Sampling(cd));
+  }
+
+  /**
+   * Sets the contour values to the specified sampling.
+   * If this method is called, then clips (or percentiles) are not used 
+   * to determine contour values, and readable contours are disabled.
+   * @param cs the contour sampling.
+   */
+  public void setContours(Sampling cs) {
+    _readableContours = false;
+    _cs = cs;
+    _cl = null;
+    repaint();
+  }
+
+  /**
+   * Gets the contour values.  
+   * @return array of contour values.
+   */
+  public float[] getContours() {
+    updateContourSampling();
+    float[] values = new float[_cs.getCount()];
+    for (int n=0; n<values.length; n++)
+      values[n] = _cl.get(n).fc;
+    return values;
+  }
+
+  /**
+   * Sets the clips for this view. These values limit the range used
+   * to determine contour values. Function values f(x1,x2) less than
+   * clipMin and greater than clipMax are ignored.
+   * <p>
+   * Calling this method disables the computation of clips from percentiles.
+   * Previous clip values will be forgotten.
+   * @param clipMin the lower bound on contour values.
+   * @param clipMax the upper bound on contour values.
+   */
+  public void setClips(float clipMin, float clipMax) {
+    _clips.setClips(clipMin,clipMax);
+    _cs = null;
+    _cl = null;
+    repaint();
   }
 
   /**
@@ -131,7 +275,7 @@ public class ContoursView extends TiledView {
    * @return the minimum clip value.
    */
   public float getClipMin() {
-    return _clipMin;
+    return _clips.getClipMin();
   }
 
   /**
@@ -139,7 +283,7 @@ public class ContoursView extends TiledView {
    * @return the maximum clip value.
    */
   public float getClipMax() {
-    return _clipMax;
+    return _clips.getClipMax();
   }
 
   /**
@@ -153,16 +297,10 @@ public class ContoursView extends TiledView {
    * @param percMax the percentile corresponding to clipMax.
    */
   public void setPercentiles(float percMin, float percMax) {
-    Check.argument(0.0f<=percMin,"0<=percMin");
-    Check.argument(percMin<percMax,"percMin<percMax");
-    Check.argument(percMax<=100.0f,"percMax<=100");
-    if (_percMin!=percMin || _percMax!=percMax) {
-      _percMin = percMin;
-      _percMax = percMax;
-      _usePercentiles = true;
-      updateClips();
-      repaint();
-    }
+    _clips.setPercentiles(percMin,percMax);
+    _cs = null;
+    _cl = null;
+    repaint();
   }
 
   /**
@@ -170,7 +308,7 @@ public class ContoursView extends TiledView {
    * @return the minimum percentile.
    */
   public float getPercentileMin() {
-    return _percMin;
+    return _clips.getPercentileMin();
   }
 
   /**
@@ -178,12 +316,30 @@ public class ContoursView extends TiledView {
    * @return the maximum percentile.
    */
   public float getPercentileMax() {
-    return _percMax;
+    return _clips.getPercentileMax();
+  }
+
+  /**
+   * Adds the specified color map listener.
+   * @param cml the listener.
+   */
+  public void addColorMapListener(ColorMapListener cml) {
+    _colorMap.addListener(cml);
+  }
+
+  /**
+   * Removes the specified color map listener.
+   * @param cml the listener.
+   */
+  public void removeColorMapListener(ColorMapListener cml) {
+    _colorMap.removeListener(cml);
   }
 
   public void paint(Graphics2D g2d) {
 
-	/*
+    updateContourSampling();
+    updateContours();
+
     // Projectors and transcaler.
     Projector hp = getHorizontalProjector();
     Projector vp = getVerticalProjector();
@@ -241,9 +397,116 @@ public class ContoursView extends TiledView {
     double dy = (y1-y0)/max(1,ny-1);
     double fx = x0;
     double fy = y0;
-    */
-  }
 
+    float lineWidth = 1.0f;
+
+    // Graphic context for contour lines
+    Graphics2D gline = null;
+    gline = (Graphics2D)g2d.create();
+    float[] dash = null;
+    Line lineStyle = _lineStyle;
+    if (lineStyle==Line.DEFAULT)
+      lineStyle = Line.SOLID;
+    if (lineStyle!=Line.SOLID) {
+      float dotLength = lineWidth;
+      float dashLength = 5.0f*lineWidth;
+      float gapLength = 5.0f*lineWidth;
+      if (lineStyle==Line.DASH) {
+        dash = new float[]{dashLength,gapLength};
+      } else if (lineStyle==Line.DOT) {
+        dash = new float[]{dotLength,gapLength};
+      } else if (lineStyle==Line.DASH_DOT) {
+        dash = new float[]{dashLength,gapLength,dotLength,gapLength};
+      }
+    }
+    float width = lineWidth;
+    if (_lineWidth!=0.0f)
+      width *= _lineWidth;
+    BasicStroke bs = null;
+    if (dash!=null) {
+      int cap = BasicStroke.CAP_ROUND;
+      int join = BasicStroke.JOIN_ROUND;
+      float miter = 10.0f;
+      float phase = 0.0f;
+      bs = new BasicStroke(width,cap,join,miter,dash,phase);
+    } else {
+      bs = new BasicStroke(width);
+    }
+    gline.setStroke(bs);
+
+    BasicStroke bsneg = null;
+    if (_lineStyleNegative!=Line.DEFAULT) {
+      dash = null;
+      if (_lineStyleNegative!=Line.SOLID) {
+        float dotLength = lineWidth;
+        float dashLength = 5.0f*lineWidth;
+        float gapLength = 5.0f*lineWidth;
+        if (_lineStyleNegative==Line.DASH) {
+          dash = new float[]{dashLength,gapLength};
+        } else if (_lineStyleNegative==Line.DOT) {
+          dash = new float[]{dotLength,gapLength};
+        } else if (_lineStyleNegative==Line.DASH_DOT) {
+          dash = new float[]{dashLength,gapLength,dotLength,gapLength};
+        }
+      }
+      width = lineWidth;
+      if (_lineWidth!=0.0f)
+        width *= _lineWidth;
+      if (dash!=null) {
+        int cap = BasicStroke.CAP_ROUND;
+        int join = BasicStroke.JOIN_ROUND;
+        float miter = 10.0f;
+        float phase = 0.0f;
+        bsneg = new BasicStroke(width,cap,join,miter,dash,phase);
+      } else {
+        bsneg = new BasicStroke(width);
+      }
+    }
+    
+    IndexColorModel cm = null;
+    if (_lineColor!=null) {
+      gline.setColor(_lineColor);
+    } else {
+      cm = _colorMap.getColorModel();
+    }
+
+    for (int is=0; is<_cs.getCount(); ++is) {
+      float fc = _cl.get(is).fc;
+      ArrayList<float[]> cx1 = _cl.get(is).x1;
+      ArrayList<float[]> cx2 = _cl.get(is).x2;
+      Iterator<float[]> it1 = cx1.iterator();
+      Iterator<float[]> it2 = cx2.iterator();
+      // If assigning a ColorMap to the contours, then assign the values
+      // of the contours to their ColorMap equivalents within a 0-255 range.
+      if (cm!=null) {
+        //Normalize the color components for 0 - 255
+        int index;
+        if (fc<_clipMin) index = 0;
+        else if (fc>_clipMax) index = 255;
+        else index = (int)((fc-_clipMin)/(_clipMax-_clipMin)*255f);
+        gline.setColor(new Color(cm.getRGB(index)));
+      }
+      // If we're using dashed negatives, then let's change the 
+      // line stroke depending on whether the value is negative
+      // or positive.
+      if (_lineStyleNegative!=Line.DEFAULT) {
+        if (fc<0.0f) gline.setStroke(bsneg);
+        if (fc>=0.0f) gline.setStroke(bs);
+      }
+
+      while (it1.hasNext()) {
+        float[] xc1 = it1.next();
+        float[] xc2 = it2.next();
+        int n = xc1.length;
+        int[] xcon = new int[xc1.length];
+        int[] ycon = new int[xc2.length];
+        computeXY(hp,vp,ts,n,xc1,xc2,xcon,ycon);
+        if (gline!=null) 
+          gline.drawPolyline(xcon,ycon,n);
+      }
+    }
+  }
+  
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -282,57 +545,88 @@ public class ContoursView extends TiledView {
     }
   }
 
+  // Contour line attributes.
+  private float _lineWidth = 0.0f;
+  private Line _lineStyle = Line.SOLID; 
+  private Line _lineStyleNegative = Line.DEFAULT;
+  private Color _lineColor = Color.BLACK;
+  private ColorMap _colorMap = new ColorMap(ColorMap.JET);
+
   // The sampled floats.
   private Sampling _s1; // sampling of 1st dimension
   private Sampling _s2; // sampling of 2nd dimension
   private float[][] _f; // copy of array of floats
 
-  // View orientation.
+  // View orientation
   private Orientation _orientation = Orientation.X1RIGHT_X2UP;
 
-  // Clips and percentiles.
-  private float _clipMin; // mapped to color map byte index 0
-  private float _clipMax; // mapped to color map byte index 255
-  private float _percMin = 0.0f; // may be used to compute _clipMin
-  private float _percMax = 100.0f; // may be used to compute _clipMax
-  private boolean _usePercentiles = true; // true, if using percentiles
-
   // Sampling of the function f(x1,x2) in the pixel (x,y) coordinate system. 
-  //private boolean _transposed;
-  private boolean _xflipped;
-  private boolean _yflipped;
-  private int _nx;
-  private double _dx;
-  private double _fx;
-  private int _ny;
-  private double _dy;
-  private double _fy;
+  private boolean _transposed; // true, if (x,y) <=> (x2,x1)
+  private boolean _xflipped; // true, if axis decreases with increasing x
+  private boolean _yflipped; // true, if axis decreases with increasing y
+  private int _nx; // number of samples for x axis
+  private double _dx; // sampling interval for x axis
+  private double _fx; // first sample for x axis
+  private int _ny; // number of samples for y axis
+  private double _dy; // sampling interval for y axis
+  private double _fy; // first sample for y axis
 
-  // Contour sampling and corresponding list of contours.
-  private Sampling _cs;
-  private ArrayList<Contour> _cl;
+  // Clipping
+  private Clips _clips;
+  private float _clipMin;
+  private float _clipMax;
+
+  // Contour sampling and list of contours.
+  private int _nc = 25; // number of contours; may be less if readable contours
+  private boolean _readableContours = true; // true, for readable contour vals
+  private Sampling _cs; // contour sampling
+  private ArrayList<Contour> _cl; // list of contours
+  
+  // Contour rendering
 
   /**
-   * If using percentiles, computes corresponding clip values.
+   * Update the clips if necessary.
    */
   private void updateClips() {
-    if (_usePercentiles) {
-      float[] a = (_percMin!=0.0f || _percMax!=0.0f)?Array.flatten(_f):null;
-      int n = (a!=null)?a.length:0;
-      int kmin = (int)rint(_percMin*0.01*(n-1));
-      if (kmin<=0) {
-        _clipMin = Array.min(_f);
+    float clipMin = _clips.getClipMin();
+    float clipMax = _clips.getClipMax();
+    if (_clipMin!=clipMin || _clipMax!=clipMax) {
+      _clipMin = clipMin;
+      _clipMax = clipMax;
+      _colorMap.setValueRange(clipMin,clipMax);
+    }
+  }
+
+  /**
+   * Updates the number of contours. This is based on the contour sampling,
+   * which is determined by the clipping values of the data range.  Since
+   * the defaults are 0 and 100, the entire range of data will be used
+   * to determine the contour values.  If the clips are set, the contours
+   * will be set to the new range.
+   */
+  private void updateContourSampling() {
+    if (_cs==null) {
+      updateClips();
+      int nc;
+      double dc,fc;
+      if (_readableContours) {
+        AxisTics at = new AxisTics(_clipMin,_clipMax,_nc);
+        nc = at.getCountMajor();
+        dc = at.getDeltaMajor();
+        fc = at.getFirstMajor();
       } else {
-        Array.quickPartialSort(kmin,a);
-        _clipMin = a[kmin];
+        nc = _nc;
+        dc = (_clipMax-_clipMin)/(nc+1);
+        fc = _clipMin;
       }
-      int kmax = (int)rint(_percMax*0.01*(n-1));
-      if (kmax>=n-1) {
-        _clipMax = Array.max(_f);
-      } else {
-        Array.quickPartialSort(kmax,a);
-        _clipMax = a[kmax];
+      double[] cstep = new double[nc];
+      cstep[0] = fc+dc;
+      int count = 1;
+      while (count<nc) {
+        cstep[count] = cstep[count-1]+dc;
+        count++;
       }
+      _cs = new Sampling(cstep);
     }
   }
 
@@ -344,7 +638,7 @@ public class ContoursView extends TiledView {
    * corresponds to y. In either case, the coordinates (_fx,_fy) correspond
    * to the sampled function value _f[0][0].
    */
-  private void updateSampling() {
+  private void updateArraySampling() {
     int n1 = _s1.getCount();
     int n2 = _s2.getCount();
     double d1 = _s1.getDelta();
@@ -352,7 +646,7 @@ public class ContoursView extends TiledView {
     double f1 = _s1.getFirst();
     double f2 = _s2.getFirst();
     if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      //_transposed = true;
+      _transposed = true;
       _xflipped = false;
       _yflipped = false;
       _nx = n2;
@@ -362,7 +656,7 @@ public class ContoursView extends TiledView {
       _dy = d1;
       _fy = f1;
     } else if (_orientation==Orientation.X1RIGHT_X2UP) {
-      //_transposed = false;
+      _transposed = false;
       _xflipped = false;
       _yflipped = true;
       _nx = n1;
@@ -409,33 +703,60 @@ public class ContoursView extends TiledView {
       y1 += tiny;
     }
 
-    // Margins in normalized coordinates.
-    double uxMargin = (_nx>1)?0.5/_nx:0.0;
-    double uyMargin = (_ny>1)?0.5/_ny:0.0;
-
-    // (ux0,uy0) = normalized coordinates for (left,top) of view.
-    // (ux1,uy1) = normalized coordinates for (right,bottom) of view.
-    double ux0 = uxMargin;
-    double uy0 = uyMargin;
-    double ux1 = 1.0-uxMargin;
-    double uy1 = 1.0-uyMargin;
+    // Assume mark sizes and line widths less than 2% of plot dimensions.
+    // The goal is to avoid clipping wide lines. The problem is that line 
+    // widths are specified in screen pixels (or points), but margins u0 
+    // and u1 are specified in normalized coordinates, fractions of our 
+    // tile's width and height. Here, we do not know those dimensions.
+    double u0 = 0.0;
+    double u1 = 1.0;
+    if (_lineWidth>1.0f) {
+      u0 = 0.01;
+      u1 = 0.99;
+    }
 
     // Best projectors.
-    Projector bhp = new Projector(x0,x1,ux0,ux1);
-    Projector bvp = new Projector(y0,y1,uy0,uy1);
+    Projector bhp = new Projector(x0,x1,u0,u1);
+    Projector bvp = new Projector(y0,y1,u0,u1);
     setBestProjectors(bhp,bvp);
   }
 
+  /**
+   * Updates the contours for this view.
+   */
   private void updateContours() {
-    int nc = _cs.getCount();
-    _cl = new ArrayList<Contour>();
-    for (int ic=0; ic<nc; ++ic) {
-      float fc = (float)_cs.getValue(ic);
-      Contour c = makeContour(fc,_s1,_s2,_f);
-      _cl.add(c);
+    if (_cl==null) {
+      int nc = _cs.getCount();
+      _cl = new ArrayList<Contour>();
+      for (int ic=0; ic<nc; ++ic) {
+        float fc = (float)_cs.getValue(ic);
+        Contour c = makeContour(fc,_s1,_s2,_f);
+        _cl.add(c);
+      }
     }
   }
 
+  /**
+   * Computes coordinates for a contour segment.
+   */
+  private void computeXY(
+    Projector hp, Projector vp, Transcaler ts,
+    int n, float[] x1, float[] x2, int[] x, int[] y) 
+  {
+    ts = ts.combineWith(hp,vp);
+    float[] xv,yv;
+    if (_transposed) {
+      xv = x2;
+      yv = x1;
+    } else {
+      xv = x1;
+      yv = x2;
+    }
+    for (int i=0; i<n; ++i) {
+      x[i] = ts.x(xv[i]);
+      y[i] = ts.y(yv[i]);
+    }
+  }
 
 
   ///////////////////////////////////////////////////////////////////////////
@@ -562,8 +883,11 @@ public class ContoursView extends TiledView {
           clrs(i1,i2,flags);
           for (i=is; i>=0; i=connect(i,fc,n1,d1,f1,n2,d2,f2,f,flags,x1,x2))
             --ni;
+          // Close the contours...
+          x1.add(x1.a[0]);
+          x2.add(x2.a[0]);
           c.append(x1,x2);
-        }
+        } 
       }
     }
 
@@ -590,7 +914,7 @@ public class ContoursView extends TiledView {
 
     // If exiting north, ...
     if (sset(i1,i2+1,flags)) {
-      float d = delta(fc,f[i2][i1],f[i2][i1+1]);
+      float d = delta(fc,f[i2+1][i1],f[i2+1][i1+1]);
       x1.add(f1+(i1+d)*d1);
       x2.add(f2+(i2+1)*d2);
       clrs(i1,++i2,flags);
@@ -599,7 +923,7 @@ public class ContoursView extends TiledView {
     
     // Else if exiting east, ...
     else if (wset(i1+1,i2,flags)) {
-      float d = delta(fc,f[i2][i1],f[i2+1][i1]);
+      float d = delta(fc,f[i2][i1+1],f[i2+1][i1+1]);
       x1.add(f1+(i1+1)*d1);
       x2.add(f2+(i2+d)*d2);
       clrw(++i1,i2,flags);
@@ -630,6 +954,7 @@ public class ContoursView extends TiledView {
     }
   }
 
+  // Contour exit-directions.
   private static final byte WEST = 1;
   private static final byte SOUTH = 2;
   private static final byte NOT_WEST = ~WEST;
