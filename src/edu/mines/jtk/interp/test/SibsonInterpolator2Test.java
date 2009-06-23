@@ -50,6 +50,8 @@ public class SibsonInterpolator2Test extends TestCase {
     SibsonInterpolator2.Method.WATSON_SAMBRIDGE;
 
   public void testAll() {
+    doSkinnyTriangle();
+    /*
     doSimpleTriangle();
     doSimpleSquare();
     TestFunction tf;
@@ -59,6 +61,7 @@ public class SibsonInterpolator2Test extends TestCase {
     tf = TestFunction.makeLinear();
     doScattered(tf);
     doUniform(tf);
+    */
   }
 
   private void doScattered(TestFunction tf) {
@@ -69,6 +72,18 @@ public class SibsonInterpolator2Test extends TestCase {
   private void doUniform(TestFunction tf) {
     float[][] fx = tf.sampleUniform2(NS,XMIN,XMAX,XMIN,XMAX);
     doMethods(tf,fx);
+  }
+
+  private void doSkinnyTriangle() {
+    float xmin = XMIN+0.25f*(XMAX-XMIN);
+    float xmax = XMAX-0.25f*(XMAX-XMIN);
+    float xmid = 0.5f*(xmin+xmax);
+    float xtop = xmid+0.1f*(xmax-xmin);
+    float[] x1 = {xmin,xmax,xmid};
+    float[] x2 = {xmid,xmid,xtop};
+    float[] f =  {1.0f,0.5f,1.0f};
+    float[][] fx = {f,x1,x2};
+    doMethods(null,fx);
   }
 
   private void doSimpleTriangle() {
@@ -128,7 +143,7 @@ public class SibsonInterpolator2Test extends TestCase {
         PixelsView pv = sp.addPixels(SX,SX,g);
         pv.setColorModel(ColorMap.JET);
         pv.setInterpolation(PixelsView.Interpolation.LINEAR);
-        //pv.setClips(0.0f,1.0f);
+        //pv.setClips(0.0f,2.0f);
         PointsView px = sp.addPoints(x1,x2);
         px.setLineStyle(PointsView.Line.NONE);
         px.setMarkStyle(PointsView.Mark.FILLED_CIRCLE);

@@ -46,13 +46,12 @@ import edu.mines.jtk.util.*;
  * <p>
  * To extend the interpolant outside the convex hull, this class enables
  * bounds to be set explicitly. When bounds are set, extra ghost samples 
- * are added outside the convex hull. These ghost samples have values and 
- * gradients computed by weighted least-squares fitting of nearby samples
+ * are added outside the convex hull. These ghost samples have no values,
  * but they create a larger convex hull so that Sibson coordinates can be
  * computed anywhere within the specified bounds. While often useful, this 
  * extrapolation feature should be used with care, because the added ghost 
- * samples may alter the Sibson interpolant at points inside the original 
- * convex hull.
+ * samples may alter the Sibson interpolant at points inside but near the 
+ * original convex hull.
  * <p>
  * References:
  * <ul><li>
@@ -274,9 +273,9 @@ public class SibsonInterpolator3 {
     Check.argument(x3min<x3max,"x3min<x3max");
 
     // Remember the specified bounding box.
-    _xmin = x1min; _xmax = x1max;
-    _ymin = x2min; _ymax = x2max;
-    _zmin = x3min; _zmax = x3max;
+    _x1bmn = x1min; _x1bmx = x1max;
+    _x2bmn = x2min; _x2bmx = x2max;
+    _x3bmn = x3min; _x3bmx = x3max;
     _useBoundingBox = true;
 
     // Compute coordinates for ghost nodes, and add them to the mesh.
@@ -284,9 +283,12 @@ public class SibsonInterpolator3 {
     float x1avg = 0.5f*(x1min+x1max);
     float x2avg = 0.5f*(x2min+x2max);
     float x3avg = 0.5f*(x3min+x3max);
-    float x1pad = scale*(x1max-x1min);
-    float x2pad = scale*(x2max-x2min);
-    float x3pad = scale*(x3max-x3min);
+    float x1dif = Math.max(x1max-_x1min,_x1max-x1min);
+    float x2dif = Math.max(x2max-_x2min,_x2max-x2min);
+    float x3dif = Math.max(x3max-_x3min,_x3max-x3min);
+    float x1pad = scale*x1dif;
+    float x2pad = scale*x2dif;
+    float x3pad = scale*x3dif;
     x1min -= x1pad; x1max += x1pad;
     x2min -= x2pad; x2max += x2pad;
     x3min -= x3pad; x3max += x2pad;
@@ -409,14 +411,12 @@ public class SibsonInterpolator3 {
    * between the i'th sample value and the returned interpolated value is
    * a measure of error at the i'th sample.
    * <p>
+   * If bounds have not been set explicitly, then this method will return 
+   * a null value if the validated sample is on the convex hull of samples.
+   * <p>
    * This method does not recompute gradients that may have been estimated 
    * using the sample to be validated. Therefore, validation should be 
    * performed without using gradients. 
-   * <p> 
-   * This method does not recompute values for ghost nodes that may have 
-   * been constructed using the value of the sample to be validated. And 
-   * if bounds have not been set explicitly, then this method will return 
-   * a null values if the validated sample is on the convex hull.
    * @param i the index of the sample to validate.
    * @return the value interpolated at the validated sample point.
    */
@@ -430,14 +430,12 @@ public class SibsonInterpolator3 {
    * between the values of the specified samples and the returned 
    * interpolated values are measures of errors for those samples.
    * <p>
+   * If bounds have not been set explicitly, then this method will return 
+   * null values if the validated sample is on the convex hull of samples.
+   * <p>
    * This method does not recompute gradients that may have been estimated 
    * using the samples to be validated. Therefore, validation should be 
    * performed without using gradients. 
-   * <p> 
-   * This method does not recompute values for ghost nodes that may have 
-   * been constructed using values of samples to be validated. And if
-   * bounds have not been set explicitly, then this method will return 
-   * null values for validated samples on the convex hull.
    * @param i array of indices of samples to validate.
    * @return array of values interpolated at validated sample points.
    */
@@ -496,21 +494,25 @@ public class SibsonInterpolator3 {
   private boolean _haveGradients; // true if mesh nodes have gradients
   private double _gradientPower; // power of gradients
   private float _fnull; // returned when interpolation point out of bounds
-  private float _xmin,_xmax,_ymin,_ymax,_zmin,_zmax; // bounding box
+  private float _x1min,_x1max,_x2min,_x2max,_x3min,_x3max; // for (x1,x2,x3)
+  private float _x1bmn,_x1bmx,_x2bmn,_x2bmx,_x3bmn,_x3bmx; // if bounds set
   private boolean _useBoundingBox; // true if using bounding box
 
   // Returns a tet mesh built from specified scattered samples.
-  private void makeMesh(float[] f, float[] x, float[] y, float[] z) {
-    int n = x.length;
+  private void makeMesh(float[] f, float[] x1, float[] x2, float[] x3) {
 
     // Find bounding box for sample points.
-    float xmin = x[0], xmax = x[0];
-    float ymin = y[0], ymax = y[0];
-    float zmin = z[0], zmax = z[0];
+    int n = x1.length;
+    _x1min = x1[0]; _x1max = x1[0];
+    _x2min = x2[0]; _x2max = x2[0];
+    _x3min = x3[0]; _x3max = x3[0];
     for (int i=1; i<n; ++i) {
-      if (x[i]<xmin) xmin = x[i]; if (x[i]>xmax) xmax = x[i];
-      if (y[i]<ymin) ymin = y[i]; if (y[i]>ymax) ymax = y[i];
-      if (z[i]<zmin) zmin = z[i]; if (z[i]>zmax) zmax = z[i];
+      if (x1[i]<_x1min) _x1min = x1[i]; 
+      if (x1[i]>_x1max) _x1max = x1[i];
+      if (x2[i]<_x2min) _x2min = x2[i]; 
+      if (x2[i]>_x2max) _x2max = x2[i];
+      if (x3[i]<_x3min) _x3min = x3[i]; 
+      if (x3[i]>_x3max) _x3max = x3[i];
     }
 
     // Array of nodes, one for each specified sample.
@@ -519,20 +521,23 @@ public class SibsonInterpolator3 {
     // Construct the mesh with nodes at sample points.
     _mesh = new TetMesh();
     for (int i=0; i<n; ++i) {
-      float xi = x[i];
-      float yi = y[i];
-      float zi = z[i];
+      float x1i = x1[i];
+      float x2i = x2[i];
+      float x3i = x3[i];
 
       // Push out slightly any points that are on the bounding box. This 
       // perturbation inflates the convex hull of sample points, so that 
       // interpolation can be performed at points that would otherwise be 
       // on (or, due to rounding errors, outside) the convex hull.
-      if (xi==xmin) xi -= Math.ulp(xi); if (xi==xmax) xi += Math.ulp(xi);
-      if (yi==ymin) yi -= Math.ulp(yi); if (yi==ymax) yi += Math.ulp(yi);
-      if (zi==zmin) zi -= Math.ulp(zi); if (zi==zmax) zi += Math.ulp(zi);
+      if (x1i==_x1min) x1i -= Math.ulp(x1i); 
+      if (x1i==_x1max) x1i += Math.ulp(x1i);
+      if (x2i==_x2min) x2i -= Math.ulp(x2i); 
+      if (x2i==_x2max) x2i += Math.ulp(x2i);
+      if (x3i==_x3min) x3i -= Math.ulp(x3i); 
+      if (x3i==_x3max) x3i += Math.ulp(x3i);
 
       // Add a new node to the mesh, unless one already exists there.
-      TetMesh.Node node = new TetMesh.Node(xi,yi,zi);
+      TetMesh.Node node = new TetMesh.Node(x1i,x2i,x3i);
       boolean added = _mesh.addNode(node);
       Check.argument(added,"each sample has unique coordinates");
       NodeData data = new NodeData();
@@ -549,11 +554,29 @@ public class SibsonInterpolator3 {
     return _haveGradients && _gradientPower>0.0;
   }
 
+  // Adds ghost nodes to the mesh without any values or gradients.
+  // Arrays x[ng], y[ng] and z[ng] contain coordinates of ng ghost nodes.
+  private void addGhostNodes(float[] x, float[] y, float[] z) {
+    int ng = x.length;
+    for (int ig=0; ig<ng; ++ig) {
+      float xg = x[ig];
+      float yg = y[ig];
+      float zg = z[ig];
+      TetMesh.PointLocation pl = _mesh.locatePoint(xg,yg,zg);
+      if (pl.isOutside()) {
+        TetMesh.Node n = new TetMesh.Node(xg,yg,zg);
+        n.data = new NodeData();
+        n.index = -1-ig; // ghost nodes have negative indices
+        _mesh.addNode(n);
+      }
+    }
+  }
+
   // Adds ghost nodes to the mesh with estimated values and gradients.
   // Arrays x[ng], y[ng] and z[ng] contain coordinates of ng ghost nodes.
   // Function values and gradients are computed by inverse-distance 
   // weighted least-squares fitting of function values for real nodes.
-  private void addGhostNodes(float[] x, float[] y, float[] z) {
+  private void addGhostNodesWithValues(float[] x, float[] y, float[] z) {
     int ng = x.length;
     int nn = _nodes.length;
 
@@ -644,11 +667,11 @@ public class SibsonInterpolator3 {
   }
 
   // Returns true if not using bounding box or if point is inside the box.
-  private boolean inBounds(float x, float y, float z) {
+  private boolean inBounds(float x1, float x2, float x3) {
     return !_useBoundingBox ||
-           _xmin<=x && x<=_xmax &&
-           _ymin<=y && y<=_ymax &&
-           _zmin<=z && z<=_zmax;
+           _x1bmn<=x1 && x1<=_x1bmx &&
+           _x2bmn<=x2 && x2<=_x2bmx &&
+           _x3bmn<=x3 && x3<=_x3bmx;
   }
 
   // Gets lists of natural neighbor nodes and tets of point (x,y,z).
@@ -785,6 +808,7 @@ public class SibsonInterpolator3 {
     double zn = n.zp();
     _mesh.removeNode(n);
     double vsum = computeVolumes((float)xn,(float)yn,(float)zn);
+    _mesh.addNode(n);
     if (vsum>0.0) {
       int nm = _nodeList.nnode();
       TetMesh.Node[] ms = _nodeList.nodes();
@@ -792,47 +816,52 @@ public class SibsonInterpolator3 {
                         hyy = 0.0, hyz = 0.0,
                                    hzz = 0.0;
       double px = 0.0, py = 0.0, pz = 0.0;
+      double nr = 0; // number of real (not ghost) natural neighbor nodes
       for (int im=0; im<nm; ++im) {
         TetMesh.Node m = ms[im];
-        double fm = f(m);
-        double wm = volume(m);
-        double xm = m.xp();
-        double ym = m.yp();
-        double zm = m.zp();
-        double df = fn-fm;
-        double dx = xn-xm;
-        double dy = yn-ym;
-        double dz = zn-zm;
-        double ds = wm/(dx*dx+dy*dy+dz*dz);
-        hxx += ds*dx*dx; // 3x3 symmetric positive-definite matrix
-        hxy += ds*dx*dy;
-        hxz += ds*dx*dz;
-        hyy += ds*dy*dy;
-        hyz += ds*dy*dz;
-        hzz += ds*dz*dz;
-        px += ds*dx*df; // right-hand-side column vector
-        py += ds*dy*df;
-        pz += ds*dz*df;
+        if (!ghost(m)) {
+          double fm = f(m);
+          double wm = volume(m);
+          double xm = m.xp();
+          double ym = m.yp();
+          double zm = m.zp();
+          double df = fn-fm;
+          double dx = xn-xm;
+          double dy = yn-ym;
+          double dz = zn-zm;
+          double ds = wm/(dx*dx+dy*dy+dz*dz);
+          hxx += ds*dx*dx; // 3x3 symmetric positive-definite matrix
+          hxy += ds*dx*dy;
+          hxz += ds*dx*dz;
+          hyy += ds*dy*dy;
+          hyz += ds*dy*dz;
+          hzz += ds*dz*dz;
+          px += ds*dx*df; // right-hand-side column vector
+          py += ds*dy*df;
+          pz += ds*dz*df;
+          ++nr;
+        }
       }
-      double lxx = Math.sqrt(hxx); // Cholesky decomposition
-      double lxy = hxy/lxx;
-      double lxz = hxz/lxx;
-      double dyy = hyy-lxy*lxy;
-      double lyy = Math.sqrt(dyy);
-      double lyz = (hyz-lxz*lxy)/lyy;
-      double dzz = hzz-lxz*lxz-lyz*lyz;
-      double lzz = Math.sqrt(dzz);
-      double qx = px/lxx; // forward elimination
-      double qy = (py-lxy*qx)/lyy;
-      double qz = (pz-lxz*qx-lyz*qy)/lzz;
-      double gz = qz/lzz; // back substitution
-      double gy = (qy-lyz*gz)/lyy;
-      double gx = (qx-lxy*gy-lxz*gz)/lxx;
-      data.gx = (float)gx;
-      data.gy = (float)gy;
-      data.gz = (float)gz;
+      if (nr>2) { // need at least three real natural neighbor nodes
+        double lxx = Math.sqrt(hxx); // Cholesky decomposition
+        double lxy = hxy/lxx;
+        double lxz = hxz/lxx;
+        double dyy = hyy-lxy*lxy;
+        double lyy = Math.sqrt(dyy);
+        double lyz = (hyz-lxz*lxy)/lyy;
+        double dzz = hzz-lxz*lxz-lyz*lyz;
+        double lzz = Math.sqrt(dzz);
+        double qx = px/lxx; // forward elimination
+        double qy = (py-lxy*qx)/lyy;
+        double qz = (pz-lxz*qx-lyz*qy)/lzz;
+        double gz = qz/lzz; // back substitution
+        double gy = (qy-lyz*gz)/lyy;
+        double gx = (qx-lxy*gy-lxz*gz)/lxx;
+        data.gx = (float)gx;
+        data.gy = (float)gy;
+        data.gz = (float)gz;
+      }
     }
-    _mesh.addNode(n);
   }
 
   ///////////////////////////////////////////////////////////////////////////
