@@ -14862,6 +14862,6 @@ public class Array {
   }
 
   // Static methods only.
-  private Array() {
+  protected Array() {
   }
 }

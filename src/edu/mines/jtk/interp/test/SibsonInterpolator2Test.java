@@ -51,7 +51,6 @@ public class SibsonInterpolator2Test extends TestCase {
 
   public void testAll() {
     doSkinnyTriangle();
-    /*
     doSimpleTriangle();
     doSimpleSquare();
     TestFunction tf;
@@ -61,7 +60,6 @@ public class SibsonInterpolator2Test extends TestCase {
     tf = TestFunction.makeLinear();
     doScattered(tf);
     doUniform(tf);
-    */
   }
 
   private void doScattered(TestFunction tf) {
@@ -116,7 +114,7 @@ public class SibsonInterpolator2Test extends TestCase {
       SibsonInterpolator2 si = new SibsonInterpolator2(method,f,x1,x2);
       si.setNullValue(1.0f);
       si.setBounds(SX,SX);
-      si.setGradientPower(1.0);
+      //si.setGradientPower(1.0);
       double tmin = Double.MAX_VALUE;
       float[][] g = null;
       for (int iter=0; iter<3; ++iter) {
