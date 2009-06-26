@@ -1045,10 +1045,8 @@ public class SibsonInterpolator2 {
     // Processes one edge.
     private void processEdge(double xp, double yp, Edge edge) {
 
-      // Coordinates of two edge nodes, shifted for local origin.
+      // Two edge nodes.
       TriMesh.Node na = edge.na, nb = edge.nb;
-      double xa = na.xp()-xp, ya = na.yp()-yp;
-      double xb = nb.xp()-xp, yb = nb.yp()-yp;
 
       // Accumulate areas for the Voronoi edge through the tri edge.
       double x1 = edge.xf;

@@ -10,7 +10,6 @@ import static java.lang.Math.*;
 import java.util.Random;
 
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.Array;
 
 /**
  * Functions for testing interpolation methods.

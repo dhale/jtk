@@ -397,7 +397,7 @@ public class OrbitView extends View {
     ++_ndraw;
     if (_stopwatch.time()>2.0) {
       _stopwatch.stop();
-      int rate = (int)(_ndraw/_stopwatch.time());
+      //int rate = (int)(_ndraw/_stopwatch.time());
       //trace("OrbitView: draw frame/s = "+rate);
       _ndraw = 0;
       _stopwatch.restart();

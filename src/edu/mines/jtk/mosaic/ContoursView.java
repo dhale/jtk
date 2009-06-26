@@ -10,7 +10,6 @@ import static edu.mines.jtk.util.MathPlus.*;
 
 import java.awt.*;
 import java.awt.image.IndexColorModel;
-import java.awt.image.ColorModel;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -376,6 +375,7 @@ public class ContoursView extends TiledView {
     if (clipRect.isEmpty())
       return;
     
+    /* Drawing not yet restricted to clip rectangle.
     // Sample coordinates corresponding to the clip rectangle.
     int xc = clipRect.x;
     int yc = clipRect.y;
@@ -397,6 +397,7 @@ public class ContoursView extends TiledView {
     double dy = (y1-y0)/max(1,ny-1);
     double fx = x0;
     double fy = y0;
+    */
 
     float lineWidth = 1.0f;
 
