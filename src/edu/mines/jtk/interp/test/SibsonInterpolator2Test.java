@@ -8,7 +8,6 @@ package edu.mines.jtk.interp.test;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import static java.lang.Math.*;
 import javax.swing.SwingUtilities;
 
 import edu.mines.jtk.awt.*;
@@ -16,6 +15,7 @@ import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.interp.*;
 import edu.mines.jtk.mosaic.*;
 import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.mesh.SibsonInterpolator2}.
@@ -24,6 +24,10 @@ import edu.mines.jtk.util.*;
  */
 public class SibsonInterpolator2Test extends TestCase {
   public static void main(String[] args) {
+    if (args.length>=1 && args[0].equals("demo")) {
+      demo();
+      return;
+    }
     TestSuite suite = new TestSuite(SibsonInterpolator2Test.class);
     junit.textui.TestRunner.run(suite);
   }
@@ -83,9 +87,9 @@ public class SibsonInterpolator2Test extends TestCase {
     assertValue(si, 0.5f, 0.5f, 1.0f);
   }
 
-  public void xtestLinear() {
+  public void testLinear() {
     testLinear(HL);
-    //testLinear(BS); // BS too slow
+    testLinear(BS);
     //testLinear(WS); // WS too inaccurate
   }
   private void testLinear(SibsonInterpolator2.Method m) {
@@ -118,29 +122,32 @@ public class SibsonInterpolator2Test extends TestCase {
     assertEquals(f,g);
   }
 
-  public void demoAll() {
-    doSkinnyTriangle();
-    doSimpleTriangle();
-    doSimpleSquare();
-    TestFunction tf;
-    tf = TestFunction.makeSine();
-    doScattered(tf);
-    doUniform(tf);
-    tf = TestFunction.makeLinear();
-    doScattered(tf);
-    doUniform(tf);
+  ///////////////////////////////////////////////////////////////////////////
+  // demos
+  public static void demo() {
+    //doSkinnyTriangle();
+    //doSimpleTriangle();
+    //doSimpleSquare();
+    TestFunction tfs = TestFunction.makeSine();
+    TestFunction tfl = TestFunction.makeLinear();
+    TestFunction tfq = TestFunction.makeSphericalQuadratic();
+    TestFunction[] tfa = {tfs,tfl,tfq};
+    for (TestFunction tf:tfa) {
+      doScattered(tf);
+      doUniform(tf);
+    }
   }
-  private void doScattered(TestFunction tf) {
+  private static void doScattered(TestFunction tf) {
     float[][] fx = tf.sampleScattered2(NS,XMIN,XMAX,XMIN,XMAX);
     doMethods(tf,fx);
   }
 
-  private void doUniform(TestFunction tf) {
+  private static void doUniform(TestFunction tf) {
     float[][] fx = tf.sampleUniform2(NS,XMIN,XMAX,XMIN,XMAX);
     doMethods(tf,fx);
   }
 
-  private void doSkinnyTriangle() {
+  private static void doSkinnyTriangle() {
     float xmin = XMIN+0.25f*(XMAX-XMIN);
     float xmax = XMAX-0.25f*(XMAX-XMIN);
     float xmid = 0.5f*(xmin+xmax);
@@ -152,7 +159,7 @@ public class SibsonInterpolator2Test extends TestCase {
     doMethods(null,fx);
   }
 
-  private void doSimpleTriangle() {
+  private static void doSimpleTriangle() {
     float xmin = XMIN+0.35f*(XMAX-XMIN);
     float xmax = XMAX-0.35f*(XMAX-XMIN);
     float xavg = 0.5f*(xmin+xmax);
@@ -163,7 +170,7 @@ public class SibsonInterpolator2Test extends TestCase {
     doMethods(null,fx);
   }
 
-  private void doSimpleSquare() {
+  private static void doSimpleSquare() {
     float xmin = XMIN+0.35f*(XMAX-XMIN);
     float xmax = XMAX-0.35f*(XMAX-XMIN);
     float[] x1 = {xmin,xmax,xmin,xmax};
@@ -173,8 +180,16 @@ public class SibsonInterpolator2Test extends TestCase {
     doMethods(null,fx);
   }
 
-  private void doMethods(TestFunction tf, float[][] fx) {
+  private static void doMethods(TestFunction tf, float[][] fx) {
     float[] f = fx[0], x1 = fx[1], x2 = fx[2];
+    float[][] fk = null;
+    float fkmin = 0.0f, fkmax = 0.0f;
+    if (tf!=null) {
+      fk = tf.sampleUniform2(SX,SX);
+      fkmin = min(fk);
+      fkmax = max(fk);
+      plot("known",fkmin,fkmax,fk,x1,x2);
+    }
     //SibsonInterpolator2.Method[] methods = {HL,BS,WS};
     SibsonInterpolator2.Method[] methods = {HL};
     for (int i=0; i<methods.length; ++i) {
@@ -182,22 +197,18 @@ public class SibsonInterpolator2Test extends TestCase {
       SibsonInterpolator2 si = new SibsonInterpolator2(method,f,x1,x2);
       si.setNullValue(1.0f);
       si.setBounds(SX,SX);
-      //si.setGradientPower(1.0);
-      double tmin = Double.MAX_VALUE;
-      float[][] g = null;
-      for (int iter=0; iter<3; ++iter) {
-        Stopwatch sw = new Stopwatch();
-        sw.start();
-        g = si.interpolate(SX,SX);
-        sw.stop();
-        tmin = min(tmin,sw.time());
+      si.setGradientPower(1.0);
+      float[][] fi = si.interpolate(SX,SX);
+      plot(method.toString()+" interpolated",fkmin,fkmax,fi,x1,x2);
+      if (fk!=null) {
+        float[][] fe = sub(fi,fk);
+        plot(method.toString()+" interpolation error",0.0f,0.0f,fe,x1,x2);
       }
-      System.out.println("method="+method+" time="+tmin);
-      plot(method.toString(),g,x1,x2);
     }
   }
 
   private static void plot(final String method,
+    final float cmin, final float cmax,
     final float[][] g, final float[] x1, final float[] x2) 
   {
     SwingUtilities.invokeLater(new Runnable() {
@@ -205,11 +216,14 @@ public class SibsonInterpolator2Test extends TestCase {
         System.out.println("min="+Array.min(g)+" max="+Array.max(g));
         SimplePlot sp = new SimplePlot();
         sp.setTitle(method);
-        sp.setSize(700,745);
+        sp.setSize(847,740);
+        sp.addColorBar();
+        sp.getPlotPanel().setColorBarWidthMinimum(100);
         PixelsView pv = sp.addPixels(SX,SX,g);
         pv.setColorModel(ColorMap.JET);
         pv.setInterpolation(PixelsView.Interpolation.LINEAR);
-        //pv.setClips(0.0f,2.0f);
+        if (cmin<cmax)
+          pv.setClips(cmin,cmax);
         PointsView px = sp.addPoints(x1,x2);
         px.setLineStyle(PointsView.Line.NONE);
         px.setMarkStyle(PointsView.Mark.FILLED_CIRCLE);

@@ -19,6 +19,20 @@ import edu.mines.jtk.util.Array;
  */
 abstract class TestFunction {
 
+  public static TestFunction makeSphericalQuadratic() {
+    return new TestFunction() {
+      public float f(float x1) {
+        return 1.0f+2.0f*x1-3.0f*x1*x1;
+      }
+      public float f(float x1, float x2) {
+        return 1.0f+2.0f*x1+3.0f*x2-6.0f*(x1*x1+x2*x2);
+      }
+      public float f(float x1, float x2, float x3) {
+        return 1.0f+2.0f*x1+3.0f*x2+4.0f*x3-10.0f*(x1*x1+x2*x2+x3*x3);
+      }
+    };
+  }
+
   public static TestFunction makeSine() {
     return new TestFunction() {
       public float f(float x1) {
@@ -94,6 +108,38 @@ abstract class TestFunction {
     return new float[][]{f,x1,x2,x3};
   }
 
+  public float[][] sampleUniform2(Sampling s1, Sampling s2) {
+    int n1 = s1.getCount();
+    int n2 = s2.getCount();
+    float[][] f = new float[n2][n1];
+    for (int i2=0; i2<n2; ++i2) {
+      float x2 = (float)s2.getValue(i2);
+      for (int i1=0; i1<n1; ++i1) {
+        float x1 = (float)s1.getValue(i1);
+        f[i2][i1] = f(x1,x2);
+      }
+    }
+    return f;
+  }
+
+  public float[][][] sampleUniform2(Sampling s1, Sampling s2, Sampling s3) {
+    int n1 = s1.getCount();
+    int n2 = s2.getCount();
+    int n3 = s3.getCount();
+    float[][][] f = new float[n3][n2][n1];
+    for (int i3=0; i3<n3; ++i3) {
+      float x3 = (float)s3.getValue(i3);
+      for (int i2=0; i2<n2; ++i2) {
+        float x2 = (float)s2.getValue(i2);
+        for (int i1=0; i1<n1; ++i1) {
+          float x1 = (float)s1.getValue(i1);
+          f[i3][i2][i1] = f(x1,x2,x3);
+        }
+      }
+    }
+    return f;
+  }
+
   public float[][] sampleUniform2(
     int n,
     float x1min, float x1max,
@@ -147,8 +193,8 @@ abstract class TestFunction {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
-  private Random _random = new Random(314);
-  //private Random _random = new Random();
+  //private Random _random = new Random(314);
+  private Random _random = new Random();
   private float randomFloat() {
     return _random.nextFloat();
   }

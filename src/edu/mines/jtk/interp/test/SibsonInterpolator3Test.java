@@ -28,10 +28,10 @@ public class SibsonInterpolator3Test extends TestCase {
   public static void main(String[] args) {
     if (args.length>=1 && args[0].equals("bench")) {
       benchMethods();
-    } else {
-      TestSuite suite = new TestSuite(SibsonInterpolator3Test.class);
-      junit.textui.TestRunner.run(suite);
+      return;
     }
+    TestSuite suite = new TestSuite(SibsonInterpolator3Test.class);
+    junit.textui.TestRunner.run(suite);
   }
 
   public void testSimpleTet() {
