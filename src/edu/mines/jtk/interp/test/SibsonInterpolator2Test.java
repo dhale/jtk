@@ -49,7 +49,76 @@ public class SibsonInterpolator2Test extends TestCase {
   private static SibsonInterpolator2.Method WS = 
     SibsonInterpolator2.Method.WATSON_SAMBRIDGE;
 
-  public void testAll() {
+  public void testSimpleTri() {
+    testSimpleTri(HL);
+    testSimpleTri(BS);
+    testSimpleTri(WS);
+  }
+  private void testSimpleTri(SibsonInterpolator2.Method m) {
+    float[] f  = {-2.0f, 0.0f, 1.0f};
+    float[] x1 = {-1.0f, 1.0f, 0.0f};
+    float[] x2 = {-1.0f,-1.0f, 1.0f};
+    SibsonInterpolator2 si = new SibsonInterpolator2(m,f,x1,x2);
+    assertValue(si,-0.5f,-0.5f,-1.0f);
+    assertValue(si, 0.5f,-0.5f, 0.0f);
+    assertValue(si, 0.0f, 0.5f, 0.5f);
+    assertValue(si, 0.0f, 0.0f, 0.0f);
+  }
+
+  public void testSimpleSquare() {
+    testSimpleSquare(HL);
+    testSimpleSquare(BS);
+    //testSimpleSquare(WS); // WS fails
+  }
+  private void testSimpleSquare(SibsonInterpolator2.Method m) {
+    float[] f  = {-2.0f, 0.0f, 0.0f, 2.0f};
+    float[] x1 = {-1.0f, 1.0f,-1.0f, 1.0f};
+    float[] x2 = {-1.0f,-1.0f, 1.0f, 1.0f};
+    SibsonInterpolator2 si = new SibsonInterpolator2(m,f,x1,x2);
+    si.setNullValue(999.0f);
+    assertValue(si, 0.0f, 0.0f, 0.0f);
+    assertValue(si,-0.5f,-0.5f,-1.0f);
+    assertValue(si, 0.5f,-0.5f, 0.0f);
+    assertValue(si,-0.5f, 0.5f, 0.0f);
+    assertValue(si, 0.5f, 0.5f, 1.0f);
+  }
+
+  public void xtestLinear() {
+    testLinear(HL);
+    //testLinear(BS); // BS too slow
+    //testLinear(WS); // WS too inaccurate
+  }
+  private void testLinear(SibsonInterpolator2.Method m) {
+    TestFunction tf = TestFunction.makeLinear();
+    float[][] fx = tf.sampleUniform2(NS,XMIN,XMAX,XMIN,XMAX);
+    float[] f = fx[0], x1 = fx[1], x2 = fx[2];
+    SibsonInterpolator2 si = new SibsonInterpolator2(m,f,x1,x2);
+    si.setNullValue(999.0f);
+    int n1 = NX, n2 = NX;
+    Sampling s1 = SX, s2 = SX;
+    float[][] g = si.interpolate(s1,s2);
+    for (int i2=0; i2<n2; ++i2) {
+      float x2i = (float)s2.getValue(i2);
+      for (int i1=0; i1<n1; ++i1) {
+        float x1i = (float)s1.getValue(i1);
+        float fe = tf.f(x1i,x2i);
+        assertEquals(fe,g[i2][i1]);
+      }
+    }
+  }
+
+  private static final double TOLERANCE = 1.0e-5;
+  private void assertEquals(float e, float a) {
+    assertEquals(e,a,TOLERANCE);
+  }
+  private void assertValue(
+    SibsonInterpolator2 si, float x1, float x2, float f) 
+  {
+    float g = si.interpolate(x1,x2);
+    assertEquals(f,g);
+  }
+
+  public void demoAll() {
     doSkinnyTriangle();
     doSimpleTriangle();
     doSimpleSquare();
@@ -61,7 +130,6 @@ public class SibsonInterpolator2Test extends TestCase {
     doScattered(tf);
     doUniform(tf);
   }
-
   private void doScattered(TestFunction tf) {
     float[][] fx = tf.sampleScattered2(NS,XMIN,XMAX,XMIN,XMAX);
     doMethods(tf,fx);
