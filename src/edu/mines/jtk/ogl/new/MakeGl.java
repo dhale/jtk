@@ -1,3 +1,4 @@
+package edu.mines.jtk.ogl;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
@@ -19,7 +20,7 @@ import java.util.regex.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.07.10
  */
-public class MakeGl {
+class MakeGl {
 
   public static void main(String[] args) {
     String inputFileName = "Gl.txt";
