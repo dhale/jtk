@@ -20,7 +20,6 @@ public class Suite extends TestSuite {
     TestSuite suite = new TestSuite();
 
     suite.addTestSuite(GeometryTest.class);
-    suite.addTestSuite(LasserreVolumeTest.class);
     suite.addTestSuite(TetMeshTest.class);
     suite.addTestSuite(TriMeshTest.class);
 
