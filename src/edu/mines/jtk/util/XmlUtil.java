@@ -40,7 +40,7 @@ class XmlUtil {
    * Quotes character data.
    * Replaces special characters and XML entities.
    * Encloses string in double quotes if it contains whitespace.
-   * @param character data to be quoted.
+   * @param s character data to be quoted.
    * @return quoted character data.
    */
   public static String quoteCharacterData(String s) {

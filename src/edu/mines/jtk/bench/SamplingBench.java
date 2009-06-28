@@ -25,9 +25,7 @@ public class SamplingBench {
       double xd = f+i*d;
       errorMaximum = max(errorMaximum,abs(xd-x));
     }
-    double xf = f;
-    double xl = f+(n-1)*d;
-    double errorEstimate = FLT_EPSILON*n*(abs(xf)+abs(xl))/2.0;
+    double errorEstimate = FLT_EPSILON*n*(abs(f)+abs(f+(n-1)*d))/2.0;
     System.out.println("error estimate ="+errorEstimate/d);
     System.out.println("error maximum  ="+errorMaximum/d);
   }

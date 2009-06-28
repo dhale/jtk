@@ -61,14 +61,14 @@ public class DifferenceFilter {
     float xp0,xp1,xp2,xp3,xp4;
     int n1 = x[0].length;
     int n2 = x.length;
-    xm0 = xm1 = xm2 = xm3 = xm4 = 0.0f;
+    xm0 = xm1 = xm2 = xm3 = 0.0f;
     for (int i1=0; i1<n1; ++i1) {
       xm4 = xm3;  xm3 = xm2;  xm2 = xm1;  xm1 = xm0;  xm0 = x[0][i1];
       y[0][i1] = A0P0*xm0+A0P1*xm1+A0P2*xm2+A0P3*xm3+A0P4*xm4;
     }
     for (int i2=1; i2<n2; ++i2) {
-      xm0 = xm1 = xm2 = xm3 = xm4 = 0.0f;
-      xp0 = xp1 = xp2 = xp3 = xp4 = 0.0f;
+      xm0 = xm1 = xm2 = xm3 = 0.0f;
+      xp1 = xp2 = xp3 = xp4 = 0.0f;
       if (n1>=4)
         xp4 = x[i2-1][3];
       if (n1>=3)
@@ -123,7 +123,7 @@ public class DifferenceFilter {
     for (int i3=0; i3<n3; ++i3) {
       for (int i2=0; i2<n2; ++i2) {
         float x0mm2=0.0f, x0mm1=0.0f, x0mm0=0.0f, x0mp1=0.0f, x0mp2=0.0f;
-        float x00m2=0.0f, x00m1=0.0f, x00m0=0.0f;
+        float x00m2     , x00m1=0.0f, x00m0=0.0f;
         float                         xm0m0=0.0f, xm0p1=0.0f, xm0p2=0.0f;
         float xmpm2=0.0f, xmpm1=0.0f, xmpm0=0.0f, xmpp1=0.0f, xmpp2=0.0f;
         if (n1>0) {
@@ -233,14 +233,14 @@ public class DifferenceFilter {
     float xp0,xp1,xp2,xp3,xp4;
     int n1 = x[0].length;
     int n2 = x.length;
-    xp0 = xp1 = xp2 = xp3 = xp4 = 0.0f;
+    xp0 = xp1 = xp2 = xp3 = 0.0f;
     for (int i1=n1-1; i1>=0; --i1) {
       xp4 = xp3;  xp3 = xp2;  xp2 = xp1;  xp1 = xp0;  xp0 = x[n2-1][i1];
       y[n2-1][i1] = A0P0*xp0+A0P1*xp1+A0P2*xp2+A0P3*xp3+A0P4*xp4;
     }
     for (int i2=n2-2; i2>=0; --i2) {
-      xm0 = xm1 = xm2 = xm3 = xm4 = 0.0f;
-      xp0 = xp1 = xp2 = xp3 = xp4 = 0.0f;
+      xm1 = xm2 = xm3 = xm4 = 0.0f;
+      xp0 = xp1 = xp2 = xp3 = 0.0f;
       if (n1>=4)
         xm4 = x[i2+1][n1-4];
       if (n1>=3)
@@ -297,7 +297,7 @@ public class DifferenceFilter {
     for (int i3=n3m1; i3>=0; --i3) {
       for (int i2=n2m1; i2>=0; --i2) {
         float x0mm2=0.0f, x0mm1=0.0f, x0mm0=0.0f, x0mp1=0.0f, x0mp2=0.0f;
-        float x00m2=0.0f, x00m1=0.0f, x00m0=0.0f;
+        float x00m2     , x00m1=0.0f, x00m0=0.0f;
         float                         xm0m0=0.0f, xm0p1=0.0f, xm0p2=0.0f;
         float xmpm2=0.0f, xmpm1=0.0f, xmpm0=0.0f, xmpp1=0.0f, xmpp2=0.0f;
         if (n1>0) {
@@ -408,14 +408,14 @@ public class DifferenceFilter {
     float yp0,yp1,yp2,yp3,yp4;
     int n1 = x[0].length;
     int n2 = x.length;
-    ym0 = ym1 = ym2 = ym3 = ym4 = 0.0f;
+    ym0 = ym1 = ym2 = ym3 = 0.0f;
     for (int i1=0; i1<n1; ++i1) {
       ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[0][i1];
       y[0][i1] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4);
     }
     for (int i2=1; i2<n2; ++i2) {
-      ym0 = ym1 = ym2 = ym3 = ym4 = 0.0f;
-      yp0 = yp1 = yp2 = yp3 = yp4 = 0.0f;
+      ym0 = ym1 = ym2 = ym3 = 0.0f;
+      yp1 = yp2 = yp3 = yp4 = 0.0f;
       if (n1>=4)
         yp4 = y[i2-1][3];
       if (n1>=3)
@@ -451,8 +451,8 @@ public class DifferenceFilter {
       if (n1>=1) {
         ym4 = ym3;  ym3 = ym2;  ym2 = ym1;  ym1 = ym0;  xm0 = x[i2][n1-1];
         yp0 = yp1;
-        y[i2][n1-1] = ym0 = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
-                             APM0*yp0);
+        y[i2][n1-1] = AIP0*(xm0-A0P1*ym1-A0P2*ym2-A0P3*ym3-A0P4*ym4 -
+                       APM0*yp0);
       }
     }
   }
@@ -471,7 +471,7 @@ public class DifferenceFilter {
       for (int i2=0; i2<n2; ++i2) {
         float x00m0;
         float y0mm2=0.0f, y0mm1=0.0f, y0mm0=0.0f, y0mp1=0.0f, y0mp2=0.0f;
-        float y00m2=0.0f, y00m1=0.0f, y00m0=0.0f;
+        float y00m2     , y00m1=0.0f, y00m0=0.0f;
         float                         ym0m0=0.0f, ym0p1=0.0f, ym0p2=0.0f;
         float ympm2=0.0f, ympm1=0.0f, ympm0=0.0f, ympp1=0.0f, ympp2=0.0f;
         if (n1>0) {
@@ -550,10 +550,10 @@ public class DifferenceFilter {
           ympm1 = ympm0;
           ympm0 = ympp1;
           ym0m0 = ym0p1;
-          y[i3][i2][n1-1] = y00m0 = AI0P0*(x00m0-A00P1*y00m1-A00P2*y00m2 -
-                                     A0PP0*y0mm0-A0PP1*y0mm1-A0PP2*y0mm2 -
-                                     APMP0*ympm0-APMP1*ympm1-APMP2*ympm2 -
-                                     AP0P0*ym0m0);
+          y[i3][i2][n1-1] = AI0P0*(x00m0-A00P1*y00m1-A00P2*y00m2 -
+                             A0PP0*y0mm0-A0PP1*y0mm1-A0PP2*y0mm2 -
+                             APMP0*ympm0-APMP1*ympm1-APMP2*ympm2 -
+                             AP0P0*ym0m0);
         }
       }
     }
@@ -582,14 +582,14 @@ public class DifferenceFilter {
     float yp0,yp1,yp2,yp3,yp4;
     int n1 = x[0].length;
     int n2 = x.length;
-    yp0 = yp1 = yp2 = yp3 = yp4 = 0.0f;
+    yp0 = yp1 = yp2 = yp3 = 0.0f;
     for (int i1=n1-1; i1>=0; --i1) {
       yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[n2-1][i1];
       y[n2-1][i1] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4);
     }
     for (int i2=n2-2; i2>=0; --i2) {
-      ym0 = ym1 = ym2 = ym3 = ym4 = 0.0f;
-      yp0 = yp1 = yp2 = yp3 = yp4 = 0.0f;
+      ym1 = ym2 = ym3 = ym4 = 0.0f;
+      yp0 = yp1 = yp2 = yp3 = 0.0f;
       if (n1>=4)
         ym4 = y[i2+1][n1-4];
       if (n1>=3)
@@ -625,8 +625,8 @@ public class DifferenceFilter {
       if (n1>0) {
         yp4 = yp3;  yp3 = yp2;  yp2 = yp1;  yp1 = yp0;  xp0 = x[i2][0];
         ym0 = ym1;
-        y[i2][0] = yp0 = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4 -
-                          APM0*ym0);
+        y[i2][0] = AIP0*(xp0-A0P1*yp1-A0P2*yp2-A0P3*yp3-A0P4*yp4 -
+                    APM0*ym0);
       }
     }
   }
@@ -647,7 +647,7 @@ public class DifferenceFilter {
       for (int i2=n2m1; i2>=0; --i2) {
         float x00m0;
         float y0mm2=0.0f, y0mm1=0.0f, y0mm0=0.0f, y0mp1=0.0f, y0mp2=0.0f;
-        float y00m2=0.0f, y00m1=0.0f, y00m0=0.0f;
+        float y00m2     , y00m1=0.0f, y00m0=0.0f;
         float                         ym0m0=0.0f, ym0p1=0.0f, ym0p2=0.0f;
         float ympm2=0.0f, ympm1=0.0f, ympm0=0.0f, ympp1=0.0f, ympp2=0.0f;
         if (n1>0) {
@@ -726,10 +726,10 @@ public class DifferenceFilter {
           ympm1 = ympm0;
           ympm0 = ympp1;
           ym0m0 = ym0p1;
-          y[i3][i2][0] = y00m0 =    AI0P0*(x00m0-A00P1*y00m1-A00P2*y00m2 -
-                                     A0PP0*y0mm0-A0PP1*y0mm1-A0PP2*y0mm2 -
-                                     APMP0*ympm0-APMP1*ympm1-APMP2*ympm2 -
-                                     AP0P0*ym0m0);
+          y[i3][i2][0] = AI0P0*(x00m0-A00P1*y00m1-A00P2*y00m2 -
+                          A0PP0*y0mm0-A0PP1*y0mm1-A0PP2*y0mm2 -
+                          APMP0*ympm0-APMP1*ympm1-APMP2*ympm2 -
+                          AP0P0*ym0m0);
         }
       }
     }

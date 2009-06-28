@@ -508,7 +508,7 @@ public class RecursiveParallelFilter {
     m = 0;
     for (int i=0; i<n; ++i) {
       if (c[i].r!=0.0 || c[i].i!=0.0)
-        d[i] = c[i];
+        d[m++] = c[i];
     }
     return d;
   }

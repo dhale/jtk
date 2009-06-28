@@ -33,8 +33,7 @@ public class ArrayMathTest extends TestCase {
   public void testSort() {
     Random r = new Random(314159);
     int[] ntest = {100,1023,1024,1025};
-    for (int itest=0; itest<ntest.length; ++itest) {
-      int n = ntest[itest];
+    for (int n:ntest) {
       float[] x = new float[n];
       for (int m = 1; m<2*n; m*=2) {
         for (int dist=0; dist<5; ++dist) {
@@ -51,7 +50,7 @@ public class ArrayMathTest extends TestCase {
           }
           for (int order=0; order<6; ++order) {
             float[] y = null;
-            float[] z = null;
+            float[] z;
             switch(order) {
             case COPY:
               y = copy(x);

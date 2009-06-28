@@ -6,8 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.bench;
 
-import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Stopwatch;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Benchmark Pure Java and LAPACK's QR decompositions.
@@ -37,31 +37,31 @@ public class QrdBench {
     double rate,sum;
     int nqrd;
     Stopwatch sw = new Stopwatch();
-    for (;;) {
+    for (int niter=0; niter<5; ++niter) {
 
       // Pure Java.
-      edu.mines.jtk.la.DMatrixQrd qrdj = null;
-      edu.mines.jtk.la.DMatrix xj = null;
+      edu.mines.jtk.la.DMatrixQrd qrdj;
+      edu.mines.jtk.la.DMatrix xj = new edu.mines.jtk.la.DMatrix(1,1);
       sw.restart();
       for (nqrd=0;  sw.time()<maxtime; ++nqrd) {
         qrdj = new edu.mines.jtk.la.DMatrixQrd(aj);
         xj = qrdj.solve(bj);
       }
       sw.stop();
-      sum = Array.sum(xj.getArray());
+      sum = sum(xj.getArray());
       rate = nqrd/sw.time();
       System.out.println("Pure Java: rate="+rate+" sum="+sum);
 
       // LAPACK.
-      edu.mines.jtk.lapack.DMatrixQrd qrdl = null;
-      edu.mines.jtk.lapack.DMatrix xl = null;
+      edu.mines.jtk.lapack.DMatrixQrd qrdl;
+      edu.mines.jtk.lapack.DMatrix xl = new edu.mines.jtk.lapack.DMatrix(1,1);
       sw.restart();
       for (nqrd=0;  sw.time()<maxtime; ++nqrd) {
         qrdl = new edu.mines.jtk.lapack.DMatrixQrd(al);
         xl = qrdl.solve(bl);
       }
       sw.stop();
-      sum = Array.sum(xl.getArray());
+      sum = sum(xl.getArray());
       rate = nqrd/sw.time();
       System.out.println("   LAPACK: rate="+rate+" sum="+sum);
     }

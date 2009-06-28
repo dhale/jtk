@@ -31,11 +31,15 @@ public class ParameterSetTest extends TestCase {
     String s1 = root.toString();
     ParameterSet foo = root.addParameterSet("foo");
     foo.addParameter("bar");
-    ParameterSet temp = (ParameterSet)root.clone();
-    temp.remove("foo");
-    root.replaceWith(temp);
-    String s2 = root.toString();
-    assertTrue(s1.equals(s2));
+    try {
+      ParameterSet temp = (ParameterSet)root.clone();
+      temp.remove("foo");
+      root.replaceWith(temp);
+      String s2 = root.toString();
+      assertTrue(s1.equals(s2));
+    } catch (CloneNotSupportedException e) {
+      assertTrue(false);
+    }
   }
 
   public void testSpecialCharacters() {
@@ -98,7 +102,7 @@ public class ParameterSetTest extends TestCase {
     assertTrue(pfind==null);
 
     boolean b1 = ss1.getParameter("pb1").getBoolean();
-    assertTrue(b1==true);
+    assertTrue(b1);
     int i1 = ss1.getParameter("pi1").getInt();
     assertTrue(i1==1);
     float f1 = ss1.getParameter("pf1").getFloat();
@@ -115,9 +119,13 @@ public class ParameterSetTest extends TestCase {
     //System.out.println(str2);
     assertTrue(str1.equals(str2));
 
-    ParameterSet psrootClone = (ParameterSet)psroot.clone();
-    assertTrue(psroot.equals(psrootClone));
-    assertTrue(psroot.hashCode()==psrootClone.hashCode());
+    try {
+      ParameterSet psrootClone = (ParameterSet)psroot.clone();
+      assertTrue(psroot.equals(psrootClone));
+      assertTrue(psroot.hashCode()==psrootClone.hashCode());
+    } catch (CloneNotSupportedException e) {
+      assertTrue(false);
+    }
   }
 
   public void testSetGet() {
@@ -131,7 +139,7 @@ public class ParameterSetTest extends TestCase {
     ps.setString("ps","1.0");
 
     boolean b = ps.getBoolean("pb",false);
-    assertTrue(b==true);
+    assertTrue(b);
     int i = ps.getInt("pi",0);
     assertTrue(i==1);
     long l = ps.getLong("pl",0);
@@ -144,7 +152,7 @@ public class ParameterSetTest extends TestCase {
     assertTrue(s.equals("1.0"));
 
     b = ps.getBoolean("qb",false);
-    assertTrue(b==false);
+    assertTrue(!b);
     i = ps.getInt("qi",0);
     assertTrue(i==0);
     l = ps.getLong("ql",0);

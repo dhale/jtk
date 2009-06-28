@@ -133,7 +133,7 @@ public class PolygonState implements State {
    * @param mode the polygon mode.
    */
   public void setPolygonModeFront(int mode) {
-    _polygonModeFront = _polygonModeDefault;
+    _polygonModeFront = mode;
     _polygonModeFrontSet = true;
   }
 
@@ -142,7 +142,7 @@ public class PolygonState implements State {
    * @param mode the polygon mode.
    */
   public void setPolygonModeBack(int mode) {
-    _polygonModeBack = _polygonModeDefault;
+    _polygonModeBack = mode;
     _polygonModeBackSet = true;
   }
 

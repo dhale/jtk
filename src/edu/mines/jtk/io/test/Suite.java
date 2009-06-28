@@ -20,7 +20,6 @@ public class Suite extends TestSuite {
     TestSuite suite = new TestSuite();
 
     suite.addTestSuite(ArrayFileTest.class);
-    suite.addTestSuite(DataFileTest.class);
 
     return suite;
   }

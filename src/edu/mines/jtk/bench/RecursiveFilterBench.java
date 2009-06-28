@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.bench;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Stopwatch;
 
 /**
@@ -25,18 +25,18 @@ public class RecursiveFilterBench {
     float b2 =  1.28f;
     float a1 = -1.80f;
     float a2 =  0.81f;
-    float[][] x = Array.rampfloat(0.0f,0.0f,1.0f,n1,n2);
-    float[][] y = Array.zerofloat(n1,n2);
+    float[][] x = ArrayMath.rampfloat(0.0f,0.0f,1.0f,n1,n2);
+    float[][] y = ArrayMath.zerofloat(n1,n2);
     double mflop = 9.0*n1*n2*1.0e-6;
     double rate,sum;
     int n;
     Stopwatch sw = new Stopwatch();
-    for (;;) {
+    for (int niter=0; niter<5; ++niter) {
       sw.restart();
       for (n=0;  sw.time()<maxtime; ++n)
         filter1(b0,b1,b2,a1,a2,x,y);
       sw.stop();
-      sum = Array.sum(y);
+      sum = ArrayMath.sum(y);
       rate = n*mflop/sw.time();
       System.out.println("filter1: rate="+rate+" sum="+sum);
 
@@ -44,7 +44,7 @@ public class RecursiveFilterBench {
       for (n=0;  sw.time()<maxtime; ++n)
         filter2a(b0,b1,b2,a1,a2,x,y);
       sw.stop();
-      sum = Array.sum(y);
+      sum = ArrayMath.sum(y);
       rate = n*mflop/sw.time();
       System.out.println("filter2a: rate="+rate+" sum="+sum);
 
@@ -52,7 +52,7 @@ public class RecursiveFilterBench {
       for (n=0;  sw.time()<maxtime; ++n)
         filter2b(b0,b1,b2,a1,a2,x,y);
       sw.stop();
-      sum = Array.sum(y);
+      sum = ArrayMath.sum(y);
       rate = n*mflop/sw.time();
       System.out.println("filter2b: rate="+rate+" sum="+sum);
     }

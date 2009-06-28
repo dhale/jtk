@@ -45,11 +45,11 @@ public class Threads {
    * @exception RuntimeException if any threads are interrupted.
    */
   public static void startAndJoin(Thread[] threads) {
-    for (int ithread=0; ithread<threads.length; ++ithread)
-      threads[ithread].start();
+    for (Thread thread:threads)
+      thread.start();
     try {
-      for (int ithread=0; ithread<threads.length; ++ithread)
-        threads[ithread].join();
+      for (Thread thread:threads)
+        thread.join();
     } catch (InterruptedException ie) {
       throw new RuntimeException(ie);
     }

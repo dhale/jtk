@@ -12,6 +12,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Benchmark single- and multi-threaded matrix multiplication.
@@ -27,12 +28,12 @@ public class MtMatMulBench {
   public static void main(String[] args) {
     int m = 1001;
     int n = 1002;
-    float[][] a = Array.randfloat(n,m);
-    float[][] b = Array.randfloat(m,n);
-    float[][] c1 = Array.zerofloat(m,m);
-    float[][] c2 = Array.zerofloat(m,m);
-    float[][] c3 = Array.zerofloat(m,m);
-    float[][] c4 = Array.zerofloat(m,m);
+    float[][] a = randfloat(n,m);
+    float[][] b = randfloat(m,n);
+    float[][] c1 = zerofloat(m,m);
+    float[][] c2 = zerofloat(m,m);
+    float[][] c3 = zerofloat(m,m);
+    float[][] c4 = zerofloat(m,m);
     Stopwatch s = new Stopwatch();
     double mflops = 2.0e-6*m*m*n;
     double nmul,maxtime=5.0;
@@ -228,11 +229,11 @@ public class MtMatMulBench {
   */
 
   private static void startAndJoin(Thread[] threads) {
-    for (int ithread=0; ithread<threads.length; ++ithread)
-      threads[ithread].start();
+    for (Thread thread:threads)
+      thread.start();
     try {
-      for (int ithread=0; ithread<threads.length; ++ithread)
-        threads[ithread].join();
+      for (Thread thread:threads)
+        thread.join();
     } catch (InterruptedException ie) {
       throw new RuntimeException(ie);
     }

@@ -375,7 +375,7 @@ public class TileAxis extends IPanel {
     int ticLabelWidth = _ticLabelWidth;
     if (ticLabelWidth==0)
       ticLabelWidth = maxTicLabelWidth(fm);
-    int width = 0;
+    int width;
     if (isVertical()) {
       width = ticLabelWidth+fm.getHeight();
       if (_label!=null)
@@ -399,7 +399,7 @@ public class TileAxis extends IPanel {
    */
   int getHeightMinimum() {
     FontMetrics fm = getFontMetrics(getFont());
-    int height = 0;
+    int height;
     if (isHorizontal()) {
       height = fm.getHeight()+fm.getAscent();
       if (_label!=null)
@@ -494,7 +494,7 @@ public class TileAxis extends IPanel {
     // maximum number until we find a good fit. As a special case, if the
     // tic interval is specified, then this loop exits quickly after we
     // compute the max width and height of tic labels.
-    int ntic = 0;
+    int ntic;
     double dtic = 0.0;
     for (int nmax=20; nmax>=2; nmax=ntic-1) {
 
@@ -554,7 +554,6 @@ public class TileAxis extends IPanel {
       _ticLabelWidth = ticLabelWidth;
       _ticLabelHeight = ticLabelHeight;
       revalidateLater();
-      return;
     }
   }
 

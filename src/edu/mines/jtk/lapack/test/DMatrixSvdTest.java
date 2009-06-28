@@ -14,7 +14,7 @@ import junit.framework.TestSuite;
 
 import edu.mines.jtk.lapack.DMatrix;
 import edu.mines.jtk.lapack.DMatrixSvd;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Tests {@link edu.mines.jtk.lapack.DMatrixSvd}.
@@ -59,9 +59,9 @@ public class DMatrixSvdTest extends TestCase {
     int n = a.getN();
     DMatrixSvd svd = new DMatrixSvd(a);
     double[] s = svd.getSingularValues();
-    double smax = Array.max(s);
+    double smax = ArrayMath.max(s);
     assertEqualExact(s[0],smax);
-    double smin = Array.min(s);
+    double smin = ArrayMath.min(s);
     assertEqualExact(s[min(m,n)-1],smin);
     double cond = svd.cond();
     assertEqualExact(smax/smin,cond);

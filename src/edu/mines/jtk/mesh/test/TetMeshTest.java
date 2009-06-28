@@ -103,14 +103,14 @@ public class TetMeshTest extends TestCase {
     int ntet = tm.countTets();
     assertEquals(8,nnode);
     TetMesh.NodePropertyMap map = tm.getNodePropertyMap("foo");
-    map.put(n000,new Integer(0));
-    map.put(n001,new Integer(1));
-    map.put(n010,new Integer(2));
-    map.put(n011,new Integer(3));
-    map.put(n100,new Integer(4));
-    map.put(n101,new Integer(5));
-    map.put(n110,new Integer(6));
-    map.put(n111,new Integer(7));
+    map.put(n000,0);
+    map.put(n001,1);
+    map.put(n010,2);
+    map.put(n011,3);
+    map.put(n100,4);
+    map.put(n101,5);
+    map.put(n110,6);
+    map.put(n111,7);
 
     // Write and read it.
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -319,8 +319,8 @@ public class TetMeshTest extends TestCase {
   public void testAddFindRemove() {
     java.util.Random random = new java.util.Random();
     TetMesh tm = new TetMesh();
-    int nadd = 0;
-    int nremove = 0;
+    //int nadd = 0;
+    //int nremove = 0;
     for (int niter=0; niter<1000; ++niter) {
       float x = random.nextFloat();
       float y = random.nextFloat();
@@ -330,7 +330,7 @@ public class TetMeshTest extends TestCase {
         boolean ok = tm.addNode(node);
         assertTrue(ok);
         tm.validate();
-        ++nadd;
+        //++nadd;
       } else if (tm.countNodes()>0) {
         TetMesh.Node node = tm.findNodeNearest(x,y,z);
         assertTrue(node!=null);
@@ -338,7 +338,7 @@ public class TetMeshTest extends TestCase {
         assertTrue(node==nodeSlow);
         tm.removeNode(node);
         tm.validate();
-        ++nremove;
+        //++nremove;
       }
     }
     //System.out.println("Nodes added/removed = "+nadd+"/"+nremove);
@@ -373,6 +373,7 @@ public class TetMeshTest extends TestCase {
         System.out.println("Sleeping");
         Thread.sleep(5000,0);
       } catch (InterruptedException e) {
+        throw new RuntimeException(e);
       }
     }
   }

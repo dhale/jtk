@@ -300,7 +300,7 @@ public class GridView extends TiledView {
       }
     }
     float width = lineWidth;
-    BasicStroke bs = null;
+    BasicStroke bs;
     if (dash!=null) {
       int cap = BasicStroke.CAP_ROUND;
       int join = BasicStroke.JOIN_ROUND;

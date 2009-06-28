@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * An array of eigen-decompositions of tensors for 2D image processing.
@@ -147,8 +147,8 @@ public class EigenTensors2 implements Tensors2 {
    * @param av array of eigenvalues av.
    */
   public void getEigenvalues(float[][] au, float[][] av) {
-    Array.copy(_au,au);
-    Array.copy(_av,av);
+    ArrayMath.copy(_au,au);
+    ArrayMath.copy(_av,av);
   }
 
   /**
@@ -242,8 +242,8 @@ public class EigenTensors2 implements Tensors2 {
    * @param av eigenvalue av.
    */
   public void setEigenvalues(float au, float av) {
-    Array.fill(au,_au);
-    Array.fill(av,_av);
+    ArrayMath.fill(au,_au);
+    ArrayMath.fill(av,_av);
   }
 
   /**
@@ -274,8 +274,8 @@ public class EigenTensors2 implements Tensors2 {
    * @param av array of eigenvalues av.
    */
   public void setEigenvalues(float[][] au, float[][] av) {
-    Array.copy(au,_au);
-    Array.copy(av,_av);
+    ArrayMath.copy(au,_au);
+    ArrayMath.copy(av,_av);
   }
 
   /**

@@ -88,7 +88,7 @@ public class PlotFrame extends JFrame {
     _split = split;
     _panelMain = new MainPanel();
     _panelMain.setLayout(new BorderLayout());
-    double resizeWeight = 0.5;
+    double resizeWeight;
     if (_split==Split.HORIZONTAL) {
       _splitPane = new JSplitPane(
         JSplitPane.HORIZONTAL_SPLIT,_panelTL,_panelBR);

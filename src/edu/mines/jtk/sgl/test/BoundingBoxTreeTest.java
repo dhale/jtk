@@ -11,7 +11,7 @@ import junit.framework.TestSuite;
 
 import edu.mines.jtk.sgl.BoundingBox;
 import edu.mines.jtk.sgl.BoundingBoxTree;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Tests {@link edu.mines.jtk.sgl.BoundingBoxTree}.
@@ -27,9 +27,9 @@ public class BoundingBoxTreeTest extends TestCase {
   public void testRandom() {
     int minSize = 10;
     int n = 10000;
-    float[] x = Array.randfloat(n);
-    float[] y = Array.randfloat(n);
-    float[] z = Array.randfloat(n);
+    float[] x = ArrayMath.randfloat(n);
+    float[] y = ArrayMath.randfloat(n);
+    float[] z = ArrayMath.randfloat(n);
     BoundingBoxTree bbt = new BoundingBoxTree(minSize,x,y,z);
     BoundingBoxTree.Node root = bbt.getRoot();
     test(root,minSize,x,y,z);

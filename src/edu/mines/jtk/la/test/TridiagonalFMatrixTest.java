@@ -9,7 +9,7 @@ package edu.mines.jtk.la.test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.la.TridiagonalFMatrix;
 import static edu.mines.jtk.util.MathPlus.*;
 
@@ -26,14 +26,14 @@ public class TridiagonalFMatrixTest extends TestCase {
 
   public void testSolve() {
     int n = 100;
-    float[] a = Array.randfloat(n);
-    float[] b = Array.randfloat(n);
-    float[] c = Array.randfloat(n);
+    float[] a = ArrayMath.randfloat(n);
+    float[] b = ArrayMath.randfloat(n);
+    float[] c = ArrayMath.randfloat(n);
     for (int i=0; i<n; ++i)
       b[i] += a[i]+c[i]; // ensure non-singular (and positive-definite)
     TridiagonalFMatrix t = new TridiagonalFMatrix(n,a,b,c);
-    float[] r = Array.randfloat(n);
-    float[] u = Array.zerofloat(n);
+    float[] r = ArrayMath.randfloat(n);
+    float[] u = ArrayMath.zerofloat(n);
     t.solve(r,u);
     float[] s = t.times(u);
     assertEqualFuzzy(r,s);
@@ -41,7 +41,7 @@ public class TridiagonalFMatrixTest extends TestCase {
 
   private static void assertEqualFuzzy(float[] a, float[] b) {
     int n = a.length;
-    double eps = 0.000001*max(Array.max(a),Array.max(b));
+    double eps = 0.000001*max(ArrayMath.max(a), ArrayMath.max(b));
     for (int j=0; j<n; ++j) {
       assertEquals(a[j],b[j],eps);
     }

@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.MathPlus.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.util.Clips}.
@@ -26,10 +26,10 @@ public class ClipsTest extends TestCase {
   public void testPercentiles() {
     double tiny = 10.0f*FLT_EPSILON;
     int n = 101;
-    //float[][][] f = Array.rampfloat(0.0f,1.0f,0.0f,0.0f,n,n,n);
+    //float[][][] f = ArrayMath.rampfloat(0.0f,1.0f,0.0f,0.0f,n,n,n);
     //SimpleFloat3 f3 = new SimpleFloat3(f);
     //Clips clips = new Clips(f3);
-    float[] f = Array.rampfloat(0.0f,1.0f,n);
+    float[] f = rampfloat(0.0f,1.0f,n);
     Clips clips = new Clips(f);
     for (int imin=0,imax=n-1; imin<imax; ++imin,--imax) {
       double pmin = 100.0*imin/(n-1);

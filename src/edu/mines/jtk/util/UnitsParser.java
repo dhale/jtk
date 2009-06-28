@@ -36,7 +36,7 @@ final class UnitsParser {
 
   /** 
    * Parse a String containing a unit definition.
-   * @param the unit definition, as in "coulomb/volt".
+   * @param definition the unit definition, as in "coulomb/volt".
    * @exception ParseException if the definition is not valid.
    */
   static synchronized Units parse(String definition) throws ParseException {

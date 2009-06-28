@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.LocalOrientFilter;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.LocalOrientFilter}.
@@ -35,7 +35,7 @@ public class LocalOrientFilterTest extends TestCase {
       float k = 0.3f;
       float c = k*cos(dip);
       float s = k*sin(dip);
-      float[][] x = Array.sin(Array.rampfloat(0.0f,c,s,n1,n2));
+      float[][] x = ArrayMath.sin(ArrayMath.rampfloat(0.0f,c,s,n1,n2));
       float[][] theta = new float[n2][n1];
       float[][] u1 = new float[n2][n1];
       float[][] u2 = new float[n2][n1];
@@ -70,7 +70,7 @@ public class LocalOrientFilterTest extends TestCase {
         float ku1 = k*cos(dip);
         float ku2 = k*sin(dip)*cos(azi);
         float ku3 = k*sin(dip)*sin(azi);
-        float[][][] x = Array.sin(Array.rampfloat(0.0f,ku1,ku2,ku3,n1,n2,n3));
+        float[][][] x = ArrayMath.sin(ArrayMath.rampfloat(0.0f,ku1,ku2,ku3,n1,n2,n3));
         float[][][] theta = new float[n3][n2][n1];
         float[][][] phi = new float[n3][n2][n1];
         float[][][] u1 = new float[n3][n2][n1];
@@ -185,10 +185,12 @@ public class LocalOrientFilterTest extends TestCase {
     assertEquals(abs(e),abs(a[n3/2][n2/2][n1/2]),tol);
   }
 
+  /*
   private static void print(String s, float[][][] a) {
     int n1 = a[0][0].length;
     int n2 = a[0].length;
     int n3 = a.length;
     System.out.println(s+a[n3/2][n2/2][n1/2]);
   }
+  */
 }

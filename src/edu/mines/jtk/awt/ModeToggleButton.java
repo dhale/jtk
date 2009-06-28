@@ -37,7 +37,7 @@ public class ModeToggleButton extends JToggleButton {
     mode.addPropertyChangeListener(new PropertyChangeListener() {
       public void propertyChange(PropertyChangeEvent e) {
         if (e.getPropertyName().equals("active"))
-          setSelected(((Boolean)e.getNewValue()).booleanValue());
+          setSelected((Boolean)e.getNewValue());
       }
     });
   }

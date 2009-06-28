@@ -228,8 +228,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeBytes(byte[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeBytes(v[i]);
+    for (byte[] vi:v)
+      writeBytes(vi);
   }
 
   /**
@@ -237,8 +237,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeBytes(byte[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeBytes(v[i]);
+    for (byte[][] vi:v)
+      writeBytes(vi);
   }
 
   /**
@@ -276,8 +276,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeChars(char[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeChars(v[i]);
+    for (char[] vi:v)
+      writeChars(vi);
   }
 
   /**
@@ -285,8 +285,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeChars(char[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeChars(v[i]);
+    for (char[][] vi:v)
+      writeChars(vi);
   }
 
   /**
@@ -324,8 +324,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeShorts(short[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeShorts(v[i]);
+    for (short[] vi:v)
+      writeShorts(vi);
   }
 
   /**
@@ -333,8 +333,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeShorts(short[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeShorts(v[i]);
+    for (short[][] vi:v)
+      writeShorts(vi);
   }
 
   /**
@@ -372,8 +372,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeInts(int[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeInts(v[i]);
+    for (int[] vi:v)
+      writeInts(vi);
   }
 
   /**
@@ -381,8 +381,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeInts(int[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeInts(v[i]);
+    for (int[][] vi:v)
+      writeInts(vi);
   }
 
   /**
@@ -420,8 +420,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeLongs(long[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeLongs(v[i]);
+    for (long[] vi:v)
+      writeLongs(vi);
   }
 
   /**
@@ -429,8 +429,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeLongs(long[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeLongs(v[i]);
+    for (long[][] vi:v)
+      writeLongs(vi);
   }
 
   /**
@@ -468,8 +468,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeFloats(float[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeFloats(v[i]);
+    for (float[] vi:v)
+      writeFloats(vi);
   }
 
   /**
@@ -477,8 +477,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeFloats(float[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeFloats(v[i]);
+    for (float[][] vi:v)
+      writeFloats(vi);
   }
 
   /**
@@ -516,8 +516,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeDoubles(double[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeDoubles(v[i]);
+    for (double[] vi:v)
+      writeDoubles(vi);
   }
 
   /**
@@ -525,8 +525,8 @@ public class ArrayOutputAdapter implements ArrayOutput {
    * @param v the array.
    */
   public void writeDoubles(double[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      writeDoubles(v[i]);
+    for (double[][] vi:v)
+      writeDoubles(vi);
   }
 
   ///////////////////////////////////////////////////////////////////////////

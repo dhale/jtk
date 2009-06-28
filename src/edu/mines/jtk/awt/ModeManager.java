@@ -51,6 +51,7 @@ public class ModeManager {
 
   /**
    * Called by a mode when it is constructed.
+   * @param m the mode.
    */
   void add(Mode m) {
     _mset.add(m);
@@ -58,6 +59,8 @@ public class ModeManager {
 
   /**
    * Called by a mode when its action is performed.
+   * @param mode the mode.
+   * @param active true, for active; false, otherwise.
    */
   void setActive(Mode mode, boolean active) {
 

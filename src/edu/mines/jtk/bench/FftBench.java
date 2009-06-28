@@ -7,8 +7,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.bench;
 
 import edu.mines.jtk.dsp.FftComplex;
-import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Stopwatch;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Benchmark FFTs.
@@ -17,7 +17,7 @@ import edu.mines.jtk.util.Stopwatch;
  */
 public class FftBench {
   public static void main(String[] args) {
-    for (;;) {
+    for (int niter=0; niter<5; ++niter) {
       for (int nfft=1; nfft<=720720;) {
         int nfftSmall = FftComplex.nfftSmall(nfft);
         int nfftFast = FftComplex.nfftFast(nfft);
@@ -39,7 +39,7 @@ public class FftBench {
   private static double time(int nfft) {
     double maxtime = 2.0;
     FftComplex fft = new FftComplex(nfft);
-    float[] cx = Array.crandfloat(nfft);
+    float[] cx = crandfloat(nfft);
     int count;
     Stopwatch sw = new Stopwatch();
     sw.start();

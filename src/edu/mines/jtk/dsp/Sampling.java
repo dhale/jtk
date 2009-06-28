@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -146,7 +146,7 @@ public class Sampling {
    */
   public Sampling(double[] v, double t) {
     Check.argument(v.length>0,"v.length>0");
-    Check.argument(Array.isIncreasing(v),"v is increasing");
+    Check.argument(ArrayMath.isIncreasing(v),"v is increasing");
     _n = v.length;
     _d = (_n<2)?1.0:(v[_n-1]-v[0])/(_n-1);
     _f = v[0];
@@ -158,7 +158,7 @@ public class Sampling {
       if (!almostEqual(v[i],vi,_td))
         uniform = false;
     }
-    _v = (uniform)?null:Array.copy(v);
+    _v = (uniform)?null: ArrayMath.copy(v);
   }
 
   /**
@@ -211,9 +211,9 @@ public class Sampling {
    * @return the sample values; returned by copy, not by reference.
    */
   public double[] getValues() {
-    double[] v = null;
+    double[] v;
     if (_v!=null) {
-      v = Array.copy(_v);
+      v = ArrayMath.copy(_v);
     } else {
       v = new double[_n];
       for (int i=0; i<_n; ++i)
@@ -335,7 +335,7 @@ public class Sampling {
       if (0<=j && j<_n && almostEqual(x,_f+j*_d,_td))
         i = j;
     } else {
-      int j = Array.binarySearch(_v,x);
+      int j = ArrayMath.binarySearch(_v,x);
       if (0<=j) {
         i = j;
       } else {
@@ -356,7 +356,7 @@ public class Sampling {
    * @return the index of the nearest sample.
    */
   public int indexOfNearest(double x) {
-    int i = -1;
+    int i;
     if (isUniform()) {
       i = (int)Math.round((x-_f)/_d);
       if (i<0)
@@ -364,7 +364,7 @@ public class Sampling {
       if (i>=_n)
         i = _n-1;
     } else {
-      i = Array.binarySearch(_v,x);
+      i = ArrayMath.binarySearch(_v,x);
       if (i<0) {
         i = -(i+1);
         if (i==_n) {

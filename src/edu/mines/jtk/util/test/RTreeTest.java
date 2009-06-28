@@ -282,9 +282,7 @@ public class RTreeTest extends TestCase {
     public Object[] findOverlapping(RTree.Boxed boxed) {
       boxed.getBounds(_amin,_amax);
       ArrayList<RTree.Boxed> list = new ArrayList<RTree.Boxed>();
-      Iterator<RTree.Boxed> i = _set.iterator();
-      while (i.hasNext()) {
-        RTree.Boxed b = i.next();
+      for (RTree.Boxed b:_set) {
         b.getBounds(_bmin,_bmax);
         if (overlapsAB())
           list.add(b);
@@ -299,9 +297,7 @@ public class RTreeTest extends TestCase {
       for (int i=0; i<n; ++i) {
         float dmin = Float.MAX_VALUE;
         RTree.Boxed bmin = null;
-        Iterator<RTree.Boxed> si = _set.iterator();
-        while (si.hasNext()) {
-          RTree.Boxed b = si.next();
+        for (RTree.Boxed b:_set) {
           if (list.contains(b))
             continue;
           float d = b.getDistanceSquared(point);
@@ -453,21 +449,16 @@ public class RTreeTest extends TestCase {
         if (s<0.0f) {
           if (t<0.0f) { // region 4
             if (d<0.0f) {
-              t = 0.0f;
               if (-d>=a) {
-                s = 1.0f;
                 q = a+2.0f*d+f;
               } else {
                 s = -d/a;
                 q = d*s+f;
               }
             } else {
-              s = 0.0f;
               if (e>=0.0f) {
-                t = 0.0f;
                 q = f;
               } else if (-e>=c) {
-                t = 1.0f;
                 q = c+2.0f*e+f;
               } else {
                 t = -e/c;
@@ -475,12 +466,9 @@ public class RTreeTest extends TestCase {
               }
             }
           } else { // region 3
-            s = 0.0f;
             if (e>=0.0f) {
-              t = 0.0f;
               q = f;
             } else if (-e>=c) {
-              t = 1.0f;
               q = c+2.0f*e+f;
             } else {
               t = -e/c;
@@ -488,12 +476,9 @@ public class RTreeTest extends TestCase {
             }
           }
         } else if (t<0.0f) { // region 5
-          t = 0.0f;
           if (d>=0.0f) {
-            s = 0.0f;
             q = f;
           } else if (-d>=a) {
-            s = 1.0f;
             q = a+2.0f*d+f;
           } else {
             s = -d/a;
@@ -513,8 +498,6 @@ public class RTreeTest extends TestCase {
             float num = ce-bd;
             float den = a-2.0f*b+c;
             if (num>=den) {
-              s = 1.0f;
-              t = 0.0f;
               q = a+2.0f*d+f;
             } else {
               s = num/den;
@@ -522,12 +505,9 @@ public class RTreeTest extends TestCase {
               q = s*(a*s+b*t+2.0f*d)+t*(b*s+c*t+2.0f*e)+f;
             }
           } else {
-            s = 0.0f;
             if (ce<=0.0f) {
-              t = 1.0f;
               q = c+2.0f*e+f;
             } else if (e>=0.0f) {
-              t = 0.0f;
               q = f;
             } else {
               t = -e/c;
@@ -541,8 +521,6 @@ public class RTreeTest extends TestCase {
             float num = ad-be;
             float den = a-2.0f*b+c;
             if (num>=den) {
-              t = 1.0f;
-              s = 0.0f;
               q = c+2.0f*e+f;
             } else {
               t = num/den;
@@ -550,12 +528,9 @@ public class RTreeTest extends TestCase {
               q = s*(a*s+b*t+2.0f*d)+t*(b*s+c*t+2.0f*e)+f;
             }
           } else {
-            t = 0.0f;
             if (ad<=0.0f) {
-              s = 1.0f;
               q = a+2.0f*d+f;
             } else if (d>=0.0f) {
-              s = 0.0f;
               q = f;
             } else {
               s = -d/a;
@@ -565,14 +540,10 @@ public class RTreeTest extends TestCase {
         } else { // region 1
           float num = c+e-b-d;
           if (num<=0.0f) {
-            s = 0.0f;
-            t = 1.0f;
             q = c+2.0f*e+f;
           } else {
             float den = a-2.0f*b+c;
             if (num>=den) {
-              s = 1.0f;
-              t = 0.0f;
               q = a+2.0f*d+f;
             } else {
               s = num/den;

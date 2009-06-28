@@ -35,7 +35,7 @@ public class ImagePanelGroupTest {
     float k1 = 4.0f*FLT_PI*(float)d1;
     float k2 = 4.0f*FLT_PI*(float)d2;
     float k3 = 4.0f*FLT_PI*(float)d3;
-    float[][][] f = Array.sin(Array.rampfloat(0.0f,k1,k2,k3,n1,n2,n3));
+    float[][][] f = ArrayMath.sin(ArrayMath.rampfloat(0.0f,k1,k2,k3,n1,n2,n3));
     ImagePanelGroup ipg = new ImagePanelGroup(s1,s2,s3,f);
     ipg.setPercentiles(1,99);
     World world = new World();

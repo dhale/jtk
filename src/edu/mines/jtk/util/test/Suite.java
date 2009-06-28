@@ -22,7 +22,6 @@ public class Suite extends TestSuite {
     suite.addTestSuite(AlmostTest.class);
     suite.addTestSuite(ArgsParserTest.class);
     suite.addTestSuite(ArrayMathTest.class);
-    suite.addTestSuite(ArrayTest.class);
     suite.addTestSuite(ArrayQueueTest.class);
     suite.addTestSuite(AxisTicsTest.class);
     suite.addTestSuite(CfloatTest.class);

@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -34,7 +34,7 @@ class Pfacc {
    * @return true, if valid; false, otherwise.
    */
   static boolean nfftValid(int nfft) {
-    return Array.binarySearch(_ntable,nfft)>=0;
+    return ArrayMath.binarySearch(_ntable,nfft)>=0;
   }
 
   /**
@@ -48,7 +48,7 @@ class Pfacc {
    */
   static int nfftSmall(int n) {
     Check.argument(n<=720720,"n does not exceed 720720");
-    int itable = Array.binarySearch(_ntable,n);
+    int itable = ArrayMath.binarySearch(_ntable,n);
     if (itable<0) itable = -(itable+1);
     return _ntable[itable];
   }
@@ -64,7 +64,7 @@ class Pfacc {
    */
   static int nfftFast(int n) {
     Check.argument(n<=720720,"n does not exceed 720720");
-    int ifast = Array.binarySearch(_ntable,n);
+    int ifast = ArrayMath.binarySearch(_ntable,n);
     if (ifast<0) ifast = -(ifast+1);
     int nfast = _ntable[ifast];
     int nstop = 2*nfast;
@@ -112,7 +112,7 @@ class Pfacc {
       if (sign<0)
         mu = ifac-mu;
 
-      // Array stride, bound, and indices.
+      // ArrayMath stride, bound, and indices.
       int jinc = 2*mm;
       int jmax = 2*nfft;
       int j0 = 0;
@@ -120,7 +120,7 @@ class Pfacc {
 
       // Factor 2.
       if (ifac==2) {
-        pfa2(z,mu,m,j0,j1);
+        pfa2(z,m,j0,j1);
         continue;
       }
       int j2 = (j1+jinc)%jmax;
@@ -189,12 +189,10 @@ class Pfacc {
       // Factor 16.
       if (ifac==16) {
         pfa16(z,mu,m,j0,j1,j2,j3,j4,j5,j6,j7,j8,j9,j10,j11,j12,j13,j14,j15);
-        continue;
       }
     }
   }
-  private static void pfa2(float[] z, int mu, int m,
-    int j0, int j1)
+  private static void pfa2(float[] z, int m, int j0, int j1)
   {
     for (int i=0; i<m; ++i) {
       float t1r = z[j0  ]-z[j1  ];
@@ -1373,7 +1371,7 @@ class Pfacc {
       if (sign<0)
         mu = ifac-mu;
 
-      // Array stride, bound, and indices.
+      // ArrayMath stride, bound, and indices.
       int jinc = mm;
       int jmax = nfft;
       int j0 = 0;
@@ -1381,7 +1379,7 @@ class Pfacc {
 
       // Factor 2.
       if (ifac==2) {
-        pfa2a(n1,z,mu,m,j0,j1);
+        pfa2a(n1,z,m,j0,j1);
         continue;
       }
       int j2 = (j1+jinc)%jmax;
@@ -1450,12 +1448,10 @@ class Pfacc {
       // Factor 16.
       if (ifac==16) {
         pfa16a(n1,z,mu,m,j0,j1,j2,j3,j4,j5,j6,j7,j8,j9,j10,j11,j12,j13,j14,j15);
-        continue;
       }
     }
   }
-  private static void pfa2a(int n1, float[][] z, int mu, int m,
-    int j0, int j1)
+  private static void pfa2a(int n1, float[][] z, int m, int j0, int j1)
   {
     int m1 = 2*n1;
     for (int i=0; i<m; ++i) {
@@ -2742,7 +2738,7 @@ class Pfacc {
       if (sign<0)
         mu = ifac-mu;
 
-      // Array stride, bound, and indices.
+      // ArrayMath stride, bound, and indices.
       int jinc = 2*mm;
       int jmax = 2*nfft;
       int j0 = 0;
@@ -2750,7 +2746,7 @@ class Pfacc {
 
       // Factor 2.
       if (ifac==2) {
-        pfa2b(n1,z,mu,m,j0,j1);
+        pfa2b(n1,z,m,j0,j1);
         continue;
       }
       int j2 = (j1+jinc)%jmax;
@@ -2819,12 +2815,10 @@ class Pfacc {
       // Factor 16.
       if (ifac==16) {
         pfa16b(n1,z,mu,m,j0,j1,j2,j3,j4,j5,j6,j7,j8,j9,j10,j11,j12,j13,j14,j15);
-        continue;
       }
     }
   }
-  private static void pfa2b(int n1, float[][] z, int mu, int m,
-    int j0, int j1)
+  private static void pfa2b(int n1, float[][] z, int m, int j0, int j1)
   {
     for (int i=0; i<m; ++i) {
       float[] zj0r = z[j0  ];

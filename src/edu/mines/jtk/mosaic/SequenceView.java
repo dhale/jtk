@@ -11,7 +11,7 @@ import static java.lang.Math.*;
 import java.awt.*;
 
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -85,7 +85,7 @@ public class SequenceView extends TiledView {
   public void set(Sampling sx, float[] f) {
     Check.argument(sx.getCount()==f.length,"sx count equals length of f");
     _sx = sx;
-    _f = Array.copy(f);
+    _f = ArrayMath.copy(f);
     updateBestProjectors();
     repaint();
   }
@@ -103,7 +103,7 @@ public class SequenceView extends TiledView {
    * @return array of sampled function values f(x).
    */
   public float[] getFunction() {
-    return Array.copy(_f);
+    return ArrayMath.copy(_f);
   }
 
 

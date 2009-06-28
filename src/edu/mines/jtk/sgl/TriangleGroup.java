@@ -268,7 +268,7 @@ public class TriangleGroup extends Group implements Selectable {
     int nv = xyz.length/3;
     int nt = nv/3;
 
-    // Array of vertex indices, one per vertex.
+    // ArrayMath of vertex indices, one per vertex.
     int[] ijk = new int[nv];
 
     // For sequential indexing, simply fill the array. For non-sequential 
@@ -283,10 +283,10 @@ public class TriangleGroup extends Group implements Selectable {
           Vertex v = new Vertex(xyz[kv+X],xyz[kv+Y],xyz[kv+Z]);
           Integer i = vimap.get(v);
           if (i==null) {
-            i = new Integer(jv);
+            i = jv;
             vimap.put(v,i);
           }
-          ijk[jv] = i.intValue();
+          ijk[jv] = i;
         }
       }
     }

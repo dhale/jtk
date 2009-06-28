@@ -34,7 +34,9 @@ import java.nio.channels.FileChannel;
  * data file.
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.01.14
+ * @deprecated Use the class {@link edu.mines.jtk.io.ArrayFile} instead.
  */
+@Deprecated
 public class DataFile implements DataInput, DataOutput, Closeable {
 
   /**
@@ -43,7 +45,7 @@ public class DataFile implements DataInput, DataOutput, Closeable {
    */
   public enum ByteOrder {
     BIG_ENDIAN,
-    LITTLE_ENDIAN;
+    LITTLE_ENDIAN
   }
 
   /**

@@ -54,7 +54,7 @@ public class LocalCorrelationFilter {
   public enum Type {
     SIMPLE,
     SYMMETRIC
-  };
+  }
 
   /**
    * Cross-correlations windows.
@@ -62,7 +62,7 @@ public class LocalCorrelationFilter {
   public enum Window {
     GAUSSIAN,
     RECTANGLE
-  };
+  }
 
   /**
    * Construct a correlation filter with specified parameters.
@@ -168,8 +168,8 @@ public class LocalCorrelationFilter {
     } else {
       Check.argument(f[0].length==g[0].length,"f[0].length==g[0].length");
       Check.argument(f.length==g.length,"f.length==g.length");
-      Check.argument(Array.isRegular(f),"f is regular");
-      Check.argument(Array.isRegular(g),"g is regular");
+      Check.argument(ArrayMath.isRegular(f),"f is regular");
+      Check.argument(ArrayMath.isRegular(g),"g is regular");
       _dimension = 2;
       _n1 = f[0].length;
       _n2 = f.length;
@@ -198,8 +198,8 @@ public class LocalCorrelationFilter {
         f[0][0].length==g[0][0].length,"f[0][0].length==g[0][0].length");
       Check.argument(f[0].length==g[0].length,"f[0].length==g[0].length");
       Check.argument(f.length==g.length,"f.length==g.length");
-      Check.argument(Array.isRegular(f),"f is regular");
-      Check.argument(Array.isRegular(g),"g is regular");
+      Check.argument(ArrayMath.isRegular(f),"f is regular");
+      Check.argument(ArrayMath.isRegular(g),"g is regular");
       _dimension = 3;
       _n1 = f[0][0].length;
       _n2 = f[0].length;
@@ -386,7 +386,7 @@ public class LocalCorrelationFilter {
     int n1 = f.length;
     float[] t = new float[n1];
     _f1.apply(f,t);
-    Array.sub(f,t,t);
+    ArrayMath.sub(f,t,t);
     return t;
   }
 
@@ -401,7 +401,7 @@ public class LocalCorrelationFilter {
     float[][] t = new float[n2][n1];
     _f1.apply1(f,t);
     _f2.apply2(t,t);
-    Array.sub(f,t,t);
+    ArrayMath.sub(f,t,t);
     return t;
   }
 
@@ -418,7 +418,7 @@ public class LocalCorrelationFilter {
     _f1.apply1(f,t);
     _f2.apply2(t,t);
     _f3.apply3(t,t);
-    Array.sub(f,t,t);
+    ArrayMath.sub(f,t,t);
     return t;
   }
 
@@ -458,8 +458,8 @@ public class LocalCorrelationFilter {
       // lag  ...  -2  -1   0   1   2  ...
       // l1f  ...  -1  -1   0   0   1  ...
       // l1g  ...  -1   0   0   1   1  ...
-      l1f = (l1>=0)?(l1+0)/2:(l1-1)/2;
-      l1g = (l1>=0)?(l1+1)/2:(l1+0)/2;
+      l1f = (l1>=0)?(l1  )/2:(l1-1)/2;
+      l1g = (l1>=0)?(l1+1)/2:(l1  )/2;
     }
 
     // Scale factor so that center of window = 1.
@@ -496,7 +496,7 @@ public class LocalCorrelationFilter {
     if (_window==Window.GAUSSIAN && _type==Type.SYMMETRIC) {
       if (l1f!=l1g) {
         shift(h,c);
-        Array.copy(c,h);
+        ArrayMath.copy(c,h);
       }
     }
 
@@ -527,10 +527,10 @@ public class LocalCorrelationFilter {
 
     // Shifted lags for symmetric correlation.
     if (_type==Type.SYMMETRIC) {
-      l1f = (l1>=0)?(l1+0)/2:(l1-1)/2;
-      l1g = (l1>=0)?(l1+1)/2:(l1+0)/2;
-      l2f = (l2>=0)?(l2+0)/2:(l2-1)/2;
-      l2g = (l2>=0)?(l2+1)/2:(l2+0)/2;
+      l1f = (l1>=0)?(l1  )/2:(l1-1)/2;
+      l1g = (l1>=0)?(l1+1)/2:(l1  )/2;
+      l2f = (l2>=0)?(l2  )/2:(l2-1)/2;
+      l2g = (l2>=0)?(l2+1)/2:(l2  )/2;
     }
 
     // Scale factor so that center of window = 1.
@@ -579,11 +579,11 @@ public class LocalCorrelationFilter {
     if (_window==Window.GAUSSIAN && _type==Type.SYMMETRIC) {
       if (l1f!=l1g) {
         shift1(h,c);
-        Array.copy(c,h);
+        ArrayMath.copy(c,h);
       }
       if (l2f!=l2g) {
         shift2(h,c);
-        Array.copy(c,h);
+        ArrayMath.copy(c,h);
       }
     }
 
@@ -597,7 +597,7 @@ public class LocalCorrelationFilter {
       f2 = new RectangleFilter(_sigma2,l2);
     }
     f1.apply1(h,c);
-    Array.copy(c,h);
+    ArrayMath.copy(c,h);
     f2.apply2(h,c);
   }
 
@@ -623,12 +623,12 @@ public class LocalCorrelationFilter {
 
     // Shifted lags for symmetric correlation.
     if (_type==Type.SYMMETRIC) {
-      l1f = (l1>=0)?(l1+0)/2:(l1-1)/2;
-      l1g = (l1>=0)?(l1+1)/2:(l1+0)/2;
-      l2f = (l2>=0)?(l2+0)/2:(l2-1)/2;
-      l2g = (l2>=0)?(l2+1)/2:(l2+0)/2;
-      l3f = (l3>=0)?(l3+0)/2:(l3-1)/2;
-      l3g = (l3>=0)?(l3+1)/2:(l3+0)/2;
+      l1f = (l1>=0)?(l1  )/2:(l1-1)/2;
+      l1g = (l1>=0)?(l1+1)/2:(l1  )/2;
+      l2f = (l2>=0)?(l2  )/2:(l2-1)/2;
+      l2g = (l2>=0)?(l2+1)/2:(l2  )/2;
+      l3f = (l3>=0)?(l3  )/2:(l3-1)/2;
+      l3g = (l3>=0)?(l3+1)/2:(l3  )/2;
     }
 
     // Scale factor so that center of window = 1.
@@ -689,15 +689,15 @@ public class LocalCorrelationFilter {
     if (_window==Window.GAUSSIAN && _type==Type.SYMMETRIC) {
       if (l1f!=l1g) {
         shift1(h,c);
-        Array.copy(c,h);
+        ArrayMath.copy(c,h);
       }
       if (l2f!=l2g) {
         shift2(h,c);
-        Array.copy(c,h);
+        ArrayMath.copy(c,h);
       }
       if (l3f!=l3g) {
         shift3(h,c);
-        Array.copy(c,h);
+        ArrayMath.copy(c,h);
       }
     }
 
@@ -713,9 +713,9 @@ public class LocalCorrelationFilter {
       f3 = new RectangleFilter(_sigma3,l3);
     }
     f1.apply1(h,c);
-    Array.copy(c,h);
+    ArrayMath.copy(c,h);
     f2.apply2(h,c);
-    Array.copy(c,h);
+    ArrayMath.copy(c,h);
     f3.apply3(h,c);
   }
 
@@ -735,10 +735,10 @@ public class LocalCorrelationFilter {
         float[] sg = _s[1][0][0];
         correlate(0,f,f,sf);
         correlate(0,g,g,sg);
-        Array.sqrt(sf,sf);
-        Array.sqrt(sg,sg);
-        Array.div(1.0f,sf,sf);
-        Array.div(1.0f,sg,sg);
+        ArrayMath.sqrt(sf,sf);
+        ArrayMath.sqrt(sg,sg);
+        ArrayMath.div(1.0f,sf,sf);
+        ArrayMath.div(1.0f,sg,sg);
       } else if (_dimension==2) {
         float[][] f = _f[0];
         float[][] g = _g[0];
@@ -746,10 +746,10 @@ public class LocalCorrelationFilter {
         float[][] sg = _s[1][0];
         correlate(0,0,f,f,sf);
         correlate(0,0,g,g,sg);
-        Array.sqrt(sf,sf);
-        Array.sqrt(sg,sg);
-        Array.div(1.0f,sf,sf);
-        Array.div(1.0f,sg,sg);
+        ArrayMath.sqrt(sf,sf);
+        ArrayMath.sqrt(sg,sg);
+        ArrayMath.div(1.0f,sf,sf);
+        ArrayMath.div(1.0f,sg,sg);
       } else {
         float[][][] f = _f;
         float[][][] g = _g;
@@ -757,10 +757,10 @@ public class LocalCorrelationFilter {
         float[][][] sg = _s[1];
         correlate(0,0,0,f,f,sf);
         correlate(0,0,0,g,g,sg);
-        Array.sqrt(sf,sf);
-        Array.sqrt(sg,sg);
-        Array.div(1.0f,sf,sf);
-        Array.div(1.0f,sg,sg);
+        ArrayMath.sqrt(sf,sf);
+        ArrayMath.sqrt(sg,sg);
+        ArrayMath.div(1.0f,sf,sf);
+        ArrayMath.div(1.0f,sg,sg);
       }
     } else {
       if (_dimension==1) {
@@ -771,9 +771,9 @@ public class LocalCorrelationFilter {
         float[] sg = new float[_n1];
         correlate(0,f,f,sf);
         correlate(0,g,g,sg);
-        Array.mul(sf,sg,s);
-        Array.sqrt(s,s);
-        Array.div(1.0f,s,s);
+        ArrayMath.mul(sf,sg,s);
+        ArrayMath.sqrt(s,s);
+        ArrayMath.div(1.0f,s,s);
       } else if (_dimension==2) {
         float[][] f = _f[0];
         float[][] g = _g[0];
@@ -782,9 +782,9 @@ public class LocalCorrelationFilter {
         float[][] sg = new float[_n2][_n1];
         correlate(0,0,f,f,sf);
         correlate(0,0,g,g,sg);
-        Array.mul(sf,sg,s);
-        Array.sqrt(s,s);
-        Array.div(1.0f,s,s);
+        ArrayMath.mul(sf,sg,s);
+        ArrayMath.sqrt(s,s);
+        ArrayMath.div(1.0f,s,s);
       } else {
         float[][][] f = _f;
         float[][][] g = _g;
@@ -793,9 +793,9 @@ public class LocalCorrelationFilter {
         float[][][] sg = new float[_n3][_n2][_n1];
         correlate(0,0,0,f,f,sf);
         correlate(0,0,0,g,g,sg);
-        Array.mul(sf,sg,s);
-        Array.sqrt(s,s);
-        Array.div(1.0f,s,s);
+        ArrayMath.mul(sf,sg,s);
+        ArrayMath.sqrt(s,s);
+        ArrayMath.div(1.0f,s,s);
       }
     }
   }
@@ -931,14 +931,14 @@ public class LocalCorrelationFilter {
   }
 
   private void checkDimensions(float[][] c) {
-    Check.argument(Array.isRegular(c),"c is regular");
+    Check.argument(ArrayMath.isRegular(c),"c is regular");
     Check.argument(_n1==c[0].length,"array dimension 1 is valid");
     Check.argument(_n2==c.length,"array dimension 2 is valid");
     checkDimension(2);
   }
 
   private void checkDimensions(float[][][] c) {
-    Check.argument(Array.isRegular(c),"c is regular");
+    Check.argument(ArrayMath.isRegular(c),"c is regular");
     Check.argument(_n1==c[0][0].length,"array dimension 1 is valid");
     Check.argument(_n2==c[0].length,"array dimension 2 is valid");
     Check.argument(_n3==c.length,"array dimension 3 is valid");

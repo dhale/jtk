@@ -20,7 +20,7 @@ import edu.mines.jtk.mosaic.*;
 import edu.mines.jtk.util.*;
 
 /**
- * Tests {@link edu.mines.jtk.mesh.SibsonInterpolator3}.
+ * Tests {@link edu.mines.jtk.interp.SibsonInterpolator3}.
  * @author Dave Hale, Colorado School of Mines
  * @version 2009.06.14
  */
@@ -166,8 +166,7 @@ public class SibsonInterpolator3Test extends TestCase {
     System.out.println();
     //SibsonInterpolator3.Method[] methods = {HL,WS,BS};
     SibsonInterpolator3.Method[] methods = {HL};
-    for (int i=0; i<methods.length; ++i) {
-      SibsonInterpolator3.Method method = methods[i];
+    for (SibsonInterpolator3.Method method:methods) {
       SibsonInterpolator3 si = new SibsonInterpolator3(method,f,x1,x2,x3);
       si.setNullValue(1.0f);
       si.setBounds(SX,SX,SX);
@@ -182,7 +181,7 @@ public class SibsonInterpolator3Test extends TestCase {
         tmin = min(tmin,sw.time());
       }
       System.out.println("method="+method+" time="+tmin);
-      System.out.println("min="+Array.min(g)+" max="+Array.max(g));
+      System.out.println("min="+ ArrayMath.min(g)+" max="+ ArrayMath.max(g));
       plot(method,g);
     }
   }

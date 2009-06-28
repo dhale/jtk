@@ -11,7 +11,7 @@ import static edu.mines.jtk.lapack.Lapack.dgetrf;
 import static edu.mines.jtk.lapack.Lapack.dgetrs;
 import static java.lang.Math.min;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -47,9 +47,8 @@ public class DMatrixLud {
       _p[i] = i;
     _det = 1.0;
     for (int i=0; i<_m; ++i) {
-      int j = i;
       if (i<_npiv) {
-        j = _ipiv[i]-1;
+        int j = _ipiv[i]-1;
         _det *= _lu[i+i*_m];
         if (j!=i) {
           int pi = _p[i];
@@ -129,7 +128,7 @@ public class DMatrixLud {
    * @return the pivot indices p.
    */
   public int[] getPivotIndices() {
-    return Array.copy(_p);
+    return ArrayMath.copy(_p);
   }
 
   /**

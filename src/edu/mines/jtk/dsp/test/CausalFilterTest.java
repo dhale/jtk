@@ -56,7 +56,7 @@ public class CausalFilterTest extends TestCase {
 
     { // x == BAx (for B = inv(A))
       float[] x = randfloat(n);
-      float[] y = Array.copy(x);
+      float[] y = ArrayMath.copy(x);
       cf.apply(y,y); // in-place
       cf.applyInverse(y,y); // in-place
       assertEqual(x,y);
@@ -64,7 +64,7 @@ public class CausalFilterTest extends TestCase {
 
     { // x == A'B'x (for B = inv(A))
       float[] x = randfloat(n);
-      float[] y = Array.copy(x);
+      float[] y = ArrayMath.copy(x);
       cf.applyInverseTranspose(y,y); // in-place
       cf.applyTranspose(y,y); // in-place
       assertEqual(x,y);
@@ -115,7 +115,7 @@ public class CausalFilterTest extends TestCase {
 
     { // x == BAx (for B = inv(A))
       float[][] x = randfloat(n1,n2);
-      float[][] y = Array.copy(x);
+      float[][] y = ArrayMath.copy(x);
       cf.apply(y,y); // in-place
       cf.applyInverse(y,y); // in-place
       assertEqual(x,y);
@@ -123,7 +123,7 @@ public class CausalFilterTest extends TestCase {
 
     { // x == A'B'x (for B = inv(A))
       float[][] x = randfloat(n1,n2);
-      float[][] y = Array.copy(x);
+      float[][] y = ArrayMath.copy(x);
       cf.applyInverseTranspose(y,y); // in-place
       cf.applyTranspose(y,y); // in-place
       assertEqual(x,y);
@@ -187,7 +187,7 @@ public class CausalFilterTest extends TestCase {
 
     { // x == BAx (for B = inv(A))
       float[][][] x = randfloat(n1,n2,n3);
-      float[][][] y = Array.copy(x);
+      float[][][] y = ArrayMath.copy(x);
       cf.apply(y,y); // in-place
       cf.applyInverse(y,y); // in-place
       assertEqual(x,y);
@@ -195,7 +195,7 @@ public class CausalFilterTest extends TestCase {
 
     { // x == A'B'x (for B = inv(A))
       float[][][] x = randfloat(n1,n2,n3);
-      float[][][] y = Array.copy(x);
+      float[][][] y = ArrayMath.copy(x);
       cf.applyInverseTranspose(y,y); // in-place
       cf.applyTranspose(y,y); // in-place
       assertEqual(x,y);
@@ -242,8 +242,8 @@ public class CausalFilterTest extends TestCase {
       }
     }
     //System.out.println("2-D Laplacian:");
-    //Array.dump(r);
-    //Array.dump(s);
+    //ArrayMath.dump(r);
+    //ArrayMath.dump(s);
   }
 
   public void testFactorLaplacian3() {
@@ -296,8 +296,8 @@ public class CausalFilterTest extends TestCase {
       }
     }
     //System.out.println("3-D Laplacian:");
-    //Array.dump(r);
-    //Array.dump(s);
+    //ArrayMath.dump(r);
+    //ArrayMath.dump(s);
   }
 
   public void xtestFactorPlane2Filter() {
@@ -313,12 +313,12 @@ public class CausalFilterTest extends TestCase {
     float[][] t = new float[3][7];
     int maxiter = 100;
     float epsilon = FLT_EPSILON;
-    int ntheta = 33;
-    float dtheta = FLT_PI/(float)(ntheta-1);
-    float ftheta = -FLT_PI/2.0f;
-    ntheta = 2;
-    dtheta = FLT_PI/4.0f;
-    ftheta = -FLT_PI/8.0f;
+    //int ntheta = 33;
+    //float dtheta = FLT_PI/(float)(ntheta-1);
+    //float ftheta = -FLT_PI/2.0f;
+    int ntheta = 2;
+    float dtheta = FLT_PI/4.0f;
+    float ftheta = -FLT_PI/8.0f;
     CausalFilter cf = new CausalFilter(lag1,lag2);
     for (int itheta=0; itheta<ntheta; ++itheta) {
       float theta = ftheta+itheta*dtheta;
@@ -333,15 +333,15 @@ public class CausalFilterTest extends TestCase {
         {     -p12*p12, -2.0f*m12*p12,     -m12*m12}
       };
       cf.factorWilsonBurg(maxiter,epsilon,r);
-      Array.dump(r);
-      Array.zero(s);
+      ArrayMath.dump(r);
+      ArrayMath.zero(s);
       int k1 = (s[0].length-1)/2;
       int k2 = (s.length-1)/2;
       s[k2][k1] = 1.0f;
       cf.apply(s,t);
       cf.applyTranspose(t,s);
-      Array.dump(s);
-      Array.dump(t);
+      ArrayMath.dump(s);
+      ArrayMath.dump(t);
     }
   }
 
@@ -470,16 +470,16 @@ public class CausalFilterTest extends TestCase {
           if (abs(a[j])>amax[j])
             amax[j] = abs(a[j]);
         }
-        //Array.dump(r);
-        Array.zero(s);
+        //ArrayMath.dump(r);
+        ArrayMath.zero(s);
         int k1 = (s[0][0].length-1)/2;
         int k2 = (s[0].length-1)/2;
         int k3 = (s.length-1)/2;
         s[k3][k2][k1] = 1.0f;
         cf.apply(s,t);
         cf.applyTranspose(t,s);
-        //Array.dump(s);
-        //Array.dump(t);
+        //ArrayMath.dump(s);
+        //ArrayMath.dump(t);
       }
     }
     for (int j=0; j<m; ++j)
@@ -493,33 +493,33 @@ public class CausalFilterTest extends TestCase {
   // private
 
   private static float[] randfloat(int n1) {
-    return Array.sub(Array.randfloat(n1),0.5f);
+    return ArrayMath.sub(ArrayMath.randfloat(n1),0.5f);
   }
   private static float[][] randfloat(int n1, int n2) {
-    return Array.sub(Array.randfloat(n1,n2),0.5f);
+    return ArrayMath.sub(ArrayMath.randfloat(n1,n2),0.5f);
   }
   private static float[][][] randfloat(int n1, int n2, int n3) {
-    return Array.sub(Array.randfloat(n1,n2,n3),0.5f);
+    return ArrayMath.sub(ArrayMath.randfloat(n1,n2,n3),0.5f);
   }
 
   private static float[] zerofloat(int n1) {
-    return Array.zerofloat(n1);
+    return ArrayMath.zerofloat(n1);
   }
   private static float[][] zerofloat(int n1, int n2) {
-    return Array.zerofloat(n1,n2);
+    return ArrayMath.zerofloat(n1,n2);
   }
   private static float[][][] zerofloat(int n1, int n2, int n3) {
-    return Array.zerofloat(n1,n2,n3);
+    return ArrayMath.zerofloat(n1,n2,n3);
   }
 
   private static float dot(float[] x, float[] y) {
-    return Array.sum(Array.mul(x,y));
+    return ArrayMath.sum(ArrayMath.mul(x,y));
   }
   private static float dot(float[][] x, float[][] y) {
-    return Array.sum(Array.mul(x,y));
+    return ArrayMath.sum(ArrayMath.mul(x,y));
   }
   private static float dot(float[][][] x, float[][][] y) {
-    return Array.sum(Array.mul(x,y));
+    return ArrayMath.sum(ArrayMath.mul(x,y));
   }
 
   private static void assertEqual(float[] re, float[] ra) {
@@ -562,7 +562,7 @@ public class CausalFilterTest extends TestCase {
       float xn = (float)(i-k)/sigma;
       r[i] = exp(-0.5f*xn*xn);
     }
-    r = Array.mul(1.0f/Array.sum(r),r);
+    r = ArrayMath.mul(1.0f/ArrayMath.sum(r),r);
     //r[k] *= 1.01f;
     int[] lag1 = {0,1,2,3,4};
     double dr1 = 1.12075;
@@ -583,17 +583,17 @@ public class CausalFilterTest extends TestCase {
     a[2] = (float)(a2+a1*b1+b2);
     a[3] = (float)(a1*b2+b1*a2);
     a[4] = (float)(a2*b2);
-    a = Array.mul(1.0f/Array.sum(a),a);
+    a = ArrayMath.mul(1.0f/ArrayMath.sum(a),a);
     CausalFilter cf = new CausalFilter(lag1,a);
-    float[] s = Array.zerofloat(n);
-    float[] t = Array.zerofloat(n);
+    float[] s = ArrayMath.zerofloat(n);
+    float[] t = ArrayMath.zerofloat(n);
     s[k] = 1.0f;
     cf.applyInverseTranspose(s,t);
     cf.applyInverse(t,s);
     cf.apply(s,t);
     cf.applyTranspose(t,s);
-    Array.dump(r);
-    Array.dump(s);
+    ArrayMath.dump(r);
+    ArrayMath.dump(s);
     //cf.factorInverseWilsonBurg(10,FLT_EPSILON,r);
   }
   */

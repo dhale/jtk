@@ -49,9 +49,9 @@ public class DrawList {
     // While drawing, need current and previous arrays of nodes.
     Node[] empty = new Node[0];
     Node[] nodes = empty;
-    Node[] prevs = empty;
+    Node[] prevs;
     int nnode = nodes.length;
-    int nprev = prevs.length;
+    int nprev;
 
     // Loop over all arrays of nodes in the list.
     int nlist = _list.size();

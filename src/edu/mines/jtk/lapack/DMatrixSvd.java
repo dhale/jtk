@@ -10,7 +10,7 @@ import static edu.mines.jtk.lapack.Lapack.JOB_S;
 import static edu.mines.jtk.lapack.Lapack.dgesvd;
 import static java.lang.Math.*;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Singular value decomposition of a matrix A.
@@ -52,7 +52,7 @@ public class DMatrixSvd {
    * @return the matrix U.
    */
   public DMatrix getU() {
-    return new DMatrix(_m,_mn,Array.copy(_u));
+    return new DMatrix(_m,_mn, ArrayMath.copy(_u));
   }
 
   /**
@@ -68,7 +68,7 @@ public class DMatrixSvd {
    * @return the array s.
    */
   public double[] getSingularValues() {
-    return Array.copy(_s);
+    return ArrayMath.copy(_s);
   }
 
   /**
@@ -86,7 +86,7 @@ public class DMatrixSvd {
    * @return the matrix V'.
    */
   public DMatrix getVTranspose() {
-    return new DMatrix(_mn,_n,Array.copy(_vt));
+    return new DMatrix(_mn,_n, ArrayMath.copy(_vt));
   }
 
   /**

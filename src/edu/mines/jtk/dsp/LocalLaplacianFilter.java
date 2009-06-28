@@ -110,11 +110,11 @@ public class LocalLaplacianFilter {
 
   private float _scale; // scale factor for diffusion coefficients
 
-  private void applySerial(Tensors3 d, float[][][] x, float[][][] y) {
-    int n3 = x.length;
-    for (int i3=1; i3<n3; ++i3)
-      applySlice3(i3,d,x,y);
-  }
+  //private void applySerial(Tensors3 d, float[][][] x, float[][][] y) {
+  //  int n3 = x.length;
+  //  for (int i3=1; i3<n3; ++i3)
+  //    applySlice3(i3,d,x,y);
+  //}
 
   private void applyParallel(
     final Tensors3 d, final float[][][] x, final float[][][] y) 

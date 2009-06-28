@@ -87,15 +87,15 @@ public class FloatColorMap extends ColorMap {
     Check.argument(
       f.length==1 || f.length==3 || f.length==4,
       "number of arrays (color components) equals 1, 3, or 4");
-    _nc = f.length;
-    //_ic = ic;
-    _fbm = new FloatByteMap[_nc];
-    for (int jc=0; jc<_nc; ++jc)
-      _fbm[jc] = new FloatByteMap(f[jc]);
-    _fbmi0 = _fbm[0];
-    _fbmi1 = (_nc>1)?_fbm[1]:_fbm[0];
-    _fbmi2 = (_nc>1)?_fbm[2]:_fbm[0];
-    _fbmi3 = (_nc>3)?_fbm[3]:null;
+    int nc = f.length;
+    FloatByteMap[] fbm = new FloatByteMap[nc];
+    for (int jc=0; jc<nc; ++jc)
+      fbm[jc] = new FloatByteMap(f[jc]);
+    _fbmi0 = fbm[0];
+    _fbmi1 = (nc>1)?fbm[1]:fbm[0];
+    _fbmi2 = (nc>1)?fbm[2]:fbm[0];
+    _fbmi3 = (nc>3)?fbm[3]:null;
+    _fbmic = fbm[ic];
   }
 
   /**
@@ -217,9 +217,9 @@ public class FloatColorMap extends ColorMap {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private int _nc; // number of color components: 1, 3, or 4.
+  //private int nc; // number of color components: 1, 3, or 4.
   //private int _ic; // array index of component for index color model
-  private FloatByteMap[] _fbm; // float-byte maps, one for each component
+  //private FloatByteMap[] _fbm; // float-byte maps, one for each component
   private FloatByteMap _fbmic; // the float-byte map for index color model
   private FloatByteMap _fbmi0; // cached fbm[0]
   private FloatByteMap _fbmi1; // cached fbm[1]

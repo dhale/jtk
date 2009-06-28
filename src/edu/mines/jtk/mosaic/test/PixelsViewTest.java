@@ -12,7 +12,7 @@ import javax.swing.SwingUtilities;
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Tests {@link edu.mines.jtk.mosaic.PixelsView}
@@ -35,7 +35,7 @@ public class PixelsViewTest {
     int n2 = 11;
     float d1 = 1.0f/(float)max(1,n1-1);
     float d2 = 1.0f/(float)max(1,n2-1);
-    float[][] f = Array.rampfloat(0.0f,d1,d2,n1,n2);
+    float[][] f = ArrayMath.rampfloat(0.0f,d1,d2,n1,n2);
 
     Sampling s1 = new Sampling(n1,0.5,0.25*(n1-1));
     Sampling s2 = new Sampling(n2,0.5,0.25*(n2-1));
@@ -45,7 +45,7 @@ public class PixelsViewTest {
     pv0.setInterpolation(PixelsView.Interpolation.NEAREST);
     pv0.setColorModel(ColorMap.JET);
     pv0.setPercentiles(0.0f,100.0f);
-    f = Array.mul(10.0f,f);
+    f = ArrayMath.mul(10.0f,f);
     pv0.set(f);
 
     PixelsView pv0b = panel.addPixels(0,0,s1,s2,f);
@@ -57,7 +57,7 @@ public class PixelsViewTest {
     pv1.setInterpolation(PixelsView.Interpolation.LINEAR);
     pv1.setColorModel(ColorMap.GRAY);
     pv1.setPercentiles(0.0f,100.0f);
-    f = Array.mul(10.0f,f);
+    f = ArrayMath.mul(10.0f,f);
     pv1.set(f);
 
     PixelsView pv1b = panel.addPixels(0,1,s1,s2,f);
@@ -76,11 +76,11 @@ public class PixelsViewTest {
     int n2 = 11;
     float d1 = 1.0f/(float)max(1,n1-1);
     float d2 = 1.0f/(float)max(1,n2-1);
-    float[][] f0 = Array.rampfloat(0.0f,d1,d2,n1,n2);
-    float[][] f1 = Array.zerofloat(n1,n2);
-    float[][] f2 = Array.zerofloat(n1,n2);
-    //float[][] f1 = Array.rampfloat(0.0f,d1,d2,n1,n2);
-    //float[][] f2 = Array.rampfloat(0.0f,d1,d2,n1,n2);
+    float[][] f0 = ArrayMath.rampfloat(0.0f,d1,d2,n1,n2);
+    float[][] f1 = ArrayMath.zerofloat(n1,n2);
+    float[][] f2 = ArrayMath.zerofloat(n1,n2);
+    //float[][] f1 = ArrayMath.rampfloat(0.0f,d1,d2,n1,n2);
+    //float[][] f2 = ArrayMath.rampfloat(0.0f,d1,d2,n1,n2);
 
     Sampling s1 = new Sampling(n1,0.5,0.25*(n1-1));
     Sampling s2 = new Sampling(n2,0.5,0.25*(n2-1));

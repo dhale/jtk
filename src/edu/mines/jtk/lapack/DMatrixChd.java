@@ -10,7 +10,7 @@ import static edu.mines.jtk.lapack.Blas.LOWER;
 import static edu.mines.jtk.lapack.Lapack.dpotrf;
 import static edu.mines.jtk.lapack.Lapack.dpotrs;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -67,7 +67,7 @@ public class DMatrixChd {
    * @return the factor L.
    */
   public DMatrix getL() {
-    return new DMatrix(_n,_n,Array.copy(_l));
+    return new DMatrix(_n,_n, ArrayMath.copy(_l));
   }
 
   /**

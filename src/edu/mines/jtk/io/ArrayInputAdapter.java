@@ -214,8 +214,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readBytes(byte[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readBytes(v[i]);
+    for (byte[] vi:v)
+      readBytes(vi);
   }
 
   /**
@@ -224,8 +224,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readBytes(byte[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readBytes(v[i]);
+    for (byte[][] vi:v)
+      readBytes(vi);
   }
 
   /**
@@ -264,8 +264,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readChars(char[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readChars(v[i]);
+    for (char[] vi:v)
+      readChars(vi);
   }
 
   /**
@@ -274,8 +274,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readChars(char[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readChars(v[i]);
+    for (char[][] vi:v)
+      readChars(vi);
   }
 
   /**
@@ -314,8 +314,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readShorts(short[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readShorts(v[i]);
+    for (short[] vi:v)
+      readShorts(vi);
   }
 
   /**
@@ -324,8 +324,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readShorts(short[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readShorts(v[i]);
+    for (short[][] vi:v)
+      readShorts(vi);
   }
 
   /**
@@ -364,8 +364,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readInts(int[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readInts(v[i]);
+    for (int[] vi:v)
+      readInts(vi);
   }
 
   /**
@@ -374,8 +374,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readInts(int[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readInts(v[i]);
+    for (int[][] vi:v)
+      readInts(vi);
   }
 
   /**
@@ -414,8 +414,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readLongs(long[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readLongs(v[i]);
+    for (long[] vi:v)
+      readLongs(vi);
   }
 
   /**
@@ -424,8 +424,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readLongs(long[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readLongs(v[i]);
+    for (long[][] vi:v)
+      readLongs(vi);
   }
 
   /**
@@ -464,8 +464,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readFloats(float[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readFloats(v[i]);
+    for (float[] vi:v)
+      readFloats(vi);
   }
 
   /**
@@ -474,8 +474,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readFloats(float[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readFloats(v[i]);
+    for (float[][] vi:v)
+      readFloats(vi);
   }
 
   /**
@@ -514,8 +514,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readDoubles(double[][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readDoubles(v[i]);
+    for (double[] vi:v)
+      readDoubles(vi);
   }
 
   /**
@@ -524,8 +524,8 @@ public class ArrayInputAdapter implements ArrayInput {
    * @param v the array.
    */
   public void readDoubles(double[][][] v) throws IOException {
-    for (int i=0; i<v.length; ++i)
-      readDoubles(v[i]);
+    for (double[][] vi:v)
+      readDoubles(vi);
   }
 
   ///////////////////////////////////////////////////////////////////////////

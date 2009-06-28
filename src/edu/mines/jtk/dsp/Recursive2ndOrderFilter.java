@@ -1265,8 +1265,8 @@ public class Recursive2ndOrderFilter {
   private static void checkArrays(float[][] x, float[][] y) {
     Check.argument(x.length==y.length,"x.length==y.length");
     Check.argument(x[0].length==y[0].length,"x[0].length==y[0].length");
-    Check.argument(Array.isRegular(x),"x is regular");
-    Check.argument(Array.isRegular(y),"y is regular");
+    Check.argument(ArrayMath.isRegular(x),"x is regular");
+    Check.argument(ArrayMath.isRegular(y),"y is regular");
   }
 
   private static void checkArrays(float[][][] x, float[][][] y) {
@@ -1274,8 +1274,8 @@ public class Recursive2ndOrderFilter {
     Check.argument(x[0].length==y[0].length,"x[0].length==y[0].length");
     Check.argument(x[0][0].length==y[0][0].length,
       "x[0][0].length==y[0][0].length");
-    Check.argument(Array.isRegular(x),"x is regular");
-    Check.argument(Array.isRegular(y),"y is regular");
+    Check.argument(ArrayMath.isRegular(x),"x is regular");
+    Check.argument(ArrayMath.isRegular(y),"y is regular");
   }
 
   private void get2(int i2, float[][][] x, float[][] x2) {

@@ -12,7 +12,6 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.mesh.TriMesh;
-import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Stopwatch;
 
 /**
@@ -24,84 +23,6 @@ public class TriMeshTest extends TestCase {
   public static void main(String[] args) {
     TestSuite suite = new TestSuite(TriMeshTest.class);
     junit.textui.TestRunner.run(suite);
-  }
-
-  public void testInterpolateSibson() {
-
-    // Linear function.
-    testInterpolateSibson(new Function() {
-      public float eval(float x, float y) {
-        return 1.0f+x+y;
-      }
-    });
-
-    // Quadratic.
-    testInterpolateSibson(new Function() {
-      public float eval(float x, float y) {
-        return 1.0f+x+y+x*x+x*y+y*y;
-      }
-    });
-  }
-
-  // A function f(x,y) defined on [0,1]x[0,1].
-  interface Function {
-    public float eval(float x, float y);
-  }
-
-  // Bilinear interpolation.
-  private float interpolateBilinear(
-    float xp, float yp, float x0, float y0, float x1, float y1,
-    float f00, float f10, float f01, float f11)
-  {
-    float w00 = (x1-xp)/(x1-x0) * (y1-yp)/(y1-y0);
-    float w10 = (xp-x0)/(x1-x0) * (y1-yp)/(y1-y0);
-    float w01 = (x1-xp)/(x1-x0) * (yp-y0)/(y1-y0);
-    float w11 = (xp-x0)/(x1-x0) * (yp-y0)/(y1-y0);
-    return w00*f00+w10*f10+w01*f01+w11*f11;
-  }
-
-  // Tests Sibson interpolation for a specified function.
-  private void testInterpolateSibson(Function f) {
-    float xmin = -0.000001f; // ensure [0,1]x[0,1] lies inside mesh
-    float xmax =  1.000001f;
-    float ymin = -0.000001f;
-    float ymax =  1.000001f;
-    TriMesh.Node n0 = new TriMesh.Node(xmin,ymin);
-    TriMesh.Node n1 = new TriMesh.Node(xmax,ymin);
-    TriMesh.Node n2 = new TriMesh.Node(xmin,ymax);
-    TriMesh.Node n3 = new TriMesh.Node(xmax,ymax);
-    TriMesh tm = new TriMesh();
-    tm.addNode(n0);
-    tm.addNode(n1);
-    tm.addNode(n2);
-    tm.addNode(n3);
-    TriMesh.NodePropertyMap map = tm.getNodePropertyMap("f");
-    float f0 = f.eval(n0.x(),n0.y());
-    float f1 = f.eval(n1.x(),n1.y());
-    float f2 = f.eval(n2.x(),n2.y());
-    float f3 = f.eval(n3.x(),n3.y());
-    map.put(n0,new Float(f0));
-    map.put(n1,new Float(f1));
-    map.put(n2,new Float(f2));
-    map.put(n3,new Float(f3));
-    int nx = 101;
-    int ny = 101;
-    float[][] fe = new float[nx][ny];
-    float[][] fa = new float[nx][ny];
-    float fnull = 0.0f;
-    for (int ix=0; ix<nx; ++ix) {
-      float x = (float)(ix)/(float)(nx-1);
-      for (int iy=0; iy<ny; ++iy) {
-        float y = (float)(iy)/(float)(ny-1);
-        fe[ix][iy] = interpolateBilinear(x,y,xmin,ymin,xmax,ymax,f0,f1,f2,f3);
-        fa[ix][iy] = tm.interpolateSibson(x,y,map,fnull);
-      }
-    }
-    float[][] e = Array.sub(fa,fe);
-    float emax = Array.max(Array.abs(e));
-    //edu.mines.jtk.mosaic.SimplePlot.asPixels(e);
-    //System.out.println("emax="+emax);
-    assertEquals(0.0,emax,0.0001);
   }
 
   public void testNabors() {
@@ -149,10 +70,10 @@ public class TriMeshTest extends TestCase {
     int ntri = tm.countTris();
     assertEquals(4,nnode);
     TriMesh.NodePropertyMap map = tm.getNodePropertyMap("foo");
-    map.put(n00,new Integer(0));
-    map.put(n01,new Integer(1));
-    map.put(n10,new Integer(2));
-    map.put(n11,new Integer(3));
+    map.put(n00,0);
+    map.put(n01,1);
+    map.put(n10,2);
+    map.put(n11,3);
 
     // Write and read it.
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -246,8 +167,8 @@ public class TriMeshTest extends TestCase {
   public void testAddFindRemove() {
     java.util.Random random = new java.util.Random();
     TriMesh tm = new TriMesh();
-    int nadd = 0;
-    int nremove = 0;
+    //int nadd = 0;
+    //int nremove = 0;
     for (int niter=0; niter<1000; ++niter) {
       float x = random.nextFloat();
       float y = random.nextFloat();
@@ -256,7 +177,7 @@ public class TriMeshTest extends TestCase {
         boolean ok = tm.addNode(node);
         assertTrue(ok);
         tm.validate();
-        ++nadd;
+        //++nadd;
       } else if (tm.countNodes()>0) {
         TriMesh.Node node = tm.findNodeNearest(x,y);
         assertTrue(node!=null);
@@ -264,7 +185,7 @@ public class TriMeshTest extends TestCase {
         assertTrue(node==nodeSlow);
         tm.removeNode(node);
         tm.validate();
-        ++nremove;
+        //++nremove;
       }
     }
     //System.out.println("Nodes added/removed = "+nadd+"/"+nremove);
@@ -293,6 +214,7 @@ public class TriMeshTest extends TestCase {
         System.out.println("Sleeping");
         Thread.sleep(5000,0);
       } catch (InterruptedException e) {
+        throw new RuntimeException(e);
       }
     }
   }

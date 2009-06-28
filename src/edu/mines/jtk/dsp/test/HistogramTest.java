@@ -6,13 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp.test;
 
-import java.util.Random;
-
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.Histogram;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.Histogram}.
@@ -28,7 +26,7 @@ public class HistogramTest extends TestCase {
   public void testConstant() {
     int n = 1001;
     float vfill = 2.0f;
-    float[] v = Array.fillfloat(vfill,n);
+    float[] v = ArrayMath.fillfloat(vfill,n);
 
     // Test with default range and number of bins.
     float vmin = vfill;
@@ -97,9 +95,9 @@ public class HistogramTest extends TestCase {
 
   public void testRamp() {
     int n = 1001;
-    float[] v = Array.rampfloat(0.0f,1.0f,n);
-    float vmin = Array.min(v);
-    float vmax = Array.max(v);
+    float[] v = ArrayMath.rampfloat(0.0f,1.0f,n);
+    float vmin = ArrayMath.min(v);
+    float vmax = ArrayMath.max(v);
     int nbin = 10;
     double dbin = (vmax-vmin)/nbin;
     double fbin = vmin+0.5*dbin;
@@ -112,6 +110,7 @@ public class HistogramTest extends TestCase {
     assertEquals(0,h.getHighCount());
   }
 
+  /*
   public void testGaussian() {
     Random r = new Random();
     int n = 1000;
@@ -119,10 +118,11 @@ public class HistogramTest extends TestCase {
     for (int i=0; i<n; ++i)
       v[i] = (float)r.nextGaussian();
     //Histogram h = new Histogram(v);
-    //Array.dump(h.getDensities());
+    //ArrayMath.dump(h.getDensities());
     //int nbin = h.getBinCount();
     //double dbin = h.getBinDelta();
     //double fbin = h.getBinFirst();
     //System.out.println("nbin="+nbin+" dbin="+dbin+" fbin="+fbin);
   }
+  */
 }

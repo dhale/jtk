@@ -6,16 +6,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util.test;
 
-import static edu.mines.jtk.util.MathPlus.abs;
-import static edu.mines.jtk.util.MathPlus.max;
-
 import java.util.Random;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.CubicInterpolator;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.util.CubicInterpolator}.
@@ -33,9 +30,9 @@ public class CubicInterpolatorTest extends TestCase {
     //create set of data points
     int npoints = 100;
     Random generator = new Random(100);
-    float[] x = Array.randfloat(generator, npoints);
-    float[] y = Array.randfloat(generator, npoints);
-    Array.quickSort(x);
+    float[] x = randfloat(generator, npoints);
+    float[] y = randfloat(generator, npoints);
+    quickSort(x);
     
     //construct interpolators
     CubicInterpolator.Method linear = CubicInterpolator.Method.LINEAR;
@@ -79,10 +76,10 @@ public class CubicInterpolatorTest extends TestCase {
     //create set of monotonic data points
     int npoints = 100;
     Random generator = new Random(100);
-    float[] x = Array.randfloat(generator, npoints);
-    float[] y = Array.randfloat(generator, npoints);
-    Array.quickSort(x);
-    Array.quickSort(y);
+    float[] x = randfloat(generator, npoints);
+    float[] y = randfloat(generator, npoints);
+    quickSort(x);
+    quickSort(y);
     
     //Construct interpolator
     CubicInterpolator.Method monoto = CubicInterpolator.Method.MONOTONIC;

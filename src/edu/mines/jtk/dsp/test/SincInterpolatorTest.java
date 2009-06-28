@@ -7,8 +7,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp.test;
 
 
-//import static edu.mines.jtk.util.Array.cabs;
-//import static edu.mines.jtk.util.Array.mul;
+//import static edu.mines.jtk.util.ArrayMath.cabs;
+//import static edu.mines.jtk.util.ArrayMath.mul;
 import static java.lang.Math.*;
 
 import java.util.Random;
@@ -128,11 +128,9 @@ public class SincInterpolatorTest extends TestCase {
   }
 
   public void testErrorAndFrequency() {
-    for (int iemax=0; iemax<_emaxs.length; ++iemax) {
-      double emax = _emaxs[iemax];
-      for (int ifmax=0; ifmax<_fmaxs.length; ++ifmax) {
-        double fmax = _fmaxs[ifmax];
-        SincInterpolator si = 
+    for (double emax:_emaxs) {
+      for (double fmax:_fmaxs) {
+        SincInterpolator si =
           SincInterpolator.fromErrorAndFrequency(emax,fmax);
         testInterpolator(si);
       }
@@ -140,11 +138,9 @@ public class SincInterpolatorTest extends TestCase {
   }
 
   public void testErrorAndLength() {
-    for (int iemax=0; iemax<_emaxs.length; ++iemax) {
-      double emax = _emaxs[iemax];
-      for (int ilmax=0; ilmax<_lmaxs.length; ++ilmax) {
-        int lmax = _lmaxs[ilmax];
-        SincInterpolator si = 
+    for (double emax:_emaxs) {
+      for (int lmax:_lmaxs) {
+        SincInterpolator si =
           SincInterpolator.fromErrorAndLength(emax,lmax);
         testInterpolator(si);
       }
@@ -152,10 +148,8 @@ public class SincInterpolatorTest extends TestCase {
   }
 
   public void testFrequencyAndLength() {
-    for (int ifmax=0; ifmax<_fmaxs.length; ++ifmax) {
-      double fmax = _fmaxs[ifmax];
-      for (int ilmax=0; ilmax<_lmaxs.length; ++ilmax) {
-        int lmax = _lmaxs[ilmax];
+    for (double fmax:_fmaxs) {
+      for (int lmax:_lmaxs) {
         if ((1.0-2.0*fmax)*lmax>1.0) {
           SincInterpolator si = 
             SincInterpolator.fromFrequencyAndLength(fmax,lmax);

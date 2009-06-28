@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
-import static edu.mines.jtk.util.MathPlus.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Piecewise cubic interpolation of a function y(x) (or its derivatives).
@@ -63,7 +63,7 @@ public class CubicInterpolator {
    * @param y array[n] of function values y(x).
    */
   public CubicInterpolator(Method method, int n, float[] x, float[] y) {
-    Check.argument(Array.isMonotonic(x), "array x is monotonic");
+    Check.argument(isMonotonic(x), "array x is monotonic");
     _xd = new float[n];
     _yd = new float[n][4];
     for (int i=0; i<n; ++i) {
@@ -184,7 +184,7 @@ public class CubicInterpolator {
   private float[][] _yd; // array[n][4] of y, y', y'', and y'''.
 
   private int index(float x) {
-    int index = Array.binarySearch(_xd,x,_index);
+    int index = binarySearch(_xd,x,_index);
     if (index<0) 
       index = (index<-1)?-2-index:0;
     _index = index;

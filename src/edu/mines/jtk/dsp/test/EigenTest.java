@@ -34,8 +34,8 @@ public class EigenTest extends TestCase {
     double[][] v = new double[2][2];
     double[] d = new double[2];
     for (int irand=0; irand<nrand; ++irand) {
-      double[][] a = Array.randdouble(2,2);
-      a = Array.add(a,Array.transpose(a));
+      double[][] a = ArrayMath.randdouble(2,2);
+      a = ArrayMath.add(a, ArrayMath.transpose(a));
       Eigen.solveSymmetric22(a,v,d);
       check(a,v,d);
     }
@@ -46,8 +46,8 @@ public class EigenTest extends TestCase {
     double[] d = new double[3];
     int nrand = 10000;
     for (int irand=0; irand<nrand; ++irand) {
-      //double[][] a = Array.randdouble(3,3);
-      //a = Array.add(a,Array.transpose(a));
+      //double[][] a = ArrayMath.randdouble(3,3);
+      //a = ArrayMath.add(a,ArrayMath.transpose(a));
       double[][] a = makeRandomSymmetric33();
       Eigen.solveSymmetric33(a,v,d);
       check(a,v,d);
@@ -191,8 +191,8 @@ public class EigenTest extends TestCase {
     int nrand = 10000;
     double[][][] a = new double[nrand][][];
     for (int irand=0; irand<nrand; ++irand) {
-      a[irand] = Array.randdouble(3,3);
-      a[irand] = Array.add(a[irand],Array.transpose(a[irand]));
+      a[irand] = ArrayMath.randdouble(3,3);
+      a[irand] = ArrayMath.add(a[irand], ArrayMath.transpose(a[irand]));
     }
     double[][] v = new double[3][3];
     double[] d = new double[3];

@@ -29,13 +29,13 @@ public class ArgsParserTest extends TestCase {
       {"--alpha","3.14","--beta","foo"},
       {"--a=3.14","--b","foo"},
     };
-    for (int iarg=0; iarg<args.length; ++iarg) {
+    for (String[] arg:args) {
       float a = 0.0f;
       boolean b = false;
       try {
         String shortOpts = "ha:b";
         String[] longOpts = {"help","alpha=","beta"};
-        ArgsParser ap = new ArgsParser(args[iarg],shortOpts,longOpts);
+        ArgsParser ap = new ArgsParser(arg,shortOpts,longOpts);
         String[] opts = ap.getOptions();
         String[] vals = ap.getValues();
         for (int i=0; i<opts.length; ++i) {
@@ -53,7 +53,7 @@ public class ArgsParserTest extends TestCase {
         assertTrue(otherArgs.length==1);
         assertTrue(otherArgs[0].equals("foo"));
         assertTrue(a==3.14f);
-        assertTrue(b==true);
+        assertTrue(b);
       } catch (ArgsParser.OptionException e) {
         assertTrue("no exceptions: e="+e.getMessage(),false);
       }

@@ -63,7 +63,7 @@ public class PlotPanelPixels3 extends PlotPanel {
   public enum AxesPlacement {
     LEFT_BOTTOM,
     NONE
-  };
+  }
 
   /**
    * Constructs a plot panel with three pixels views.
@@ -706,7 +706,7 @@ public class PlotPanelPixels3 extends PlotPanel {
     float[][] xic = new float[_n3][_n2];
     for (int ic=0; ic<_nc; ++ic) {
       _f3[ic].get23(_n2,_n3,_k1,0,0,xic);
-      x[ic] = (_transpose23)?Array.transpose(xic):xic;
+      x[ic] = (_transpose23)? ArrayMath.transpose(xic):xic;
     }
     return x;
   }
@@ -809,7 +809,7 @@ public class PlotPanelPixels3 extends PlotPanel {
     }
   }
 
-  private TileAxis[] getAxes(int i) {
+  TileAxis[] getAxes(int i) {
     Mosaic mosaic = getMosaic();
     TileAxis al0 = mosaic.getTileAxisLeft(0);
     TileAxis al1 = mosaic.getTileAxisLeft(1);
@@ -843,9 +843,9 @@ def plot3dPanels(k1,k2,k3,file,clip,cmod=ColorMap.GRAY,png=None):
   f12 = readFloats12(file,k3)
   f13 = readFloats13(file,k2)
   f23 = readFloats23(file,k1)
-  print "plot3dPanels: f12 min =",Array.min(f12),"  max =",Array.max(f12)
-  print "plot3dPanels: f13 min =",Array.min(f13),"  max =",Array.max(f13)
-  print "plot3dPanels: f23 min =",Array.min(f23),"  max =",Array.max(f23)
+  print "plot3dPanels: f12 min =",ArrayMath.min(f12),"  max =",ArrayMath.max(f12)
+  print "plot3dPanels: f13 min =",ArrayMath.min(f13),"  max =",ArrayMath.max(f13)
+  print "plot3dPanels: f23 min =",ArrayMath.min(f23),"  max =",ArrayMath.max(f23)
   panel = PlotPanel(2,2,
     PlotPanel.Orientation.X1DOWN_X2RIGHT,
     PlotPanel.AxesPlacement.LEFT_BOTTOM)

@@ -61,51 +61,51 @@ public class AlmostTest extends TestCase {
    */
   public void testHashCode () {
     Almost a = new Almost(0.001,0.000001);
-    assert (a.hashCodeOf(new Double(0.00000001),100) == 0);
-    assert (a.hashCodeOf(new Double(0.99999999),100) == 1);
-    assert (a.hashCodeOf(new Double(1.00000001),100) == 1);
-    assert (a.hashCodeOf(new Long(123456789),100) == 123456789);
-    assert (a.hashCodeOf(new Double(3.1415),4) ==
-           a.hashCodeOf(new Double(3.1415926),4));
-    assert (a.hashCodeOf(new Double(3.1415),5) !=
-           a.hashCodeOf(new Double(3.1415926),5));
-    assert (a.hashCodeOf(new Double(-3.1415),4) ==
-           a.hashCodeOf(new Double(-3.1415926),4));
-    assert (a.hashCodeOf(new Double(-3.1415),5) !=
-           a.hashCodeOf(new Double(-3.1415926),5));
-    assert (a.hashCodeOf(new Double(314.15),4) ==
-           a.hashCodeOf(new Double(314.15926),4));
-    assert (a.hashCodeOf(new Double(314.15),5) !=
-           a.hashCodeOf(new Double(314.15926),5));
-    assert (a.hashCodeOf(new Double(-314.15),4) ==
-           a.hashCodeOf(new Double(-314.15926),4));
-    assert (a.hashCodeOf(new Double(-314.15),5) !=
-           a.hashCodeOf(new Double(-314.15926),5));
-    assert (a.hashCodeOf(new Double(0.0031415),4) ==
-           a.hashCodeOf(new Double(0.0031415926),4));
-    assert (a.hashCodeOf(new Double(0.0031415),5) !=
-           a.hashCodeOf(new Double(0.0031415926),5));
+    assert (a.hashCodeOf(0.00000001,100) == 0);
+    assert (a.hashCodeOf(0.99999999,100) == 1);
+    assert (a.hashCodeOf(1.00000001,100) == 1);
+    assert (a.hashCodeOf(123456789L,100) == 123456789L);
+    assert (a.hashCodeOf(3.1415,4) ==
+           a.hashCodeOf(3.1415926,4));
+    assert (a.hashCodeOf(3.1415,5) !=
+           a.hashCodeOf(3.1415926,5));
+    assert (a.hashCodeOf(-3.1415,4) ==
+           a.hashCodeOf(-3.1415926,4));
+    assert (a.hashCodeOf(-3.1415,5) !=
+           a.hashCodeOf(-3.1415926,5));
+    assert (a.hashCodeOf(314.15,4) ==
+           a.hashCodeOf(314.15926,4));
+    assert (a.hashCodeOf(314.15,5) !=
+           a.hashCodeOf(314.15926,5));
+    assert (a.hashCodeOf(-314.15,4) ==
+           a.hashCodeOf(-314.15926,4));
+    assert (a.hashCodeOf(-314.15,5) !=
+           a.hashCodeOf(-314.15926,5));
+    assert (a.hashCodeOf(0.0031415,4) ==
+           a.hashCodeOf(0.0031415926,4));
+    assert (a.hashCodeOf(0.0031415,5) !=
+           a.hashCodeOf(0.0031415926,5));
 
     // specify precision differently
     a = new Almost(0.0001);
     assert (a.equal(0.0031415,0.0031415926));
-    assert (a.hashCodeOf(new Double(0.0031415)) ==
-           a.hashCodeOf(new Double(0.0031415926)));
+    assert (a.hashCodeOf(0.0031415) ==
+           a.hashCodeOf(0.0031415926));
 
     a = new Almost(0.00001);
     assert (!a.equal(0.0031415,0.0031415926));
-    assert (a.hashCodeOf(new Double(0.0031415)) !=
-           a.hashCodeOf(new Double(0.0031415926)));
+    assert (a.hashCodeOf(0.0031415) !=
+           a.hashCodeOf(0.0031415926));
 
     a = new Almost(4);
     assert (a.equal(0.0031415,0.0031415926));
-    assert (a.hashCodeOf(new Double(0.0031415)) ==
-           a.hashCodeOf(new Double(0.0031415926)));
+    assert (a.hashCodeOf(0.0031415) ==
+           a.hashCodeOf(0.0031415926));
 
     a = new Almost(5);
     assert (!a.equal(0.0031415,0.0031415926));
-    assert (a.hashCodeOf(new Double(0.0031415)) !=
-           a.hashCodeOf(new Double(0.0031415926)));
+    assert (a.hashCodeOf(0.0031415) !=
+           a.hashCodeOf(0.0031415926));
 
   }
 

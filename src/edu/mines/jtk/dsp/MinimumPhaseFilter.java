@@ -8,7 +8,7 @@ package edu.mines.jtk.dsp;
 
 import static edu.mines.jtk.util.MathPlus.*;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -140,7 +140,7 @@ public class MinimumPhaseFilter {
    * @return array of lags; by copy, not by reference.
    */
   public int[] getLag1() {
-    return Array.copy(_lag1);
+    return ArrayMath.copy(_lag1);
   }
 
   /**
@@ -148,7 +148,7 @@ public class MinimumPhaseFilter {
    * @return array of lags; by copy, not by reference.
    */
   public int[] getLag2() {
-    return Array.copy(_lag2);
+    return ArrayMath.copy(_lag2);
   }
 
   /**
@@ -156,7 +156,7 @@ public class MinimumPhaseFilter {
    * @return array of lags; by copy, not by reference.
    */
   public int[] getLag3() {
-    return Array.copy(_lag3);
+    return ArrayMath.copy(_lag3);
   }
 
   /**
@@ -164,7 +164,7 @@ public class MinimumPhaseFilter {
    * @return array of filter coefficients; by copy, not by reference.
    */
   public float[] getA() {
-    return Array.copy(_a);
+    return ArrayMath.copy(_a);
   }
 
   /**
@@ -205,10 +205,10 @@ public class MinimumPhaseFilter {
     float[] u = new float[n1];
 
     // S is R padded with zeros to reduce truncation of R/(AA').
-    Array.copy(r.length,0,r,k1-l1,s);
+    ArrayMath.copy(r.length,0,r,k1-l1,s);
 
     // Initial factor is minimum-phase and matches lag zero of R.
-    Array.zero(_a);
+    ArrayMath.zero(_a);
     _a[0] = sqrt(s[k1]);
     _a0 = _a[0];
     _a0i = 1.0f/_a[0];
@@ -218,7 +218,7 @@ public class MinimumPhaseFilter {
     boolean converged = false;
     float eemax = s[k1]*epsilon;
     for (niter=0; niter<maxiter && !converged; ++niter) {
-      //Array.dump(_a); // for debugging only
+      //ArrayMath.dump(_a); // for debugging only
 
       // U(z) + U(1/z) = 1 + S(z)/(A(z)*A(1/z))
       this.applyInverseTranspose(s,t);
@@ -293,10 +293,10 @@ public class MinimumPhaseFilter {
     float[][] u = new float[n2][n1];
 
     // S is R padded with zeros to reduce truncation of R/(AA').
-    Array.copy(r[0].length,r.length,0,0,r,k1-l1,k2-l2,s);
+    ArrayMath.copy(r[0].length,r.length,0,0,r,k1-l1,k2-l2,s);
 
     // Initial factor is minimum-phase and matches lag zero of R.
-    Array.zero(_a);
+    ArrayMath.zero(_a);
     _a[0] = sqrt(s[k2][k1]);
     _a0 = _a[0];
     _a0i = 1.0f/_a[0];
@@ -306,7 +306,7 @@ public class MinimumPhaseFilter {
     boolean converged = false;
     float eemax = s[k2][k1]*epsilon;
     for (niter=0; niter<maxiter && !converged; ++niter) {
-      //Array.dump(_a); // for debugging only
+      //ArrayMath.dump(_a); // for debugging only
 
       // U(z) + U(1/z) = 1 + S(z)/(A(z)*A(1/z))
       this.applyInverseTranspose(s,t);
@@ -390,10 +390,10 @@ public class MinimumPhaseFilter {
     float[][][] u = new float[n3][n2][n1];
 
     // S is R padded with zeros to reduce truncation of R/(AA').
-    Array.copy(r[0][0].length,r[0].length,r.length,0,0,0,r,k1-l1,k2-l2,k3-l3,s);
+    ArrayMath.copy(r[0][0].length,r[0].length,r.length,0,0,0,r,k1-l1,k2-l2,k3-l3,s);
 
     // Initial factor is minimum-phase and matches lag zero of R.
-    Array.zero(_a);
+    ArrayMath.zero(_a);
     _a[0] = sqrt(s[k3][k2][k1]);
     _a0 = _a[0];
     _a0i = 1.0f/_a[0];
@@ -403,7 +403,7 @@ public class MinimumPhaseFilter {
     boolean converged = false;
     float eemax = s[k3][k2][k1]*epsilon;
     for (niter=0; niter<maxiter && !converged; ++niter) {
-      //Array.dump(_a); // for debugging only
+      //ArrayMath.dump(_a); // for debugging only
 
       // U(z) + U(1/z) = 1 + S(z)/(A(z)*A(1/z))
       this.applyInverseTranspose(s,t);
@@ -1441,7 +1441,6 @@ public class MinimumPhaseFilter {
   private int[] _lag3;
   private float[] _a;
   private float _a0,_a0i; // a[0] and 1/a[0]
-  private int _ni;
   private float[][] _ai;
   private float[] _ai0,_ai0i;
 
@@ -1458,11 +1457,11 @@ public class MinimumPhaseFilter {
     for (int j=1; j<a.length; ++j)
       Check.argument(lag1[j]>0,"lag1["+j+"]>0");
     _m = lag1.length;
-    _lag1 = Array.copy(lag1);
-    _lag2 = Array.zeroint(_m);
-    _lag3 = Array.zeroint(_m);
-    _min1 = Array.min(lag1);
-    _max1 = Array.max(lag1);
+    _lag1 = ArrayMath.copy(lag1);
+    _lag2 = ArrayMath.zeroint(_m);
+    _lag3 = ArrayMath.zeroint(_m);
+    _min1 = ArrayMath.min(lag1);
+    _max1 = ArrayMath.max(lag1);
   }
 
   private void initLags(int[] lag1, int[] lag2, float[] a) {
@@ -1477,13 +1476,13 @@ public class MinimumPhaseFilter {
         Check.argument(lag1[j]>0,"if lag2==0, lag1["+j+"]>0");
     }
     _m = lag1.length;
-    _lag1 = Array.copy(lag1);
-    _lag2 = Array.copy(lag2);
-    _lag3 = Array.zeroint(_m);
-    _min1 = Array.min(lag1);
-    _min2 = Array.min(lag2);
-    _max1 = Array.max(lag1);
-    _max2 = Array.max(lag2);
+    _lag1 = ArrayMath.copy(lag1);
+    _lag2 = ArrayMath.copy(lag2);
+    _lag3 = ArrayMath.zeroint(_m);
+    _min1 = ArrayMath.min(lag1);
+    _min2 = ArrayMath.min(lag2);
+    _max1 = ArrayMath.max(lag1);
+    _max2 = ArrayMath.max(lag2);
   }
 
   private void initLags(int[] lag1, int[] lag2, int[] lag3, float[] a) {
@@ -1503,31 +1502,31 @@ public class MinimumPhaseFilter {
       }
     }
     _m = a.length;
-    _lag1 = Array.copy(lag1);
-    _lag2 = Array.copy(lag2);
-    _lag3 = Array.copy(lag3);
-    _min1 = Array.min(lag1);
-    _min2 = Array.min(lag2);
-    _min3 = Array.min(lag3);
-    _max1 = Array.max(lag1);
-    _max2 = Array.max(lag2);
-    _max3 = Array.max(lag3);
+    _lag1 = ArrayMath.copy(lag1);
+    _lag2 = ArrayMath.copy(lag2);
+    _lag3 = ArrayMath.copy(lag3);
+    _min1 = ArrayMath.min(lag1);
+    _min2 = ArrayMath.min(lag2);
+    _min3 = ArrayMath.min(lag3);
+    _max1 = ArrayMath.max(lag1);
+    _max2 = ArrayMath.max(lag2);
+    _max3 = ArrayMath.max(lag3);
   }
 
   private void initA(float[] a) {
-    _a = Array.copy(a);
+    _a = ArrayMath.copy(a);
     _a0 = a[0];
     _a0i = 1.0f/a[0];
   }
 
   private void initA(float[][] a) {
-    Check.argument(Array.isRegular(a),"a is regular");
+    Check.argument(ArrayMath.isRegular(a),"a is regular");
     initA(a[0]);
-    _ni = a.length;
-    _ai = Array.copy(a);
-    _ai0 = new float[_ni];
-    _ai0i = new float[_ni];
-    for (int ii=0; ii<_ni; ++ii) {
+    int ni = a.length;
+    _ai = ArrayMath.copy(a);
+    _ai0 = new float[ni];
+    _ai0i = new float[ni];
+    for (int ii=0; ii<ni; ++ii) {
       _ai0[ii] = a[ii][0];
       _ai0i[ii] = 1.0f/a[ii][0];
     }

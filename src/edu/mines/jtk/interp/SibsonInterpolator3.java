@@ -342,7 +342,7 @@ public class SibsonInterpolator3 {
     if (usingGradients()) {
       return interpolate1(vsum,x1,x2,x3);
     } else {
-      return interpolate0(vsum,x1,x2,x3);
+      return interpolate0(vsum);
     }
   }
 
@@ -515,7 +515,7 @@ public class SibsonInterpolator3 {
       if (x3[i]>_x3max) _x3max = x3[i];
     }
 
-    // Array of nodes, one for each specified sample.
+    // ArrayMath of nodes, one for each specified sample.
     _nodes = new TetMesh.Node[n];
 
     // Construct the mesh with nodes at sample points.
@@ -729,7 +729,7 @@ public class SibsonInterpolator3 {
   }
 
   // C0 interpolation; does not use gradients.
-  private float interpolate0(double vsum, double x, double y, double z) {
+  private float interpolate0(double vsum) {
     double vfsum = 0.0;
     int nnode = _nodeList.nnode();
     TetMesh.Node[] nodes = _nodeList.nodes();
@@ -1110,7 +1110,7 @@ public class SibsonInterpolator3 {
     // Determines whether all faces in the face set have exactly three
     // neighbor faces. Should always be true, except for points (x,y,z)
     // that lie on (over very near?) the convex hull of the mesh.
-    private boolean faceNaborsOk(double xp, double yp, double zp) {
+    private boolean faceNaborsOk() {
       int nface = _faceList.nface();
       ArrayList<Face> faces = _faceList.faces();
       for (int iface=0; iface<nface; ++iface) {
@@ -1123,7 +1123,7 @@ public class SibsonInterpolator3 {
 
     // Processes all faces in the face list.
     private boolean processFaces(double xp, double yp, double zp) {
-      if (!faceNaborsOk(xp,yp,zp))
+      if (!faceNaborsOk())
         return false;
       int nface = _faceList.nface();
       ArrayList<Face> faces = _faceList.faces();

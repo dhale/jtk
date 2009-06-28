@@ -55,7 +55,7 @@ public class PlotPanel extends IPanel {
     LEFT_TOP,
     LEFT_BOTTOM,
     NONE
-  };
+  }
 
   /**
    * Orientation of axes x1 and x2. For example, the default orientation 
@@ -185,7 +185,7 @@ public class PlotPanel extends IPanel {
    * @return the color bar.
    */
   public ColorBar addColorBar(String label) {
-    _colorBarLabel = label;
+    //_colorBarLabel = label;
     if (_colorBar==null) {
       _colorBar = new ColorBar(label);
       _colorBar.setFont(getFont());
@@ -975,7 +975,7 @@ public class PlotPanel extends IPanel {
   private Mosaic _mosaic;
   private ColorBar _colorBar;
   private String _colorBarFormat;
-  private String _colorBarLabel;
+  //private String _colorBarLabel;
   private int _colorBarWidthMinimum = 0;
   private PixelsView _colorBarPixelsView;
   private Title _title;

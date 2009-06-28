@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.DifferenceFilter;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.DifferenceFilter}.
@@ -222,33 +222,33 @@ public class DifferenceFilterTest extends TestCase {
   }
 
   private static float[] randfloat(int n1) {
-    return Array.sub(Array.randfloat(n1),0.5f);
+    return ArrayMath.sub(ArrayMath.randfloat(n1),0.5f);
   }
   private static float[][] randfloat(int n1, int n2) {
-    return Array.sub(Array.randfloat(n1,n2),0.5f);
+    return ArrayMath.sub(ArrayMath.randfloat(n1,n2),0.5f);
   }
   private static float[][][] randfloat(int n1, int n2, int n3) {
-    return Array.sub(Array.randfloat(n1,n2,n3),0.5f);
+    return ArrayMath.sub(ArrayMath.randfloat(n1,n2,n3),0.5f);
   }
 
   private static float[] zerofloat(int n1) {
-    return Array.zerofloat(n1);
+    return ArrayMath.zerofloat(n1);
   }
   private static float[][] zerofloat(int n1, int n2) {
-    return Array.zerofloat(n1,n2);
+    return ArrayMath.zerofloat(n1,n2);
   }
   private static float[][][] zerofloat(int n1, int n2, int n3) {
-    return Array.zerofloat(n1,n2,n3);
+    return ArrayMath.zerofloat(n1,n2,n3);
   }
 
   private static float dot(float[] x, float[] y) {
-    return Array.sum(Array.mul(x,y));
+    return ArrayMath.sum(ArrayMath.mul(x,y));
   }
   private static float dot(float[][] x, float[][] y) {
-    return Array.sum(Array.mul(x,y));
+    return ArrayMath.sum(ArrayMath.mul(x,y));
   }
   private static float dot(float[][][] x, float[][][] y) {
-    return Array.sum(Array.mul(x,y));
+    return ArrayMath.sum(ArrayMath.mul(x,y));
   }
 
   private static void assertEqual(float[] re, float[] ra) {

@@ -8,7 +8,7 @@ package edu.mines.jtk.sgl;
 
 import static edu.mines.jtk.util.MathPlus.max;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -62,7 +62,7 @@ public class BoundingBoxTree {
      * @return the array of indices.
      */
     public int[] getIndices() {
-      return Array.copy(1+_kmax-_kmin,_kmin,_i);
+      return ArrayMath.copy(1+_kmax-_kmin,_kmin,_i);
     }
 
     /**
@@ -106,10 +106,10 @@ public class BoundingBoxTree {
   public BoundingBoxTree(int minSize, float[] xyz) {
     Check.argument(minSize>0,"minSize>0");
     _n = xyz.length/3;
-    _i = Array.rampint(0,1,_n);
-    _x = Array.copy(_n,0,3,xyz);
-    _y = Array.copy(_n,1,3,xyz);
-    _z = Array.copy(_n,2,3,xyz);
+    _i = ArrayMath.rampint(0,1,_n);
+    _x = ArrayMath.copy(_n,0,3,xyz);
+    _y = ArrayMath.copy(_n,1,3,xyz);
+    _z = ArrayMath.copy(_n,2,3,xyz);
     _root = new Node();
     _root._bb = new BoundingBox(_x,_y,_z);
     _root._kmin = 0;
@@ -130,10 +130,10 @@ public class BoundingBoxTree {
     Check.argument(x.length==y.length,"x.length==y.length");
     Check.argument(x.length==z.length,"x.length==z.length");
     _n = x.length;
-    _i = Array.rampint(0,1,_n);
-    _x = Array.copy(x);
-    _y = Array.copy(y);
-    _z = Array.copy(z);
+    _i = ArrayMath.rampint(0,1,_n);
+    _x = ArrayMath.copy(x);
+    _y = ArrayMath.copy(y);
+    _z = ArrayMath.copy(z);
     _root = new Node();
     _root._bb = new BoundingBox(_x,_y,_z);
     _root._kmin = 0;
@@ -199,7 +199,7 @@ public class BoundingBoxTree {
     for (int k=kmin; k<=kmax; ++k)
       i[k-kmin] = _i[k];
     int kmid = kmin+n/2;
-    Array.quickPartialIndexSort(kmid-kmin,a,i);
+    ArrayMath.quickPartialIndexSort(kmid-kmin,a,i);
     for (int k=kmin; k<=kmax; ++k)
       _i[k] = i[k-kmin];
 

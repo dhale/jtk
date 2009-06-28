@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.MinimumPhaseFilter;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.MinimumPhaseFilter}.
@@ -206,8 +206,8 @@ public class MinimumPhaseFilterTest extends TestCase {
       }
     }
     //System.out.println("2-D Laplacian:");
-    //Array.dump(r);
-    //Array.dump(s);
+    //ArrayMath.dump(r);
+    //ArrayMath.dump(s);
   }
 
   public void testFactorLaplacian3() {
@@ -260,8 +260,8 @@ public class MinimumPhaseFilterTest extends TestCase {
       }
     }
     //System.out.println("3-D Laplacian:");
-    //Array.dump(r);
-    //Array.dump(s);
+    //ArrayMath.dump(r);
+    //ArrayMath.dump(s);
   }
 
   public void xtestFactorPlane2Filter() {
@@ -277,12 +277,12 @@ public class MinimumPhaseFilterTest extends TestCase {
     float[][] t = new float[3][7];
     int maxiter = 100;
     float epsilon = FLT_EPSILON;
-    int ntheta = 33;
-    float dtheta = FLT_PI/(float)(ntheta-1);
-    float ftheta = -FLT_PI/2.0f;
-    ntheta = 2;
-    dtheta = FLT_PI/4.0f;
-    ftheta = -FLT_PI/8.0f;
+    //int ntheta = 33;
+    //float dtheta = FLT_PI/(float)(ntheta-1);
+    //float ftheta = -FLT_PI/2.0f;
+    int ntheta = 2;
+    float dtheta =  FLT_PI/4.0f;
+    float ftheta = -FLT_PI/8.0f;
     MinimumPhaseFilter mpf = new MinimumPhaseFilter(lag1,lag2);
     for (int itheta=0; itheta<ntheta; ++itheta) {
       float theta = ftheta+itheta*dtheta;
@@ -297,15 +297,15 @@ public class MinimumPhaseFilterTest extends TestCase {
         {     -p12*p12, -2.0f*m12*p12,     -m12*m12}
       };
       mpf.factorWilsonBurg(maxiter,epsilon,r);
-      Array.dump(r);
-      Array.zero(s);
+      ArrayMath.dump(r);
+      ArrayMath.zero(s);
       int k1 = (s[0].length-1)/2;
       int k2 = (s.length-1)/2;
       s[k2][k1] = 1.0f;
       mpf.apply(s,t);
       mpf.applyTranspose(t,s);
-      Array.dump(s);
-      Array.dump(t);
+      ArrayMath.dump(s);
+      ArrayMath.dump(t);
     }
   }
 
@@ -434,16 +434,16 @@ public class MinimumPhaseFilterTest extends TestCase {
           if (abs(a[j])>amax[j])
             amax[j] = abs(a[j]);
         }
-        //Array.dump(r);
-        Array.zero(s);
+        //ArrayMath.dump(r);
+        ArrayMath.zero(s);
         int k1 = (s[0][0].length-1)/2;
         int k2 = (s[0].length-1)/2;
         int k3 = (s.length-1)/2;
         s[k3][k2][k1] = 1.0f;
         mpf.apply(s,t);
         mpf.applyTranspose(t,s);
-        //Array.dump(s);
-        //Array.dump(t);
+        //ArrayMath.dump(s);
+        //ArrayMath.dump(t);
       }
     }
     for (int j=0; j<m; ++j)
@@ -457,33 +457,33 @@ public class MinimumPhaseFilterTest extends TestCase {
   // private
 
   private static float[] randfloat(int n1) {
-    return Array.sub(Array.randfloat(n1),0.5f);
+    return ArrayMath.sub(ArrayMath.randfloat(n1),0.5f);
   }
   private static float[][] randfloat(int n1, int n2) {
-    return Array.sub(Array.randfloat(n1,n2),0.5f);
+    return ArrayMath.sub(ArrayMath.randfloat(n1,n2),0.5f);
   }
   private static float[][][] randfloat(int n1, int n2, int n3) {
-    return Array.sub(Array.randfloat(n1,n2,n3),0.5f);
+    return ArrayMath.sub(ArrayMath.randfloat(n1,n2,n3),0.5f);
   }
 
   private static float[] zerofloat(int n1) {
-    return Array.zerofloat(n1);
+    return ArrayMath.zerofloat(n1);
   }
   private static float[][] zerofloat(int n1, int n2) {
-    return Array.zerofloat(n1,n2);
+    return ArrayMath.zerofloat(n1,n2);
   }
   private static float[][][] zerofloat(int n1, int n2, int n3) {
-    return Array.zerofloat(n1,n2,n3);
+    return ArrayMath.zerofloat(n1,n2,n3);
   }
 
   private static float dot(float[] x, float[] y) {
-    return Array.sum(Array.mul(x,y));
+    return ArrayMath.sum(ArrayMath.mul(x,y));
   }
   private static float dot(float[][] x, float[][] y) {
-    return Array.sum(Array.mul(x,y));
+    return ArrayMath.sum(ArrayMath.mul(x,y));
   }
   private static float dot(float[][][] x, float[][][] y) {
-    return Array.sum(Array.mul(x,y));
+    return ArrayMath.sum(ArrayMath.mul(x,y));
   }
 
   private static void assertEqual(float[] re, float[] ra) {

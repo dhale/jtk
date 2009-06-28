@@ -6,8 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp.test;
 
-import static edu.mines.jtk.util.Array.randfloat;
-import static edu.mines.jtk.util.Array.zerofloat;
+import static edu.mines.jtk.util.ArrayMath.randfloat;
+import static edu.mines.jtk.util.ArrayMath.zerofloat;
 import static edu.mines.jtk.util.MathPlus.*;
 
 import java.util.Random;

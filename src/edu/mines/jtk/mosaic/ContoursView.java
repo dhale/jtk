@@ -16,7 +16,7 @@ import java.util.Iterator;
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 import edu.mines.jtk.util.AxisTics;
 import edu.mines.jtk.util.Clips;
@@ -88,12 +88,12 @@ public class ContoursView extends TiledView {
   public void set(Sampling s1, Sampling s2, float[][] f) {
     Check.argument(s1.isUniform(),"s1 is uniform");
     Check.argument(s2.isUniform(),"s2 is uniform");
-    Check.argument(Array.isRegular(f),"f is regular");
+    Check.argument(ArrayMath.isRegular(f),"f is regular");
     Check.argument(s1.getCount()==f[0].length,"s1 consistent with f"); 
     Check.argument(s2.getCount()==f.length,"s2 consistent with f");
     _s1 = s1;
     _s2 = s2;
-    _f = Array.copy(f);
+    _f = ArrayMath.copy(f);
     _clips = new Clips(f);
     updateArraySampling();
     _cs = null;
@@ -402,7 +402,7 @@ public class ContoursView extends TiledView {
     float lineWidth = 1.0f;
 
     // Graphic context for contour lines
-    Graphics2D gline = null;
+    Graphics2D gline;
     gline = (Graphics2D)g2d.create();
     float[] dash = null;
     Line lineStyle = _lineStyle;
@@ -423,7 +423,7 @@ public class ContoursView extends TiledView {
     float width = lineWidth;
     if (_lineWidth!=0.0f)
       width *= _lineWidth;
-    BasicStroke bs = null;
+    BasicStroke bs;
     if (dash!=null) {
       int cap = BasicStroke.CAP_ROUND;
       int join = BasicStroke.JOIN_ROUND;

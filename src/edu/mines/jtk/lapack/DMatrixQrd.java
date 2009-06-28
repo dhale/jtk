@@ -10,7 +10,7 @@ import static edu.mines.jtk.lapack.Blas.*;
 import static edu.mines.jtk.lapack.Lapack.*;
 import static java.lang.Math.min;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -63,7 +63,7 @@ public class DMatrixQrd {
    * @return the m-by-n matrix factor Q.
    */
   public DMatrix getQ() {
-    double[] q = Array.copy(_qr);
+    double[] q = ArrayMath.copy(_qr);
     dorgqr(_m,_n,_k,q,_m,_tau,_work,_lwork);
     return new DMatrix(_m,_n,q);
   }

@@ -350,9 +350,9 @@ public class RecursiveCascadeFilter {
     for (int i=0; i<n; ++i) {
       if (c[i]!=null && !c[i].isReal()) {
         Cdouble cc = c[i].conj();
-        int j;
-        for (j=i+1; j<n && !cc.equals(c[j]); ++j)
-          ;
+        int j = i+1;
+        while (j<n && !cc.equals(c[j]))
+          ++j;
         Check.argument(j<n,"complex "+c[i]+" has a conjugate mate");
         cs[ns++] = c[i]; // copy pair to
         cs[ns++] = c[j]; // sorted output

@@ -206,9 +206,8 @@ public final class Units implements Cloneable {
    * @return true, if these units have dimensions; false, otherwise.
    */
   public boolean haveDimensions() {
-    for (int i=0; i<_power.length; ++i) {
-      if (_power[i]!=0) return true;
-    }
+    for (int power:_power)
+      if (power!=0) return true;
     return false;
   }
 
@@ -238,10 +237,10 @@ public final class Units implements Cloneable {
     }
     for (int i=0; i<_nbase; ++i) {
       if (_power[i]!=0) {
-	if (appending) sd += " ";
-	sd += _bases[i];
-	if (_power[i]!=1) sd += "^"+_power[i];
-	appending = true;
+        if (appending) sd += " ";
+        sd += _bases[i];
+        if (_power[i]!=1) sd += "^"+_power[i];
+        appending = true;
       }
     }
     if (_shift!=0.0) {
@@ -471,9 +470,9 @@ public final class Units implements Cloneable {
       String temp = name.substring(_prefix_string[index].length());
       entry = _table.get(temp);
       if (entry!=null) {
-	Units units = (Units)entry._units.clone();
-	units.scale(factor);
-	return units;
+        Units units = (Units)entry._units.clone();
+        units.scale(factor);
+        return units;
       }
     }
 
@@ -483,8 +482,8 @@ public final class Units implements Cloneable {
       name = name.substring(0,name.length()-1);
       entry = _table.get(name);
       if (entry!=null && entry._plural) {
-	Units units = (Units)entry._units.clone();
-	return units;
+        Units units = (Units)entry._units.clone();
+        return units;
       }
     }
 
@@ -493,9 +492,9 @@ public final class Units implements Cloneable {
       name = name.substring(_prefix_string[index].length());
       entry = _table.get(name);
       if (entry!=null && entry._plural) {
-	Units units = (Units)entry._units.clone();
-	units.scale(factor);
-	return units;
+        Units units = (Units)entry._units.clone();
+        units.scale(factor);
+        return units;
       }
     }
 
@@ -577,8 +576,8 @@ public final class Units implements Cloneable {
       if (name0>prefix0) continue;
       if (name0<prefix0) break;
       if (name.startsWith(prefix) && length<prefix.length()) {
-	length = prefix.length();
-	index = i;
+        length = prefix.length();
+        index = i;
       }
     }
     return index;
@@ -614,8 +613,7 @@ public final class Units implements Cloneable {
   // Load the default units table.
   private static synchronized void loadTable() {
     String[] specs = UnitsSpecs.specs;
-    for (int i=0; i<specs.length; ++i) {
-      String spec = specs[i];
+    for (String spec:specs) {
       if (spec.startsWith("#")) continue;
       StringTokenizer st = new StringTokenizer(spec);
       if (st.countTokens()<2) continue;
@@ -625,20 +623,20 @@ public final class Units implements Cloneable {
       boolean plural = plural_str.equals("P");
       String definition = (st.hasMoreTokens())?st.nextToken(""):null;
       if (definition!=null) {
-	int index = definition.indexOf("#");
-	if (index>=0) definition = definition.substring(0,index);
-	definition = definition.trim();
+        int index = definition.indexOf("#");
+        if (index>=0) definition = definition.substring(0,index);
+        definition = definition.trim();
       }
       if (definition!=null && definition.equals("")) definition = null;
       try {
-	boolean defined = addDefinition(name,plural,definition);
-	if (!defined) {
-	  System.err.println("Units.loadTable: failed to define " +
-	      name+" = "+definition);
-	}
+        boolean defined = addDefinition(name,plural,definition);
+        if (!defined) {
+          System.err.println("Units.loadTable: failed to define " +
+            name+" = "+definition);
+        }
       } catch (UnitsFormatException e) {
-	System.err.println("Units.loadTable: failed to define " +
-	    name+" = "+definition+" because "+e.getMessage());
+        System.err.println("Units.loadTable: failed to define " +
+          name+" = "+definition+" because "+e.getMessage());
       }
     }
   }

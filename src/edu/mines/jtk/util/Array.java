@@ -83,7 +83,9 @@ import java.util.Random;
  * </pre>
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.17
+ * @deprecated Use the class {@link ArrayMath} instead.
  */
+@Deprecated
 public class Array {
 
   ///////////////////////////////////////////////////////////////////////////
@@ -14862,6 +14864,6 @@ public class Array {
   }
 
   // Static methods only.
-  protected Array() {
+  private Array() {
   }
 }

@@ -343,7 +343,7 @@ public class Parameter implements Cloneable {
    * The clone will be an orphan; its parent parameter set will be null.
    * @return a clone of this parameter.
    */
-  public Object clone() {
+  public Object clone() throws CloneNotSupportedException {
     try {
       Parameter p = (Parameter)super.clone();
       p._parent = null;
@@ -391,7 +391,7 @@ public class Parameter implements Cloneable {
    * @return the destination parameter.
    */
   public Parameter copyTo(ParameterSet parent, String name) {
-    if (parent==_parent && name==_name) return this;
+    if (_parent==parent && _name==name) return this;
     Parameter p = (parent!=null)?parent.addParameter(name):new Parameter(name);
     p.setUnits(getUnits());
     p.setValues(getValues());
@@ -420,7 +420,7 @@ public class Parameter implements Cloneable {
    * @return the destination parameter.
    */
   public Parameter moveTo(ParameterSet parent, String name) {
-    if (parent==_parent && name==_name) return this;
+    if (_parent==parent && _name==name) return this;
     if (_parent!=null) _parent.remove(this);
     if (parent!=null) {
       parent.insert(name,this);
@@ -878,9 +878,8 @@ public class Parameter implements Cloneable {
       sb.append("> ").append(values[0]).append(" </par>\n");
     } else {
       sb.append(">\n");
-      for (int i=0; i<values.length; ++i) {
-        sb.append(indent).append("  ").append(values[i]).append("\n");
-      }
+      for (Object value:values)
+        sb.append(indent).append("  ").append(value).append("\n");
       sb.append(indent).append("</par>\n");
     }
     return sb.toString();
@@ -1116,7 +1115,7 @@ public class Parameter implements Cloneable {
   }
 
   private static boolean[] valuesAsBooleans(Object values, boolean copy) {
-    boolean[] bvalues = null;
+    boolean[] bvalues;
     if (values instanceof boolean[]) {
       bvalues = (boolean[])values;
       if (copy) {
@@ -1153,7 +1152,7 @@ public class Parameter implements Cloneable {
   }
 
   private static int[] valuesAsInts(Object values, boolean copy) {
-    int[] ivalues = null;
+    int[] ivalues;
     if (values instanceof int[]) {
       ivalues = (int[])values;
       if (copy) {
@@ -1166,7 +1165,7 @@ public class Parameter implements Cloneable {
           String[] svalues = (String[])values;
           ivalues = new int[svalues.length];
           for (int i=0; i<svalues.length; ++i) {
-            ivalues[i] = Integer.valueOf(svalues[i]).intValue();
+            ivalues[i] = Integer.valueOf(svalues[i]);
           }
         } else if (values==null) {
           ivalues = new int[0];
@@ -1183,7 +1182,7 @@ public class Parameter implements Cloneable {
   }
 
   private static long[] valuesAsLongs(Object values, boolean copy) {
-    long[] lvalues = null;
+    long[] lvalues;
     if (values instanceof long[]) {
       lvalues = (long[])values;
       if (copy) {
@@ -1196,7 +1195,7 @@ public class Parameter implements Cloneable {
           String[] svalues = (String[])values;
           lvalues = new long[svalues.length];
           for (int i=0; i<svalues.length; ++i) {
-            lvalues[i] = Long.valueOf(svalues[i]).longValue();
+            lvalues[i] = Long.valueOf(svalues[i]);
           }
         } else if (values==null) {
           lvalues = new long[0];
@@ -1213,7 +1212,7 @@ public class Parameter implements Cloneable {
   }
 
   private static float[] valuesAsFloats(Object values, boolean copy) {
-    float[] fvalues = null;
+    float[] fvalues;
     if (values instanceof float[]) {
       fvalues = (float[])values;
       if (copy) {
@@ -1238,7 +1237,7 @@ public class Parameter implements Cloneable {
           String[] svalues = (String[])values;
           fvalues = new float[svalues.length];
           for (int i=0; i<svalues.length; ++i) {
-            fvalues[i] = Float.valueOf(svalues[i]).floatValue();
+            fvalues[i] = Float.valueOf(svalues[i]);
           }
         } else if (values==null) {
           fvalues = new float[0];
@@ -1255,7 +1254,7 @@ public class Parameter implements Cloneable {
   }
 
   private static double[] valuesAsDoubles(Object values, boolean copy) {
-    double[] dvalues = null;
+    double[] dvalues;
     if (values instanceof double[]) {
       dvalues = (double[])values;
       if (copy) {
@@ -1280,7 +1279,7 @@ public class Parameter implements Cloneable {
           String[] svalues = (String[])values;
           dvalues = new double[svalues.length];
           for (int i=0; i<svalues.length; ++i) {
-            dvalues[i] = Double.valueOf(svalues[i]).doubleValue();
+            dvalues[i] = Double.valueOf(svalues[i]);
           }
         } else if (values==null) {
           dvalues = new double[0];
@@ -1297,7 +1296,7 @@ public class Parameter implements Cloneable {
   }
 
   private static String[] valuesAsStrings(Object values, boolean copy) {
-    String[] svalues = null;
+    String[] svalues;
     if (values instanceof String[]) {
       svalues = (String[])values;
       if (copy) {

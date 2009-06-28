@@ -10,7 +10,7 @@ import javax.swing.SwingUtilities;
 
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Tests {@link edu.mines.jtk.mosaic.SimplePlot}
@@ -30,7 +30,7 @@ public class SimplePlotTest {
     });
   }
   private static void plot0() {
-    float[] f = Array.sin(Array.rampfloat(0.0f,0.1f,63));
+    float[] f = ArrayMath.sin(ArrayMath.rampfloat(0.0f,0.1f,63));
     SimplePlot.asSequence(f);
   }
   private static void plot1() {
@@ -38,20 +38,20 @@ public class SimplePlotTest {
     float dx = 0.1f;
     float fx = 0.0f;
     Sampling sx = new Sampling(nx,dx,fx);
-    float[] x = Array.rampfloat(fx,dx,nx);
-    float[] f = Array.sub(Array.mul(x,Array.sin(x)),1.0f);
+    float[] x = ArrayMath.rampfloat(fx,dx,nx);
+    float[] f = ArrayMath.sub(ArrayMath.mul(x, ArrayMath.sin(x)),1.0f);
     SimplePlot.asPoints(sx,f);
   }
   private static void plot2() {
-    float[][] f = Array.sin(Array.rampfloat(0.0f,0.1f,0.1f,101,101));
+    float[][] f = ArrayMath.sin(ArrayMath.rampfloat(0.0f,0.1f,0.1f,101,101));
     SimplePlot.asPixels(f).addColorBar();
   }
   private static void plot3() {
     SimplePlot plot = new SimplePlot();
     plot.addGrid("H-.V-.");
-    float[] f = Array.sin(Array.rampfloat(0.0f,0.1f,63));
+    float[] f = ArrayMath.sin(ArrayMath.rampfloat(0.0f,0.1f,63));
     plot.addPoints(f).setStyle("r-o");
-    float[] g = Array.cos(Array.rampfloat(0.0f,0.1f,63));
+    float[] g = ArrayMath.cos(ArrayMath.rampfloat(0.0f,0.1f,63));
     plot.addPoints(g).setStyle("b-x");
     plot.setTitle("A simple plot of two arrays");
     plot.setVLabel("array value");

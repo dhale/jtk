@@ -9,7 +9,7 @@ package edu.mines.jtk.lapack;
 import static edu.mines.jtk.lapack.Blas.LOWER;
 import static edu.mines.jtk.lapack.Lapack.*;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -59,10 +59,10 @@ public class DMatrixEvd {
         throw new RuntimeException("internal error in LAPACK dsyevr");
     } else {
       double[] work = new double[1];
-      int info = dgeev(JOB_N,JOB_V,_n,aa,_n,_d,_e,_v,_n,_v,_n,work,-1);
+      dgeev(JOB_N,JOB_V,_n,aa,_n,_d,_e,_v,_n,_v,_n,work,-1);
       int lwork = (int)work[0];
       work = new double[lwork];
-      info = dgeev(JOB_N,JOB_V,_n,aa,_n,_d,_e,_v,_n,_v,_n,work,lwork);
+      int info = dgeev(JOB_N,JOB_V,_n,aa,_n,_d,_e,_v,_n,_v,_n,work,lwork);
       if (info>0)
         throw new RuntimeException("LAPACK dgeev failed to converge");
     }
@@ -101,7 +101,7 @@ public class DMatrixEvd {
    * @return array of real parts = real(diag(D)).
    */
   public double[] getRealEigenvalues() {
-    return Array.copy(_d);
+    return ArrayMath.copy(_d);
   }
 
   /** 
@@ -109,7 +109,7 @@ public class DMatrixEvd {
    * @return array of imaginary parts = imag(diag(D))
    */
   public double[] getImagEigenvalues() {
-    return Array.copy(_e);
+    return ArrayMath.copy(_e);
   }
 
   ///////////////////////////////////////////////////////////////////////////

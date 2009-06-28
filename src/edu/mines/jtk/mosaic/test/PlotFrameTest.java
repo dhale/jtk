@@ -11,7 +11,7 @@ import javax.swing.SwingUtilities;
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Tests {@link edu.mines.jtk.mosaic.PlotFrame}
@@ -37,12 +37,12 @@ public class PlotFrameTest {
     double f2 = 33.0;
     Sampling s2 = new Sampling(n2,d2,f2);
 
-    float[][] f = Array.sin(Array.rampfloat(0.0f,0.1f,0.1f,n1,n2));
+    float[][] f = ArrayMath.sin(ArrayMath.rampfloat(0.0f,0.1f,0.1f,n1,n2));
     float ax = (float)(f2+d2*n2/2.0);
     float bx = (float)(0.45*d2*(n2-1));
     float cx = (float)(0.1/d1);
-    float[] x1 = Array.rampfloat((float)f1,(float)d1,n1);
-    float[] x2 = Array.add(ax,Array.mul(bx,Array.sin(Array.mul(cx,x1))));
+    float[] x1 = ArrayMath.rampfloat((float)f1,(float)d1,n1);
+    float[] x2 = ArrayMath.add(ax, ArrayMath.mul(bx, ArrayMath.sin(ArrayMath.mul(cx,x1))));
 
     PlotPanel.Orientation orientation = PlotPanel.Orientation.X1DOWN_X2RIGHT;
     PlotPanel panel = new PlotPanel(1,2,orientation);

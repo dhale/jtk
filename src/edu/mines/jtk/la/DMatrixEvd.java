@@ -8,7 +8,7 @@ package edu.mines.jtk.la;
 
 import static java.lang.Math.*;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -99,7 +99,7 @@ public class DMatrixEvd {
    * @return array of real parts = real(diag(D)).
    */
   public double[] getRealEigenvalues() {
-    return Array.copy(_d);
+    return ArrayMath.copy(_d);
   }
 
   /** 
@@ -107,7 +107,7 @@ public class DMatrixEvd {
    * @return array of imaginary parts = imag(diag(D))
    */
   public double[] getImagEigenvalues() {
-    return Array.copy(_e);
+    return ArrayMath.copy(_e);
   }
 
   ///////////////////////////////////////////////////////////////////////////

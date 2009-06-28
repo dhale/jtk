@@ -569,7 +569,7 @@ public class LocalSmoothingFilter {
 
   // Zeros array x.
   private static void szero(float[][] x) {
-    Array.zero(x);
+    ArrayMath.zero(x);
   }
   private static void szero(float[][][] x) {
     if (PARALLEL) {
@@ -600,7 +600,7 @@ public class LocalSmoothingFilter {
 
   // Copys array x to array y.
   private static void scopy(float[][] x, float[][] y) {
-    Array.copy(x,y);
+    ArrayMath.copy(x,y);
   }
   private static void scopy(float[][][] x, float[][][] y) {
     if (PARALLEL) {

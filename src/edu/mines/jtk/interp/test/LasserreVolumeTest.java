@@ -12,7 +12,7 @@ import junit.framework.TestSuite;
 import edu.mines.jtk.interp.LasserreVolume;
 
 /**
- * Tests {@link edu.mines.jtk.mesh.LasserreVolume}.
+ * Tests {@link edu.mines.jtk.interp.LasserreVolume}.
  * @author Dave Hale, Colorado School of Mines
  * @version 2009.06.10
  */

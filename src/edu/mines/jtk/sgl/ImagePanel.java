@@ -472,7 +472,7 @@ public class ImagePanel extends AxisAlignedPanel {
     int kxmax = _sx.indexOfNearest(_xmax);
     int kymax = _sy.indexOfNearest(_ymax);
     int kzmax = _sz.indexOfNearest(_zmax);
-    boolean stale = false;
+    boolean stale;
     if (_axis==Axis.X) {
       stale = _kxmin!=kxmin;
       _kxmin = kxmin;
@@ -529,7 +529,7 @@ public class ImagePanel extends AxisAlignedPanel {
           if (!staleList.isEmpty()) {
             tn = staleList.remove(--nstale);
           } else {
-            tn = makeTexture(js,jt);
+            tn = makeTexture();
           }
           _tn[jt][js] = tn;
           loadTexture(js,jt);
@@ -580,7 +580,7 @@ public class ImagePanel extends AxisAlignedPanel {
     }
   }
 
-  private GlTextureName makeTexture(int js, int jt) {
+  private GlTextureName makeTexture() {
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     GlTextureName tn = new GlTextureName();
     glBindTexture(GL_TEXTURE_2D,tn.name());

@@ -155,10 +155,10 @@ public class UnitSphereSamplingTest extends TestCase {
       // TODO: more assertions?
       /*
       trace("wa="+wa+" wb="+wb+" wc="+wc);
-      edu.mines.jtk.util.Array.dump(p);
-      edu.mines.jtk.util.Array.dump(qa);
-      edu.mines.jtk.util.Array.dump(qb);
-      edu.mines.jtk.util.Array.dump(qc);
+      edu.mines.jtk.util.ArrayMath.dump(p);
+      edu.mines.jtk.util.ArrayMath.dump(qa);
+      edu.mines.jtk.util.ArrayMath.dump(qb);
+      edu.mines.jtk.util.ArrayMath.dump(qc);
       */
     }
   }
@@ -184,9 +184,9 @@ public class UnitSphereSamplingTest extends TestCase {
     float dmaxDegrees = (float)(dmax*180.0/PI);
     trace("npoint="+npoint+" dmax="+dmax+" degrees="+dmaxDegrees);
     trace("pmax=");
-    edu.mines.jtk.util.Array.dump(pmax);
+    edu.mines.jtk.util.ArrayMath.dump(pmax);
     trace("qmax=");
-    edu.mines.jtk.util.Array.dump(qmax);
+    edu.mines.jtk.util.ArrayMath.dump(qmax);
     */
     assertTrue(dmax<error);
   }
@@ -220,9 +220,11 @@ public class UnitSphereSamplingTest extends TestCase {
     //return (float)acos(p[0]*q[0]+p[1]*q[1]+p[2]*q[2]);
   }
 
+  /*
   private static final boolean TRACE = true;
   private static void trace(String s) {
     if (TRACE)
       System.out.println(s);
   }
+  */
 }

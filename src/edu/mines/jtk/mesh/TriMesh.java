@@ -260,7 +260,6 @@ public class TriMesh implements Serializable {
         nmin = _n1;
       }
       if (d2<dmin) {
-        dmin = d2;
         nmin = _n2;
       }
       return nmin;
@@ -484,37 +483,37 @@ public class TriMesh implements Serializable {
       _quality = -1.0;
     }
 
-    private final void setInner() {
+    private void setInner() {
       _bits |= INNER_BIT;
     }
 
-    private final void clearInner() {
+    private void clearInner() {
       _bits &= ~INNER_BIT;
     }
 
-    private final boolean isInner() {
+    private boolean isInner() {
       return (_bits&INNER_BIT)!=0;
     }
 
-    private final void setOuter() {
+    private void setOuter() {
       _bits |= OUTER_BIT;
     }
 
-    private final void clearOuter() {
+    private void clearOuter() {
       _bits &= ~OUTER_BIT;
     }
 
-    private final boolean isOuter() {
+    private boolean isOuter() {
       return (_bits&OUTER_BIT)!=0;
     }
 
-    private final void setCenter(double xc, double yc) {
+    private void setCenter(double xc, double yc) {
       _xc = xc;
       _yc = yc;
       _bits |= CENTER_BIT;
     }
 
-    private final boolean hasCenter() {
+    private boolean hasCenter() {
       return (_bits&CENTER_BIT)!=0;
     }
 
@@ -789,7 +788,7 @@ public class TriMesh implements Serializable {
     }
 
     /*
-    private final boolean isVisibleFromNode(Node node) {
+    private boolean isVisibleFromNode(Node node) {
       return isVisibleFromPoint(node._x,node._y);
     }
     */
@@ -2136,9 +2135,7 @@ public class TriMesh implements Serializable {
     if (triLeft!=null && isInner(triLeft))
       return true;
     Tri triRight = edge.triRight();
-    if (triRight!=null && isInner(triRight))
-      return true;
-    return false;
+    return triRight!=null && isInner(triRight);
   }
 
   /**
@@ -2308,561 +2305,6 @@ public class TriMesh implements Serializable {
   }
 
   /**
-   * Sibson coordinates, used in natural-neighbor interpolation.
-   * The Voronoi polygon of any node added to a Delaunay tri mesh will 
-   * overlap the polygons of its natural neighbors that existed before
-   * the node was added. The Sibson coordinate of each such neighbor
-   * equals the area of overlap divided by the total area of the Voronoi 
-   * polygon of the added node. The Sibson coordinates for any point can 
-   * be computed without explicitly adding (and then removing) a node at 
-   * that point.
-   */
-  public class SibsonCoordinates {
-
-    /**
-     * Gets the nodes that are natural neighbors.
-     */
-    public Iterator<Node> getNodes() {
-      return _nlist.iterator();
-    }
-
-    /**
-     * Gets the areas corresponding to the natural-neighbor nodes.
-     */
-    public Iterator<Float> getAreas() {
-      return _alist.iterator();
-    }
-
-    /**
-     * Gets the total of all areas.
-     */
-    public float getAreaTotal() {
-      return _atotal;
-    }
-
-    /**
-     * Returns the number of nodes that are natural neighbors.
-     */
-    public int countNodes() {
-      return _ntotal;
-    }
-
-    void append(Node n, float a) {
-      _alist.add(a);
-      _nlist.add(n);
-      _atotal += a;
-      _ntotal += 1;
-    }
-    private ArrayList<Node> _nlist = new ArrayList<Node>(16);
-    private ArrayList<Float> _alist = new ArrayList<Float>(16);
-    private float _atotal = 0.0f;
-    private int _ntotal = 0;
-  }
-
-  /**
-   * Gets Sibson coordinates for a specified point (x,y).
-   * @param x the x coordinate of a point.
-   * @param y the y coordinate of a point.
-   * @return the Sibson coordinates for the point (x,y).
-   */
-  public synchronized SibsonCoordinates getSibsonCoordinates(float x, float y) 
-  {
-    SibsonCoordinates sc = new SibsonCoordinates();
-
-    // The point p = (x,y).
-    double xp = x;
-    double yp = y;
-
-    // Where is the point?
-    PointLocation pl = locatePoint(xp,yp);
-
-    // Extrapolation is not supported.
-    if (pl.isOutside())
-      return null;
-
-
-    // Build a set of Delaunay edges for the specified point p = (x,y).
-    // These are edges of triangles with circumcircles that contain p,
-    // and that would survive if a new node was added at point p. The
-    // edges form a polygon around the point p.
-    _edgeSet.clear();
-    clearTriMarks();
-    getDelaunayEdgesAround(xp,yp,pl.tri());
-
-    // Array used to get circumcenters.
-    double[] center = new double[2];
-
-    // Get nodes a, b, and c, and triangle (a,b,c) from first edge in set.
-    // The edge a->b is opposite node c in the tri (a,b,c).
-    _edgeSet.first();
-    Node na = _edgeSet.a;
-    Node nb = _edgeSet.b;
-    Node nc = _edgeSet.c;
-    Tri tri = _edgeSet.abc;
-
-    // Remember the first node a, so we know when done looping over nodes.
-    Node fa = na;
-
-    // For all nodes a in the polygon of Delaunay edges around p, ...
-    do {
-
-      // Circumcenter p0 of triangle (a,b,p).
-      Geometry.centerCircle(na._x,na._y,nb._x,nb._y,xp,yp,center);
-      double x0 = center[0];
-      double y0 = center[1];
-      double xs = x0;
-      double ys = y0;
-
-      // Circumcenter p1 of triangle (a,b,c).
-      tri.centerCircle(center);
-      double x1 = center[0];
-      double y1 = center[1];
-
-      // Initialize computation of area for current node a.
-      double an = x0*y1-x1*y0;
-
-      // For all non-Delaunay edges a->b around node a, ...
-      for (;;) {
-        
-        // Replace circumcenter p0 with previous circumcenter p1.
-        x0 = x1;
-        y0 = y1;
-
-        // If edge is in fact Delaunay, then accumulate area for 
-        // circumcenter p1 of (a,c,p) and break; else accumulate 
-        // area for circumcenter p1 of next tri (a,b,c).
-        if (_edgeSet.contains(tri,nb)) {
-          Geometry.centerCircle(na._x,na._y,nc._x,nc._y,xp,yp,center);
-          x1 = center[0];
-          y1 = center[1];
-          an += x0*y1-x1*y0;
-          break;
-        } else {
-          Tri triNabor = tri.triNabor(nb);
-          Node nodeNabor = tri.nodeNabor(triNabor);
-          nb = nc;
-          nc = nodeNabor;
-          tri = triNabor;
-          tri.centerCircle(center);
-          x1 = center[0];
-          y1 = center[1];
-          an += x0*y1-x1*y0;
-        }
-      }
-
-      // Complete accumulation of area for current node a.
-      an += x1*ys-xs*y1;
-      an *= 0.5;
-
-      // Append node a and area to Sibson coordinates.
-      sc.append(na,(float)an);
-
-      // Next nodes a, b, and c for triangle (a,b,c).
-      Node nt = nc;
-      nc = nb;
-      nb = na;
-      na = nt;
-    } while (na!=fa);
-
-    // Return Sibson coordinates.
-    return sc;
-  }
-
-  /**
-   * Sibson's C0 natural-neighbor interpolation.
-   * @param x the x coordinate at which to interpolate.
-   * @param y the y coordinate at which to interpolate.
-   * @param fmap map for function values f stored in Floats.
-   * @param fnull null value returned for points (x,y) outside the mesh.
-   * @return the interpolated float value.
-   */
-  public synchronized float interpolateSibson0(
-    float x, float y, NodePropertyMap fmap, float fnull) 
-  {
-    SibsonCoordinates sc = getSibsonCoordinates(x,y);
-    if (sc==null)
-      return fnull;
-    Iterator<Node> nodes = sc.getNodes();
-    Iterator<Float> areas = sc.getAreas();
-    float fs = 0.0f;
-    float as = 0.0f;
-    while (nodes.hasNext()) {
-      Node n = nodes.next();
-      float a = areas.next();
-      //a = 3.0f*a*a-2.0f*a*a*a;
-      //a = 2.0f*a-a*a;
-      //a = a*a;
-      float f = (Float)fmap.get(n);
-      fs += a*f;
-      as += a;
-    }
-    return fs/as;
-  }
-
-  /**
-   * Sibson's C1 natural-neighbor interpolation.
-   * Requires gradients as well as function values at mesh nodes.
-   * @param x the x coordinate at which to interpolate.
-   * @param y the y coordinate at which to interpolate.
-   * @param fgmap map for function and gradient stored in arrays {f,gx,gy}.
-   * @param fnull null value returned for points (x,y) outside the mesh.
-   * @return the interpolated float value.
-   */
-  public synchronized float interpolateSibson1(
-    float x, float y, NodePropertyMap fgmap, float fnull) 
-  {
-    SibsonCoordinates sc = getSibsonCoordinates(x,y);
-    if (sc==null)
-      return fnull;
-    Iterator<Node> nodes = sc.getNodes();
-    Iterator<Float> areas = sc.getAreas();
-    double as = sc.getAreaTotal();
-    double fs = 0.0;
-    double es = 0.0;
-    double wds = 0.0;
-    double wdds = 0.0;
-    double wods = 0.0;
-    while (nodes.hasNext()) {
-      Node n = nodes.next();
-      float[] fg = (float[])fgmap.get(n);
-      double f = fg[0];
-      double gx = fg[1];
-      double gy = fg[2];
-      double a = areas.next();
-      double w = a/as;
-      double xn = n.x();
-      double yn = n.y();
-      double dx = x-xn;
-      double dy = y-yn;
-      double dd = dx*dx+dy*dy;
-      if (dd==0.0)
-        return (float)f;
-      double d = sqrt(dd);
-      double wd = w*d;
-      double wod = w/d;
-      double wdd = w*dd;
-      es += wod*(f+gx*dx+gy*dy);
-      fs += w*f;
-      wds += wd;
-      wdds += wdd;
-      wods += wod;
-    }
-    es /= wods;
-    double alpha = wds/wods;
-    double beta = wdds;
-    return (float)((alpha*fs+beta*es)/(alpha+beta));
-  }
-
-  /**
-   * Estimate gradients of a function specified at nodes of this mesh.
-   * Uses Sibson's weighted least-squares method based on his natural
-   * neighbor coordinates.
-   * @param fmap map for function values f stored in Floats.
-   * @param fgmap map for function and gradient stored in arrays {f,gx,gy}.
-   */
-  public synchronized void estimateGradients(
-    NodePropertyMap fmap, NodePropertyMap fgmap) 
-  {
-    int nnode = countNodes();
-    Node[] nodes = new Node[nnode];
-    NodeIterator ni = getNodes();
-    for (int inode=0; inode<nnode; ++inode)
-      nodes[inode] = ni.next();
-    for (int inode=0; inode<nnode; ++inode) {
-      Node n = nodes[inode];
-      double fn = (Float)fmap.get(n);
-      double xn = n.x();
-      double yn = n.y();
-      removeNode(n);
-      SibsonCoordinates sc = getSibsonCoordinates((float)xn,(float)yn);
-      if (sc==null) {
-        float[] fg = {(float)fn,0.0f,0.0f};
-        fgmap.put(n,fg);
-      } else {
-        Iterator<Node> mi = sc.getNodes();
-        int nn = sc.countNodes();
-        double hxx=0.0,hxy=0.0,hyy=0.0,px=0.0,py=0.0;
-        for (int in=0; in<nn; ++in) {
-          Node m = mi.next();
-          double fm = (Float)fmap.get(m);
-          double xm = m.x();
-          double ym = m.y();
-          double df = fn-fm;
-          double dx = xn-xm;
-          double dy = yn-ym;
-          double ds = 1.0/(dx*dx+dy*dy);
-          hxx += ds*dx*dx;
-          hxy += ds*dx*dy;
-          hyy += ds*dy*dy;
-          px += ds*dx*df;
-          py += ds*dy*df;
-        }
-        double det = hxx*hyy-hxy*hxy;
-        double gxn = (hyy*px-hxy*py)/det;
-        double gyn = (hxx*py-hxy*px)/det;
-        float[] fg = {(float)fn,(float)gxn,(float)gyn};
-        fgmap.put(n,fg);
-      }
-      addNode(n);
-    }
-  }
-
-  /**
-   * Interpolates a float property using Sibson's (natural-neighbors) method.
-   * Extrapolation is not yet supported; if the specified point is not inside
-   * the mesh, this method returns a specified null value.
-   * @param x the x coordinate of the point at which to interpolate.
-   * @param y the y coordinate of the point at which to interpolate.
-   * @param map a property map containing float values for all nodes.
-   * @param fnull null value returned for points (x,y) outside the mesh.
-   * @return the interpolated float value.
-   */
-  public synchronized float interpolateSibson(
-    float x, float y, NodePropertyMap map, float fnull) 
-  {
-    // The point p = (x,y).
-    double xp = x;
-    double yp = y;
-
-    // Where is the point?
-    PointLocation pl = locatePoint(xp,yp);
-
-    // If point is on a node, then interpolation is trivial.
-    if (pl.isOnNode())
-      return (Float)map.get(pl.node());
-
-    // If point is outside, simply return zero.
-    // (Extrapolation is not yet supported.)
-    if (pl.isOutside())
-      return fnull;
-
-
-    // Build a set of Delaunay edges for the specified point p = (x,y).
-    // These are edges of triangles with circumcircles that contain p,
-    // and that would survive if a new node was added at point p. The
-    // edges form a polygon around the point p.
-    _edgeSet.clear();
-    clearTriMarks();
-    getDelaunayEdgesAround(xp,yp,pl.tri());
-
-    // Array used to get circumcenters.
-    double[] center = new double[2];
-
-    // Sum of all areas and area-weighted float values.
-    double as = 0.0;
-    double fs = 0.0;
-
-    // Get nodes a, b, and c, and triangle (a,b,c) from first edge in set.
-    // The edge a->b is opposite node c in the tri (a,b,c).
-    _edgeSet.first();
-    Node na = _edgeSet.a;
-    Node nb = _edgeSet.b;
-    Node nc = _edgeSet.c;
-    Tri tri = _edgeSet.abc;
-
-    // Remember the first node a, so we know when done looping over nodes.
-    Node fa = na;
-
-    // For all nodes a in the polygon of Delaunay edges around p, ...
-    do {
-
-      // Float value for current node a.
-      float fn = (Float)map.get(na);
-
-      // Circumcenter ps of triangle (a,b,p) is the local origin.
-      Geometry.centerCircle(na._x,na._y,nb._x,nb._y,xp,yp,center);
-      double xs = center[0];
-      double ys = center[1];
-
-      // Circumcenter p0 of triangle (a,b,c), shifted by (xs,ys).
-      tri.centerCircle(center);
-      double x0 = center[0]-xs;
-      double y0 = center[1]-ys;
-
-      // Area for current node a.
-      double an = 0.0;
-
-      // For all non-Delaunay edges a->b around node a, ...
-      double x1,y1;
-      for(;;) {
-        
-        // Circumcenter p1 of the next triangle. If edge is in fact
-        // Delaunay, then this is the last triangle (a,c,p). Else,
-        // it is a triangle (a,b,c). Either way, accumulate area.
-        if (_edgeSet.contains(tri,nb)) {
-          Geometry.centerCircle(na._x,na._y,nc._x,nc._y,xp,yp,center);
-          x1 = center[0]-xs;
-          y1 = center[1]-ys;
-          an += x0*y1-x1*y0;
-          break;
-        } else {
-          Tri triNabor = tri.triNabor(nb);
-          Node nodeNabor = tri.nodeNabor(triNabor);
-          nb = nc;
-          nc = nodeNabor;
-          tri = triNabor;
-          tri.centerCircle(center);
-          x1 = center[0]-xs;
-          y1 = center[1]-ys;
-          an += x0*y1-x1*y0;
-        }
-        
-        // Next circumcenter p0 is the current circumcenter p1.
-        x0 = x1;
-        y0 = y1;
-      }
-
-      // Update sums with area (actually, 2*area) of current node a.
-      as += an;
-      fs += fn*an;
-
-      // Next nodes a, b, and c for triangle (a,b,c).
-      Node nt = nc;
-      nc = nb;
-      nb = na;
-      na = nt;
-    } while (na!=fa);
-
-    // Return interpolated value normalized by total area.
-    return (float)(fs/as);
-  }
-  // This method is used for Sibson interpolation. It works much like
-  // the method getDelaunayEdgesInside, but (1) does not kill any tris,
-  // and (2) adds edges instead of edge mates to the edge set.
-  private void getDelaunayEdgesAround(double xp, double yp, Tri tri) {
-    mark(tri);
-    Node n0 = tri._n0;
-    Node n1 = tri._n1;
-    Node n2 = tri._n2;
-    if (inCircle(n0,n1,n2,xp,yp)) {
-      Tri t0 = tri._t0;
-      Tri t1 = tri._t1;
-      Tri t2 = tri._t2;
-      _edgeSet.add(tri,n0);
-      _edgeSet.add(tri,n1);
-      _edgeSet.add(tri,n2);
-      if (t0!=null && !isMarked(t0))
-        getDelaunayEdgesAround(xp,yp,t0);
-      if (t1!=null && !isMarked(t1))
-        getDelaunayEdgesAround(xp,yp,t1);
-      if (t2!=null && !isMarked(t2))
-        getDelaunayEdgesAround(xp,yp,t2);
-    }
-  }
-
-  /**
-   * Interpolates a float property using Sibson's (natural neighbors) method.
-   * Extrapolation is not yet supported; if the specified point is not inside
-   * the mesh, this method returns a specified null value.
-   * <p>
-   * This implementation is based on an algorithm published by Sambridge 
-   * et al., who note that it fails for points (x,y) on Delaunay edges.
-   * Therefore, this method is private and exists only for testing.
-   * @param x the x coordinate of the point at which to interpolate.
-   * @param y the y coordinate of the point at which to interpolate.
-   * @param map a property map containing float values for all nodes.
-   * @param fnull null value returned for points (x,y) outside the mesh.
-   * @return the interpolated float value.
-   */
-  private float interpolateSambridge(
-    float x, float y, NodePropertyMap map, float fnull) 
-  {
-    double xp = x;
-    double yp = y;
-
-    // Where is the point?
-    PointLocation pl = locatePoint(xp,yp);
-
-    // If point is on a node, then interpolation is trivial.
-    if (pl.isOnNode())
-      return (Float)map.get(pl.node());
-
-    // If point is outside, simply return zero.
-    // (Extrapolation is not yet supported.)
-    if (pl.isOutside())
-      return fnull;
-
-    // Get a list of tris that are not Delaunay with respect to the 
-    // specified point (x,y). That is, these tris have circumcircles 
-    // that contain the point, and the list begins with the tri that
-    // contains the point.
-    clearTriMarks();
-    Tri tri = pl.tri();
-    TriList triList = new TriList();
-    getTrisNotDelaunayForPointInside(xp,yp,tri,triList);
-
-    // Arrays for four circumcenters of triangles.
-    double[] c0 = new double[2];
-    double[] c1 = new double[2];
-    double[] c2 = new double[2];
-    double[] cv = new double[2];
-
-    // Sums of signed areas and float values.
-    double as = 0.0;
-    double fs = 0.0;
-    
-    // For all tris in the list, ...
-    int ntri = triList.ntri();
-    Tri[] tris = triList.tris();
-    for (int itri=0; itri<ntri; ++itri) {
-
-      // The three nodes of one tri.
-      tri = tris[itri];
-      Node n0 = tri._n0;
-      Node n1 = tri._n1;
-      Node n2 = tri._n2;
-      double x0 = n0._x, y0 = n0._y;
-      double x1 = n1._x, y1 = n1._y;
-      double x2 = n2._x, y2 = n2._y;
-
-      // Centers of four circles.
-      Geometry.centerCircle(x1,y1,x2,y2,xp,yp,c0);
-      Geometry.centerCircle(x2,y2,x0,y0,xp,yp,c1);
-      Geometry.centerCircle(x0,y0,x1,y1,xp,yp,c2);
-      Geometry.centerCircle(x0,y0,x1,y1,x2,y2,cv);
-
-      // Accumulate signed areas and float values.
-      double a0 = area(c1,c2,cv);
-      double a1 = area(c2,c0,cv);
-      double a2 = area(c0,c1,cv);
-      float f0 = (Float)map.get(n0);
-      float f1 = (Float)map.get(n1);
-      float f2 = (Float)map.get(n2);
-      as += a0+a1+a2;
-      fs += a0*f0+a1*f1+a2*f2;
-    }
-
-    // Return interpolated value normalized by total area.
-    return (float)(fs/as);
-  }
-  private void getTrisNotDelaunayForPointInside(
-    double x, double y, Tri tri, TriList tl) 
-  {
-    if (tri!=null && !isMarked(tri)) {
-      mark(tri);
-      Node n0 = tri._n0;
-      Node n1 = tri._n1;
-      Node n2 = tri._n2;
-      if (inCircle(n0,n1,n2,x,y)) {
-        tl.add(tri);
-        Tri t0 = tri._t0;
-        Tri t1 = tri._t1;
-        Tri t2 = tri._t2;
-        getTrisNotDelaunayForPointInside(x,y,t0,tl);
-        getTrisNotDelaunayForPointInside(x,y,t1,tl);
-        getTrisNotDelaunayForPointInside(x,y,t2,tl);
-      }
-    }
-  }
-  private double area(double[] cj, double[] ck, double[] cv) {
-    double xj = cj[0]-cv[0];
-    double yj = cj[1]-cv[1];
-    double xk = ck[0]-cv[0];
-    double yk = ck[1]-cv[1];
-    return 0.5*(xj*yk-yj*xk);
-  }
-
-  /**
    * Validates the internal consistency of the mesh.
    * @exception RuntimeException if the mesh is invalid.
    */
@@ -3019,7 +2461,7 @@ public class TriMesh implements Serializable {
    * Returns a new tri, possibly one resurrected from the dead.
    * Resurrection reduces the need for garbage collection of dead tris.
    */
-  private final Tri makeTri(Node n0, Node n1, Node n2) {
+  private Tri makeTri(Node n0, Node n1, Node n2) {
     ++_ntri;
     int ndead = _deadTris.ntri();
     if (ndead==0) {
@@ -3037,7 +2479,7 @@ public class TriMesh implements Serializable {
    * Kills a tri and, if there is room, buries it in the graveyard,
    * from where it may be resurrected later.
    */
-  private final void killTri(Tri tri) {
+  private void killTri(Tri tri) {
     --_ntri;
     fireTriRemoved(tri);
     int ndead = _deadTris.ntri();
@@ -3053,7 +2495,7 @@ public class TriMesh implements Serializable {
    * Returns the distance squared between the specified node and a point
    * with specified coordinates.
    */
-  private static final double distanceSquared(
+  private static double distanceSquared(
     Node node, double x, double y)
   {
     double dx = x-node._x;
@@ -3065,14 +2507,14 @@ public class TriMesh implements Serializable {
    * Returns true iff node n is left of oriented line ab.
    * Perturbation of coordinates ensures that the node is not in the line.
    */
-  private static final boolean leftOfLine(Node a, Node b, Node n) {
+  private static boolean leftOfLine(Node a, Node b, Node n) {
     return Geometry.leftOfLine(a._x,a._y,b._x,b._y,n._x,n._y)>0.0;
   }
 
   /**
    * Returns true iff point (x,y) is left of oriented line ab.
    */
-  private static final boolean leftOfLine(
+  private static boolean leftOfLine(
     Node a, Node b,
     double x, double y)
   {
@@ -3083,7 +2525,7 @@ public class TriMesh implements Serializable {
    * Returns true iff node n is in circumcircle of tri abc.
    * Perturbation of coordinates ensures that the node is not on the circle.
    */
-  private static final boolean inCircle(
+  private static boolean inCircle(
     Node a, Node b, Node c, Node n)
   {
     return Geometry.inCircle(a._x,a._y,b._x,b._y,c._x,c._y,n._x,n._y)>0.0;
@@ -3092,7 +2534,7 @@ public class TriMesh implements Serializable {
   /**
    * Returns true iff point (x,y) is in circumcircle of tri abc.
    */
-  private static final boolean inCircle(
+  private static boolean inCircle(
     Node a, Node b, Node c,
     double x, double y)
   {
@@ -3270,9 +2712,7 @@ public class TriMesh implements Serializable {
     // First, find the nearest node among the sampled nodes.
     _nmin = _nroot;
     _dmin = distanceSquared(_nmin,x,y);
-    Iterator<Node> ni = _sampledNodes.iterator();
-    while (ni.hasNext()) {
-      Node n = ni.next();
+    for (Node n:_sampledNodes) {
       double d = distanceSquared(n,x,y);
       if (d<_dmin) {
         _dmin = d;
@@ -3462,9 +2902,7 @@ public class TriMesh implements Serializable {
     // Otherwise, find a good tri in which to begin the recursive search.
     Node nmin = _nroot;
     double dmin = distanceSquared(nmin,x,y);
-    Iterator<Node> ni = _sampledNodes.iterator();
-    while (ni.hasNext()) {
-      Node n = ni.next();
+    for (Node n:_sampledNodes) {
       double d = distanceSquared(n,x,y);
       if (d<dmin) {
         dmin = d;
@@ -4148,6 +3586,7 @@ public class TriMesh implements Serializable {
    * Validates the specified tri.
    */
   private void validate(Tri tri) {
+    Check.state(tri!=null,"tri not null");
     Node na = tri.nodeA();
     Node nb = tri.nodeB();
     Node nc = tri.nodeC();
@@ -4166,7 +3605,7 @@ public class TriMesh implements Serializable {
   }
 
   /*
-  private static final void trace(String s) {
+  private static void trace(String s) {
     if (TRACE) System.out.println(s);
   }
   */
@@ -4195,7 +3634,7 @@ public class TriMesh implements Serializable {
    * them as they are matched by their mates. This scheme also makes this set
    * unsuitable for general use.
    */
-  private static final class EdgeSet {
+  private static class EdgeSet {
 
     /**
      * The current edge, typically, the edge added, or the mate removed.
@@ -4505,7 +3944,7 @@ public class TriMesh implements Serializable {
    * set improves the efficiency of the method addNode; nodes can be
    * added/removed faster than edges.
    */
-  private static final class NodeSet {
+  private static class NodeSet {
 
     /**
      * The current node; typically, the node added or removed.

@@ -198,9 +198,9 @@ public class Projector {
       double u0t = u0b;
       u0b = 1.0-u1b;
       u1b = 1.0-u0t;
-      double v0t = v0b;
-      v0b = v1b;
-      v1b = v0t;
+      //double v0t = v0b;
+      //v0b = v1b;
+      //v1b = v0t;
     }
     double u0 = 0.0;
     double u1 = 1.0;

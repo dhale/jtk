@@ -18,7 +18,7 @@ import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * Tests {@link edu.mines.jtk.mesh.SibsonInterpolator2}.
+ * Tests {@link edu.mines.jtk.interp.SibsonInterpolator2}.
  * @author Dave Hale, Colorado School of Mines
  * @version 2009.06.13
  */
@@ -192,8 +192,7 @@ public class SibsonInterpolator2Test extends TestCase {
     }
     //SibsonInterpolator2.Method[] methods = {HL,BS,WS};
     SibsonInterpolator2.Method[] methods = {HL};
-    for (int i=0; i<methods.length; ++i) {
-      SibsonInterpolator2.Method method = methods[i];
+    for (SibsonInterpolator2.Method method:methods) {
       SibsonInterpolator2 si = new SibsonInterpolator2(method,f,x1,x2);
       si.setNullValue(1.0f);
       si.setBounds(SX,SX);
@@ -213,7 +212,7 @@ public class SibsonInterpolator2Test extends TestCase {
   {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        System.out.println("min="+Array.min(g)+" max="+Array.max(g));
+        System.out.println("min="+ ArrayMath.min(g)+" max="+ ArrayMath.max(g));
         SimplePlot sp = new SimplePlot();
         sp.setTitle(method);
         sp.setSize(847,740);

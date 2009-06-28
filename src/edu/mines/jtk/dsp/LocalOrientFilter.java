@@ -9,7 +9,7 @@ package edu.mines.jtk.dsp;
 //import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Threads;
 import static edu.mines.jtk.util.MathPlus.*;
 
@@ -279,12 +279,12 @@ public class LocalOrientFilter {
         if (_rgfSmoother1!=null) {
           _rgfSmoother1.apply0X(g,h);
         } else {
-          Array.copy(g,h);
+          ArrayMath.copy(g,h);
         }
         if (_rgfSmoother2!=null) {
           _rgfSmoother2.applyX0(h,g);
         } else {
-          Array.copy(h,g);
+          ArrayMath.copy(h,g);
         }
       }
     }
@@ -467,7 +467,6 @@ public class LocalOrientFilter {
           if (u3i<0.0f) {
             u1i = -u1i;
             u2i = -u2i;
-            u3i = -u3i;
           }
           u1[i3][i2][i1] = u1i;
           u2[i3][i2][i1] = u2i;
@@ -571,16 +570,16 @@ public class LocalOrientFilter {
         if (_rgfSmoother1!=null) {
           _rgfSmoother1.apply0XX(g,h);
         } else {
-          Array.copy(g,h);
+          ArrayMath.copy(g,h);
         }
         if (_rgfSmoother2!=null) {
           _rgfSmoother2.applyX0X(h,g);
         } else {
-          Array.copy(h,g);
+          ArrayMath.copy(h,g);
         }
         if (_rgfSmoother3!=null) {
           _rgfSmoother3.applyXX0(g,h);
-          Array.copy(h,g);
+          ArrayMath.copy(h,g);
         }
       }
     }

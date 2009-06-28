@@ -8,7 +8,7 @@ package edu.mines.jtk.dsp;
 
 import static edu.mines.jtk.util.MathPlus.*;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -136,7 +136,7 @@ public class LocalCausalFilter {
    * @return array of lags; by copy, not by reference.
    */
   public int[] getLag1() {
-    return Array.copy(_lag1);
+    return ArrayMath.copy(_lag1);
   }
 
   /**
@@ -144,7 +144,7 @@ public class LocalCausalFilter {
    * @return array of lags; by copy, not by reference.
    */
   public int[] getLag2() {
-    return Array.copy(_lag2);
+    return ArrayMath.copy(_lag2);
   }
 
   /**
@@ -152,7 +152,7 @@ public class LocalCausalFilter {
    * @return array of lags; by copy, not by reference.
    */
   public int[] getLag3() {
-    return Array.copy(_lag3);
+    return ArrayMath.copy(_lag3);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -281,7 +281,7 @@ public class LocalCausalFilter {
    */
   public void applyInverseTranspose(A1 a1, float[] y, float[] x) {
     Check.argument(x!=y,"x!=y");
-    Array.zero(x);
+    ArrayMath.zero(x);
     float[] a = new float[_m];
     int n1 = y.length;
     int i1lo = min(_max1,n1);
@@ -514,7 +514,7 @@ public class LocalCausalFilter {
    */
   public void applyInverseTranspose(A2 a2, float[][] y, float[][] x) {
     Check.argument(x!=y,"x!=y");
-    Array.zero(x);
+    ArrayMath.zero(x);
     float[] a = new float[_m];
     int n1 = y[0].length;
     int n2 = y.length;
@@ -893,7 +893,7 @@ public class LocalCausalFilter {
    */
   public void applyInverseTranspose(A3 a3, float[][][] y, float[][][] x) {
     Check.argument(x!=y,"x!=y");
-    Array.zero(x);
+    ArrayMath.zero(x);
     float[] a = new float[_m];
     int n1 = y[0][0].length;
     int n2 = y[0].length;
@@ -988,7 +988,7 @@ public class LocalCausalFilter {
   private int _m; // number of lags and filter coefficients
   private int _min1,_max1; // min/max lags in 1st dimension
   private int _min2,_max2; // min/max lags in 2nd dimension
-  private int _min3,_max3; // min/max lags in 3rd dimension
+  private int       _max3; //     max lag  in 3rd dimension
   private int[] _lag1; // lags in 1st dimension
   private int[] _lag2; // lags in 2nd dimension
   private int[] _lag3; // lags in 3rd dimension
@@ -999,11 +999,11 @@ public class LocalCausalFilter {
     for (int j=1; j<lag1.length; ++j)
       Check.argument(lag1[j]>0,"lag1["+j+"]>0");
     _m = lag1.length;
-    _lag1 = Array.copy(lag1);
-    _lag2 = Array.zeroint(_m);
-    _lag3 = Array.zeroint(_m);
-    _min1 = Array.min(lag1);
-    _max1 = Array.max(lag1);
+    _lag1 = ArrayMath.copy(lag1);
+    _lag2 = ArrayMath.zeroint(_m);
+    _lag3 = ArrayMath.zeroint(_m);
+    _min1 = ArrayMath.min(lag1);
+    _max1 = ArrayMath.max(lag1);
   }
 
   private void initLags(int[] lag1, int[] lag2) {
@@ -1016,13 +1016,13 @@ public class LocalCausalFilter {
         Check.argument(lag1[j]>0,"if lag2==0, lag1["+j+"]>0");
     }
     _m = lag1.length;
-    _lag1 = Array.copy(lag1);
-    _lag2 = Array.copy(lag2);
-    _lag3 = Array.zeroint(_m);
-    _min1 = Array.min(lag1);
-    _min2 = Array.min(lag2);
-    _max1 = Array.max(lag1);
-    _max2 = Array.max(lag2);
+    _lag1 = ArrayMath.copy(lag1);
+    _lag2 = ArrayMath.copy(lag2);
+    _lag3 = ArrayMath.zeroint(_m);
+    _min1 = ArrayMath.min(lag1);
+    _min2 = ArrayMath.min(lag2);
+    _max1 = ArrayMath.max(lag1);
+    _max2 = ArrayMath.max(lag2);
   }
 
   private void initLags(int[] lag1, int[] lag2, int[] lag3) {
@@ -1039,26 +1039,26 @@ public class LocalCausalFilter {
       }
     }
     _m = lag1.length;
-    _lag1 = Array.copy(lag1);
-    _lag2 = Array.copy(lag2);
-    _lag3 = Array.copy(lag3);
-    _min1 = Array.min(lag1);
-    _min2 = Array.min(lag2);
-    _min3 = Array.min(lag3);
-    _max1 = Array.max(lag1);
-    _max2 = Array.max(lag2);
-    _max3 = Array.max(lag3);
+    _lag1 = ArrayMath.copy(lag1);
+    _lag2 = ArrayMath.copy(lag2);
+    _lag3 = ArrayMath.copy(lag3);
+    _min1 = ArrayMath.min(lag1);
+    _min2 = ArrayMath.min(lag2);
+    _max1 = ArrayMath.max(lag1);
+    _max2 = ArrayMath.max(lag2);
+    _max3 = ArrayMath.max(lag3);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // Testing interface for linear interpolation of table-driven filters.
   // Not working, so keep private for now.
 
+  /*
   /**
    * Interface for filter coefficients indexed in 1 dimension.
    * Filter coefficients may vary with sample index, and will be got 
    * through this interface for every output sample computed.
-   */
+   * /
   private interface A12 {
     
     /**
@@ -1066,7 +1066,7 @@ public class LocalCausalFilter {
      * @param i1 sample index in 1st dimension.
      * @param s array[2] with two scale factors.
      * @param a array[2][] with two arrays of filter coefficients.
-     */
+     * /
     public void get(int i1, float[] s, float[][] a);
   }
 
@@ -1078,7 +1078,7 @@ public class LocalCausalFilter {
    * @param a12 scale factors and filter coefficients.
    * @param y input array.
    * @param x output array.
-   */
+   * /
   private void applyInverse(A12 a12, float[] y, float[] x) {
     int n1 = y.length;
     int mod1 = 1+_max1;
@@ -1116,7 +1116,7 @@ public class LocalCausalFilter {
    * @param a12 scale factors and filter coefficients.
    * @param y input array.
    * @param x output array.
-   */
+   * /
   private void applyInverseTranspose(A12 a12, float[] y, float[] x) {
     int n1 = y.length;
     int mod1 = 1+_max1;
@@ -1145,4 +1145,5 @@ public class LocalCausalFilter {
       }
     }
   }
+  */
 }

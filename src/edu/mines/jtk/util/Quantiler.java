@@ -195,8 +195,8 @@ public class Quantiler {
   private float _fnull; // null sample value, if ignoring nulls
   private double _m0,_m1,_m2,_m3,_m4; // marker positions
   private double _q0,_q1,_q2,_q3,_q4; // marker heights
-  private double _f0,_f1,_f2,_f3,_f4; // desired marker positions
-  private double _d0,_d1,_d2,_d3,_d4; // desired marker position increments
+  private double     _f1,_f2,_f3    ; // desired marker positions
+  private double     _d1,_d2,_d3    ; // desired marker position increments
   private boolean _ignoreNull; // true if ignoring fnull samples
   private boolean _inited; // true if estimator has been initialized
 
@@ -242,18 +242,14 @@ public class Quantiler {
     _q4 = y[4];
 
     // Initialize desired marker positions.
-    _f0 = 0.0;
     _f1 = 2.0*_q;
     _f2 = 4.0*_q;
     _f3 = 2.0+2.0*_q;
-    _f4 = 4.0;
- 
+
     // Compute increments in desired marker positions.
-    _d0 = 0.0;
     _d1 = _q/2.0;
     _d2 = _q;
     _d3 = (1.0+_q)/2.0;
-    _d4 = 1.0;
 
     // The estimator is now initialized and the current estimate is q2.
     _inited = true;
@@ -302,11 +298,9 @@ public class Quantiler {
       }
       
       // Increment desired marker positions.
-      _f0 += _d0;
       _f1 += _d1;
       _f2 += _d2;
       _f3 += _d3;
-      _f4 += _d4;
 
       // If necessary, adjust height and location of markers 1, 2, and 3.
       double mm,mp;

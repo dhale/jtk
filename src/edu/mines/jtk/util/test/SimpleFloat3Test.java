@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.util.SimpleFloat3}.
@@ -28,9 +29,9 @@ public class SimpleFloat3Test extends TestCase {
     int n1 = 10;
     int n2 = 11;
     int n3 = 12;
-    float[][][] a = Array.randfloat(n1,n2,n3);
+    float[][][] a = randfloat(n1,n2,n3);
     SimpleFloat3 sf3 = new SimpleFloat3(a);
-    float[][][] c = Array.copy(a);
+    float[][][] c = copy(a);
     test1(sf3,c);
     test2(sf3,c);
     test3(sf3,c);
@@ -40,9 +41,9 @@ public class SimpleFloat3Test extends TestCase {
     int n1 = 10;
     int n2 = 11;
     int n3 = 12;
-    float[][][] a = Array.randfloat(n1,n2,n3);
+    float[][][] a = randfloat(n1,n2,n3);
     SimpleFloat3 sf3 = new SimpleFloat3(a);
-    float[][][] c = Array.copy(a);
+    float[][][] c = copy(a);
     testRandom1(sf3,c);
     testRandom2(sf3,c);
     testRandom3(sf3,c);

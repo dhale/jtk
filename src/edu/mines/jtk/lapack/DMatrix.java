@@ -9,7 +9,7 @@ package edu.mines.jtk.lapack;
 import static edu.mines.jtk.lapack.Blas.*;
 import static java.lang.Math.*;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -61,7 +61,7 @@ public class DMatrix {
    */
   public DMatrix(int m, int n, double v) {
     this(m,n);
-    Array.fill(v,_a);
+    ArrayMath.fill(v,_a);
   }
 
   /**
@@ -94,7 +94,7 @@ public class DMatrix {
    * @param a the array.
    */
   public DMatrix(double[][] a) {
-    Check.argument(Array.isRegular(a),"array a is regular");
+    Check.argument(ArrayMath.isRegular(a),"array a is regular");
     _m = a.length;
     _n = a[0].length;
     _a = new double[_m*_n];
@@ -106,7 +106,7 @@ public class DMatrix {
    * @param a the matrix.
    */
   public DMatrix(DMatrix a) {
-    this(a._m,a._n,Array.copy(a._a));
+    this(a._m,a._n, ArrayMath.copy(a._a));
   }
 
   /**
@@ -230,7 +230,7 @@ public class DMatrix {
    */
   public DMatrix get(int[] r, int[] c) {
     if (r==null && c==null) {
-      return new DMatrix(_m,_n,Array.copy(_a));
+      return new DMatrix(_m,_n, ArrayMath.copy(_a));
     } else {
       int m = (r!=null)?r.length:_m;
       int n = (c!=null)?c.length:_n;
@@ -321,7 +321,7 @@ public class DMatrix {
    * @return the array of matrix elements packed by columns.
    */
   public double[] getPackedColumns() {
-    return Array.copy(_a);
+    return ArrayMath.copy(_a);
   }
 
   /**
@@ -399,7 +399,7 @@ public class DMatrix {
       Check.argument(c.length==x._n,"c.length equals number of columns in x");
     }
     if (r==null && c==null) {
-      Array.copy(x._a,_a);
+      ArrayMath.copy(x._a,_a);
     } else {
       int m = (r!=null)?r.length:_m;
       int n = (c!=null)?c.length:_n;
@@ -492,7 +492,7 @@ public class DMatrix {
    * @param c the array of matrix elements packed by columns.
    */
   public void setPackedColumns(double[] c) {
-    Array.copy(_m*_n,c,_a);
+    ArrayMath.copy(_m*_n,c,_a);
   }
 
   /**
@@ -680,7 +680,7 @@ public class DMatrix {
    */
   public DMatrix negate() {
     DMatrix c = new DMatrix(_m,_n);
-    Array.neg(_a,c._a);
+    ArrayMath.neg(_a,c._a);
     return c;
   }
 
@@ -691,7 +691,7 @@ public class DMatrix {
    */
   public DMatrix plus(DMatrix b) {
     DMatrix c = new DMatrix(_m,_n);
-    Array.add(_a,b._a,c._a);
+    ArrayMath.add(_a,b._a,c._a);
     return c;
   }
 
@@ -701,7 +701,7 @@ public class DMatrix {
    * @return A = A + B.
    */
   public DMatrix plusEquals(DMatrix b) {
-    Array.add(_a,b._a,_a);
+    ArrayMath.add(_a,b._a,_a);
     return this;
   }
 
@@ -712,7 +712,7 @@ public class DMatrix {
    */
   public DMatrix minus(DMatrix b) {
     DMatrix c = new DMatrix(_m,_n);
-    Array.sub(_a,b._a,c._a);
+    ArrayMath.sub(_a,b._a,c._a);
     return c;
   }
 
@@ -722,7 +722,7 @@ public class DMatrix {
    * @return A = A - B.
    */
   public DMatrix minusEquals(DMatrix b) {
-    Array.sub(_a,b._a,_a);
+    ArrayMath.sub(_a,b._a,_a);
     return this;
   }
 
@@ -734,7 +734,7 @@ public class DMatrix {
    */
   public DMatrix arrayTimes(DMatrix b) {
     DMatrix c = new DMatrix(_m,_n);
-    Array.mul(_a,b._a,c._a);
+    ArrayMath.mul(_a,b._a,c._a);
     return c;
   }
 
@@ -745,7 +745,7 @@ public class DMatrix {
    * @return A = A .* B.
    */
   public DMatrix arrayTimesEquals(DMatrix b) {
-    Array.mul(_a,b._a,_a);
+    ArrayMath.mul(_a,b._a,_a);
     return this;
   }
 
@@ -757,7 +757,7 @@ public class DMatrix {
    */
   public DMatrix arrayRightDivide(DMatrix b) {
     DMatrix c = new DMatrix(_m,_n);
-    Array.div(_a,b._a,c._a);
+    ArrayMath.div(_a,b._a,c._a);
     return c;
   }
 
@@ -768,7 +768,7 @@ public class DMatrix {
    * @return A = A ./ B.
    */
   public DMatrix arrayRightDivideEquals(DMatrix b) {
-    Array.div(_a,b._a,_a);
+    ArrayMath.div(_a,b._a,_a);
     return this;
   }
 
@@ -780,7 +780,7 @@ public class DMatrix {
    */
   public DMatrix arrayLeftDivide(DMatrix b) {
     DMatrix c = new DMatrix(_m,_n);
-    Array.div(b._a,_a,c._a);
+    ArrayMath.div(b._a,_a,c._a);
     return c;
   }
 
@@ -791,7 +791,7 @@ public class DMatrix {
    * @return A = A .\ B.
    */
   public DMatrix arrayLeftDivideEquals(DMatrix b) {
-    Array.div(b._a,_a,_a);
+    ArrayMath.div(b._a,_a,_a);
     return this;
   }
 
@@ -802,7 +802,7 @@ public class DMatrix {
    */
   public DMatrix times(double s) {
     DMatrix c = new DMatrix(_m,_n);
-    Array.mul(_a,s,c._a);
+    ArrayMath.mul(_a,s,c._a);
     return c;
   }
 
@@ -812,7 +812,7 @@ public class DMatrix {
    * @return A = A * s.
    */
   public DMatrix timesEquals(double s) {
-    Array.mul(_a,s,_a);
+    ArrayMath.mul(_a,s,_a);
     return this;
   }
 
@@ -872,7 +872,7 @@ public class DMatrix {
    */
   public static DMatrix random(int m, int n) {
     DMatrix x = new DMatrix(m,n);
-    Array.rand(x._a);
+    ArrayMath.rand(x._a);
     return x;
   }
 

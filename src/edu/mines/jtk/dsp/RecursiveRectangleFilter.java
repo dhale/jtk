@@ -51,7 +51,7 @@ public class RecursiveRectangleFilter {
   public void apply(float[] x, float[] y) {
     checkArrays(x,y);
     if (x==y)
-      x = Array.copy(x);
+      x = ArrayMath.copy(x);
     int n = x.length;
     int m = _m;
     int l = _l;
@@ -127,13 +127,13 @@ public class RecursiveRectangleFilter {
     int n1 = x[0].length;
     int n2 = x.length;
     if (x==y)
-      x = Array.copy(x);
+      x = ArrayMath.copy(x);
     int m = _m;
     int l = _l;
     float s = 1.0f/(float)(1+m-l);
 
     // Initialize y[0].
-    Array.zero(y[0]);
+    ArrayMath.zero(y[0]);
     int i2lo = max(0,l);
     int i2hi = min(n2,m+1);
     for (int i2=i2lo; i2<i2hi; ++i2) {
@@ -281,8 +281,8 @@ public class RecursiveRectangleFilter {
   private static void checkArrays(float[][] x, float[][] y) {
     Check.argument(x.length==y.length,"x.length==y.length");
     Check.argument(x[0].length==y[0].length,"x[0].length==y[0].length");
-    Check.argument(Array.isRegular(x),"x is regular");
-    Check.argument(Array.isRegular(y),"y is regular");
+    Check.argument(ArrayMath.isRegular(x),"x is regular");
+    Check.argument(ArrayMath.isRegular(y),"y is regular");
   }
 
   private static void checkArrays(float[][][] x, float[][][] y) {
@@ -290,7 +290,7 @@ public class RecursiveRectangleFilter {
     Check.argument(x[0].length==y[0].length,"x[0].length==y[0].length");
     Check.argument(x[0][0].length==y[0][0].length,
       "x[0][0].length==y[0][0].length");
-    Check.argument(Array.isRegular(x),"x is regular");
-    Check.argument(Array.isRegular(y),"y is regular");
+    Check.argument(ArrayMath.isRegular(x),"x is regular");
+    Check.argument(ArrayMath.isRegular(y),"y is regular");
   }
 }

@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.util.Quantiler}.
@@ -50,7 +51,7 @@ public class QuantilerTest extends TestCase {
 
   public void testRandom() {
     int n = 10000;
-    float[] f = Array.randfloat(new Random(314159),n);
+    float[] f = randfloat(new Random(314159),n);
     int ntest = 101;
     for (int itest=0; itest<ntest; ++itest) {
       float q = (float)itest/(float)(ntest-1);
@@ -74,7 +75,7 @@ public class QuantilerTest extends TestCase {
     int nq,rate;
 
     for (int ntrial=0; ntrial<3; ++ntrial) {
-      float[] f1 = Array.randfloat(n);
+      float[] f1 = randfloat(n);
 
       float q1 = 0.0f;
       sw.restart();
@@ -90,8 +91,8 @@ public class QuantilerTest extends TestCase {
       float q2 = 0.0f;
       sw.restart();
       for (nq=0; sw.time()<maxtime; ++nq) {
-        float[] f2 = Array.copy(f1);
-        Array.quickPartialSort(n/2,f2);
+        float[] f2 = copy(f1);
+        quickPartialSort(n/2,f2);
         q2 = f2[n/2];
       }
       sw.stop();

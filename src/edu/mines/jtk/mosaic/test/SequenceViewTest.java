@@ -10,7 +10,7 @@ import java.awt.Color;
 
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Test {@link edu.mines.jtk.mosaic.SequenceView} and associates.
@@ -25,8 +25,8 @@ public class SequenceViewTest {
     float dx = 0.1f;
     float fx = -0.5f*dx*(float)(nx-1);
     Sampling sx = new Sampling(nx,dx,fx);
-    float[] f1 = Array.rampfloat(fx,dx,nx);
-    float[] f2 = Array.add(0.5f,Array.sin(f1));
+    float[] f1 = ArrayMath.rampfloat(fx,dx,nx);
+    float[] f2 = ArrayMath.add(0.5f, ArrayMath.sin(f1));
 
     PlotPanel panel = new PlotPanel(2,1);
 

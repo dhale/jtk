@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
-import static java.lang.Math.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Clips (clipMin,clipMax) are lower and upper bounds for arrays of values.
@@ -263,18 +263,18 @@ public class Clips {
       if (_percMin==0.0f && _percMax==100.0f) {
         if (_f instanceof float[]) {
           float[] a = (float[])_f;
-          _clipMin = Array.min(a);
-          _clipMax = Array.max(a);
+          _clipMin = min(a);
+          _clipMax = max(a);
           clipsComputed = true;
         } else if (_f instanceof float[][]) {
           float[][] a = (float[][])_f;
-          _clipMin = Array.min(a);
-          _clipMax = Array.max(a);
+          _clipMin = min(a);
+          _clipMax = max(a);
           clipsComputed = true;
         } else if (_f instanceof float[][][]) {
           float[][][] a = (float[][][])_f;
-          _clipMin = Array.min(a);
-          _clipMax = Array.max(a);
+          _clipMin = min(a);
+          _clipMax = max(a);
           clipsComputed = true;
         } else if (_f instanceof Float3) {
           Float3 f3 = (Float3)_f;
@@ -284,8 +284,8 @@ public class Clips {
           float[][] a = new float[n2][n1];
           for (int i3=0; i3<n3; ++i3) {
             f3.get12(n1,n2,0,0,i3,a);
-            _clipMin = min(_clipMin,Array.min(a));
-            _clipMax = max(_clipMax,Array.max(a));
+            _clipMin = min(_clipMin,min(a));
+            _clipMax = max(_clipMax,max(a));
           }
           clipsComputed = true;
         }
@@ -295,11 +295,11 @@ public class Clips {
       else {
         float[] a = null;
         if (_f instanceof float[]) {
-          a = Array.copy((float[])_f);
+          a = copy((float[])_f);
         } else if (_f instanceof float[][]) {
-          a = Array.flatten((float[][])_f);
+          a = flatten((float[][])_f);
         } else if (_f instanceof float[][][]) {
-          a = Array.flatten((float[][][])_f);
+          a = flatten((float[][][])_f);
         } else if (_f instanceof Float3) {
           Float3 f3 = (Float3)_f;
           int n1 = f3.getN1();
@@ -312,16 +312,16 @@ public class Clips {
           int n = a.length;
           int kmin = (int)rint(_percMin*0.01*(n-1));
           if (kmin<=0) {
-            _clipMin = Array.min(a);
+            _clipMin = min(a);
           } else {
-            Array.quickPartialSort(kmin,a);
+            quickPartialSort(kmin,a);
             _clipMin = a[kmin];
           }
           int kmax = (int)rint(_percMax*0.01*(n-1));
           if (kmax>=n-1) {
-            _clipMax = Array.max(a);
+            _clipMax = max(a);
           } else {
-            Array.quickPartialSort(kmax,a);
+            quickPartialSort(kmax,a);
             _clipMax = a[kmax];
           }
           clipsComputed = true;

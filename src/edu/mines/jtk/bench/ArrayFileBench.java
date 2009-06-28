@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.nio.ByteOrder;
 
 import edu.mines.jtk.io.ArrayFile;
-import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Stopwatch;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Benchmark for {@link edu.mines.jtk.io.ArrayFile}.
@@ -55,8 +55,8 @@ public class ArrayFileBench {
   private static void benchFloat(
     ArrayFile af, int n) throws IOException 
   {
-    float[] a = Array.randfloat(n);
-    float[] b = Array.zerofloat(n);
+    float[] a = randfloat(n);
+    float[] b = zerofloat(n);
     int nio;
     Stopwatch sw = new Stopwatch();
     sw.start();
@@ -78,8 +78,8 @@ public class ArrayFileBench {
   private static void benchDouble(
     ArrayFile af, int n) throws IOException 
   {
-    double[] a = Array.randdouble(n);
-    double[] b = Array.zerodouble(n);
+    double[] a = randdouble(n);
+    double[] b = zerodouble(n);
     int nio;
     Stopwatch sw = new Stopwatch();
     sw.start();

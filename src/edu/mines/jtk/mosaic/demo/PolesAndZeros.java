@@ -18,7 +18,7 @@ import javax.swing.*;
 import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Cdouble;
 
 /**
@@ -387,7 +387,7 @@ public class PolesAndZeros {
       _poles.toArray(poles);
       _zeros.toArray(zeros);
 
-      // Array for impulse response h.
+      // ArrayMath for impulse response h.
       int n = 101;
       float[] h = new float[n];
 
@@ -436,16 +436,16 @@ public class PolesAndZeros {
       }
 
       // Amplitude response, normalized.
-      //float amax = max(Array.max(af),FLT_EPSILON);
-      //af = Array.mul(1.0f/amax,af);
+      //float amax = max(ArrayMath.max(af),FLT_EPSILON);
+      //af = ArrayMath.mul(1.0f/amax,af);
       if (_db) {
-        af = Array.log10(af);
-        af = Array.mul(20.0f,af);
+        af = ArrayMath.log10(af);
+        af = ArrayMath.mul(20.0f,af);
       }
       Real1 a = new Real1(sf,af);
 
       // Phase response, in cycles.
-      pf = Array.mul(0.5f/FLT_PI,pf);
+      pf = ArrayMath.mul(0.5f/FLT_PI,pf);
       Real1 p = new Real1(sf,pf);
 
       return new Real1[]{a,p};
@@ -473,26 +473,26 @@ public class PolesAndZeros {
       // Real-to-complex fast Fourier transform.
       FftReal fft = new FftReal(nfft);
       float[] cf = new float[2*nf];
-      Array.copy(nt,h.getValues(),cf);
+      ArrayMath.copy(nt,h.getValues(),cf);
       fft.realToComplex(-1,cf,cf);
 
       // Adjust phase for possibly non-zero time of first sample.
-      float[] wft = Array.rampfloat(0.0f,-2.0f*FLT_PI*(float)(df*ft),nf);
-      cf = Array.cmul(cf,Array.cmplx(Array.cos(wft),Array.sin(wft)));
+      float[] wft = ArrayMath.rampfloat(0.0f,-2.0f*FLT_PI*(float)(df*ft),nf);
+      cf = ArrayMath.cmul(cf,ArrayMath.cmplx(ArrayMath.cos(wft),ArrayMath.sin(wft)));
 
       // Amplitude response, normalized.
-      float[] af = Array.cabs(cf);
-      float amax = max(Array.max(af),FLT_EPSILON);
-      af = Array.mul(1.0f/amax,af);
+      float[] af = ArrayMath.cabs(cf);
+      float amax = max(ArrayMath.max(af),FLT_EPSILON);
+      af = ArrayMath.mul(1.0f/amax,af);
       if (_db) {
-        af = Array.log10(af);
-        af = Array.mul(20.0f,af);
+        af = ArrayMath.log10(af);
+        af = ArrayMath.mul(20.0f,af);
       }
       Real1 a = new Real1(sf,af);
 
       // Phase response, in cycles.
-      float[] pf = Array.carg(cf);
-      pf = Array.mul(0.5f/FLT_PI,pf);
+      float[] pf = ArrayMath.carg(cf);
+      pf = ArrayMath.mul(0.5f/FLT_PI,pf);
       Real1 p = new Real1(sf,pf);
 
       return new Real1[]{a,p};
@@ -549,7 +549,7 @@ public class PolesAndZeros {
     private Tile _tile; // tile in which editing began
 
     // Handles mouse pressed and released events.
-    private MouseListener _ml = new MouseAdapter() {;
+    private MouseListener _ml = new MouseAdapter() {
       public void mousePressed(MouseEvent e) {
         if (e.isShiftDown()) {
           add(e);

@@ -26,7 +26,7 @@ public class ParameterTest extends TestCase {
     Parameter par = new Parameter("fo<o","Hello");
     assertTrue(par.getString().equals("Hello"));
     par.setString("true");
-    assertTrue(par.getBoolean()==true);
+    assertTrue(par.getBoolean());
     par.setString("3141");
     assertTrue(par.getInt()==3141);
     par.setString("3141.0");
@@ -40,7 +40,6 @@ public class ParameterTest extends TestCase {
     assertTrue(par.getType()==Parameter.FLOAT);
     float[] fvalues = {1.2f,3.4f};
     par.setFloats(fvalues);
-    fvalues = null;
     fvalues = par.getFloats();
     assertTrue(fvalues[0]==1.2f);
     assertTrue(fvalues[1]==3.4f);
@@ -48,10 +47,9 @@ public class ParameterTest extends TestCase {
     assertTrue(par.getUnits().equals("km/s"));
     boolean[] bvalues = {true,false};
     par.setBooleans(bvalues);
-    bvalues = null;
     bvalues = par.getBooleans();
-    assertTrue(bvalues[0]==true);
-    assertTrue(bvalues[1]==false);
+    assertTrue(bvalues[0]);
+    assertTrue(!bvalues[1]);
     par.setUnits(null);
     assertTrue(par.getUnits()==null);
   }

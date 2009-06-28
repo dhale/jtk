@@ -6,10 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import static edu.mines.jtk.util.MathPlus.*;
-
-import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Check;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * A multi-dimensional causal filter that is linear and shift-invariant.
@@ -130,7 +128,7 @@ public class CausalFilter {
    * @return array of lags; by copy, not by reference.
    */
   public int[] getLag1() {
-    return Array.copy(_lag1);
+    return copy(_lag1);
   }
 
   /**
@@ -138,7 +136,7 @@ public class CausalFilter {
    * @return array of lags; by copy, not by reference.
    */
   public int[] getLag2() {
-    return Array.copy(_lag2);
+    return copy(_lag2);
   }
 
   /**
@@ -146,7 +144,7 @@ public class CausalFilter {
    * @return array of lags; by copy, not by reference.
    */
   public int[] getLag3() {
-    return Array.copy(_lag3);
+    return copy(_lag3);
   }
 
   /**
@@ -154,7 +152,7 @@ public class CausalFilter {
    * @return array of filter coefficients; by copy, not by reference.
    */
   public float[] getA() {
-    return Array.copy(_a);
+    return copy(_a);
   }
 
   /**
@@ -195,10 +193,10 @@ public class CausalFilter {
     float[] u = new float[n1];
 
     // S is R padded with zeros to reduce truncation of R/(AA').
-    Array.copy(l1+1+l1,0,r,k1-l1,s);
+    copy(l1+1+l1,0,r,k1-l1,s);
 
     // Initial factor is minimum-phase and matches lag zero of R.
-    Array.zero(_a);
+    zero(_a);
     _a[0] = sqrt(s[k1]);
     _a0 = _a[0];
     _a0i = 1.0f/_a[0];
@@ -208,7 +206,7 @@ public class CausalFilter {
     boolean converged = false;
     float eemax = s[k1]*epsilon;
     for (niter=0; niter<maxiter && !converged; ++niter) {
-      //Array.dump(_a); // for debugging only
+      //dump(_a); // for debugging only
 
       // U(z) + U(1/z) = 1 + S(z)/(A(z)*A(1/z))
       this.applyInverseTranspose(s,t);
@@ -283,10 +281,10 @@ public class CausalFilter {
     float[][] u = new float[n2][n1];
 
     // S is R padded with zeros to reduce truncation of R/(AA').
-    Array.copy(l1+1+l1,l2+1+l2,0,0,r,k1-l1,k2-l2,s);
+    copy(l1+1+l1,l2+1+l2,0,0,r,k1-l1,k2-l2,s);
 
     // Initial factor is minimum-phase and matches lag zero of R.
-    Array.zero(_a);
+    zero(_a);
     _a[0] = sqrt(s[k2][k1]);
     _a0 = _a[0];
     _a0i = 1.0f/_a[0];
@@ -296,7 +294,7 @@ public class CausalFilter {
     boolean converged = false;
     float eemax = s[k2][k1]*epsilon;
     for (niter=0; niter<maxiter && !converged; ++niter) {
-      //Array.dump(_a); // for debugging only
+      //dump(_a); // for debugging only
 
       // U(z) + U(1/z) = 1 + S(z)/(A(z)*A(1/z))
       this.applyInverseTranspose(s,t);
@@ -380,10 +378,10 @@ public class CausalFilter {
     float[][][] u = new float[n3][n2][n1];
 
     // S is R padded with zeros to reduce truncation of R/(AA').
-    Array.copy(l1+1+l1,l2+1+l2,l3+1+l3,0,0,0,r,k1-l1,k2-l2,k3-l3,s);
+    copy(l1+1+l1,l2+1+l2,l3+1+l3,0,0,0,r,k1-l1,k2-l2,k3-l3,s);
 
     // Initial factor is minimum-phase and matches lag zero of R.
-    Array.zero(_a);
+    zero(_a);
     _a[0] = sqrt(s[k3][k2][k1]);
     _a0 = _a[0];
     _a0i = 1.0f/_a[0];
@@ -393,7 +391,7 @@ public class CausalFilter {
     boolean converged = false;
     float eemax = s[k3][k2][k1]*epsilon;
     for (niter=0; niter<maxiter && !converged; ++niter) {
-      //Array.dump(_a); // for debugging only
+      //dump(_a); // for debugging only
       //System.out.println("niter="+niter);
       //checkA(this,r);
 
@@ -435,15 +433,17 @@ public class CausalFilter {
     }
     Check.state(converged,"Wilson-Burg iterations converged");
   }
+  /*
   private static void checkA(CausalFilter cf, float[][][] r) {
     float[][][] t = new float[21][21][21];
     t[10][10][10] = 1.0f;
     cf.apply(t,t);
     cf.applyTranspose(t,t);
-    float[][][] s = Array.copy(3,3,3,9,9,9,t);
-    Array.dump(r);
-    Array.dump(s);
+    float[][][] s = copy(3,3,3,9,9,9,t);
+    dump(r);
+    dump(s);
   }
+  */
 
   ///////////////////////////////////////////////////////////////////////////
   // Note to programmers:
@@ -1229,11 +1229,11 @@ public class CausalFilter {
     for (int j=1; j<a.length; ++j)
       Check.argument(lag1[j]>0,"lag1["+j+"]>0");
     _m = lag1.length;
-    _lag1 = Array.copy(lag1);
-    _lag2 = Array.zeroint(_m);
-    _lag3 = Array.zeroint(_m);
-    _min1 = Array.min(lag1);
-    _max1 = Array.max(lag1);
+    _lag1 = copy(lag1);
+    _lag2 = zeroint(_m);
+    _lag3 = zeroint(_m);
+    _min1 = min(lag1);
+    _max1 = max(lag1);
   }
 
   private void initLags(int[] lag1, int[] lag2, float[] a) {
@@ -1248,13 +1248,13 @@ public class CausalFilter {
         Check.argument(lag1[j]>0,"if lag2==0, lag1["+j+"]>0");
     }
     _m = lag1.length;
-    _lag1 = Array.copy(lag1);
-    _lag2 = Array.copy(lag2);
-    _lag3 = Array.zeroint(_m);
-    _min1 = Array.min(lag1);
-    _min2 = Array.min(lag2);
-    _max1 = Array.max(lag1);
-    _max2 = Array.max(lag2);
+    _lag1 = copy(lag1);
+    _lag2 = copy(lag2);
+    _lag3 = zeroint(_m);
+    _min1 = min(lag1);
+    _min2 = min(lag2);
+    _max1 = max(lag1);
+    _max2 = max(lag2);
   }
 
   private void initLags(int[] lag1, int[] lag2, int[] lag3, float[] a) {
@@ -1274,19 +1274,19 @@ public class CausalFilter {
       }
     }
     _m = a.length;
-    _lag1 = Array.copy(lag1);
-    _lag2 = Array.copy(lag2);
-    _lag3 = Array.copy(lag3);
-    _min1 = Array.min(lag1);
-    _min2 = Array.min(lag2);
-    _min3 = Array.min(lag3);
-    _max1 = Array.max(lag1);
-    _max2 = Array.max(lag2);
-    _max3 = Array.max(lag3);
+    _lag1 = copy(lag1);
+    _lag2 = copy(lag2);
+    _lag3 = copy(lag3);
+    _min1 = min(lag1);
+    _min2 = min(lag2);
+    _min3 = min(lag3);
+    _max1 = max(lag1);
+    _max2 = max(lag2);
+    _max3 = max(lag3);
   }
 
   private void initA(float[] a) {
-    _a = Array.copy(a);
+    _a = copy(a);
     _a0 = a[0];
     _a0i = 1.0f/a[0];
   }
@@ -1308,6 +1308,7 @@ public class CausalFilter {
    * @exception IllegalStateException if Wilson-Burg iterations do not
    *  converge within the specified maximum number of iterations.
    */
+  /*
   private void factorInverseWilsonBurg(int maxiter, float epsilon, float[] r) {
     Check.argument(r.length%2==1,"r.length is odd");
 
@@ -1328,12 +1329,12 @@ public class CausalFilter {
     float[] u = new float[n1];
 
     // S is -R padded with zeros to reduce truncation of -AA'R.
-    Array.copy(r.length,0,r,k1-l1,s);
+    copy(r.length,0,r,k1-l1,s);
     for (int i1=0; i1<n1; ++i1)
       s[i1] = -s[i1];
 
     // Initial factor is minimum-phase and matches lag zero of 1/R.
-    //Array.zero(_a);
+    //zero(_a);
     //_a[0] = 1.0f/sqrt(rsum);
     _a0 = _a[0];
     _a0i = 1.0f/_a[0];
@@ -1343,12 +1344,12 @@ public class CausalFilter {
     boolean converged = false;
     float eemax = s[k1]*epsilon;
     for (niter=0; niter<maxiter && !converged; ++niter) {
-      Array.dump(_a); // for debugging only
+      dump(_a); // for debugging only
 
       // U(z) + U(1/z) = 3 - A(z)*A(1/z)*S(z)
       this.applyTranspose(s,t);
       this.apply(t,u);
-      Array.dump(u);
+      dump(u);
       u[k1] += 3.0f;
 
       // U(z) is the causal part we want; zero the anti-causal part.
@@ -1375,4 +1376,5 @@ public class CausalFilter {
     }
     Check.state(converged,"Wilson-Burg iterations converged");
   }
+  */
 }

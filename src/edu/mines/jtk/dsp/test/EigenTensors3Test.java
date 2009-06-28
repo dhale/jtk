@@ -9,7 +9,7 @@ package edu.mines.jtk.dsp.test;
 import java.io.*;
 import junit.framework.*;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.dsp.EigenTensors3;
 
 /**
@@ -124,8 +124,8 @@ public class EigenTensors3Test extends TestCase {
     boolean ok = Math.abs(1.0-uv)<ce;
     if (!ok) {
       System.out.println("uv="+uv+" ce="+ce);
-      System.out.println("expect:"); Array.dump(u);
-      System.out.println("actual:"); Array.dump(v);
+      System.out.println("expect:"); ArrayMath.dump(u);
+      System.out.println("actual:"); ArrayMath.dump(v);
     }
     assertEquals(1.0,uv,ce);
   }

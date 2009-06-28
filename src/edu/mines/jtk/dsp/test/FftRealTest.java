@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp.test;
 
-import static edu.mines.jtk.util.Array.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
 import static edu.mines.jtk.util.MathPlus.FLT_PI;
 import junit.framework.*;
@@ -121,7 +121,7 @@ public class FftRealTest extends TestCase {
       int nfft = FftReal.nfftSmall(n);
       FftReal fft = new FftReal(nfft);
       int nw = nfft/2+1;
-      float[] rr = randfloat(nfft);;
+      float[] rr = randfloat(nfft);
       float[] rx = copy(rr);
       float[] cy = czerofloat(nw);
       fft.realToComplex( 1,rx,cy);
@@ -141,7 +141,7 @@ public class FftRealTest extends TestCase {
         int n1fft = FftReal.nfftSmall(n1);
         FftReal fft1 = new FftReal(n1fft);
         int nw = n1fft/2+1;
-        float[][] rr = randfloat(n1fft,n2);;
+        float[][] rr = randfloat(n1fft,n2);
         float[][] rx = copy(rr);
         float[][] cy = czerofloat(nw,n2fft);
         fft1.realToComplex1( 1,n2,rx,cy);
@@ -165,7 +165,7 @@ public class FftRealTest extends TestCase {
       for (int n1=2; n1<n1max; ++n1) {
         int n1fft = FftComplex.nfftSmall(n1);
         FftComplex fft1 = new FftComplex(n1fft);
-        float[][] rr = randfloat(n1,n2fft);;
+        float[][] rr = randfloat(n1,n2fft);
         float[][] rx = copy(rr);
         float[][] cy = czerofloat(n1fft,nw);
         fft2.realToComplex2( 1,n1,rx,cy);

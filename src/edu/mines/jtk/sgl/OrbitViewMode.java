@@ -184,13 +184,13 @@ public class OrbitViewMode extends Mode {
     }
     public void mouseReleased(MouseEvent e) {
       if (_scaling) {
-        endScale(e);
+        endScale();
         _scaling = false;
       } else if (_translating) {
-        endTranslate(e);
+        endTranslate();
         _translating = false;
       } else if (_rotating) {
-        endRotate(e);
+        endRotate();
         _rotating = false;
       }
     }
@@ -224,7 +224,7 @@ public class OrbitViewMode extends Mode {
     _view.setScale(_scale*Math.pow(10.0,ds));
   }
 
-  private void endScale(MouseEvent e) {
+  private void endScale() {
     _canvas.removeMouseMotionListener(_mml);
   }
 
@@ -271,7 +271,7 @@ public class OrbitViewMode extends Mode {
     _view.setTranslate(t);
   }
 
-  private void endTranslate(MouseEvent e) {
+  private void endTranslate() {
     _canvas.removeMouseMotionListener(_mml);
   }
 
@@ -297,7 +297,7 @@ public class OrbitViewMode extends Mode {
     _view.setAzimuthAndElevation(_azimuth+da,_elevation+de);
   }
 
-  private void endRotate(MouseEvent e) {
+  private void endRotate() {
     _canvas.removeMouseMotionListener(_mml);
   }
 }

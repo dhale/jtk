@@ -11,7 +11,7 @@ import static java.lang.Math.*;
 import java.util.ArrayList;
 
 //import edu.mines.jtk.lapack.DMatrix;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -88,7 +88,7 @@ public class LocalPredictionFilter {
     System.out.println("Average number of CG iterations = "+niter);
 
     // Apply prediction filters.
-    Array.zero(g);
+    ArrayMath.zero(g);
     for (int j=0; j<m; ++j) {
       int j1 = lag1[j];
       int j2 = lag2[j];
@@ -107,9 +107,9 @@ public class LocalPredictionFilter {
     return a;
     //return rcache.get();
     
-    //Array.copy(Array.div(rcache.get(1,1),rcache.get(0,0)),g);
-    //Array.copy(a[0],g);
-    //Array.copy(a[m-1],f);
+    //ArrayMath.copy(ArrayMath.div(rcache.get(1,1),rcache.get(0,0)),g);
+    //ArrayMath.copy(a[0],g);
+    //ArrayMath.copy(a[m-1],f);
   }
 
   public void applyPef(int[] lag1, int[] lag2, float[][] f, float[][] g) {
@@ -161,7 +161,7 @@ public class LocalPredictionFilter {
     System.out.println("Average number of CG iterations = "+niter);
 
     // Apply prediction error filters.
-    Array.copy(f,g);
+    ArrayMath.copy(f,g);
     for (int j=0; j<m; ++j) {
       int j1 = lag1[j];
       int j2 = lag2[j];

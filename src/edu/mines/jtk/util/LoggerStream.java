@@ -87,13 +87,13 @@ public class LoggerStream extends PrintStream {
   public static void main(String[] args) {
     Logger logger = Logger.getLogger("edu.mines.jtk.util");
     PrintStream psInfo = new LoggerStream(logger, Level.INFO);
-    PrintStream psWarning = new LoggerStream(logger, Level.WARNING);
+    //PrintStream psWarning = new LoggerStream(logger, Level.WARNING);
     psInfo.print(3.);
     psInfo.println("*3.=9.");
-    if (false) {
-      psWarning.print(3.);
-      psWarning.println("*3.=9.");
-    }
+    //if (false) {
+    //  psWarning.print(3.);
+    //  psWarning.println("*3.=9.");
+    //}
     psInfo.print(3.);
     psInfo.flush();
     psInfo.println("*3.=9.");

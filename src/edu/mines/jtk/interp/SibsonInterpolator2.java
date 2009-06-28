@@ -322,7 +322,7 @@ public class SibsonInterpolator2 {
     if (usingGradients()) {
       return interpolate1(asum,x1,x2);
     } else {
-      return interpolate0(asum,x1,x2);
+      return interpolate0(asum);
     }
   }
 
@@ -482,7 +482,7 @@ public class SibsonInterpolator2 {
       if (x2[i]>_x2max) _x2max = x2[i];
     }
 
-    // Array of nodes, one for each specified sample.
+    // ArrayMath of nodes, one for each specified sample.
     _nodes = new TriMesh.Node[n];
 
     // Construct the mesh with nodes at sample points.
@@ -679,7 +679,7 @@ public class SibsonInterpolator2 {
   }
 
   // C0 interpolation; does not use gradients.
-  private float interpolate0(double asum, double x, double y) {
+  private float interpolate0(double asum) {
     double afsum = 0.0;
     int nnode = _nodeList.nnode();
     TriMesh.Node[] nodes = _nodeList.nodes();
@@ -942,7 +942,7 @@ public class SibsonInterpolator2 {
     {
       clear();
       processTris(xp,yp,mesh,triList);
-      boolean ok = processEdges(xp,yp);
+      boolean ok = processEdges();
       return (ok)?sum():0.0;
     }
 
@@ -1020,7 +1020,7 @@ public class SibsonInterpolator2 {
     // Determines whether all edges in the edge set have a non-null
     // neighbor edge. This should always be true, except for points 
     // (x,y) that lie on (over very near?) the convex hull of the mesh.
-    private boolean edgeNaborsOk(double xp, double yp) {
+    private boolean edgeNaborsOk() {
       int nedge = _edgeList.nedge();
       ArrayList<Edge> edges = _edgeList.edges();
       for (int iedge=0; iedge<nedge; ++iedge) {
@@ -1032,18 +1032,18 @@ public class SibsonInterpolator2 {
     }
 
     // Processes all edges in the edge list.
-    private boolean processEdges(double xp, double yp) {
-      if (!edgeNaborsOk(xp,yp))
+    private boolean processEdges() {
+      if (!edgeNaborsOk())
         return false;
       int nedge = _edgeList.nedge();
       ArrayList<Edge> edges = _edgeList.edges();
       for (int iedge=0; iedge<nedge; ++iedge)
-        processEdge(xp,yp,edges.get(iedge));
+        processEdge(edges.get(iedge));
       return true;
     }
 
     // Processes one edge.
-    private void processEdge(double xp, double yp, Edge edge) {
+    private void processEdge(Edge edge) {
 
       // Two edge nodes.
       TriMesh.Node na = edge.na, nb = edge.nb;

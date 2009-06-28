@@ -183,6 +183,7 @@ public abstract class Mode extends AbstractAction {
    * with specified name is found relative to the specified class.
    * @param cls the class used to find the resource.
    * @param res the name of the resource that contains the icon.
+   * @return the icon.
    */
   protected static Icon loadIcon(Class<?> cls, String res) {
     java.net.URL url = cls.getResource(res);
@@ -196,6 +197,7 @@ public abstract class Mode extends AbstractAction {
    * @param res the name of the resource that contains the cursor image.
    * @param x the x coordinate of the cursor hot spot
    * @param y the y coordinate of the cursor hot spot
+   * @return the cursor.
    */
   protected static Cursor loadCursor(Class<?> cls, String res, int x, int y) {
     java.net.URL url = cls.getResource(res);
@@ -230,11 +232,10 @@ public abstract class Mode extends AbstractAction {
   /**
    * Called by the mode manager. When changing the active state of this
    * mode, the manager may also change the active state of other modes.
+   * @param active true, for active; false, otherwise.
    */
   void setActiveInternal(boolean active) {
-    Boolean oldValue = Boolean.valueOf(_active);
-    Boolean newValue = Boolean.valueOf(active);
-    firePropertyChange("active",oldValue,newValue);
+    firePropertyChange("active",_active,active);
     _active = active;
   }
 
@@ -249,7 +250,7 @@ public abstract class Mode extends AbstractAction {
     image = new ImageIcon(image).getImage(); // ensure all pixels loaded
     int w = image.getWidth(null); // so we can get width
     int h = image.getHeight(null); // and height
-    Dimension size = new Dimension(w,h);
+    Dimension size;
     try {
       size = Toolkit.getDefaultToolkit().getBestCursorSize(w,h);
     } catch (HeadlessException e) { // no screen?
@@ -260,7 +261,7 @@ public abstract class Mode extends AbstractAction {
     w = size.width;
     h = size.height;
     boolean hasAlpha = hasAlpha(image);
-    BufferedImage bimage = null;
+    BufferedImage bimage;
     GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
     try {
       int transparency = hasAlpha?Transparency.BITMASK:Transparency.OPAQUE;

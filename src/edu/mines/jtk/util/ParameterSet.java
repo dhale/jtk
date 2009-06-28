@@ -44,7 +44,7 @@ public class ParameterSet implements Cloneable, Externalizable {
    * The clone will be an orphan; its parent parameter set will be null.
    * @return a clone of this parameter set.
    */
-  public Object clone() {
+  public Object clone() throws CloneNotSupportedException {
     try {
       ParameterSet ps = (ParameterSet)super.clone();
       ps._parent = null;
@@ -529,7 +529,7 @@ public class ParameterSet implements Cloneable, Externalizable {
    * @return the destination parameter set.
    */
   public ParameterSet copyTo(ParameterSet parent, String name) {
-    if (parent==_parent && name==_name) return this;
+    if (_parent==parent && _name==name) return this;
 
     // Create a new destination ParameterSet to hold the copy.
     // Do not make it a child of the parent, yet, because
@@ -577,7 +577,7 @@ public class ParameterSet implements Cloneable, Externalizable {
    * @return the destination parameter set.
    */
   public ParameterSet moveTo(ParameterSet parent, String name) {
-    if (parent==_parent && name==_name) return this;
+    if (_parent==parent && _name==name) return this;
 
     // Parent cannot be this parset or a child of this parset.
     for (ParameterSet ps=parent; ps!=null; ps=ps.getParent()) {

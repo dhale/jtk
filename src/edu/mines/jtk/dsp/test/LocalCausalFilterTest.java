@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.LocalCausalFilter;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.LocalCausalFilter}.
@@ -67,7 +67,7 @@ public class LocalCausalFilterTest extends TestCase {
 
     { // x == BAx (for B = inv(A))
       float[] x = randfloat(n);
-      float[] y = Array.copy(x);
+      float[] y = ArrayMath.copy(x);
       lcf.apply(a1,y,y); // in-place
       lcf.applyInverse(a1,y,y); // in-place
       assertEqual(x,y);
@@ -95,15 +95,15 @@ public class LocalCausalFilterTest extends TestCase {
        1.79548454f, -0.64490664f, -0.03850411f, -0.01793403f, -0.00708972f,
       -0.02290331f, -0.04141619f, -0.08457147f, -0.20031442f, -0.55659920f
     };
-    final float[] ar = Array.mul(1.0f,aa);
-    final float[] as = Array.mul(2.0f,aa);
+    final float[] ar = ArrayMath.mul(1.0f,aa);
+    final float[] as = ArrayMath.mul(2.0f,aa);
     LocalCausalFilter lcf = new LocalCausalFilter(lag1,lag2);
     LocalCausalFilter.A2 a2 = new LocalCausalFilter.A2() {
       public void get(int i1, int i2, float[] a) {
         if ((i1+i2)%2==0) {
-          Array.copy(ar,a);
+          ArrayMath.copy(ar,a);
         } else {
-          Array.copy(as,a);
+          ArrayMath.copy(as,a);
         }
       }
     };
@@ -137,7 +137,7 @@ public class LocalCausalFilterTest extends TestCase {
 
     { // x == BAx (for B = inv(A))
       float[][] x = randfloat(n1,n2);
-      float[][] y = Array.copy(x);
+      float[][] y = ArrayMath.copy(x);
       lcf.apply(a2,y,y); // in-place
       lcf.applyInverse(a2,y,y); // in-place
       assertEqual(x,y);
@@ -177,15 +177,15 @@ public class LocalCausalFilterTest extends TestCase {
       -0.0149963f, -0.0408317f, -0.0945958f, -0.0223166f, -0.0062781f, 
       -0.0213786f, -0.0898909f, -0.4322719f
     };
-    final float[] ar = Array.mul(1.0f,aa);
-    final float[] as = Array.mul(2.0f,aa);
+    final float[] ar = ArrayMath.mul(1.0f,aa);
+    final float[] as = ArrayMath.mul(2.0f,aa);
     LocalCausalFilter lcf = new LocalCausalFilter(lag1,lag2,lag3);
     LocalCausalFilter.A3 a3 = new LocalCausalFilter.A3() {
       public void get(int i1, int i2, int i3, float[] a) {
         if ((i1+i2+i3)%2==0) {
-          Array.copy(ar,a);
+          ArrayMath.copy(ar,a);
         } else {
-          Array.copy(as,a);
+          ArrayMath.copy(as,a);
         }
       }
     };
@@ -220,7 +220,7 @@ public class LocalCausalFilterTest extends TestCase {
 
     { // x == BAx (for B = inv(A))
       float[][][] x = randfloat(n1,n2,n3);
-      float[][][] y = Array.copy(x);
+      float[][][] y = ArrayMath.copy(x);
       lcf.apply(a3,y,y); // in-place
       lcf.applyInverse(a3,y,y); // in-place
       assertEqual(x,y);
@@ -239,33 +239,33 @@ public class LocalCausalFilterTest extends TestCase {
   // private
 
   private static float[] randfloat(int n1) {
-    return Array.sub(Array.randfloat(n1),0.5f);
+    return ArrayMath.sub(ArrayMath.randfloat(n1),0.5f);
   }
   private static float[][] randfloat(int n1, int n2) {
-    return Array.sub(Array.randfloat(n1,n2),0.5f);
+    return ArrayMath.sub(ArrayMath.randfloat(n1,n2),0.5f);
   }
   private static float[][][] randfloat(int n1, int n2, int n3) {
-    return Array.sub(Array.randfloat(n1,n2,n3),0.5f);
+    return ArrayMath.sub(ArrayMath.randfloat(n1,n2,n3),0.5f);
   }
 
   private static float[] zerofloat(int n1) {
-    return Array.zerofloat(n1);
+    return ArrayMath.zerofloat(n1);
   }
   private static float[][] zerofloat(int n1, int n2) {
-    return Array.zerofloat(n1,n2);
+    return ArrayMath.zerofloat(n1,n2);
   }
   private static float[][][] zerofloat(int n1, int n2, int n3) {
-    return Array.zerofloat(n1,n2,n3);
+    return ArrayMath.zerofloat(n1,n2,n3);
   }
 
   private static float dot(float[] x, float[] y) {
-    return Array.sum(Array.mul(x,y));
+    return ArrayMath.sum(ArrayMath.mul(x,y));
   }
   private static float dot(float[][] x, float[][] y) {
-    return Array.sum(Array.mul(x,y));
+    return ArrayMath.sum(ArrayMath.mul(x,y));
   }
   private static float dot(float[][][] x, float[][][] y) {
-    return Array.sum(Array.mul(x,y));
+    return ArrayMath.sum(ArrayMath.mul(x,y));
   }
 
   private static void assertEqual(float[] re, float[] ra) {

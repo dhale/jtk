@@ -172,8 +172,8 @@ public class LasserreVolume {
     void dump() { // for debugging
       System.out.println("m="+_m+" n="+_n);
       for (double[] ab:this) {
-        for (int i=0; i<ab.length; ++i)
-          System.out.print(ab[i]+" ");
+        for (double abi:ab)
+          System.out.print(abi+" ");
         System.out.println();
       }
     }

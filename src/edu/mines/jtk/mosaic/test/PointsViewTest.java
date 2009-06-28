@@ -9,7 +9,7 @@ package edu.mines.jtk.mosaic.test;
 import javax.swing.SwingUtilities;
 
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Tests {@link edu.mines.jtk.mosaic.PointsView}
@@ -28,9 +28,9 @@ public class PointsViewTest {
 
   private static void test1() {
     int n = 50;
-    float[] x1 = Array.randfloat(n);
-    float[] x2 = Array.randfloat(n);
-    float[] x3 = Array.randfloat(n);
+    float[] x1 = ArrayMath.randfloat(n);
+    float[] x2 = ArrayMath.randfloat(n);
+    float[] x3 = ArrayMath.randfloat(n);
 
     PlotPanel panel = new PlotPanel(1,1);
     panel.setLimits(-0.1,-0.1,1.1,1.1);

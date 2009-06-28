@@ -24,7 +24,7 @@ public class UnitsTest extends TestCase {
   }
 
   public void testDefine() {
-    boolean defined = false;
+    boolean defined;
     try {
       defined = Units.define("degrees F",false,"degF");
       assertTrue(defined);
@@ -36,7 +36,6 @@ public class UnitsTest extends TestCase {
       assertTrue(defined);
       defined = Units.define("m",false,"meters");
       assertTrue(!defined);
-      defined = true;
     } catch (UnitsFormatException e) {
       assertTrue(false);
     }
@@ -77,27 +76,26 @@ public class UnitsTest extends TestCase {
       {"kilogram*meter/second^2","kilogram*meter/second/second","0","1.0"},
     };
 
-    for (int i=0; i<conversions.length; ++i) {
-      String from = conversions[i][0];
-      String to = conversions[i][1];
-      Units fromUnits = null;
-      Units toUnits = null;
+    for (String[] conversion:conversions) {
+      String from = conversion[0];
+      String to = conversion[1];
+      Units fromUnits,toUnits;
       try {
         fromUnits = new Units(from);
         toUnits = new Units(to);
       } catch (UnitsFormatException e) {
-        assertTrue(conversions[i][2].equals("invalid"));
+        assertTrue(conversion[2].equals("invalid"));
         continue;
       }
       if (fromUnits.haveDimensionsOf(toUnits)) {
         float shift = toUnits.floatShiftFrom(fromUnits);
         float scale = toUnits.floatScaleFrom(fromUnits);
-        float shiftExpected = Float.parseFloat(conversions[i][2]);
-        float scaleExpected = Float.parseFloat(conversions[i][3]);
+        float shiftExpected = Float.parseFloat(conversion[2]);
+        float scaleExpected = Float.parseFloat(conversion[3]);
         assertTrue(shift==shiftExpected);
         assertTrue(scale==scaleExpected);
       } else {
-        assertTrue(conversions[i][2].equals("incompatible"));
+        assertTrue(conversion[2].equals("incompatible"));
       }
     }
   }
@@ -118,13 +116,12 @@ public class UnitsTest extends TestCase {
       {"degrees F","0.5555555555555556 kelvin - 459.67"},
     };
 
-    for (int i=0; i<specifications.length; ++i) {
-      String sd = null;
+    for (String[] specification:specifications) {
       try {
-        sd = new Units(specifications[i][0]).standardDefinition();
-        assertTrue(sd.equals(specifications[i][1]));
+        String sd = new Units(specification[0]).standardDefinition();
+        assertTrue(sd.equals(specification[1]));
       } catch (UnitsFormatException e) {
-        assertTrue(specifications[i][1].equals("invalid"));
+        assertTrue(specification[1].equals("invalid"));
       }
     }
   }

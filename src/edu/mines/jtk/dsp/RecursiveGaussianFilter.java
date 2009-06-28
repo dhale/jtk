@@ -453,8 +453,8 @@ public class RecursiveGaussianFilter {
   private static void checkArrays(float[][] x, float[][] y) {
     Check.argument(x.length==y.length,"x.length==y.length");
     Check.argument(x[0].length==y[0].length,"x[0].length==y[0].length");
-    Check.argument(Array.isRegular(x),"x is regular");
-    Check.argument(Array.isRegular(y),"y is regular");
+    Check.argument(ArrayMath.isRegular(x),"x is regular");
+    Check.argument(ArrayMath.isRegular(y),"y is regular");
   }
 
   private static void checkArrays(float[][][] x, float[][][] y) {
@@ -462,8 +462,8 @@ public class RecursiveGaussianFilter {
     Check.argument(x[0].length==y[0].length,"x[0].length==y[0].length");
     Check.argument(x[0][0].length==y[0][0].length,
       "x[0][0].length==y[0][0].length");
-    Check.argument(Array.isRegular(x),"x is regular");
-    Check.argument(Array.isRegular(y),"y is regular");
+    Check.argument(ArrayMath.isRegular(x),"x is regular");
+    Check.argument(ArrayMath.isRegular(y),"y is regular");
   }
 
   private static boolean sameArrays(float[] x, float[] y) {
@@ -571,11 +571,11 @@ public class RecursiveGaussianFilter {
   }
 
   private static void startAndJoin(Thread[] threads) {
-    for (int ithread=0; ithread<threads.length; ++ithread)
-      threads[ithread].start();
+    for (Thread thread:threads)
+      thread.start();
     try {
-      for (int ithread=0; ithread<threads.length; ++ithread)
-        threads[ithread].join();
+      for (Thread thread:threads)
+        thread.join();
     } catch (InterruptedException ie) {
       throw new RuntimeException(ie);
     }
@@ -591,7 +591,7 @@ public class RecursiveGaussianFilter {
     void applyN(int nd, float[] x, float[] y) {
       checkArrays(x,y);
       if (sameArrays(x,y))
-        x = Array.copy(x);
+        x = ArrayMath.copy(x);
       int m = y.length;
       float n0 = _n0[nd],  n1 = _n1[nd],  n2 = _n2[nd],  n3 = _n3[nd];
       float d1 = _d1[nd],  d2 = _d2[nd],  d3 = _d3[nd],  d4 = _d4[nd];
@@ -627,7 +627,7 @@ public class RecursiveGaussianFilter {
     void applyXN(int nd, float[][] x, float[][] y) {
       checkArrays(x,y);
       if (sameArrays(x,y))
-        x = Array.copy(x);
+        x = ArrayMath.copy(x);
       int m2 = y.length;
       int m1 = y[0].length;
       float n0 = _n0[nd],  n1 = _n1[nd],  n2 = _n2[nd],  n3 = _n3[nd];
@@ -869,7 +869,7 @@ public class RecursiveGaussianFilter {
     void applyN(int nd, float[] x, float[] y) {
       checkArrays(x,y);
       if (sameArrays(x,y))
-        x = Array.copy(x);
+        x = ArrayMath.copy(x);
       _g[nd][0][0].applyForward(x,y);
       _g[nd][0][1].accumulateReverse(x,y);
       _g[nd][1][0].accumulateForward(x,y);
@@ -879,7 +879,7 @@ public class RecursiveGaussianFilter {
     void applyXN(int nd, float[][] x, float[][] y) {
       checkArrays(x,y);
       if (sameArrays(x,y))
-        x = Array.copy(x);
+        x = ArrayMath.copy(x);
       _g[nd][0][0].apply2Forward(x,y);
       _g[nd][0][1].accumulate2Reverse(x,y);
       _g[nd][1][0].accumulate2Forward(x,y);

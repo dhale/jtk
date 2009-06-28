@@ -155,7 +155,7 @@ public class RandomFloat {
     _c = CS;
   }
 
-  private final float fib() {
+  private float fib() {
     float r = _u[_i]-_u[_j];
     if (r<0.0f) r += 1.0f;
     _u[_i] = r;

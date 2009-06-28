@@ -175,7 +175,7 @@ public class ArgsParser {
    */
   public static double toDouble(String s) throws OptionException {
     try {
-      return Double.valueOf(s).doubleValue();
+      return Double.valueOf(s);
     } catch (NumberFormatException e) {
       throw new OptionException("the value "+s+" is not a valid double");
     }
@@ -189,7 +189,7 @@ public class ArgsParser {
    */
   public static float toFloat(String s) throws OptionException {
     try {
-      return Float.valueOf(s).floatValue();
+      return Float.valueOf(s);
     } catch (NumberFormatException e) {
       throw new OptionException("the value "+s+" is not a valid float");
     }
@@ -274,7 +274,7 @@ public class ArgsParser {
         val = argString;
         argString = "";
       }
-      _optList.add(new String("-"+opt));
+      _optList.add("-"+opt);
       _valList.add(val);
     }
   }
@@ -307,7 +307,7 @@ public class ArgsParser {
     } else if (val!=null) {
       throw new OptionException("option --"+opt+" must not have a value");
     }
-    _optList.add(new String("--"+opt));
+    _optList.add("--"+opt);
     _valList.add(val);
   }
 

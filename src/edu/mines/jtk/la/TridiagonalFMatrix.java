@@ -121,7 +121,7 @@ public class TridiagonalFMatrix {
   public void times(float[] x, float[] y) {
     int n = x.length;
     int nm1 = n-1;
-    float xim1 = 0.0f;
+    float xim1;
     float xip1 = 0.0f;
     float xi = x[0];
     y[0] = _b[0]*xi;

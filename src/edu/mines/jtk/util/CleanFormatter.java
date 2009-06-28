@@ -102,7 +102,8 @@ public class CleanFormatter extends Formatter {
     boolean hasFinalNL = lines.endsWith(NL);
     StringTokenizer divided = new StringTokenizer(lines, NL);
     while (divided.hasMoreTokens()) {
-      result.append(prepend + divided.nextToken());
+      result.append(prepend);
+      result.append(divided.nextToken());
       if (divided.hasMoreTokens() || hasFinalNL) result.append(NL);
     }
     return result.toString();

@@ -65,12 +65,12 @@ public class MouseTrackMode extends Mode {
   private int _xmouse; // x coordinate where mouse last tracked
   private int _ymouse; // y coordinate where mouse last tracked
 
-  private MouseListener _ml = new MouseAdapter() {;
+  private MouseListener _ml = new MouseAdapter() {
     public void mouseEntered(MouseEvent e) {
       beginTracking(e);
     }
     public void mouseExited(MouseEvent e) {
-      endTracking(e);
+      endTracking();
     }
   };
 
@@ -114,7 +114,7 @@ public class MouseTrackMode extends Mode {
       ta.duringTracking(x,y);
   }
 
-  private void endTracking(MouseEvent e) {
+  private void endTracking() {
     _tile.removeMouseMotionListener(_mml);
     endTracking(_tile.getTileAxisTop());
     endTracking(_tile.getTileAxisLeft());

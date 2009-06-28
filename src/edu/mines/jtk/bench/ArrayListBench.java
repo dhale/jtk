@@ -25,16 +25,14 @@ public class ArrayListBench {
     public void add(float f) {
       if (n==a.length) {
         float[] t = new float[2*a.length];
-        for (int i=0; i<n; ++i)
-          t[i] = a[i];
+        System.arraycopy(a,0,t,0,n);
         a = t;
       }
       a[n++] = f;
     }
     public float[] trim() {
       float[] t = new float[n];
-      for (int i=0; i<n; ++i)
-        t[i] = a[i];
+      System.arraycopy(a,0,t,0,n);
       return t;
     }
   }
@@ -43,14 +41,13 @@ public class ArrayListBench {
     double maxtime = 2;
     int n = 10000;
     double rate;
-    for (;;) {
+    for (int niter=0; niter<5; ++niter) {
       rate = benchArrayList(maxtime,n);
       System.out.println("ArrayList<Float> rate="+rate);
       rate = benchFloatList(maxtime,n);
       System.out.println("FloatList        rate="+rate);
     }
   }
-
 
   interface ListMaker {
     public void makeList(int n);
@@ -63,8 +60,7 @@ public class ArrayListBench {
     for (niter=0; sw.time()<maxtime; ++niter)
       lm.makeList(n);
     sw.stop();
-    double rate = (double)n*(double)niter/sw.time()*1.0e-6;
-    return rate;
+    return (double)n*(double)niter/sw.time()*1.0e-6;
   }
 
   static double benchArrayList(double maxtime, int n) {

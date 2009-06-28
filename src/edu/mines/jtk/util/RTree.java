@@ -8,6 +8,8 @@ package edu.mines.jtk.util;
 
 import java.util.*;
 
+import static edu.mines.jtk.util.ArrayMath.*;
+
 /** 
  * A tree of bounded objects with methods for fast updates and queries.
  * An R-tree's entries are bounded objects with min/max coordinates in N
@@ -362,7 +364,7 @@ public class RTree extends AbstractSet<Object> {
    */
   public boolean contains(Object object) {
     Node leaf = _root.findLeafWith(object);
-    return (leaf!=null)?true:false;
+    return leaf!=null;
   }
 
   /**
@@ -659,8 +661,9 @@ public class RTree extends AbstractSet<Object> {
 
     /**
      * Searches this node recursively for boxes that overlap the specified 
-     * box. Appends any overlapping non-node boxes to the specified list.
-     * @param box the box for which to search for overlapping boxes.
+     * bounds. Appends any overlapping non-node boxes to the specified list.
+     * @param min array of min coordinates.
+     * @param max array of max coordinates.
      * @param list the list to which overlapping boxes are appended.
      */
     void findOverlapping(float[] min, float[] max, ArrayList<Object> list) {
@@ -1450,7 +1453,7 @@ public class RTree extends AbstractSet<Object> {
 
     // If nothing to add, simply return.
     if (p>=q) {
-      return;
+      //return;
     }
 
     // Otherwise, if packed for all dimensions, add the objects.
@@ -1479,7 +1482,7 @@ public class RTree extends AbstractSet<Object> {
           xsort[jsort] = xidim[index[p+jsort]];
         }
       }
-      Array.quickIndexSort(xsort,isort);
+      quickIndexSort(xsort,isort);
       if (nsort<n) {
         for (int jsort=0; jsort<nsort; ++jsort)
           isort[jsort] = index[p+isort[jsort]];

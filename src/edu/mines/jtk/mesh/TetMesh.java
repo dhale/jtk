@@ -333,7 +333,6 @@ public class TetMesh implements Serializable {
         nmin = _n2;
       }
       if (d3<dmin) {
-        dmin = d3;
         nmin = _n3;
       }
       return nmin;
@@ -733,38 +732,38 @@ public class TetMesh implements Serializable {
       _quality = -1.0;
     }
 
-    private final void setInner() {
+    private void setInner() {
       _bits |= INNER_BIT;
     }
 
-    private final void clearInner() {
+    private void clearInner() {
       _bits &= ~INNER_BIT;
     }
 
-    private final boolean isInner() {
+    private boolean isInner() {
       return (_bits&INNER_BIT)!=0;
     }
 
-    private final void setOuter() {
+    private void setOuter() {
       _bits |= OUTER_BIT;
     }
 
-    private final void clearOuter() {
+    private void clearOuter() {
       _bits &= ~OUTER_BIT;
     }
 
-    private final boolean isOuter() {
+    private boolean isOuter() {
       return (_bits&OUTER_BIT)!=0;
     }
 
-    private final void setCenter(double xc, double yc, double zc) {
+    private void setCenter(double xc, double yc, double zc) {
       _xc = xc;
       _yc = yc;
       _zc = zc;
       _bits |= CENTER_BIT;
     }
 
-    private final boolean hasCenter() {
+    private boolean hasCenter() {
       return (_bits&CENTER_BIT)!=0;
     }
 
@@ -1375,7 +1374,7 @@ public class TetMesh implements Serializable {
     }
 
     /*
-    private final boolean isVisibleFromNode(Node node) {
+    private boolean isVisibleFromNode(Node node) {
       return isVisibleFromPoint(node._x,node._y,node._z);
     }
     */
@@ -2479,7 +2478,7 @@ public class TetMesh implements Serializable {
           mark(_tnext);
         }
       }
-      private final void addTet(Tet tet) {
+      private void addTet(Tet tet) {
         if (tet!=null && !isMarked(tet)) {
           mark(tet);
           if (tet.intersectsPlane(a,b,c,d))
@@ -2638,10 +2637,10 @@ public class TetMesh implements Serializable {
    */
   public Tet findTetInPlane(double a, double b, double c, double d) {
     Node node = findNodeNearestPlane(a,b,c,d);
-    Tet[] tet = getTetNabors(node);
-    for (int i=0; i<tet.length; ++i) {
-      if (tet[i].intersectsPlane(a,b,c,d))
-        return tet[i];
+    Tet[] tets = getTetNabors(node);
+    for (Tet tet:tets) {
+      if (tet.intersectsPlane(a,b,c,d))
+        return tet;
     }
     return null;
   }
@@ -3164,9 +3163,7 @@ public class TetMesh implements Serializable {
     if (tetLeft!=null && isInner(tetLeft))
       return true;
     Tet tetRight = face.tetRight();
-    if (tetRight!=null && isInner(tetRight))
-      return true;
-    return false;
+    return tetRight!=null && isInner(tetRight);
   }
 
   /**
@@ -3627,7 +3624,7 @@ public class TetMesh implements Serializable {
         clearTetMarks();
         stackTet(_troot);
       }
-      private final void stackTet(Tet tet) {
+      private void stackTet(Tet tet) {
         if (tet!=null && !isMarked(tet)) {
           mark(tet);
           _stack.add(tet);
@@ -3642,7 +3639,7 @@ public class TetMesh implements Serializable {
    * Assuming that the new tet will be linked into the mesh, the root
    * tet is set to the new tet.
    */
-  private final Tet makeTet(Node n0, Node n1, Node n2, Node n3) {
+  private Tet makeTet(Node n0, Node n1, Node n2, Node n3) {
     ++_ntet;
     int ndead = _deadTets.ntet();
     if (ndead==0) {
@@ -3663,7 +3660,7 @@ public class TetMesh implements Serializable {
    * root tet. The caller is responsible for setting the root tet, as
    * necessary.
    */
-  private final void killTet(Tet tet) {
+  private void killTet(Tet tet) {
     --_ntet;
     fireTetRemoved(tet);
     int ndead = _deadTets.ntet();
@@ -3697,7 +3694,7 @@ public class TetMesh implements Serializable {
    * Returns the distance squared between two specified nodes.
    */
   /*
-  private static final double distanceSquared(Node a, Node b) {
+  private static double distanceSquared(Node a, Node b) {
     double dx = a._x-b._x;
     double dy = a._y-b._y;
     double dz = a._z-b._z;
@@ -3709,7 +3706,7 @@ public class TetMesh implements Serializable {
    * Returns the distance squared between the specified node and a point
    * with specified coordinates.
    */
-  private static final double distanceSquared(
+  private static double distanceSquared(
     Node node, double x, double y, double z)
   {
     double dx = x-node._x;
@@ -3722,7 +3719,7 @@ public class TetMesh implements Serializable {
    * Returns the distance squared from the specified node to the 
    * specified plane.
    */
-  private static final double distanceToPlaneSquared(
+  private static double distanceToPlaneSquared(
     Node node, double a, double b, double c, double d)
   {
     double dp = a*node._x+b*node._y+c*node._z+d;
@@ -3733,7 +3730,7 @@ public class TetMesh implements Serializable {
    * Returns true iff node n is left of oriented plane abc.
    * Perturbation of coordinates ensures that the node is not in the plane.
    */
-  private static final boolean leftOfPlane(Node a, Node b, Node c, Node n) {
+  private static boolean leftOfPlane(Node a, Node b, Node c, Node n) {
     return Geometry.leftOfPlane(
       a._x,a._y,a._z,
       b._x,b._y,b._z,
@@ -3744,7 +3741,7 @@ public class TetMesh implements Serializable {
   /**
    * Returns true iff point (x,y,z) is left of oriented plane abc.
    */
-  private static final boolean leftOfPlane(
+  private static boolean leftOfPlane(
     Node a, Node b, Node c,
     double x, double y, double z)
   {
@@ -3759,7 +3756,7 @@ public class TetMesh implements Serializable {
    * Returns true iff node n is in circumsphere of tet abcd.
    * Perturbation of coordinates ensures that the node is not on the sphere.
    */
-  private static final boolean inSphere(
+  private static boolean inSphere(
     Node a, Node b, Node c, Node d, Node n)
   {
     return Geometry.inSphere(
@@ -3774,7 +3771,7 @@ public class TetMesh implements Serializable {
    * Returns true iff point (x,y,z) is in circumsphere of tet abcd.
    * (Currently unused.)
    */
-  private static final boolean inSphere(
+  private static boolean inSphere(
     Node a, Node b, Node c, Node d, 
     double x, double y, double z)
   {
@@ -4480,9 +4477,7 @@ public class TetMesh implements Serializable {
     // First, find the nearest node among the sampled nodes.
     _nmin = _nroot;
     _dmin = distanceSquared(_nmin,x,y,z);
-    Iterator<Node> ni = _sampledNodes.iterator();
-    while (ni.hasNext()) {
-      Node n = ni.next();
+    for (Node n:_sampledNodes) {
       double d = distanceSquared(n,x,y,z);
       if (d<_dmin) {
         _dmin = d;
@@ -4579,9 +4574,7 @@ public class TetMesh implements Serializable {
     // First, find the nearest node among the sampled nodes.
     _nmin = _nroot;
     _dmin = distanceToPlaneSquared(_nmin,a,b,c,d);
-    Iterator<Node> ni = _sampledNodes.iterator();
-    while (ni.hasNext()) {
-      Node n = ni.next();
+    for (Node n:_sampledNodes) {
       double dp = distanceToPlaneSquared(n,a,b,c,d);
       if (dp<_dmin) {
         _dmin = dp;
@@ -4692,9 +4685,7 @@ public class TetMesh implements Serializable {
     // Otherwise, find a good tet in which to begin the recursive search.
     Node nmin = _nroot;
     double dmin = distanceSquared(nmin,x,y,z);
-    Iterator<Node> ni = _sampledNodes.iterator();
-    while (ni.hasNext()) {
-      Node n = ni.next();
+    for (Node n:_sampledNodes) {
       double d = distanceSquared(n,x,y,z);
       if (d<dmin) {
         dmin = d;
@@ -5874,7 +5865,7 @@ public class TetMesh implements Serializable {
       Check.state(td.tetNabor(tet.nodeNabor(td))==tet,"d nabor ok");
   }
 
-  private static final void trace(String s) {
+  private static void trace(String s) {
     if (TRACE) System.out.println(s);
   }
   static final boolean DEBUG = false;
@@ -5902,7 +5893,7 @@ public class TetMesh implements Serializable {
    * them as they are matched by their mates. This scheme also makes this set
    * unsuitable for general use.
    */
-  private static final class FaceSet {
+  private static class FaceSet {
 
     /**
      * The current face, typically, the face added, or the mate removed.
@@ -6192,7 +6183,7 @@ public class TetMesh implements Serializable {
    * set improves the efficiency of the method addNode; edges can be
    * added/removed faster than faces.
    */
-  private static final class EdgeSet {
+  private static class EdgeSet {
 
     /**
      * The current edge, typically, the edge added, or the mate removed.

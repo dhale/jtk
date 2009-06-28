@@ -45,7 +45,7 @@ public class Direct {
    * @return the new buffer.
    */
   public static ByteBuffer newByteBuffer(int capacity) {
-    ByteBuffer b = null;
+    ByteBuffer b;
     try {
       b = ByteBuffer.allocateDirect(capacity);
     } catch (OutOfMemoryError e1) {

@@ -213,11 +213,11 @@ public class GeometryTest extends TestCase {
     
     trace("");
     Stopwatch sw = new Stopwatch();
-    int nsphere = 0;
+    int nsphere;
     int niter = 100;
     double maxtime = 2.0;
 
-    for(;;) {
+    for(int nloop=0; nloop<5; ++nloop) {
 
     sw.reset();
     sw.start();
@@ -264,7 +264,7 @@ public class GeometryTest extends TestCase {
     
     trace("");
     Stopwatch sw = new Stopwatch();
-    int nplane = 0;
+    int nplane;
     int niter = 100;
     double maxtime = 2.0;
 

@@ -8,7 +8,7 @@ package edu.mines.jtk.dsp;
 
 import static edu.mines.jtk.util.MathPlus.*;
 
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -146,7 +146,7 @@ public class Histogram {
    * @return array[nbin] of counts, where nbin is the number of bins.
    */
   public long[] getCounts() {
-    return Array.copy(_h);
+    return ArrayMath.copy(_h);
   }
 
   /**
@@ -225,7 +225,7 @@ public class Histogram {
   private float[] trim(float[] v) {
     float[] t;
     if (_computedMinMax) {
-      t = Array.copy(v);
+      t = ArrayMath.copy(v);
     } else {
       int n = v.length;
       t = new float[n];
@@ -236,7 +236,7 @@ public class Histogram {
           t[m++] = vi;
       }
       if (m<n)
-        t = Array.copy(m,t);
+        t = ArrayMath.copy(m,t);
     }
     return t;
   }
@@ -270,10 +270,10 @@ public class Histogram {
 
           // Compute 25th and 75th percentiles.
           int k25 = (int)rint(0.25*(n-1));
-          Array.quickPartialSort(k25,t);
+          ArrayMath.quickPartialSort(k25,t);
           double v25 = t[k25];
           int k75 = (int)rint(0.75*(n-1));
-          Array.quickPartialSort(k75,t);
+          ArrayMath.quickPartialSort(k75,t);
           double v75 = t[k75];
 
           // Compute number and width of bins.

@@ -9,6 +9,7 @@ package edu.mines.jtk.dsp;
 import static edu.mines.jtk.util.MathPlus.*;
 
 import edu.mines.jtk.util.Check;
+import edu.mines.jtk.util.ArrayMath;
 
 /**
  * Special-purpose eigensolvers for digital signal processing.
@@ -54,7 +55,7 @@ public class Eigen {
       r = t*a01;
       a00 -= r;
       a11 += r;
-      a01 = 0.0f;
+      //a01 = 0.0f;
       vpr = v00;
       vqr = v10;
       v00 = vpr-s*(vqr+vpr*u);
@@ -118,7 +119,7 @@ public class Eigen {
       r = t*a01;
       a00 -= r;
       a11 += r;
-      a01 = 0.0;
+      //a01 = 0.0;
       vpr = v00;
       vqr = v10;
       v00 = vpr-s*(vqr+vpr*u);
@@ -327,9 +328,9 @@ public class Eigen {
       // While not converged and number of iterations not too large.
       for (int niter=0; niter<=100; ++niter) {
         if (niter==100) {
-          System.out.println("A ="); edu.mines.jtk.util.Array.dump(a);
-          System.out.println("V ="); edu.mines.jtk.util.Array.dump(v);
-          System.out.println("d ="); edu.mines.jtk.util.Array.dump(d);
+          System.out.println("A ="); ArrayMath.dump(a);
+          System.out.println("V ="); ArrayMath.dump(v);
+          System.out.println("d ="); ArrayMath.dump(d);
         }
         Check.state(niter<100,"number of QL iterations is less than 100");
 

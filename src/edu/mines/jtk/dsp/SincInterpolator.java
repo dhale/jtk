@@ -9,7 +9,7 @@ package edu.mines.jtk.dsp;
 import static java.lang.Math.*;
 
 import edu.mines.jtk.opt.BrentMinFinder;
-import edu.mines.jtk.util.Array;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -76,7 +76,7 @@ public class SincInterpolator {
   public enum Extrapolation {
     ZERO, 
     CONSTANT,
-  };
+  }
 
   /**
    * Returns a sinc interpolator with specified maximum error and length.
@@ -841,7 +841,7 @@ public class SincInterpolator {
     // The Kaiser window accounts for a hard-wired fraction of the maximum 
     // interpolation error. The other error will be due to table lookup.
     double ewin = emax*EWIN_FRAC;
-    KaiserWindow kwin = null;
+    KaiserWindow kwin;
 
     // If maximum frequency and length are specified, compute the error
     // due to windowing. That windowing error is three times the error 
@@ -951,7 +951,7 @@ public class SincInterpolator {
     if (_asinc==null)
       makeTable();
     assert _asinc != null;
-    return Array.copy(_asinc); 
+    return ArrayMath.copy(_asinc);
   }
 
   private static double sinc(double x) {

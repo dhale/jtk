@@ -6,8 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
-import static java.lang.Math.*;
-import edu.mines.jtk.util.Check;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * A roughly uniform sampling of the unit-sphere.
@@ -434,7 +433,6 @@ public class UnitSphereSampling {
   // but less than the maximum of 65536 points that could possibly be 
   // represented in 16 bits.
   
-  private int _nbits; // number of bits used in quantization
   private int _m; // number of samples for positive r and s, not including zero
   private int _n; // number of samples of r and s
   private int _mindex; // maximum positive index
@@ -448,17 +446,16 @@ public class UnitSphereSampling {
 
   private static UnitSphereSampling _uss16;
   private static UnitSphereSampling getUnitSphereSampling16() {
-    return (_uss16!=null)?_uss16:new UnitSphereSampling(16);
+    if (_uss16==null)
+      _uss16 = new UnitSphereSampling(16);
+    return _uss16;
   }
 
   private void initialize(int nbits) {
     Check.argument(nbits>=4,"nbits>=4");
     Check.argument(nbits<=32,"nbits<=32");
 
-    // Number of bits in sample indices, including the sign bit.
-    _nbits = nbits;
-
-    // Sampling of the r-s plane with an n by n grid. Compute the 
+    // Sampling of the r-s plane with an n by n grid. Compute the
     // largest m such that the number of sample indices fits in a 
     // signed integer with the specified number of bits. Note that
     // nbits-1 is the number of bits not counting the sign bit. The
@@ -569,10 +566,10 @@ public class UnitSphereSampling {
 
   public static void main(String[] args) {
     UnitSphereSampling uss = new UnitSphereSampling(8);
-    //testSymmetry(uss);
-    //testInterpolation(uss);
-    //testWeights(uss);
-    //testTriangle(uss);
+    testSymmetry(uss);
+    testInterpolation(uss);
+    testWeights(uss);
+    testTriangle(uss);
     testMaxError(uss);
   }
 
@@ -641,7 +638,7 @@ public class UnitSphereSampling {
       }
     }
     trace("emax="+emax);
-    edu.mines.jtk.util.Array.dump(pmax);
+    dump(pmax);
   }
   private static float func(float x, float y, float z) {
     return 0.1f*(9.0f*x*x*x-2.0f*x*x*y+3.0f*x*y*y-4.0f*y*y*y+2.0f*z*z*z-x*y*z);
@@ -665,11 +662,11 @@ public class UnitSphereSampling {
       float dc = distanceOnSphere(p,qc);
       if (i!=ia && i!=ib && i!=ic) {
         trace("d="+d+" da="+da+" db="+db+" dc="+dc);
-        edu.mines.jtk.util.Array.dump(p);
-        edu.mines.jtk.util.Array.dump(q);
-        edu.mines.jtk.util.Array.dump(qa);
-        edu.mines.jtk.util.Array.dump(qb);
-        edu.mines.jtk.util.Array.dump(qc);
+        dump(p);
+        dump(q);
+        dump(qa);
+        dump(qb);
+        dump(qc);
         assert false:"i equals ia or ib or ic";
       }
     }
@@ -687,10 +684,10 @@ public class UnitSphereSampling {
       float[] wabc = uss.getWeights(p,iabc);
       float wa = wabc[0], wb = wabc[1], wc = wabc[2];
       trace("wa="+wa+" wb="+wb+" wc="+wc);
-      edu.mines.jtk.util.Array.dump(p);
-      edu.mines.jtk.util.Array.dump(qa);
-      edu.mines.jtk.util.Array.dump(qb);
-      edu.mines.jtk.util.Array.dump(qc);
+      dump(p);
+      dump(qa);
+      dump(qb);
+      dump(qc);
     }
   }
 
@@ -717,9 +714,9 @@ public class UnitSphereSampling {
     float dmaxDegrees = (float)(dmax*180.0/PI);
     trace("npoint="+npoint+" dmax="+dmax+" degrees="+dmaxDegrees);
     trace("pmax=");
-    edu.mines.jtk.util.Array.dump(pmax);
+    dump(pmax);
     trace("qmax=");
-    edu.mines.jtk.util.Array.dump(qmax);
+    dump(qmax);
     return dmax;
   }
 
@@ -732,7 +729,7 @@ public class UnitSphereSampling {
     if (f<0.1f)            x = 0.0f;
     if (0.1f<=f && f<0.2f) y = 0.0f;
     if (0.2f<=f && f<0.3f) z = 0.0f;
-    float s = 1.0f/(float)sqrt(x*x+y*y+z*z);
+    float s = 1.0f/sqrt(x*x+y*y+z*z);
     return new float[]{x*s,y*s,z*s};
   }
 }

@@ -176,9 +176,6 @@ public class Plane {
 
   private double _a,_b,_c,_d;
 
-  private Plane() {
-  }
-
   private void normalize() {
     double s = 1.0/sqrt(_a*_a+_b*_b+_c*_c);
     _a *= s;

@@ -61,7 +61,7 @@ public class TileZoomMode extends Mode {
   private int _xdraw; // x coordinate to which zoom rect was last drawn
   private int _ydraw; // y coordinate to which zoom rect was last drawn
 
-  private MouseListener _ml = new MouseAdapter() {;
+  private MouseListener _ml = new MouseAdapter() {
     public void mousePressed(MouseEvent e) {
       if (e.isControlDown() && e.isAltDown()) {
         Object source = e.getSource();
@@ -95,7 +95,7 @@ public class TileZoomMode extends Mode {
       }
     }
     public void mouseReleased(MouseEvent e) {
-      endZoom(e);
+      endZoom();
     }
   };
 
@@ -132,7 +132,7 @@ public class TileZoomMode extends Mode {
     }
   }
 
-  private void endZoom(MouseEvent e) {
+  private void endZoom() {
 
     // Tile for which to set the view rectangle, and flags for x and y zoom.
     Tile tile = null;
