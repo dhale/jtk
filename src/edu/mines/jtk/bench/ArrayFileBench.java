@@ -39,17 +39,14 @@ public class ArrayFileBench {
   private static void bench(ByteOrder order) {
     System.out.println("order="+order);
     int n = 1000000;
-    File file = null;
-    ArrayFile af = null;
     try {
-      file = File.createTempFile("junk","dat");
-      af = new ArrayFile(file,"rw",order,order);
+      File file = File.createTempFile("junk","dat");
+      ArrayFile af = new ArrayFile(file,"rw",order,order);
       benchFloat(af,n);
       benchDouble(af,n);
-      if (af!=null)
-        af.close();
-      if (file!=null)
-        file.delete();
+      af.close();
+      boolean deleted = file.delete();
+      assert deleted:"temporary file "+file+" deleted";
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
