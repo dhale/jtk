@@ -9,8 +9,6 @@ package edu.mines.jtk.bench;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import edu.mines.jtk.io.DataFile;
 import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Stopwatch;
@@ -20,7 +18,7 @@ import edu.mines.jtk.util.Stopwatch;
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.01.17
  */
-public class DataFileBench extends TestCase {
+public class DataFileBench {
   public static void main(String[] args) {
     benchBigEndian();
     benchLittleEndian();

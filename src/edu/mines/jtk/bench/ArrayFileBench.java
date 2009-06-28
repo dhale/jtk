@@ -10,8 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteOrder;
 
-import junit.framework.TestCase;
-
 import edu.mines.jtk.io.ArrayFile;
 import edu.mines.jtk.util.Array;
 import edu.mines.jtk.util.Stopwatch;
@@ -21,7 +19,7 @@ import edu.mines.jtk.util.Stopwatch;
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.01.17
  */
-public class ArrayFileBench extends TestCase {
+public class ArrayFileBench {
   public static void main(String[] args) {
     benchBigEndian();
     benchLittleEndian();
