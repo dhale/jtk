@@ -8,10 +8,12 @@ package edu.mines.jtk.interp;
 
 import java.util.ArrayList;
 
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.la.*;
-import edu.mines.jtk.mesh.*;
-import edu.mines.jtk.util.*;
+import edu.mines.jtk.dsp.Sampling;
+import edu.mines.jtk.la.DMatrix;
+import edu.mines.jtk.la.DMatrixQrd;
+import edu.mines.jtk.mesh.Geometry;
+import edu.mines.jtk.mesh.TetMesh;
+import edu.mines.jtk.util.Check;
 
 /**
  * Sibson interpolation of scattered samples of 3D functions f(x1,x2,x3).

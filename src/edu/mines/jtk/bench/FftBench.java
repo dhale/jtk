@@ -7,8 +7,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.bench;
 
 import edu.mines.jtk.dsp.FftComplex;
+import static edu.mines.jtk.util.ArrayMath.crandfloat;
 import edu.mines.jtk.util.Stopwatch;
-import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Benchmark FFTs.

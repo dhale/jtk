@@ -7,8 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.awt;
 
 import java.awt.image.IndexColorModel;
-import static java.lang.Math.*;
-
+import static java.lang.Math.floor;
 
 import edu.mines.jtk.util.Check;
 import edu.mines.jtk.util.FloatByteMap;

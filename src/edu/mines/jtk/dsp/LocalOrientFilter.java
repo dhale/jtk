@@ -7,11 +7,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp;
 
 //import java.util.concurrent.*;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.mines.jtk.util.ArrayMath;
-import edu.mines.jtk.util.Threads;
 import static edu.mines.jtk.util.MathPlus.*;
+import edu.mines.jtk.util.Threads;
 
 /**
  * Local estimates of orientations of features in images.

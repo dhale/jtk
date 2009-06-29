@@ -6,12 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp.test;
 
-import static edu.mines.jtk.util.MathPlus.*;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.util.*;
+import edu.mines.jtk.dsp.CausalFilter;
+import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.MathPlus.*;
 /**
  * Tests {@link edu.mines.jtk.dsp.CausalFilter}.
  * @author Dave Hale, Colorado School of Mines

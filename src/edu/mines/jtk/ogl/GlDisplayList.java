@@ -6,11 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.ogl;
 
-import static edu.mines.jtk.ogl.Gl.glDeleteLists;
-import static edu.mines.jtk.ogl.Gl.glGenLists;
-
 import javax.media.opengl.GLContext;
 
+import static edu.mines.jtk.ogl.Gl.glDeleteLists;
+import static edu.mines.jtk.ogl.Gl.glGenLists;
 import edu.mines.jtk.util.Check;
 
 /**

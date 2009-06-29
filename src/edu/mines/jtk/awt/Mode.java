@@ -9,7 +9,6 @@ package edu.mines.jtk.awt;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.*;
-
 import javax.swing.*;
 
 /**

@@ -6,9 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack;
 
-import static edu.mines.jtk.lapack.Blas.*;
 import static java.lang.Math.*;
 
+import static edu.mines.jtk.lapack.Blas.*;
 import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 

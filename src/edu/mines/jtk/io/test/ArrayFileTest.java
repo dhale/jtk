@@ -6,10 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.io.test;
 
-import static java.lang.Math.min;
-
 import java.io.File;
 import java.io.IOException;
+import static java.lang.Math.min;
 import java.nio.ByteOrder;
 
 import junit.framework.TestCase;

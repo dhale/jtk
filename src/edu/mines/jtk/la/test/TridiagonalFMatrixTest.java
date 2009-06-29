@@ -9,9 +9,9 @@ package edu.mines.jtk.la.test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.la.TridiagonalFMatrix;
-import static edu.mines.jtk.util.MathPlus.*;
+import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.MathPlus.max;
 
 /**
  * Tests {@link edu.mines.jtk.la.TridiagonalFMatrix}.

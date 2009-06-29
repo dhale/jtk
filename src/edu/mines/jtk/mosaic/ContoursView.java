@@ -6,8 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static edu.mines.jtk.util.MathPlus.*;
-
 import java.awt.*;
 import java.awt.image.IndexColorModel;
 import java.util.ArrayList;
@@ -16,10 +14,8 @@ import java.util.Iterator;
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.ArrayMath;
-import edu.mines.jtk.util.Check;
-import edu.mines.jtk.util.AxisTics;
-import edu.mines.jtk.util.Clips;
+import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * A view of a sampled function f(x1,x2), displayed with contour lines.

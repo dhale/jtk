@@ -9,13 +9,9 @@ package edu.mines.jtk.mosaic.test;
 import java.awt.*;
 import java.util.EnumSet;
 import java.util.Set;
+import javax.swing.*;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-
-import edu.mines.jtk.mosaic.Mosaic;
-import edu.mines.jtk.mosaic.PointsView;
-import edu.mines.jtk.mosaic.TileZoomMode;
+import edu.mines.jtk.mosaic.*;
 
 /**
  * Test {@link edu.mines.jtk.mosaic.Mosaic} and associates.

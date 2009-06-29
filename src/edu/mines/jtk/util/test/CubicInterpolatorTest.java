@@ -11,8 +11,8 @@ import java.util.Random;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.util.CubicInterpolator;
 import static edu.mines.jtk.util.ArrayMath.*;
+import edu.mines.jtk.util.CubicInterpolator;
 
 /**
  * Tests {@link edu.mines.jtk.util.CubicInterpolator}.

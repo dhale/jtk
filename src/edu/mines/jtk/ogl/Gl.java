@@ -7,7 +7,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.ogl;
 
 import java.nio.*;
-
 import javax.media.opengl.GL;
 import javax.media.opengl.GLContext;
 

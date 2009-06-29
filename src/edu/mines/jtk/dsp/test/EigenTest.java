@@ -6,13 +6,14 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp.test;
 
+import java.util.Random;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import java.util.Random;
-
 import edu.mines.jtk.dsp.Eigen;
-import edu.mines.jtk.util.*;
+import edu.mines.jtk.util.ArrayMath;
+import edu.mines.jtk.util.Stopwatch;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.Eigen}.

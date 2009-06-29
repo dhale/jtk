@@ -6,11 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
-import static edu.mines.jtk.util.Localize.timeWords;
-
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static edu.mines.jtk.util.Localize.timeWords;
 
 /** Report progress to default Logger
     @author W.S. Harlan

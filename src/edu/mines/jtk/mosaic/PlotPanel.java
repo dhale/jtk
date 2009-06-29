@@ -6,11 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static java.lang.Math.*;
-
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
+import static java.lang.Math.*;
 import java.util.EnumSet;
 import java.util.Set;
 

@@ -6,18 +6,19 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.interp.test;
 
+import java.awt.*;
+import static java.lang.Math.min;
+import javax.swing.*;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import static java.lang.Math.*;
-import java.awt.Color;
-import javax.swing.SwingUtilities;
-
-import edu.mines.jtk.awt.*;
-import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.interp.*;
+import edu.mines.jtk.awt.ColorMap;
+import edu.mines.jtk.dsp.Sampling;
+import edu.mines.jtk.interp.SibsonInterpolator3;
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.*;
+import edu.mines.jtk.util.ArrayMath;
+import edu.mines.jtk.util.Stopwatch;
 
 /**
  * Tests {@link edu.mines.jtk.interp.SibsonInterpolator3}.

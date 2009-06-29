@@ -6,11 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mesh;
 
-import java.awt.geom.GeneralPath;
 import java.awt.*;
+import java.awt.geom.GeneralPath;
 import java.util.*;
 
-//import static edu.mines.jtk.util.MathPlus.*;
 import edu.mines.jtk.mosaic.*;
 
 /**

@@ -8,7 +8,7 @@ package edu.mines.jtk.dsp;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import edu.mines.jtk.util.*;
+import edu.mines.jtk.util.Threads;
 
 /**
  * Local Laplacian filter defined by non-constant diffusion tensors. 

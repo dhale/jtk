@@ -6,10 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack;
 
-import static edu.mines.jtk.lapack.Lapack.JOB_S;
-import static edu.mines.jtk.lapack.Lapack.dgesvd;
 import static java.lang.Math.*;
 
+import static edu.mines.jtk.lapack.Lapack.JOB_S;
+import static edu.mines.jtk.lapack.Lapack.dgesvd;
 import edu.mines.jtk.util.ArrayMath;
 
 /**

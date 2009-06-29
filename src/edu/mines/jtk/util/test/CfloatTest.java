@@ -6,12 +6,25 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util.test;
 
-import static edu.mines.jtk.util.Cfloat.*;
-import static edu.mines.jtk.util.MathPlus.*;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.util.Cfloat;
+import static edu.mines.jtk.util.Cfloat.*;
+import static edu.mines.jtk.util.Cfloat.abs;
+import static edu.mines.jtk.util.Cfloat.cos;
+import static edu.mines.jtk.util.Cfloat.cosh;
+import static edu.mines.jtk.util.Cfloat.exp;
+import static edu.mines.jtk.util.Cfloat.log;
+import static edu.mines.jtk.util.Cfloat.pow;
+import static edu.mines.jtk.util.Cfloat.sin;
+import static edu.mines.jtk.util.Cfloat.sinh;
+import static edu.mines.jtk.util.Cfloat.sqrt;
+import static edu.mines.jtk.util.Cfloat.tan;
+import static edu.mines.jtk.util.Cfloat.tanh;
+import static edu.mines.jtk.util.MathPlus.*;
+import static edu.mines.jtk.util.MathPlus.abs;
+import static edu.mines.jtk.util.MathPlus.max;
 
 /**
  * Tests {@link edu.mines.jtk.util.Cfloat}.

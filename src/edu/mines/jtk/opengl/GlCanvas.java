@@ -6,8 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opengl;
 
-import java.awt.Canvas;
-import java.awt.Graphics;
+import java.awt.*;
 
 /**
  * A canvas that paints via OpenGL. To paint a canvas using OpenGL, 

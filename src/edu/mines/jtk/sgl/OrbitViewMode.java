@@ -6,10 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.*;
-
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 import edu.mines.jtk.awt.Mode;
 import edu.mines.jtk.awt.ModeManager;

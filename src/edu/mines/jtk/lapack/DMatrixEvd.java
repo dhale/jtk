@@ -8,7 +8,6 @@ package edu.mines.jtk.lapack;
 
 import static edu.mines.jtk.lapack.Blas.LOWER;
 import static edu.mines.jtk.lapack.Lapack.*;
-
 import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 

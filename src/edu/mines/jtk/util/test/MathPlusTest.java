@@ -6,9 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util.test;
 
-import static edu.mines.jtk.util.MathPlus.*;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Tests {@link edu.mines.jtk.util.MathPlus}.

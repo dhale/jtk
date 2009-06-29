@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import java.awt.Canvas;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 
 /**

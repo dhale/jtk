@@ -6,11 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack;
 
+import static java.lang.Math.min;
+
 import static edu.mines.jtk.lapack.Blas.NO_TRANS;
 import static edu.mines.jtk.lapack.Lapack.dgetrf;
 import static edu.mines.jtk.lapack.Lapack.dgetrs;
-import static java.lang.Math.min;
-
 import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 

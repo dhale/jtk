@@ -8,8 +8,7 @@ package edu.mines.jtk.awt;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
-import javax.swing.JRadioButtonMenuItem;
+import javax.swing.*;
 
 /**
  * A menu item for a mode. When the mode is active, the mode menu item 

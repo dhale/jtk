@@ -9,7 +9,6 @@ package edu.mines.jtk.util;
 import java.io.CharArrayWriter;
 import java.io.Reader;
 import java.util.ArrayList;
-
 import javax.xml.parsers.*;
 
 import org.xml.sax.*;

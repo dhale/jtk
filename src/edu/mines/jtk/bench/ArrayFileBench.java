@@ -11,8 +11,8 @@ import java.io.IOException;
 import java.nio.ByteOrder;
 
 import edu.mines.jtk.io.ArrayFile;
-import edu.mines.jtk.util.Stopwatch;
 import static edu.mines.jtk.util.ArrayMath.*;
+import edu.mines.jtk.util.Stopwatch;
 
 /**
  * Benchmark for {@link edu.mines.jtk.io.ArrayFile}.

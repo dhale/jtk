@@ -8,7 +8,6 @@ package edu.mines.jtk.opengl;
 
 import static edu.mines.jtk.opengl.Gl.glDeleteTextures;
 import static edu.mines.jtk.opengl.Gl.glGenTextures;
-
 import edu.mines.jtk.util.Check;
 
 /**

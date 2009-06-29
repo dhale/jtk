@@ -6,11 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
+import java.awt.*;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Iterator;
 

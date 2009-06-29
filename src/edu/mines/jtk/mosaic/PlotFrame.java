@@ -6,11 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static java.lang.Math.round;
-
 import java.awt.*;
 import java.io.IOException;
-
+import static java.lang.Math.round;
 import javax.swing.*;
 
 import edu.mines.jtk.awt.ModeManager;

@@ -11,8 +11,10 @@ import java.util.Random;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.ArrayMath.*;
+import static edu.mines.jtk.util.ArrayMath.copy;
+import static edu.mines.jtk.util.ArrayMath.randfloat;
+import edu.mines.jtk.util.Float3;
+import edu.mines.jtk.util.SimpleFloat3;
 
 /**
  * Tests {@link edu.mines.jtk.util.SimpleFloat3}.

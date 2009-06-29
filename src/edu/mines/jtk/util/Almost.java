@@ -5,12 +5,13 @@ the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
-import static edu.mines.jtk.util.MathPlus.DBL_EPSILON;
-import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
 
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.logging.Logger;
+
+import static edu.mines.jtk.util.MathPlus.DBL_EPSILON;
+import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
 
 /** This class allows safe comparisons of floating point numbers
     with limited precision.

@@ -6,7 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import edu.mines.jtk.util.Almost;

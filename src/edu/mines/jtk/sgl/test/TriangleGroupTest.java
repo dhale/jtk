@@ -6,11 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl.test;
 
+import java.awt.*;
+
 import static edu.mines.jtk.ogl.Gl.GL_AMBIENT_AND_DIFFUSE;
-
-import java.awt.Color;
-import java.awt.Dimension;
-
 import edu.mines.jtk.sgl.*;
 //import edu.mines.jtk.util.Stopwatch;
 

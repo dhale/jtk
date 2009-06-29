@@ -9,8 +9,9 @@ package edu.mines.jtk.util.test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.ArrayMath.*;
+import static edu.mines.jtk.util.ArrayMath.FLT_EPSILON;
+import static edu.mines.jtk.util.ArrayMath.rampfloat;
+import edu.mines.jtk.util.Clips;
 
 /**
  * Tests {@link edu.mines.jtk.util.Clips}.

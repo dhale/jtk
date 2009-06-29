@@ -6,9 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import static edu.mines.jtk.ogl.Gl.*;
-import static edu.mines.jtk.util.MathPlus.*;
-
 import java.awt.image.IndexColorModel;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
@@ -16,8 +13,11 @@ import java.util.ArrayList;
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
+import static edu.mines.jtk.ogl.Gl.*;
 import edu.mines.jtk.ogl.GlTextureName;
 import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.MathPlus.max;
+import static edu.mines.jtk.util.MathPlus.min;
 
 /**
  * An axis-aligned panel that draws a 2D image of a slice of a 3D array.

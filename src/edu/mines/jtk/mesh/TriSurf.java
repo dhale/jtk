@@ -8,7 +8,8 @@ package edu.mines.jtk.mesh;
 
 import static java.lang.Math.*;
 import java.util.*;
-import edu.mines.jtk.util.*;
+
+import edu.mines.jtk.util.Check;
 
 /** 
  * A 3-D triangulated manifold oriented surface, possibly with boundary.

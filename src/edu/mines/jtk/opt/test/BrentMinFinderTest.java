@@ -6,11 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt.test;
 
-import static edu.mines.jtk.util.MathPlus.*;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.opt.BrentMinFinder;
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Tests {@link edu.mines.jtk.util.BrentMinFinder}.

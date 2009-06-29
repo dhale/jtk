@@ -6,13 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static java.lang.Math.*;
-
 import java.awt.*;
 import java.awt.event.*;
-
-import javax.swing.JComponent;
-import javax.swing.KeyStroke;
+import static java.lang.Math.*;
+import javax.swing.*;
 
 import edu.mines.jtk.awt.Mode;
 import edu.mines.jtk.awt.ModeManager;

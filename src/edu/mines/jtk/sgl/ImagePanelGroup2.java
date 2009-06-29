@@ -10,10 +10,11 @@ import java.awt.image.IndexColorModel;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import static edu.mines.jtk.ogl.Gl.*;
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
+import static edu.mines.jtk.ogl.Gl.GL_ONE_MINUS_SRC_ALPHA;
+import static edu.mines.jtk.ogl.Gl.GL_SRC_ALPHA;
 import edu.mines.jtk.util.*;
 
 /**

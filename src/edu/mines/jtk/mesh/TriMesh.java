@@ -6,14 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mesh;
 
-import static edu.mines.jtk.util.MathPlus.*;
-
 import java.io.*;
 import java.util.*;
-
 import javax.swing.event.EventListenerList;
 
 import edu.mines.jtk.util.Check;
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * A triangular mesh.

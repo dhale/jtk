@@ -6,9 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.awt;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.image.IndexColorModel;
-
 import javax.swing.event.EventListenerList;
 
 import edu.mines.jtk.util.Check;

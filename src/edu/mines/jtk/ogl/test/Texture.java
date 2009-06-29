@@ -6,10 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.ogl.test;
 
-import static edu.mines.jtk.ogl.Gl.*;
-
 import java.nio.ByteBuffer;
 
+import static edu.mines.jtk.ogl.Gl.*;
 import edu.mines.jtk.ogl.GlCanvas;
 
 /**

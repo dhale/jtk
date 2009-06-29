@@ -6,12 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic.test;
 
-import static java.lang.Math.*;
-
 import java.awt.*;
 import java.io.IOException;
-
-import javax.swing.JFrame;
+import static java.lang.Math.*;
+import javax.swing.*;
 
 import edu.mines.jtk.mosaic.IPanel;
 import edu.mines.jtk.mosaic.Transcaler;

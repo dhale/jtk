@@ -6,12 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import static edu.mines.jtk.ogl.Gl.*;
-
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 
 import edu.mines.jtk.dsp.Sampling;
+import static edu.mines.jtk.ogl.Gl.*;
 import edu.mines.jtk.util.Direct;
 
 /**

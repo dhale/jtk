@@ -6,10 +6,10 @@
  ****************************************************************************/
 package edu.mines.jtk.mosaic.test;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.mosaic.*;
+import edu.mines.jtk.mosaic.SimplePlot;
 import edu.mines.jtk.util.ArrayMath;
 
 /**

@@ -6,8 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.bench;
 
+import static edu.mines.jtk.util.ArrayMath.sum;
 import edu.mines.jtk.util.Stopwatch;
-import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Benchmark Pure Java and LAPACK's QR decompositions.

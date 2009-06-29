@@ -7,7 +7,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.opengl.test;
 
 import static edu.mines.jtk.opengl.Gl.*;
-
 import edu.mines.jtk.opengl.GlPainter;
 
 /**

@@ -6,12 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mesh.test;
 
-import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
-import static edu.mines.jtk.util.MathPlus.FLT_PI;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.mesh.Geometry;
+import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
+import static edu.mines.jtk.util.MathPlus.FLT_PI;
 import edu.mines.jtk.util.Stopwatch;
 
 /**

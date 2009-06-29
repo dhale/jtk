@@ -6,8 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static edu.mines.jtk.util.MathPlus.*;
-
 import java.awt.*;
 import java.awt.image.*;
 
@@ -15,6 +13,7 @@ import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * A view of sampled functions f(x1,x2), displayed as a 2-D array of pixels.

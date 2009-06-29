@@ -6,15 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static java.lang.Math.*;
-
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.geom.Rectangle2D;
-
-import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
+import static java.lang.Math.*;
+import javax.swing.*;
 
 import edu.mines.jtk.util.AxisTics;
 import edu.mines.jtk.util.StringUtil;

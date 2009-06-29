@@ -6,11 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.ogl.test;
 
-import static edu.mines.jtk.ogl.Gl.*;
-
 import javax.media.opengl.*;
-import javax.swing.JFrame;
+import javax.swing.*;
 
+import static edu.mines.jtk.ogl.Gl.*;
 import edu.mines.jtk.util.Stopwatch;
 
 /**

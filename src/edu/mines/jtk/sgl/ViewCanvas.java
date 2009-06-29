@@ -6,10 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import static edu.mines.jtk.ogl.Gl.*;
-
 import java.nio.FloatBuffer;
 
+import static edu.mines.jtk.ogl.Gl.*;
 import edu.mines.jtk.ogl.GlCanvas;
 import edu.mines.jtk.util.Direct;
 

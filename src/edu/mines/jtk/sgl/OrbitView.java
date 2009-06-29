@@ -6,12 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
-import static edu.mines.jtk.ogl.Gl.*;
+import java.awt.*;
 import static java.lang.Math.*;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
-
+import static edu.mines.jtk.ogl.Gl.*;
 import edu.mines.jtk.util.Stopwatch;
 
 /**

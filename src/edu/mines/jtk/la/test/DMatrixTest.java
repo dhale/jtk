@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.la.test;
 
 import static java.lang.Math.max;
+
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 

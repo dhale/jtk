@@ -7,10 +7,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp;
 
 import static java.lang.Math.*;
-
 import java.util.ArrayList;
 
-//import edu.mines.jtk.lapack.DMatrix;
 import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 

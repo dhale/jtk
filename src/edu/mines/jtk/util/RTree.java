@@ -8,7 +8,7 @@ package edu.mines.jtk.util;
 
 import java.util.*;
 
-import static edu.mines.jtk.util.ArrayMath.*;
+import static edu.mines.jtk.util.ArrayMath.quickIndexSort;
 
 /** 
  * A tree of bounded objects with methods for fast updates and queries.

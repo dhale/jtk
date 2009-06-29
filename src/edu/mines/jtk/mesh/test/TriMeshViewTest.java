@@ -6,11 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mesh.test;
 
-import java.awt.Color;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import javax.swing.*;
 
-import edu.mines.jtk.mesh.*;
+import edu.mines.jtk.mesh.TriMesh;
+import edu.mines.jtk.mesh.TriMeshView;
 import edu.mines.jtk.mosaic.*;
 
 

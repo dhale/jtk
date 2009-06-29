@@ -6,17 +6,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp.test;
 
-
-//import static edu.mines.jtk.util.ArrayMath.cabs;
-//import static edu.mines.jtk.util.ArrayMath.mul;
 import static java.lang.Math.*;
-
 import java.util.Random;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.dsp.*;
+import edu.mines.jtk.dsp.SincInterpolator;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.SincInterpolator}.

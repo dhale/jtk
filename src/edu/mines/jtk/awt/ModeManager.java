@@ -6,8 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.awt;
 
-import java.awt.Component;
-import java.awt.Cursor;
+import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 

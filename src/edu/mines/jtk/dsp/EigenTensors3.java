@@ -7,7 +7,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp;
 
 import java.io.*;
-import edu.mines.jtk.io.*;
+
+import edu.mines.jtk.io.ArrayInputStream;
+import edu.mines.jtk.io.ArrayOutputStream;
 import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.UnitSphereSampling;
 

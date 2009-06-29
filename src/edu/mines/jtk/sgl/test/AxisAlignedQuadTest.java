@@ -6,11 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl.test;
 
-import static edu.mines.jtk.util.MathPlus.*;
-import edu.mines.jtk.util.*;
-
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.sgl.*;
+import edu.mines.jtk.util.Float3;
+import static edu.mines.jtk.util.MathPlus.FLT_PI;
+import static edu.mines.jtk.util.MathPlus.sin;
+import edu.mines.jtk.util.SimpleFloat3;
 
 /**
  * Tests {@link edu.mines.jtk.sgl.AxisAlignedQuad}.

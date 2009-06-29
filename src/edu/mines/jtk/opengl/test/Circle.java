@@ -6,13 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opengl.test;
 
-import static edu.mines.jtk.opengl.Gl.*;
-import static edu.mines.jtk.opengl.Glu.gluPerspective;
 import static java.lang.Math.*;
-
 import java.util.Random;
 
+import static edu.mines.jtk.opengl.Gl.*;
 import edu.mines.jtk.opengl.GlPainter;
+import static edu.mines.jtk.opengl.Glu.gluPerspective;
 import edu.mines.jtk.util.Stopwatch;
 
 /**

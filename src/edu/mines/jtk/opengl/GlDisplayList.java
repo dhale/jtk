@@ -8,7 +8,6 @@ package edu.mines.jtk.opengl;
 
 import static edu.mines.jtk.opengl.Gl.glDeleteLists;
 import static edu.mines.jtk.opengl.Gl.glGenLists;
-
 import edu.mines.jtk.util.Check;
 
 /**

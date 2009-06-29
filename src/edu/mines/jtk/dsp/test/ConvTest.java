@@ -6,16 +6,15 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp.test;
 
-import static edu.mines.jtk.util.ArrayMath.randfloat;
-import static edu.mines.jtk.util.ArrayMath.zerofloat;
-import static edu.mines.jtk.util.MathPlus.*;
-
 import java.util.Random;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.Conv;
+import static edu.mines.jtk.util.ArrayMath.randfloat;
+import static edu.mines.jtk.util.ArrayMath.zerofloat;
+import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.Conv}.

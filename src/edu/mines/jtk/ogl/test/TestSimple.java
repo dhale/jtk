@@ -6,10 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.ogl.test;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-
-import javax.swing.JFrame;
+import java.awt.*;
+import javax.swing.*;
 
 import edu.mines.jtk.ogl.GlCanvas;
 

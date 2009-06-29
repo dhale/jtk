@@ -6,9 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import static java.lang.Math.*;
-
 import java.awt.*;
+import static java.lang.Math.*;
 
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.ArrayMath;

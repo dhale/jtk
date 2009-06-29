@@ -6,13 +6,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack.test;
 
-import static edu.mines.jtk.lapack.test.DMatrixTest.assertEqualExact;
-import static edu.mines.jtk.lapack.test.DMatrixTest.assertEqualFuzzy;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.lapack.DMatrix;
 import edu.mines.jtk.lapack.DMatrixChd;
+import static edu.mines.jtk.lapack.test.DMatrixTest.assertEqualExact;
+import static edu.mines.jtk.lapack.test.DMatrixTest.assertEqualFuzzy;
 
 /**
  * Tests {@link edu.mines.jtk.lapack.DMatrixChd}.

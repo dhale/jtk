@@ -1,7 +1,9 @@
 package edu.mines.jtk.ogl;
+
 import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Makes OpenGL wrapper class Gl.java for JOGL's javax.media.opengl.GL.
