@@ -6,10 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import static java.lang.Math.*;
 
 import edu.mines.jtk.opt.BrentMinFinder;
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -951,7 +950,7 @@ public class SincInterpolator {
     if (_asinc==null)
       makeTable();
     assert _asinc != null;
-    return ArrayMath.copy(_asinc);
+    return copy(_asinc);
   }
 
   private static double sinc(double x) {

@@ -10,7 +10,7 @@ import java.io.*;
 
 import edu.mines.jtk.io.ArrayInputStream;
 import edu.mines.jtk.io.ArrayOutputStream;
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.UnitSphereSampling;
 
 
@@ -422,13 +422,13 @@ public class EigenTensors3 implements Tensors3,Serializable {
       float ascale = (as>0.0f)?AS_SET/as:0.0f;
       short bu = (short)(au*ascale+0.5f);
       short bw = (short)(aw*ascale+0.5f);
-      ArrayMath.fill(bu,_bu);
-      ArrayMath.fill(bw,_bw);
+      fill(bu,_bu);
+      fill(bw,_bw);
     } else {
-      ArrayMath.fill(au,_au);
-      ArrayMath.fill(aw,_aw);
+      fill(au,_au);
+      fill(aw,_aw);
     }
-    ArrayMath.fill(as,_as);
+    fill(as,_as);
   }
 
   /**

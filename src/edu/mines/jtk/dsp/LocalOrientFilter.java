@@ -10,8 +10,7 @@ package edu.mines.jtk.dsp;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import edu.mines.jtk.util.ArrayMath;
-import static edu.mines.jtk.util.MathPlus.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Threads;
 
 /**
@@ -280,12 +279,12 @@ public class LocalOrientFilter {
         if (_rgfSmoother1!=null) {
           _rgfSmoother1.apply0X(g,h);
         } else {
-          ArrayMath.copy(g,h);
+          copy(g,h);
         }
         if (_rgfSmoother2!=null) {
           _rgfSmoother2.applyX0(h,g);
         } else {
-          ArrayMath.copy(h,g);
+          copy(h,g);
         }
       }
     }
@@ -571,16 +570,16 @@ public class LocalOrientFilter {
         if (_rgfSmoother1!=null) {
           _rgfSmoother1.apply0XX(g,h);
         } else {
-          ArrayMath.copy(g,h);
+          copy(g,h);
         }
         if (_rgfSmoother2!=null) {
           _rgfSmoother2.applyX0X(h,g);
         } else {
-          ArrayMath.copy(h,g);
+          copy(h,g);
         }
         if (_rgfSmoother3!=null) {
           _rgfSmoother3.applyXX0(g,h);
-          ArrayMath.copy(h,g);
+          copy(h,g);
         }
       }
     }

@@ -6,9 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Special-purpose eigensolvers for digital signal processing.
@@ -327,9 +326,9 @@ public class Eigen {
       // While not converged and number of iterations not too large.
       for (int niter=0; niter<=100; ++niter) {
         if (niter==100) {
-          System.out.println("A ="); ArrayMath.dump(a);
-          System.out.println("V ="); ArrayMath.dump(v);
-          System.out.println("d ="); ArrayMath.dump(d);
+          System.out.println("A ="); dump(a);
+          System.out.println("V ="); dump(v);
+          System.out.println("d ="); dump(d);
         }
         Check.state(niter<100,"number of QL iterations is less than 100");
 

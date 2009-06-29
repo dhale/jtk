@@ -6,8 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.ArrayMath;
-import static edu.mines.jtk.util.MathPlus.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Steerable pyramid for 2D and 3D images. Includes creation of the steerable
@@ -137,12 +136,12 @@ public class SteerablePyramid {
       int lfactor = (int)pow(2.0,(double)lev);
       int nl2 = (n2-1)/lfactor+1;
       int nl1 = (n1-1)/lfactor+1;
-      spyr[lev] = ArrayMath.zerofloat(nl1,nl2,NDIR2);
+      spyr[lev] = zerofloat(nl1,nl2,NDIR2);
     }
     int lfactor = (int)pow(2.0,(double)nlev);
     int nl2 = (n2-1)/lfactor+1;
     int nl1 = (n1-1)/lfactor+1;
-    spyr[nlev] = ArrayMath.zerofloat(nl1,nl2,1);
+    spyr[nlev] = zerofloat(nl1,nl2,1);
     float[][] cf = ftForward(0,x);
     applyRadial(ka,kb,cf);
     for (int lev=0; lev<nlev; ++lev) {
@@ -207,14 +206,14 @@ public class SteerablePyramid {
       int nl1 = (n1-1)/lfactor+1;
       spyr[lev] = new float[NDIR3][1][1][1];
       for (int dir=0; dir<NDIR3; ++dir) {
-        spyr[lev][dir] = ArrayMath.zerofloat(nl1,nl2,nl3);
+        spyr[lev][dir] = zerofloat(nl1,nl2,nl3);
       }
     }
     int lfactor = (int)pow(2.0,(double)nlev);
     int nl3 = (n3-1)/lfactor+1;
     int nl2 = (n2-1)/lfactor+1;
     int nl1 = (n1-1)/lfactor+1;
-    spyr[nlev][0] = ArrayMath.zerofloat(nl1,nl2,nl3);
+    spyr[nlev][0] = zerofloat(nl1,nl2,nl3);
     float[][][] cf = ftForward(0,x);
     applyRadial(ka,kb,cf);
     for (int lev=0; lev<nlev; ++lev) {
@@ -238,7 +237,7 @@ public class SteerablePyramid {
     int lev;
     // Optionally zero the low-wavenumber image.
     if (!keeplow) {
-      ArrayMath.zero(spyr[nlev][0]);
+      zero(spyr[nlev][0]);
     }
     // Sum basis images to create filtered image.  Sinc interpolation is
     // performed on subsampled images prior to summing adjacent levels.
@@ -248,7 +247,7 @@ public class SteerablePyramid {
     for (int i=0; i<nlev; ++i) {
       lev = nlev-i-1;
       for (int dir=1; dir<NDIR2; ++dir) {
-        ArrayMath.add(spyr[lev][0],spyr[lev][dir],spyr[lev][0]);
+        add(spyr[lev][0],spyr[lev][dir],spyr[lev][0]);
       }
       int m2 = (nl2-1)/2+1;
       int m1 = (nl1-1)/2+1;
@@ -263,8 +262,8 @@ public class SteerablePyramid {
       nl2 = (nl2-1)*2+1;
       nl1 = (nl1-1)*2+1;
     }
-    float[][] y = ArrayMath.zerofloat(nx1,nx2);
-    ArrayMath.copy(nx1,nx2,spyr[0][0],y);
+    float[][] y = zerofloat(nx1,nx2);
+    copy(nx1,nx2,spyr[0][0],y);
     return y;
   }
   
@@ -280,7 +279,7 @@ public class SteerablePyramid {
     int lev;
     // Optionally zero the low-wavenumber image.
     if (!keeplow) {
-      ArrayMath.zero(spyr[nlev][0]);
+      zero(spyr[nlev][0]);
     }
     // Sum basis images to create filtered image.  Sinc interpolation is
     // performed on subsampled images prior to summing adjacent levels.
@@ -291,15 +290,15 @@ public class SteerablePyramid {
     for (int i=0; i<nlev; ++i) {
       lev = nlev-i-1;
       for (int dir=1; dir<NDIR3; ++dir) {
-        ArrayMath.add(spyr[lev][0],spyr[lev][dir],spyr[lev][0]);
+        add(spyr[lev][0],spyr[lev][dir],spyr[lev][0]);
       }
       int m3 = (nl3-1)/2+1;
       int m2 = (nl2-1)/2+1;
       int m1 = (nl1-1)/2+1;
       int j1,j2,j3;
-      float[] lo11 = ArrayMath.zerofloat(m1);
-      float[] lo12 = ArrayMath.zerofloat(m2);
-      float[] lo13 = ArrayMath.zerofloat(m3);
+      float[] lo11 = zerofloat(m1);
+      float[] lo12 = zerofloat(m2);
+      float[] lo13 = zerofloat(m3);
       SincInterpolator si = SincInterpolator.fromErrorAndFrequency(0.001,0.4);
       si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
       for (int i3=0; i3<nl3; i3=i3+2) {
@@ -341,13 +340,13 @@ public class SteerablePyramid {
           }
         }
       }
-      ArrayMath.add(spyr[lev][0],spyr[lev][1],spyr[lev][0]);
+      add(spyr[lev][0],spyr[lev][1],spyr[lev][0]);
       nl3 = (nl3-1)*2+1;
       nl2 = (nl2-1)*2+1;
       nl1 = (nl1-1)*2+1;
     }
-    float[][][] y = ArrayMath.zerofloat(nx1,nx2,nx3);
-    ArrayMath.copy(nx1,nx2,nx3,spyr[0][0],y);
+    float[][][] y = zerofloat(nx1,nx2,nx3);
+    copy(nx1,nx2,nx3,spyr[0][0],y);
     return y;
   }
   
@@ -400,7 +399,7 @@ public class SteerablePyramid {
       int nl2 = (n2-1)/lfactor+1;
       int nl1 = (n1-1)/lfactor+1;
       for (int j=0; j<2; ++j) {
-        attr[lev][j] = ArrayMath.zerofloat(nl1,nl2);
+        attr[lev][j] = zerofloat(nl1,nl2);
       }
     }
     // Apply preprocessing to multiple levels and average adjacent scales.
@@ -498,8 +497,8 @@ public class SteerablePyramid {
                                                       float[][][][][] spyr) {
     double sigmaa = 2.0*sigma;
     double sigmac = 0.5*sigma;
-    double[] f = ArrayMath.zerodouble(NDIR3);
-    double[][] abcf = ArrayMath.zerodouble(4,3);
+    double[] f = zerodouble(NDIR3);
+    double[][] abcf = zerodouble(4,3);
     int i1a,i2a,i3a,i1c,i2c,i3c;
     // Parameters to select estimation for locally planar or linear features
     int abcindx = 2;
@@ -519,7 +518,7 @@ public class SteerablePyramid {
       int nl2 = (n2-1)/lfactor+1;
       int nl1 = (n1-1)/lfactor+1;
       for (int j=0; j<4; ++j) {
-        attr[lev][j] = ArrayMath.zerofloat(nl1,nl2,nl3);
+        attr[lev][j] = zerofloat(nl1,nl2,nl3);
       }
     }
     // Apply preprocessing to multiple levels and average adjacent scales.
@@ -617,13 +616,13 @@ public class SteerablePyramid {
       // Convert basis images to line-enhancing sin^2 if
       // attributes have been estimated for linear features.
       if (statelinear) {
-        float[][][] p = ArrayMath.add(spyr[lev][0],spyr[lev][1]);
+        float[][][] p = add(spyr[lev][0],spyr[lev][1]);
         for (int dir=2; dir<NDIR3; ++dir) {
-          ArrayMath.add(p,spyr[lev][dir],p);
+          add(p,spyr[lev][dir],p);
         }
-        ArrayMath.mul(p,0.5f,p);
+        mul(p,0.5f,p);
         for (int dir=0; dir<NDIR3; ++dir) {
-          ArrayMath.sub(p,spyr[lev][dir],spyr[lev][dir]);
+          sub(p,spyr[lev][dir],spyr[lev][dir]);
         }
       }
       // Compute and apply steering weights and scaling option
@@ -744,13 +743,13 @@ public class SteerablePyramid {
     int lfactor = (int)pow(2.0,(double)lev);
     int nl2 = (n2-1)/lfactor+1;
     int nl1 = (n1-1)/lfactor+1;
-    float[][] clo1 = ArrayMath.copy(cf);
+    float[][] clo1 = copy(cf);
     applyRadial(ka/2.0,kb/2.0,clo1);
-    ArrayMath.sub(cf,clo1,cf);
+    sub(cf,clo1,cf);
     ftInverse(lev,0,clo1,spyr);
     int ml2 = (nl2-1)/2+1;
     int ml1 = (nl1-1)/2+1;
-    ArrayMath.copy(ml1,ml2,0,0,2,2,spyr[lev][0],0,0,1,1,spyr[lev+1][0]);
+    copy(ml1,ml2,0,0,2,2,spyr[lev][0],0,0,1,1,spyr[lev+1][0]);
     for (int dir=0; dir<NDIR2; ++dir) {
       applySteerableFilter(dir,cf,clo1);
       ftInverse(lev,dir,clo1,spyr); 
@@ -771,14 +770,14 @@ public class SteerablePyramid {
     int nl3 = (n3-1)/lfactor+1;
     int nl2 = (n2-1)/lfactor+1;
     int nl1 = (n1-1)/lfactor+1;
-    float[][][] clo1 = ArrayMath.copy(cf);
+    float[][][] clo1 = copy(cf);
     applyRadial(ka/2.0,kb/2.0,clo1);
-    ArrayMath.sub(cf,clo1,cf);
+    sub(cf,clo1,cf);
     ftInverse(lev,0,clo1,spyr);
     int ml3 = (nl3-1)/2+1;
     int ml2 = (nl2-1)/2+1;
     int ml1 = (nl1-1)/2+1;
-    ArrayMath.copy(ml1,ml2,ml3,0,0,0,2,2,2,spyr[lev][0],
+    copy(ml1,ml2,ml3,0,0,0,2,2,2,spyr[lev][0],
         0,0,0,1,1,1,spyr[lev+1][0]);
     for (int dir=0; dir<NDIR3; ++dir) {
       applySteerableFilter(dir,cf,clo1);
@@ -982,16 +981,16 @@ public class SteerablePyramid {
   private float[][][] pqjShiftSmooth(double sigma,int lev,
                                        float[][][][] spyr) {
     RecursiveGaussianFilter rcg = new RecursiveGaussianFilter(sigma);
-    float [] test = ArrayMath.zerofloat(NDIR2);
+    float [] test = zerofloat(NDIR2);
     float testmin;
     // Allocate output array
-    float[][][] pq = ArrayMath.zerofloat(1,1,NDIR2);
+    float[][][] pq = zerofloat(1,1,NDIR2);
     // Compute pqj from qj's
-    pq[0] = ArrayMath.add(spyr[lev][0],spyr[lev][1]);
-    ArrayMath.add(pq[0],spyr[lev][2],pq[0]);
-    pq[1] = ArrayMath.mul(pq[0],spyr[lev][1]);
-    pq[2] = ArrayMath.mul(pq[0],spyr[lev][2]);
-    ArrayMath.mul(pq[0],spyr[lev][0],pq[0]);
+    pq[0] = add(spyr[lev][0],spyr[lev][1]);
+    add(pq[0],spyr[lev][2],pq[0]);
+    pq[1] = mul(pq[0],spyr[lev][1]);
+    pq[2] = mul(pq[0],spyr[lev][2]);
+    mul(pq[0],spyr[lev][0],pq[0]);
     // Shift samples to avoid negative
     int n2 = pq[0].length;
     int n1 = pq[0][0].length;
@@ -1000,7 +999,7 @@ public class SteerablePyramid {
         test[0] = pq[0][i2][i1];
         test[1] = pq[1][i2][i1];
         test[2] = pq[2][i2][i1];
-        testmin = ArrayMath.min(test);
+        testmin = min(test);
         if (testmin<0.0f) {
           pq[0][i2][i1] -= testmin;
           pq[1][i2][i1] -= testmin;
@@ -1032,19 +1031,19 @@ public class SteerablePyramid {
   private float[][][][] pqjShiftSmooth(double sigma,int lev,
                                        float[][][][][] spyr) {
     RecursiveGaussianFilter rcg = new RecursiveGaussianFilter(sigma);
-    float [] test = ArrayMath.zerofloat(NDIR3);
+    float [] test = zerofloat(NDIR3);
     float testmin;
     // Allocate output array
     float[][][][] pq = new float[NDIR3][1][1][1];
     // Compute pqj from qj's
-    pq[0] = ArrayMath.add(spyr[lev][0],spyr[lev][1]);
+    pq[0] = add(spyr[lev][0],spyr[lev][1]);
     for (int dir=2; dir<NDIR3; ++dir) {
-      ArrayMath.add(pq[0],spyr[lev][dir],pq[0]);
+      add(pq[0],spyr[lev][dir],pq[0]);
     }
     for (int dir=1; dir<NDIR3; ++dir) {
-      pq[dir] = ArrayMath.mul(pq[0],spyr[lev][dir]);
+      pq[dir] = mul(pq[0],spyr[lev][dir]);
     }
-    ArrayMath.mul(pq[0],spyr[lev][0],pq[0]);
+    mul(pq[0],spyr[lev][0],pq[0]);
     // Shift samples to avoid negative
     int nl3 = pq[0].length;
     int nl2 = pq[0][0].length;
@@ -1055,7 +1054,7 @@ public class SteerablePyramid {
           for (int dir=0; dir<NDIR3; ++dir) {
             test[dir] = pq[dir][i3][i2][i1];
           }
-          testmin = ArrayMath.min(test);
+          testmin = min(test);
           if (testmin<0.0f) {
             for (int dir=0; dir<NDIR3; ++dir) {
               pq[dir][i3][i2][i1] -= testmin;
@@ -1409,9 +1408,9 @@ public class SteerablePyramid {
     int nf1 = FftReal.nfftSmall(nl1+mpad*2);
     int nf1c = nf1/2+1;
     int nf2 = FftComplex.nfftSmall(nl2+mpad*2);
-    float[][] xr = ArrayMath.zerofloat(nf1,nf2);
-    ArrayMath.copy(ny1,ny2,0,0,x,mpad,mpad,xr);
-    float[][] cx = ArrayMath.czerofloat(nf1c,nf2);
+    float[][] xr = zerofloat(nf1,nf2);
+    copy(ny1,ny2,0,0,x,mpad,mpad,xr);
+    float[][] cx = czerofloat(nf1c,nf2);
     fft1 = new FftReal(nf1);
     fft2 = new FftComplex(nf2);
     fft1.realToComplex1(1,nf2,xr,cx);
@@ -1443,9 +1442,9 @@ public class SteerablePyramid {
     int nf2 = FftComplex.nfftSmall(nl2+mpad*2);
     int nf1 = FftReal.nfftSmall(nl1+mpad*2);
     int nf1c = nf1/2+1;
-    float[][][] xr = ArrayMath.zerofloat(nf1,nf2,nf3);
-    ArrayMath.copy(ny1,ny2,ny3,0,0,0,x,mpad,mpad,mpad,xr);
-    float[][][] cx = ArrayMath.czerofloat(nf1c,nf2,nf3);
+    float[][][] xr = zerofloat(nf1,nf2,nf3);
+    copy(ny1,ny2,ny3,0,0,0,x,mpad,mpad,mpad,xr);
+    float[][][] cx = czerofloat(nf1c,nf2,nf3);
     fft1 = new FftReal(nf1);
     fft2 = new FftComplex(nf2);
     fft3 = new FftComplex(nf3);
@@ -1484,7 +1483,7 @@ public class SteerablePyramid {
     fft2.scale(nf1c,nf2,cf);
     fft1.complexToReal1(-1,nf2,cf,cf);
     fft1.scale(nf1,nf2,cf);
-    ArrayMath.copy(nl1,nl2,mpad,mpad,1,1,cf,0,0,1,1,spyr[lev][dir]);
+    copy(nl1,nl2,mpad,mpad,1,1,cf,0,0,1,1,spyr[lev][dir]);
   }
   
   /**
@@ -1521,7 +1520,7 @@ public class SteerablePyramid {
     fft2.scale(nf1c,nf2,nf3,cf);
     fft1.complexToReal1(-1,nf2,nf3,cf,cf);
     fft1.scale(nf1,nf2,nf3,cf);
-    ArrayMath.copy(nl1,nl2,nl3,mpad,mpad,mpad,1,1,1,cf,
+    copy(nl1,nl2,nl3,mpad,mpad,mpad,1,1,1,cf,
         0,0,0,1,1,1,spyr[lev][dir]);
   }
   

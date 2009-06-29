@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -34,7 +34,7 @@ class Pfacc {
    * @return true, if valid; false, otherwise.
    */
   static boolean nfftValid(int nfft) {
-    return ArrayMath.binarySearch(_ntable,nfft)>=0;
+    return binarySearch(_ntable,nfft)>=0;
   }
 
   /**
@@ -48,7 +48,7 @@ class Pfacc {
    */
   static int nfftSmall(int n) {
     Check.argument(n<=720720,"n does not exceed 720720");
-    int itable = ArrayMath.binarySearch(_ntable,n);
+    int itable = binarySearch(_ntable,n);
     if (itable<0) itable = -(itable+1);
     return _ntable[itable];
   }
@@ -64,7 +64,7 @@ class Pfacc {
    */
   static int nfftFast(int n) {
     Check.argument(n<=720720,"n does not exceed 720720");
-    int ifast = ArrayMath.binarySearch(_ntable,n);
+    int ifast = binarySearch(_ntable,n);
     if (ifast<0) ifast = -(ifast+1);
     int nfast = _ntable[ifast];
     int nstop = 2*nfast;
@@ -112,7 +112,7 @@ class Pfacc {
       if (sign<0)
         mu = ifac-mu;
 
-      // ArrayMath stride, bound, and indices.
+      // Array stride, bound, and indices.
       int jinc = 2*mm;
       int jmax = 2*nfft;
       int j0 = 0;
@@ -1371,7 +1371,7 @@ class Pfacc {
       if (sign<0)
         mu = ifac-mu;
 
-      // ArrayMath stride, bound, and indices.
+      // Array stride, bound, and indices.
       int jinc = mm;
       int jmax = nfft;
       int j0 = 0;
@@ -2738,7 +2738,7 @@ class Pfacc {
       if (sign<0)
         mu = ifac-mu;
 
-      // ArrayMath stride, bound, and indices.
+      // Array stride, bound, and indices.
       int jinc = 2*mm;
       int jmax = 2*nfft;
       int j0 = 0;

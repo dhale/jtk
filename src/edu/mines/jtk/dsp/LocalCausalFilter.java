@@ -6,10 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.util.MathPlus.max;
-import static edu.mines.jtk.util.MathPlus.min;
 
 /**
  * A multi-dimensional causal filter with locally variable coefficients.
@@ -136,7 +134,7 @@ public class LocalCausalFilter {
    * @return array of lags; by copy, not by reference.
    */
   public int[] getLag1() {
-    return ArrayMath.copy(_lag1);
+    return copy(_lag1);
   }
 
   /**
@@ -144,7 +142,7 @@ public class LocalCausalFilter {
    * @return array of lags; by copy, not by reference.
    */
   public int[] getLag2() {
-    return ArrayMath.copy(_lag2);
+    return copy(_lag2);
   }
 
   /**
@@ -152,7 +150,7 @@ public class LocalCausalFilter {
    * @return array of lags; by copy, not by reference.
    */
   public int[] getLag3() {
-    return ArrayMath.copy(_lag3);
+    return copy(_lag3);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -281,7 +279,7 @@ public class LocalCausalFilter {
    */
   public void applyInverseTranspose(A1 a1, float[] y, float[] x) {
     Check.argument(x!=y,"x!=y");
-    ArrayMath.zero(x);
+    zero(x);
     float[] a = new float[_m];
     int n1 = y.length;
     int i1lo = min(_max1,n1);
@@ -514,7 +512,7 @@ public class LocalCausalFilter {
    */
   public void applyInverseTranspose(A2 a2, float[][] y, float[][] x) {
     Check.argument(x!=y,"x!=y");
-    ArrayMath.zero(x);
+    zero(x);
     float[] a = new float[_m];
     int n1 = y[0].length;
     int n2 = y.length;
@@ -893,7 +891,7 @@ public class LocalCausalFilter {
    */
   public void applyInverseTranspose(A3 a3, float[][][] y, float[][][] x) {
     Check.argument(x!=y,"x!=y");
-    ArrayMath.zero(x);
+    zero(x);
     float[] a = new float[_m];
     int n1 = y[0][0].length;
     int n2 = y[0].length;
@@ -999,11 +997,11 @@ public class LocalCausalFilter {
     for (int j=1; j<lag1.length; ++j)
       Check.argument(lag1[j]>0,"lag1["+j+"]>0");
     _m = lag1.length;
-    _lag1 = ArrayMath.copy(lag1);
-    _lag2 = ArrayMath.zeroint(_m);
-    _lag3 = ArrayMath.zeroint(_m);
-    _min1 = ArrayMath.min(lag1);
-    _max1 = ArrayMath.max(lag1);
+    _lag1 = copy(lag1);
+    _lag2 = zeroint(_m);
+    _lag3 = zeroint(_m);
+    _min1 = min(lag1);
+    _max1 = max(lag1);
   }
 
   private void initLags(int[] lag1, int[] lag2) {
@@ -1016,13 +1014,13 @@ public class LocalCausalFilter {
         Check.argument(lag1[j]>0,"if lag2==0, lag1["+j+"]>0");
     }
     _m = lag1.length;
-    _lag1 = ArrayMath.copy(lag1);
-    _lag2 = ArrayMath.copy(lag2);
-    _lag3 = ArrayMath.zeroint(_m);
-    _min1 = ArrayMath.min(lag1);
-    _min2 = ArrayMath.min(lag2);
-    _max1 = ArrayMath.max(lag1);
-    _max2 = ArrayMath.max(lag2);
+    _lag1 = copy(lag1);
+    _lag2 = copy(lag2);
+    _lag3 = zeroint(_m);
+    _min1 = min(lag1);
+    _min2 = min(lag2);
+    _max1 = max(lag1);
+    _max2 = max(lag2);
   }
 
   private void initLags(int[] lag1, int[] lag2, int[] lag3) {
@@ -1039,14 +1037,14 @@ public class LocalCausalFilter {
       }
     }
     _m = lag1.length;
-    _lag1 = ArrayMath.copy(lag1);
-    _lag2 = ArrayMath.copy(lag2);
-    _lag3 = ArrayMath.copy(lag3);
-    _min1 = ArrayMath.min(lag1);
-    _min2 = ArrayMath.min(lag2);
-    _max1 = ArrayMath.max(lag1);
-    _max2 = ArrayMath.max(lag2);
-    _max3 = ArrayMath.max(lag3);
+    _lag1 = copy(lag1);
+    _lag2 = copy(lag2);
+    _lag3 = copy(lag3);
+    _min1 = min(lag1);
+    _min2 = min(lag2);
+    _max1 = max(lag1);
+    _max2 = max(lag2);
+    _max3 = max(lag3);
   }
 
   ///////////////////////////////////////////////////////////////////////////

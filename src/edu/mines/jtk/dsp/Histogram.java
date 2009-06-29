@@ -6,9 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * A histogram summarizes the distribution of values v in an array.
@@ -145,7 +144,7 @@ public class Histogram {
    * @return array[nbin] of counts, where nbin is the number of bins.
    */
   public long[] getCounts() {
-    return ArrayMath.copy(_h);
+    return copy(_h);
   }
 
   /**
@@ -224,7 +223,7 @@ public class Histogram {
   private float[] trim(float[] v) {
     float[] t;
     if (_computedMinMax) {
-      t = ArrayMath.copy(v);
+      t = copy(v);
     } else {
       int n = v.length;
       t = new float[n];
@@ -235,7 +234,7 @@ public class Histogram {
           t[m++] = vi;
       }
       if (m<n)
-        t = ArrayMath.copy(m,t);
+        t = copy(m,t);
     }
     return t;
   }
@@ -269,10 +268,10 @@ public class Histogram {
 
           // Compute 25th and 75th percentiles.
           int k25 = (int)rint(0.25*(n-1));
-          ArrayMath.quickPartialSort(k25,t);
+          quickPartialSort(k25,t);
           double v25 = t[k25];
           int k75 = (int)rint(0.75*(n-1));
-          ArrayMath.quickPartialSort(k75,t);
+          quickPartialSort(k75,t);
           double v75 = t[k75];
 
           // Compute number and width of bins.

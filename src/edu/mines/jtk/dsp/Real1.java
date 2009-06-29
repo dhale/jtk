@@ -6,9 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.util.MathPlus.max;
 
 /**
  * A real-valued sampled function of one variable.
@@ -89,7 +88,7 @@ public class Real1 {
    * @param r the function to copy.
    */
   public Real1(Real1 r) {
-    this(r._s, ArrayMath.copy(r._v));
+    this(r._s, copy(r._v));
   }
 
   /**
@@ -265,7 +264,7 @@ public class Real1 {
    */
   public static Real1 fill(double ar, Sampling s) {
     int n = s.getCount();
-    return new Real1(s, ArrayMath.fillfloat((float)ar,n));
+    return new Real1(s, fillfloat((float)ar,n));
   }
 
   /**
@@ -293,7 +292,7 @@ public class Real1 {
     int n = s.getCount();
     double d = s.getDelta();
     double f = s.getFirst();
-    return new Real1(s, ArrayMath.rampfloat((float)(fv-f*dv),(float)(d*dv),n));
+    return new Real1(s, rampfloat((float)(fv-f*dv),(float)(d*dv),n));
   }
 
   /**

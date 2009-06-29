@@ -6,10 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import static java.lang.Math.*;
 import java.util.ArrayList;
 
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -86,7 +85,7 @@ public class LocalPredictionFilter {
     System.out.println("Average number of CG iterations = "+niter);
 
     // Apply prediction filters.
-    ArrayMath.zero(g);
+    zero(g);
     for (int j=0; j<m; ++j) {
       int j1 = lag1[j];
       int j2 = lag2[j];
@@ -105,9 +104,9 @@ public class LocalPredictionFilter {
     return a;
     //return rcache.get();
     
-    //ArrayMath.copy(ArrayMath.div(rcache.get(1,1),rcache.get(0,0)),g);
-    //ArrayMath.copy(a[0],g);
-    //ArrayMath.copy(a[m-1],f);
+    //copy(div(rcache.get(1,1),rcache.get(0,0)),g);
+    //copy(a[0],g);
+    //copy(a[m-1],f);
   }
 
   public void applyPef(int[] lag1, int[] lag2, float[][] f, float[][] g) {
@@ -159,7 +158,7 @@ public class LocalPredictionFilter {
     System.out.println("Average number of CG iterations = "+niter);
 
     // Apply prediction error filters.
-    ArrayMath.copy(f,g);
+    copy(f,g);
     for (int j=0; j<m; ++j) {
       int j1 = lag1[j];
       int j2 = lag2[j];

@@ -10,8 +10,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.DifferenceFilter;
-import edu.mines.jtk.util.ArrayMath;
-import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.DifferenceFilter}.
@@ -127,9 +126,9 @@ public class DifferenceFilterTest extends TestCase {
     int n = 100;
     float[] x,y,z;
 
-    x = randfloat(n);
-    y = zerofloat(n);
-    z = zerofloat(n);
+    x = rands(n);
+    y = zeros(n);
+    z = zeros(n);
     df.apply(x,y);
     df.applyInverse(y,z);
     assertEqual(x,z);
@@ -139,9 +138,9 @@ public class DifferenceFilterTest extends TestCase {
 
     float d1,d2;
     float tiny = n*10.0f*FLT_EPSILON;
-    x = randfloat(n);
-    y = randfloat(n);
-    z = zerofloat(n);
+    x = rands(n);
+    y = rands(n);
+    z = zeros(n);
     df.apply(x,z);
     d1 = dot(z,y);
     df.applyTranspose(y,z);
@@ -160,9 +159,9 @@ public class DifferenceFilterTest extends TestCase {
     int n2 = 21;
     float[][] x,y,z;
 
-    x = randfloat(n1,n2);
-    y = zerofloat(n1,n2);
-    z = zerofloat(n1,n2);
+    x = rands(n1,n2);
+    y = zeros(n1,n2);
+    z = zeros(n1,n2);
     df.apply(x,y);
     df.applyInverse(y,z);
     assertEqual(x,z);
@@ -172,9 +171,9 @@ public class DifferenceFilterTest extends TestCase {
 
     float d1,d2;
     float tiny = n1*n2*10.0f*FLT_EPSILON;
-    x = randfloat(n1,n2);
-    y = randfloat(n1,n2);
-    z = zerofloat(n1,n2);
+    x = rands(n1,n2);
+    y = rands(n1,n2);
+    z = zeros(n1,n2);
     df.apply(x,z);
     d1 = dot(z,y);
     df.applyTranspose(y,z);
@@ -194,9 +193,9 @@ public class DifferenceFilterTest extends TestCase {
     int n3 = 12;
     float[][][] x,y,z;
 
-    x = randfloat(n1,n2,n3);
-    y = zerofloat(n1,n2,n3);
-    z = zerofloat(n1,n2,n3);
+    x = rands(n1,n2,n3);
+    y = zeros(n1,n2,n3);
+    z = zeros(n1,n2,n3);
     df.apply(x,y);
     df.applyInverse(y,z);
     assertEqual(x,z);
@@ -206,9 +205,9 @@ public class DifferenceFilterTest extends TestCase {
 
     float d1,d2;
     float tiny = n1*n2*n3*10.0f*FLT_EPSILON;
-    x = randfloat(n1,n2,n3);
-    y = randfloat(n1,n2,n3);
-    z = zerofloat(n1,n2,n3);
+    x = rands(n1,n2,n3);
+    y = rands(n1,n2,n3);
+    z = zeros(n1,n2,n3);
     df.apply(x,z);
     d1 = dot(z,y);
     df.applyTranspose(y,z);
@@ -221,34 +220,34 @@ public class DifferenceFilterTest extends TestCase {
     assertEquals(d1,d2,tiny);
   }
 
-  private static float[] randfloat(int n1) {
-    return ArrayMath.sub(ArrayMath.randfloat(n1),0.5f);
+  private static float[] rands(int n1) {
+    return sub(randfloat(n1),0.5f);
   }
-  private static float[][] randfloat(int n1, int n2) {
-    return ArrayMath.sub(ArrayMath.randfloat(n1,n2),0.5f);
+  private static float[][] rands(int n1, int n2) {
+    return sub(randfloat(n1,n2),0.5f);
   }
-  private static float[][][] randfloat(int n1, int n2, int n3) {
-    return ArrayMath.sub(ArrayMath.randfloat(n1,n2,n3),0.5f);
+  private static float[][][] rands(int n1, int n2, int n3) {
+    return sub(randfloat(n1,n2,n3),0.5f);
   }
 
-  private static float[] zerofloat(int n1) {
-    return ArrayMath.zerofloat(n1);
+  private static float[] zeros(int n1) {
+    return zerofloat(n1);
   }
-  private static float[][] zerofloat(int n1, int n2) {
-    return ArrayMath.zerofloat(n1,n2);
+  private static float[][] zeros(int n1, int n2) {
+    return zerofloat(n1,n2);
   }
-  private static float[][][] zerofloat(int n1, int n2, int n3) {
-    return ArrayMath.zerofloat(n1,n2,n3);
+  private static float[][][] zeros(int n1, int n2, int n3) {
+    return zerofloat(n1,n2,n3);
   }
 
   private static float dot(float[] x, float[] y) {
-    return ArrayMath.sum(ArrayMath.mul(x,y));
+    return sum(mul(x,y));
   }
   private static float dot(float[][] x, float[][] y) {
-    return ArrayMath.sum(ArrayMath.mul(x,y));
+    return sum(mul(x,y));
   }
   private static float dot(float[][][] x, float[][][] y) {
-    return ArrayMath.sum(ArrayMath.mul(x,y));
+    return sum(mul(x,y));
   }
 
   private static void assertEqual(float[] re, float[] ra) {
