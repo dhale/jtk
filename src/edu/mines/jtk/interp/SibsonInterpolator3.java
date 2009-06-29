@@ -89,13 +89,13 @@ public class SibsonInterpolator3 {
    */
   public enum Method {
    /**
-    * The Hale-Liang method.
+    * The Hale-Liang algorithm.
     * Developed by Dave Hale and Luming Liang at the Colorado School of
     * Mines. Accurate, robust and fast, this method is the default.
     */
     HALE_LIANG,
    /**
-    * The Braun-Sambridge method. Developed by Braun and Sambridge (1995),
+    * The Braun-Sambridge algorithm. Developed by Braun and Sambridge (1995),
     * this method uses Lasserre's (1983) algorithm for computing the volumes 
     * of polyhedra without computing their vertices. This method is much
     * slower than the other methods provided here. It may also suffer from 
