@@ -3,19 +3,20 @@ from edu.mines.jtk.awt import *
 from edu.mines.jtk.dsp import *
 from edu.mines.jtk.mosaic import *
 from edu.mines.jtk.util import *
+from edu.mines.jtk.util.ArrayMath import *
 
 True = 1
 False = 0
 
 n1 = 101;  d1 = 0.1;  f1 = 0.0
 n2 = 101;  d2 = 0.1;  f2 = 0.0
-f = Array.sin(Array.rampfloat(0.0,d1,d2,n1,n2))
+f = sin(rampfloat(0.0,d1,d2,n1,n2))
 s1 = Sampling(n1,d1,f1)
 s2 = Sampling(n2,d2,f2)
 
 ax = 0.5*d2*(n2-1)
-x1 = Array.rampfloat(f1,d1,n1)
-x2 = Array.add(ax,Array.mul(ax,Array.sin(x1)))
+x1 = rampfloat(f1,d1,n1)
+x2 = add(ax,mul(ax,sin(x1)))
 
 # For testing below.
 def makePlotPanel(orientation):

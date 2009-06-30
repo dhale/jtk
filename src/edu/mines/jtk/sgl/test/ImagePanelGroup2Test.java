@@ -9,8 +9,7 @@ package edu.mines.jtk.sgl.test;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.sgl.ImagePanelGroup2;
 import edu.mines.jtk.sgl.World;
-import edu.mines.jtk.util.ArrayMath;
-import static edu.mines.jtk.util.MathPlus.FLT_PI;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.sgl.ImagePanelGroup2}.
@@ -35,8 +34,8 @@ public class ImagePanelGroup2Test {
     float k1 = 4.0f*FLT_PI*(float)d1;
     float k2 = 4.0f*FLT_PI*(float)d2;
     float k3 = 4.0f*FLT_PI*(float)d3;
-    float[][][] fb = ArrayMath.rampfloat(0.0f,k1,k2,k3,n1,n2,n3);
-    float[][][] fa = ArrayMath.sin(fb);
+    float[][][] fb = rampfloat(0.0f,k1,k2,k3,n1,n2,n3);
+    float[][][] fa = sin(fb);
     ImagePanelGroup2 ipg = new ImagePanelGroup2(s1,s2,s3,fa,fb);
     ipg.setPercentiles1(1,99);
     World world = new World();
