@@ -72,6 +72,7 @@ public abstract class Mode extends AbstractAction {
   }
 
   // Override base class implementation. Disabled modes cannot be active.
+  @Override
   public void setEnabled(boolean enabled) {
     if (!enabled && isActive())
       setActive(false);
