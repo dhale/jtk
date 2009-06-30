@@ -88,27 +88,27 @@ public class SibsonInterpolator3 {
    * neighbors.
    */
   public enum Method {
-   /**
-    * The Hale-Liang algorithm.
-    * Developed by Dave Hale and Luming Liang at the Colorado School of
-    * Mines. Accurate, robust and fast, this method is the default.
-    */
+    /**
+     * The Hale-Liang algorithm.
+     * Developed by Dave Hale and Luming Liang at the Colorado School of
+     * Mines. Accurate, robust and fast, this method is the default.
+     */
     HALE_LIANG,
-   /**
-    * The Braun-Sambridge algorithm. Developed by Braun and Sambridge (1995),
-    * this method uses Lasserre's (1983) algorithm for computing the volumes 
-    * of polyhedra without computing their vertices. This method is much
-    * slower than the other methods provided here. It may also suffer from 
-    * numerical instability due to divisions in Lasserre's algorithm.
-    */
+    /**
+     * The Braun-Sambridge algorithm. Developed by Braun and Sambridge (1995),
+     * this method uses Lasserre's (1983) algorithm for computing the volumes 
+     * of polyhedra without computing their vertices. This method is much
+     * slower than the other methods provided here. It may also suffer from 
+     * numerical instability due to divisions in Lasserre's algorithm.
+     */
     BRAUN_SAMBRIDGE,
-   /**
-    * The Watson-Sambridge algorithm. Developed by Watson (1992) and
-    * described further by Sambridge et al. (1995). Though simplest to
-    * implement and fast, this method is inaccurate (sometimes wildly so) 
-    * at interpolation points (x1,x2,x3) that lie on or near edges of a 
-    * Delaunay triangulation of the scattered sample points. 
-    */
+    /**
+     * The Watson-Sambridge algorithm. Developed by Watson (1992) and
+     * described further by Sambridge et al. (1995). Though simplest to
+     * implement and fast, this method is inaccurate (sometimes wildly so) 
+     * at interpolation points (x1,x2,x3) that lie on or near edges of a 
+     * Delaunay triangulation of the scattered sample points. 
+     */
     WATSON_SAMBRIDGE,
   }
 

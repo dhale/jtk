@@ -10,8 +10,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.LocalCausalFilter;
-import edu.mines.jtk.util.ArrayMath;
-import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.LocalCausalFilter}.
@@ -42,10 +41,10 @@ public class LocalCausalFilterTest extends TestCase {
     float tiny = n*10.0f*FLT_EPSILON;
 
     { // y'Ax == x'A'y
-      float[] x = randfloat(n);
-      float[] y = randfloat(n);
-      float[] ax = zerofloat(n);
-      float[] ay = zerofloat(n);
+      float[] x = rands(n);
+      float[] y = rands(n);
+      float[] ax = zeros(n);
+      float[] ay = zeros(n);
       lcf.apply(a1,x,ax);
       lcf.applyTranspose(a1,y,ay);
       float dyx = dot(y,ax);
@@ -54,10 +53,10 @@ public class LocalCausalFilterTest extends TestCase {
     }
 
     { // y'Bx == x'B'y (for B = inv(A))
-      float[] x = randfloat(n);
-      float[] y = randfloat(n);
-      float[] bx = zerofloat(n);
-      float[] by = zerofloat(n);
+      float[] x = rands(n);
+      float[] y = rands(n);
+      float[] bx = zeros(n);
+      float[] by = zeros(n);
       lcf.applyInverse(a1,x,bx);
       lcf.applyInverseTranspose(a1,y,by);
       float dyx = dot(y,bx);
@@ -66,16 +65,16 @@ public class LocalCausalFilterTest extends TestCase {
     }
 
     { // x == BAx (for B = inv(A))
-      float[] x = randfloat(n);
-      float[] y = ArrayMath.copy(x);
+      float[] x = rands(n);
+      float[] y = copy(x);
       lcf.apply(a1,y,y); // in-place
       lcf.applyInverse(a1,y,y); // in-place
       assertEqual(x,y);
     }
 
     { // x == A'B'x (for B = inv(A))
-      float[] x = randfloat(n);
-      float[] y = zerofloat(n);
+      float[] x = rands(n);
+      float[] y = zeros(n);
       lcf.applyInverseTranspose(a1,x,y); // *not* in-place
       lcf.applyTranspose(a1,y,y); // in-place
       assertEqual(x,y);
@@ -95,15 +94,15 @@ public class LocalCausalFilterTest extends TestCase {
        1.79548454f, -0.64490664f, -0.03850411f, -0.01793403f, -0.00708972f,
       -0.02290331f, -0.04141619f, -0.08457147f, -0.20031442f, -0.55659920f
     };
-    final float[] ar = ArrayMath.mul(1.0f,aa);
-    final float[] as = ArrayMath.mul(2.0f,aa);
+    final float[] ar = mul(1.0f,aa);
+    final float[] as = mul(2.0f,aa);
     LocalCausalFilter lcf = new LocalCausalFilter(lag1,lag2);
     LocalCausalFilter.A2 a2 = new LocalCausalFilter.A2() {
       public void get(int i1, int i2, float[] a) {
         if ((i1+i2)%2==0) {
-          ArrayMath.copy(ar,a);
+          copy(ar,a);
         } else {
-          ArrayMath.copy(as,a);
+          copy(as,a);
         }
       }
     };
@@ -112,10 +111,10 @@ public class LocalCausalFilterTest extends TestCase {
     float tiny = n1*n2*10.0f*FLT_EPSILON;
 
     { // y'Ax == x'A'y
-      float[][] x = randfloat(n1,n2);
-      float[][] y = randfloat(n1,n2);
-      float[][] ax = zerofloat(n1,n2);
-      float[][] ay = zerofloat(n1,n2);
+      float[][] x = rands(n1,n2);
+      float[][] y = rands(n1,n2);
+      float[][] ax = zeros(n1,n2);
+      float[][] ay = zeros(n1,n2);
       lcf.apply(a2,x,ax);
       lcf.applyTranspose(a2,y,ay);
       float dyx = dot(y,ax);
@@ -124,10 +123,10 @@ public class LocalCausalFilterTest extends TestCase {
     }
 
     { // y'Bx == x'B'y (for B = inv(A))
-      float[][] x = randfloat(n1,n2);
-      float[][] y = randfloat(n1,n2);
-      float[][] bx = zerofloat(n1,n2);
-      float[][] by = zerofloat(n1,n2);
+      float[][] x = rands(n1,n2);
+      float[][] y = rands(n1,n2);
+      float[][] bx = zeros(n1,n2);
+      float[][] by = zeros(n1,n2);
       lcf.applyInverse(a2,x,bx);
       lcf.applyInverseTranspose(a2,y,by);
       float dyx = dot(y,bx);
@@ -136,16 +135,16 @@ public class LocalCausalFilterTest extends TestCase {
     }
 
     { // x == BAx (for B = inv(A))
-      float[][] x = randfloat(n1,n2);
-      float[][] y = ArrayMath.copy(x);
+      float[][] x = rands(n1,n2);
+      float[][] y = copy(x);
       lcf.apply(a2,y,y); // in-place
       lcf.applyInverse(a2,y,y); // in-place
       assertEqual(x,y);
     }
 
     { // x == A'B'x (for B = inv(A))
-      float[][] x = randfloat(n1,n2);
-      float[][] y = zerofloat(n1,n2);
+      float[][] x = rands(n1,n2);
+      float[][] y = zeros(n1,n2);
       lcf.applyInverseTranspose(a2,x,y); // *not* in-place
       lcf.applyTranspose(a2,y,y); // in-place
       assertEqual(x,y);
@@ -177,15 +176,15 @@ public class LocalCausalFilterTest extends TestCase {
       -0.0149963f, -0.0408317f, -0.0945958f, -0.0223166f, -0.0062781f, 
       -0.0213786f, -0.0898909f, -0.4322719f
     };
-    final float[] ar = ArrayMath.mul(1.0f,aa);
-    final float[] as = ArrayMath.mul(2.0f,aa);
+    final float[] ar = mul(1.0f,aa);
+    final float[] as = mul(2.0f,aa);
     LocalCausalFilter lcf = new LocalCausalFilter(lag1,lag2,lag3);
     LocalCausalFilter.A3 a3 = new LocalCausalFilter.A3() {
       public void get(int i1, int i2, int i3, float[] a) {
         if ((i1+i2+i3)%2==0) {
-          ArrayMath.copy(ar,a);
+          copy(ar,a);
         } else {
-          ArrayMath.copy(as,a);
+          copy(as,a);
         }
       }
     };
@@ -195,10 +194,10 @@ public class LocalCausalFilterTest extends TestCase {
     float tiny = n1*n2*n3*10.0f*FLT_EPSILON;
 
     { // y'Ax == x'A'y
-      float[][][] x = randfloat(n1,n2,n3);
-      float[][][] y = randfloat(n1,n2,n3);
-      float[][][] ax = zerofloat(n1,n2,n3);
-      float[][][] ay = zerofloat(n1,n2,n3);
+      float[][][] x = rands(n1,n2,n3);
+      float[][][] y = rands(n1,n2,n3);
+      float[][][] ax = zeros(n1,n2,n3);
+      float[][][] ay = zeros(n1,n2,n3);
       lcf.apply(a3,x,ax);
       lcf.applyTranspose(a3,y,ay);
       float dyx = dot(y,ax);
@@ -207,10 +206,10 @@ public class LocalCausalFilterTest extends TestCase {
     }
 
     { // y'Bx == x'B'y (for B = inv(A))
-      float[][][] x = randfloat(n1,n2,n3);
-      float[][][] y = randfloat(n1,n2,n3);
-      float[][][] bx = zerofloat(n1,n2,n3);
-      float[][][] by = zerofloat(n1,n2,n3);
+      float[][][] x = rands(n1,n2,n3);
+      float[][][] y = rands(n1,n2,n3);
+      float[][][] bx = zeros(n1,n2,n3);
+      float[][][] by = zeros(n1,n2,n3);
       lcf.applyInverse(a3,x,bx);
       lcf.applyInverseTranspose(a3,y,by);
       float dyx = dot(y,bx);
@@ -219,16 +218,16 @@ public class LocalCausalFilterTest extends TestCase {
     }
 
     { // x == BAx (for B = inv(A))
-      float[][][] x = randfloat(n1,n2,n3);
-      float[][][] y = ArrayMath.copy(x);
+      float[][][] x = rands(n1,n2,n3);
+      float[][][] y = copy(x);
       lcf.apply(a3,y,y); // in-place
       lcf.applyInverse(a3,y,y); // in-place
       assertEqual(x,y);
     }
 
     { // x == A'B'x (for B = inv(A))
-      float[][][] x = randfloat(n1,n2,n3);
-      float[][][] y = zerofloat(n1,n2,n3);
+      float[][][] x = rands(n1,n2,n3);
+      float[][][] y = zeros(n1,n2,n3);
       lcf.applyInverseTranspose(a3,x,y); // *not* in-place
       lcf.applyTranspose(a3,y,y); // in-place
       assertEqual(x,y);
@@ -238,34 +237,34 @@ public class LocalCausalFilterTest extends TestCase {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private static float[] randfloat(int n1) {
-    return ArrayMath.sub(ArrayMath.randfloat(n1),0.5f);
+  private static float[] rands(int n1) {
+    return sub(randfloat(n1),0.5f);
   }
-  private static float[][] randfloat(int n1, int n2) {
-    return ArrayMath.sub(ArrayMath.randfloat(n1,n2),0.5f);
+  private static float[][] rands(int n1, int n2) {
+    return sub(randfloat(n1,n2),0.5f);
   }
-  private static float[][][] randfloat(int n1, int n2, int n3) {
-    return ArrayMath.sub(ArrayMath.randfloat(n1,n2,n3),0.5f);
+  private static float[][][] rands(int n1, int n2, int n3) {
+    return sub(randfloat(n1,n2,n3),0.5f);
   }
 
-  private static float[] zerofloat(int n1) {
-    return ArrayMath.zerofloat(n1);
+  private static float[] zeros(int n1) {
+    return zerofloat(n1);
   }
-  private static float[][] zerofloat(int n1, int n2) {
-    return ArrayMath.zerofloat(n1,n2);
+  private static float[][] zeros(int n1, int n2) {
+    return zerofloat(n1,n2);
   }
-  private static float[][][] zerofloat(int n1, int n2, int n3) {
-    return ArrayMath.zerofloat(n1,n2,n3);
+  private static float[][][] zeros(int n1, int n2, int n3) {
+    return zerofloat(n1,n2,n3);
   }
 
   private static float dot(float[] x, float[] y) {
-    return ArrayMath.sum(ArrayMath.mul(x,y));
+    return sum(mul(x,y));
   }
   private static float dot(float[][] x, float[][] y) {
-    return ArrayMath.sum(ArrayMath.mul(x,y));
+    return sum(mul(x,y));
   }
   private static float dot(float[][][] x, float[][][] y) {
-    return ArrayMath.sum(ArrayMath.mul(x,y));
+    return sum(mul(x,y));
   }
 
   private static void assertEqual(float[] re, float[] ra) {

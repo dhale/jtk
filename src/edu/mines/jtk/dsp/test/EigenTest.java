@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.Eigen;
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Stopwatch;
 
 /**
@@ -35,8 +35,8 @@ public class EigenTest extends TestCase {
     double[][] v = new double[2][2];
     double[] d = new double[2];
     for (int irand=0; irand<nrand; ++irand) {
-      double[][] a = ArrayMath.randdouble(2,2);
-      a = ArrayMath.add(a, ArrayMath.transpose(a));
+      double[][] a = randdouble(2,2);
+      a = add(a, transpose(a));
       Eigen.solveSymmetric22(a,v,d);
       check(a,v,d);
     }
@@ -47,8 +47,8 @@ public class EigenTest extends TestCase {
     double[] d = new double[3];
     int nrand = 10000;
     for (int irand=0; irand<nrand; ++irand) {
-      //double[][] a = ArrayMath.randdouble(3,3);
-      //a = ArrayMath.add(a,ArrayMath.transpose(a));
+      //double[][] a = randdouble(3,3);
+      //a = add(a,transpose(a));
       double[][] a = makeRandomSymmetric33();
       Eigen.solveSymmetric33(a,v,d);
       check(a,v,d);
@@ -192,8 +192,8 @@ public class EigenTest extends TestCase {
     int nrand = 10000;
     double[][][] a = new double[nrand][][];
     for (int irand=0; irand<nrand; ++irand) {
-      a[irand] = ArrayMath.randdouble(3,3);
-      a[irand] = ArrayMath.add(a[irand], ArrayMath.transpose(a[irand]));
+      a[irand] = randdouble(3,3);
+      a[irand] = add(a[irand],transpose(a[irand]));
     }
     double[][] v = new double[3][3];
     double[] d = new double[3];

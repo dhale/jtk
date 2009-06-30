@@ -22,6 +22,7 @@ from edu.mines.jtk.dsp import *
 from edu.mines.jtk.io import *
 from edu.mines.jtk.mosaic import *
 from edu.mines.jtk.util import *
+from edu.mines.jtk.util.ArrayMath import *
 
 True = 1
 False = 0
@@ -68,7 +69,7 @@ def makePyramidandPlotBasisImages2D(filename):
       plot(pyr[lev][dir],0.00125,)
   y = spyr.sumPyramid(1,pyr)
   plot(y,0.0125,)
-  Array.sub(x,y,y)
+  sub(x,y,y)
   plot(y,0.0125,)
 
 def makePyramidandPlotBasisImages3D(filename):
@@ -82,13 +83,13 @@ def makePyramidandPlotBasisImages3D(filename):
       sliceplot(pyr[lev][dir],0.00125,)
   y = spyr.sumPyramid(1,pyr)
   sliceplot(y,0.0125,)
-  Array.sub(x,y,y)
+  sub(x,y,y)
   sliceplot(y,0.0125,)
 
 def makePyramidSteerSumandCascadePlot2D(filename):
   x = readImage2D(filename)
   plot(x,0.0125,)
-  y = Array.copy(x)
+  y = copy(x)
   for i in range(0,5,1):
     pyr = spyr.makePyramid(y)
     attr = spyr.estimateAttributes(2.0,pyr)
@@ -99,7 +100,7 @@ def makePyramidSteerSumandCascadePlot2D(filename):
 def SubtractPlanesthenHighlightChannels3D(filename):
   x = readImage3D(filename)
   sliceplot(x,0.0100,)
-  y = Array.copy(x)
+  y = copy(x)
   # Smooth locally-planar and plot.
   for i in range(0,3,1):
     pyr = spyr.makePyramid(y)
@@ -108,7 +109,7 @@ def SubtractPlanesthenHighlightChannels3D(filename):
     y = spyr.sumPyramid(1,pyr)
     sliceplot(y,0.0100,)
   # Subtract smoothed planes and plot.
-  Array.sub(x,y,y)
+  sub(x,y,y)
   sliceplot(y,0.0100,)
   # Smooth locally-linear, threshold and plot.
   pyr = spyr.makePyramid(y)
@@ -120,19 +121,19 @@ def SubtractPlanesthenHighlightChannels3D(filename):
 def readImage2D(infile):
   fileName = dataDir+infile
   ais = ArrayInputStream(fileName,ByteOrder.BIG_ENDIAN)
-  x = Array.zerofloat(nr1,nr2)
+  x = zerofloat(nr1,nr2)
   ais.readFloats(x)
   ais.close()
-  print "x min =",Array.min(x)," max =",Array.max(x)
+  print "x min =",min(x)," max =",max(x)
   return x
 
 def readImage3D(infile):
   fileName = dataDir+infile
   ais = ArrayInputStream(fileName,ByteOrder.BIG_ENDIAN)
-  x = Array.zerofloat(n3d1,n3d2,n3d3)
+  x = zerofloat(n3d1,n3d2,n3d3)
   ais.readFloats(x)
   ais.close()
-  print "x min =",Array.min(x)," max =",Array.max(x)
+  print "x min =",min(x)," max =",max(x)
   return x
 
 #############################################################################
@@ -157,15 +158,15 @@ def sliceplot(x,clip=0.0,png=None):
   np3 = len(x)
   np2 = len(x[0])
   np1 = len(x[0][0])
-  islice = Array.zerofloat(np2, np1)
+  islice = zerofloat(np2, np1)
   for i2 in range(np2):
     for i1 in range(np1):
       islice[i1][i2] = x[(int)(np3/2.0)][i2][np1-1-i1]
-  xslice = Array.zerofloat(np3, np1)
+  xslice = zerofloat(np3, np1)
   for i2 in range(np3):
     for i1 in range(np1):
       xslice[i1][i2] = x[i2][(int)(np2/2.0)][np1-1-i1]
-  tslice = Array.zerofloat(np2, np3)
+  tslice = zerofloat(np2, np3)
   for i2 in range(np3):
     for i1 in range(np2):
       tslice[i2][i1] = x[i2][i1][(int)(np1/2.0)]

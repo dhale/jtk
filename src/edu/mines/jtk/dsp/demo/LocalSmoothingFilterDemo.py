@@ -11,6 +11,7 @@ from edu.mines.jtk.mosaic import *
 from edu.mines.jtk.sgl import *
 from edu.mines.jtk.sgl.test import *
 from edu.mines.jtk.util import *
+from edu.mines.jtk.util.ArrayMath import *
 
 #############################################################################
 # functions
@@ -27,10 +28,10 @@ def getNearestNeighbors(t,x,n1):
      for specified lists t and x that define a sampled function x(t). 
      n1 is the number of samples in the returned 1D arrays d and y."""
   nt = len(t)
-  d = Array.zerofloat(n1)
-  y = Array.zerofloat(n1)
+  d = zerofloat(n1)
+  y = zerofloat(n1)
   for i1 in range(n1):
-    kt = Array.binarySearch(t,i1)
+    kt = binarySearch(t,i1)
     if kt<0:
       kt = -1-kt
     if kt>=nt:
@@ -52,8 +53,8 @@ def doInterpExample1():
   t = [ 60.0, 100.0, 170.0, 200.0, 250.0]
   x = [  1.0,   2.0,   2.7,   3.0,   2.0]
   d,y = getNearestNeighbors(t,x,n1)
-  #d = Array.clip(0.0,25.0,d)
-  s = Array.mul(d,d)
+  #d = clip(0.0,25.0,d)
+  s = mul(d,d)
   SimplePlot.asPoints(d)
   SimplePlot.asPoints(s)
   sp = SimplePlot()
@@ -64,7 +65,7 @@ def doInterpExample1():
   pvy.setLineStyle(PointsView.Line.DASH)
   lsf = LocalSmoothingFilter()
   for c,color in [(0.1,Color.RED),(0.3,Color.GREEN),(0.5,Color.BLUE)]:
-    z = Array.zerofloat(n1)
+    z = zerofloat(n1)
     lsf.apply(c,s,y,z)
     pvz = sp.addPoints(z)
     pvz.setLineColor(color)
@@ -73,9 +74,9 @@ def doSmoothExample1():
   n1 = 315
   sigma = 10.0
   c = 0.5*sigma*sigma;
-  s = Array.abs(Array.rampfloat(1.0,-2.0/(n1-1),n1))
-  s = Array.mul(s,s)
-  x = Array.zerofloat(n1)
+  s = abs(rampfloat(1.0,-2.0/(n1-1),n1))
+  s = mul(s,s)
+  x = zerofloat(n1)
   x[1*n1/8] = 1.0
   x[2*n1/8] = 1.0
   x[3*n1/8] = 1.0
@@ -84,7 +85,7 @@ def doSmoothExample1():
   x[6*n1/8] = 1.0
   x[7*n1/8] = 1.0
   lsf = LocalSmoothingFilter()
-  y = Array.zerofloat(n1)
+  y = zerofloat(n1)
   lsf.apply(c,s,x,y)
   SimplePlot.asPoints(s);
   SimplePlot.asPoints(x);
@@ -101,8 +102,8 @@ def doTargetExample2():
   t = makeTargetImage2(n1,n2)
   d = makeTensors2(t)
   lsf = LocalSmoothingFilter(small,niter)
-  y = Array.copy(x)
-  #y = Array.zerofloat(n1,n2)
+  y = copy(x)
+  #y = zerofloat(n1,n2)
   lsf.apply(d,scale,x,y)
   plot2(y)
 
@@ -118,18 +119,18 @@ def doTargetExample3():
   #plot3(t)
   d = makeTensors3(t)
   lsf = LocalSmoothingFilter(small,niter)
-  y = Array.copy(x)
-  #y = Array.zerofloat(n1,n2,n3)
+  y = copy(x)
+  #y = zerofloat(n1,n2,n3)
   lsf.apply(d,scale,x,y)
   plot3(y)
 
 def makeRandomImage2(n1,n2):
-  r = Array.sub(Array.randfloat(n1,n2),0.5)
+  r = sub(randfloat(n1,n2),0.5)
   r = smooth2(r)
   return r
 
 def makeBlockyImage2(n1,n2):
-  r = Array.zerofloat(n1,n2)
+  r = zerofloat(n1,n2)
   for i2 in range(0,n2/2):
     for i1 in range(n1):
       r[i2][i1] = 1.0
@@ -141,14 +142,14 @@ def makeBlockyImage2(n1,n2):
   return r
 
 def makeRandomImage3(n1,n2,n3):
-  r = Array.sub(Array.randfloat(n1,n2,n3),0.5)
+  r = sub(randfloat(n1,n2,n3),0.5)
   r = smooth3(r)
   return r
 
 def makeTargetImage2(n1,n2):
   k = 0.3
   c1,c2 = n1/2,n2/2
-  f = Array.zerofloat(n1,n2)
+  f = zerofloat(n1,n2)
   for i2 in range(n2):
     d2 = i2-c2
     for i1 in range(n1):
@@ -159,7 +160,7 @@ def makeTargetImage2(n1,n2):
 def makeTargetImage3(n1,n2,n3):
   k = 0.3
   c1,c2,c3 = n1/2,n2/2,n3/2
-  f = Array.zerofloat(n1,n2,n3)
+  f = zerofloat(n1,n2,n3)
   for i3 in range(n3):
     d3 = i3-c3
     for i2 in range(n2):
@@ -171,14 +172,14 @@ def makeTargetImage3(n1,n2,n3):
 
 def smooth2(x):
   n1,n2 = len(x[0]),len(x)
-  y = Array.zerofloat(n1,n2)
+  y = zerofloat(n1,n2)
   rgf = RecursiveGaussianFilter(1.0)
   rgf.apply00(x,y)
   return y
 
 def smooth3(x):
   n1,n2,n3 = len(x[0][0]),len(x[0]),len(x)
-  y = Array.zerofloat(n1,n2,n3)
+  y = zerofloat(n1,n2,n3)
   rgf = RecursiveGaussianFilter(1.0)
   rgf.apply000(x,y)
   return y

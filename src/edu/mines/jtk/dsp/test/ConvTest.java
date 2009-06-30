@@ -12,9 +12,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.Conv;
-import static edu.mines.jtk.util.ArrayMath.randfloat;
-import static edu.mines.jtk.util.ArrayMath.zerofloat;
-import static edu.mines.jtk.util.MathPlus.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.Conv}.

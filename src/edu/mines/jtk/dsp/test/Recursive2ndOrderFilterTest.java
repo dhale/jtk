@@ -10,8 +10,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.Recursive2ndOrderFilter;
-import edu.mines.jtk.util.ArrayMath;
-import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.Recursive2ndOrderFilter}.
@@ -35,20 +34,20 @@ public class Recursive2ndOrderFilterTest extends TestCase {
   public void test1(float b0, float b1, float b2, float a1, float a2) {
     int n = 100;
     float[] x,y1,y2;
-    x = ArrayMath.randfloat(n);
+    x = randfloat(n);
     Recursive2ndOrderFilter rf = new Recursive2ndOrderFilter(b0,b1,b2,a1,a2);
 
-    y1 = ArrayMath.copy(x);
+    y1 = copy(x);
     rf.applyForward(y1,y1);
-    y2 = ArrayMath.reverse(x);
+    y2 = reverse(x);
     rf.applyReverse(y2,y2);
-    y2 = ArrayMath.reverse(y2);
+    y2 = reverse(y2);
     assertEqual(y1,y2);
 
     rf.accumulateForward(y1,y1);
-    y2 = ArrayMath.reverse(y2);
+    y2 = reverse(y2);
     rf.accumulateReverse(y2,y2);
-    y2 = ArrayMath.reverse(y2);
+    y2 = reverse(y2);
     assertEqual(y1,y2);
   }
 
@@ -63,27 +62,27 @@ public class Recursive2ndOrderFilterTest extends TestCase {
   public void test2(float b0, float b1, float b2, float a1, float a2) {
     int n = 20;
     float[][] x,y1,y2;
-    x = ArrayMath.randfloat(n,n);
+    x = randfloat(n,n);
     Recursive2ndOrderFilter rf = new Recursive2ndOrderFilter(b0,b1,b2,a1,a2);
 
-    y1 = ArrayMath.copy(x);
+    y1 = copy(x);
     rf.apply1Forward(y1,y1);
     rf.accumulate1Forward(y1,y1);
 
-    y2 = ArrayMath.transpose(x);
+    y2 = transpose(x);
     rf.apply2Forward(y2,y2);
     rf.accumulate2Forward(y2,y2);
-    y2 = ArrayMath.transpose(y2);
+    y2 = transpose(y2);
     assertEqual(y1,y2);
 
-    y1 = ArrayMath.copy(x);
+    y1 = copy(x);
     rf.apply1Reverse(y1,y1);
     rf.accumulate1Reverse(y1,y1);
 
-    y2 = ArrayMath.transpose(x);
+    y2 = transpose(x);
     rf.apply2Reverse(y2,y2);
     rf.accumulate2Reverse(y2,y2);
-    y2 = ArrayMath.transpose(y2);
+    y2 = transpose(y2);
     assertEqual(y1,y2);
   }
 
@@ -98,10 +97,10 @@ public class Recursive2ndOrderFilterTest extends TestCase {
   public void test3(float b0, float b1, float b2, float a1, float a2) {
     int n = 20;
     float[][][] x,y1,y2;
-    x = ArrayMath.randfloat(n,n,n);
+    x = randfloat(n,n,n);
     Recursive2ndOrderFilter rf = new Recursive2ndOrderFilter(b0,b1,b2,a1,a2);
 
-    y1 = ArrayMath.copy(x);
+    y1 = copy(x);
     rf.apply1Forward(y1,y1);
     rf.accumulate1Forward(y1,y1);
 
@@ -117,7 +116,7 @@ public class Recursive2ndOrderFilterTest extends TestCase {
     y2 = transpose13(y2);
     assertEqual(y1,y2);
 
-    y1 = ArrayMath.copy(x);
+    y1 = copy(x);
     rf.apply1Reverse(y1,y1);
     rf.accumulate1Reverse(y1,y1);
 

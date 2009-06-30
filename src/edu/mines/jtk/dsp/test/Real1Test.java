@@ -11,7 +11,7 @@ import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.Real1;
 import edu.mines.jtk.dsp.Sampling;
-import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
+import static edu.mines.jtk.util.ArrayMath.FLT_EPSILON;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.Real1}.

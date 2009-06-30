@@ -10,8 +10,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.MinimumPhaseFilter;
-import edu.mines.jtk.util.ArrayMath;
-import static edu.mines.jtk.util.MathPlus.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.MinimumPhaseFilter}.
@@ -31,9 +30,9 @@ public class MinimumPhaseFilterTest extends TestCase {
     int n = 100;
     float[] x,y,z;
 
-    x = randfloat(n);
-    y = zerofloat(n);
-    z = zerofloat(n);
+    x = rands(n);
+    y = zeros(n);
+    z = zeros(n);
     mpf.apply(x,y);
     mpf.applyInverse(y,z);
     assertEqual(x,z);
@@ -43,9 +42,9 @@ public class MinimumPhaseFilterTest extends TestCase {
 
     float d1,d2;
     float tiny = n*10.0f*FLT_EPSILON;
-    x = randfloat(n);
-    y = randfloat(n);
-    z = zerofloat(n);
+    x = rands(n);
+    y = rands(n);
+    z = zeros(n);
     mpf.apply(x,z);
     d1 = dot(z,y);
     mpf.applyTranspose(y,z);
@@ -77,9 +76,9 @@ public class MinimumPhaseFilterTest extends TestCase {
     int n2 = 21;
     float[][] x,y,z;
 
-    x = randfloat(n1,n2);
-    y = zerofloat(n1,n2);
-    z = zerofloat(n1,n2);
+    x = rands(n1,n2);
+    y = zeros(n1,n2);
+    z = zeros(n1,n2);
     mpf.apply(x,y);
     mpf.applyInverse(y,z);
     assertEqual(x,z);
@@ -89,9 +88,9 @@ public class MinimumPhaseFilterTest extends TestCase {
 
     float d1,d2;
     float tiny = n1*n2*10.0f*FLT_EPSILON;
-    x = randfloat(n1,n2);
-    y = randfloat(n1,n2);
-    z = zerofloat(n1,n2);
+    x = rands(n1,n2);
+    y = rands(n1,n2);
+    z = zeros(n1,n2);
     mpf.apply(x,z);
     d1 = dot(z,y);
     mpf.applyTranspose(y,z);
@@ -135,9 +134,9 @@ public class MinimumPhaseFilterTest extends TestCase {
     int n3 = 12;
     float[][][] x,y,z;
 
-    x = randfloat(n1,n2,n3);
-    y = zerofloat(n1,n2,n3);
-    z = zerofloat(n1,n2,n3);
+    x = rands(n1,n2,n3);
+    y = zeros(n1,n2,n3);
+    z = zeros(n1,n2,n3);
     mpf.apply(x,y);
     mpf.applyInverse(y,z);
     assertEqual(x,z);
@@ -147,9 +146,9 @@ public class MinimumPhaseFilterTest extends TestCase {
 
     float d1,d2;
     float tiny = n1*n2*n3*10.0f*FLT_EPSILON;
-    x = randfloat(n1,n2,n3);
-    y = randfloat(n1,n2,n3);
-    z = zerofloat(n1,n2,n3);
+    x = rands(n1,n2,n3);
+    y = rands(n1,n2,n3);
+    z = zeros(n1,n2,n3);
     mpf.apply(x,z);
     d1 = dot(z,y);
     mpf.applyTranspose(y,z);
@@ -206,8 +205,8 @@ public class MinimumPhaseFilterTest extends TestCase {
       }
     }
     //System.out.println("2-D Laplacian:");
-    //ArrayMath.dump(r);
-    //ArrayMath.dump(s);
+    //dump(r);
+    //dump(s);
   }
 
   public void testFactorLaplacian3() {
@@ -260,8 +259,8 @@ public class MinimumPhaseFilterTest extends TestCase {
       }
     }
     //System.out.println("3-D Laplacian:");
-    //ArrayMath.dump(r);
-    //ArrayMath.dump(s);
+    //dump(r);
+    //dump(s);
   }
 
   public void xtestFactorPlane2Filter() {
@@ -297,15 +296,15 @@ public class MinimumPhaseFilterTest extends TestCase {
         {     -p12*p12, -2.0f*m12*p12,     -m12*m12}
       };
       mpf.factorWilsonBurg(maxiter,epsilon,r);
-      ArrayMath.dump(r);
-      ArrayMath.zero(s);
+      dump(r);
+      zero(s);
       int k1 = (s[0].length-1)/2;
       int k2 = (s.length-1)/2;
       s[k2][k1] = 1.0f;
       mpf.apply(s,t);
       mpf.applyTranspose(t,s);
-      ArrayMath.dump(s);
-      ArrayMath.dump(t);
+      dump(s);
+      dump(t);
     }
   }
 
@@ -434,16 +433,16 @@ public class MinimumPhaseFilterTest extends TestCase {
           if (abs(a[j])>amax[j])
             amax[j] = abs(a[j]);
         }
-        //ArrayMath.dump(r);
-        ArrayMath.zero(s);
+        //dump(r);
+        zero(s);
         int k1 = (s[0][0].length-1)/2;
         int k2 = (s[0].length-1)/2;
         int k3 = (s.length-1)/2;
         s[k3][k2][k1] = 1.0f;
         mpf.apply(s,t);
         mpf.applyTranspose(t,s);
-        //ArrayMath.dump(s);
-        //ArrayMath.dump(t);
+        //dump(s);
+        //dump(t);
       }
     }
     for (int j=0; j<m; ++j)
@@ -456,34 +455,34 @@ public class MinimumPhaseFilterTest extends TestCase {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private static float[] randfloat(int n1) {
-    return ArrayMath.sub(ArrayMath.randfloat(n1),0.5f);
+  private static float[] rands(int n1) {
+    return sub(randfloat(n1),0.5f);
   }
-  private static float[][] randfloat(int n1, int n2) {
-    return ArrayMath.sub(ArrayMath.randfloat(n1,n2),0.5f);
+  private static float[][] rands(int n1, int n2) {
+    return sub(randfloat(n1,n2),0.5f);
   }
-  private static float[][][] randfloat(int n1, int n2, int n3) {
-    return ArrayMath.sub(ArrayMath.randfloat(n1,n2,n3),0.5f);
+  private static float[][][] rands(int n1, int n2, int n3) {
+    return sub(randfloat(n1,n2,n3),0.5f);
   }
 
-  private static float[] zerofloat(int n1) {
-    return ArrayMath.zerofloat(n1);
+  private static float[] zeros(int n1) {
+    return zerofloat(n1);
   }
-  private static float[][] zerofloat(int n1, int n2) {
-    return ArrayMath.zerofloat(n1,n2);
+  private static float[][] zeros(int n1, int n2) {
+    return zerofloat(n1,n2);
   }
-  private static float[][][] zerofloat(int n1, int n2, int n3) {
-    return ArrayMath.zerofloat(n1,n2,n3);
+  private static float[][][] zeros(int n1, int n2, int n3) {
+    return zerofloat(n1,n2,n3);
   }
 
   private static float dot(float[] x, float[] y) {
-    return ArrayMath.sum(ArrayMath.mul(x,y));
+    return sum(mul(x,y));
   }
   private static float dot(float[][] x, float[][] y) {
-    return ArrayMath.sum(ArrayMath.mul(x,y));
+    return sum(mul(x,y));
   }
   private static float dot(float[][][] x, float[][][] y) {
-    return ArrayMath.sum(ArrayMath.mul(x,y));
+    return sum(mul(x,y));
   }
 
   private static void assertEqual(float[] re, float[] ra) {

@@ -6,9 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.la;
 
-import static java.lang.Math.*;
-
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -99,7 +97,7 @@ public class DMatrixEvd {
    * @return array of real parts = real(diag(D)).
    */
   public double[] getRealEigenvalues() {
-    return ArrayMath.copy(_d);
+    return copy(_d);
   }
 
   /** 
@@ -107,7 +105,7 @@ public class DMatrixEvd {
    * @return array of imaginary parts = imag(diag(D))
    */
   public double[] getImagEigenvalues() {
-    return ArrayMath.copy(_e);
+    return copy(_e);
   }
 
   ///////////////////////////////////////////////////////////////////////////

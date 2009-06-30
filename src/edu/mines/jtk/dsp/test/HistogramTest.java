@@ -10,7 +10,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.dsp.Histogram;
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.Histogram}.
@@ -26,7 +26,7 @@ public class HistogramTest extends TestCase {
   public void testConstant() {
     int n = 1001;
     float vfill = 2.0f;
-    float[] v = ArrayMath.fillfloat(vfill,n);
+    float[] v = fillfloat(vfill,n);
 
     // Test with default range and number of bins.
     float vmin = vfill;
@@ -95,9 +95,9 @@ public class HistogramTest extends TestCase {
 
   public void testRamp() {
     int n = 1001;
-    float[] v = ArrayMath.rampfloat(0.0f,1.0f,n);
-    float vmin = ArrayMath.min(v);
-    float vmax = ArrayMath.max(v);
+    float[] v = rampfloat(0.0f,1.0f,n);
+    float vmin = min(v);
+    float vmax = max(v);
     int nbin = 10;
     double dbin = (vmax-vmin)/nbin;
     double fbin = vmin+0.5*dbin;
@@ -118,7 +118,7 @@ public class HistogramTest extends TestCase {
     for (int i=0; i<n; ++i)
       v[i] = (float)r.nextGaussian();
     //Histogram h = new Histogram(v);
-    //ArrayMath.dump(h.getDensities());
+    //dump(h.getDensities());
     //int nbin = h.getBinCount();
     //double dbin = h.getBinDelta();
     //double fbin = h.getBinFirst();
