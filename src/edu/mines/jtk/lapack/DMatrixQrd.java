@@ -6,11 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack;
 
-import static java.lang.Math.min;
-
 import static edu.mines.jtk.lapack.Blas.*;
 import static edu.mines.jtk.lapack.Lapack.*;
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -63,7 +61,7 @@ public class DMatrixQrd {
    * @return the m-by-n matrix factor Q.
    */
   public DMatrix getQ() {
-    double[] q = ArrayMath.copy(_qr);
+    double[] q = copy(_qr);
     dorgqr(_m,_n,_k,q,_m,_tau,_work,_lwork);
     return new DMatrix(_m,_n,q);
   }

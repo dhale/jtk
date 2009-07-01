@@ -27,7 +27,7 @@ public class ClipsTest extends TestCase {
   public void testPercentiles() {
     double tiny = 10.0f*FLT_EPSILON;
     int n = 101;
-    //float[][][] f = ArrayMath.rampfloat(0.0f,1.0f,0.0f,0.0f,n,n,n);
+    //float[][][] f = rampfloat(0.0f,1.0f,0.0f,0.0f,n,n,n);
     //SimpleFloat3 f3 = new SimpleFloat3(f);
     //Clips clips = new Clips(f3);
     float[] f = rampfloat(0.0f,1.0f,n);

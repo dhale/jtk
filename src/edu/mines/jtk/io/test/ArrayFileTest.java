@@ -8,14 +8,13 @@ package edu.mines.jtk.io.test;
 
 import java.io.File;
 import java.io.IOException;
-import static java.lang.Math.min;
 import java.nio.ByteOrder;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.io.ArrayFile;
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.io.ArrayFile}.
@@ -59,8 +58,8 @@ public class ArrayFileTest extends TestCase {
   private static void testFloat(ArrayFile af, int n) 
     throws IOException 
   {
-    float[] a = ArrayMath.randfloat(n);
-    float[] b = ArrayMath.zerofloat(n);
+    float[] a = randfloat(n);
+    float[] b = zerofloat(n);
 
     af.seek(0);
     af.writeFloats(a);
@@ -69,7 +68,7 @@ public class ArrayFileTest extends TestCase {
     for (int i=0; i<n; ++i)
       assertEquals(a[i],b[i]);
 
-    ArrayMath.zero(b);
+    zero(b);
     af.seek(0);
     for (int i=0; i<n; ++i)
       af.writeFloat(a[i]);
@@ -86,7 +85,7 @@ public class ArrayFileTest extends TestCase {
     af.seek(0);
     for (int i=0; i<n; ++i)
       af.writeFloat(a[i]);
-    ArrayMath.zero(b);
+    zero(b);
     af.seek(0);
     af.readFloats(b);
     for (int i=0; i<n; ++i)
@@ -96,7 +95,7 @@ public class ArrayFileTest extends TestCase {
     af.seek(0);
     for (int j=0; j<n; j+=mw)
       af.writeFloats(a,j,min(n-j,mw));
-    ArrayMath.zero(b);
+    zero(b);
     af.seek(0);
     int mr = 2739;
     for (int j=0; j<n; j+=mr)
@@ -108,8 +107,8 @@ public class ArrayFileTest extends TestCase {
   private static void testDouble(ArrayFile af, int n) 
     throws IOException 
   {
-    double[] a = ArrayMath.randdouble(n);
-    double[] b = ArrayMath.zerodouble(n);
+    double[] a = randdouble(n);
+    double[] b = zerodouble(n);
 
     af.seek(0);
     af.writeDoubles(a);
@@ -118,7 +117,7 @@ public class ArrayFileTest extends TestCase {
     for (int i=0; i<n; ++i)
       assertEquals(a[i],b[i]);
 
-    ArrayMath.zero(b);
+    zero(b);
     af.seek(0);
     for (int i=0; i<n; ++i)
       af.writeDouble(a[i]);
@@ -135,7 +134,7 @@ public class ArrayFileTest extends TestCase {
     af.seek(0);
     for (int i=0; i<n; ++i)
       af.writeDouble(a[i]);
-    ArrayMath.zero(b);
+    zero(b);
     af.seek(0);
     af.readDoubles(b);
     for (int i=0; i<n; ++i)
@@ -145,7 +144,7 @@ public class ArrayFileTest extends TestCase {
     af.seek(0);
     for (int j=0; j<n; j+=mw)
       af.writeDoubles(a,j,min(n-j,mw));
-    ArrayMath.zero(b);
+    zero(b);
     af.seek(0);
     int mr = 2739;
     for (int j=0; j<n; j+=mr)

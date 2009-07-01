@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import edu.mines.jtk.util.UnitSphereSampling;
+//import static edu.mines.jtk.util.ArrayMath.dump;
 
 /**
  * Tests {@link edu.mines.jtk.util.UnitSphereSampling}.
@@ -155,10 +156,10 @@ public class UnitSphereSamplingTest extends TestCase {
       // TODO: more assertions?
       /*
       trace("wa="+wa+" wb="+wb+" wc="+wc);
-      edu.mines.jtk.util.ArrayMath.dump(p);
-      edu.mines.jtk.util.ArrayMath.dump(qa);
-      edu.mines.jtk.util.ArrayMath.dump(qb);
-      edu.mines.jtk.util.ArrayMath.dump(qc);
+      dump(p);
+      dump(qa);
+      dump(qb);
+      dump(qc);
       */
     }
   }
@@ -184,9 +185,9 @@ public class UnitSphereSamplingTest extends TestCase {
     float dmaxDegrees = (float)(dmax*180.0/PI);
     trace("npoint="+npoint+" dmax="+dmax+" degrees="+dmaxDegrees);
     trace("pmax=");
-    edu.mines.jtk.util.ArrayMath.dump(pmax);
+    dump(pmax);
     trace("qmax=");
-    edu.mines.jtk.util.ArrayMath.dump(qmax);
+    dump(qmax);
     */
     assertTrue(dmax<error);
   }

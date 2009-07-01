@@ -10,9 +10,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.util.MathPlus.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * A view of points (x1,x2) with marks at points and/or lines between them.
@@ -82,7 +81,7 @@ public class PointsView extends TiledView {
    * @param x2 array of x2 coordinates.
    */
   public PointsView(float[] x2) {
-    float[] x1 = ArrayMath.rampfloat(0.0f,1.0f,x2.length);
+    float[] x1 = rampfloat(0.0f,1.0f,x2.length);
     set(x1,x2);
   }
 
@@ -181,10 +180,10 @@ public class PointsView extends TiledView {
     _x3.clear();
     _nxmax = x1.length;
     _nx.add(x1.length);
-    _x1.add(ArrayMath.copy(x1));
-    _x2.add(ArrayMath.copy(x2));
+    _x1.add(copy(x1));
+    _x2.add(copy(x2));
     if (x3!=null)
-      _x3.add(ArrayMath.copy(x3));
+      _x3.add(copy(x3));
     updateBestProjectors();
     repaint();
   }
@@ -222,10 +221,10 @@ public class PointsView extends TiledView {
                     "x1[i].length equals x2[i].length");
       _nxmax = max(_nxmax,x1[is].length);
       _nx.add(x1[is].length);
-      _x1.add(ArrayMath.copy(x1[is]));
-      _x2.add(ArrayMath.copy(x2[is]));
+      _x1.add(copy(x1[is]));
+      _x2.add(copy(x2[is]));
       if (x3!=null)
-        _x3.add(ArrayMath.copy(x3[is]));
+        _x3.add(copy(x3[is]));
     }
     updateBestProjectors();
     repaint();

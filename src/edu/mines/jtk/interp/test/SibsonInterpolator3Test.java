@@ -7,7 +7,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.interp.test;
 
 import java.awt.*;
-import static java.lang.Math.min;
 import javax.swing.*;
 
 import junit.framework.TestCase;
@@ -17,8 +16,8 @@ import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.interp.SibsonInterpolator3;
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Stopwatch;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.interp.SibsonInterpolator3}.
@@ -182,7 +181,7 @@ public class SibsonInterpolator3Test extends TestCase {
         tmin = min(tmin,sw.time());
       }
       System.out.println("method="+method+" time="+tmin);
-      System.out.println("min="+ ArrayMath.min(g)+" max="+ ArrayMath.max(g));
+      System.out.println("min="+min(g)+" max="+max(g));
       plot(method,g);
     }
   }

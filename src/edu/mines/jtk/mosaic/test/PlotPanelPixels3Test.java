@@ -13,7 +13,7 @@ import javax.swing.*;
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.mosaic.PlotPanelPixels3}
@@ -41,7 +41,7 @@ public class PlotPanelPixels3Test {
     float d1 = 1.0f/(float)max(1,n1-1);
     float d2 = 1.0f/(float)max(1,n2-1);
     float d3 = 1.0f/(float)max(1,n3-1);
-    float[][][] f = ArrayMath.rampfloat(0.0f,d1,d2,d3,n1,n2,n3);
+    float[][][] f = rampfloat(0.0f,d1,d2,d3,n1,n2,n3);
 
     PlotPanelPixels3 plot = new PlotPanelPixels3(
       PlotPanelPixels3.Orientation.X1RIGHT,
@@ -80,12 +80,12 @@ public class PlotPanelPixels3Test {
     //float d1 = 1.0f/(float)max(1,n1-1);
     //float d2 = 1.0f/(float)max(1,n2-1);
     //float d3 = 1.0f/(float)max(1,n3-1);
-    //float[][][] f0 = ArrayMath.rampfloat(0.0f,d1,d2,d3,n1,n2,n3);
-    //float[][][] f1 = ArrayMath.fillfloat(0.0f,n1,n2,n3);
-    //float[][][] f2 = ArrayMath.fillfloat(0.0f,n1,n2,n3);
-    float[][][] f0 = ArrayMath.randfloat(n1,n2,n3);
-    float[][][] f1 = ArrayMath.randfloat(n1,n2,n3);
-    float[][][] f2 = ArrayMath.randfloat(n1,n2,n3);
+    //float[][][] f0 = rampfloat(0.0f,d1,d2,d3,n1,n2,n3);
+    //float[][][] f1 = fillfloat(0.0f,n1,n2,n3);
+    //float[][][] f2 = fillfloat(0.0f,n1,n2,n3);
+    float[][][] f0 = randfloat(n1,n2,n3);
+    float[][][] f1 = randfloat(n1,n2,n3);
+    float[][][] f2 = randfloat(n1,n2,n3);
     float[][][][] f = new float[][][][]{f0,f1,f2};
 
     PlotPanelPixels3 plot = new PlotPanelPixels3(

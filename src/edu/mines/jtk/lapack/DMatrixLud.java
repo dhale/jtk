@@ -11,7 +11,7 @@ import static java.lang.Math.min;
 import static edu.mines.jtk.lapack.Blas.NO_TRANS;
 import static edu.mines.jtk.lapack.Lapack.dgetrf;
 import static edu.mines.jtk.lapack.Lapack.dgetrs;
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -128,7 +128,7 @@ public class DMatrixLud {
    * @return the pivot indices p.
    */
   public int[] getPivotIndices() {
-    return ArrayMath.copy(_p);
+    return copy(_p);
   }
 
   /**

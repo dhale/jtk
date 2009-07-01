@@ -12,6 +12,7 @@ import java.awt.image.IndexColorModel;
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * A plot panel with three pixels views of slices from a 3-D array.
@@ -706,7 +707,7 @@ public class PlotPanelPixels3 extends PlotPanel {
     float[][] xic = new float[_n3][_n2];
     for (int ic=0; ic<_nc; ++ic) {
       _f3[ic].get23(_n2,_n3,_k1,0,0,xic);
-      x[ic] = (_transpose23)? ArrayMath.transpose(xic):xic;
+      x[ic] = (_transpose23)?transpose(xic):xic;
     }
     return x;
   }
@@ -837,51 +838,4 @@ public class PlotPanelPixels3 extends PlotPanel {
     }
     return a;
   }
-
-/*
-def plot3dPanels(k1,k2,k3,file,clip,cmod=ColorMap.GRAY,png=None):
-  f12 = readFloats12(file,k3)
-  f13 = readFloats13(file,k2)
-  f23 = readFloats23(file,k1)
-  print "plot3dPanels: f12 min =",ArrayMath.min(f12),"  max =",ArrayMath.max(f12)
-  print "plot3dPanels: f13 min =",ArrayMath.min(f13),"  max =",ArrayMath.max(f13)
-  print "plot3dPanels: f23 min =",ArrayMath.min(f23),"  max =",ArrayMath.max(f23)
-  panel = PlotPanel(2,2,
-    PlotPanel.Orientation.X1DOWN_X2RIGHT,
-    PlotPanel.AxesPlacement.LEFT_BOTTOM)
-  panel.setHLabel(0,"inline (km)")
-  panel.setHLabel(1,"crossline (km)")
-  panel.setVLabel(0,"crossline (km)")
-  panel.setVLabel(1,"time (s)")
-  #panel.setColorBarWidthMinimum(colorBarWidthMinimum)
-  mosaic = panel.getMosaic()
-  mosaic.getTileAxisBottom(0).setInterval(2.0)
-  mosaic.getTileAxisBottom(1).setInterval(2.0)
-  mosaic.getTileAxisLeft(0).setInterval(2.0)
-  mosaic.getTileAxisLeft(1).setInterval(0.2)
-  #mosaic.setWidthElastic(0,100*n2/n3)
-  #cb = panel.addColorBar()
-  p12 = panel.addPixels(1,0,s1,s2,f12)
-  p13 = panel.addPixels(1,1,s1,s3,f13)
-  p23 = panel.addPixels(0,0,s2,s3,f23)
-  p23.setOrientation(PixelsView.Orientation.X1RIGHT_X2UP)
-  p12.setClips(-clip,clip)
-  p13.setClips(-clip,clip)
-  p23.setClips(-clip,clip)
-  p12.setColorModel(cmod)
-  p13.setColorModel(cmod)
-  p23.setColorModel(cmod)
-  xa1,xa2,xa3 = s1.getValue(0),s2.getValue(0),s3.getValue(0)
-  xk1,xk2,xk3 = s1.getValue(k1),s2.getValue(k2),s3.getValue(k3)
-  xb1,xb2,xb3 = s1.getValue(n1-1),s2.getValue(n2-1),s3.getValue(n3-1)
-  p12 = panel.addPoints(1,0,((xa1,xb1),(xk1,xk1)),((xk2,xk2),(xa2,xb2)))
-  p13 = panel.addPoints(1,1,((xa1,xb1),(xk1,xk1)),((xk3,xk3),(xa3,xb3)))
-  p23 = panel.addPoints(0,0,((xa2,xb2),(xk2,xk2)),((xk3,xk3),(xa3,xb3)))
-  p23.setOrientation(PointsView.Orientation.X1RIGHT_X2UP)
-  if isGray(cmod):
-    p12.setLineColor(Color.YELLOW)
-    p13.setLineColor(Color.YELLOW)
-    p23.setLineColor(Color.YELLOW)
-  return frame(panel,png)
-*/
 }

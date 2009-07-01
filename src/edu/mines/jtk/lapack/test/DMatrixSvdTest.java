@@ -6,8 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack.test;
 
-import static java.lang.Math.min;
-
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
@@ -15,7 +13,7 @@ import edu.mines.jtk.lapack.DMatrix;
 import edu.mines.jtk.lapack.DMatrixSvd;
 import static edu.mines.jtk.lapack.test.DMatrixTest.assertEqualExact;
 import static edu.mines.jtk.lapack.test.DMatrixTest.assertEqualFuzzy;
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.lapack.DMatrixSvd}.
@@ -60,9 +58,9 @@ public class DMatrixSvdTest extends TestCase {
     int n = a.getN();
     DMatrixSvd svd = new DMatrixSvd(a);
     double[] s = svd.getSingularValues();
-    double smax = ArrayMath.max(s);
+    double smax = max(s);
     assertEqualExact(s[0],smax);
-    double smin = ArrayMath.min(s);
+    double smin = min(s);
     assertEqualExact(s[min(m,n)-1],smin);
     double cond = svd.cond();
     assertEqualExact(smax/smin,cond);

@@ -15,9 +15,8 @@ import javax.swing.*;
 import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Cdouble;
-import static edu.mines.jtk.util.MathPlus.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Interactive digital filter design with poles and zeros.
@@ -385,7 +384,7 @@ public class PolesAndZeros {
       _poles.toArray(poles);
       _zeros.toArray(zeros);
 
-      // ArrayMath for impulse response h.
+      // Array for impulse response h.
       int n = 101;
       float[] h = new float[n];
 
@@ -434,16 +433,16 @@ public class PolesAndZeros {
       }
 
       // Amplitude response, normalized.
-      //float amax = max(ArrayMath.max(af),FLT_EPSILON);
-      //af = ArrayMath.mul(1.0f/amax,af);
+      //float amax = max(max(af),FLT_EPSILON);
+      //af = mul(1.0f/amax,af);
       if (_db) {
-        af = ArrayMath.log10(af);
-        af = ArrayMath.mul(20.0f,af);
+        af = log10(af);
+        af = mul(20.0f,af);
       }
       Real1 a = new Real1(sf,af);
 
       // Phase response, in cycles.
-      pf = ArrayMath.mul(0.5f/FLT_PI,pf);
+      pf = mul(0.5f/FLT_PI,pf);
       Real1 p = new Real1(sf,pf);
 
       return new Real1[]{a,p};
@@ -471,26 +470,26 @@ public class PolesAndZeros {
       // Real-to-complex fast Fourier transform.
       FftReal fft = new FftReal(nfft);
       float[] cf = new float[2*nf];
-      ArrayMath.copy(nt,h.getValues(),cf);
+      copy(nt,h.getValues(),cf);
       fft.realToComplex(-1,cf,cf);
 
       // Adjust phase for possibly non-zero time of first sample.
-      float[] wft = ArrayMath.rampfloat(0.0f,-2.0f*FLT_PI*(float)(df*ft),nf);
-      cf = ArrayMath.cmul(cf,ArrayMath.cmplx(ArrayMath.cos(wft),ArrayMath.sin(wft)));
+      float[] wft = rampfloat(0.0f,-2.0f*FLT_PI*(float)(df*ft),nf);
+      cf = cmul(cf,cmplx(cos(wft),sin(wft)));
 
       // Amplitude response, normalized.
-      float[] af = ArrayMath.cabs(cf);
-      float amax = max(ArrayMath.max(af),FLT_EPSILON);
-      af = ArrayMath.mul(1.0f/amax,af);
+      float[] af = cabs(cf);
+      float amax = max(max(af),FLT_EPSILON);
+      af = mul(1.0f/amax,af);
       if (_db) {
-        af = ArrayMath.log10(af);
-        af = ArrayMath.mul(20.0f,af);
+        af = log10(af);
+        af = mul(20.0f,af);
       }
       Real1 a = new Real1(sf,af);
 
       // Phase response, in cycles.
-      float[] pf = ArrayMath.carg(cf);
-      pf = ArrayMath.mul(0.5f/FLT_PI,pf);
+      float[] pf = carg(cf);
+      pf = mul(0.5f/FLT_PI,pf);
       Real1 p = new Real1(sf,pf);
 
       return new Real1[]{a,p};

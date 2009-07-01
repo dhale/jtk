@@ -13,7 +13,7 @@ import junit.framework.TestSuite;
 
 import edu.mines.jtk.opt.CoordinateTransform;
 import edu.mines.jtk.util.Almost;
-import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.ArrayMath.copy;
 
 /** Wrap edu.mines.jtk.opt.CoordinateTransform for junit testing.
    (junit.jar must be in CLASSPATH)
@@ -34,8 +34,8 @@ public class CoordinateTransformTest extends TestCase {
       {4.},
       {7.},
     };
-    double[][] inCopy = ArrayMath.copy(in);
-    double[][] outCopy = ArrayMath.copy(out);
+    double[][] inCopy = copy(in);
+    double[][] outCopy = copy(out);
 
     CoordinateTransform ls = new CoordinateTransform(1, 2);
     for (int j=0; j<out.length; ++j) {

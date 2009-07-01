@@ -15,7 +15,6 @@ import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.interp.SibsonInterpolator2;
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.ArrayMath;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
@@ -213,7 +212,7 @@ public class SibsonInterpolator2Test extends TestCase {
   {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        System.out.println("min="+ ArrayMath.min(g)+" max="+ ArrayMath.max(g));
+        System.out.println("min="+ min(g)+" max="+ max(g));
         SimplePlot sp = new SimplePlot();
         sp.setTitle(method);
         sp.setSize(847,740);

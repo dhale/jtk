@@ -10,8 +10,7 @@ import java.awt.*;
 import javax.swing.*;
 
 import edu.mines.jtk.mosaic.*;
-import edu.mines.jtk.util.ArrayMath;
-import static edu.mines.jtk.util.MathPlus.FLT_PI;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * A simple demonstration of {@link edu.mines.jtk.mosaic.PlotFrame}.
@@ -29,8 +28,8 @@ public class SimpleSine {
   }
 
   public SimpleSine() {
-    float[] x = ArrayMath.rampfloat(0.0f,4.0f*FLT_PI/200.0f,201);
-    float[] s = ArrayMath.sin(x);
+    float[] x = rampfloat(0.0f,4.0f*FLT_PI/200.0f,201);
+    float[] s = sin(x);
     _plotPanel = new PlotPanel();
     _plotPanel.setTitle("The sine function");
     _plotPanel.setHLabel("x");

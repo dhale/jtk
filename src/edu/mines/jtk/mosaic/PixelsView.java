@@ -12,8 +12,9 @@ import java.awt.image.*;
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.util.MathPlus.*;
+import edu.mines.jtk.util.Check;
+import edu.mines.jtk.util.Clips;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * A view of sampled functions f(x1,x2), displayed as a 2-D array of pixels.
@@ -169,7 +170,7 @@ public class PixelsView extends TiledView {
   public void set(Sampling s1, Sampling s2, float[][][] f) {
     Check.argument(s1.isUniform(),"s1 is uniform");
     Check.argument(s2.isUniform(),"s2 is uniform");
-    Check.argument(ArrayMath.isRegular(f),"f is regular");
+    Check.argument(isRegular(f),"f is regular");
     Check.argument(s1.getCount()==f[0][0].length,"s1 consistent with f");
     Check.argument(s2.getCount()==f[0].length,"s2 consistent with f");
     Check.argument(_nc!=0 || f.length==1 || f.length==3 || f.length==4,
@@ -179,7 +180,7 @@ public class PixelsView extends TiledView {
     _nc = f.length;
     _s1 = s1;
     _s2 = s2;
-    _f = ArrayMath.copy(f);
+    _f = copy(f);
     if (_clips==null) {
       _clips = new Clips[_nc];
       for (int ic=0; ic<_nc; ++ic)
@@ -709,10 +710,10 @@ public class PixelsView extends TiledView {
     int nx, double dx, double fx,
     int ny, double dy, double fy)
   {
-    // ArrayMath of bytes.
+    // Array of bytes.
     byte[] b = new byte[nx*ny];
 
-    // ArrayMath temp1 will contain one row of sampled floats, interpolated to
+    // Array temp1 will contain one row of sampled floats, interpolated to
     // pixel resolution. Likewise, array temp2 will contain an adjacent row
     // of sampled floats, interpolated to pixel resolution. Image pixels
     // are interpolated between these two rows. The index jy1 is the row
@@ -854,10 +855,10 @@ public class PixelsView extends TiledView {
     int nx, double dx, double fx,
     int ny, double dy, double fy)
   {
-    // ArrayMath of bytes.
+    // Array of bytes.
     byte[] b = new byte[nx*ny];
 
-    // ArrayMath temp will contain one row of bytes interpolated to pixel
+    // Array temp will contain one row of bytes interpolated to pixel
     // resolution. The index jytemp is the row index of the sampled 
     // floats that correspond to the array temp. Initially, jytemp is 
     // garbage, because we have no values in temp.

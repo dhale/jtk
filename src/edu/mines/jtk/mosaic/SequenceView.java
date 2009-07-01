@@ -7,11 +7,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic;
 
 import java.awt.*;
-import static java.lang.Math.*;
 
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * A view of a sequence of samples of a function f(x) of one variable x.
@@ -84,7 +83,7 @@ public class SequenceView extends TiledView {
   public void set(Sampling sx, float[] f) {
     Check.argument(sx.getCount()==f.length,"sx count equals length of f");
     _sx = sx;
-    _f = ArrayMath.copy(f);
+    _f = copy(f);
     updateBestProjectors();
     repaint();
   }
@@ -102,7 +101,7 @@ public class SequenceView extends TiledView {
    * @return array of sampled function values f(x).
    */
   public float[] getFunction() {
-    return ArrayMath.copy(_f);
+    return copy(_f);
   }
 
 

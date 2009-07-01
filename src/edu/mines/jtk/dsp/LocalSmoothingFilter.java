@@ -8,7 +8,10 @@ package edu.mines.jtk.dsp;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import edu.mines.jtk.util.*;
+import edu.mines.jtk.util.AtomicFloat;
+import edu.mines.jtk.util.Threads;
+import static edu.mines.jtk.util.ArrayMath.copy;
+import static edu.mines.jtk.util.ArrayMath.zero;
 
 /**
  * Local smoothing of images with tensor filter coefficients.
@@ -569,7 +572,7 @@ public class LocalSmoothingFilter {
 
   // Zeros array x.
   private static void szero(float[][] x) {
-    ArrayMath.zero(x);
+    zero(x);
   }
   private static void szero(float[][][] x) {
     if (PARALLEL) {
@@ -600,7 +603,7 @@ public class LocalSmoothingFilter {
 
   // Copys array x to array y.
   private static void scopy(float[][] x, float[][] y) {
-    ArrayMath.copy(x,y);
+    copy(x,y);
   }
   private static void scopy(float[][][] x, float[][][] y) {
     if (PARALLEL) {
