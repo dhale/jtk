@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic.test;
 
 import java.awt.*;
+import javax.swing.SwingUtilities;
 
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.mosaic.*;
@@ -20,7 +21,13 @@ import static edu.mines.jtk.util.ArrayMath.*;
 public class SequenceViewTest {
 
   public static void main(String[] args) {
-
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        go();
+      }
+    });
+  }
+  private static void go() {
     int nx = 101;
     float dx = 0.1f;
     float fx = -0.5f*dx*(float)(nx-1);

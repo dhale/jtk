@@ -418,16 +418,16 @@ public class SibsonInterpolator2 {
   public float[] validate(int[] i) {
     int nv = i.length;
     for (int iv=0; iv<nv; ++iv)
-      _mesh.removeNode(_nodes[iv]);
+      _mesh.removeNode(_nodes[i[iv]]);
     float[] fv = new float[nv];
     for (int iv=0; iv<nv; ++iv) {
-      TriMesh.Node node = _nodes[iv];
+      TriMesh.Node node = _nodes[i[iv]];
       float xn = node.x();
       float yn = node.y();
       fv[iv] = interpolate(xn,yn);
     }
     for (int iv=0; iv<nv; ++iv)
-      _mesh.addNode(_nodes[iv]);
+      _mesh.addNode(_nodes[i[iv]]);
     return fv;
   }
 

@@ -444,17 +444,17 @@ public class SibsonInterpolator3 {
   public float[] validate(int[] i) {
     int nv = i.length;
     for (int iv=0; iv<nv; ++iv)
-      _mesh.removeNode(_nodes[iv]);
+      _mesh.removeNode(_nodes[i[iv]]);
     float[] fv = new float[nv];
     for (int iv=0; iv<nv; ++iv) {
-      TetMesh.Node node = _nodes[iv];
+      TetMesh.Node node = _nodes[i[iv]];
       float xn = node.x();
       float yn = node.y();
       float zn = node.z();
       fv[iv] = interpolate(xn,yn,zn);
     }
     for (int iv=0; iv<nv; ++iv)
-      _mesh.addNode(_nodes[iv]);
+      _mesh.addNode(_nodes[i[iv]]);
     return fv;
   }
 

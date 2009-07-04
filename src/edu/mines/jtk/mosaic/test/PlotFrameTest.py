@@ -1,4 +1,7 @@
+import sys
 from java.awt import *
+from java.lang import *
+from javax.swing import *
 from edu.mines.jtk.awt import *
 from edu.mines.jtk.dsp import *
 from edu.mines.jtk.mosaic import *
@@ -47,18 +50,27 @@ def makePlotPanel(orientation):
 
   return pp
 
-# One plot panel.
-#pp = makePlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
-#pf = PlotFrame(pp)
+def main(args):
+  # One plot panel.
+  #pp = makePlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
+  #pf = PlotFrame(pp)
 
-# Two plot panels.
-pp1 = makePlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
-pp2 = makePlotPanel(PlotPanel.Orientation.X1RIGHT_X2UP)
-pf = PlotFrame(pp1,pp2,PlotFrame.Split.VERTICAL)
+  # Two plot panels.
+  pp1 = makePlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
+  pp2 = makePlotPanel(PlotPanel.Orientation.X1RIGHT_X2UP)
+  pf = PlotFrame(pp1,pp2,PlotFrame.Split.VERTICAL)
 
-pf.setBackground(Color.CYAN)
-pf.setFontSize(24)
+  pf.setBackground(Color.CYAN)
+  #pf.setFontSize(24)
+  #pf.setFontSizeForSlide(1,1)
+  pf.setFontSizeForPrint(8,504) # 504 pt for a 2-column figure
 
-pf.pack();
-pf.setVisible(True)
-#pf.paintToPng(300,6,"junk.png")
+  pf.pack();
+  pf.setVisible(True)
+  #pf.paintToPng(720,3.3333,"junk.png")
+
+#############################################################################
+class RunMain(Runnable):
+  def run(self):
+    main(sys.argv)
+SwingUtilities.invokeLater(RunMain()) 

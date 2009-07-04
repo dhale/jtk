@@ -63,8 +63,6 @@ public class SimplePlot extends PlotFrame {
   public SimplePlot(Origin origin) {
     super(makePanel(origin));
     this.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
-    this.setFontSize(24);
-    this.setSize(DEFAULT_WIDTH,DEFAULT_HEIGHT);
     this.setVisible(true);
   }
 
@@ -584,8 +582,8 @@ public class SimplePlot extends PlotFrame {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private static final int DEFAULT_WIDTH = 800;
-  private static final int DEFAULT_HEIGHT = 700;
+  private static final int DEFAULT_WIDTH = 720;
+  private static final int DEFAULT_HEIGHT = 550;
 
   private PlotPanel _panel = super.getPlotPanel(); // one panel in plot
 

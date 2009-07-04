@@ -66,7 +66,9 @@ public class PlotFrameTest {
     PlotFrame frame = new PlotFrame(panel);
     frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
     frame.setFontSize(24);
+    //frame.setFontSizeForSlide(1,1);
+    //frame.setFontSizeForPrint(8,240);
     frame.setVisible(true);
-    //frame.paintToPng(300,6,"junk.png");
+    //frame.paintToPng(720,3.333,"junk.png");
   }
 }
