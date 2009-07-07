@@ -33,8 +33,8 @@ public class PlotFrameTest {
     double f1 = -1.3;
     Sampling s1 = new Sampling(n1,d1,f1);
     int n2 = 101;
-    double d2 = 29.0;
-    double f2 = 33.0;
+    double d2 = 0.029;
+    double f2 = 0.033;
     Sampling s2 = new Sampling(n2,d2,f2);
 
     float[][] f = sin(rampfloat(0.0f,0.1f,0.1f,n1,n2));
@@ -57,18 +57,20 @@ public class PlotFrameTest {
     ptv0.setStyle("r--.");
     ptv1.setStyle("k-o");
 
-    panel.addColorBar("amplitude");
-    panel.setTitle("A Test of PlotFrame");
-    panel.setVLabel("depth (km)");
-    panel.setHLabel(0,"offset (km)");
-    panel.setHLabel(1,"velocity (km/s)");
+    panel.addColorBar("Amplitude");
+    panel.setVLabel("Depth (km)");
+    panel.setHLabel(0,"Offset (km)");
+    panel.setHLabel(1,"Velocity (km/s)");
 
     PlotFrame frame = new PlotFrame(panel);
     frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
     frame.setFontSize(24);
+    panel.setTitle("Graphic with 24-pt font");
     //frame.setFontSizeForSlide(1,1);
+    //panel.setTitle("Graphic for slide");
     //frame.setFontSizeForPrint(8,240);
+    //panel.setTitle("Graphic for print");
     frame.setVisible(true);
-    //frame.paintToPng(720,3.333,"junk.png");
+    //frame.paintToPng(720,3.333333,"junk.png");
   }
 }

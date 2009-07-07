@@ -1134,7 +1134,7 @@ public class PlotPanel extends IPanel {
     gbc.fill = GridBagConstraints.VERTICAL;
     gbc.anchor = GridBagConstraints.WEST;
     gbc.insets.top = _mosaic.getHeightAxesTop();
-    gbc.insets.left = 25;
+    gbc.insets.left = 10;
     gbc.insets.bottom = _mosaic.getHeightAxesBottom();
     gbc.insets.right = 0;
     return gbc;

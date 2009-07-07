@@ -41,6 +41,10 @@ import edu.mines.jtk.awt.ModeManager;
  * {@link #setFont(java.awt.Font)} will set the font for all panels and, 
  * in turn, all mosaics, tiles, tile axes, color bars, and titles in this 
  * frame.
+ * <p>
+ * Note that a plot frame has methods that enable font sizes to be
+ * automatically computed for figures in printed manuscripts and in
+ * presentation slides.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.12.31
  */
@@ -379,30 +383,23 @@ public class PlotFrame extends JFrame {
     if (panelWidth==0.0 || panelHeight==0.0)
       return;
 
-    // Assume slide width = 4 and height = 3, with arbitrary units.
-    double slideWidth = 4.0;
-    double slideHeight = 3.0;
+    // Part of the slide that is available for the main panel.
+    // Here we assume that the slide has a 4:3 aspect ratio.
+    double slideWidth = 4.0*_fracWidthSlide;
+    double slideHeight = 3.0*_fracHeightSlide;
 
-    // Only a specified subset of the slide is available for this panel.
-    double subsetWidth = slideWidth*_fracWidthSlide;
-    double subsetHeight = slideHeight*_fracHeightSlide;
-
-    // The aspect ratio of this panel will typically not match that
-    // of the subset available on the slide. Therefore, the panel
-    // height may correspond to only a fraction of the subset height.
+    // The aspect ratio of this panel will typically not match that of
+    // the space available on the slide. Therefore, the panel height may
+    // represent only a fraction of the height available on the slide.
     // This scale factor is that fraction.
     double scaleHeight = 1.0;
-    if (panelWidth*subsetHeight>panelHeight*subsetWidth)
-      scaleHeight = (panelHeight*subsetWidth)/(panelWidth*subsetHeight);
+    if (panelWidth*slideHeight>panelHeight*slideWidth)
+      scaleHeight = (panelHeight*slideWidth)/(panelWidth*slideHeight);
 
-    // Text height equals 1/25 of panel height, adjusted for any
+    // Font size equals 1/20 of panel height, adjusted for any
     // scaling and our use of only a fraction of slide height.
-    double textHeight = panelHeight/scaleHeight/_fracHeightSlide/25.0;
-
-    // The font size is larger than the text height. 
-    // The factor 1.25 was determined empirically.
-    float fontSize = (float)(1.25*textHeight);
-    setFontSizeInternal(fontSize);
+    double fontSize = panelHeight/scaleHeight/_fracHeightSlide/20.0;
+    setFontSizeInternal((float)fontSize);
   }
 
   // Sets font size for plots in printed manuscripts.

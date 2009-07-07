@@ -228,7 +228,7 @@ public class TileAxis extends IPanel {
     int fl = round(lm.getLeading());
 
     // Length of major tics.
-    int tl = 2*fa/3;
+    int tl = fa/3;
 
     // Axis placement.
     boolean isHorizontal = isHorizontal();
