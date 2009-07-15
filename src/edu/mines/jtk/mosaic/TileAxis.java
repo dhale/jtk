@@ -374,7 +374,7 @@ public class TileAxis extends IPanel {
       ticLabelWidth = maxTicLabelWidth(fm);
     int width;
     if (isVertical()) {
-      width = ticLabelWidth+fm.getHeight();
+      width = ticLabelWidth+fm.getAscent();
       if (_label!=null)
         width += fm.getHeight();
     } else {
@@ -546,7 +546,7 @@ public class TileAxis extends IPanel {
     _axisTics = new AxisTics(v0,v1,dtic);
 
     // If either the tic label max width or height has changed, remember 
-    // the new values and revalidate this axis before returning true.
+    // the new values and revalidate this axis before returning.
     if (_ticLabelWidth!=ticLabelWidth || _ticLabelHeight!=ticLabelHeight) {
       _ticLabelWidth = ticLabelWidth;
       _ticLabelHeight = ticLabelHeight;

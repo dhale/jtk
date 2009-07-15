@@ -52,8 +52,8 @@ public class PolesAndZeros {
   // Location and size of pole-zero plot.
   private static final int PZP_X = 100;
   private static final int PZP_Y = 0;
-  private static final int PZP_WIDTH = 400;
-  private static final int PZP_HEIGHT = 440;
+  private static final int PZP_WIDTH = 520;
+  private static final int PZP_HEIGHT = 550;
 
   // Location and size of response plot.
   private static final int RP_X = PZP_X+PZP_WIDTH;
@@ -231,6 +231,7 @@ public class PolesAndZeros {
       _plotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       _plotFrame.setLocation(PZP_X,PZP_Y);
       _plotFrame.setSize(PZP_WIDTH,PZP_HEIGHT);
+      _plotFrame.setFontSizeForPrint(8,240);
       _plotFrame.setVisible(true);
     }
 
@@ -352,6 +353,7 @@ public class PolesAndZeros {
       _plotFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       _plotFrame.setLocation(RP_X,RP_Y);
       _plotFrame.setSize(RP_WIDTH,RP_HEIGHT);
+      _plotFrame.setFontSizeForPrint(8,240);
       _plotFrame.setVisible(true);
     }
 

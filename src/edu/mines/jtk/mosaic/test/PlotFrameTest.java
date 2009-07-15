@@ -64,12 +64,17 @@ public class PlotFrameTest {
 
     PlotFrame frame = new PlotFrame(panel);
     frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
-    frame.setFontSize(24);
-    panel.setTitle("Graphic with 24-pt font");
-    //frame.setFontSizeForSlide(1,1);
-    //panel.setTitle("Graphic for slide");
-    //frame.setFontSizeForPrint(8,240);
-    //panel.setTitle("Graphic for print");
+    int type = 2;
+    if (type==0) {
+      frame.setFontSize(24);
+      panel.setTitle("Graphic with 24-pt font");
+    } else if (type==1) {
+      frame.setFontSizeForPrint(8,240);
+      panel.setTitle("Graphic for print");
+    } else if (type==2) {
+      frame.setFontSizeForSlide(1,1);
+      panel.setTitle("Graphic for slide");
+    }
     frame.setVisible(true);
     //frame.paintToPng(720,3.333333,"junk.png");
   }
