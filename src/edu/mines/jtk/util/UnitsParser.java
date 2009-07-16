@@ -48,8 +48,9 @@ final class UnitsParser {
   Units e;
     e = expr();
     jj_consume_token(0);
-    {if (true) return e;}
-    throw new Error("Missing return statement in function");
+    return e;
+    //{if (true) return e;}
+    //throw new Error("Missing return statement in function");
   }
 
   static final public Units expr() throws ParseException {
@@ -102,8 +103,9 @@ final class UnitsParser {
       jj_la1[3] = jj_gen;
       ;
     }
-    {if (true) return t;}
-    throw new Error("Missing return statement in function");
+    return t;
+    //{if (true) return t;}
+    //throw new Error("Missing return statement in function");
   }
 
   static final public Units term() throws ParseException {
@@ -152,8 +154,9 @@ final class UnitsParser {
         throw new ParseException();
       }
     }
-    {if (true) return f;}
-    throw new Error("Missing return statement in function");
+    return f;
+    //{if (true) return f;}
+    //throw new Error("Missing return statement in function");
   }
 
   static final public Units factor() throws ParseException {
@@ -170,8 +173,9 @@ final class UnitsParser {
       jj_la1[7] = jj_gen;
       ;
     }
-    {if (true) return p;}
-    throw new Error("Missing return statement in function");
+    return p;
+    //{if (true) return p;}
+    //throw new Error("Missing return statement in function");
   }
 
   static final public Units primary() throws ParseException {
@@ -183,8 +187,9 @@ final class UnitsParser {
     p = Units.unitsFromName(n.image);
     if (p==null) {if (true) throw new ParseException("Units /" +n.image+ 
 	"/ are undefined.");}
-    {if (true) return p;}
-      break;
+    return p;
+    //{if (true) return p;}
+    //  break;
     case INTEGER:
     case DOUBLE:
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -200,20 +205,22 @@ final class UnitsParser {
         throw new ParseException();
       }
     double d = (new Double(n.image)).doubleValue();
-    {if (true) return (new Units()).scale(d);}
-      break;
+    return (new Units()).scale(d);
+    //{if (true) return (new Units()).scale(d);}
+    //  break;
     case LP:
       jj_consume_token(LP);
       e = expr();
       jj_consume_token(RP);
-    {if (true) return e;}
-      break;
+    return e;
+    //{if (true) return e;}
+    //  break;
     default:
       jj_la1[9] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
+    //throw new Error("Missing return statement in function");
   }
 
   static private boolean jj_initialized_once = false;

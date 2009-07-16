@@ -9,10 +9,14 @@ package edu.mines.jtk.mosaic;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
-import static java.lang.Math.*;
+import java.awt.image.IndexColorModel;
 import java.util.EnumSet;
 import java.util.Set;
+import static java.lang.Math.*;
 
+import edu.mines.jtk.awt.ColorMap;
+import edu.mines.jtk.awt.ColorMapped;
+import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.Check;
 
@@ -95,6 +99,7 @@ public class PlotPanel extends IPanel {
   public PlotPanel(int nrow, int ncol, Orientation orientation) {
     this(nrow,ncol,orientation,axesPlacement(orientation));
   }
+
   private static AxesPlacement axesPlacement(Orientation orientation) {
     AxesPlacement axesPlacement;
     if (orientation==Orientation.X1DOWN_X2RIGHT) {
@@ -136,6 +141,7 @@ public class PlotPanel extends IPanel {
       axesPlacementSet = EnumSet.noneOf(Mosaic.AxesPlacement.class);
     }
     _mosaic = new Mosaic(nrow,ncol,axesPlacementSet);
+    _colorMapHandler = new ColorMapHandler();
     GridBagConstraints gbc = new GridBagConstraints();
     gbc.gridx = 0;
     gbc.gridy = 1;
@@ -175,7 +181,7 @@ public class PlotPanel extends IPanel {
    * @return the color bar.
    */
   public ColorBar addColorBar() {
-    return addColorBar(null);
+    return addColorBar(null,null);
   }
 
   /**
@@ -184,7 +190,33 @@ public class PlotPanel extends IPanel {
    * @return the color bar.
    */
   public ColorBar addColorBar(String label) {
-    //_colorBarLabel = label;
+    return addColorBar(null,label);
+  }
+
+  /**
+   * Adds a color bar with a specified color mapped object and no label.
+   * @param cm the specified color mapped.
+   * @return the color bar.
+   */
+  public ColorBar addColorBar(ColorMapped cm) {
+    return addColorBar(cm,null);
+  }
+
+  /**
+   * Adds a color bar with a specified color mapped object and label.  
+   * If the specified color mapped object is null, then this plot panel
+   * will try to find the best color map to display in the color bar.
+   * @param cm the color mapped object.
+   * @param label the label.
+   * @return the color bar.
+   */
+  public ColorBar addColorBar(ColorMapped cm, String label) {
+    if (cm!=null) {
+      _autoColorMapped = false;
+      _colorMapped = cm;
+    } else {
+      _colorMapped = findBestColorMapped();
+    }
     if (_colorBar==null) {
       _colorBar = new ColorBar(label);
       _colorBar.setFont(getFont());
@@ -194,8 +226,8 @@ public class PlotPanel extends IPanel {
         _colorBar.setFormat(_colorBarFormat);
       if (_colorBarWidthMinimum!=0)
         _colorBar.setWidthMinimum(_colorBarWidthMinimum);
-      if (_colorBarPixelsView!=null) {
-        _colorBarPixelsView.addColorMapListener(_colorBar);
+      if (_colorMapped!=null) {
+        _colorMapped.getColorMap().addListener(_colorBar);
         this.add(_colorBar,makeColorBarConstraints());
         this.revalidate();
       }
@@ -243,8 +275,6 @@ public class PlotPanel extends IPanel {
    */
   public void removeColorBar() {
     if (_colorBar!=null) {
-      if (_colorBarPixelsView!=null)
-        _colorBarPixelsView.removeColorMapListener(_colorBar);
       this.remove(_colorBar);
       this.revalidate();
       _colorBar = null;
@@ -495,6 +525,19 @@ public class PlotPanel extends IPanel {
   public void setVFormat(int irow, String format) {
     if (_axesPlacement!=AxesPlacement.NONE) {
       _mosaic.getTileAxisLeft(irow).setFormat(format);
+    }
+  }
+
+  /**
+   * Sets tic label rotation for the vertical axis in the specifie row.
+   * If true, tic labels in the vertical axis are rotated 90 degrees 
+   * counter-clockwise. The default is false, not rotated.
+   * @param irow the row index.
+   * @param rotated true, if rotated; false, otherwise.
+   */
+  public void setVRotated(int irow, boolean rotated) {
+    if (_axesPlacement!=AxesPlacement.NONE) {
+      _mosaic.getTileAxisLeft(irow).setVerticalAxisRotated(rotated);
     }
   }
 
@@ -821,6 +864,18 @@ public class PlotPanel extends IPanel {
     return addContours(0,0,f);
   }
 
+  /**
+   * Adds a contours view of the specified sampled function f(x1,x2).
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
+   *  n1 = f[0].length and n2 = f.length.
+   * @return the contours view.
+   */
+  public ContoursView addContours(Sampling s1, Sampling s2, float[][] f) {
+    return addContours(0,0,s1,s2,f);
+  }
+
   /** 
    * Adds a contours view with the function f(x1,x2).
    * Function f(x1,x2) assumed to have uniform sampling.
@@ -831,7 +886,23 @@ public class PlotPanel extends IPanel {
    */
   public ContoursView addContours(int irow, int icol, float[][] f) {
     ContoursView cv = new ContoursView(f);
-    return addContoursView(irow, icol, cv);
+    return addContoursView(irow,icol,cv);
+  }
+
+  /**
+   * Adds a contours view of the specified sampled function f(x1,x2).
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), 
+   *  where n1 = f[0].length and n2 = f.length.
+   * @return the contours view.
+   */
+  public ContoursView addContours(
+    int irow, int icol, Sampling s1, Sampling s2, float[][] f) {
+    ContoursView cv = new ContoursView(s1,s2,f);
+    return addContoursView(irow,icol,cv);
   }
 
   /**
@@ -902,7 +973,11 @@ public class PlotPanel extends IPanel {
    *  tiled view; false, otherwise.
    */
   public boolean addTiledView(int irow, int icol, TiledView tv) {
-    return _mosaic.getTile(irow,icol).addTiledView(tv);
+    if (tv instanceof ColorMapped) {
+      ColorMapped cm = (ColorMapped)tv;
+      cm.getColorMap().addListener(_colorMapHandler);
+    }
+    return getTile(irow,icol).addTiledView(tv);
   }
 
   /**
@@ -912,11 +987,15 @@ public class PlotPanel extends IPanel {
    *  false, otherwise.
    */
   public boolean remove(TiledView tv) {
+    if (tv instanceof ColorMapped) {
+      ColorMapped cm = (ColorMapped)tv;
+      cm.getColorMap().removeListener(_colorMapHandler);
+    }
     int nrow = _mosaic.countRows();
     int ncol = _mosaic.countColumns();
     for (int irow=0; irow<nrow; ++irow) {
       for (int icol=0; icol<ncol; ++icol) {
-        if (getTile(irow,icol).removeTiledView(tv))
+        if (getTile(irow,icol).removeTiledView(tv)) 
           return true;
       }
     }
@@ -974,12 +1053,13 @@ public class PlotPanel extends IPanel {
   private Mosaic _mosaic;
   private ColorBar _colorBar;
   private String _colorBarFormat;
-  //private String _colorBarLabel;
   private int _colorBarWidthMinimum = 0;
-  private PixelsView _colorBarPixelsView;
   private Title _title;
   private Orientation _orientation;
   private AxesPlacement _axesPlacement;
+  private ColorMapped _colorMapped;
+  private boolean _autoColorMapped = true;
+  private ColorMapHandler _colorMapHandler;
 
   /**
    * Internal class for plot title.
@@ -1010,12 +1090,10 @@ public class PlotPanel extends IPanel {
       //int fh = round(lm.getHeight());
       //int fa = round(lm.getAscent());
       int fd = round(lm.getDescent());
-
       int wt = fm.stringWidth(text);
       int xt = max(0,min(w-wt,(w-wt)/2));
       int yt = h-1-2*fd;
       g2d.drawString(text,xt,yt);
-      
       g2d.dispose();
     }
 
@@ -1046,27 +1124,18 @@ public class PlotPanel extends IPanel {
   }
 
   private GridView addGridView(int irow, int icol, GridView gv) {
-    _mosaic.getTile(irow,icol).addTiledView(gv);
+    addTiledView(irow,icol,gv);
     return gv;
   }
 
   private PixelsView addPixelsView(int irow, int icol, PixelsView pv) {
-    if (_colorBar!=null) {
-      pv.addColorMapListener(_colorBar);
-      if (_colorBarPixelsView==null) {
-        this.add(_colorBar,makeColorBarConstraints());
-        this.revalidate();
-      } else {
-        _colorBarPixelsView.removeColorMapListener(_colorBar);
-      }
-    }
-    _colorBarPixelsView = pv;
+    pv.getColorMap().addListener(_colorMapHandler);
     if (_orientation==Orientation.X1RIGHT_X2UP) {
       pv.setOrientation(PixelsView.Orientation.X1RIGHT_X2UP);
     } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
       pv.setOrientation(PixelsView.Orientation.X1DOWN_X2RIGHT);
     }
-    _mosaic.getTile(irow,icol).addTiledView(pv);
+    addTiledView(irow,icol,pv);
     return pv;
   }
 
@@ -1076,7 +1145,7 @@ public class PlotPanel extends IPanel {
     } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
       pv.setOrientation(PointsView.Orientation.X1DOWN_X2RIGHT);
     }
-    _mosaic.getTile(irow,icol).addTiledView(pv);
+    addTiledView(irow,icol,pv);
     return pv;
   }
 
@@ -1086,12 +1155,12 @@ public class PlotPanel extends IPanel {
     } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
       cv.setOrientation(ContoursView.Orientation.X1DOWN_X2RIGHT);
     }
-    _mosaic.getTile(irow,icol).addTiledView(cv);
+    addTiledView(irow,icol,cv);
     return cv;
   }
 
   private SequenceView addSequenceView(int irow, int icol, SequenceView sv) {
-    _mosaic.getTile(irow,icol).addTiledView(sv);
+    addTiledView(irow,icol,sv);
     return sv;
   }
 
@@ -1138,5 +1207,84 @@ public class PlotPanel extends IPanel {
     gbc.insets.bottom = _mosaic.getHeightAxesBottom();
     gbc.insets.right = 0;
     return gbc;
+  }
+
+  /**
+   * Searches for the best color mapped through each tiled view.
+   * The panels are searched top to bottom, right to left.
+   */
+  private ColorMapped findBestColorMapped() {
+    if (_autoColorMapped) {
+      int rows = _mosaic.countRows();
+      int cols = _mosaic.countColumns();
+      Tile t = getTile(0,cols-1); /* Top-right panel. */
+      int ntv = t.countTiledViews();
+      ColorMapped cmBest = null;
+      ColorMapped cmSolid = null;
+      for (int ncol=cols-1; ncol>=0; --ncol) {
+        for (int nrow=0; nrow<rows; ++nrow) {
+          t = getTile(nrow,ncol);
+          for (int itv=ntv-1; itv>=0 && cmBest==null; --itv) {
+            TiledView tv = t.getTiledView(itv);
+            if (tv instanceof ColorMapped) {
+              ColorMapped cm = (ColorMapped)tv;
+              if (isMultiColor(cm)) {
+                cmBest = cm;
+              } else if (cmSolid==null) {
+                cmSolid = cm;
+              }
+            }
+          }
+        }
+      }
+      if (cmBest==null)
+        cmBest = cmSolid;
+      return cmBest;
+    } else {
+      return _colorMapped;
+    }
+  }
+
+  /**
+   * Determines if a specified color map has more than one color.
+   * Note that we ignore any variation in alpha.
+   */
+  private static boolean isMultiColor(ColorMapped cm) {
+    ColorMap cmap = cm.getColorMap();
+    IndexColorModel icm = cmap.getColorModel();
+    int n = icm.getMapSize();
+    int rgb = icm.getRGB(0)&0x00ffffff;
+    for (int i=1; i<n; ++i) 
+      if (rgb!=(icm.getRGB(i)&0x00ffffff))
+        return true;
+    return false;
+  }
+
+  /**
+   * Verifies the correct color mapped is being used.
+   */
+  private void updateColorMapped() {
+    ColorMapped cm = findBestColorMapped();
+    if (cm!=_colorMapped && _colorBar!=null) {
+      _colorMapped.getColorMap().removeListener(_colorBar);
+      _colorMapped = cm;
+      _colorMapped.getColorMap().addListener(_colorBar);
+      this.revalidate();
+    }
+  }
+
+  /**
+   * Private inner class that handles a change in the color mapped by
+   * listening to the color map.
+   */
+  private class ColorMapHandler implements ColorMapListener {
+
+    /**
+     * Called whenever the color map within PlotPanel is changed.
+     * @param cm the color map.
+     */
+    public void colorMapChanged(ColorMap cm) {
+      updateColorMapped();
+    }
   }
 }

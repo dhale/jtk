@@ -134,6 +134,14 @@ public class TileAxis extends IPanel {
   }
 
   /**
+   * Determines whether this axis is placed at left or right of mosaic, and 
+   * is rotated to read normal to the vertical axis.
+   * @return true, if vertical and rotated; false, otherwise.
+   */
+  public boolean isVerticalRotated() {
+    return isVertical() && (_isRotated==true);
+  }
+  /**
    * Sets the interval between major labeled tics for this axis.
    * The default tic interval is zero, in which case a readable tic
    * interval is computed automatically. This default is especially
@@ -179,6 +187,18 @@ public class TileAxis extends IPanel {
   // Override base class implementation, so we can update axis tics.
   public void setBounds(int x, int y, int width, int height) {
     super.setBounds(x,y,width,height);
+    updateAxisTics();
+    repaint();
+  }
+
+  /**
+   * Sets the rotation of the vertical axis.
+   * A rotated vertical axis will read normal to the vertical axis, meaning
+   * that each number is rotated by PI/2.
+   * @param rotate true if rotated; false, otherwise.
+   */
+  public void setVerticalAxisRotated(boolean rotated) {
+    _isRotated = rotated;
     updateAxisTics();
     repaint();
   }
@@ -234,6 +254,7 @@ public class TileAxis extends IPanel {
     boolean isHorizontal = isHorizontal();
     boolean isTop = isTop();
     boolean isLeft = isLeft();
+    boolean isVerticalRotated = isVerticalRotated();
 
     // Axis tic sampling.
     int nticMajor = _axisTics.getCountMajor();
@@ -294,6 +315,26 @@ public class TileAxis extends IPanel {
         int xs = max(0,min(w-ws,x-ws/2));
         int ys = y;
         g2d.drawString(stic,xs,ys);
+
+      } else if (isVerticalRotated) {
+        y = t.y(utic);
+        if (isLeft) {
+          x = w-1;
+          g2d.drawLine(x,y,x-tl,y);
+          x -= tl+fd;
+        } else {
+          x = 0;
+          g2d.drawLine(x,y,x+tl,y);
+          x += tl+fd;
+        }
+        int ws = fm.stringWidth(stic);
+        int xs = x;
+        int ys = max(ws,min(h,y+ws/2));
+        g2d.translate(xs,ys);
+        g2d.rotate(-PI/2.0);
+        g2d.drawString(stic,0,0);
+        g2d.rotate(PI/2.0);
+        g2d.translate(-xs,-ys);
       } else {
         y = t.y(utic);
         if (isLeft) {
@@ -374,7 +415,11 @@ public class TileAxis extends IPanel {
       ticLabelWidth = maxTicLabelWidth(fm);
     int width;
     if (isVertical()) {
-      width = ticLabelWidth+fm.getAscent();
+      if (isVerticalRotated()) {
+        width = fm.getAscent()+fm.getHeight();
+      } else {
+        width = ticLabelWidth+fm.getHeight();
+      }
       if (_label!=null)
         width += fm.getHeight();
     } else {
@@ -448,6 +493,7 @@ public class TileAxis extends IPanel {
 
     // Axis orientation.
     boolean isHorizontal = isHorizontal();
+    boolean isVerticalRotated = isVerticalRotated();
 
     // Min/max normalized coordinates for tics.
     // (We do not want any tics in the margins.)
@@ -528,6 +574,7 @@ public class TileAxis extends IPanel {
       if (_interval!=0.0)
         break;
 
+      //System.out.println("ntic:" + ntic + " tlw:" + ticLabelWidth);
       // Otherwise, assume that all tic labels have the max width and height.
       // If those tic labels use less than a fraction of the space available, 
       // then we have a good fit and stop looking.
@@ -535,8 +582,13 @@ public class TileAxis extends IPanel {
         if (ticLabelWidth*ntic<0.7*w)
           break;
       } else {
-        if (ticLabelHeight*ntic<0.6*h)
-          break;
+        if (isVerticalRotated) {
+          if (ticLabelWidth*ntic<0.7*h)
+            break;
+        } else {
+          if (ticLabelHeight*ntic<0.6*h)
+            break;
+        }
       }
     }
 
@@ -546,7 +598,7 @@ public class TileAxis extends IPanel {
     _axisTics = new AxisTics(v0,v1,dtic);
 
     // If either the tic label max width or height has changed, remember 
-    // the new values and revalidate this axis before returning.
+    // the new values and revalidate this axis before returning true.
     if (_ticLabelWidth!=ticLabelWidth || _ticLabelHeight!=ticLabelHeight) {
       _ticLabelWidth = ticLabelWidth;
       _ticLabelHeight = ticLabelHeight;
@@ -596,6 +648,7 @@ public class TileAxis extends IPanel {
 
   private Mosaic _mosaic;
   private Placement _placement;
+  private boolean _isRotated;
   private int _index;
   private String _label;
   private String _format = "%1.4G";

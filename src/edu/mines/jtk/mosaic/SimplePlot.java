@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
+import edu.mines.jtk.awt.ColorMapped;
 import edu.mines.jtk.dsp.Sampling;
 
 /**
@@ -413,7 +414,42 @@ public class SimplePlot extends PlotFrame {
   public ContoursView addContours(float[][] f) {
     return _panel.addContours(f);
   }
-  
+
+  /**
+   * Adds a contours view of the specified sampled function f(x1,x2).
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where
+   *  n1 = f[0].length and n2 = f.length.
+   * @return the contours view.
+   */
+  public ContoursView addContours(Sampling s1, Sampling s2, float[][] f) {
+    return _panel.addContours(s1,s2,f);
+  }
+
+  /**
+   * Adds a contours view of the specified sampled function f(x1,x2).
+   * Assumes zero first sample values and unit sampling intervals.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where
+   *  n1 = f[0].length and n2 = f.length.
+   * @return the contours view.
+   */
+  public ContoursView addContours(double[][] f) {
+    return addContours(convertToFloat(f));
+  }
+
+  /**
+   * Adds a contours view of the specified sampled function f(x1,x2).
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param s2 the sampling of the variable x2; must be uniform.
+   * @param f array[n2][n1] of sampled function values f(x1,x2), where
+   *  n1 = f[0].length and n2 = f.length.
+   * @return the contours view.
+   */
+  public ContoursView addContours(Sampling s1, Sampling s2, double[][] f) {
+    return addContours(s1,s2,convertToFloat(f));
+  }
+
   /**
    * Adds the color bar with no label. The color bar paints the color map
    * of the most recently added pixels view. To avoid confusion, a color
@@ -432,6 +468,25 @@ public class SimplePlot extends PlotFrame {
    */
   public ColorBar addColorBar(String label) {
     return _panel.addColorBar(label);
+  }
+  
+  /**
+   * Adds the color bar for the specified color mapped object.
+   * @param cm the color mapped object.
+   * @return the color bar.
+   */
+  public ColorBar addColorBar(ColorMapped cm) {
+    return _panel.addColorBar(cm);
+  }
+
+  /**
+   * Adds the color bar for the specified color mapped object and label.
+   * @param cm the color mapped object.
+   * @param label the label; null, if none.
+   * @return the color bar.
+   */
+  public ColorBar addColorBar(ColorMapped cm, String label) {
+    return _panel.addColorBar(cm,label);
   }
 
   /**
@@ -556,7 +611,7 @@ public class SimplePlot extends PlotFrame {
   }
 
   /**
-   * Sets the format for the horizontal axis.
+   * Sets the format for tic labels in the horizontal axis.
    * @param format the format.
    */
   public void setHFormat(String format) {
@@ -564,11 +619,21 @@ public class SimplePlot extends PlotFrame {
   }
 
   /**
-   * Sets the format for the vertical axis.
+   * Sets the format for tic labels in the vertical axis.
    * @param format the format.
    */
   public void setVFormat(String format) {
     _panel.setVFormat(format);
+  }
+
+  /**
+   * Sets the rotation of tic labels in the vertical axis.
+   * If true, tic labels in the vertical axis are rotated 90 degrees 
+   * counter-clockwise. The default is false, not rotated.
+   * @param rotated true if rotated; false, otherwise.
+   */
+  public void setVRotated(boolean rotated) {
+    _panel.setVRotated(0, rotated);
   }
 
   /**

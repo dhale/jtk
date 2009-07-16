@@ -9,11 +9,9 @@ package edu.mines.jtk.mosaic;
 import java.awt.*;
 import java.awt.image.*;
 
-import edu.mines.jtk.awt.ColorMap;
-import edu.mines.jtk.awt.ColorMapListener;
+import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.Check;
-import edu.mines.jtk.util.Clips;
+import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
@@ -49,7 +47,7 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.09.27
  */
-public class PixelsView extends TiledView {
+public class PixelsView extends TiledView implements ColorMapped {
 
   /**
    * Orientation of sample axes x1 and x2. For example, the default 
@@ -233,14 +231,6 @@ public class PixelsView extends TiledView {
    */
   public Interpolation getInterpolation() {
     return _interpolation;
-  }
-
-  /**
-   * Gets the color map for this view.
-   * @return the color map.
-   */
-  public ColorMap getColorMap() {
-    return _colorMap;
   }
 
   /**
@@ -549,6 +539,10 @@ public class PixelsView extends TiledView {
       BufferedImage bi = new BufferedImage(cm,wr,false,null);
       g2d.drawImage(bi,xc,yc,null);
     }
+  }
+
+  public ColorMap getColorMap() {
+    return _colorMap;
   }
 
   ///////////////////////////////////////////////////////////////////////////

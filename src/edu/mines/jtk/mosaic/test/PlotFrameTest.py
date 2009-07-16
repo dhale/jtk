@@ -59,12 +59,11 @@ def main(args):
   pp1 = makePlotPanel(PlotPanel.Orientation.X1DOWN_X2RIGHT)
   pp2 = makePlotPanel(PlotPanel.Orientation.X1RIGHT_X2UP)
   pf = PlotFrame(pp1,pp2,PlotFrame.Split.VERTICAL)
-
+  pf.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE)
   pf.setBackground(Color.CYAN)
   #pf.setFontSize(24)
   #pf.setFontSizeForSlide(1,1)
   pf.setFontSizeForPrint(8,504) # 504 pt for a 2-column figure
-
   pf.pack();
   pf.setVisible(True)
   #pf.paintToPng(720,3.3333,"junk.png")

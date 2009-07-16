@@ -11,12 +11,9 @@ import java.awt.image.IndexColorModel;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import edu.mines.jtk.awt.ColorMap;
-import edu.mines.jtk.awt.ColorMapListener;
+import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.AxisTics;
-import edu.mines.jtk.util.Check;
-import edu.mines.jtk.util.Clips;
+import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
@@ -25,7 +22,7 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * @author Dave Hale and Chris Engelsma, Colorado School of Mines
  * @version 2009.06.18
  */
-public class ContoursView extends TiledView {
+public class ContoursView extends TiledView implements ColorMapped {
 
   /**
    * Orientation of sample axes x1 and x2. For example, the default 
@@ -504,6 +501,10 @@ public class ContoursView extends TiledView {
           gline.drawPolyline(xcon,ycon,n);
       }
     }
+  }
+
+  public ColorMap getColorMap() {
+    return _colorMap;
   }
   
   ///////////////////////////////////////////////////////////////////////////
