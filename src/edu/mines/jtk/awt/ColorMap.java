@@ -29,7 +29,7 @@ import edu.mines.jtk.util.Check;
  * A color map maintains a list of color map listeners, and notifies those
  * listeners whenever its mapping from values to colors has changed.
  * @author Dave Hale, Colorado School of Mines
- * @version 2006.07.01
+ * @version 2009.07.06
  */
 public class ColorMap {
 
@@ -131,6 +131,25 @@ public class ColorMap {
   }
 
   /**
+   * Constructs a color map for a specified solid color.
+   * @param c a color.
+   */
+  public ColorMap(Color c) {
+    this(0.0,1.0,c);
+  }
+
+  /**
+   * Constructs a color map for a specified solid color within a given [0,1]
+   * range.
+   * @param vmin the minimum value.
+   * @param vmax the maximum value.
+   * @param c a color.
+   */
+  public ColorMap(double vmin, double vmax, Color c) {
+    this(vmin,vmax,makeSolidColors(c));
+  }
+
+  /**
    * Gets the minimum value in the range of mapped values.
    * @return the minimum value.
    */
@@ -194,6 +213,16 @@ public class ColorMap {
    */
   public void setColorModel(IndexColorModel colorModel) {
     _colorModel = colorModel;
+    cacheColors();
+    fireColorMapChanged();
+  }
+
+  /**
+   * Sets the index color model for this color map to a single color.
+   * @param c a color.
+   */
+  public void setColorModel(Color c) {
+    _colorModel = makeSolidColors(c);
     cacheColors();
     fireColorMapChanged();
   }
@@ -353,6 +382,18 @@ public class ColorMap {
       return new IndexColorModel(8,256,
         getReds(c),getGreens(c),getBlues(c));
     }
+  }
+
+  /**
+   * Returns an index color model for a single color.
+   * @param c a color.
+   * @return the index color model.
+   */
+  public static IndexColorModel makeSolidColors(Color c) {
+    Color[] colors = new Color[256];
+    for (int i=0; i<256; ++i)
+      colors[i] = c;
+    return makeIndexColorModel(colors);
   }
 
   ///////////////////////////////////////////////////////////////////////////

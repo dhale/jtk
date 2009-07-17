@@ -11,16 +11,20 @@ import java.awt.image.IndexColorModel;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import edu.mines.jtk.awt.*;
+import edu.mines.jtk.awt.ColorMap;
+import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.*;
+import edu.mines.jtk.util.AxisTics;
+import edu.mines.jtk.util.Check;
+import edu.mines.jtk.util.Clips;
+import edu.mines.jtk.awt.ColorMapped;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * A view of a sampled function f(x1,x2), displayed with contour lines.
  * <p>
  * @author Dave Hale and Chris Engelsma, Colorado School of Mines
- * @version 2009.06.18
+ * @version 2009.07.06
  */
 public class ContoursView extends TiledView implements ColorMapped {
 
@@ -159,7 +163,7 @@ public class ContoursView extends TiledView implements ColorMapped {
    * @param color the contour line color.
    */
   public void setLineColor(Color color) {
-    _lineColor = color;
+    _colorMap.setColorModel(color);
     repaint();
   }
 
@@ -171,9 +175,12 @@ public class ContoursView extends TiledView implements ColorMapped {
    * @param colorModel the color model.
    */
   public void setColorModel(IndexColorModel colorModel) {
-    _lineColor = null;
     _colorMap.setColorModel(colorModel);
     repaint();
+  }
+
+  public ColorMap getColorMap() {
+    return _colorMap;
   }
 
   /**
@@ -459,12 +466,7 @@ public class ContoursView extends TiledView implements ColorMapped {
       }
     }
     
-    IndexColorModel cm = null;
-    if (_lineColor!=null) {
-      gline.setColor(_lineColor);
-    } else {
-      cm = _colorMap.getColorModel();
-    }
+    IndexColorModel cm = _colorMap.getColorModel();
 
     for (int is=0; is<_cs.getCount(); ++is) {
       float fc = _cl.get(is).fc;
@@ -501,10 +503,6 @@ public class ContoursView extends TiledView implements ColorMapped {
           gline.drawPolyline(xcon,ycon,n);
       }
     }
-  }
-
-  public ColorMap getColorMap() {
-    return _colorMap;
   }
   
   ///////////////////////////////////////////////////////////////////////////
@@ -549,7 +547,6 @@ public class ContoursView extends TiledView implements ColorMapped {
   private float _lineWidth = 0.0f;
   private Line _lineStyle = Line.SOLID; 
   private Line _lineStyleNegative = Line.DEFAULT;
-  private Color _lineColor = Color.BLACK;
   private ColorMap _colorMap = new ColorMap(ColorMap.JET);
 
   // The sampled floats.
@@ -577,13 +574,11 @@ public class ContoursView extends TiledView implements ColorMapped {
   private float _clipMax;
 
   // Contour sampling and list of contours.
-  private int _nc = 25; // number of contours; may be less if readable contours
+  private int _nc = 25; // number of contours; maybe less if readable contours
   private boolean _readableContours = true; // true, for readable contour vals
   private Sampling _cs; // contour sampling
   private ArrayList<Contour> _cl; // list of contours
   
-  // Contour rendering
-
   /**
    * Update the clips if necessary.
    */
