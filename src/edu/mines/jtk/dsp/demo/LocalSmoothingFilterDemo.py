@@ -55,6 +55,7 @@ def doInterpExample1():
   d,y = getNearestNeighbors(t,x,n1)
   #d = clip(0.0,25.0,d)
   s = mul(d,d)
+  #s = add(s,64.0) # for smoothing instead of interpolation
   SimplePlot.asPoints(d)
   SimplePlot.asPoints(s)
   sp = SimplePlot()
