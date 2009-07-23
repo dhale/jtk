@@ -194,6 +194,32 @@ public class SibsonInterpolator2 {
   }
 
   /**
+   * Sets the samples to be interpolated.
+   * Any sample coordinates, values or gradients set previously are forgotten.
+   * @param f array of sample values f(x1,x2).
+   * @param x1 array of sample x1 coordinates.
+   * @param x2 array of sample x2 coordinates.
+   */
+  public void setSamples(float[] f, float[] x1, float[] x2) {
+    makeMesh(f,x1,x2);
+    _haveGradients = false;
+    if (_gradientPower>0.0)
+      estimateGradients();
+  }
+
+  /**
+   * Sets the null value for this interpolator.
+   * This null value is returned when interpolation is attempted at a
+   * point that lies outside the bounds of this interpolator. Those 
+   * bounds are by default the convex hull of the sample points, but 
+   * may also be set explicitly. The default null value is zero.
+   * @param fnull the null value.
+   */
+  public void setNullValue(float fnull) {
+    _fnull = fnull;
+  }
+
+  /**
    * Sets gradients for all samples. If the gradient power is currently 
    * zero, then this method also sets the gradient power to one. To later
    * ignore gradients that have been set, the gradient power can be reset
@@ -229,21 +255,9 @@ public class SibsonInterpolator2 {
    * @param gradientPower the gradient power.
    */
   public void setGradientPower(double gradientPower) {
-    if (!_haveGradients && gradientPower>=0.0)
+    if (!_haveGradients && gradientPower>0.0)
       estimateGradients();
     _gradientPower = gradientPower;
-  }
-
-  /**
-   * Sets the null value for this interpolator.
-   * This null value is returned when interpolation is attempted at a
-   * point that lies outside the bounds of this interpolator. Those 
-   * bounds are by default the convex hull of the sample points, but 
-   * may also be set explicitly. The default null value is zero.
-   * @param fnull the null value.
-   */
-  public void setNullValue(float fnull) {
-    _fnull = fnull;
   }
 
   /**

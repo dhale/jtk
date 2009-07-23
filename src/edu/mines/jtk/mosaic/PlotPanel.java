@@ -1266,7 +1266,8 @@ public class PlotPanel extends IPanel {
   private void updateColorMapped() {
     ColorMapped cm = findBestColorMapped();
     if (cm!=_colorMapped && _colorBar!=null) {
-      _colorMapped.getColorMap().removeListener(_colorBar);
+      if (_colorMapped!=null)
+        _colorMapped.getColorMap().removeListener(_colorBar);
       _colorMapped = cm;
       _colorMapped.getColorMap().addListener(_colorBar);
       this.revalidate();

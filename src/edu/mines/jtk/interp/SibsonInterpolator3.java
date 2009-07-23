@@ -195,6 +195,21 @@ public class SibsonInterpolator3 {
   }
 
   /**
+   * Sets the samples to be interpolated.
+   * Any sample coordinates, values or gradients set previously are forgotten.
+   * @param f array of sample values f(x1,x2,x3).
+   * @param x1 array of sample x1 coordinates.
+   * @param x2 array of sample x2 coordinates.
+   * @param x3 array of sample x3 coordinates.
+   */
+  public void setSamples(float[] f, float[] x1, float[] x2, float[] x3) {
+    makeMesh(f,x1,x2,x3);
+    _haveGradients = false;
+    if (_gradientPower>0.0)
+      estimateGradients();
+  }
+
+  /**
    * Sets gradients for all samples. If the gradient power is currently 
    * zero, then this method also sets the gradient power to one. To later
    * ignore gradients that have been set, the gradient power can be reset
@@ -232,7 +247,7 @@ public class SibsonInterpolator3 {
    * @param gradientPower the gradient power.
    */
   public void setGradientPower(double gradientPower) {
-    if (!_haveGradients && gradientPower>=0.0)
+    if (!_haveGradients && gradientPower>0.0)
       estimateGradients();
     _gradientPower = gradientPower;
   }

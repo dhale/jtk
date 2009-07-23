@@ -192,10 +192,10 @@ public class TileAxis extends IPanel {
   }
 
   /**
-   * Sets the rotation of the vertical axis.
-   * A rotated vertical axis will read normal to the vertical axis, meaning
-   * that each number is rotated by PI/2.
-   * @param rotate true if rotated; false, otherwise.
+   * Sets the rotation of tic labels in the vertical axis.
+   * Tic labels for a rotated vertical axis are rotated 90 degrees
+   * counter-clockwise.
+   * @param rotated true if rotated; false, otherwise.
    */
   public void setVerticalAxisRotated(boolean rotated) {
     _isRotated = rotated;
