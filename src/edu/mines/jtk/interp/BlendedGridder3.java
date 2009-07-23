@@ -112,7 +112,7 @@ public class BlendedGridder3 implements Gridder3 {
   }
 
   /**
-   * Enables or disables blending in {@link #grid(Sampling,Sampling)}.
+   * Enables or disables blending in {@link #grid(Sampling,Sampling,Sampling)}.
    * If true (the default), that method will perform both of the two
    * steps described; that is, it will blend (smooth) after computing
    * the nearest neighbor interpolant. If false, that method perform
