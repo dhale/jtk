@@ -110,9 +110,9 @@ public class BlendedGridder2 implements Gridder2 {
    * Enables or disables blending in {@link #grid(Sampling,Sampling)}.
    * If true (the default), that method will perform both of the two
    * steps described; that is, it will blend (smooth) after computing
-   * the nearest neighbor interpolant. If false, that method will
-   * return the nearest neighbor interpolant.
-   * @param blended true, if blended; false, otherwise.
+   * the nearest neighbor interpolant. If false, that method perform
+   * only the first step and return the nearest neighbor interpolant.
+   * @param blending true, for blending; false, otherwise.
    */
   public void setBlending(boolean blending) {
     _blending = blending;
