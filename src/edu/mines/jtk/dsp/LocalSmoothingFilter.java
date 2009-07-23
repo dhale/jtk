@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import java.util.logging.Logger;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.mines.jtk.util.AtomicFloat;
@@ -196,6 +197,8 @@ public class LocalSmoothingFilter {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+  private static Logger LOGGER = 
+    Logger.getLogger(LocalSmoothingFilter.class.getName());
 
   private static final boolean PARALLEL = true; // false for single-threaded
   private static final boolean SMOOTH = true; // false for I instead of S'S
@@ -524,10 +527,10 @@ public class LocalSmoothingFilter {
     float delta = sdot(r,r);
     float deltaBegin = delta;
     float deltaSmall = sdot(b,b)*_small*_small;
-    trace("solve: delta="+delta);
+    LOGGER.fine("solve: delta="+delta);
     int iter;
     for (iter=0; iter<_niter && delta>deltaSmall; ++iter) {
-      //trace("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
+      LOGGER.finer("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
       a.apply(d,q);
       float dq = sdot(d,q);
       float alpha = delta/dq;
@@ -538,7 +541,7 @@ public class LocalSmoothingFilter {
       float beta = delta/deltaOld;
       sxpay(beta,r,d);
     }
-    trace("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
+    LOGGER.fine("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
   }
   private void solve(Operator3 a, float[][][] b, float[][][] x) {
     int n1 = b[0][0].length;
@@ -554,7 +557,7 @@ public class LocalSmoothingFilter {
     float delta = sdot(r,r);
     float deltaBegin = delta;
     float deltaSmall = sdot(b,b)*_small*_small;
-    trace("solve: delta="+delta);
+    LOGGER.fine("solve: delta="+delta);
     int iter;
     for (iter=0; iter<_niter && delta>deltaSmall; ++iter) {
       a.apply(d,q);
@@ -567,7 +570,7 @@ public class LocalSmoothingFilter {
       float beta = delta/deltaOld;
       sxpay(beta,r,d);
     }
-    trace("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
+    LOGGER.fine("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
   }
 
   // Zeros array x.

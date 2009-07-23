@@ -226,11 +226,10 @@ public class PlotPanel extends IPanel {
         _colorBar.setFormat(_colorBarFormat);
       if (_colorBarWidthMinimum!=0)
         _colorBar.setWidthMinimum(_colorBarWidthMinimum);
-      if (_colorMapped!=null) {
+      if (_colorMapped!=null)
         _colorMapped.getColorMap().addListener(_colorBar);
-        this.add(_colorBar,makeColorBarConstraints());
-        this.revalidate();
-      }
+      this.add(_colorBar,makeColorBarConstraints());
+      this.revalidate();
     } else {
       _colorBar.setLabel(label);
       this.revalidate();
