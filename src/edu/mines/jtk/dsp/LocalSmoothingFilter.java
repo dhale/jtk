@@ -197,7 +197,8 @@ public class LocalSmoothingFilter {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
-  private static Logger LOGGER = 
+
+  private static Logger log = 
     Logger.getLogger(LocalSmoothingFilter.class.getName());
 
   private static final boolean PARALLEL = true; // false for single-threaded
@@ -527,10 +528,10 @@ public class LocalSmoothingFilter {
     float delta = sdot(r,r);
     float deltaBegin = delta;
     float deltaSmall = sdot(b,b)*_small*_small;
-    LOGGER.fine("solve: delta="+delta);
+    log.fine("solve: delta="+delta);
     int iter;
     for (iter=0; iter<_niter && delta>deltaSmall; ++iter) {
-      LOGGER.finer("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
+      log.finer("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
       a.apply(d,q);
       float dq = sdot(d,q);
       float alpha = delta/dq;
@@ -541,7 +542,7 @@ public class LocalSmoothingFilter {
       float beta = delta/deltaOld;
       sxpay(beta,r,d);
     }
-    LOGGER.fine("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
+    log.fine("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
   }
   private void solve(Operator3 a, float[][][] b, float[][][] x) {
     int n1 = b[0][0].length;
@@ -557,9 +558,10 @@ public class LocalSmoothingFilter {
     float delta = sdot(r,r);
     float deltaBegin = delta;
     float deltaSmall = sdot(b,b)*_small*_small;
-    LOGGER.fine("solve: delta="+delta);
+    log.fine("solve: delta="+delta);
     int iter;
     for (iter=0; iter<_niter && delta>deltaSmall; ++iter) {
+      log.finer("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
       a.apply(d,q);
       float dq = sdot(d,q);
       float alpha = delta/dq;
@@ -570,7 +572,7 @@ public class LocalSmoothingFilter {
       float beta = delta/deltaOld;
       sxpay(beta,r,d);
     }
-    LOGGER.fine("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
+    log.fine("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
   }
 
   // Zeros array x.
