@@ -44,19 +44,6 @@ import java.util.Iterator;
  */
 public abstract class View {
 
-  /**
-   * Axes orientation.
-   */
-  public enum AxesOrientation {
-    XRIGHT_YUP_ZOUT,
-    XRIGHT_YOUT_ZDOWN,
-    XRIGHT_YIN_ZDOWN,
-    XOUT_YRIGHT_ZUP,
-    XDOWN_YRIGHT_ZOUT,
-    XUP_YLEFT_ZOUT,
-    XUP_YRIGHT_ZOUT
-  }
-
   public AxesOrientation getAxesOrientation() {
     return _axesOrientation;
   }

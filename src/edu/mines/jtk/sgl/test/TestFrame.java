@@ -23,7 +23,7 @@ public class TestFrame extends JFrame {
 
   public TestFrame(World world) {
     OrbitView view = (world!=null)?new OrbitView(world):new OrbitView();
-    view.setAxesOrientation(View.AxesOrientation.XRIGHT_YOUT_ZDOWN);
+    view.setAxesOrientation(AxesOrientation.XRIGHT_YOUT_ZDOWN);
     ViewCanvas canvas = new ViewCanvas(view);
     canvas.setView(view);
 
