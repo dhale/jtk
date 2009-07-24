@@ -147,6 +147,14 @@ public abstract class Node {
   }
 
   /**
+   * Gets the OpenGL states for this node.
+   * @return the OpenGL states.
+   */
+  public StateSet getStates() {
+    return _states;
+  }
+
+  /**
    * Sets the OpenGL states for this node.
    * @param states the OpenGL states.
    */

@@ -12,6 +12,7 @@ import java.util.HashMap;
 import edu.mines.jtk.dsp.Sampling;
 import static edu.mines.jtk.ogl.Gl.*;
 import edu.mines.jtk.util.Direct;
+import java.awt.Color;
 
 /**
  * A group of triangles that represents a triangulated surface.
@@ -80,6 +81,7 @@ public class TriangleGroup extends Group implements Selectable {
     int[] ijk = indexVertices(!vn,xyz);
     float[] uvw = computeNormals(ijk,xyz);
     buildTree(ijk,xyz,uvw,rgb);
+    setDefaultStates();
   }
 
   /**
@@ -229,6 +231,7 @@ public class TriangleGroup extends Group implements Selectable {
     if (uvw==null)
       uvw = computeNormals(ijk,xyz);
     buildTree(ijk,xyz,uvw,rgb);
+    setDefaultStates();
   }
 
   /**
@@ -290,6 +293,20 @@ public class TriangleGroup extends Group implements Selectable {
       }
     }
     return ijk;
+  }
+
+  /**
+   * Sets the color of the triangles in this triangle group.
+   * Note that if per-vertex colors were specified when this triangle group was
+   * constructed, then the color specified here is not used.
+   * @param color the color.
+   */
+  public void setColor(Color color) {
+    StateSet states = getStates();
+    ColorState cs = (ColorState)states.find(ColorState.class);
+    if (cs==null)
+      cs = new ColorState();
+    cs.setColor(color);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -613,4 +630,27 @@ public class TriangleGroup extends Group implements Selectable {
     return u;
   }
   */
+
+  /**
+   * Initializes the triangle group states.
+   */
+  private static StateSet defaultStateSet(Color color) {
+    StateSet states = new StateSet();
+    ColorState cs = new ColorState();
+    cs.setColor(color);
+    LightModelState lms = new LightModelState();
+    lms.setTwoSide(true);
+    MaterialState ms = new MaterialState();
+    ms.setColorMaterial(GL_AMBIENT_AND_DIFFUSE);
+    ms.setSpecular(Color.WHITE);
+    ms.setShininess(100.0f);
+    states.add(cs);
+    states.add(lms);
+    states.add(ms);
+    return states;
+  }
+
+  private void setDefaultStates() {
+    setStates(defaultStateSet(Color.LIGHT_GRAY));
+  }
 }
