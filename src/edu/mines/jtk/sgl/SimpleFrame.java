@@ -25,7 +25,7 @@ public class SimpleFrame extends JFrame {
    * Axes orientation defaults to x-right, y-top and z-down.
    */
   public SimpleFrame() {
-    this(AxesOrientation.XRIGHT_YOUT_ZDOWN);
+    this(null,null);
   }
 
   /**
@@ -33,17 +33,26 @@ public class SimpleFrame extends JFrame {
    * @param ao the axes orientation.
    */
   public SimpleFrame(AxesOrientation ao) {
-    this(null, ao);
+    this(null,ao);
   }
 
   /**
-   * Constructs a simple frame with specified world view and orientation.
+   * Constructs a simple frame with the specified world.
+   * @param world the world view.
+   */
+  public SimpleFrame(World world) {
+    this(world,null);
+  }
+
+  /**
+   * Constructs a simple frame with the specified world and orientation.
    * @param world the world view.
    * @param ao the axes orientation.
    */
   public SimpleFrame(World world, AxesOrientation ao) {
-    if (_world==null)
-      _world = new World();
+    if (world==null) world = new World();
+    if (ao==null) ao = AxesOrientation.XRIGHT_YOUT_ZDOWN;
+    _world = world;
     _view = new OrbitView(_world);
     _view.setAxesOrientation(ao);
     ViewCanvas canvas = new ViewCanvas();
@@ -199,7 +208,7 @@ public class SimpleFrame extends JFrame {
    */
   public static SimpleFrame asImagePanels(ImagePanelGroup ipg) {
     SimpleFrame sf = new SimpleFrame();
-    sf.addImagePanelGroup(ipg);
+    sf.addImagePanels(ipg);
     sf.getOrbitView().setWorldSphere(ipg.getBoundingSphere(true));
     return sf;
   }
@@ -244,25 +253,15 @@ public class SimpleFrame extends JFrame {
   }
 
   /**
-   * Adds an image panel to a simple frame from a given image panel.
-   * @param ip an image panel.
-   * @return the attached image panel.
-   */
-  public ImagePanel addImagePanel(ImagePanel ip) {
-    _world.addChild(ip);
-    return ip;
-  }
-
-  /**
    * Adds an image panel group to a simple frame from a given 3D array
    * @param f a 3D array.
    * @return the image panel group.
    */
-  public ImagePanelGroup addImagePanelGroup(float[][][] f) {
-    return addImagePanelGroup(new Sampling(f[0][0].length),
-                              new Sampling(f[0].length),
-                              new Sampling(f.length),
-                              f);
+  public ImagePanelGroup addImagePanels(float[][][] f) {
+    return addImagePanels(new Sampling(f[0][0].length),
+                          new Sampling(f[0].length),
+                          new Sampling(f.length),
+                          f);
   }
 
   /**
@@ -274,9 +273,9 @@ public class SimpleFrame extends JFrame {
    * @param f a 3D array.
    * @return the image panel group.
    */
-  public ImagePanelGroup addImagePanelGroup(
+  public ImagePanelGroup addImagePanels(
           Sampling s1, Sampling s2, Sampling s3, float[][][] f) {
-    return addImagePanelGroup(new ImagePanelGroup(s1,s2,s3,f));
+    return addImagePanels(new ImagePanelGroup(s1,s2,s3,f));
   }
 
   /**
@@ -285,7 +284,7 @@ public class SimpleFrame extends JFrame {
    * @param ipg an image panel group.
    * @return the attached image panel group.
    */
-  public ImagePanelGroup addImagePanelGroup(ImagePanelGroup ipg) {
+  public ImagePanelGroup addImagePanels(ImagePanelGroup ipg) {
     _world.addChild(ipg);
     return ipg;
   }
