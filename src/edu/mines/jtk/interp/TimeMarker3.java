@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 import edu.mines.jtk.dsp.Tensors3;
 import static edu.mines.jtk.util.ArrayMath.*;
@@ -120,6 +121,8 @@ class TimeMarker3 {
 
     // For all known samples, ...
     for (int ik=0; ik<nk; ++ik) {
+      if (ik%(1+(nk-1)/100)==0)
+        log.fine("apply: ik="+ik+" nk="+nk);
       int i1 = k1[ik];
       int i2 = k2[ik];
       int i3 = k3[ik];
@@ -151,6 +154,9 @@ class TimeMarker3 {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  private static Logger log = 
+    Logger.getLogger(NearestGridder3.class.getName());
 
   // Default time for samples not yet computed.
   private static final float INFINITY = Float.MAX_VALUE;

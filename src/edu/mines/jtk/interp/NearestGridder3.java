@@ -6,6 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.interp;
 
+import java.util.logging.Logger;
+
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.mesh.TetMesh;
 import edu.mines.jtk.util.Check;
@@ -47,19 +49,22 @@ public class NearestGridder3 implements Gridder3 {
     int n2 = s2.getCount();
     int n3 = s3.getCount();
     for (int i3=0; i3<n3; ++i3) {
+      log.fine("computeDistancesAndValues: i3="+i3);
       float x3 = (float)s3.getValue(i3);
       for (int i2=0; i2<n2; ++i2) {
+        log.finer("computeDistancesAndValues: i2="+i2);
         float x2 = (float)s2.getValue(i2);
         for (int i1=0; i1<n1; ++i1) {
           float x1 = (float)s1.getValue(i1);
           TetMesh.Node node = _mesh.findNodeNearest(x1,x2,x3);
-          float d1 = x1-node.x();
-          float d2 = x2-node.y();
-          float d3 = x3-node.z();
           if (g!=null)
             g[i3][i2][i1] = _f[node.index];
-          if (d!=null) 
+          if (d!=null) {
+            float d1 = x1-node.x();
+            float d2 = x2-node.y();
+            float d3 = x3-node.z();
             d[i3][i2][i1] = sqrt(d1*d1+d2*d2+d3*d3);
+          }
         }
       }
     }
@@ -91,6 +96,9 @@ public class NearestGridder3 implements Gridder3 {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  private static Logger log = 
+    Logger.getLogger(NearestGridder3.class.getName());
 
   private int _n;
   private float[] _f;

@@ -38,7 +38,7 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * interpolant.
  * <p>
  * Reference: 
- * <a href="http://www.mines.edu/papers/Hale09ImageGuidedBlendedNeighborInterpolation.pdf">
+ * <a href="http://www.mines.edu/~dhale/papers/Hale09ImageGuidedBlendedNeighborInterpolation.pdf">
  * Hale, D., 2009, Image-guided blended neighbor interpolation, CWP-634</a>
  * @author Dave Hale, Colorado School of Mines
  * @version 2009.07.21
@@ -126,6 +126,45 @@ public class BlendedGridder3 implements Gridder3 {
   /**
    * Computes gridded values using nearest neighbors.
    * Gridded values in the array p are computed for only unknown 
+   * samples with value equal to the specified null value. Any
+   * known (non-null) sample values in the array p are not changed.
+   * <p>
+   * This method also computes and returns an array of times to
+   * nearest-neighbor samples. Times are zero for known samples 
+   * and are positive for gridded samples.
+   * @param pnull the null value representing unknown samples.
+   * @param p array of sample values to be gridded.
+   * @return array of times to nearest known samples.
+   */
+  public float[][][] gridNearest(float pnull, float[][][] p) {
+    int n1 = p[0][0].length;
+    int n2 = p[0].length;
+    int n3 = p.length;
+
+    // Make array of times, zero for samples with non-null values.
+    // Also, count the number of marks that we will need.
+    int nmark = 0;
+    float[][][] t = new float[n3][n2][n1];
+    float tnull = -FLT_MAX;
+    for (int i3=0; i3<n3; ++i3) {
+      for (int i2=0; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          if (p[i3][i2][i1]==pnull) {
+            t[i3][i2][i1] = tnull;
+          } else {
+            t[i3][i2][i1] = 0.0f;
+            ++nmark;
+          }
+        }
+      }
+    }
+    gridNearest(nmark,t,p);
+    return t;
+  }
+
+  /**
+   * Computes gridded values using nearest neighbors.
+   * Gridded values in the array p are computed for only unknown 
    * samples denoted by corresponding non-zero times in the array t. 
    * This method does not change known values in p, which correspond
    * to zero times in t.
@@ -147,37 +186,7 @@ public class BlendedGridder3 implements Gridder3 {
         }
       }
     }
-
-    // Make an array for marks, while storing values of known samples
-    // in an array of values indexed by the mark.
-    float[] pmark = new float[nmark];
-    int[][][] m = new int[n3][n2][n1];
-    int mark = 0;
-    for (int i3=0; i3<n3; ++i3) {
-      for (int i2=0; i2<n2; ++i2) {
-        for (int i1=0; i1<n1; ++i1) {
-          if (t[i3][i2][i1]==0.0f) {
-            pmark[mark] = p[i3][i2][i1];
-            m[i3][i2][i1] = mark;
-            ++mark;
-          }
-        }
-      }
-    }
-
-    // Use the time marker to compute both times and marks.
-    TimeMarker3 tm = new TimeMarker3(n1,n2,n3,_tensors);
-    tm.apply(t,m);
-
-    // Use the marks to compute the nearest-neighbor interpolant.
-    for (int i3=0; i3<n3; ++i3) {
-      for (int i2=0; i2<n2; ++i2) {
-        for (int i1=0; i1<n1; ++i1) {
-          if (t[i3][i2][i1]!=0.0f)
-            p[i3][i2][i1] = pmark[m[i3][i2][i1]];
-        }
-      }
-    }
+    gridNearest(nmark,t,p);
   }
 
   /**
@@ -281,4 +290,41 @@ public class BlendedGridder3 implements Gridder3 {
   private Tensors3 _tensors;
   private float[] _f,_x1,_x2,_x3;
   private boolean _blending = true;
+
+  private void gridNearest(int nmark, float[][][] t, float[][][] p) {
+    int n1 = t[0][0].length;
+    int n2 = t[0].length;
+    int n3 = t.length;
+
+    // Make an array for marks, while storing values of known samples
+    // in an array of values indexed by the mark.
+    float[] pmark = new float[nmark];
+    int[][][] m = new int[n3][n2][n1];
+    int mark = 0;
+    for (int i3=0; i3<n3; ++i3) {
+      for (int i2=0; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          if (t[i3][i2][i1]==0.0f) {
+            pmark[mark] = p[i3][i2][i1];
+            m[i3][i2][i1] = mark;
+            ++mark;
+          }
+        }
+      }
+    }
+
+    // Use the time marker to compute both times and marks.
+    TimeMarker3 tm = new TimeMarker3(n1,n2,n3,_tensors);
+    tm.apply(t,m);
+
+    // Use the marks to compute the nearest-neighbor interpolant.
+    for (int i3=0; i3<n3; ++i3) {
+      for (int i2=0; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          if (t[i3][i2][i1]!=0.0f)
+            p[i3][i2][i1] = pmark[m[i3][i2][i1]];
+        }
+      }
+    }
+  }
 }

@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.interp;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.la.DMatrix;
@@ -371,13 +372,16 @@ public class SibsonInterpolator3 {
    * @return array[n3][n2][n1] of interpolated values.
    */
   public float[][][] interpolate(Sampling s1, Sampling s2, Sampling s3) {
+    log.fine("interpolate: begin");
     int n1 = s1.getCount();
     int n2 = s2.getCount();
     int n3 = s2.getCount();
     float[][][] f = new float[n3][n2][n1];
     for (int i3=0; i3<n3; ++i3) {
+      log.fine("interpolate: i3="+i3);
       float x3 = (float)s3.getValue(i3);
       for (int i2=0; i2<n2; ++i2) {
+        log.finer("interpolate: i2="+i2);
         float x2 = (float)s2.getValue(i2);
         for (int i1=0; i1<n1; ++i1) {
           float x1 = (float)s1.getValue(i1);
@@ -385,6 +389,7 @@ public class SibsonInterpolator3 {
         }
       }
     }
+    log.fine("interpolate: end");
     return f;
   }
 
@@ -475,6 +480,9 @@ public class SibsonInterpolator3 {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  private static Logger log = 
+    Logger.getLogger(SibsonInterpolator3.class.getName());
 
   // Data associated with all nodes in the tet mesh.
   private static class NodeData {

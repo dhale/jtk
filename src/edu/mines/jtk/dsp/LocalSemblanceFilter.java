@@ -16,7 +16,7 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * <p>
  * Reference: 
  * <a
- * href="http://www.mines.edu/papers/Hale09StructureOrientedSmoothingAndSemblance.pdf">
+ * href="http://www.mines.edu/~dhale/papers/Hale09StructureOrientedSmoothingAndSemblance.pdf">
  * Hale, D., 2009, Structure-oriented smoothing and semblance, CWP-635</a>
  * @author Dave Hale, Colorado School of Mines
  * @version 2009.07.24

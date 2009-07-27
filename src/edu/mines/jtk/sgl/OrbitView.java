@@ -356,6 +356,9 @@ public class OrbitView extends View {
     // Other stuff.
     glEnable(GL_NORMALIZE);
     glEnable(GL_DEPTH_TEST);
+    glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+    glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
+    glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
 
     // Our world.
     World world = getWorld();

@@ -47,6 +47,53 @@ public class SimpleGridder3 implements Gridder3 {
     _fnull = fnull;
   }
 
+  /**
+   * Gets the non-null samples from the specified gridded sample values.
+   * @param fnull the null value.
+   * @param s1 sampling of x1.
+   * @param s2 sampling of x2.
+   * @param s3 sampling of x3.
+   * @param g array of gridded sample values.
+   * @return array {f,x1,x2,x3} of arrays of non-null samples.
+   */
+  public static float[][] getGriddedSamples(
+    float fnull, Sampling s1, Sampling s2, Sampling s3, float[][][] g) 
+  {
+    int n1 = s1.getCount();
+    int n2 = s2.getCount();
+    int n3 = s3.getCount();
+    int n = 0;
+    for (int i3=0; i3<n3; ++i3) {
+      for (int i2=0; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          if (g[i3][i2][i1]!=fnull)
+            ++n;
+        }
+      }
+    }
+    float[] f = new float[n];
+    float[] x1 = new float[n];
+    float[] x2 = new float[n];
+    float[] x3 = new float[n];
+    for (int i3=0,i=0; i3<n3; ++i3) {
+      float x3i = (float)s3.getValue(i3);
+      for (int i2=0; i2<n2; ++i2) {
+        float x2i = (float)s2.getValue(i2);
+        for (int i1=0; i1<n1; ++i1) {
+          if (g[i3][i2][i1]!=fnull) {
+            float x1i = (float)s1.getValue(i1);
+            x1[i] = x1i;
+            x2[i] = x2i;
+            x3[i] = x3i;
+            f[i] = g[i3][i2][i1];
+            ++i;
+          }
+        }
+      }
+    }
+    return new float[][]{f,x1,x2,x3};
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // interface Gridder3
 
