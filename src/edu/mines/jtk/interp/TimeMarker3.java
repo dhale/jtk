@@ -505,7 +505,7 @@ class TimeMarker3 {
     }
     es.shutdown();
     trace("solveParallel: ntotal="+ntotal);
-    trace("               nratio="+(float)ntotal/(float)(_n1*_n2));
+    trace("               nratio="+(float)ntotal/(float)(_n1*_n2*_n3));
   }
 
   /**

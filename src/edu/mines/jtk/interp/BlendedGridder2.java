@@ -119,6 +119,16 @@ public class BlendedGridder2 implements Gridder2 {
   }
 
   /**
+   * Sets the maximum time computed by this gridder. The gridder has 
+   * linear precision where times are less than the maximum time.
+   * @param tmax the maximum time.
+   */
+  public void setTimeMax(double tmax) {
+    _tmax = (float)tmax;
+  }
+
+
+  /**
    * Computes gridded values using nearest neighbors.
    * Gridded values in the array p are computed for only unknown 
    * samples with value equal to the specified null value. Any
@@ -264,6 +274,7 @@ public class BlendedGridder2 implements Gridder2 {
   private Tensors2 _tensors;
   private float[] _f,_x1,_x2;
   private boolean _blending = true;
+  private float _tmax = FLT_MAX;
 
   private void gridNearest(int nmark, float[][] t, float[][] p) {
     int n1 = t[0].length;
@@ -291,8 +302,11 @@ public class BlendedGridder2 implements Gridder2 {
     // Use the marks to compute the nearest-neighbor interpolant.
     for (int i2=0; i2<n2; ++i2) {
       for (int i1=0; i1<n1; ++i1) {
-        if (t[i2][i1]!=0.0f)
+        float ti = t[i2][i1];
+        if (ti!=0.0f)
           p[i2][i1] = pmark[m[i2][i1]];
+        if (ti>_tmax)
+          t[i2][i1] = _tmax;
       }
     }
   }
