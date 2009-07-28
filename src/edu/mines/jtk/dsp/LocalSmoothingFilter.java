@@ -565,8 +565,14 @@ public class LocalSmoothingFilter {
       a.apply(d,q);
       float dq = sdot(d,q);
       float alpha = delta/dq;
-      saxpy( alpha,d,x);
-      saxpy(-alpha,q,r);
+      saxpy(alpha,d,x);
+      if ((iter+1)%50==0) {
+        scopy(b,r);
+        a.apply(x,q);
+        saxpy(-1.0f,q,r); // r = b-Ax
+      } else {
+        saxpy(-alpha,q,r);
+      }
       float deltaOld = delta;
       delta = sdot(r,r);
       float beta = delta/deltaOld;
