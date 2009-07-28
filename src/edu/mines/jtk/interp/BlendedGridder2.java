@@ -119,6 +119,15 @@ public class BlendedGridder2 implements Gridder2 {
   }
 
   /**
+   * Sets the smoothness of the interpolation of gridded values.
+   * The default is 0.5, which yields an interpolant with linear precision. 
+   * Larger values yield smoother interpolants with plateaus at known samples.
+   */
+  public void setSmoothness(double smoothness) {
+    _c = 0.25f/(float)smoothness;
+  }
+
+  /**
    * Sets the maximum time computed by this gridder. The gridder has 
    * linear precision where times are less than the maximum time.
    * @param tmax the maximum time.
@@ -126,7 +135,6 @@ public class BlendedGridder2 implements Gridder2 {
   public void setTimeMax(double tmax) {
     _tmax = (float)tmax;
   }
-
 
   /**
    * Computes gridded values using nearest neighbors.
@@ -214,9 +222,8 @@ public class BlendedGridder2 implements Gridder2 {
     }
 
     // Construct and apply a local smoothing filter.
-    float c = 0.5f; // constant for linear precision
     LocalSmoothingFilter lsf = new LocalSmoothingFilter(0.01,10000);
-    lsf.apply(_tensors,c,s,p,q);
+    lsf.apply(_tensors,_c,s,p,q);
 
     // Restore the known sample values. Due to errors in finite-difference
     // approximations, these values may have changed during smoothing.
@@ -275,6 +282,7 @@ public class BlendedGridder2 implements Gridder2 {
   private float[] _f,_x1,_x2;
   private boolean _blending = true;
   private float _tmax = FLT_MAX;
+  private float _c = 0.5f;
 
   private void gridNearest(int nmark, float[][] t, float[][] p) {
     int n1 = t[0].length;
