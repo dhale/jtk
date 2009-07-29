@@ -110,21 +110,15 @@ public class LocalSemblanceFilter {
     int count0 = 0;
     int count1 = 0;
     for (int i2=0; i2<n2; ++i2) {
-      if (allZero(f[i2])) {
-        for (int i1=0; i1<n1; ++i1) {
+      for (int i1=0; i1<n1; ++i1) {
+        float sni = sn[i2][i1];
+        float sdi = sd[i2][i1];
+        if (sdi<=0.0f || sni<0.0f) {
           s[i2][i1] = 0.0f;
-        }
-      } else {
-        for (int i1=0; i1<n1; ++i1) {
-          float sni = sn[i2][i1];
-          float sdi = sd[i2][i1];
-          if (sdi<=0.0f || sni<0.0f) {
-            s[i2][i1] = 0.0f;
-          } if (sdi<sni) {
-            s[i2][i1] = 1.0f;
-          } else {
-            s[i2][i1] = sni/sdi;
-          }
+        } if (sdi<sni) {
+          s[i2][i1] = 1.0f;
+        } else {
+          s[i2][i1] = sni/sdi;
         }
       }
     }
@@ -165,21 +159,15 @@ public class LocalSemblanceFilter {
     sd = smooth2(d,t,sd);
     for (int i3=0; i3<n3; ++i3) {
       for (int i2=0; i2<n2; ++i2) {
-        if (allZero(f[i3][i2])) {
-          for (int i1=0; i1<n1; ++i1) {
+        for (int i1=0; i1<n1; ++i1) {
+          float sni = sn[i3][i2][i1];
+          float sdi = sd[i3][i2][i1];
+          if (sdi<=0.0f || sni<0.0f) {
             s[i3][i2][i1] = 0.0f;
-          }
-        } else {
-          for (int i1=0; i1<n1; ++i1) {
-            float sni = sn[i3][i2][i1];
-            float sdi = sd[i3][i2][i1];
-            if (sdi<=0.0f || sni<0.0f) {
-              s[i3][i2][i1] = 0.0f;
-            } else if (sdi<sni) {
-              s[i3][i2][i1] = 1.0f;
-            } else {
-              s[i3][i2][i1] = sni/sdi;
-            }
+          } else if (sdi<sni) {
+            s[i3][i2][i1] = 1.0f;
+          } else {
+            s[i3][i2][i1] = sni/sdi;
           }
         }
       }
@@ -309,14 +297,6 @@ public class LocalSemblanceFilter {
     float[][][] g = shapeOf(f);
     smooth2(orthogonal(d),t,f,g);
     return g;
-  }
-
-  private static boolean allZero(float[] f) {
-    int n1 = f.length;
-    for (int i1=0; i1<n1; ++i1)
-      if (f[i1]!=0.0f)
-        return false;
-    return true;
   }
 
   private static void setEigenvalues(Direction2 d, EigenTensors2 t) {
