@@ -189,6 +189,15 @@ public class SimpleFrame extends JFrame {
 
   /**
    * Returns a new simple frame with an image panel group.
+   * @param f a 3D array.
+   * @return the simple frame.
+   */
+  public static SimpleFrame asImagePanels(float[][][] f) {
+    return asImagePanels(new ImagePanelGroup(f));
+  }
+
+  /**
+   * Returns a new simple frame with an image panel group.
    * @param s1 sampling in the 1st dimension (Z).
    * @param s2 sampling in the 2nd dimension (Y).
    * @param s3 sampling in the 3rd dimension (X).
@@ -199,7 +208,6 @@ public class SimpleFrame extends JFrame {
           Sampling s1, Sampling s2, Sampling s3, float[][][] f) {
     return asImagePanels(new ImagePanelGroup(s1,s2,s3,f));
   }
-
 
   /**
    * Returns a new simple frame with an image panel group.

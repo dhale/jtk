@@ -11,8 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.mines.jtk.util.AtomicFloat;
 import edu.mines.jtk.util.Threads;
-import static edu.mines.jtk.util.ArrayMath.copy;
-import static edu.mines.jtk.util.ArrayMath.zero;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Local smoothing of images with tensor filter coefficients.
@@ -193,6 +192,19 @@ public class LocalSmoothingFilter {
     Operator3 a = new LhsOperator3(d,c,s);
     float[][][] r = applyRhs(x);
     solve(a,r,y);
+  }
+  private void testSpd(Tensors3 d, float c, float[][][] s) {
+    int n1 = s[0][0].length;
+    int n2 = s[0].length;
+    int n3 = s.length;
+    Operator3 a = new LhsOperator3(d,c,s);
+    for (int itest=0; itest<100; ++itest) {
+      float[][][] x = sub(randfloat(n1,n2,n3),0.5f);
+      float[][][] y = zerofloat(n1,n2,n3);
+      a.apply(x,y);
+      float xy = sdot(x,y);
+      System.out.println("itest="+itest+" xy="+xy);
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -565,14 +577,8 @@ public class LocalSmoothingFilter {
       a.apply(d,q);
       float dq = sdot(d,q);
       float alpha = delta/dq;
-      saxpy(alpha,d,x);
-      if ((iter+1)%20==0) {
-        scopy(b,r);
-        a.apply(x,q);
-        saxpy(-1.0f,q,r); // r = b-Ax
-      } else {
-        saxpy(-alpha,q,r);
-      }
+      saxpy( alpha,d,x);
+      saxpy(-alpha,q,r);
       float deltaOld = delta;
       delta = sdot(r,r);
       float beta = delta/deltaOld;
