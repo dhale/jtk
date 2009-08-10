@@ -29,10 +29,15 @@ public class StateSet implements State {
 
   /**
    * Returns a new state set with color, light model, and material states.
-   * The specified color is used only when per-vertex colors are not
-   * specified. The light model state is set for two-sided lighting. 
-   * The material state is set with color material ambient and diffuse,
-   * specular color white, and shininess set to 100.
+   * The specified color is used only when per-vertex colors are not used.
+   * The light model state is set for two-sided lighting. The material 
+   * state is set with color material ambient and diffuse, specular color 
+   * white, and shininess set to 100.
+   * <p>
+   * This method exists only to provide a simple way to construct a commonly 
+   * used state set. It does nothing that cannot be accomplished (more 
+   * tediously) by constructing a state set and adding each of its states 
+   * using other methods.
    * @param color the color to be set.
    * @return the state set.
    */
