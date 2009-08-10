@@ -83,14 +83,14 @@ public class EllipsoidGlyphTest {
   }
   private static float[] randomEigenvalues() {
     int type = _random.nextInt(3);
-    float[] axes = new float[3];
+    float[] axis = new float[3];
     if (type==0) {
-      axes[0] = 1.00f; axes[1] = 1.00f; axes[2] = 1.00f; // sphere
+      axis[0] = 1.0f; axis[1] = 1.0f; axis[2] = 1.0f; // sphere
     } else if (type==1) {
-      axes[0] = 1.00f; axes[1] = 1.00f; axes[2] = 0.04f; // oblate
+      axis[0] = 1.0f; axis[1] = 1.0f; axis[2] = 0.2f; // oblate
     } else {
-      axes[0] = 1.00f; axes[1] = 0.04f; axes[2] = 0.04f; // prolate
+      axis[0] = 1.0f; axis[1] = 0.2f; axis[2] = 0.2f; // prolate
     }
-    return div(1.0f,axes);
+    return div(1.0f,mul(axis,axis));
   }
 }
