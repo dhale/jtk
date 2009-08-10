@@ -183,6 +183,21 @@ public class TriangleGroup extends Group implements Selectable {
   /**
    * Constructs a triangle group with specified vertex coordinates.
    * <p>
+   * The (x,y,z) coordinates of vertices are packed into the specified 
+   * array xyz. The number of vertices is nv = xyz.length/3.
+   * <p>
+   * The (u,v,w) components of normal vectors are packed into the specified 
+   * array uvw. The number of normal vectors equals the number of vertices.
+   * @param xyz array[3*nv] of packed vertex coordinates.
+   * @param uvw array[3*nv] of packed normal vector components.
+   */
+  public TriangleGroup(float[] xyz, float[] uvw) {
+    this(indexVertices(true,xyz),xyz,uvw,null);
+  }
+
+  /**
+   * Constructs a triangle group with specified vertex coordinates.
+   * <p>
    * Triangles are specified by triplets of vertex indices (i,j,k), one 
    * triplet per triangle, packed into the specified array of integers 
    * ijk. The number of triangles is nt = ijk.length/3.
@@ -191,18 +206,33 @@ public class TriangleGroup extends Group implements Selectable {
    * array xyz. The number of vertices is nv = xyz.length/3.
    * <p>
    * The (u,v,w) components of normal vectors are packed into the specified 
-   * array uvw. If not null, the number of normal vectors equals the number
-   * of vertices.
-   * <p>
-   * For any vertex with index iv, this method computes a normal vector 
-   * as an area-weighted average of the normal vectors for all triangles 
-   * specified with index iv.
+   * array uvw. The number of normal vectors equals the number of vertices.
    * @param ijk array[3*nt] of packed vertex indices.
    * @param xyz array[3*nv] of packed vertex coordinates.
    * @param uvw array[3*nv] of packed normal vector components.
    */
   public TriangleGroup(int[] ijk, float[] xyz, float[] uvw) {
     this(ijk,xyz,uvw,null);
+  }
+
+  /**
+   * Constructs a triangle group with specified vertex coordinates
+   * and optional corresponding normal vectors and colors.
+   * <p>
+   * The (x,y,z) coordinates of vertices are packed into the specified 
+   * array xyz. The number of vertices is nv = xyz.length/3.
+   * <p>
+   * The (u,v,w) components of normal vectors are packed into the specified 
+   * array uvw. The number of normal vectors equals the number of vertices.
+   * <p>
+   * The (r,g,b) components of colors are packed into the specified array 
+   * rgb. The number of colors equals the number of vertices.
+   * @param xyz array[3*nv] of packed vertex coordinates.
+   * @param uvw array[3*nv] of packed normal vector components.
+   * @param rgb array[3*nv] of packed color components.
+   */
+  public TriangleGroup(float[] xyz, float[] uvw, float[] rgb) {
+    this(indexVertices(true,xyz),xyz,uvw,rgb);
   }
 
   /**

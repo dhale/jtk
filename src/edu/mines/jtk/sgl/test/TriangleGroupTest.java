@@ -8,9 +8,8 @@ package edu.mines.jtk.sgl.test;
 
 import java.awt.*;
 
-import static edu.mines.jtk.ogl.Gl.GL_AMBIENT_AND_DIFFUSE;
 import edu.mines.jtk.sgl.*;
-//import edu.mines.jtk.util.Stopwatch;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * Tests {@link edu.mines.jtk.sgl.TriangleGroup}.
@@ -24,8 +23,6 @@ public class TriangleGroupTest {
     xyz = addBulge(xyz);
     xyz = addTear(xyz);
     float[] rgb = makeColors(xyz);
-
-    //bench(xyz,rgb);
 
     TriangleGroup tg = new TriangleGroup(true,xyz,rgb);
     System.out.println("TriangleGroup bounding sphere =\n" +
