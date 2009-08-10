@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.sgl.test;
 
 import java.awt.*;
+import java.util.*;
 
 import edu.mines.jtk.la.*;
 import edu.mines.jtk.sgl.*;
@@ -22,6 +23,10 @@ import static edu.mines.jtk.util.ArrayMath.*;
 public class EllipsoidGlyphTest {
 
   public static void main(String[] args) {
+    test1();
+  }
+
+  public static void test1() {
     StateSet states = new StateSet();
     ColorState cs = new ColorState();
     cs.setColor(Color.CYAN);
@@ -35,39 +40,57 @@ public class EllipsoidGlyphTest {
     ms.setShininess(100.0f);
     states.add(ms);
 
-    Group g = new Group();
-    g.setStates(states);
-
-    EllipsoidGlyph eg = makeRandomEllipsoidGlyph();
-    g.addChild(eg);
-
+    Group group = new Group();
+    group.setStates(states);
     World world = new World();
-    world.addChild(g);
+    world.addChild(group);
 
-    TestFrame frame = new TestFrame(world);
-    OrbitView view = frame.getOrbitView();
-    view.setWorldSphere(new BoundingSphere(5,5,5,5));
-    frame.setSize(new Dimension(800,600));
-    frame.setVisible(true);
+    addRandomEllipsoidGlyphs(group);
+    SimpleFrame sf = new SimpleFrame(world);
+    //sf.setWorldSphere(new BoundingSphere(5,5,5,5));
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // private
+
+  private static Random _random = new Random();
+
+  private static void addRandomEllipsoidGlyphs(Group group) {
+    for (int i=0; i<10; ++i)
+      group.addChild(makeRandomEllipsoidGlyph());
   }
 
   private static EllipsoidGlyph makeRandomEllipsoidGlyph() {
     int m = 3; // approximation quality
+    float xc = 10.0f*_random.nextFloat();
+    float yc = 10.0f*_random.nextFloat();
+    float zc = 10.0f*_random.nextFloat();
+    float[] d = randomEigenvalues();
+    float[][] v = randomEigenvectors();
+    return new EllipsoidGlyph(xc,yc,zc,m,d,v);
+  }
+
+  private static float[][] randomEigenvectors() {
     DMatrix a = new DMatrix(sub(0.5,randdouble(3,3))); // random A
     a = a.transpose().times(a); // A now positive-semidefinite
-    //a = DMatrix.identity(3,3);
     DMatrixEvd evd = new DMatrixEvd(a); // eigen-decomposition of A
     DMatrix va = evd.getV(); // eigenvectors of A in columns of V
-    double[] da = {1.0,1.0,36.0}; // array of eigenvalues D
-    da = mul(0.25,da); // so ellipsoid will be larger
-    float[] d = new float[3];
     float[][] v = new float[3][3];
-    for (int i=0; i<3; ++i) {
-      d[i] = (float)da[i];
-      for (int j=0; j<3; ++j) {
-        v[j][i] = (float)va.get(i,j);
-      }
+    for (int j=0; j<3; ++j) // for all columns of A, ...
+      for (int i=0; i<3; ++i) // for all rows in i'th column of A, ...
+        v[j][i] = (float)va.get(i,j); // j'th column is one eigenvector
+    return v;
+  }
+  private static float[] randomEigenvalues() {
+    int type = _random.nextInt(3);
+    float[] axes = new float[3];
+    if (type==0) {
+      axes[0] = 1.00f; axes[1] = 1.00f; axes[2] = 1.00f; // sphere
+    } else if (type==1) {
+      axes[0] = 1.00f; axes[1] = 1.00f; axes[2] = 0.04f; // oblate
+    } else {
+      axes[0] = 1.00f; axes[1] = 0.04f; axes[2] = 0.04f; // prolate
     }
-    return new EllipsoidGlyph(5.0f,5.0f,5.0f,m,d,v);
+    return div(1.0f,axes);
   }
 }

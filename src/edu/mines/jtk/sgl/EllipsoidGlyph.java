@@ -23,7 +23,7 @@ public class EllipsoidGlyph extends Node implements Selectable {
    * Constructs an ellipsoid glpyh for a specified metric tensor.
    * The metric tensor is a 3x3 matrix A such that p'Ap = 1 for all points
    * p on the ellipsoid, where p' denotes the transpose of a column vector 
-   * p that contains the coordinates (x,y,z).
+   * p that contains the coordinates (x,y,z), minus the specified center.
    * <p>
    * Let the eigen-decomposition of the symmetric positive-definite matrix 
    * A be defined by A = VDV', where V' is the transpose of a matrix V of 
