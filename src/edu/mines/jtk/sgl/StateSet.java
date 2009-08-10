@@ -6,7 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import java.awt.Color;
 import java.util.*;
+
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * A set of OpenGL states. State sets can be associated with nodes in
@@ -23,6 +26,33 @@ import java.util.*;
  * @version 2005.05.31
  */
 public class StateSet implements State {
+
+  /**
+   * Returns a new state set with color, light model, and material states.
+   * The specified color is used only when per-vertex colors are not
+   * specified. The light model state is set for two-sided lighting. 
+   * The material state is set with color material ambient and diffuse,
+   * specular color white, and shininess set to 100.
+   * @param color the color to be set.
+   * @return the state set.
+   */
+  public static StateSet forTwoSidedShinySurface(Color color) {
+    StateSet ss = new StateSet();
+    if (color!=null) {
+      ColorState cs = new ColorState();
+      cs.setColor(color);
+      ss.add(cs);
+    }
+    LightModelState lms = new LightModelState();
+    lms.setTwoSide(true);
+    ss.add(lms);
+    MaterialState ms = new MaterialState();
+    ms.setColorMaterial(GL_AMBIENT_AND_DIFFUSE);
+    ms.setSpecular(Color.white);
+    ms.setShininess(100.0f);
+    ss.add(ms);
+    return ss;
+  }
 
   /**
    * Adds the specified state to this set.
@@ -68,6 +98,62 @@ public class StateSet implements State {
    */
   public Iterator<State> getStates() {
     return _states.iterator();
+  }
+
+  /**
+   * Gets the blend state in this set, if present.
+   * @return the blend state; null, if none.
+   */
+  public BlendState getBlendState() {
+    return (BlendState)find(BlendState.class);
+  }
+
+  /**
+   * Gets the color state in this set, if present.
+   * @return the color state; null, if none.
+   */
+  public ColorState getColorState() {
+    return (ColorState)find(ColorState.class);
+  }
+
+  /**
+   * Gets the light model state in this set, if present.
+   * @return the light model state; null, if none.
+   */
+  public LightModelState getLightModelState() {
+    return (LightModelState)find(LightModelState.class);
+  }
+
+  /**
+   * Gets the line state in this set, if present.
+   * @return the line state; null, if none.
+   */
+  public LineState getLineState() {
+    return (LineState)find(LineState.class);
+  }
+
+  /**
+   * Gets the material state in this set, if present.
+   * @return the material state; null, if none.
+   */
+  public MaterialState getMaterialState() {
+    return (MaterialState)find(MaterialState.class);
+  }
+
+  /**
+   * Gets the point state in this set, if present.
+   * @return the point state; null, if none.
+   */
+  public PointState getPointState() {
+    return (PointState)find(PointState.class);
+  }
+
+  /**
+   * Gets the polygon state in this set, if present.
+   * @return the polygon state; null, if none.
+   */
+  public PolygonState getPolygonState() {
+    return (PolygonState)find(PolygonState.class);
   }
 
   /**

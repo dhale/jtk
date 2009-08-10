@@ -27,24 +27,11 @@ public class EllipsoidGlyphTest {
   }
 
   public static void test1() {
-    StateSet states = new StateSet();
-    ColorState cs = new ColorState();
-    cs.setColor(Color.CYAN);
-    states.add(cs);
-    LightModelState lms = new LightModelState();
-    lms.setTwoSide(true);
-    states.add(lms);
-    MaterialState ms = new MaterialState();
-    ms.setColorMaterial(GL_AMBIENT_AND_DIFFUSE);
-    ms.setSpecular(Color.white);
-    ms.setShininess(100.0f);
-    states.add(ms);
-
+    StateSet states = StateSet.forTwoSidedShinySurface(Color.CYAN);
     Group group = new Group();
     group.setStates(states);
     World world = new World();
     world.addChild(group);
-
     addRandomEllipsoidGlyphs(group);
     SimpleFrame sf = new SimpleFrame(world);
   }
