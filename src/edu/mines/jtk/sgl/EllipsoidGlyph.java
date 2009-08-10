@@ -87,34 +87,37 @@ public class EllipsoidGlyph extends Node implements Selectable {
     float pyx = sx*vyx, pyy = sy*vyy, pyz = sz*vyz;
     float pzx = sx*vzx, pzy = sy*vzy, pzz = sz*vzz;
 
-    // Arrays for vertices and unit normal vectors. The initial octahedron
+    // Buffers for vertices and unit normal vectors. The initial octahedron
     // has 8 triangular faces, each with 3 vertices with 3 coordinates. Each
     // subdivision increases the number of triangles by a factor of 4.
     int n = 8*3*3;
     for (int i=0; i<m; ++i)
       n *= 4;
-    float[] xyz = new float[n];
-    float[] uvw = new float[n];
+
+    // Float buffers for vertices and normals.
+    _nt = n/9;
+    _xyz = Direct.newFloatBuffer(n);
+    _uvw = Direct.newFloatBuffer(n);
 
     // Compute vertices and unit normal vectors for the ellipsoid by 
     // recursively subdividing the eight triangular faces of the 
     // octahedron. The order of the three vertices in each triangle is 
     // counter-clockwise as viewed from outside the ellipsoid.
     n = 0;
-    n = addTri(a, pxx, pyx, pzx, pxy, pyy, pzy, pxz, pyz, pzz,m,n,xyz,uvw);
-    n = addTri(a,-pxx,-pyx,-pzx, pxz, pyz, pzz, pxy, pyy, pzy,m,n,xyz,uvw);
-    n = addTri(a, pxx, pyx, pzx,-pxz,-pyz,-pzz, pxy, pyy, pzy,m,n,xyz,uvw);
-    n = addTri(a,-pxx,-pyx,-pzx,-pxy,-pyy,-pzy, pxz, pyz, pzz,m,n,xyz,uvw);
-    n = addTri(a, pxx, pyx, pzx, pxz, pyz, pzz,-pxy,-pyy,-pzy,m,n,xyz,uvw);
-    n = addTri(a,-pxx,-pyx,-pzx, pxy, pyy, pzy,-pxz,-pyz,-pzz,m,n,xyz,uvw);
-    n = addTri(a, pxx, pyx, pzx,-pxy,-pyy,-pzy,-pxz,-pyz,-pzz,m,n,xyz,uvw);
-    n = addTri(a,-pxx,-pyx,-pzx,-pxz,-pyz,-pzz,-pxy,-pyy,-pzy,m,n,xyz,uvw);
+    n = addTri(a, pxx, pyx, pzx, pxy, pyy, pzy, pxz, pyz, pzz,m,n,_xyz,_uvw);
+    n = addTri(a,-pxx,-pyx,-pzx, pxz, pyz, pzz, pxy, pyy, pzy,m,n,_xyz,_uvw);
+    n = addTri(a, pxx, pyx, pzx,-pxz,-pyz,-pzz, pxy, pyy, pzy,m,n,_xyz,_uvw);
+    n = addTri(a,-pxx,-pyx,-pzx,-pxy,-pyy,-pzy, pxz, pyz, pzz,m,n,_xyz,_uvw);
+    n = addTri(a, pxx, pyx, pzx, pxz, pyz, pzz,-pxy,-pyy,-pzy,m,n,_xyz,_uvw);
+    n = addTri(a,-pxx,-pyx,-pzx, pxy, pyy, pzy,-pxz,-pyz,-pzz,m,n,_xyz,_uvw);
+    n = addTri(a, pxx, pyx, pzx,-pxy,-pyy,-pzy,-pxz,-pyz,-pzz,m,n,_xyz,_uvw);
+    n = addTri(a,-pxx,-pyx,-pzx,-pxz,-pyz,-pzz,-pxy,-pyy,-pzy,m,n,_xyz,_uvw);
 
     // Shift all vertices (x,y,z) to center the ellipsoid at (xc,yc,zc).
     for (int i=0; i<n; i+=3) {
-      xyz[i  ] += xc;
-      xyz[i+1] += yc;
-      xyz[i+2] += zc;
+      _xyz.put(i  ,_xyz.get(i  )+xc);
+      _xyz.put(i+1,_xyz.get(i+1)+yc);
+      _xyz.put(i+2,_xyz.get(i+2)+zc);
     }
 
     // Bounding sphere.
@@ -123,15 +126,6 @@ public class EllipsoidGlyph extends Node implements Selectable {
     double radius2 = 1.0/sqrt(d[2]);
     double radius = max(radius0,radius1,radius2);
     _bs = new BoundingSphere(xc,yc,zc,radius);
-
-    // Float buffers for vertices and normals.
-    _nt = xyz.length/9;
-    _vb = Direct.newFloatBuffer(xyz.length);
-    _nb = Direct.newFloatBuffer(uvw.length);
-    _vb.put(xyz);
-    _nb.put(uvw);
-    _vb.rewind();
-    _nb.rewind();
 
     // Remember ellipsoid parameters.
     _xc = xc;
@@ -144,15 +138,15 @@ public class EllipsoidGlyph extends Node implements Selectable {
   public void pick(PickContext pc) {
     Segment ps = pc.getPickSegment();
     for (int it=0,jt=0; it<_nt; ++it) {
-      double xi = _vb.get(jt++);
-      double yi = _vb.get(jt++);
-      double zi = _vb.get(jt++);
-      double xj = _vb.get(jt++);
-      double yj = _vb.get(jt++);
-      double zj = _vb.get(jt++);
-      double xk = _vb.get(jt++);
-      double yk = _vb.get(jt++);
-      double zk = _vb.get(jt++);
+      double xi = _xyz.get(jt++);
+      double yi = _xyz.get(jt++);
+      double zi = _xyz.get(jt++);
+      double xj = _xyz.get(jt++);
+      double yj = _xyz.get(jt++);
+      double zj = _xyz.get(jt++);
+      double xk = _xyz.get(jt++);
+      double yk = _xyz.get(jt++);
+      double zk = _xyz.get(jt++);
       Point3 p = ps.intersectWithTriangle(xi,yi,zi,xj,yj,zj,xk,yk,zk);
       if (p!=null)
         pc.addResult(p);
@@ -173,9 +167,9 @@ public class EllipsoidGlyph extends Node implements Selectable {
   protected void draw(DrawContext dc) {
     boolean selected = isSelected();
     glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3,GL_FLOAT,0,_vb);
+    glVertexPointer(3,GL_FLOAT,0,_xyz);
     glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer(GL_FLOAT,0,_nb);
+    glNormalPointer(GL_FLOAT,0,_uvw);
     if (selected) {
       glEnable(GL_POLYGON_OFFSET_FILL);
       glPolygonOffset(1.0f,1.0f);
@@ -199,21 +193,15 @@ public class EllipsoidGlyph extends Node implements Selectable {
   private float[][] _v; // eigenvectors
   private BoundingSphere _bs; // pre-computed bounding sphere
   private int _nt; // number of triangles
-  private FloatBuffer _vb; // vertex buffer
-  private FloatBuffer _nb; // normal buffer
-
-  private void init(
-    float xc, float yc, float zc, int m, float[] d, float[][] v,
-    float[] xyz, float[] uvw) 
-  {
-  }
+  private FloatBuffer _xyz; // vertex buffer
+  private FloatBuffer _uvw; // normal buffer
 
   private static int addTri(
     float[] a,
     float xa, float ya, float za,
     float xb, float yb, float zb,
     float xc, float yc, float zc,
-    int m, int n, float[] xyz, float[] uvw)
+    int m, int n, FloatBuffer xyz, FloatBuffer uvw)
   {
     float axx = a[0], axy = a[1], axz = a[2],
                       ayy = a[3], ayz = a[4],
@@ -224,9 +212,9 @@ public class EllipsoidGlyph extends Node implements Selectable {
 
       // Append the coordinates of the vertices a, b, c of triangle abc.
       int k = n;
-      xyz[k++] = xa; xyz[k++] = ya; xyz[k++] = za;
-      xyz[k++] = xb; xyz[k++] = yb; xyz[k++] = zb;
-      xyz[k++] = xc; xyz[k++] = yc; xyz[k++] = zc;
+      xyz.put(k++,xa); xyz.put(k++,ya); xyz.put(k++,za);
+      xyz.put(k++,xb); xyz.put(k++,yb); xyz.put(k++,zb);
+      xyz.put(k++,xc); xyz.put(k++,yc); xyz.put(k++,zc);
 
       // Compute and append unit normal vectors for vertices a, b, c.
       float ua = axx*xa+axy*ya+axz*za;
@@ -244,9 +232,9 @@ public class EllipsoidGlyph extends Node implements Selectable {
       float sa = 1.0f/da;
       float sb = 1.0f/db;
       float sc = 1.0f/dc;
-      uvw[n++] = ua*sa; uvw[n++] = va*sa; uvw[n++] = wa*sa;
-      uvw[n++] = ub*sb; uvw[n++] = vb*sb; uvw[n++] = wb*sb;
-      uvw[n++] = uc*sc; uvw[n++] = vc*sc; uvw[n++] = wc*sc;
+      uvw.put(n++,ua*sa); uvw.put(n++,va*sa); uvw.put(n++,wa*sa);
+      uvw.put(n++,ub*sb); uvw.put(n++,vb*sb); uvw.put(n++,wb*sb);
+      uvw.put(n++,uc*sc); uvw.put(n++,vc*sc); uvw.put(n++,wc*sc);
     } 
 
     // Else, if subdividing, ...
