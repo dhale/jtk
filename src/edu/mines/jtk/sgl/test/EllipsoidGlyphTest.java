@@ -47,7 +47,6 @@ public class EllipsoidGlyphTest {
 
     addRandomEllipsoidGlyphs(group);
     SimpleFrame sf = new SimpleFrame(world);
-    //sf.setWorldSphere(new BoundingSphere(5,5,5,5));
   }
 
   ///////////////////////////////////////////////////////////////////////////
