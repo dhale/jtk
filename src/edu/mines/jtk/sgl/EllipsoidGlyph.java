@@ -8,231 +8,216 @@ package edu.mines.jtk.sgl;
 
 import java.nio.FloatBuffer;
 
+import edu.mines.jtk.ogl.*;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.ogl.Gl.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * An ellipsoid glyph represented by a small number of triangles.
- * @author Dave Hale and Chris Engelsma, Colorado School of Mines
- * @version 2009.08.10
+ * A glyph for fast rendering of ellipsoids (including spheres).
+ * This class is especially useful in any node that must render a large 
+ * number of ellipsoids. Such a node would first construct a single 
+ * ellipsoid glyph, and then call one of the glyph's draw methods for 
+ * each ellipsoid to be rendered. 
+ * <p>
+ * Internally, each ellipsoid is drawn by transforming an approximation to 
+ * a unit sphere (with radius one) that has been precomputed and stored in 
+ * an OpenGL display list.
+ * <p>
+ * The unit sphere is approximated by recursively subdividing the triangular 
+ * faces of an octahedron. The quality of the approximation increases with 
+ * the number of subdivisions, and the number of triangles increases by a 
+ * factor of four with each subdivision.
+ * 
+ * @author Dave Hale, Colorado School of Mines
+ * @version 2009.08.12
  */
-public class EllipsoidGlyph extends Node implements Selectable {
+public class EllipsoidGlyph {
 
   /**
-   * Constructs an ellipsoid glpyh for a specified metric tensor.
-   * The metric tensor is a 3x3 matrix A such that p'Ap = 1 for all points
-   * p on the ellipsoid, where p' denotes the transpose of a column vector 
-   * p that contains the coordinates (x,y,z), minus the specified center.
-   * <p>
-   * Let the eigen-decomposition of the symmetric positive-definite matrix 
-   * A be defined by A = VDV', where V' is the transpose of a matrix V of 
-   * orthonormal eigenvectors and D is a diagonal matrix of corresponding 
-   * positive eigenvalues.
-   * @param xc x coordinate of center of ellipsoid.
-   * @param yc y coordinate of center of ellipsoid.
-   * @param zc z coordinate of center of ellipsoid.
-   * @param m the approximation quality. The number of triangles used to
-   *  approximate the ellipsoid is proportional to 4^m.
-   * @param d array of three eigenvalues; must be positive.
-   * @param v array of three orthonormal unit eigenvectors. There are
-   *  three eigenvectors v[0], v[1] and v[2], each with three components.
-   *  Eigenvector v[k] corresponds to eigenvalue d[k], for k = 0, 1, 2.
+   * Constructs an ellipsoid glyph with default quality of four subdivisions.
    */
-  public EllipsoidGlyph(
-    float xc, float yc, float zc, int m, float[] d, float[][] v) 
+  public EllipsoidGlyph() {
+    this(4);
+  }
+
+  /**
+   * Constructs an ellipsoid glyph with specified quality.
+   * @param m the quality = the number of subdivisions.
+   */
+  public EllipsoidGlyph(int m) {
+    makeTransformMatrix();
+    makeUnitSphere(m);
+  }
+
+  /**
+   * Returns the number of vertices used to approximate this glyph.
+   * @return the number of vertices.
+   */
+  public int countVertices() {
+    return _nv;
+  }
+
+  /**
+   * Gets the vertices of the unit sphere used to approximate this glyph.
+   * @return array of packed (x,y,z) coordinates of vertices; by reference,
+   *  not by copy. The array length is 3 times the number of vertices.
+   */
+  public float[] getVertices() {
+    return _xyz;
+  }
+
+  /**
+   * Draws a unit sphere centered at the origin.
+   */
+  public void draw() {
+    if (_displayList==null) {
+      FloatBuffer xyz = Direct.newFloatBuffer(3*_nv);
+      xyz.put(_xyz); xyz.rewind();
+      _displayList = new GlDisplayList();
+      glEnableClientState(GL_VERTEX_ARRAY);
+      glEnableClientState(GL_NORMAL_ARRAY);
+      glNewList(_displayList.list(),GL_COMPILE);
+      glVertexPointer(3,GL_FLOAT,0,xyz);
+      glNormalPointer(GL_FLOAT,0,xyz);
+      glDrawArrays(GL_TRIANGLES,0,_nv);
+      glEndList();
+      glDisableClientState(GL_NORMAL_ARRAY);
+      glDisableClientState(GL_VERTEX_ARRAY);
+    }
+    glCallList(_displayList.list());
+  }
+
+  /**
+   * Draws a sphere centered at a specified point with specified radius.
+   * @param cx x coordinate of the center point.
+   * @param cy y coordinate of the center point.
+   * @param cz z coordinate of the center point.
+   * @param r radius of the sphere.
+   */
+  public void draw(float cx, float cy, float cz, float r) {
+    draw(cx,cy,cz,r,r,r);
+  }
+
+  /**
+   * Draws an axis-aligned ellipsoid centered at a specified point.
+   * @param cx x coordinate of the center point.
+   * @param cy y coordinate of the center point.
+   * @param cz z coordinate of the center point.
+   * @param dx semi-principal length in direction of x axis.
+   * @param dy semi-principal length in direction of y axis.
+   * @param dz semi-principal length in direction of z axis.
+   */
+  public void draw(
+    float cx, float cy, float cz,
+    float dx, float dy, float dz)
   {
-    Check.argument(d[0]>0.0f,"d[0] is positive");
-    Check.argument(d[1]>0.0f,"d[1] is positive");
-    Check.argument(d[2]>0.0f,"d[2] is positive");
-
-    // Elements of specified matrices D and V.
-    float dx = d[0], dy = d[1], dz = d[2];
-    float vxx = v[0][0], vxy = v[1][0], vxz = v[2][0];
-    float vyx = v[0][1], vyy = v[1][1], vyz = v[2][1];
-    float vzx = v[0][2], vzy = v[1][2], vzz = v[2][2];
-
-    // Ensure that the eigenvectors in V form a right-handed coordinate 
-    // system. This is necessary because of the ambiguity in the sign
-    // of V in the eigen-decomposition A = VDV' = (-V)D(-V)'. We want
-    // multiplication by V to be a pure rotation, to not include any 
-    // reflection about the origin, so that triangle vertices will be 
-    // in counter-clockwise order as viewed from outside the ellipsoid.
-    float txz = vyx*vzy-vzx*vyy;
-    float tyz = vzx*vxy-vxx*vzy;
-    float tzz = vxx*vyy-vxy*vyx;
-    if (txz*vxz+tyz*vyz+tzz*vzz<0.0) {
-      vxx = -vxx; vxy = -vxy; vxz = -vxz;
-      vyx = -vyx; vyy = -vyy; vyz = -vyz;
-      vzx = -vzx; vzy = -vzy; vzz = -vzz;
-    }
-
-    // Six unique elements of the symmetric positive-definite matrix A = VDV'.
-    float[] a = {
-      vxx*dx*vxx+vxy*dy*vxy+vxz*dz*vxz, // axx
-      vxx*dx*vyx+vxy*dy*vyy+vxz*dz*vyz, // axy = ayx
-      vxx*dx*vzx+vxy*dy*vzy+vxz*dz*vzz, // axz = azx
-      vyx*dx*vyx+vyy*dy*vyy+vyz*dz*vyz, // ayy
-      vyx*dx*vzx+vyy*dy*vzy+vyz*dz*vzz, // ayz = azy
-      vzx*dx*vzx+vzy*dy*vzy+vzz*dz*vzz, // azz
-    };
-
-    // Initial points p are vertices of an octahedron such that p'Ap = 1.
-    // The six points are (pxx,pyx,pzx), (pyx,pyy,pyz), (pzx,pzy,pzz)
-    // and the three reflections of those three points about the origin.
-    float sx = 1.0f/sqrt(dx);
-    float sy = 1.0f/sqrt(dy);
-    float sz = 1.0f/sqrt(dz);
-    float pxx = sx*vxx, pxy = sy*vxy, pxz = sz*vxz;
-    float pyx = sx*vyx, pyy = sy*vyy, pyz = sz*vyz;
-    float pzx = sx*vzx, pzy = sy*vzy, pzz = sz*vzz;
-
-    // Buffers for vertices and unit normal vectors. The initial octahedron
-    // has 8 triangular faces, each with 3 vertices with 3 coordinates. Each
-    // subdivision increases the number of triangles by a factor of 4.
-    int n = 8*3*3;
-    for (int i=0; i<m; ++i)
-      n *= 4;
-    _nt = n/9;
-    _xyz = Direct.newFloatBuffer(n);
-    _uvw = Direct.newFloatBuffer(n);
-
-    // Compute vertices and unit normal vectors for the ellipsoid by 
-    // recursively subdividing the eight triangular faces of the 
-    // octahedron. The order of the three vertices in each triangle is 
-    // counter-clockwise as viewed from outside the ellipsoid.
-    n = 0;
-    n = addTri(a, pxx, pyx, pzx, pxy, pyy, pzy, pxz, pyz, pzz,m,n,_xyz,_uvw);
-    n = addTri(a,-pxx,-pyx,-pzx, pxz, pyz, pzz, pxy, pyy, pzy,m,n,_xyz,_uvw);
-    n = addTri(a, pxx, pyx, pzx,-pxz,-pyz,-pzz, pxy, pyy, pzy,m,n,_xyz,_uvw);
-    n = addTri(a,-pxx,-pyx,-pzx,-pxy,-pyy,-pzy, pxz, pyz, pzz,m,n,_xyz,_uvw);
-    n = addTri(a, pxx, pyx, pzx, pxz, pyz, pzz,-pxy,-pyy,-pzy,m,n,_xyz,_uvw);
-    n = addTri(a,-pxx,-pyx,-pzx, pxy, pyy, pzy,-pxz,-pyz,-pzz,m,n,_xyz,_uvw);
-    n = addTri(a, pxx, pyx, pzx,-pxy,-pyy,-pzy,-pxz,-pyz,-pzz,m,n,_xyz,_uvw);
-    n = addTri(a,-pxx,-pyx,-pzx,-pxz,-pyz,-pzz,-pxy,-pyy,-pzy,m,n,_xyz,_uvw);
-
-    // Shift all vertices (x,y,z) to center the ellipsoid at (xc,yc,zc).
-    for (int i=0; i<n; i+=3) {
-      _xyz.put(i  ,_xyz.get(i  )+xc);
-      _xyz.put(i+1,_xyz.get(i+1)+yc);
-      _xyz.put(i+2,_xyz.get(i+2)+zc);
-    }
-
-    // Bounding sphere.
-    double radius0 = 1.0/sqrt(d[0]);
-    double radius1 = 1.0/sqrt(d[1]);
-    double radius2 = 1.0/sqrt(d[2]);
-    double radius = max(radius0,radius1,radius2);
-    _bs = new BoundingSphere(xc,yc,zc,radius);
-
-    // Remember ellipsoid parameters.
-    _xc = xc;
-    _yc = yc;
-    _zc = zc;
-    _d = copy(d);
-    _v = copy(v);
+    glPushMatrix();
+    glTranslatef(cx,cy,cz);
+    glScalef(dx,dy,dz);
+    draw();
+    glPopMatrix();
   }
 
-  public void pick(PickContext pc) {
-    Segment ps = pc.getPickSegment();
-    for (int it=0,jt=0; it<_nt; ++it) {
-      double xi = _xyz.get(jt++);
-      double yi = _xyz.get(jt++);
-      double zi = _xyz.get(jt++);
-      double xj = _xyz.get(jt++);
-      double yj = _xyz.get(jt++);
-      double zj = _xyz.get(jt++);
-      double xk = _xyz.get(jt++);
-      double yk = _xyz.get(jt++);
-      double zk = _xyz.get(jt++);
-      Point3 p = ps.intersectWithTriangle(xi,yi,zi,xj,yj,zj,xk,yk,zk);
-      if (p!=null)
-        pc.addResult(p);
+  /**
+   * Draws an arbitrary ellipsoid centered at a specified point.
+   * The semi-principal axes of the ellipsoid are represented by three 
+   * orthogonal vectors u, v, and w. The lengths of these three vectors
+   * are the semi-principal lengths of the ellipsoid.
+   * @param cx x coordinate of the center point.
+   * @param cy y coordinate of the center point.
+   * @param cz z coordinate of the center point.
+   * @param ux x component of vector u.
+   * @param uy y component of vector u.
+   * @param uz z component of vector u.
+   * @param vx x component of vector v.
+   * @param vy y component of vector v.
+   * @param vz z component of vector v.
+   * @param wx x component of vector w.
+   * @param wy y component of vector w.
+   * @param wz z component of vector w.
+   */
+  public void draw(
+    float cx, float cy, float cz,
+    float ux, float uy, float uz,
+    float vx, float vy, float vz,
+    float wx, float wy, float wz)
+  {
+    // Ensure vectors u, v, and w form a right-handed coordinate system.
+    // This is necessary to keep triangle vertices in counter-clockwise
+    // order as viewed from outside the ellipsoid.
+    if (ux*(vy*wz-vz*wy)+uy*(vz*wx-vx*wz)+uz*(vx*wy-vy*wx)<0.0) {
+      ux = -ux; uy = -uy; uz = -uz;
+      vx = -vx; vy = -vy; vz = -vz;
+      wx = -wx; wy = -wy; wz = -wz;
     }
-  }
 
-  ///////////////////////////////////////////////////////////////////////////
-  // protected
+    // The transformation matrix.
+    _m[ 0] = ux; _m[ 4] = vx; _m[ 8] = wx; _m[12] = cx;
+    _m[ 1] = uy; _m[ 5] = vy; _m[ 9] = wy; _m[13] = cy;
+    _m[ 2] = uz; _m[ 6] = vz; _m[10] = wz; _m[14] = cz;
 
-  protected void selectedChanged() {
-    dirtyDraw();
-  }
-
-  protected BoundingSphere computeBoundingSphere(boolean finite) {
-    return _bs;
-  }
-
-  protected void draw(DrawContext dc) {
-    boolean selected = isSelected();
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3,GL_FLOAT,0,_xyz);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer(GL_FLOAT,0,_uvw);
-    if (selected) {
-      glEnable(GL_POLYGON_OFFSET_FILL);
-      glPolygonOffset(1.0f,1.0f);
-    }
-    glDrawArrays(GL_TRIANGLES,0,3*_nt);
-    glDisableClientState(GL_NORMAL_ARRAY);
-    if (selected) {
-      glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-      glDisable(GL_LIGHTING);
-      glColor3d(1.0,1.0,1.0);
-      glDrawArrays(GL_TRIANGLES,0,3*_nt);
-    }
-    glDisableClientState(GL_VERTEX_ARRAY);
+    // Draw the transformed unit sphere.
+    glPushMatrix();
+    glMultMatrixf(_m,0);
+    draw();
+    glPopMatrix();
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private float _xc,_yc,_zc; // center
-  private float[] _d; // eigenvalues
-  private float[][] _v; // eigenvectors
-  private BoundingSphere _bs; // pre-computed bounding sphere
-  private int _nt; // number of triangles
-  private FloatBuffer _xyz; // vertex buffer
-  private FloatBuffer _uvw; // normal buffer
+  private float[] _m; // transform matrix used when drawing
+  private int _nv; // number of vertices for unit sphere
+  private float[] _xyz; // vertices on the unit sphere
+  private GlDisplayList _displayList; // draws unit sphere when called
 
-  private static int addTri(
-    float[] a,
+  private void makeTransformMatrix() {
+    _m = new float[16];
+    _m[15] = 1.0f;
+  }
+
+  private void makeUnitSphere(int m) {
+
+    // Buffers for vertices of triangles used to approximate the unit sphere. 
+    // The initial octahedron has 8 triangular faces, each with 3 vertices. 
+    // Each subdivision increases the number of triangles by a factor of 4.
+    _nv = 8*3;
+    for (int i=0; i<m; ++i)
+      _nv *= 4;
+    int n = _nv*3;
+    _xyz = new float[n];
+
+    // Compute vertices and unit normal vectors for the ellipsoid by 
+    // recursively subdividing the eight triangular faces of the 
+    // octahedron. The order of the three vertices in each triangle is 
+    // counter-clockwise as viewed from outside the ellipsoid.
+    float xm = -1.0f, x0 = 0.0f, xp = 1.0f;
+    float ym = -1.0f, y0 = 0.0f, yp = 1.0f;
+    float zm = -1.0f, z0 = 0.0f, zp = 1.0f;
+    n = 0;
+    n = addTri(xp,y0,z0,x0,yp,z0,x0,y0,zp,m,n);
+    n = addTri(xm,y0,z0,x0,y0,zp,x0,yp,z0,m,n);
+    n = addTri(xp,y0,z0,x0,y0,zp,x0,ym,z0,m,n);
+    n = addTri(xm,y0,z0,x0,ym,z0,x0,y0,zp,m,n);
+    n = addTri(xp,y0,z0,x0,y0,zm,x0,yp,z0,m,n);
+    n = addTri(xm,y0,z0,x0,yp,z0,x0,y0,zm,m,n);
+    n = addTri(xp,y0,z0,x0,ym,z0,x0,y0,zm,m,n);
+    n = addTri(xm,y0,z0,x0,y0,zm,x0,ym,z0,m,n);
+  }
+  private int addTri(
     float xa, float ya, float za,
     float xb, float yb, float zb,
     float xc, float yc, float zc,
-    int m, int n, FloatBuffer xyz, FloatBuffer uvw)
+    int m, int n)
   {
-    float axx = a[0], axy = a[1], axz = a[2],
-                      ayy = a[3], ayz = a[4],
-                                  azz = a[5];
-
     // If no longer subdividing, ...
     if (m==0) {
 
-      // Append the coordinates of the vertices a, b, c of triangle abc.
-      int k = n;
-      xyz.put(k++,xa); xyz.put(k++,ya); xyz.put(k++,za);
-      xyz.put(k++,xb); xyz.put(k++,yb); xyz.put(k++,zb);
-      xyz.put(k++,xc); xyz.put(k++,yc); xyz.put(k++,zc);
-
-      // Compute and append unit normal vectors for vertices a, b, c.
-      float ua = axx*xa+axy*ya+axz*za;
-      float va = axy*xa+ayy*ya+ayz*za;
-      float wa = axz*xa+ayz*ya+azz*za;
-      float ub = axx*xb+axy*yb+axz*zb;
-      float vb = axy*xb+ayy*yb+ayz*zb;
-      float wb = axz*xb+ayz*yb+azz*zb;
-      float uc = axx*xc+axy*yc+axz*zc;
-      float vc = axy*xc+ayy*yc+ayz*zc;
-      float wc = axz*xc+ayz*yc+azz*zc;
-      float da = sqrt(ua*ua+va*va+wa*wa);
-      float db = sqrt(ub*ub+vb*vb+wb*wb);
-      float dc = sqrt(uc*uc+vc*vc+wc*wc);
-      float sa = 1.0f/da;
-      float sb = 1.0f/db;
-      float sc = 1.0f/dc;
-      uvw.put(n++,ua*sa); uvw.put(n++,va*sa); uvw.put(n++,wa*sa);
-      uvw.put(n++,ub*sb); uvw.put(n++,vb*sb); uvw.put(n++,wb*sb);
-      uvw.put(n++,uc*sc); uvw.put(n++,vc*sc); uvw.put(n++,wc*sc);
+      // Append coordinates of vertices a, b, c of triangle abc.
+      _xyz[n++] = xa; _xyz[n++] = ya; _xyz[n++] = za;
+      _xyz[n++] = xb; _xyz[n++] = yb; _xyz[n++] = zb;
+      _xyz[n++] = xc; _xyz[n++] = yc; _xyz[n++] = zc;
     } 
 
     // Else, if subdividing, ...
@@ -243,18 +228,12 @@ public class EllipsoidGlyph extends Node implements Selectable {
       float xbc = 0.5f*(xb+xc), ybc = 0.5f*(yb+yc), zbc = 0.5f*(zb+zc);
       float xca = 0.5f*(xc+xa), yca = 0.5f*(yc+ya), zca = 0.5f*(zc+za);
 
-      // Metric distances from new vertices to origin.
-      float dab = sqrt(xab*(axx*xab+axy*yab+axz*zab) +
-                       yab*(axy*xab+ayy*yab+ayz*zab) +
-                       zab*(axz*xab+ayz*yab+azz*zab));
-      float dbc = sqrt(xbc*(axx*xbc+axy*ybc+axz*zbc) +
-                       ybc*(axy*xbc+ayy*ybc+ayz*zbc) +
-                       zbc*(axz*xbc+ayz*ybc+azz*zbc));
-      float dca = sqrt(xca*(axx*xca+axy*yca+axz*zca) +
-                       yca*(axy*xca+ayy*yca+ayz*zca) +
-                       zca*(axz*xca+ayz*yca+azz*zca));
+      // Distances from new vertices to origin.
+      float dab = sqrt(xab*xab+yab*yab+zab*zab);
+      float dbc = sqrt(xbc*xbc+ybc*ybc+zbc*zbc);
+      float dca = sqrt(xca*xca+yca*yca+zca*zca);
 
-      // Scale new vertices to put them on the ellipsoid.
+      // Scale new vertices to put them on the sphere.
       float sab = 1.0f/dab;
       float sbc = 1.0f/dbc;
       float sca = 1.0f/dca;
@@ -264,10 +243,10 @@ public class EllipsoidGlyph extends Node implements Selectable {
 
       // Recursively subdivide triangle abc into four triangles.
       m -= 1;
-      n = addTri(a, xa, ya, za,xab,yab,zab,xca,yca,zca,m,n,xyz,uvw);
-      n = addTri(a, xb, yb, zb,xbc,ybc,zbc,xab,yab,zab,m,n,xyz,uvw);
-      n = addTri(a, xc, yc, zc,xca,yca,zca,xbc,ybc,zbc,m,n,xyz,uvw);
-      n = addTri(a,xab,yab,zab,xbc,ybc,zbc,xca,yca,zca,m,n,xyz,uvw);
+      n = addTri( xa, ya, za,xab,yab,zab,xca,yca,zca,m,n);
+      n = addTri( xb, yb, zb,xbc,ybc,zbc,xab,yab,zab,m,n);
+      n = addTri( xc, yc, zc,xca,yca,zca,xbc,ybc,zbc,m,n);
+      n = addTri(xab,yab,zab,xbc,ybc,zbc,xca,yca,zca,m,n);
     }
 
     return n;

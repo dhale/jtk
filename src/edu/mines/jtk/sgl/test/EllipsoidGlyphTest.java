@@ -24,59 +24,118 @@ public class EllipsoidGlyphTest {
 
   public static void main(String[] args) {
     test1();
+    test2();
   }
 
   public static void test1() {
-    StateSet states = StateSet.forTwoSidedShinySurface(Color.CYAN);
-    Group group = new Group();
-    group.setStates(states);
-    World world = new World();
-    world.addChild(group);
-    addRandomEllipsoidGlyphs(group);
-    SimpleFrame sf = new SimpleFrame(world);
+    show(new EightEllipsoidsInCube());
+  }
+
+  public static void test2() {
+    show(new RandomEllipsoidsOnGrid());
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private static Random _random = new Random();
-
-  private static void addRandomEllipsoidGlyphs(Group group) {
-    for (int i=0; i<10; ++i)
-      group.addChild(makeRandomEllipsoidGlyph());
+  private static void show(Node node) {
+    StateSet states = StateSet.forTwoSidedShinySurface(Color.CYAN);
+    node.setStates(states);
+    World world = new World();
+    world.addChild(node);
+    SimpleFrame sf = new SimpleFrame(world);
   }
 
-  private static EllipsoidGlyph makeRandomEllipsoidGlyph() {
-    int m = 3; // approximation quality
-    float xc = 10.0f*_random.nextFloat();
-    float yc = 10.0f*_random.nextFloat();
-    float zc = 10.0f*_random.nextFloat();
-    float[] d = randomEigenvalues();
-    float[][] v = randomEigenvectors();
-    return new EllipsoidGlyph(xc,yc,zc,m,d,v);
-  }
-
-  private static float[][] randomEigenvectors() {
-    DMatrix a = new DMatrix(sub(0.5,randdouble(3,3))); // random A
-    a = a.transpose().times(a); // A now positive-semidefinite
-    DMatrixEvd evd = new DMatrixEvd(a); // eigen-decomposition of A
-    DMatrix va = evd.getV(); // eigenvectors of A in columns of V
-    float[][] v = new float[3][3];
-    for (int j=0; j<3; ++j) // for all columns of A, ...
-      for (int i=0; i<3; ++i) // for all rows in i'th column of A, ...
-        v[j][i] = (float)va.get(i,j); // j'th column is one eigenvector
-    return v;
-  }
-  private static float[] randomEigenvalues() {
-    int type = _random.nextInt(3);
-    float[] axis = new float[3];
-    if (type==0) {
-      axis[0] = 1.0f; axis[1] = 1.0f; axis[2] = 1.0f; // sphere
-    } else if (type==1) {
-      axis[0] = 1.0f; axis[1] = 1.0f; axis[2] = 0.2f; // oblate
-    } else {
-      axis[0] = 1.0f; axis[1] = 0.2f; axis[2] = 0.2f; // prolate
+  // Eight ellipsoids at the corners of a cube.
+  public static class EightEllipsoidsInCube extends Node {
+    public void draw(DrawContext dc) {
+      float cx = 0.5f, cy = 0.5f, cz = 0.5f;
+      float ux = 0.5f, uy = 0.0f, uz = 0.0f;
+      float vx = 0.0f, vy = 0.1f, vz = 0.0f;
+      float wx = 0.0f, wy = 0.0f, wz = 0.5f;
+      _ellipsoid.draw(-cx, cy,-cz,ux,uy,uz,vx,vy,vz,wx,wy,wz);
+      _ellipsoid.draw( cx, cy,-cz,ux,uy,uz,vx,vy,vz,wx,wy,wz);
+      _ellipsoid.draw(-cx,-cy,-cz,ux,uy,uz,vx,vy,vz,wx,wy,wz);
+      _ellipsoid.draw( cx,-cy,-cz,ux,uy,uz,vx,vy,vz,wx,wy,wz);
+      _ellipsoid.draw(-cx, cy, cz,ux,uy,uz,vx,vy,vz,wx,wy,wz);
+      _ellipsoid.draw( cx, cy, cz,ux,uy,uz,vx,vy,vz,wx,wy,wz);
+      _ellipsoid.draw(-cx,-cy, cz,ux,uy,uz,vx,vy,vz,wx,wy,wz);
+      _ellipsoid.draw( cx,-cy, cz,ux,uy,uz,vx,vy,vz,wx,wy,wz);
     }
-    return div(1.0f,mul(axis,axis));
+    public BoundingSphere computeBoundingSphere(boolean finite) {
+      return _bs;
+    }
+    private EllipsoidGlyph _ellipsoid = new EllipsoidGlyph();
+    private BoundingSphere _bs = 
+      new BoundingSphere(new BoundingBox(-1,-1,-1,1,1,1));
+  }
+
+  // A 2D grid of random ellipsoids.
+  public static class RandomEllipsoidsOnGrid extends Node {
+    public RandomEllipsoidsOnGrid() {
+      int ns = 4;
+      int nt = 5;
+      _ux = new float[ns][nt];
+      _uy = new float[ns][nt];
+      _uz = new float[ns][nt];
+      _vx = new float[ns][nt];
+      _vy = new float[ns][nt];
+      _vz = new float[ns][nt];
+      _wx = new float[ns][nt];
+      _wy = new float[ns][nt];
+      _wz = new float[ns][nt];
+      _cx = new float[ns][nt];
+      _cy = new float[ns][nt];
+      _cz = new float[ns][nt];
+      float ds = 0.5f/ns;
+      float dt = 0.5f/nt;
+      float dd = min(ds,dt);
+      for (int is=0; is<ns; ++is) {
+        for (int it=0; it<nt; ++it) {
+          DMatrix matrix = new DMatrix(sub(randdouble(3,3),0.5));
+          matrix = matrix.transpose().times(matrix); // random SPD matrix
+          DMatrixEvd evd = new DMatrixEvd(matrix); // eigen-decomp
+          DMatrix ev = evd.getV(); // three orthogonal unit vectors
+          float[] d = mul(dd,randfloat(3)); // random scale factors
+          float du = d[0], dv = d[1], dw = d[2];
+          _ux[is][it] = (float)ev.get(0,0)*du;
+          _uy[is][it] = (float)ev.get(1,0)*du;
+          _uz[is][it] = (float)ev.get(2,0)*du;
+          _vx[is][it] = (float)ev.get(0,1)*dv;
+          _vy[is][it] = (float)ev.get(1,1)*dv;
+          _vz[is][it] = (float)ev.get(2,1)*dv;
+          _wx[is][it] = (float)ev.get(0,2)*dw;
+          _wy[is][it] = (float)ev.get(1,2)*dw;
+          _wz[is][it] = (float)ev.get(2,2)*dw;
+          _cx[is][it] = (1+2*is)*ds;
+          _cy[is][it] = 0.5f; // arbitrarily choose y to be constant
+          _cz[is][it] = (1+2*it)*dt;
+        }
+      }
+      _ellipsoid = new EllipsoidGlyph();
+      _bs = new BoundingSphere(new BoundingBox(0,0,0,1,1,1));
+    }
+    public void draw(DrawContext dc) {
+      int ns = _cx.length;
+      int nt = _cx[0].length;
+      for (int is=0; is<ns; ++is) {
+        for (int it=0; it<nt; ++it) {
+          _ellipsoid.draw(
+            _cx[is][it],_cy[is][it],_cz[is][it],
+            _ux[is][it],_uy[is][it],_uz[is][it],
+            _vx[is][it],_vy[is][it],_vz[is][it],
+            _wx[is][it],_wy[is][it],_wz[is][it]);
+        }
+      }
+    }
+    public BoundingSphere computeBoundingSphere(boolean finite) {
+      return _bs;
+    }
+    private float[][] _cx,_cy,_cz;
+    private float[][] _ux,_uy,_uz;
+    private float[][] _vx,_vy,_vz;
+    private float[][] _wx,_wy,_wz;
+    private EllipsoidGlyph _ellipsoid;
+    private BoundingSphere _bs;
   }
 }
