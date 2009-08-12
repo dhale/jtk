@@ -93,8 +93,6 @@ public class EllipsoidGlyph extends Node implements Selectable {
     int n = 8*3*3;
     for (int i=0; i<m; ++i)
       n *= 4;
-
-    // Float buffers for vertices and normals.
     _nt = n/9;
     _xyz = Direct.newFloatBuffer(n);
     _uvw = Direct.newFloatBuffer(n);
