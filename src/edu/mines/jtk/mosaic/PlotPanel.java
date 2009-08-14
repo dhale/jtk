@@ -1216,13 +1216,12 @@ public class PlotPanel extends IPanel {
     if (_autoColorMapped) {
       int rows = _mosaic.countRows();
       int cols = _mosaic.countColumns();
-      Tile t = getTile(0,cols-1); /* Top-right panel. */
-      int ntv = t.countTiledViews();
       ColorMapped cmBest = null;
       ColorMapped cmSolid = null;
       for (int ncol=cols-1; ncol>=0; --ncol) {
         for (int nrow=0; nrow<rows; ++nrow) {
-          t = getTile(nrow,ncol);
+          Tile t = getTile(nrow,ncol);
+          int ntv = t.countTiledViews();
           for (int itv=ntv-1; itv>=0 && cmBest==null; --itv) {
             TiledView tv = t.getTiledView(itv);
             if (tv instanceof ColorMapped) {
