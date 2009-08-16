@@ -76,12 +76,16 @@ public class RecursiveCascadeFilter {
    * @param y the output array.
    */
   public void applyForwardReverse(float[] x, float[] y) {
+    applyForward(x,y);
+    applyReverse(y,y);
+    /*
     _f1[0].applyForward(x,y);
     _f1[0].applyReverse(y,y);
     for (int i1=1; i1<_n1; ++i1) {
       _f1[i1].applyForward(y,y);
       _f1[i1].applyReverse(y,y);
     }
+    */
   }
 
   /**
@@ -119,12 +123,16 @@ public class RecursiveCascadeFilter {
    * @param y the output array.
    */
   public void apply1ForwardReverse(float[][] x, float[][] y) {
+    apply1Forward(x,y);
+    apply1Reverse(y,y);
+    /*
     _f1[0].apply1Forward(x,y);
     _f1[0].apply1Reverse(y,y);
     for (int i1=1; i1<_n1; ++i1) {
       _f1[i1].apply1Forward(y,y);
       _f1[i1].apply1Reverse(y,y);
     }
+    */
   }
 
   /**
@@ -162,12 +170,16 @@ public class RecursiveCascadeFilter {
    * @param y the output array.
    */
   public void apply2ForwardReverse(float[][] x, float[][] y) {
+    apply2Forward(x,y);
+    apply2Reverse(y,y);
+    /*
     _f1[0].apply2Forward(x,y);
     _f1[0].apply2Reverse(y,y);
     for (int i1=1; i1<_n1; ++i1) {
       _f1[i1].apply2Forward(y,y);
       _f1[i1].apply2Reverse(y,y);
     }
+    */
   }
 
   /**
@@ -205,12 +217,16 @@ public class RecursiveCascadeFilter {
    * @param y the output array.
    */
   public void apply1ForwardReverse(float[][][] x, float[][][] y) {
+    apply1Forward(x,y);
+    apply1Reverse(y,y);
+    /*
     _f1[0].apply1Forward(x,y);
     _f1[0].apply1Reverse(y,y);
     for (int i1=1; i1<_n1; ++i1) {
       _f1[i1].apply1Forward(y,y);
       _f1[i1].apply1Reverse(y,y);
     }
+    */
   }
 
   /**
@@ -248,12 +264,16 @@ public class RecursiveCascadeFilter {
    * @param y the output array.
    */
   public void apply2ForwardReverse(float[][][] x, float[][][] y) {
+    apply2Forward(x,y);
+    apply2Reverse(y,y);
+    /*
     _f1[0].apply2Forward(x,y);
     _f1[0].apply2Reverse(y,y);
     for (int i1=1; i1<_n1; ++i1) {
       _f1[i1].apply2Forward(y,y);
       _f1[i1].apply2Reverse(y,y);
     }
+    */
   }
 
   /**
@@ -291,12 +311,16 @@ public class RecursiveCascadeFilter {
    * @param y the output array.
    */
   public void apply3ForwardReverse(float[][][] x, float[][][] y) {
+    apply3Forward(x,y);
+    apply3Reverse(y,y);
+    /*
     _f1[0].apply3Forward(x,y);
     _f1[0].apply3Reverse(y,y);
     for (int i1=1; i1<_n1; ++i1) {
       _f1[i1].apply3Forward(y,y);
       _f1[i1].apply3Reverse(y,y);
     }
+    */
   }
 
   ///////////////////////////////////////////////////////////////////////////
