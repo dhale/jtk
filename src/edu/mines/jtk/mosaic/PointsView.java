@@ -585,6 +585,16 @@ public class PointsView extends TiledView {
       }
     }
 
+    // Ensure x1min<x1max and x2min<x2max.
+    if (x1min==x1max) {
+      x1min -= ulp(x1min);
+      x1max += ulp(x1max);
+    }
+    if (x2min==x2max) {
+      x2min -= ulp(x2min);
+      x2max += ulp(x2max);
+    }
+
     // Assume mark sizes and line widths less than 2% of plot dimensions.
     // The goal is to avoid clipping big marks and wide lines. The problem
     // is that mark sizes and line widths are specified in screen pixels

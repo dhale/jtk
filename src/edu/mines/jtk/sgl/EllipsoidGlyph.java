@@ -101,6 +101,7 @@ public class EllipsoidGlyph {
 
   /**
    * Draws an axis-aligned ellipsoid centered at a specified point.
+   * The lengths of the specified semi-principal axes must be positive.
    * @param cx x coordinate of the center point.
    * @param cy y coordinate of the center point.
    * @param cz z coordinate of the center point.
@@ -122,8 +123,8 @@ public class EllipsoidGlyph {
   /**
    * Draws an arbitrary ellipsoid centered at a specified point.
    * The semi-principal axes of the ellipsoid are represented by three 
-   * orthogonal vectors u, v, and w. The lengths of these three vectors
-   * are the semi-principal lengths of the ellipsoid.
+   * vectors u, v, and w. The lengths of these three vectors are the 
+   * semi-principal lengths of the ellipsoid, and must be non-zero.
    * @param cx x coordinate of the center point.
    * @param cy y coordinate of the center point.
    * @param cz z coordinate of the center point.

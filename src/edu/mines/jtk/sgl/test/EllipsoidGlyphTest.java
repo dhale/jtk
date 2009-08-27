@@ -98,15 +98,18 @@ public class EllipsoidGlyphTest {
           DMatrix ev = evd.getV(); // three orthogonal unit vectors
           float[] d = mul(dd,randfloat(3)); // random scale factors
           float du = d[0], dv = d[1], dw = d[2];
+          if (du<0.01f) du = 0.001f; // make some
+          if (dv<0.01f) dv = 0.001f; // ellipsoids
+          if (dw<0.01f) dw = 0.001f; // very thin
           _ux[is][it] = (float)ev.get(0,0)*du;
           _uy[is][it] = (float)ev.get(1,0)*du;
-          _uz[is][it] = (float)ev.get(2,0)*du;
+          _uz[is][it] = (float)ev.get(2,0)*du*0.5f; // squeeze vertically
           _vx[is][it] = (float)ev.get(0,1)*dv;
           _vy[is][it] = (float)ev.get(1,1)*dv;
-          _vz[is][it] = (float)ev.get(2,1)*dv;
+          _vz[is][it] = (float)ev.get(2,1)*dv*0.5f; // squeeze vertically
           _wx[is][it] = (float)ev.get(0,2)*dw;
           _wy[is][it] = (float)ev.get(1,2)*dw;
-          _wz[is][it] = (float)ev.get(2,2)*dw;
+          _wz[is][it] = (float)ev.get(2,2)*dw*0.5f; // squeeze vertically
           _cx[is][it] = (1+2*is)*ds;
           _cy[is][it] = 0.5f; // arbitrarily choose y to be constant
           _cz[is][it] = (1+2*it)*dt;
