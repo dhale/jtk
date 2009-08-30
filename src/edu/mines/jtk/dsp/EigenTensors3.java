@@ -303,7 +303,7 @@ public class EigenTensors3 implements Tensors3,Serializable {
     float[] w = getEigenvectorW(i1,i2,i3);
     v[0] = w[1]*u[2]-w[2]*u[1]; // v = w cross u
     v[1] = w[2]*u[0]-w[0]*u[2];
-    v[2] = w[0]*u[1]-w[1]*u[1];
+    v[2] = w[0]*u[1]-w[1]*u[0];
   }
 
   /**
