@@ -108,6 +108,7 @@ public class PlotFrame extends JFrame {
       resizeWeight = rowTL/(rowTL+rowBR);
     }
     _splitPane.setResizeWeight(resizeWeight);
+    _splitPane.setDividerLocation(1.0-resizeWeight);
     _splitPane.setOneTouchExpandable(true);
     _panelMain.add(_splitPane,BorderLayout.CENTER);
     this.setSize(_panelMain.getPreferredSize());
@@ -144,6 +145,14 @@ public class PlotFrame extends JFrame {
    */
   public PlotPanel getPlotPanelBottomRight() {
     return _panelBR;
+  }
+
+  /**
+   * Gets the split pane for this frame if it contains two panels.
+   * @return the split pane; null, if this frame contains only one panel.
+   */
+  public JSplitPane getSplitPane() {
+    return _splitPane;
   }
 
   /**
