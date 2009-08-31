@@ -65,17 +65,27 @@ public class Almost implements Serializable, Comparator<Number> {
       For double precision, use a multiple of 2.2204460492503131e-016;
       I recommend multiplying these values by at least 10
       to allow for errors introduced by arithmetic.
+      Should be much less than 1.
    */
   public Almost(double epsilon) {
+    if (epsilon > 0.1) {
+      throw new IllegalArgumentException
+        ("Epsilon should be a small number: "+epsilon);
+    }
     _epsilon = Math.abs(epsilon);
   }
 
   /** Specify precision to be used for operations.
       Epsilon will be 0.1 to this power.
       MinValue defaults to 100.*Float.MIN_VALUE;
-      @param significantDigits
+      @param significantDigits the number of significant digits, should be
+      positive.
    */
   public Almost(int significantDigits) {
+    if (significantDigits < 1) {
+      throw new IllegalArgumentException
+        ("The number of significant digits should be positive.");
+    }
     significantDigits = Math.abs(significantDigits);
     _epsilon = 1.;
     while (significantDigits >0) {
