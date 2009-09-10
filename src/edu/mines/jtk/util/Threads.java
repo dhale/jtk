@@ -14,6 +14,14 @@ package edu.mines.jtk.util;
 public class Threads {
 
   /**
+   * Gets the number of available processors (cores).
+   * @return the number of available processors (cores).
+   */
+  public static int getAvailableProcessors() {
+    return Runtime.getRuntime().availableProcessors();
+  }
+
+  /**
    * Returns a new array for threads. The length of the array equals the
    * number of available processors (or cores). 
    * <p>
@@ -34,7 +42,7 @@ public class Threads {
    * @return the array, with length for at least one thread.
    */
   public static Thread[] makeArray(double multiple) {
-    int nprocessors = Runtime.getRuntime().availableProcessors();
+    int nprocessors = getAvailableProcessors();
     int nthread = Math.max(1,(int)(multiple*nprocessors));
     return new Thread[nthread];
   }
