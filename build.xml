@@ -43,6 +43,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <target name="compile-java" depends="init">
     <javac srcdir="${src}" destdir="${build.cls}" 
       compiler="javac1.5"
+      memoryMaximumSize="500m"
+      fork="true"
       debug="on" 
       deprecation="on">
       <compilerarg value="-Xlint:all,-serial"/>

@@ -100,7 +100,6 @@ public class LocalSmoothingFilter {
         e[i1] = c;
     }
 
-
     // Work array w overwrites sub-diagonal array e.
     float[] w = e;
 
