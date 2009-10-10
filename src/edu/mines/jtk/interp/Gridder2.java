@@ -25,7 +25,7 @@ public interface Gridder2 {
    * Sets the known (scattered) samples.
    * The specified arrays may be either referenced or copied,
    * depending on the implementation. Unless stated otherwise,
-   * one must assume that these arrays are reference.
+   * assume that these arrays are referenced, not copied.
    * @param f array of sample values f(x1,x2).
    * @param x1 array of sample x1 coordinates.
    * @param x2 array of sample x2 coordinates.
