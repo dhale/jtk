@@ -61,6 +61,20 @@ public class DiscreteSibsonGridder2 implements Gridder2 {
     setScattered(f,x1,x2);
   }
 
+  /**
+   * Sets the number of bi-Laplacian smoothing iterations.
+   * If non-zero, these iterations are performed at the end of discrete 
+   * Sibson interpolation, and does not alter known sample values. This
+   * smoothing attenuates high-frequency artifacts caused by approximating 
+   * circles on a uniform sampling grid. However, smoothing iterations may 
+   * also create unwanted oscillations in gridded values. The default 
+   * number of smoothing iterations is zero.
+   * @param nsmooth number of smoothing iterations.
+   */
+  public void setSmooth(int nsmooth) {
+    _nsmooth = nsmooth;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // interface Gridder2
 
@@ -193,6 +207,34 @@ public class DiscreteSibsonGridder2 implements Gridder2 {
       }
     }
 
+    // Optional Gauss-Seidel iterations of bi-Laplacian smoothing to
+    // attenuate artifacts in discrete Sibson interpolation.
+    int n1m = n1-1;
+    int n2m = n2-1;
+    float a1 =  8.0f/20.0f;
+    float a2 = -2.0f/20.0f;
+    float a3 = -1.0f/20.0f;
+    for (int jsmooth=0; jsmooth<_nsmooth; ++jsmooth) {
+      for (int i2=0; i2<n2; ++i2) {
+        int i2m = (i2==0  )?i2:i2-1;
+        int i2p = (i2==n2m)?i2:i2+1;
+        int i2mm = (i2m==0  )?i2m:i2m-1;
+        int i2pp = (i2p==n2m)?i2p:i2p+1;
+        for (int i1=0; i1<n1; ++i1) {
+          int i1m = (i1==0  )?i1:i1-1;
+          int i1p = (i1==n1m)?i1:i1+1;
+          int i1mm = (i1m==0  )?i1m:i1m-1;
+          int i1pp = (i1p==n1m)?i1p:i1p+1;
+          if (c[i2][i1]>0.0f) {
+            float g1 = a1*(g[i2 ][i1m]+g[i2 ][i1p]+g[i2m][i1 ]+g[i2p][i1 ]);
+            float g2 = a2*(g[i2m][i1m]+g[i2m][i1p]+g[i2p][i1m]+g[i2p][i1p]);
+            float g3 = a3*(g[i2][i1mm]+g[i2][i1pp]+g[i2mm][i1]+g[i2pp][i1]);
+            g[i2][i1] = g1+g2+g3;
+          }
+        }
+      }
+    }
+
     return g;
   }
 
@@ -201,4 +243,5 @@ public class DiscreteSibsonGridder2 implements Gridder2 {
 
   private int _n;
   private float[] _f,_x1,_x2;
+  private int _nsmooth;
 }
