@@ -68,6 +68,7 @@ public class TileZoomMode extends Mode {
           Projector hp = tile.getHorizontalProjector();
           Projector vp = tile.getVerticalProjector();
           DRectangle r = tile.getViewRectangle();
+          double ffsize = frame.getFont().getSize();
           double fwidth = frame.getWidth();
           double fheight = frame.getHeight();
           double fratio = fwidth/fheight; 
@@ -77,7 +78,8 @@ public class TileZoomMode extends Mode {
           double vwidth = abs(hp.v(r.x)-hp.v(r.x+r.width));
           double vheight = abs(vp.v(r.y)-vp.v(r.y+r.height));
           double vratio = vwidth/vheight; 
-          System.out.printf("Tile: frame width  = %1d%n",(int)fwidth);
+          System.out.printf("Tile: frame font size  = %1d%n",(int)ffsize);
+          System.out.printf("      frame width  = %1d%n",(int)fwidth);
           System.out.printf("      frame height = %1d%n",(int)fheight);
           System.out.printf("      frame ratio  = %1.4g%n",fratio);
           System.out.printf("      pixel width  = %1d%n",(int)pwidth);

@@ -78,7 +78,7 @@ public class PlotFrame extends JFrame {
     this.setBackground(DEFAULT_BACKGROUND);
     this.setSize(DEFAULT_WIDTH,DEFAULT_HEIGHT);
     addModeManager();
-    addMainPanelListener();
+    addResizeListener();
   }
 
   /**
@@ -117,7 +117,7 @@ public class PlotFrame extends JFrame {
     this.setFont(DEFAULT_FONT);
     this.setSize(DEFAULT_WIDTH,DEFAULT_HEIGHT);
     addModeManager();
-    addMainPanelListener();
+    addResizeListener();
   }
 
   /**
@@ -366,13 +366,15 @@ public class PlotFrame extends JFrame {
     Font font = getFont();
     if (font==null)
       font = UIManager.getFont("Panel.font");
-    if (font!=null)
-      setFont(font.deriveFont(size));
+    if (font!=null) {
+      font = font.deriveFont(size);
+      setFont(font);
+    }
   }
 
-  // When main panel is resized, we may need to adjust its font size.
-  private void addMainPanelListener() {
-    _panelMain.addComponentListener(new ComponentAdapter() {
+  // When this frame is resized, we may need to adjust the font size.
+  private void addResizeListener() {
+    this.addComponentListener(new ComponentAdapter() {
       public void componentResized(ComponentEvent e) {
         if (_fontSizeForPrint) {
           adjustFontSizeForPrint();
