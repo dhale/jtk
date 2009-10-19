@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import static java.lang.Math.*;
 import java.awt.image.IndexColorModel;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -225,21 +226,58 @@ public class ImagePanelGroup extends Group {
     _colorMap.removeListener(cml);
   }
 
+  /**
+   * Sets indices of image slices displayed in this group.
+   * @param k1 index in 1st dimension (Z axis).
+   * @param k2 index in 2nd dimension (Y axis).
+   * @param k3 index in 3rd dimension (X axis).
+   */
+  public void setSlices(int k1, int k2, int k3) {
+    int nx = _s3.getCount();
+    int ny = _s2.getCount();
+    int nz = _s1.getCount();
+    double dx = _s3.getDelta();
+    double dy = _s2.getDelta();
+    double dz = _s1.getDelta();
+    double fx = _s3.getFirst();
+    double fy = _s2.getFirst();
+    double fz = _s1.getFirst();
+    double lx = fx+(nx-1)*dx;
+    double ly = fy+(ny-1)*dy;
+    double lz = fz+(nz-1)*dz;
+    int kx = max(0,min(nx-1,k3));
+    int ky = max(0,min(ny-1,k2));
+    int kz = max(0,min(nz-1,k1));
+    double xk = fx+kx*dx;
+    double yk = fy+ky*dy;
+    double zk = fz+kz*dz;
+    for (ImagePanel ip:_ipList) {
+      AxisAlignedFrame frame = ip.getFrame();
+      Axis axis = frame.getAxis();
+      if (axis==Axis.X) {
+        frame.setCorners(new Point3(xk,fy,fz),new Point3(xk,ly,lz));
+      } else if (axis==Axis.Y) {
+        frame.setCorners(new Point3(fx,yk,fz),new Point3(lx,yk,lz));
+      } else {
+        frame.setCorners(new Point3(fx,fy,zk),new Point3(lx,ly,zk));
+      }
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  // List of image panels.
+  private Sampling _s1,_s2,_s3;
   private ArrayList<ImagePanel> _ipList;
-
-  // Clips.
   private Clips _clips;
-
-  // Color map.
   private ColorMap _colorMap = new ColorMap(0.0,1.0,ColorMap.GRAY);
 
   private void addPanels(
     Sampling s1, Sampling s2, Sampling s3, Float3 f3, Axis[] axes) 
   {
+    _s1 = s1;
+    _s2 = s2;
+    _s3 = s3;
     int nx = s3.getCount();
     int ny = s2.getCount();
     int nz = s1.getCount();

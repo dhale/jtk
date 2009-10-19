@@ -74,6 +74,15 @@ public class ColorBar extends IPanel implements ColorMapListener {
   }
 
   /**
+   * Sets the major labeled tic interval in the axis for this color bar.
+   * @param interval the major labeled tic interval.
+   */
+  public void setInterval(double interval) {
+    _mosaic.getTileAxisRight(0).setInterval(interval);
+    revalidate();
+  }
+
+  /**
    * Gets the tile used to display this color bar.
    * @return the tile.
    */
