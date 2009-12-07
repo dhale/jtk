@@ -25,13 +25,14 @@ import edu.mines.jtk.util.Almost;
 public class ArrayVect3f implements Vect {
 
   /** wrapped data */
-  protected float[][][] _data = null;
+  protected transient float[][][] _data = null;
 
   /** variance for all samples */
-  protected double _variance = 1.;
+  protected transient double _variance = 1.;
 
   private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L; // try never to change
+  private static final int VERSION = 1; // compatible change in serialization
 
   /** Wrap an array as a Vect.
       @param data This will be assigned to the public data.
@@ -146,5 +147,30 @@ public class ArrayVect3f implements Vect {
       }
     }
     return result;
+  }
+
+  private void writeObject(java.io.ObjectOutputStream out)
+    throws java.io.IOException {
+    java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+    map.put("data", _data);
+    map.put("variance", _variance);
+    map.put("VERSION", VERSION);
+    out.writeObject(map);
+  }
+
+  private void readObject(java.io.ObjectInputStream in)
+    throws java.io.IOException, ClassNotFoundException {
+
+    @SuppressWarnings("unchecked") java.util.Map<String, Object> map =
+      (java.util.Map<String, Object>) in.readObject();
+
+    _data = (float[][][]) map.get("data");
+    _variance = (Double) map.get("variance");
+
+    int version = (Integer) map.get("VERSION");
+    if (version != VERSION) {
+      java.util.logging.Logger.getLogger(this.getClass().getName()).warning
+        ("Need to convert data from version "+version+" to "+VERSION);
+    }
   }
 }

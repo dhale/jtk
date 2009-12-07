@@ -13,11 +13,12 @@ import edu.mines.jtk.util.Almost;
 /** Implements a Vect by wrapping a single double */
 public class ScalarVect implements Vect {
   /** wrapped data */
-  protected double _value = 0;
+  protected transient double _value = 0;
   /** variance for value */
-  protected double _variance = 1.;
+  protected transient double _variance = 1.;
   private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L; // try never to change
+  private static final int VERSION = 1; // compatible change in serialization
 
   /** Specify the initial value
       @param value The initial value of the wrapped scalar
@@ -107,6 +108,31 @@ public class ScalarVect implements Vect {
   // VectConst
   public double magnitude() {
     return Almost.FLOAT.divide (this.dot(this), _variance, 0.);
+  }
+
+  private void writeObject(java.io.ObjectOutputStream out)
+    throws java.io.IOException {
+    java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+    map.put("value", _value);
+    map.put("variance", _variance);
+    map.put("VERSION", VERSION);
+    out.writeObject(map);
+  }
+
+  private void readObject(java.io.ObjectInputStream in)
+    throws java.io.IOException, ClassNotFoundException {
+
+    @SuppressWarnings("unchecked") java.util.Map<String, Object> map =
+      (java.util.Map<String, Object>) in.readObject();
+
+    _value = (Double) map.get("value");
+    _variance = (Double) map.get("variance");
+
+    int version = (Integer) map.get("VERSION");
+    if (version != VERSION) {
+      java.util.logging.Logger.getLogger(this.getClass().getName()).warning
+        ("Need to convert data from version "+version+" to "+VERSION);
+    }
   }
 }
 
