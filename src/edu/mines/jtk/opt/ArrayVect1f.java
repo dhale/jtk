@@ -22,21 +22,21 @@ import edu.mines.jtk.util.Almost;
     as a private member of your own class,
     and easily delegate all implemented methods.
     @author W.S. Harlan
- */
+*/
 public class ArrayVect1f implements Vect {
-  private static final long serialVersionUID = 1L;
+  private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+  private static final long serialVersionUID = 2L;
+  private static final int VERSION = 1;
 
   /** Array of wrapped data */
-  protected float[] _data = null;
+  protected transient float[] _data = null;
 
   /** Variance of each ArrayVect1f */
-  protected double _variance = 1.;
+  protected transient double _variance = 1.;
 
   /** This is the first sample to treat as non-zero.
       Earlier samples should be constrained to zero. */
-  protected int _firstSample = 0;
-
-  private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+  protected transient int _firstSample = 0;
 
   /** Construct from an array of data.
       @param data This is the data that will be manipulated.
@@ -69,7 +69,7 @@ public class ArrayVect1f implements Vect {
 
   /** This is the first sample to treat as non-zero.
       @return first non-zero sample
-   */
+  */
   public int getFirstSample() {
     return _firstSample;
   }
@@ -80,14 +80,14 @@ public class ArrayVect1f implements Vect {
 
   /** Get the embedded data
       @return Same array as passed to constructor.
-   */
+  */
   public float[] getData() {
     return _data;
   }
 
   /** Set the internal data array to new values.
       @param data Copy this data into the internal wrapped array.
-   */
+  */
   public void setData(float[] data) {
     System.arraycopy(data,0, _data, 0, _data.length);
   }
@@ -202,18 +202,30 @@ public class ArrayVect1f implements Vect {
 
   // Serializable
   private void writeObject(java.io.ObjectOutputStream out)
-    throws IOException {
-    out.writeObject(_data);
-    out.writeDouble(_variance);
-    out.writeInt(_firstSample);
+    throws java.io.IOException {
+    java.util.Map<String, Object> map = new java.util.HashMap<String, Object>();
+    map.put("d", _data);
+    map.put("v", _variance);
+    map.put("f", _firstSample);
+    map.put("V", VERSION);
+    out.writeObject(map);
   }
 
-  // Serializable
   private void readObject(java.io.ObjectInputStream in)
-    throws IOException, ClassNotFoundException {
-    _data = (float[]) in.readObject();
-    _variance =  in.readDouble();
-    _firstSample = in.readInt();
+    throws java.io.IOException, ClassNotFoundException {
+
+    @SuppressWarnings("unchecked") java.util.Map<String, Object> map =
+      (java.util.Map<String, Object>) in.readObject();
+
+    _data = (float[]) map.get("d");
+    _variance = (Double) map.get("v");
+    _firstSample = (Integer) map.get("f");
+
+    int version = (Integer) map.get("V");
+    if (version != VERSION) {
+      java.util.logging.Logger.getLogger(this.getClass().getName()).warning
+        ("Need to convert data from version "+version+" to "+VERSION);
+    }
   }
 }
 

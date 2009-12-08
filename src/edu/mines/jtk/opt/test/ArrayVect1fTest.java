@@ -16,7 +16,7 @@ import edu.mines.jtk.util.Almost;
 public class ArrayVect1fTest extends TestCase {
   private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt.test");
 
-  /** Run test code. 
+  /** Run test code.
    * @throws Exception any test failure */
   public void testAll () throws Exception {
     { // check Vect properties
@@ -62,10 +62,10 @@ public class ArrayVect1fTest extends TestCase {
         writeObjectSize = result.length;
         LOG.fine("writeObject size = "+writeObjectSize);
       }
-      assert externalSize <= minimumSize + 130 :
-        externalSize+" <= "+(minimumSize+130);
-      assert writeObjectSize <= minimumSize + 130 :
-        writeObjectSize +"<="+ (minimumSize + 130);
+      assert externalSize <= minimumSize + 308 :
+        externalSize+" <= "+(minimumSize + 308 );
+      assert writeObjectSize <= minimumSize + 308 :
+        writeObjectSize +"<="+ (minimumSize + 308);
     }
   }
 
@@ -79,7 +79,7 @@ public class ArrayVect1fTest extends TestCase {
 
   // NO NEED TO CHANGE THE FOLLOWING
 
-  /** Standard constructor calls TestCase(name) constructor 
+  /** Standard constructor calls TestCase(name) constructor
       @param name Name of junit Test.
    */
   public ArrayVect1fTest(String name) {super (name);}
@@ -93,7 +93,7 @@ public class ArrayVect1fTest extends TestCase {
     return new TestSuite(ArrayVect1fTest.class);
   }
 
-  /** Run all tests with text gui if this class main is invoked 
+  /** Run all tests with text gui if this class main is invoked
       @param args Command-line arguments.
    */
   public static void main (String[] args) {
