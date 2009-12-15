@@ -12,23 +12,25 @@ import static edu.mines.jtk.util.ArrayMath.*;
 /**
  * An easy to use fast Fourier transform.
  * This class is less flexible than {@link FftComplex} and {@link FftReal}.
- * For example, the user has less control over the frequency sampling.
+ * For example, the user has less control over the sampling of frequency.
  * However, for many applications this class may be simpler to use.
- * For example, the following program shows how to use this FFT to
+ * <p>
+ * For example, the following program shows how to use this class to
  * filter a real-valued sequence in the frequency domain.
  * <pre><code>
  *   Fft fft = new Fft(nx); // nx = number of samples of f(x)
  *   Sampling sk = fft.getFrequencySampling1();
  *   int nk = sk.getCount(); // number of frequencies sampled
- *   float[] f = ... // nx real values of input f(x)
- *   float[] g = fft.applyForward(f); // nk complex values of g(k)
- *   for (int jk=0,jr=0,ji=jr+1; jk&lt;nk; ++jk,jr+=2,ji+=2) {
- *     double k = sk.getValue(jk); // frequency k in cycles/sample
- *     // modify g[jr], the real part of g(k)
- *     // modify g[ji], the imag part of g(k)
+ *   float[] f = ... // nx real samples of input f(x)
+ *   float[] g = fft.applyForward(f); // nk complex samples of g(k)
+ *   for (int kk=0,kr=0,ki=kr+1; kk&lt;nk; ++kk,kr+=2,ki+=2) {
+ *     double k = sk.getValue(kk); // frequency k in cycles/sample
+ *     // modify g[kr], the real part of g(k)
+ *     // modify g[ki], the imag part of g(k)
  *   }
- *   float[] h = fft.applyInverse(g); // nx real values of output h(x)
+ *   float[] h = fft.applyInverse(g); // nx real samples of output h(x)
  * </code></pre>
+ * This example is almost as simple for multi-dimensional transforms.
  * <p>
  * A forward transform computes an output array of complex values g(k) 
  * from an input array of real or complex values f(x). An inverse 
@@ -59,10 +61,8 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * A frequency sampling sk may be centered. Such a centered frequency
  * sampling always has an odd number of samples, and zero frequency
  * corresponds to the middle sample in the array of complex transformed 
- * values. If not centered, zero frequency corresponds to the first
- * sample, the one with index 0. Note that for real-valued f(x), any
- * negative frequencies in a centered g(k) are redundant, because
- * g(k) = the complex conjugate of g(-k).
+ * values. The default is not centered, so that zero frequency corresponds 
+ * to the first sample, the one with index 0.
  * <p>
  * Arrays input to forward transforms may contain either real or
  * complex values. If complex, values are packed sequentially as 
@@ -220,15 +220,29 @@ public class Fft {
   }
 
   /**
-   * Sets the type of input values for this transform.
-   * The default input type is real.
-   * @param complex true, for complex input; false, for real input.
+   * Sets the type of input (output) values for forward (inverse) transforms.
+   * The default type is real.
+   * @param complex true, for complex values; false, for real values.
    */
   public void setComplex(boolean complex) {
     if (_complex!=complex) {
       _complex = complex;
       updateSampling1();
     }
+  }
+
+  /**
+   * Sets the ability of this transform to overwrite specified arrays.
+   * The array specified in an inverse transform is either copied or 
+   * overwritten internally by the inverse transform. Copying preserves 
+   * the values in the specified array, but wastes memory in the case 
+   * when those values are no longer needed. If overwrite is true, then
+   * the inverse transform will be performed in place, so that no copy 
+   * is necessary. The default is false.
+   * @param overwrite true, to overwrite; false, to copy.
+   */
+  public void setOverwrite(boolean overwrite) {
+    _overwrite = overwrite;
   }
 
   /**
@@ -434,13 +448,13 @@ public class Fft {
     ensureSamplingX2(f);
     float[][] fpad = pad(f);
     int nx2 = _sx2.getCount();
-    int nk1 = _sk1.getCount();
     if (_complex) {
       _fft1c.complexToComplex1(_sign1,nx2,fpad,fpad);
+      _fft2.complexToComplex2(_sign2,_nfft1,fpad,fpad);
     } else {
       _fft1r.realToComplex1(_sign1,nx2,fpad,fpad);
+      _fft2.complexToComplex2(_sign2,_nfft1/2+1,fpad,fpad);
     }
-    _fft2.complexToComplex2(_sign2,nk1,fpad,fpad);
     phase(fpad);
     center(fpad);
     return fpad;
@@ -452,54 +466,102 @@ public class Fft {
    * @return the transformed array, a sampled function of frequency.
    */
   public float[][][] applyForward(float[][][] f) {
-    return null;
+    ensureSamplingX3(f);
+    float[][][] fpad = pad(f);
+    int nx2 = _sx2.getCount();
+    int nx3 = _sx3.getCount();
+    if (_complex) {
+      _fft1c.complexToComplex1(_sign1,nx2,nx3,fpad,fpad);
+      _fft2.complexToComplex2(_sign2,_nfft1,nx3,fpad,fpad);
+      _fft3.complexToComplex3(_sign3,_nfft1,_nfft2,fpad,fpad);
+    } else {
+      _fft1r.realToComplex1(_sign1,nx2,nx3,fpad,fpad);
+      _fft2.complexToComplex2(_sign2,_nfft1/2+1,nx3,fpad,fpad);
+      _fft3.complexToComplex3(_sign3,_nfft1/2+1,_nfft2,fpad,fpad);
+    }
+    phase(fpad);
+    center(fpad);
+    return fpad;
   }
 
   /**
    * Applies an inverse frequency-to-space transform of a 1D array.
-   * @param f the array to be transformed, a sampled function of frequency.
+   * @param g the array to be transformed, a sampled function of frequency.
    * @return the transformed array, a sampled function of space.
    */
-  public float[] applyInverse(float[] f) {
-    ensureSamplingK1(f);
+  public float[] applyInverse(float[] g) {
+    ensureSamplingK1(g);
     int nx1 = _sx1.getCount();
-    float[] fpad = copy(f);
-    uncenter(fpad);
-    unphase(fpad);
+    float[] gpad = (_overwrite)?g:copy(g);
+    uncenter(gpad);
+    unphase(gpad);
     if (_complex) {
-      _fft1c.complexToComplex(-_sign1,fpad,fpad);
-      _fft1c.scale(nx1,fpad);
-      return copy(2*nx1,fpad);
+      _fft1c.complexToComplex(-_sign1,gpad,gpad);
+      _fft1c.scale(nx1,gpad);
+      return ccopy(nx1,gpad);
     } else {
-      _fft1r.complexToReal(-_sign1,fpad,fpad);
-      _fft1r.scale(nx1,fpad);
-      return copy(nx1,fpad);
+      _fft1r.complexToReal(-_sign1,gpad,gpad);
+      _fft1r.scale(nx1,gpad);
+      return copy(nx1,gpad);
     }
   }
 
   /**
    * Applies an inverse frequency-to-space transform of a 2D array.
-   * @param f the array to be transformed, a sampled function of frequency.
+   * @param g the array to be transformed, a sampled function of frequency.
    * @return the transformed array, a sampled function of space.
    */
-  public float[][] applyInverse(float[][] f) {
-    ensureSamplingK2(f);
-    float[][] fpad = copy(f);
+  public float[][] applyInverse(float[][] g) {
+    ensureSamplingK2(g);
+    float[][] gpad = (_overwrite)?g:copy(g);
     int nx1 = _sx1.getCount();
     int nx2 = _sx2.getCount();
-    int nk1 = _sk1.getCount();
-    uncenter(fpad);
-    unphase(fpad);
-    _fft2.complexToComplex2(-_sign2,nk1,fpad,fpad);
-    _fft2.scale(nk1,nx2,fpad);
+    uncenter(gpad);
+    unphase(gpad);
     if (_complex) {
-      _fft1c.complexToComplex1(-_sign1,nx2,fpad,fpad);
-      _fft1c.scale(nx1,nx2,fpad);
-      return copy(nx1,nx2,fpad);
+      _fft2.complexToComplex2(-_sign2,_nfft1,gpad,gpad);
+      _fft2.scale(_nfft1,nx2,gpad);
+      _fft1c.complexToComplex1(-_sign1,nx2,gpad,gpad);
+      _fft1c.scale(nx1,nx2,gpad);
+      return ccopy(nx1,nx2,gpad);
     } else {
-      _fft1r.complexToReal1(-_sign1,nx2,fpad,fpad);
-      _fft1r.scale(nx1,nx2,fpad);
-      return copy(nx1,nx2,fpad);
+      _fft2.complexToComplex2(-_sign2,_nfft1/2+1,gpad,gpad);
+      _fft2.scale(_nfft1/2+1,nx2,gpad);
+      _fft1r.complexToReal1(-_sign1,nx2,gpad,gpad);
+      _fft1r.scale(nx1,nx2,gpad);
+      return copy(nx1,nx2,gpad);
+    }
+  }
+
+  /**
+   * Applies an inverse frequency-to-space transform of a 3D array.
+   * @param g the array to be transformed, a sampled function of frequency.
+   * @return the transformed array, a sampled function of space.
+   */
+  public float[][][] applyInverse(float[][][] g) {
+    ensureSamplingK3(g);
+    float[][][] gpad = (_overwrite)?g:copy(g);
+    int nx1 = _sx1.getCount();
+    int nx2 = _sx2.getCount();
+    int nx3 = _sx3.getCount();
+    uncenter(gpad);
+    unphase(gpad);
+    if (_complex) {
+      _fft3.complexToComplex3(-_sign3,_nfft1,_nfft2,gpad,gpad);
+      _fft3.scale(_nfft1,_nfft2,nx3,gpad);
+      _fft2.complexToComplex2(-_sign2,_nfft1,nx3,gpad,gpad);
+      _fft2.scale(_nfft1,nx2,nx3,gpad);
+      _fft1c.complexToComplex1(-_sign1,nx2,nx3,gpad,gpad);
+      _fft1c.scale(nx1,nx2,nx3,gpad);
+      return ccopy(nx1,nx2,nx3,gpad);
+    } else {
+      _fft3.complexToComplex3(-_sign3,_nfft1/2+1,_nfft2,gpad,gpad);
+      _fft3.scale(_nfft1/2+1,_nfft2,nx3,gpad);
+      _fft2.complexToComplex2(-_sign2,_nfft1/2+1,nx3,gpad,gpad);
+      _fft2.scale(_nfft1/2+1,nx2,nx3,gpad);
+      _fft1r.complexToReal1(-_sign1,nx2,nx3,gpad,gpad);
+      _fft1r.scale(nx1,nx2,nx3,gpad);
+      return copy(nx1,nx2,nx3,gpad);
     }
   }
 
@@ -515,6 +577,7 @@ public class Fft {
   private int _padding1,_padding2,_padding3;
   private boolean _center1,_center2,_center3;
   private boolean _complex;
+  private boolean _overwrite;
 
   private void updateSampling1() {
     if (_sx1==null)
@@ -557,7 +620,7 @@ public class Fft {
       }
     }
     _sk1 = new Sampling(nk,dk,fk);
-    trace("sk1: nfft="+nfft+" nk="+nk+" dk="+dk+" fk="+fk);
+    //trace("sk1: nfft="+nfft+" nk="+nk+" dk="+dk+" fk="+fk);
   }
   private void updateSampling2() {
     if (_sx2==null)
@@ -570,8 +633,9 @@ public class Fft {
     double fk;
     int nk;
     if (_center2) {
-      nk = (nfft%2==0)?nfft+1:nfft;
-      fk = -0.5/dx+0.5*dk;
+      boolean even = nfft%2==0;
+      nk = even?nfft+1:nfft;
+      fk = even?-0.5/dx:-0.5/dx+0.5*dk;
     } else {
       nk = nfft;
       fk = 0.0;
@@ -581,7 +645,7 @@ public class Fft {
       _nfft2 = nfft;
     }
     _sk2 = new Sampling(nk,dk,fk);
-    trace("sk2: nfft="+nfft+" nk="+nk+" dk="+dk+" fk="+fk);
+    //trace("sk2: nfft="+nfft+" nk="+nk+" dk="+dk+" fk="+fk);
   }
   private void updateSampling3() {
     if (_sx3==null)
@@ -594,8 +658,9 @@ public class Fft {
     double fk;
     int nk;
     if (_center3) {
-      nk = (nfft%2==0)?nfft+1:nfft;
-      fk = -0.5/dx+0.5*dk;
+      boolean even = nfft%2==0;
+      nk = even?nfft+1:nfft;
+      fk = even?-0.5/dx:-0.5/dx+0.5*dk;
     } else {
       nk = nfft;
       fk = 0.0;
@@ -605,7 +670,7 @@ public class Fft {
       _nfft3 = nfft;
     }
     _sk3 = new Sampling(nk,dk,fk);
-    trace("sk3: nfft="+nfft+" nk="+nk+" dk="+dk+" fk="+fk);
+    //trace("sk3: nfft="+nfft+" nk="+nk+" dk="+dk+" fk="+fk);
   }
 
   private float[] pad(float[] f) {
@@ -626,6 +691,18 @@ public class Fft {
       ccopy(f[0].length/2,f.length,f,fpad);
     } else {
       copy(f[0].length,f.length,f,fpad);
+    }
+    return fpad;
+  }
+  private float[][][] pad(float[][][] f) {
+    int nk1 = _sk1.getCount();
+    int nk2 = _sk2.getCount();
+    int nk3 = _sk3.getCount();
+    float[][][] fpad = new float[nk3][nk2][2*nk1];
+    if (_complex) {
+      ccopy(f[0][0].length/2,f[0].length,f.length,f,fpad);
+    } else {
+      copy(f[0][0].length,f[0].length,f.length,f,fpad);
     }
     return fpad;
   }
@@ -833,7 +910,6 @@ public class Fft {
   private void uncenter2(float[][] f) {
     if (!_center2)
       return;
-    int nk2 = _sk2.getCount();
     int nfft2 = _nfft2;
     boolean even2 = nfft2%2==0;
     if (even2) {
@@ -876,6 +952,96 @@ public class Fft {
     f[i] = fm;
   }
 
+  private void center(float[][][] f) {
+    if (_center1) {
+      for (int i3=0; i3<_nfft3; ++i3)
+        for (int i2=0; i2<_nfft2; ++i2)
+          center1(f[i3][i2]);
+    }
+    if (_center2) {
+        for (int i3=0; i3<_nfft3; ++i3)
+          center2(f[i3]);
+    }
+    center3(f);
+  }
+  private void uncenter(float[][][] f) {
+    uncenter3(f);
+    if (_center2) {
+      for (int i3=0; i3<_nfft3; ++i3)
+        uncenter2(f[i3]);
+    }
+    if (_center1) {
+      for (int i3=0; i3<_nfft3; ++i3)
+        for (int i2=0; i2<_nfft2; ++i2)
+          uncenter1(f[i3][i2]);
+    }
+  }
+  private void center3(float[][][] f) {
+    if (!_center3)
+      return;
+    int nk3 = _sk3.getCount();
+    int nfft3 = _nfft3;
+    boolean even3 = nfft3%2==0;
+    if (even3) {
+      // nfft even
+      // 0 1 2 3 4 5 6 7 | 8
+      // 4 5 6 7 0 1 2 3 | 4
+      cswap(nfft3/2,0,nfft3/2,f);
+      f[nk3-1] = f[0];
+    } else {
+      // nfft odd
+      // 0 1 2 3 4 5 6
+      // 4 5 6 3 0 1 2
+      // 4 5 6 0 1 2 3
+      cswap((nfft3-1)/2,0,(nfft3+1)/2,f);
+      crotateLeft((nfft3+1)/2,(nfft3-1)/2,f);
+    }
+  }
+  private void uncenter3(float[][][] f) {
+    if (!_center3)
+      return;
+    int nfft3 = _nfft3;
+    boolean even3 = nfft3%2==0;
+    if (even3) {
+      // nfft even
+      // 4 5 6 7 0 1 2 3 | 8
+      // 0 1 2 3 4 5 6 7 | 8
+      cswap(nfft3/2,0,nfft3/2,f);
+    } else {
+      // nfft odd
+      // 4 5 6 0 1 2 3
+      // 4 5 6 3 0 1 2
+      // 0 1 2 3 4 5 6
+      crotateRight((nfft3+1)/2,(nfft3-1)/2,f);
+      cswap((nfft3-1)/2,0,(nfft3+1)/2,f);
+    }
+  }
+  private static void cswap(int n, int i, int j, float[][][] f) {
+    for (int k=0; k<n; ++k,++i,++j) {
+      float[][] fi = f[i]; f[i] = f[j]; f[j] = fi;
+    }
+  }
+  private static void crotateLeft(int n, int j, float[][][] f) {
+      // nfft odd
+      // 4 5 6 3 0 1 2
+      // 4 5 6 0 1 2 3
+      // crotateLeft(n=4,j=3,f);
+    float[][] fj = f[j];
+    int m = j+n;
+    int i;
+    for (i=j+1; i<m; ++i)
+      f[i-1] = f[i];
+    f[i-1] = fj;
+  }
+  private static void crotateRight(int n, int j, float[][][] f) {
+    int m = j+n-1;
+    float[][] fm = f[m];
+    int i;
+    for (i=m; i>j; --i)
+      f[i] = f[i-1];
+    f[i] = fm;
+  }
+
   private void phase(float[] f) {
     phase(_sign1,f);
   }
@@ -898,7 +1064,6 @@ public class Fft {
       f[ii] = fi*cosp+fr*sinp;
     }
   }
-
   private void phase(float[][] f) {
     phase(_sign1,_sign2,f);
   }
@@ -915,9 +1080,10 @@ public class Fft {
     double dp1 = sign1*2.0*PI*_sk1.getDelta()*fx1;
     double dp2 = sign2*2.0*PI*_sk2.getDelta()*fx2;
     for (int i2=0; i2<nk2; ++i2) {
+      double p2 = i2*dp2;
       float[] f2 = f[i2];
       for (int i1=0,ir=0,ii=1; i1<nk1; ++i1,ir+=2,ii+=2) {
-        float p = (float)(i1*dp1+i2*dp2);
+        float p = (float)(i1*dp1+p2);
         float cosp = cos(p);
         float sinp = sin(p);
         float fr = f2[ir];
@@ -927,60 +1093,38 @@ public class Fft {
       }
     }
   }
-
-  ///////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////
-
-  private static void trace(String s) {
-    System.out.println(s);
+  private void phase(float[][][] f) {
+    phase(_sign1,_sign2,_sign3,f);
   }
-
-  private static void test1() {
-    int nx = 9;
-    double dx = 1.0;
-    double fx = 0.0;
-    Sampling sx = new Sampling(nx,dx,fx);
-    Fft fft = new Fft(sx);
-    float[] f,g;
-    f = zerofloat(nx);
-    f[1] = 1.0f;
-    trace("f:"); dump(f);
-    g = fft.applyForward(f);
-    trace("g:"); cdump(g);
-    f = fft.applyInverse(g);
-    trace("f:"); dump(f);
-    fft.setCenter(true);
-    g = fft.applyForward(f);
-    trace("g:"); cdump(g);
-    f = fft.applyInverse(g);
-    trace("f:"); dump(f);
+  private void unphase(float[][][] f) {
+    phase(-_sign1,-_sign2,-_sign3,f);
   }
-
-  private static void test2() {
-    int nx1 = 4, nx2 = 3;
-    double dx1 = 1.0, dx2 = 1.0;
-    double fx1 = 0.0, fx2 = 0.0;
-    Sampling sx1 = new Sampling(nx1,dx1,fx1);
-    Sampling sx2 = new Sampling(nx2,dx2,fx2);
-    Fft fft = new Fft(sx1,sx2);
-    float[][] f,g;
-    f = zerofloat(nx1,nx2);
-    f[1][1] = 1.0f;
-    trace("f:"); dump(f);
-    g = fft.applyForward(f);
-    trace("g:"); cdump(g);
-    f = fft.applyInverse(g);
-    trace("f:"); dump(f);
-    fft.setCenter(true);
-    g = fft.applyForward(f);
-    trace("g:"); cdump(g);
-    f = fft.applyInverse(g);
-    trace("f:"); dump(f);
-  }
-
-  public static void main(String[] args) {
-    test1();
-    //test2();
+  private void phase(int sign1, int sign2, int sign3, float[][][] f) {
+    double fx1 = _sx1.getFirst();
+    double fx2 = _sx2.getFirst();
+    double fx3 = _sx3.getFirst();
+    if (fx1==0.0 && fx2==0.0 && fx3==0.0)
+      return;
+    int nk1 = (_complex)?_nfft1:_nfft1/2+1;
+    int nk2 = _nfft2;
+    int nk3 = _nfft3;
+    double dp1 = sign1*2.0*PI*_sk1.getDelta()*fx1;
+    double dp2 = sign2*2.0*PI*_sk2.getDelta()*fx2;
+    double dp3 = sign3*2.0*PI*_sk3.getDelta()*fx3;
+    for (int i3=0; i3<nk3; ++i3) {
+      for (int i2=0; i2<nk2; ++i2) {
+        double p23 = i2*dp2+i3*dp3;
+        float[] f32 = f[i3][i2];
+        for (int i1=0,ir=0,ii=1; i1<nk1; ++i1,ir+=2,ii+=2) {
+          float p = (float)(i1*dp1+p23);
+          float cosp = cos(p);
+          float sinp = sin(p);
+          float fr = f32[ir];
+          float fi = f32[ii];
+          f32[ir] = fr*cosp-fi*sinp;
+          f32[ii] = fi*cosp+fr*sinp;
+        }
+      }
+    }
   }
 }
