@@ -16,21 +16,21 @@ import static edu.mines.jtk.util.ArrayMath.*;
 /**
  * Local smoothing of images with tensor filter coefficients.
  * Smoothing is performed by solving a sparse symmetric positive-definite
- * system of equations: (S'S+G'DG)y = S'Sx, where G is a matrix of gradient 
- * operators, S is a matrix of smoothing operators, D is a matrix of tensor 
- * filter coefficients, x is an input image, and y is an output image.
+ * (SPD) system of equations: (I+G'DG)y = x (or S'Sx), where G is a 
+ * gradient operator, S is a smoothing operator, D is an SPD tensor 
+ * field, x is an input image, and y is an output image.
  * <p>
- * The smoothing operators S compensate for deficiencies in the gradient
- * operators G. Finite-difference approximations in G break down for high 
+ * The smoothing operator S compensates for deficiencies in the gradient
+ * operator G. Finite-difference approximations in G are poor for high 
  * wavenumbers near the Nyquist limit, and the smoothing operator S 
- * attenuates those high wavenumbers. Because S'S appears on both left
- * and right sides of the filter equations, a local smoothing filter does 
- * nothing for tensor coefficients D = 0.
+ * attenuates those high wavenumbers. This smoothing operator is disabled
+ * by default; it should be enabled if the input image x is known to 
+ * contain significant energy for wavenumbers near Nyquist.
  * <p>
  * The sparse system of filter equations is solved iteratively, beginning
- * with y = x. Iterations continue until either the error in the solution 
- * y is below a specified threshold or the number of iterations exceeds a 
- * specified limit.
+ * with y = x (or y = S'Sx). Iterations continue until either the error in 
+ * the solution y is below a specified threshold or the number of iterations 
+ * exceeds a specified limit.
  * <p>
  * For low wavenumbers the output of this filter approximates the solution 
  * to an anisotropic inhomogeneous diffusion equation, where the filter 
@@ -38,7 +38,7 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * output y corresponds to the solution at some later time t.
  *
  * @author Dave Hale, Colorado School of Mines
- * @version 2008.11.16
+ * @version 2009.12.16
  */
 public class LocalSmoothingFilter {
 
@@ -60,6 +60,16 @@ public class LocalSmoothingFilter {
   public LocalSmoothingFilter(double small, int niter) {
     _small = (float)small;
     _niter = niter;
+  }
+
+  /**
+   * Enables or disables zeroing of wavenumbers with the filter S'S.
+   * This extra smoothing filter compensates for deficiences in the gradient
+   * approximation G in the operator G'DG at high (near Nyquist) wavenumbers.
+   * Smoothing with S'S is enabled by default.
+   */
+  public void setSmoothS(boolean ss) {
+    _ss = ss;
   }
 
   /**
@@ -151,8 +161,55 @@ public class LocalSmoothingFilter {
     Tensors2 d, float c, float[][] s, float[][] x, float[][] y) 
   {
     Operator2 a = new LhsOperator2(d,c,s);
-    float[][] r = applyRhs(x);
-    solve(a,r,y);
+    if (_ss) {
+      x = copy(x);
+      smoothS(x,x);
+    }
+    scopy(x,y);
+    solve(a,x,y);
+  }
+
+  /**
+   * Applies the transpose of this filter for specified tensor coefficients.
+   * @param d tensor coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void applyTranspose(Tensors2 d, float[][] x, float[][] y) {
+    applyTranspose(d,1.0f,x,y);
+  }
+
+  /**
+   * Applies the transpose of this filter for specified tensor coefficients 
+   * and scale factor.
+   * @param d tensor coefficients.
+   * @param c constant scale factor for tensor coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void applyTranspose(
+    Tensors2 d, float c, float[][] x, float[][] y) 
+  {
+    applyTranspose(d,c,null,x,y);
+  }
+
+  /**
+   * Applies the transpose of this filter for specified tensor coefficients 
+   * and scale factors.
+   * @param d tensor coefficients.
+   * @param c constant scale factor for tensor coefficients.
+   * @param s array of scale factors for tensor coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void applyTranspose(
+    Tensors2 d, float c, float[][] s, float[][] x, float[][] y) 
+  {
+    Operator2 a = new LhsOperator2(d,c,s);
+    scopy(x,y);
+    solve(a,x,y);
+    if (_ss)
+      smoothS(y,y);
   }
 
   /**
@@ -189,21 +246,54 @@ public class LocalSmoothingFilter {
     Tensors3 d, float c, float[][][] s, float[][][] x, float[][][] y) 
   {
     Operator3 a = new LhsOperator3(d,c,s);
-    float[][][] r = applyRhs(x);
-    solve(a,r,y);
-  }
-  private void testSpd(Tensors3 d, float c, float[][][] s) {
-    int n1 = s[0][0].length;
-    int n2 = s[0].length;
-    int n3 = s.length;
-    Operator3 a = new LhsOperator3(d,c,s);
-    for (int itest=0; itest<100; ++itest) {
-      float[][][] x = sub(randfloat(n1,n2,n3),0.5f);
-      float[][][] y = zerofloat(n1,n2,n3);
-      a.apply(x,y);
-      float xy = sdot(x,y);
-      System.out.println("itest="+itest+" xy="+xy);
+    if (_ss) {
+      x = copy(x);
+      smoothS(x,x);
     }
+    solve(a,x,y);
+  }
+
+  /**
+   * Applies the transpose of this filter for specified tensor coefficients.
+   * @param d tensor coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void applyTranspose(Tensors3 d, float[][][] x, float[][][] y) {
+    applyTranspose(d,1.0f,x,y);
+  }
+
+  /**
+   * Applies the transpose of this filter for specified tensor coefficients 
+   * and scale factor.
+   * @param d tensor coefficients.
+   * @param c constant scale factor for tensor coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void applyTranspose(
+    Tensors3 d, float c, float[][][] x, float[][][] y) 
+  {
+    applyTranspose(d,c,null,x,y);
+  }
+
+  /**
+   * Applies the transpose of this filter for specified tensor coefficients 
+   * and scale factors.
+   * @param d tensor coefficients.
+   * @param c constant scale factor for tensor coefficients.
+   * @param s array of scale factors for tensor coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void applyTranspose(
+    Tensors3 d, float c, float[][][] s, float[][][] x, float[][][] y) 
+  {
+    Operator3 a = new LhsOperator3(d,c,s);
+    scopy(x,y);
+    solve(a,x,y);
+    if (_ss)
+      smoothS(y,y);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -213,10 +303,10 @@ public class LocalSmoothingFilter {
     Logger.getLogger(LocalSmoothingFilter.class.getName());
 
   private static final boolean PARALLEL = true; // false for single-threaded
-  private static final boolean SMOOTH = true; // false for I instead of S'S
 
   private float _small; // stop iterations when residuals are small
   private int _niter; // number of iterations
+  private boolean _ss; // true iff smoothing with S'S
 
   /**
    * A symmetric positive-definite operator.
@@ -257,53 +347,63 @@ public class LocalSmoothingFilter {
   }
 
   /**
-   * Returns y = S'Sx.
+   * Computes y = S'Sx. Arrays x and y may be the same array.
    */
-  private static float[][] applyRhs(float[][] x) {
-    if (!SMOOTH)
-      return x;
+  private static void smoothS(float[][] x, float[][] y) {
     int n1 = x[0].length;
     int n2 = x.length;
-    float[][] y = new float[n2][n1];
-    for (int i2=1; i2<n2; ++i2) {
-      for (int i1=1; i1<n1; ++i1) {
-        float x00 = x[i2  ][i1  ];
-        float x01 = x[i2  ][i1-1];
-        float x10 = x[i2-1][i1  ];
-        float x11 = x[i2-1][i1-1];
+    float[][] t = new float[2][n1];
+    scopy(x[0],t[0]);
+    szero(y[0]);
+    for (int i2=1,i2m=0; i2<n2; ++i2,++i2m) {
+      int j2  = (i2 )%2;
+      int j2m = (i2m)%2;
+      scopy(x[i2],t[j2]);
+      szero(y[i2]);
+      float[] x0 = t[j2 ];
+      float[] x1 = t[j2m];
+      float[] y0 = y[i2 ];
+      float[] y1 = y[i2m];
+      for (int i1=1,i1m=0; i1<n1; ++i1,++i1m) {
+        float x00 = x0[i1 ];
+        float x01 = x0[i1m];
+        float x10 = x1[i1 ];
+        float x11 = x1[i1m];
         //         0.0625 = 1/16
         float xs = 0.0625f*(x00+x01+x10+x11);
-        y[i2  ][i1  ] += xs;
-        y[i2  ][i1-1] += xs;
-        y[i2-1][i1  ] += xs;
-        y[i2-1][i1-1] += xs;
+        y0[i1 ] += xs;
+        y0[i1m] += xs;
+        y1[i1 ] += xs;
+        y1[i1m] += xs;
       }
     }
-    return y;
   }
 
   /**
-   * Returns y = S'Sx.
+   * Computes y = S'Sx. Arrays x and y may be the same array.
    */
-  private static float[][][] applyRhs(float[][][] x) {
-    if (!SMOOTH)
-      return x;
+  private static void smoothS(float[][][] x, float[][][] y) {
     int n1 = x[0][0].length;
     int n2 = x[0].length;
     int n3 = x.length;
-    float[][][] y = new float[n3][n2][n1];
-    for (int i3=1; i3<n3; ++i3) {
-      for (int i2=1; i2<n2; ++i2) {
-        float[] x00 = x[i3  ][i2  ];
-        float[] x01 = x[i3  ][i2-1];
-        float[] x10 = x[i3-1][i2  ];
-        float[] x11 = x[i3-1][i2-1];
-        float[] y00 = y[i3  ][i2  ];
-        float[] y01 = y[i3  ][i2-1];
-        float[] y10 = y[i3-1][i2  ];
-        float[] y11 = y[i3-1][i2-1];
-        for (int i1=1; i1<n1; ++i1) {
-          int i1m = i1-1;
+    float[][][] t = new float[2][n2][n1];
+    scopy(x[0],t[0]);
+    szero(y[0]);
+    for (int i3=1,i3m=0; i3<n3; ++i3,++i3m) {
+      int j3  = (i3  )%2;
+      int j3m = (i3-1)%2;
+      scopy(x[i3],t[j3]);
+      szero(y[i3]);
+      for (int i2=1,i2m=0; i2<n2; ++i2,++i2m) {
+        float[] x00 = t[j3 ][i2 ];
+        float[] x01 = t[j3 ][i2m];
+        float[] x10 = t[j3m][i2 ];
+        float[] x11 = t[j3m][i2m];
+        float[] y00 = y[i3 ][i2 ];
+        float[] y01 = y[i3 ][i2m];
+        float[] y10 = y[i3m][i2 ];
+        float[] y11 = y[i3m][i2m];
+        for (int i1=1,i1m=0; i1<n1; ++i1,++i1m) {
           float x000 = x00[i1 ];
           float x001 = x00[i1m];
           float x010 = x01[i1 ];
@@ -325,34 +425,33 @@ public class LocalSmoothingFilter {
         }
       }
     }
-    return y;
   }
 
   /**
-   * Computes y = (S'S+G'DG)x. Arrays x and y must be distinct.
+   * Computes y = (I+G'DG)x. Arrays x and y must be distinct.
    */
   private static void applyLhs(
     Tensors2 d, float c, float[][] s, float[][] x, float[][] y) 
   {
     int n1 = x[0].length;
     int n2 = x.length;
-    if (SMOOTH) {
-      szero(y);
-    } else {
-      scopy(x,y);
-    }
+    scopy(x,y);
     float[] di = new float[3];
-    for (int i2=1; i2<n2; ++i2) {
-      for (int i1=1; i1<n1; ++i1) {
+    for (int i2=1,i2m=0; i2<n2; ++i2,++i2m) {
+      float[] x0 = x[i2 ];
+      float[] xm = x[i2m];
+      float[] y0 = y[i2 ];
+      float[] ym = y[i2m];
+      for (int i1=1,i1m=0; i1<n1; ++i1,++i1m) {
         d.getTensor(i1,i2,di);
         float csi = (s!=null)?c*s[i2][i1]:c;
         float d11 = di[0]*csi;
         float d12 = di[1]*csi;
         float d22 = di[2]*csi;
-        float x00 = x[i2  ][i1  ];
-        float x01 = x[i2  ][i1-1];
-        float x10 = x[i2-1][i1  ];
-        float x11 = x[i2-1][i1-1];
+        float x00 = x0[i1 ];
+        float x01 = x0[i1m];
+        float x10 = xm[i1 ];
+        float x11 = xm[i1m];
         float xa = x00-x11;
         float xb = x01-x10;
         float x1 = 0.25f*(xa-xb);
@@ -361,30 +460,21 @@ public class LocalSmoothingFilter {
         float y2 = d12*x1+d22*x2;
         float ya = y1+y2;
         float yb = y1-y2;
-        if (SMOOTH) { // 0.0625 = 1/16
-          float xs = 0.0625f*(x00+x01+x10+x11);
-          y[i2  ][i1  ] += ya+xs;
-          y[i2  ][i1-1] -= yb-xs;
-          y[i2-1][i1  ] += yb+xs;
-          y[i2-1][i1-1] -= ya-xs;
-        } else {
-          y[i2  ][i1  ] += ya;
-          y[i2  ][i1-1] -= yb;
-          y[i2-1][i1  ] += yb;
-          y[i2-1][i1-1] -= ya;
-        }
+        y0[i1 ] += ya;
+        y0[i1m] -= yb;
+        ym[i1 ] += yb;
+        ym[i1m] -= ya;
       }
     }
   }
 
+  /**
+   * Computes y = (I+G'DG)x. Arrays x and y must be distinct.
+   */
   private static void applyLhs(
     Tensors3 d, float c, float[][][] s, float[][][] x, float[][][] y) 
   {
-    if (SMOOTH) {
-      szero(y);
-    } else {
-      scopy(x,y);
-    }
+    scopy(x,y);
     if (PARALLEL) {
       applyLhsParallel(d,c,s,x,y);
     } else {
@@ -435,7 +525,7 @@ public class LocalSmoothingFilter {
 
 
   /**
-   * Computes y = (S'S+D'TD)x for one constant-i3 slice.
+   * Computes y = (I+G'DG)x for one constant-i3 slice.
    */
   private static void applyLhsSlice3(
     int i3, Tensors3 d, float c, float[][][] s, float[][][] x, float[][][] y) 
@@ -467,7 +557,7 @@ public class LocalSmoothingFilter {
   }
 
   /**
-   * Computes y = (S'S+D'TD)x for one sample.
+   * Computes y = (I+G'DG)x for one sample.
    */
   private static void applyLhs(int i1,
    float d11, float d12, float d13, float d22, float d23, float d33,
@@ -500,26 +590,14 @@ public class LocalSmoothingFilter {
     float yb = y1-y2+y3;
     float yc = y1+y2-y3;
     float yd = y1-y2-y3;
-    if (SMOOTH) {
-      float xs = 0.015625f*(x000+x001+x010+x011+x100+x101+x110+x111);
-      y00[i1 ] += ya+xs;
-      y00[i1m] -= yd-xs;
-      y01[i1 ] += yb+xs;
-      y01[i1m] -= yc-xs;
-      y10[i1 ] += yc+xs;
-      y10[i1m] -= yb-xs;
-      y11[i1 ] += yd+xs;
-      y11[i1m] -= ya-xs;
-    } else {
-      y00[i1 ] += ya;
-      y00[i1m] -= yd;
-      y01[i1 ] += yb;
-      y01[i1m] -= yc;
-      y10[i1 ] += yc;
-      y10[i1m] -= yb;
-      y11[i1 ] += yd;
-      y11[i1m] -= ya;
-    }
+    y00[i1 ] += ya;
+    y00[i1m] -= yd;
+    y01[i1 ] += yb;
+    y01[i1m] -= yc;
+    y10[i1 ] += yc;
+    y10[i1m] -= yb;
+    y11[i1 ] += yd;
+    y11[i1m] -= ya;
   }
 
   /**
@@ -587,6 +665,9 @@ public class LocalSmoothingFilter {
   }
 
   // Zeros array x.
+  private static void szero(float[] x) {
+    zero(x);
+  }
   private static void szero(float[][] x) {
     zero(x);
   }
@@ -618,6 +699,9 @@ public class LocalSmoothingFilter {
   }
 
   // Copys array x to array y.
+  private static void scopy(float[] x, float[] y) {
+    copy(x,y);
+  }
   private static void scopy(float[][] x, float[][] y) {
     copy(x,y);
   }
@@ -779,4 +863,67 @@ public class LocalSmoothingFilter {
     if (TRACE)
       System.out.println(s);
   }
-} 
+
+  private static void test2() {
+    LocalSmoothingFilter lsf = new LocalSmoothingFilter(0.00001,100);
+    //lsf.setSmoothS(false);
+    Tensors2 t = new Tensors2() {
+      public void getTensor(int i1, int i2, float[] a) {
+        a[0] = 1.0f; a[1] = 1.0f; a[2] = 1.0f;
+      }
+    };
+    int n1=5,n2=5;
+    float[][] x = randfloat(n1,n2);
+    float[][] y = randfloat(n1,n2);
+    //float[][] x = fillfloat(1.0f,n1,n2);
+    //float[][] y = fillfloat(1.0f,n1,n2);
+    //float[][] x = zerofloat(n1,n2);
+    //float[][] y = zerofloat(n1,n2);
+    //x[2][2] = 1.0f;
+    //y[2][2] = 1.0f;
+    float[][] sx = copy(x);
+    float[][] sy = copy(y);
+    lsf.apply(t,x,sx); // Sx
+    lsf.applyTranspose(t,y,sy); // S'y
+    dump(sx);
+    dump(sy);
+    float ysx = sdot(y,sx); // y'(Sx)
+    float xsy = sdot(x,sy); // x'(S'y)
+    trace("ysx="+ysx+" xsy="+xsy);
+  }
+
+  private static void test3() {
+    LocalSmoothingFilter lsf = new LocalSmoothingFilter(0.00001,100);
+    //lsf.setSmoothS(false);
+    Tensors3 t = new Tensors3() {
+      public void getTensor(int i1, int i2, int i3, float[] a) {
+        a[0] = 1.0f; a[1] = 0.0f; a[2] = 0.0f;
+                     a[3] = 1.0f; a[4] = 0.0f;
+                                  a[5] = 1.0f;
+      }
+    };
+    int n1=5,n2=5,n3=5;
+    float[][][] x = randfloat(n1,n2,n3);
+    float[][][] y = randfloat(n1,n2,n3);
+    //float[][][] x = fillfloat(1.0f,n1,n2,n3);
+    //float[][][] y = fillfloat(1.0f,n1,n2,n3);
+    //float[][][] x = zerofloat(n1,n2,n3);
+    //float[][][] y = zerofloat(n1,n2,n3);
+    //x[n3/2][n2/2][n1/2] = 1.0f;
+    //y[n3/2][n2/2][n1/2] = 1.0f;
+    float[][][] sx = copy(x);
+    float[][][] sy = copy(y);
+    lsf.apply(t,x,sx); // Sx
+    lsf.applyTranspose(t,y,sy); // S'y
+    dump(sx);
+    dump(sy);
+    float ysx = sdot(y,sx); // y'(Sx)
+    float xsy = sdot(x,sy); // x'(S'y)
+    trace("ysx="+ysx+" xsy="+xsy);
+  }
+
+  public static void main(String[] args) {
+    test2();
+    //test3();
+  }
+}

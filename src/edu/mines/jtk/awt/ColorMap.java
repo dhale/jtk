@@ -200,11 +200,9 @@ public class ColorMap {
    * @param vmax the maximum value.
    */
   public void setValueRange(double vmin, double vmax) {
-    if (_vmin!=vmin || _vmax!=vmax) {
-      _vmin = vmin;
-      _vmax = vmax;
-      fireColorMapChanged();
-    }
+    _vmin = vmin;
+    _vmax = vmax;
+    fireColorMapChanged();
   }
 
   /**
