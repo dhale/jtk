@@ -52,7 +52,7 @@ def demo3():
   plotH3(h)
   plotA3(h)
   kh = (nh-1)/2
-  #h = fillfloat(1.0,nh,nh)
+  #h = fillfloat(1.0,nh,nh,nh)
   h = zerofloat(nh,nh,nh); h[kh][kh][kh] = 1.0
   bpf.apply(h,h)
   plotH3(h)
