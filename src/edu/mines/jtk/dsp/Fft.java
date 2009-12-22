@@ -753,6 +753,11 @@ public class Fft {
 
   private void center(float[] f) {
     center1(f);
+    if (_center1 && !_complex)
+      // real, nfft = 8
+      // x x x x 0 1 2 3 4
+      // 4 3 2 1 0 1 2 3 4
+      creflect(_nfft1/2,_nfft1/2,f);
   }
   private void center1(float[] f) {
     if (!_center1)
@@ -780,9 +785,7 @@ public class Fft {
       // real, nfft = 8
       // 0 1 2 3 4
       // 0 1 2 3 0 1 2 3 4
-      // 4 3 2 1 0 1 2 3 4
       cshift(nfft1/2+1,0,nfft1/2,f);
-      creflect(nfft1/2,nfft1/2,f);
     }
   }
   private void uncenter(float[] f) {
@@ -878,6 +881,8 @@ public class Fft {
         center1(f[i2]);
     }
     center2(f);
+    if (_center1 && !_complex)
+      creflect(_nfft1/2,_nfft1/2,f);
   }
   private void uncenter(float[][] f) {
     uncenter2(f);
@@ -897,7 +902,7 @@ public class Fft {
       // 0 1 2 3 4 5 6 7 | 8
       // 4 5 6 7 0 1 2 3 | 4
       cswap(nfft2/2,0,nfft2/2,f);
-      f[nk2-1] = f[0];
+      ccopy(f[0],f[nk2-1]);
     } else {
       // nfft odd
       // 0 1 2 3 4 5 6
@@ -924,6 +929,19 @@ public class Fft {
       // 0 1 2 3 4 5 6
       crotateRight((nfft2+1)/2,(nfft2-1)/2,f);
       cswap((nfft2-1)/2,0,(nfft2+1)/2,f);
+    }
+  }
+  private static void creflect(int n, int i, float[][] f) {
+    int n2 = f.length;
+    for (int i2=0,j2=n2-1; i2<n2; ++i2,--j2) {
+      int ir = 2*(i+1), ii = ir+1;
+      int jr = 2*(i-1), ji = jr+1;
+      float[] fj2 = f[j2];
+      float[] fi2 = f[i2];
+      for (int k=0; k<n; ++k,ir+=2,ii+=2,jr-=2,ji-=2) {
+        fj2[jr] =  fi2[ir];
+        fj2[ji] = -fi2[ii];
+      }
     }
   }
   private static void cswap(int n, int i, int j, float[][] f) {
@@ -963,6 +981,8 @@ public class Fft {
           center2(f[i3]);
     }
     center3(f);
+    if (_center1 && !_complex)
+      creflect(_nfft1/2,_nfft1/2,f);
   }
   private void uncenter(float[][][] f) {
     uncenter3(f);
@@ -987,7 +1007,7 @@ public class Fft {
       // 0 1 2 3 4 5 6 7 | 8
       // 4 5 6 7 0 1 2 3 | 4
       cswap(nfft3/2,0,nfft3/2,f);
-      f[nk3-1] = f[0];
+      ccopy(f[0],f[nk3-1]);
     } else {
       // nfft odd
       // 0 1 2 3 4 5 6
@@ -1014,6 +1034,22 @@ public class Fft {
       // 0 1 2 3 4 5 6
       crotateRight((nfft3+1)/2,(nfft3-1)/2,f);
       cswap((nfft3-1)/2,0,(nfft3+1)/2,f);
+    }
+  }
+  private static void creflect(int n, int i, float[][][] f) {
+    int n2 = f[0].length;
+    int n3 = f.length;
+    for (int i3=0,j3=n3-1; i3<n3; ++i3,--j3) {
+      for (int i2=0,j2=n2-1; i2<n2; ++i2,--j2) {
+        int ir = 2*(i+1), ii = ir+1;
+        int jr = 2*(i-1), ji = jr+1;
+        float[] fj3j2 = f[j3][j2];
+        float[] fi3i2 = f[i3][i2];
+        for (int k=0; k<n; ++k,ir+=2,ii+=2,jr-=2,ji-=2) {
+          fj3j2[jr] =  fi3i2[ir];
+          fj3j2[ji] = -fi3i2[ii];
+        }
+      }
     }
   }
   private static void cswap(int n, int i, int j, float[][][] f) {

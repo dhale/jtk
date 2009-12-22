@@ -97,7 +97,7 @@ public class FftTest extends TestCase {
     }
   }
 
-  public void xtest3() { // too long for routine testing
+  public void xxtest3() { // too long for routine testing
     for (boolean complex:_complex) {
       for (boolean overwrite:_overwrite) {
         for (boolean center1:_center) {
