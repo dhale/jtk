@@ -19,8 +19,8 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * pass band, the width of the transition from pass band to stop bands,
  * and the maximum error for amplitude in both pass and stop bands.
  * <p>
- * For efficiency, the Fourier transform of the filter is cached for 
- * repeated application to multiple input arrays. The cached transform 
+ * For efficiency the Fourier transform of the filter is cached for 
+ * repeated application to multiple input arrays. A cached transform 
  * can be reused while the lengths of input arrays do not change.
  *
  * @author Dave Hale, Colorado School of Mines
@@ -98,6 +98,16 @@ public class BandPassFilter {
   }
 
   /**
+   * Gets the 3D array of coefficients for this filter.
+   * The origin of the filter is at the center of the array.
+   * @return the array of filter coefficients.
+   */
+  public float[][][] getCoefficients3() {
+    updateFilter3();
+    return copy(_h3);
+  }
+
+  /**
    * Applies this filter.
    * Input and output arrays may be the same array.
    * @param x input array.
@@ -117,6 +127,17 @@ public class BandPassFilter {
   public void apply(float[][] x, float[][] y) {
     updateFilter2();
     _ff2.apply(x,y);
+  }
+
+  /**
+   * Applies this filter.
+   * Input and output arrays may be the same array.
+   * @param x input array.
+   * @param y output filtered array.
+   */
+  public void apply(float[][][] x, float[][][] y) {
+    updateFilter3();
+    _ff3.apply(x,y);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -186,12 +207,48 @@ public class BandPassFilter {
     }
   }
 
-  private static double h1(double r) {
-    return (r==0.0)?1.0f:sin(PI*r)/(PI*r);
+  private void updateFilter3() {
+    if (_ff3==null) {
+      KaiserWindow kw = KaiserWindow.fromErrorAndWidth(_aerror,_kwidth);
+      int nh = ((int)kw.getLength()+1)/2*2+1;
+      int nh1 = nh;
+      int nh2 = nh;
+      int nh3 = nh;
+      int kh1 = (nh1-1)/2;
+      int kh2 = (nh2-1)/2;
+      int kh3 = (nh3-1)/2;
+      _h3 = new float[nh3][nh2][nh1];
+      double kus = 8.0*_kupper*_kupper*_kupper;
+      double kls = 8.0*_klower*_klower*_klower;
+      for (int i3=0; i3<nh3; ++i3) {
+        double x3 = i3-kh3;
+        double w3 = kw.evaluate(x3);
+        for (int i2=0; i2<nh2; ++i2) {
+          double x2 = i2-kh2;
+          double w2 = kw.evaluate(x2);
+          for (int i1=0; i1<nh1; ++i1) {
+            double x1 = i1-kh1;
+            double w1 = kw.evaluate(x1);
+            double r = sqrt(x1*x1+x2*x2+x3*x3);
+            double kur = 2.0*_kupper*r;
+            double klr = 2.0*_klower*r;
+            _h3[i3][i2][i1] = (float)(w1*w2*w3*(kus*h3(kur)-kls*h3(klr)));
+          }
+        }
+      }
+      _ff3 = new FftFilter(_h3);
+      if (_extrapolation==Extrapolation.ZERO_SLOPE)
+        _ff3.setExtrapolation(FftFilter.Extrapolation.ZERO_SLOPE);
+    }
   }
 
+  private static double h1(double r) {
+    return (r==0.0)?1.0:sin(PI*r)/(PI*r);
+  }
+
+  private static double PIO4 = PI/4.0;
   private static double h2(double r) {
-    return (r==0.0)?0.25*PI:besselJ1(PI*r)/(2.0*r);
+    return (r==0.0)?PIO4:besselJ1(PI*r)/(2.0*r);
   }
   private static double besselJ1(double x) {
     double ax = abs(x);
@@ -226,6 +283,16 @@ public class BandPassFilter {
       double am = ax-2.356194491;
       double y = sqrt(0.636619772/ax)*(cos(am)*t1-z*sin(am)*t2);
       return (x<0.0)?-y:y;
+    }
+  }
+
+  private static double PIO6 = PI/6.0;
+  private static double h3(double r) {
+    if (r==0.0) {
+      return PIO6;
+    } else {
+      double pir = PI*r;
+      return 0.5*PI*(sin(pir)-pir*cos(pir))/(pir*pir*pir);
     }
   }
 }

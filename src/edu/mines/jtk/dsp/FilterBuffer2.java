@@ -45,11 +45,17 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * </code></pre>
  * In the inner loop, the input index j1 is one greater than the output
  * index i1. This difference accounts for the padding with an extra 
- * l1 = 1 value at the beginning of the buffered input array x. An 
- * extra m1 = 1 value of padding is also provided at the end of each
- * buffered array. In other words, the buffered arrays xm, x0 and xp 
- * each contain l1+n1+m1 values. This padding enables the inner loop
- * to be written with no special cases near the ends of the arrays.
+ * l1 = 1 value at the beginning of the arrays xm, x0 and xp. An extra 
+ * m1 = 1 value of padding is also provided at the end of each of these 
+ * three arrays. In other words, the arrays xm, x0 and xp each contain 
+ * l1+n1+m1 values. This padding enables the inner loop to be written 
+ * simply, with no special cases near the ends of the arrays.
+ * <p>
+ * While simple, the program above is also efficient. First, the buffer
+ * contains only three 1D arrays, independent of the 2D array length n2. 
+ * Second, although input array values must be copied to the buffer, 
+ * those values are used multiple times before being replaced by other 
+ * values.
  * <p>
  * Another purpose of this class is to facilitate filtering in place. In 
  * the example above, the input array x and output array y can be the same 
@@ -109,8 +115,8 @@ public class FilterBuffer2 {
   };
 
   /**
-   * Constructs a buffer for specified numbers of values. The buffer 
-   * will store l2+1+m2 1D arrays, each with l1+n1+m1 values. Array
+   * Constructs a buffer for the specified array. The buffer will 
+   * store l2+1+m2 1D arrays, each with l1+n1+m1 values. Array
    * lengths n1 and n2 are set to n1=a[0].length and n2=a.length.
    * @param l1 number of extra values at beginning in 1st dimension.
    * @param m1 number of extra values at end in 1st dimension.
@@ -124,10 +130,10 @@ public class FilterBuffer2 {
   }
 
   /**
-   * Constructs a buffer for specified numbers of values. The buffer 
+   * Constructs a buffer for specified array lengths. The buffer 
    * will store l2+1+m2 1D arrays, each with l1+n1+m1 values. Array
    * lengths n1 and n2 are specified explicitly here. An array with
-   * those lengths must be specified later, <em>before</em> accessing
+   * those lengths must be specified later, but before accessing 
    * buffered values.
    * @param l1 number of extra values at beginning in 1st dimension.
    * @param m1 number of extra values at end in 1st dimension.
