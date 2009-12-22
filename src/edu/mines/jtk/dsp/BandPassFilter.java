@@ -10,7 +10,18 @@ import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * A multi-dimensional band-pass filter.
+ * A multi-dimensional band-pass filter. Filtering is performed using fast
+ * Fourier transforms. The result is equivalent to convolution with an 
+ * ideal symmetric (zero-phase) band-pass filter that has been smoothly 
+ * tapered to zero. 
+ * <p>
+ * Filter parameters include lower and upper frequencies that define the 
+ * pass band, the width of the transition from pass band to stop bands,
+ * and the maximum error for amplitude in both pass and stop bands.
+ * <p>
+ * For efficiency, the Fourier transform of the filter is cached for 
+ * repeated application to multiple input arrays. The cached transform 
+ * can be reused while the lengths of input arrays do not change.
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2009.12.19
