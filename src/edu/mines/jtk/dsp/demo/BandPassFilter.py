@@ -15,8 +15,8 @@ def main(args):
   demo3()
 
 def demo1():
-  #bpf = BandPassFilter(0.0,0.45,0.1,0.01)
-  bpf = BandPassFilter(0.0,0.3,0.1,0.01)
+  #bpf = BandPassFilter(0.0,0.3,0.1,0.01)
+  bpf = BandPassFilter(0.0,0.45,0.1,0.01)
   bpf.setExtrapolation(BandPassFilter.Extrapolation.ZERO_SLOPE)
   h = bpf.getCoefficients1()
   nh = len(h)

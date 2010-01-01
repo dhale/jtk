@@ -430,12 +430,13 @@ public class LocalSmoothingFilter {
   /**
    * Computes y = (I+G'DG)x. Arrays x and y must be distinct.
    */
-  private static void applyLhs(
+  public static void applyLhs(
     Tensors2 d, float c, float[][] s, float[][] x, float[][] y) 
   {
     int n1 = x[0].length;
     int n2 = x.length;
     scopy(x,y);
+    c *= 0.25f;
     float[] di = new float[3];
     for (int i2=1,i2m=0; i2<n2; ++i2,++i2m) {
       float[] x0 = x[i2 ];
@@ -454,8 +455,8 @@ public class LocalSmoothingFilter {
         float x11 = xm[i1m];
         float xa = x00-x11;
         float xb = x01-x10;
-        float x1 = 0.25f*(xa-xb);
-        float x2 = 0.25f*(xa+xb);
+        float x1 = xa-xb;
+        float x2 = xa+xb;
         float y1 = d11*x1+d12*x2;
         float y2 = d12*x1+d22*x2;
         float ya = y1+y2;
@@ -530,6 +531,7 @@ public class LocalSmoothingFilter {
   private static void applyLhsSlice3(
     int i3, Tensors3 d, float c, float[][][] s, float[][][] x, float[][][] y) 
   {
+    c *= 0.0625f;
     float[] di = new float[6];
     int n1 = x[0][0].length;
     int n2 = x[0].length;
@@ -573,16 +575,16 @@ public class LocalSmoothingFilter {
     float x101 = x10[i1m];
     float x110 = x11[i1 ];
     float x111 = x11[i1m];
-    //float x1 = 0.0625f*(x000+x010+x100+x110-x001-x011-x101-x111);
-    //float x2 = 0.0625f*(x000+x001+x100+x101-x010-x011-x110-x111);
-    //float x3 = 0.0625f*(x000+x001+x010+x011-x100-x101-x110-x111);
+    //float x1 = x000+x010+x100+x110-x001-x011-x101-x111;
+    //float x2 = x000+x001+x100+x101-x010-x011-x110-x111;
+    //float x3 = x000+x001+x010+x011-x100-x101-x110-x111;
     float xa = x000-x111;
     float xb = x001-x110;
     float xc = x010-x101;
     float xd = x100-x011;
-    float x1 = 0.0625f*(xa-xb+xc+xd);
-    float x2 = 0.0625f*(xa+xb-xc+xd);
-    float x3 = 0.0625f*(xa+xb+xc-xd);
+    float x1 = xa-xb+xc+xd;
+    float x2 = xa+xb-xc+xd;
+    float x3 = xa+xb+xc-xd;
     float y1 = d11*x1+d12*x2+d13*x3;
     float y2 = d12*x1+d22*x2+d23*x3;
     float y3 = d13*x1+d23*x2+d33*x3;
