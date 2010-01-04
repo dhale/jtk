@@ -15,6 +15,7 @@ import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * A group of image panels that display a single 3D array.
@@ -93,6 +94,7 @@ public class ImagePanelGroup extends Group {
   {
     _clips = new Clips(f);
     addPanels(s1,s2,s3,f,axes);
+    addChild(new Wires(_ipList));
   }
 
   /**
@@ -302,5 +304,43 @@ public class ImagePanelGroup extends Group {
       this.addChild(aaq);
       _ipList.add(ip);
     }
+  }
+
+  // Decorates this group with wires that show panel intersections.
+  static class Wires extends Node {
+    Wires(ArrayList<ImagePanel> ipList) {
+      _ipList = ipList;
+    }
+    protected void draw(DrawContext dc) {
+      glColor3f(1.0f,1.0f,1.0f);
+      glLineWidth(1.5f);
+      for (ImagePanel ip:_ipList) {
+        AxisAlignedFrame fi = ip.getFrame();
+        Axis ai = fi.getAxis();
+        for (ImagePanel jp:_ipList) {
+          AxisAlignedFrame fj = jp.getFrame();
+          Axis aj = fj.getAxis();
+          if (ai!=aj) {
+            Point3 pmini = fi.getCornerMin();
+            Point3 pmaxi = fi.getCornerMax();
+            Point3 pminj = fj.getCornerMin();
+            Point3 pmaxj = fj.getCornerMax();
+            double xmin = max(pmini.x,pminj.x);
+            double xmax = min(pmaxi.x,pmaxj.x);
+            double ymin = max(pmini.y,pminj.y);
+            double ymax = min(pmaxi.y,pmaxj.y);
+            double zmin = max(pmini.z,pminj.z);
+            double zmax = min(pmaxi.z,pmaxj.z);
+            if (xmin<=xmax && ymin<=ymax && zmin<=zmax) {
+              glBegin(GL_LINES); {
+                glVertex3d(xmin,ymin,zmin);
+                glVertex3d(xmax,ymax,zmax);
+              } glEnd();
+            }
+          }
+        }
+      }
+    }
+    private ArrayList<ImagePanel> _ipList;
   }
 }

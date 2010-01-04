@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * A local diffusion kernel for use in anisotropic diffusion filtering.
@@ -63,8 +64,8 @@ public class LocalDiffusionKernel {
     /** 
      * A 2x4 stencil. 
      * The 2D version has 8 non-zero coefficients.
+     * The 3D version has 24 non-zero coefficients.
      * <em>The 3D version is not yet implemented.</em>
-     * If implemented, the 3D version would have 24 non-zero coefficients.
      */
     D24,
     /** 
@@ -74,9 +75,14 @@ public class LocalDiffusionKernel {
      */
     D33,
     /** A 7x1 stencil. 
-     * Both 2D and 3D version have 6 non-zero coefficients. 
+     * Both 2D and 3D versions have 6 non-zero coefficients. 
      */
     D71,
+    /** A 9x1 stencil. 
+     * Both 2D and 3D versions have 8 non-zero coefficients. 
+     * <em>The 3D version is not yet implemented.</em>
+     */
+    D91,
   }
 
   /**
@@ -135,6 +141,8 @@ public class LocalDiffusionKernel {
       apply33(d,c,s,x,y);
     } else if (_stencil==Stencil.D71) {
       apply71(d,c,s,x,y);
+    } else if (_stencil==Stencil.D91) {
+      apply91(d,c,s,x,y);
     }
   }
 
@@ -209,11 +217,15 @@ public class LocalDiffusionKernel {
     } else if (_stencil==Stencil.D24) {
       //apply24(i3,d,c,s,x,y);
       throw new UnsupportedOperationException(
-        "Stencil.D24 not yet supported for 3D arrays");
+        "Stencil.D24 not supported for 3D arrays");
     } else if (_stencil==Stencil.D33) {
       apply33(i3,d,c,s,x,y);
     } else if (_stencil==Stencil.D71) {
       apply71(i3,d,c,s,x,y);
+    } else if (_stencil==Stencil.D91) {
+      //apply91(i3,d,c,s,x,y);
+      throw new UnsupportedOperationException(
+        "Stencil.D91 not supported for 3D arrays");
     }
   }
 
@@ -603,12 +615,52 @@ public class LocalDiffusionKernel {
   ///////////////////////////////////////////////////////////////////////////
   // D71
 
+  private static final float[] C71 = {
+    0.0f, 0.830893f, -0.227266f, 0.042877f
+  };
+  
   private void apply71(
     Tensors2 d, float c, float[][] s, float[][] x, float[][] y) 
   {
-    float c1 =  0.830893f;
-    float c2 = -0.227266f;
-    float c3 =  0.042877f;
+    final float c1 =  C71[1], c2 = C71[2], c3 = C71[3];
+    int n1 = x[0].length;
+    int n2 = x.length;
+    float[] di = new float[3];
+    float[] g1 = new float[n1];
+    for (int i2=0; i2<n2; ++i2) {
+      int i2m3 = max(0,i2-3), i2p3 = min(n2-1,i2+3);
+      int i2m2 = max(0,i2-2), i2p2 = min(n2-1,i2+2);
+      int i2m1 = max(0,i2-1), i2p1 = min(n2-1,i2+1);
+      float[] xm1 = x[i2m1], xm2 = x[i2m2], xm3 = x[i2m3];
+      float[] xp1 = x[i2p1], xp2 = x[i2p2], xp3 = x[i2p3];
+      float[] ym1 = y[i2m1], ym2 = y[i2m2], ym3 = y[i2m3];
+      float[] yp1 = y[i2p1], yp2 = y[i2p2], yp3 = y[i2p3];
+      gf(C71,x[i2],g1);
+      for (int i1=0; i1<n1; ++i1) {
+        d.getTensor(i1,i2,di);
+        float csi = (s!=null)?c*s[i2][i1]:c;
+        float d11 = di[0]*csi;
+        float d12 = di[1]*csi;
+        float d22 = di[2]*csi;
+        float x1 = g1[i1];
+        float x2 = c1*(xp1[i1]-xm1[i1]) +
+                   c2*(xp2[i1]-xm2[i1]) +
+                   c3*(xp3[i1]-xm3[i1]);
+        float y1 = d11*x1+d12*x2;
+        float y2 = d12*x1+d22*x2;
+        g1[i1] = y1;
+        float c1y2 = c1*y2; yp1[i1] += c1y2; ym1[i1] -= c1y2;
+        float c2y2 = c2*y2; yp2[i1] += c2y2; ym2[i1] -= c2y2;
+        float c3y2 = c3*y2; yp3[i1] += c3y2; ym3[i1] -= c3y2;
+      }
+      gt(C71,g1,y[i2]);
+    }
+  }
+ 
+  private void apply71X(
+    Tensors2 d, float c, float[][] s, float[][] x, float[][] y) 
+  {
+    final float c1 =  C71[1], c2 = C71[2], c3 = C71[3];
     int n1 = x[0].length;
     int n2 = x.length;
     float[] di = new float[3];
@@ -658,9 +710,55 @@ public class LocalDiffusionKernel {
   private void apply71(
     int i3, Tensors3 d, float c, float[][][] s, float[][][] x, float[][][] y) 
   {
-    float c1 =  0.830893f;
-    float c2 = -0.227266f;
-    float c3 =  0.042877f;
+    final float c1 =  C71[1], c2 = C71[2], c3 = C71[3];
+    int n1 = x[0][0].length;
+    int n2 = x[0].length;
+    int n3 = x.length;
+    float[] di = new float[6];
+    int i3m3 = max(0,i3-3), i3p3 = min(n3-1,i3+3);
+    int i3m2 = max(0,i3-2), i3p2 = min(n3-1,i3+2);
+    int i3m1 = max(0,i3-1), i3p1 = min(n3-1,i3+1);
+    float[][] g1 = new float[n2][n1];
+    float[][] g2 = new float[n2][n1];
+    gf(C71,x[i3],g1,g2);
+    for (int i2=0; i2<n2; ++i2) {
+      float[] xm1 = x[i3m1][i2], xm2 = x[i3m2][i2], xm3 = x[i3m3][i2];
+      float[] xp1 = x[i3p1][i2], xp2 = x[i3p2][i2], xp3 = x[i3p3][i2];
+      float[] ym1 = y[i3m1][i2], ym2 = y[i3m2][i2], ym3 = y[i3m3][i2];
+      float[] yp1 = y[i3p1][i2], yp2 = y[i3p2][i2], yp3 = y[i3p3][i2];
+      float[] g1i = g1[i2];
+      float[] g2i = g2[i2];
+      for (int i1=0; i1<n1; ++i1) {
+        d.getTensor(i1,i2,i3,di);
+        float csi = (s!=null)?c*s[i3][i2][i1]:c;
+        float d11 = di[0]*csi;
+        float d12 = di[1]*csi;
+        float d13 = di[2]*csi;
+        float d22 = di[3]*csi;
+        float d23 = di[4]*csi;
+        float d33 = di[5]*csi;
+        float x1 = g1i[i1];
+        float x2 = g2i[i1];
+        float x3 = c1*(xp1[i1]-xm1[i1]) +
+                   c2*(xp2[i1]-xm2[i1]) +
+                   c3*(xp3[i1]-xm3[i1]);
+        float y1 = d11*x1+d12*x2+d13*x3;
+        float y2 = d12*x1+d22*x2+d23*x3;
+        float y3 = d13*x1+d23*x2+d33*x3;
+        g1i[i1] = y1;
+        g2i[i1] = y2;
+        float c1y3 = c1*y3; yp1[i1] += c1y3; ym1[i1] -= c1y3;
+        float c2y3 = c2*y3; yp2[i1] += c2y3; ym2[i1] -= c2y3;
+        float c3y3 = c3*y3; yp3[i1] += c3y3; ym3[i1] -= c3y3;
+      }
+    }
+    gt(C71,g1,g2,y[i3]);
+  }
+
+  private void apply71X(
+    int i3, Tensors3 d, float c, float[][][] s, float[][][] x, float[][][] y) 
+  {
+    final float c1 =  C71[1], c2 = C71[2], c3 = C71[3];
     int n1 = x[0][0].length;
     int n2 = x[0].length;
     int n3 = x.length;
@@ -730,5 +828,321 @@ public class LocalDiffusionKernel {
         float c3y3 = c3*y3; yp3p0[p0] += c3y3; ym3p0[p0] -= c3y3;
       }
     }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // D91
+
+  private static final float[] C91 = {
+    0.0f, 0.8947167f, -0.3153471f, 0.1096895f, -0.0259358f
+  };
+
+  private void apply91(
+    Tensors2 d, float c, float[][] s, float[][] x, float[][] y) 
+  {
+    float c1 =  C91[1], c2 = C91[2], c3 = C91[3], c4 = C91[4];
+    int n1 = x[0].length;
+    int n2 = x.length;
+    float[] di = new float[3];
+    int i2m4,i2m3=0,i2m2=0,i2m1=0,i2p0=0,i2p1=0,i2p2=1,i2p3=2,i2p4=3;
+    for (int i2=0; i2<n2; ++i2) {
+      i2m4 = i2m3; i2m3 = i2m2; i2m2 = i2m1; i2m1 = i2p0;
+      i2p0 = i2p1; i2p1 = i2p2; i2p2 = i2p3; i2p3 = i2p4; ++i2p4;
+      if (i2p1>=n2) i2p1 = n2-1;
+      if (i2p2>=n2) i2p2 = n2-1;
+      if (i2p3>=n2) i2p3 = n2-1;
+      if (i2p4>=n2) i2p4 = n2-1;
+      float[] xm4 = x[i2m4], xm3 = x[i2m3], xm2 = x[i2m2], xm1 = x[i2m1];
+      float[] xp4 = x[i2p4], xp3 = x[i2p3], xp2 = x[i2p2], xp1 = x[i2p1];
+      float[] xp0 = x[i2p0];
+      float[] ym4 = y[i2m4], ym3 = y[i2m3], ym2 = y[i2m2], ym1 = y[i2m1];
+      float[] yp4 = y[i2p4], yp3 = y[i2p3], yp2 = y[i2p2], yp1 = y[i2p1];
+      float[] yp0 = y[i2p0];
+      int m4,m3=0,m2=0,m1=0,p0=0,p1=0,p2=1,p3=2,p4=3;
+      for (int i1=0; i1<n1; ++i1) {
+        m4 = m3; m3 = m2; m2 = m1; m1 = p0;
+        p0 = p1; p1 = p2; p2 = p3; p3 = p4; ++p4;
+        if (p1>=n1) p1 = n1-1;
+        if (p2>=n1) p2 = n1-1;
+        if (p3>=n1) p3 = n1-1;
+        if (p4>=n1) p4 = n1-1;
+        d.getTensor(i1,i2,di);
+        float csi = (s!=null)?c*s[i2][i1]:c;
+        float d11 = di[0]*csi;
+        float d12 = di[1]*csi;
+        float d22 = di[2]*csi;
+        float x1 = c1*(xp0[p1]-xp0[m1]) +
+                   c2*(xp0[p2]-xp0[m2]) +
+                   c3*(xp0[p3]-xp0[m3]) +
+                   c4*(xp0[p4]-xp0[m4]);
+        float x2 = c1*(xp1[p0]-xm1[p0]) +
+                   c2*(xp2[p0]-xm2[p0]) +
+                   c3*(xp3[p0]-xm3[p0]) +
+                   c4*(xp4[p0]-xm4[p0]);
+        float y1 = d11*x1+d12*x2;
+        float y2 = d12*x1+d22*x2;
+        float c1y1 = c1*y1; yp0[p1] += c1y1; yp0[m1] -= c1y1;
+        float c2y1 = c2*y1; yp0[p2] += c2y1; yp0[m2] -= c2y1;
+        float c3y1 = c3*y1; yp0[p3] += c3y1; yp0[m3] -= c3y1;
+        float c4y1 = c4*y1; yp0[p4] += c4y1; yp0[m4] -= c4y1;
+        float c1y2 = c1*y2; yp1[p0] += c1y2; ym1[p0] -= c1y2;
+        float c2y2 = c2*y2; yp2[p0] += c2y2; ym2[p0] -= c2y2;
+        float c3y2 = c3*y2; yp3[p0] += c3y2; ym3[p0] -= c3y2;
+        float c4y2 = c4*y2; yp4[p0] += c4y2; ym4[p0] -= c4y2;
+      }
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+  // gradients (forward and transpose) for stencils with mx1 coefficients
+
+  private static void gf(float[] c, float[] x, float[] y) {
+    int nc = c.length-1;
+    int n1 = x.length;
+    int n1m1 = n1-1, n1nc = n1-nc;
+    for (int i1=0; i1<min(nc,n1nc); ++i1) {
+      float yi = 0.0f;
+      for (int ic=1; ic<=nc; ++ic) {
+        float ci = c[ic];
+        int im = i1-ic; if (im<0   ) im = 0;
+        int ip = i1+ic; if (ip>n1m1) ip = n1m1;
+        yi += ci*(x[ip]-x[im]);
+      }
+      y[i1] = yi;
+    }
+    if (nc==3 && n1>6) { // middle part optimized for nc = 3
+      final float c1 =  c[1], c2 = c[2], c3 = c[3];
+      float xm3, xm2 = x[0], xm1 = x[1], xp0 = x[2],
+                 xp1 = x[3], xp2 = x[4], xp3 = x[5];
+      for (int i1=3; i1<n1nc; ++i1) {
+        xm3 = xm2; xm2 = xm1; xm1 = xp0;
+        xp0 = xp1; xp1 = xp2; xp2 = xp3;
+        xp3 = x[i1+3];
+        y[i1] = c1*(xp1-xm1)+c2*(xp2-xm2)+c3*(xp3-xm3);
+      }
+    } else { // middle part for general case
+      for (int i1=nc; i1<n1nc; ++i1) {
+        float yi = 0.0f;
+        for (int ic=1; ic<=nc; ++ic)
+          yi += c[ic]*(x[i1+ic]-x[i1-ic]);
+        y[i1] = yi;
+      }
+    }
+    for (int i1=max(n1nc,0); i1<n1; ++i1) {
+      float yi = 0.0f;
+      for (int ic=1; ic<=nc; ++ic) {
+        float ci = c[ic];
+        int im = i1-ic; if (im<0   ) im = 0;
+        int ip = i1+ic; if (ip>n1m1) ip = n1m1;
+        yi += ci*(x[ip]-x[im]);
+      }
+      y[i1] = yi;
+    }
+  }
+  private static void gt(float[] c, float[] x, float[] y) {
+    int nc = c.length-1;
+    int n1 = x.length;
+    int n1m1 = n1-1, n1nc = n1-nc;
+    for (int i1=0; i1<min(2*nc,n1); ++i1) {
+      float xi = x[i1];
+      for (int ic=1; ic<=nc; ++ic) {
+        float ci = c[ic];
+        int im = i1-ic; if (im<0   ) im = 0;
+        int ip = i1+ic; if (ip>n1m1) ip = n1m1;
+        if (im<nc) y[im] -= ci*xi;
+        if (ip<nc) y[ip] += ci*xi;
+      }
+    }
+    if (nc==3 && n1>6) { // middle part optimized for nc = 3
+      final float c1 =  c[1], c2 = c[2], c3 = c[3];
+      float xm3, xm2 = x[0], xm1 = x[1], xp0 = x[2],
+                 xp1 = x[3], xp2 = x[4], xp3 = x[5];
+      for (int i1=3; i1<n1nc; ++i1) {
+        xm3 = xm2; xm2 = xm1; xm1 = xp0;
+        xp0 = xp1; xp1 = xp2; xp2 = xp3;
+        xp3 = x[i1+3];
+        y[i1] += c1*(xm1-xp1)+c2*(xm2-xp2)+c3*(xm3-xp3);
+      }
+    } else { // middle part for general case
+      for (int i1=nc; i1<n1nc; ++i1) {
+        float yi = y[i1];
+        for (int ic=1; ic<=nc; ++ic)
+          yi += c[ic]*(x[i1-ic]-x[i1+ic]);
+        y[i1] = yi;
+      }
+    }
+    n1nc = max(n1nc,nc);
+    for (int i1=max(n1-2*nc,0); i1<n1; ++i1) {
+      float xi = x[i1];
+      for (int ic=1; ic<=nc; ++ic) {
+        float ci = c[ic];
+        int im = i1-ic; if (im<0   ) im = 0;
+        int ip = i1+ic; if (ip>n1m1) ip = n1m1;
+        if (im>=n1nc) y[im] -= ci*xi;
+        if (ip>=n1nc) y[ip] += ci*xi;
+      }
+    }
+  }
+  private static void gf1(float[] c, float[][] x, float[][] g1) {
+    int n2 = x.length;
+    for (int i2=0; i2<n2; ++i2)
+      gf(c,x[i2],g1[i2]);
+  }
+  private static void gf2(float[] c, float[][] x, float[][] g2) {
+    int nc = c.length-1;
+    int n1 = x[0].length;
+    int n2 = x.length;
+    if (nc==3) { // optimized for nc = 3
+      final float c1 =  C71[1], c2 = C71[2], c3 = C71[3];
+      int n2m1 = n2-1, n2m2 = n2-2, n2m3 = n2-3;
+      for (int i2=0; i2<n2; ++i2) {
+        float[] xm3 = (i2>=3)?x[i2-3]:x[0];
+        float[] xm2 = (i2>=2)?x[i2-2]:x[0];
+        float[] xm1 = (i2>=1)?x[i2-1]:x[0];
+        float[] xp1 = (i2<n2m1)?x[i2+1]:x[n2m1];
+        float[] xp2 = (i2<n2m2)?x[i2+2]:x[n2m1];
+        float[] xp3 = (i2<n2m3)?x[i2+3]:x[n2m1];
+        float[] g2i = g2[i2];
+        for (int i1=0; i1<n1; ++i1) {
+          g2i[i1] = c1*(xp1[i1]-xm1[i1]) +
+                    c2*(xp2[i1]-xm2[i1]) +
+                    c3*(xp3[i1]-xm3[i1]);
+        }
+      }
+    } else { // not optimized
+      int n2m1 = n2-1;
+      for (int i2=0; i2<n2; ++i2) {
+        float[] g2i = g2[i2];
+        zero(g2i);
+        for (int ic=1; ic<=nc; ++ic) {
+          float ci = c[ic];
+          float[] xm = (i2>=ic)?x[i2-ic]:x[0];
+          float[] xp = (i2<n2-ic)?x[i2+ic]:x[n2m1];
+          for (int i1=0; i1<n1; ++i1)
+            g2i[i1] += ci*(xp[i1]-xm[i1]);
+        }
+      }
+    }
+  }
+  private static void gt1(float[] c, float[][] g1, float[][] x) {
+    int n2 = x.length;
+    for (int i2=0; i2<n2; ++i2)
+      gt(c,g1[i2],x[i2]);
+  }
+  private static void gt2(float[] c, float[][] g2, float[][] x) {
+    int nc = c.length-1;
+    int n1 = x[0].length;
+    int n2 = x.length;
+    int n2m1 = n2-1, n2nc = n2-nc;
+    for (int i2=0; i2<min(2*nc,n2); ++i2) { // rolling on
+      float[] g2i = g2[i2];
+      for (int ic=1; ic<=nc; ++ic) {
+        float ci = c[ic];
+        int im = i2-ic; if (im<0   ) im = 0;
+        int ip = i2+ic; if (ip>n2m1) ip = n2m1;
+        if (im<nc) {
+          float[] x2m = x[im];
+          for (int i1=0; i1<n1; ++i1)
+            x2m[i1] -= ci*g2i[i1];
+        }
+        if (ip<nc) {
+          float[] x2p = x[ip];
+          for (int i1=0; i1<n1; ++i1)
+            x2p[i1] += ci*g2i[i1];
+        }
+      }
+    }
+    if (nc==3 && n1>6) { // middle part optimized for nc = 3
+      final float c1 =  c[1], c2 = c[2], c3 = c[3];
+      for (int i2=3; i2<n2-3; ++i2) {
+        float[] gm3 = g2[i2-3];
+        float[] gm2 = g2[i2-2];
+        float[] gm1 = g2[i2-1];
+        float[] gp1 = g2[i2+1];
+        float[] gp2 = g2[i2+2];
+        float[] gp3 = g2[i2+3];
+        float[] x2 = x[i2];
+        for (int i1=0; i1<n1; ++i1) {
+          x2[i1] += c1*(gm1[i1]-gp1[i1]) +
+                    c2*(gm2[i1]-gp2[i1]) +
+                    c3*(gm3[i1]-gp3[i1]);
+        }
+      }
+    } else { // middle part not optimized
+      for (int i2=nc; i2<n2-nc; ++i2) {
+        float[] x2 = x[i2];
+        for (int ic=1; ic<=nc; ++ic) {
+          float ci = c[ic];
+          float[] g2m = g2[i2-ic];
+          float[] g2p = g2[i2+ic];
+          for (int i1=0; i1<n1; ++i1)
+            x2[i1] += ci*(g2m[i1]-g2p[i1]);
+        }
+      }
+    }
+    n2nc = max(n2nc,nc);
+    for (int i2=max(n2-2*nc,0); i2<n2; ++i2) { // rolling off
+      float[] g2i = g2[i2];
+      for (int ic=1; ic<=nc; ++ic) {
+        float ci = c[ic];
+        int im = i2-ic; if (im<0   ) im = 0;
+        int ip = i2+ic; if (ip>n2m1) ip = n2m1;
+        if (im>=n2nc) {
+          float[] x2m = x[im];
+          for (int i1=0; i1<n1; ++i1)
+            x2m[i1] -= ci*g2i[i1];
+        }
+        if (ip>=n2nc) {
+          float[] x2p = x[ip];
+          for (int i1=0; i1<n1; ++i1)
+            x2p[i1] += ci*g2i[i1];
+        }
+      }
+    }
+  }
+  private static void gf(float[] c, float[][] x, float[][] g1, float[][] g2) {
+    gf1(c,x,g1);
+    gf2(c,x,g2);
+  }
+  private static void gt(float[] c, float[][] g1, float[][] g2, float[][] x) {
+    gt2(c,g2,x);
+    gt1(c,g1,x);
+  }
+  private static void testGrad1() {
+    int n = 21;
+    float[] x = randfloat(n);
+    float[] y = randfloat(n);
+    //float[] x = zerofloat(n); x[0] = x[n/2] = x[n-1] = 1.0f;
+    //float[] y = zerofloat(n); y[0] = y[n/2] = y[n-1] = 1.0f;
+    float[] gx = zerofloat(n);
+    float[] gy = zerofloat(n);
+    gf(C71,x,gx); // Gx
+    gt(C71,y,gy); // G'y
+    dump(gx);
+    dump(gy);
+    float ygx = sum(mul(y,gx)); // y'Gx
+    float xgy = sum(mul(x,gy)); // x'G'y
+    trace("ygx="+ygx);
+    trace("xgy="+xgy);
+  }
+  private static void testGrad2() {
+    int n1 = 11;
+    int n2 = 21;
+    float[][] x = randfloat(n1,n2);
+    float[][] y1 = randfloat(n1,n2);
+    float[][] y2 = randfloat(n1,n2);
+    float[][] y = zerofloat(n1,n2);
+    float[][] x1 = zerofloat(n1,n2);
+    float[][] x2 = zerofloat(n1,n2);
+    gf(C71,x,x1,x2);
+    gt(C71,y1,y2,y);
+    float ygx = sum(add(mul(y1,x1),mul(y2,x2)));
+    float xgy = sum(mul(x,y));
+    trace("ygx="+ygx);
+    trace("xgy="+xgy);
+  }
+  private static void main(String[] args) {
+    testGrad1();
+    testGrad2();
   }
 }

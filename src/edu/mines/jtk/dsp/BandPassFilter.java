@@ -19,9 +19,10 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * pass band, the width of the transition from pass band to stop bands,
  * and the maximum error for amplitude in both pass and stop bands.
  * <p>
- * For efficiency the Fourier transform of the filter is cached for 
+ * For efficiency the Fourier transform of the filter may be cached for 
  * repeated application to multiple input arrays. A cached transform 
- * can be reused while the lengths of input arrays do not change.
+ * can be reused while the lengths of input and output arrays do not 
+ * change. Because caching consumes memory, it is disabled by default.
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2009.12.19
@@ -73,6 +74,20 @@ public class BandPassFilter {
   public void setExtrapolation(Extrapolation extrapolation) {
     if (_extrapolation!=extrapolation) {
       _extrapolation = extrapolation;
+      _ff1 = _ff2 = _ff3 = null;
+    }
+  }
+
+  /**
+   * Enables or disables caching of the Fourier transform of the filter.
+   * Caching consumes memory but improves performance by about 50% when
+   * the same filter is applied repeatedly to arrays that have the same
+   * dimensions.
+   * @param filterCaching true, to enable caching; false, to disable.
+   */
+  public void setFilterCaching(boolean filterCaching) {
+    if (_filterCaching!=filterCaching) {
+      _filterCaching = filterCaching;
       _ff1 = _ff2 = _ff3 = null;
     }
   }
@@ -154,6 +169,17 @@ public class BandPassFilter {
   private float[][] _h2;
   private float[][][] _h3;
   private Extrapolation _extrapolation = Extrapolation.ZERO_VALUE;
+  private boolean _filterCaching;
+
+  private FftFilter.Extrapolation ffExtrap(Extrapolation e) {
+    if (e==Extrapolation.ZERO_VALUE) {
+      return FftFilter.Extrapolation.ZERO_VALUE;
+    } else if (e==Extrapolation.ZERO_SLOPE) {
+      return FftFilter.Extrapolation.ZERO_SLOPE;
+    } else {
+      return null;
+    }
+  }
 
   private void updateFilter1() {
     if (_ff1==null) {
@@ -173,8 +199,8 @@ public class BandPassFilter {
         _h1[i1] = (float)(w1*(kus*h1(kur)-kls*h1(klr)));
       }
       _ff1 = new FftFilter(_h1);
-      if (_extrapolation==Extrapolation.ZERO_SLOPE)
-        _ff1.setExtrapolation(FftFilter.Extrapolation.ZERO_SLOPE);
+      _ff1.setExtrapolation(ffExtrap(_extrapolation));
+      _ff1.setFilterCaching(_filterCaching);
     }
   }
 
@@ -202,8 +228,8 @@ public class BandPassFilter {
         }
       }
       _ff2 = new FftFilter(_h2);
-      if (_extrapolation==Extrapolation.ZERO_SLOPE)
-        _ff2.setExtrapolation(FftFilter.Extrapolation.ZERO_SLOPE);
+      _ff2.setExtrapolation(ffExtrap(_extrapolation));
+      _ff2.setFilterCaching(_filterCaching);
     }
   }
 
@@ -237,8 +263,8 @@ public class BandPassFilter {
         }
       }
       _ff3 = new FftFilter(_h3);
-      if (_extrapolation==Extrapolation.ZERO_SLOPE)
-        _ff3.setExtrapolation(FftFilter.Extrapolation.ZERO_SLOPE);
+      _ff3.setExtrapolation(ffExtrap(_extrapolation));
+      _ff3.setFilterCaching(_filterCaching);
     }
   }
 

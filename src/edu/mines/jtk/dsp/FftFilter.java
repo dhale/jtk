@@ -42,12 +42,13 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * array x is padded with extra values so that x[i-j] is defined for 
  * any i-j in the range [kh-nh+1:kh+nx-1] required by the convolution sum.
  * <p>
- * For efficiency, this filter computes and caches the fast Fourier
- * transform of its coefficients h when the filter is first applied 
- * to any input array x. The filter may then be applied again, without 
- * recomputing its FFT, to other input arrays x that have the same 
- * lengths. The FFT of the filter is recomputed only when the lengths 
- * of the input and output arrays have changed.
+ * For efficiency, this filter can cache the fast Fourier transform of 
+ * its coefficients h when the filter is first applied to any input 
+ * array x. The filter may then be applied again, without recomputing 
+ * its FFT, to other input arrays x that have the same lengths. The FFT 
+ * of a cached filter is recomputed only when the lengths of the input 
+ * and output arrays have changed. Because this caching consumes memory,
+ * it is disabled by default.
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2009.12.14
@@ -156,6 +157,17 @@ public class FftFilter {
   }
 
   /**
+   * Enables or disables caching of the Fourier transform of the filter.
+   * Caching consumes memory but improves performance by about 50% when
+   * the same filter is applied repeatedly to arrays that have the same
+   * dimensions.
+   * @param filterCaching true, to enable caching; false, to disable.
+   */
+  public void setFilterCaching(boolean filterCaching) {
+    _filterCaching = filterCaching;
+  }
+
+  /**
    * Applies this filter.
    * @param x input array.
    * @return filtered array.
@@ -189,6 +201,7 @@ public class FftFilter {
       xfft[k1r] = xr*hr-xi*hi;
       xfft[k1i] = xr*hi+xi*hr;
     }
+    if (!_filterCaching) _h1fft = null;
     _fft1.complexToReal(1,xfft,xfft);
     copy(nx1,xfft,y);
   }
@@ -234,6 +247,7 @@ public class FftFilter {
         x2[k1i] = xr*hi+xi*hr;
       }
     }
+    if (!_filterCaching) _h2fft = null;
     _fft2.complexToComplex2(1,_nfft1/2+1,xfft,xfft);
     _fft1.complexToReal1(1,_nfft2,xfft,xfft);
     copy(nx1,nx2,xfft,y);
@@ -285,6 +299,7 @@ public class FftFilter {
         }
       }
     }
+    if (!_filterCaching) _h3fft = null;
     _fft3.complexToComplex3(1,_nfft1/2+1,_nfft2,xfft,xfft);
     _fft2.complexToComplex2(1,_nfft1/2+1,_nfft3,xfft,xfft);
     _fft1.complexToReal1(1,_nfft2,_nfft3,xfft,xfft);
@@ -304,9 +319,10 @@ public class FftFilter {
   private float[][] _h2,_h2fft;
   private float[][][] _h3,_h3fft;
   private Extrapolation _extrapolation = Extrapolation.ZERO_VALUE;
+  private boolean _filterCaching;
 
   private void updateFfts(int nx1) {
-    if (_fft1==null || _nx1!=nx1) {
+    if (_fft1==null || _h1fft==null || _nx1!=nx1) {
       _nx1 = nx1;
       _nx2 = 0;
       _nx3 = 0;
@@ -328,7 +344,7 @@ public class FftFilter {
   }
 
   private void updateFfts(int nx1, int nx2) {
-    if (_fft2==null || _nx1!=nx1 || _nx2!=nx2) {
+    if (_fft2==null || _h2fft==null || _nx1!=nx1 || _nx2!=nx2) {
       _nx1 = nx1;
       _nx2 = nx2;
       _nx3 = 0;
@@ -356,7 +372,7 @@ public class FftFilter {
   }
 
   private void updateFfts(int nx1, int nx2, int nx3) {
-    if (_fft3==null || _nx1!=nx1 || _nx2!=nx2 || _nx3!=nx3) {
+    if (_fft3==null || _h3fft==null || _nx1!=nx1 || _nx2!=nx2 || _nx3!=nx3) {
       _nx1 = nx1;
       _nx2 = nx2;
       _nx3 = nx3;

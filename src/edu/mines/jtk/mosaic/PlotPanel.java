@@ -305,15 +305,17 @@ public class PlotPanel extends IPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 1;
+        gbc.gridwidth = 2;
         gbc.gridheight = 1;
         gbc.weightx = 0;
         gbc.weighty = 0;
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets.top = 0;
-        gbc.insets.left = _mosaic.getWidthAxesLeft();
         gbc.insets.bottom = 0;
-        gbc.insets.right = _mosaic.getWidthAxesRight();
+        gbc.insets.left = 0;
+        gbc.insets.right = 0;
+        //gbc.insets.left = _mosaic.getWidthAxesLeft();
+        //gbc.insets.right = _mosaic.getWidthAxesRight();
         this.add(_title,gbc);
         this.revalidate();
       } else {

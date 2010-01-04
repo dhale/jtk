@@ -83,7 +83,7 @@ public class LocalSemblanceFilter {
    * @return the array of semblance values.
    */
   public float[] semblance(float[] f) {
-    float[] s = shapeOf(f);
+    float[] s = like(f);
     semblance(f,s);
     return s;
   }
@@ -132,7 +132,7 @@ public class LocalSemblanceFilter {
    * @return the array of semblance values.
    */
   public float[][] semblance(Direction2 d, EigenTensors2 t, float[][] f) {
-    float[][] s = shapeOf(f);
+    float[][] s = like(f);
     semblance(d,t,f,s);
     return s;
   }
@@ -182,7 +182,7 @@ public class LocalSemblanceFilter {
    * @return the array of semblance values.
    */
   public float[][][] semblance(Direction3 d, EigenTensors3 t, float[][][] f) {
-    float[][][] s = shapeOf(f);
+    float[][][] s = like(f);
     semblance(d,t,f,s);
     return s;
   }
@@ -192,7 +192,6 @@ public class LocalSemblanceFilter {
 
   private static class LaplacianSmoother {
     LaplacianSmoother(int halfWidth) {
-      _lsf = new LocalSmoothingFilter(0.01,1000);
       _scale = halfWidth*(halfWidth+1)/6.0f;
     }
     public void apply(float[] f, float[] g) {
@@ -212,9 +211,11 @@ public class LocalSemblanceFilter {
         int n2 = f.length;
         float[][] au = new float[n2][n1];
         float[][] av = new float[n2][n1];
+        float[][] sf = new float[n2][n1];
         t.getEigenvalues(au,av);
         setEigenvalues(d,t);
-        _lsf.apply(t,_scale,f,g);
+        _lsf.applySmoothL(_kmax,f,sf);
+        _lsf.apply(t,_scale,sf,g);
         t.setEigenvalues(au,av);
       }
     }
@@ -230,14 +231,22 @@ public class LocalSemblanceFilter {
         float[][][] au = new float[n3][n2][n1];
         float[][][] av = new float[n3][n2][n1];
         float[][][] aw = new float[n3][n2][n1];
+        float[][][] sf = new float[n3][n2][n1];
         t.getEigenvalues(au,av,aw);
         setEigenvalues(d,t);
-        _lsf.apply(t,_scale,f,g);
+        _lsf.applySmoothL(_kmax,f,sf);
+        _lsf.apply(t,_scale,sf,g);
         t.setEigenvalues(au,av,aw);
       }
     }
     private float _scale;
-    private LocalSmoothingFilter _lsf;
+    private static final double _small = 0.01;
+    private static final int _niter = 1000;
+    private static final LocalDiffusionKernel _ldk = 
+      new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D71);
+    private static final LocalSmoothingFilter _lsf = 
+      new LocalSmoothingFilter(_small,_niter,_ldk);
+    private static final double _kmax = 0.35;
   }
 
   private LaplacianSmoother _smoother1,_smoother2;
@@ -246,7 +255,7 @@ public class LocalSemblanceFilter {
     _smoother1.apply(f,g);
   }
   private float[] smooth1(float[] f) {
-    float[] g = shapeOf(f);
+    float[] g = like(f);
     smooth1(f,g);
     return g;
   }
@@ -256,7 +265,7 @@ public class LocalSemblanceFilter {
     _smoother1.apply(d,t,f,g);
   }
   private float[][] smooth1(Direction2 d, EigenTensors2 t, float[][] f) {
-    float[][] g = shapeOf(f);
+    float[][] g = like(f);
     smooth1(d,t,f,g);
     return g;
   }
@@ -266,7 +275,7 @@ public class LocalSemblanceFilter {
     _smoother1.apply(d,t,f,g);
   }
   private float[][][] smooth1(Direction3 d, EigenTensors3 t, float[][][] f) {
-    float[][][] g = shapeOf(f);
+    float[][][] g = like(f);
     smooth1(d,t,f,g);
     return g;
   }
@@ -274,7 +283,7 @@ public class LocalSemblanceFilter {
     _smoother2.apply(f,g);
   }
   private float[] smooth2(float[] f) {
-    float[] g = shapeOf(f);
+    float[] g = like(f);
     smooth2(f,g);
     return g;
   }
@@ -284,7 +293,7 @@ public class LocalSemblanceFilter {
     _smoother2.apply(d,t,f,g);
   }
   private float[][] smooth2(Direction2 d, EigenTensors2 t, float[][] f) {
-    float[][] g = shapeOf(f);
+    float[][] g = like(f);
     smooth2(orthogonal(d),t,f,g);
     return g;
   }
@@ -294,7 +303,7 @@ public class LocalSemblanceFilter {
     _smoother2.apply(d,t,f,g);
   }
   private float[][][] smooth2(Direction3 d, EigenTensors3 t, float[][][] f) {
-    float[][][] g = shapeOf(f);
+    float[][][] g = like(f);
     smooth2(orthogonal(d),t,f,g);
     return g;
   }
@@ -330,13 +339,13 @@ public class LocalSemblanceFilter {
     t.setEigenvalues(au,av,aw);
   }
 
-  private static float[] shapeOf(float[] f) {
+  private static float[] like(float[] f) {
     return new float[f.length];
   }
-  private static float[][] shapeOf(float[][] f) {
+  private static float[][] like(float[][] f) {
     return new float[f.length][f[0].length];
   }
-  private static float[][][] shapeOf(float[][][] f) {
+  private static float[][][] like(float[][][] f) {
     return new float[f.length][f[0].length][f[0][0].length];
   }
 

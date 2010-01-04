@@ -205,6 +205,7 @@ public class AxisAlignedFrame extends Group {
     }
     protected void draw(DrawContext dc) {
       glColor3f(1.0f,1.0f,1.0f);
+      glLineWidth(1.5f);
       glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
       glEnable(GL_POLYGON_OFFSET_LINE);
       glPolygonOffset(-1.0f,-1.0f);

@@ -316,9 +316,12 @@ public class ImagePanel extends AxisAlignedPanel {
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
 
-    // Push image(s) slightly below anything we might draw on top.
-    //glEnable(GL_POLYGON_OFFSET_FILL);
-    //glPolygonOffset(1.0f,1.0f);
+    // Push image(s) slightly below any lines we may draw on top.
+    float[] v = {0.0f};
+    glGetFloatv(GL_POLYGON_OFFSET_FACTOR,v,0); float factor = v[0];
+    glGetFloatv(GL_POLYGON_OFFSET_UNITS,v,0); float units = v[0];
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(factor+1.0f,units+1.0f);
 
     // Shift and scale factors for computing texture coordinates.
     float sa = 0.5f/(float)_ls;

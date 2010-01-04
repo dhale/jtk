@@ -353,12 +353,17 @@ public class OrbitView extends View {
     glClearColor(0.0f,0.0f,0.0f,0.0f);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
+    // Anti-aliasing for points and lines.
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_POINT_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+    glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
+
     // Other stuff.
     glEnable(GL_NORMALIZE);
     glEnable(GL_DEPTH_TEST);
-    glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
-    glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
-    glHint(GL_POLYGON_SMOOTH_HINT,GL_NICEST);
 
     // Our world.
     World world = getWorld();
