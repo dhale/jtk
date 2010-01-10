@@ -91,7 +91,7 @@ public class LocalSemblanceFilter {
   /**
    * Computes local semblance for a 2D array.
    * @param d direction(s) for the first inner smoothing.
-   * @param t eigen-decomposition of a tensor field
+   * @param t eigen-decomposition of a tensor field.
    * @param f the array of input values.
    * @param s the array of output semblance values.
    */
@@ -127,7 +127,7 @@ public class LocalSemblanceFilter {
   /**
    * Returns local semblance for a 2D array.
    * @param d direction(s) for the first inner smoothing.
-   * @param t eigen-decomposition of a tensor field
+   * @param t eigen-decomposition of a tensor field.
    * @param f the array of input values.
    * @return the array of semblance values.
    */
@@ -140,7 +140,7 @@ public class LocalSemblanceFilter {
   /**
    * Computes local semblance for a 3D array.
    * @param d direction(s) for the first inner smoothing.
-   * @param t eigen-decomposition of a tensor field
+   * @param t eigen-decomposition of a tensor field.
    * @param f the array of input values.
    * @param s the array of output semblance values.
    */
@@ -177,7 +177,7 @@ public class LocalSemblanceFilter {
   /**
    * Returns local semblance for a 3D array.
    * @param d direction(s) for the first inner smoothing.
-   * @param t eigen-decomposition of a tensor field
+   * @param t eigen-decomposition of a tensor field.
    * @param f the array of input values.
    * @return the array of semblance values.
    */
@@ -185,6 +185,150 @@ public class LocalSemblanceFilter {
     float[][][] s = like(f);
     semblance(d,t,f,s);
     return s;
+  }
+
+  /**
+   * Applies the 1st inner smoothing of this semblance filter.
+   * @param f the input array.
+   * @param g the output array.
+   */
+  public void smooth1(float[] f, float[] g) {
+    _smoother1.apply(f,g);
+  }
+
+  /**
+   * Applies the 1st inner smoothing of this semblance filter.
+   * @param f the input array.
+   * @return the output array.
+   */
+  public float[] smooth1(float[] f) {
+    float[] g = like(f);
+    smooth1(f,g);
+    return g;
+  }
+
+  /**
+   * Applies the 1st inner smoothing of this semblance filter.
+   * @param d direction(s) for the first inner smoothing.
+   * @param t eigen-decomposition of a tensor field.
+   * @param f the input array.
+   * @param g the output array.
+   */
+  public void smooth1(
+    Direction2 d, EigenTensors2 t, float[][] f, float[][] g) 
+  {
+    _smoother1.apply(d,t,f,g);
+  }
+
+  /**
+   * Applies the 1st inner smoothing of this semblance filter.
+   * @param d direction(s) for the first inner smoothing.
+   * @param t eigen-decomposition of a tensor field.
+   * @param f the input array.
+   * @return the output array.
+   */
+  public float[][] smooth1(Direction2 d, EigenTensors2 t, float[][] f) {
+    float[][] g = like(f);
+    smooth1(d,t,f,g);
+    return g;
+  }
+
+  /**
+   * Applies the 1st inner smoothing of this semblance filter.
+   * @param d direction(s) for the first inner smoothing.
+   * @param t eigen-decomposition of a tensor field.
+   * @param f the input array.
+   * @param g the output array.
+   */
+  public void smooth1(
+    Direction3 d, EigenTensors3 t, float[][][] f, float[][][] g) 
+  {
+    _smoother1.apply(d,t,f,g);
+  }
+
+  /**
+   * Applies the 1st inner smoothing of this semblance filter.
+   * @param d direction(s) for the first inner smoothing.
+   * @param t eigen-decomposition of a tensor field.
+   * @param f the input array.
+   * @return the output array.
+   */
+  public float[][][] smooth1(Direction3 d, EigenTensors3 t, float[][][] f) {
+    float[][][] g = like(f);
+    smooth1(d,t,f,g);
+    return g;
+  }
+
+  /**
+   * Applies the 2nd outer smoothing of this semblance filter.
+   * @param f the input array.
+   * @param g the output array.
+   */
+  public void smooth2(float[] f, float[] g) {
+    _smoother2.apply(f,g);
+  }
+
+  /**
+   * Applies the 2nd outer smoothing of this semblance filter.
+   * @param f the input array.
+   * @return the output array.
+   */
+  public float[] smooth2(float[] f) {
+    float[] g = like(f);
+    smooth2(f,g);
+    return g;
+  }
+
+  /**
+   * Applies the 2nd outer smoothing of this semblance filter.
+   * @param d direction(s) for the first inner smoothing.
+   * @param t eigen-decomposition of a tensor field.
+   * @param f the input array.
+   * @param g the output array.
+   */
+  public void smooth2(
+    Direction2 d, EigenTensors2 t, float[][] f, float[][] g) 
+  {
+    _smoother2.apply(d,t,f,g);
+  }
+
+  /**
+   * Applies the 2nd outer smoothing of this semblance filter.
+   * @param d direction(s) for the first inner smoothing.
+   * @param t eigen-decomposition of a tensor field.
+   * @param f the input array.
+   * @return the output array.
+   */
+  public float[][] smooth2(Direction2 d, EigenTensors2 t, float[][] f) {
+    float[][] g = like(f);
+    smooth2(orthogonal(d),t,f,g);
+    return g;
+  }
+
+  /**
+   * Applies the 2nd outer smoothing of this semblance filter.
+   * @param d direction(s) for the first inner smoothing.
+   * @param t eigen-decomposition of a tensor field.
+   * @param f the input array.
+   * @param g the output array.
+   */
+  public void smooth2(
+    Direction3 d, EigenTensors3 t, float[][][] f, float[][][] g) 
+  {
+    _smoother2.apply(d,t,f,g);
+  }
+
+  /**
+   * Applies the 2nd outer smoothing of this semblance filter.
+   * @param d direction(s) for the first inner smoothing.
+   * @param t eigen-decomposition of a tensor field.
+   * @param f the input array.
+   * @return the output array.
+   */
+  public float[][][] smooth2(Direction3 d, EigenTensors3 t, float[][][] f) {
+    float[][][] g = like(f);
+    smooth2(orthogonal(d),t,f,g);
+    return g;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -244,69 +388,13 @@ public class LocalSemblanceFilter {
     private static final int _niter = 1000;
     private static final LocalDiffusionKernel _ldk = 
       new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D71);
+      //new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D22);
     private static final LocalSmoothingFilter _lsf = 
       new LocalSmoothingFilter(_small,_niter,_ldk);
     private static final double _kmax = 0.35;
   }
 
   private LaplacianSmoother _smoother1,_smoother2;
-
-  private void smooth1(float[] f, float[] g) {
-    _smoother1.apply(f,g);
-  }
-  private float[] smooth1(float[] f) {
-    float[] g = like(f);
-    smooth1(f,g);
-    return g;
-  }
-  private void smooth1(
-    Direction2 d, EigenTensors2 t, float[][] f, float[][] g) 
-  {
-    _smoother1.apply(d,t,f,g);
-  }
-  private float[][] smooth1(Direction2 d, EigenTensors2 t, float[][] f) {
-    float[][] g = like(f);
-    smooth1(d,t,f,g);
-    return g;
-  }
-  private void smooth1(
-    Direction3 d, EigenTensors3 t, float[][][] f, float[][][] g) 
-  {
-    _smoother1.apply(d,t,f,g);
-  }
-  private float[][][] smooth1(Direction3 d, EigenTensors3 t, float[][][] f) {
-    float[][][] g = like(f);
-    smooth1(d,t,f,g);
-    return g;
-  }
-  private void smooth2(float[] f, float[] g) {
-    _smoother2.apply(f,g);
-  }
-  private float[] smooth2(float[] f) {
-    float[] g = like(f);
-    smooth2(f,g);
-    return g;
-  }
-  private void smooth2(
-    Direction2 d, EigenTensors2 t, float[][] f, float[][] g) 
-  {
-    _smoother2.apply(d,t,f,g);
-  }
-  private float[][] smooth2(Direction2 d, EigenTensors2 t, float[][] f) {
-    float[][] g = like(f);
-    smooth2(orthogonal(d),t,f,g);
-    return g;
-  }
-  private void smooth2(
-    Direction3 d, EigenTensors3 t, float[][][] f, float[][][] g) 
-  {
-    _smoother2.apply(d,t,f,g);
-  }
-  private float[][][] smooth2(Direction3 d, EigenTensors3 t, float[][][] f) {
-    float[][][] g = like(f);
-    smooth2(orthogonal(d),t,f,g);
-    return g;
-  }
 
   private static void setEigenvalues(Direction2 d, EigenTensors2 t) {
     float au = 0.0f;

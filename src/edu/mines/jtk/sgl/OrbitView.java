@@ -350,7 +350,9 @@ public class OrbitView extends View {
   protected void draw(ViewCanvas canvas) {
 
     // Clear.
-    glClearColor(0.0f,0.0f,0.0f,0.0f);
+    Color c = canvas.getBackground();
+    glClearColor(c.getRed()/255.0f,c.getGreen()/255.0f,c.getBlue()/255.0f,0.0f);
+    //glClearColor(0.0f,0.0f,0.0f,0.0f);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     // Anti-aliasing for points and lines.

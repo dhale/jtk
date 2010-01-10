@@ -194,6 +194,24 @@ public class ColorMap {
   }
 
   /**
+   * Maps an array of floats to a packed array of RGB float values in [0,1].
+   * @param v the array of float values to be mapped to colors.
+   * @return array[3*v.length] of packed RGB float values.
+   */
+  public float[] getRgbFloats(float[] v) {
+    int nv = v.length;
+    float[] rgb = new float[3*nv];
+    float scale = 1.0f/255.0f;
+    for (int i=0,iv=0; iv<nv; ++iv) {
+      Color c = _colors[getIndex(v[iv])];
+      rgb[i++] = scale*c.getRed();
+      rgb[i++] = scale*c.getGreen();
+      rgb[i++] = scale*c.getBlue();
+    }
+    return rgb;
+  }
+
+  /**
    * Sets the min-max range of values mapped to colors. Values outside this 
    * range are clipped. The default range is [0.0,1.0].
    * @param vmin the minimum value.

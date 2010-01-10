@@ -55,11 +55,11 @@ public class SimpleFrame extends JFrame {
     _world = world;
     _view = new OrbitView(_world);
     _view.setAxesOrientation(ao);
-    ViewCanvas canvas = new ViewCanvas();
-    canvas.setView(_view);
+    _canvas = new ViewCanvas();
+    _canvas.setView(_view);
 
     ModeManager mm = new ModeManager();
-    mm.add(canvas);
+    mm.add(_canvas);
     OrbitViewMode ovm = new OrbitViewMode(mm);
     SelectDragMode sdm = new SelectDragMode(mm);
 
@@ -98,7 +98,7 @@ public class SimpleFrame extends JFrame {
 
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setSize(new Dimension(SIZE,SIZE));
-    this.add(canvas,BorderLayout.CENTER);
+    this.add(_canvas,BorderLayout.CENTER);
     this.add(toolBar,BorderLayout.WEST);
     this.setJMenuBar(menuBar);
     this.setVisible(true);
@@ -298,6 +298,14 @@ public class SimpleFrame extends JFrame {
   }
 
   /**
+   * Gets the view canvas for this frame.
+   * @return the view canvas.
+   */
+  public ViewCanvas getViewCanvas() {
+    return _canvas;
+  }
+
+  /**
    * Gets the orbit view for this frame.
    * @return the orbit view.
    */
@@ -364,6 +372,7 @@ public class SimpleFrame extends JFrame {
 /////////////////////////////////////////////////////////////////////////////
 // private
 
+  private ViewCanvas _canvas;
   private OrbitView _view;
   private World _world;
   private static final int SIZE = 600;
