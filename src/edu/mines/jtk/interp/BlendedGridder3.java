@@ -125,7 +125,7 @@ public class BlendedGridder3 implements Gridder3 {
 
   /**
    * Sets the local diffusion kernel used to perform blending.
-   * The default kernel uses a 7x1 stencil to compute derivatives.
+   * The default kernel uses a 2x2 stencil to compute derivatives.
    * @param ldk the local diffusion kernel.
    */
   public void setBlendingKernel(LocalDiffusionKernel ldk) {
@@ -323,7 +323,7 @@ public class BlendedGridder3 implements Gridder3 {
   private float _tmax = FLT_MAX;
   private float _c = 0.5f;
   private LocalDiffusionKernel _ldk =
-    new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D71);
+    new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D22);
 
   private void gridNearest(int nmark, float[][][] t, float[][][] p) {
     int n1 = t[0][0].length;

@@ -121,7 +121,7 @@ public class BlendedGridder2 implements Gridder2 {
 
   /**
    * Sets the local diffusion kernel used to perform blending.
-   * The default kernel uses a 7x1 stencil to compute derivatives.
+   * The default kernel uses a 2x2 stencil to compute derivatives.
    * @param ldk the local diffusion kernel.
    */
   public void setBlendingKernel(LocalDiffusionKernel ldk) {
