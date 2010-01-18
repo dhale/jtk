@@ -414,6 +414,61 @@ public class LocalSmoothingFilter {
     int n1 = x[0][0].length;
     int n2 = x[0].length;
     int n3 = x.length;
+    int n1m = n1-1;
+    int n2m = n2-1;
+    int n3m = n3-1;
+    float[][][] t = new float[3][n2][n1];
+    scopy(x[0],t[0]);
+    scopy(x[0],t[1]);
+    for (int i3=0; i3<n3; ++i3) {
+      int i3m = (i3>0)?i3-1:0;
+      int i3p = (i3<n3m)?i3+1:n3m;
+      int j3m = i3m%3;
+      int j3  = i3%3;
+      int j3p = i3p%3;
+      scopy(x[i3p],t[j3p]);
+      float[][] x3m = t[j3m];
+      float[][] x3p = t[j3p];
+      float[][] x30 = t[j3];
+      float[][] y30 = y[i3];
+      for (int i2=0; i2<n2; ++i2) {
+        int i2m = (i2>0)?i2-1:0;
+        int i2p = (i2<n2m)?i2+1:n2m;
+        float[] x3m2m = x3m[i2m];
+        float[] x3m20 = x3m[i2 ];
+        float[] x3m2p = x3m[i2p];
+        float[] x302m = x30[i2m];
+        float[] x3020 = x30[i2 ];
+        float[] x302p = x30[i2p];
+        float[] x3p2m = x3p[i2m];
+        float[] x3p20 = x3p[i2 ];
+        float[] x3p2p = x3p[i2p];
+        float[] y3020 = y30[i2 ];
+        for (int i1=0; i1<n1; ++i1) {
+          int i1m = (i1>0)?i1-1:0;
+          int i1p = (i1<n1m)?i1+1:n1m;
+          y3020[i1] = 0.125000f*(x3020[i1 ]) +
+                      0.062500f*(x3020[i1m]+x3020[i1p]+
+                                 x302m[i1 ]+x302p[i1 ]+
+                                 x3m20[i1 ]+x3p20[i1 ]) +
+                      0.031250f*(x3m20[i1m]+x3m20[i1p]+
+                                 x3m2m[i1 ]+x3m2p[i1 ]+
+                                 x302m[i1m]+x302m[i1p]+
+                                 x302p[i1m]+x302p[i1p]+
+                                 x3p20[i1m]+x3p20[i1p]+
+                                 x3p2m[i1 ]+x3p2p[i1 ]) +
+                      0.015625f*(x3m2m[i1m]+x3m2m[i1p]+
+                                 x3m2p[i1m]+x3m2p[i1p]+
+                                 x3p2m[i1m]+x3p2m[i1p]+
+                                 x3p2p[i1m]+x3p2p[i1p]);
+        }
+      }
+    }
+  }
+  private static void xsmoothS(float[][][] x, float[][][] y) {
+    int n1 = x[0][0].length;
+    int n2 = x[0].length;
+    int n3 = x.length;
     float[][][] t = new float[2][n2][n1];
     scopy(x[0],t[0]);
     szero(y[0]);
