@@ -110,12 +110,22 @@ public class BlendedGridder2 implements Gridder2 {
    * Enables or disables blending in {@link #grid(Sampling,Sampling)}.
    * If true (the default), that method will perform both of the two
    * steps described; that is, it will blend (smooth) after computing
-   * the nearest neighbor interpolant. If false, that method perform
-   * only the first step and return the nearest neighbor interpolant.
+   * the nearest neighbor interpolant. If false, that method will perform 
+   * only the first step and return the nearest neighbor interpolant. The
+   * default is that blending is enabled.
    * @param blending true, for blending; false, otherwise.
    */
   public void setBlending(boolean blending) {
     _blending = blending;
+  }
+
+  /**
+   * Sets the local diffusion kernel used to perform blending.
+   * The default kernel uses a 7x1 stencil to compute derivatives.
+   * @param ldk the local diffusion kernel.
+   */
+  public void setBlendingKernel(LocalDiffusionKernel ldk) {
+    _ldk = ldk;
   }
 
   /**
@@ -210,7 +220,7 @@ public class BlendedGridder2 implements Gridder2 {
     int n2 = t.length;
 
     // Compute time squared, shifted to account for the shift in the
-    // finite-difference stencil usd in the local smoothing filter.
+    // finite-difference stencil used in the local smoothing filter.
     float[][] s = mul(t,t);
     for (int i2=n2-1; i2>0; --i2) {
       for (int i1=n1-1; i1>0; --i1) {
@@ -222,11 +232,14 @@ public class BlendedGridder2 implements Gridder2 {
     }
 
     // Construct and apply a local smoothing filter.
-    LocalSmoothingFilter lsf = new LocalSmoothingFilter(0.01,10000);
-    lsf.apply(_tensors,_c,s,p,q);
+    LocalSmoothingFilter lsf = new LocalSmoothingFilter(0.0001,10000,_ldk);
+    float[][] r = copy(p); 
+    lsf.applySmoothS(r,r);
+    lsf.apply(_tensors,_c,s,r,q);
 
     // Restore the known sample values. Due to errors in finite-difference
     // approximations, these values may have changed during smoothing.
+    /* Should no longer be necessary after time adjustments.
     for (int i2=0; i2<n2; ++i2) {
       for (int i1=0; i1<n1; ++i1) {
         if (t[i2][i1]==0.0f) {
@@ -234,6 +247,7 @@ public class BlendedGridder2 implements Gridder2 {
         }
       }
     }
+    */
   }
 
 
@@ -283,6 +297,8 @@ public class BlendedGridder2 implements Gridder2 {
   private boolean _blending = true;
   private float _tmax = FLT_MAX;
   private float _c = 0.5f;
+  private LocalDiffusionKernel _ldk =
+    new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D22);
 
   private void gridNearest(int nmark, float[][] t, float[][] p) {
     int n1 = t[0].length;
@@ -307,6 +323,9 @@ public class BlendedGridder2 implements Gridder2 {
     TimeMarker2 tm = new TimeMarker2(n1,n2,_tensors);
     tm.apply(t,m);
 
+    // Adjust times to ensure interpolation of known samples.
+    adjustTimes(nmark,m,t);
+
     // Use the marks to compute the nearest-neighbor interpolant.
     for (int i2=0; i2<n2; ++i2) {
       for (int i1=0; i1<n1; ++i1) {
@@ -315,6 +334,41 @@ public class BlendedGridder2 implements Gridder2 {
           p[i2][i1] = pmark[m[i2][i1]];
         if (ti>_tmax)
           t[i2][i1] = _tmax;
+      }
+    }
+  }
+
+  // Adjusts times to be nearly zero in neighborhood of known samples.
+  private void adjustTimes(int nmark, int[][] m, float[][] t) {
+    int n1 = m[0].length;
+    int n2 = m.length;
+    int n1m = n1-1;
+    int n2m = n2-1;
+    float[] s = new float[nmark];
+    for (int i2=0; i2<n2; ++i2) {
+      int i2m = (i2>0  )?i2-1:i2;
+      int i2p = (i2<n2m)?i2+1:i2;
+      for (int i1=0; i1<n1; ++i1) {
+        int i1m = (i1>0  )?i1-1:i1;
+        int i1p = (i1<n1m)?i1+1:i1;
+        if (t[i2][i1]==0.0f) {
+          float tmax = 0.0f;
+          tmax = max(tmax,t[i2m][i1m]);
+          tmax = max(tmax,t[i2m][i1 ]);
+          tmax = max(tmax,t[i2m][i1p]);
+          tmax = max(tmax,t[i2 ][i1m]);
+          tmax = max(tmax,t[i2 ][i1p]);
+          tmax = max(tmax,t[i2p][i1m]);
+          tmax = max(tmax,t[i2p][i1 ]);
+          tmax = max(tmax,t[i2p][i1p]);
+          s[m[i2][i1]] = tmax;
+        }
+      }
+    }
+    for (int i2=0; i2<n2; ++i2) {
+      for (int i1=0; i1<n1; ++i1) {
+        if (t[i2][i1]>0.0f)
+          t[i2][i1] = max(FLT_MIN,t[i2][i1]-s[m[i2][i1]]);
       }
     }
   }

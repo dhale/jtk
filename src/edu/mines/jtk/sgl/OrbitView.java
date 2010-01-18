@@ -351,7 +351,10 @@ public class OrbitView extends View {
 
     // Clear.
     Color c = canvas.getBackground();
-    glClearColor(c.getRed()/255.0f,c.getGreen()/255.0f,c.getBlue()/255.0f,0.0f);
+    float r = c.getRed()/255.0f;
+    float g = c.getGreen()/255.0f;
+    float b = c.getBlue()/255.0f;
+    glClearColor(r,g,b,0.0f);
     //glClearColor(0.0f,0.0f,0.0f,0.0f);
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 

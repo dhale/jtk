@@ -101,6 +101,14 @@ public class LocalDiffusionKernel {
   }
 
   /**
+   * Gets the stencil used by this local diffusion kernel.
+   * @return the stencil.
+   */
+  public Stencil getStencil() {
+    return _stencil;
+  }
+
+  /**
    * Applies this filter for specified tensor coefficients.
    * @param d tensor coefficients.
    * @param x input array.

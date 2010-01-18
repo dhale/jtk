@@ -56,7 +56,8 @@ public class LocalSmoothingFilter {
   /**
    * Constructs a local smoothing filter with default parameters.
    * The default parameter small is 0.01 and the default maximum 
-   * number of iterations is 100.
+   * number of iterations is 100. Uses a default 2x2 stencil for the 
+   * derivatives in the operator G.
    */
   public LocalSmoothingFilter() {
     this(0.01,100);
@@ -64,14 +65,15 @@ public class LocalSmoothingFilter {
 
   /**
    * Constructs a local smoothing filter with specified iteration parameters.
-   * @param small stop when norm of residuals is less than this factor times
-   *  the norm of the input array.
+   * Uses a default 2x2 stencil for the derivatives in the operator G.
+   * @param small stop when norm of residuals is less than this factor 
+   *  times the norm of the input array.
    * @param niter stop when number of iterations exceeds this limit.
    */
   public LocalSmoothingFilter(double small, int niter) {
     _small = (float)small;
     _niter = niter;
-    _ldk = new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D71);
+    _ldk = new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D22);
   }
 
   /**
@@ -79,7 +81,7 @@ public class LocalSmoothingFilter {
    * @param small stop when norm of residuals is less than this factor times
    *  the norm of the input array.
    * @param niter stop when number of iterations exceeds this limit.
-   * @param ldk local diffusion kernel that computes y += (I+G'DG)x.
+   * @param ldk the local diffusion kernel that computes y += (I+G'DG)x.
    */
   public LocalSmoothingFilter(
     double small, int niter, LocalDiffusionKernel ldk)
@@ -348,6 +350,34 @@ public class LocalSmoothingFilter {
    * Computes y = S'Sx. Arrays x and y may be the same array.
    */
   private static void smoothS(float[][] x, float[][] y) {
+    int n1 = x[0].length;
+    int n2 = x.length;
+    int n1m = n1-1;
+    int n2m = n2-1;
+    float[][] t = new float[3][n1];
+    scopy(x[0],t[0]);
+    scopy(x[0],t[1]);
+    for (int i2=0; i2<n2; ++i2) {
+      int i2m = (i2>0)?i2-1:0;
+      int i2p = (i2<n2m)?i2+1:n2m;
+      int j2m = i2m%3;
+      int j2  = i2%3;
+      int j2p = i2p%3;
+      scopy(x[i2p],t[j2p]);
+      float[] x2m = t[j2m];
+      float[] x2p = t[j2p];
+      float[] x20 = t[j2];
+      float[] y2 = y[i2];
+      for (int i1=0; i1<n1; ++i1) {
+        int i1m = (i1>0)?i1-1:0;
+        int i1p = (i1<n1m)?i1+1:n1m;
+        y2[i1] = 0.2500f*(x20[i1 ]) +
+                 0.1250f*(x20[i1m]+x20[i1p]+x2m[i1 ]+x2p[i1 ]) +
+                 0.0625f*(x2m[i1m]+x2m[i1p]+x2p[i1m]+x2p[i1p]);
+      }
+    }
+  }
+  private static void xsmoothS(float[][] x, float[][] y) {
     int n1 = x[0].length;
     int n2 = x.length;
     float[][] t = new float[2][n1];

@@ -21,6 +21,7 @@ def main(args):
   #demoCircleRandom2()
   #demoSphereImpulses3()
   #demoSphereRandom3()
+  #doInterpExample1()
   return
 
 lowpass,simple = "lowpass","simple"
@@ -372,6 +373,10 @@ def doInterpExample1():
   d,y = getNearestNeighbors(t,x,n1)
   #d = clip(0.0,25.0,d)
   s = mul(d,d)
+  for i in range(n1):
+    if d[i]==0.0:
+      s[i-1] = 0.0
+      s[i+1] = 0.0
   #s = add(s,64.0) # for smoothing instead of interpolation
   SimplePlot.asPoints(d)
   SimplePlot.asPoints(s)

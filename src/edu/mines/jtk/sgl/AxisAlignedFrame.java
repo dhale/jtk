@@ -207,8 +207,8 @@ public class AxisAlignedFrame extends Group {
       glColor3f(1.0f,1.0f,1.0f);
       glLineWidth(1.5f);
       glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-      glEnable(GL_POLYGON_OFFSET_LINE);
-      glPolygonOffset(-1.0f,-1.0f);
+      //glEnable(GL_POLYGON_OFFSET_LINE);
+      //glPolygonOffset(-1.0f,-1.0f);
       glBegin(GL_QUADS); {
         glVertex3d(_p[0].x,_p[0].y,_p[0].z);
         glVertex3d(_p[1].x,_p[1].y,_p[1].z);
