@@ -113,6 +113,7 @@ public class RadialInterpolator2 {
     }
 
     public double evaluate(double r) {
+      // Adapted from Wessel's greenspline.c in GMT (Generic Mapping Tools).
       double g = 0.0;
       if (r>0.0) {
         r *= _s;
@@ -168,6 +169,14 @@ public class RadialInterpolator2 {
   public RadialInterpolator2(Basis basis, float[] f, float[] x1, float[] x2) {
     _basis = basis;
     setSamples(f,x1,x2);
+  }
+
+  /**
+   * Sets the radial basis function used by this interpolator.
+   * @param basis the radial basis function.
+   */
+  public void setBasis(Basis basis) {
+    _basis = basis;
   }
 
   /**

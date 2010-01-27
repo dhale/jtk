@@ -62,8 +62,6 @@ public class PolyTrend2 {
     } else {
       initOrder0();
     }
-    System.out.println("f0="+_f0+" f1="+_f1+" f2="+_f2);
-    System.out.println("f11="+_f11+" f12="+_f12+" f22="+_f22);
   }
 
   /**

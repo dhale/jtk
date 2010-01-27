@@ -46,14 +46,19 @@ def dataNotreDame():
   copy(nNotreDame,0,3,xyzNotreDame,0,1,xNotreDame)
   copy(nNotreDame,1,3,xyzNotreDame,0,1,yNotreDame)
   copy(nNotreDame,2,3,xyzNotreDame,0,1,zNotreDame)
-  #xNotreDame = mul(50.0,xNotreDame) # Davis says one map unit = 50 ft,
-  #yNotreDame = mul(50.0,yNotreDame) # but this makes the terrain steep!
+  xNotreDame = mul(50.0,xNotreDame) # Davis says one map unit = 50 ft,
+  yNotreDame = mul(50.0,yNotreDame) # but this makes the terrain steep!
   return xNotreDame,yNotreDame,zNotreDame
 
-def samplingsNotreDame():
-  nx,ny = 331,331
-  dx,dy = 0.02,0.02
-  fx,fy = -0.1,-0.1
+def samplingsNotreDame(grid="fine"):
+  fx,fy = -5.0,-5.0
+  dx,dy = 2.00,2.00; nx,ny = 165,165
+  if grid=="coarser": dx,dy = 8.00,8.00; nx,ny = 42,42
+  elif grid=="coarse": dx,dy = 4.00,4.00; nx,ny = 83,83
+  elif grid=="medium": dx,dy = 2.00,2.00; nx,ny = 165,165
+  elif grid=="fine": dx,dy = 1.00,1.00; nx,ny = 329,329
+  elif grid=="finer": dx,dy = 0.50,0.50; nx,ny = 657,657
+  elif grid=="finest": dx,dy = 0.25,0.25; nx,ny = 1313,1313
   sx,sy = Sampling(nx,dx,fx),Sampling(ny,dy,fy)
   return sx,sy
  
@@ -64,11 +69,13 @@ def plot2NotreDame(f,x1,x2,g,s1,s2,title=None,png=None):
   n1 = len(g[0])
   n2 = len(g)
   panel = panel2NotreDame()
-  panel.setHInterval(2.0)
-  panel.setVInterval(2.0)
-  panel.setHLabel("Easting")
-  panel.setVLabel("Northing")
-  panel.addColorBar("Elevation")
+  panel.setHLimits(-5.0,323.0)
+  panel.setVLimits(-5.0,323.0)
+  panel.setHInterval(100.0)
+  panel.setVInterval(100.0)
+  panel.setHLabel("Easting (ft)")
+  panel.setVLabel("Northing (ft)")
+  panel.addColorBar("Elevation (ft)")
   pv = panel.addPixels(s1,s2,g)
   pv.setClips(min(f),max(f))
   pv.setInterpolation(PixelsView.Interpolation.NEAREST)
@@ -85,8 +92,8 @@ def plot2NotreDame(f,x1,x2,g,s1,s2,title=None,png=None):
 def plot3NotreDame(f,x1,x2,g,s1,s2):
   g = transpose(g)
   n = len(f)
-  f = mul(0.01,f)
-  g = mul(0.01,g)
+  #f = mul(0.5,f)
+  #g = mul(0.5,g)
   xyz = zerofloat(3*n)
   copy(n,0,1,x1,0,3,xyz)
   copy(n,0,1,x2,1,3,xyz)
@@ -114,10 +121,10 @@ def frame2NotreDame(panel,title=None,png=None):
   if title:
     panel.setTitle(title)
     frame.setFontSizeForSlide(1.0,1.0)
-    frame.setSize(1064,959)
+    frame.setSize(1100,960)
   else:
     frame.setFontSizeForSlide(1.0,0.8)
-    frame.setSize(1128,897)
+    frame.setSize(1170,897)
   frame.setVisible(True)
   if png and pngDir:
     frame.paintToPng(100,6,pngDir+"/"+png+".png")

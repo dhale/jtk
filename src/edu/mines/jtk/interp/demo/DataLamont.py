@@ -61,10 +61,29 @@ def dataLamont():
   z = mul(0.001,z)
   return x,y,z
 
-def samplingsLamont():
-  nx,ny = 210,291
-  dx,dy = 0.1,0.1
+def samplingsNotreDame(grid="fine"):
+  fx,fy = -5.0,-5.0
+  dx,dy = 2.00,2.00; nx,ny = 165,165
+  if grid=="coarser": dx,dy = 8.00,8.00; nx,ny = 42,42
+  elif grid=="coarse": dx,dy = 4.00,4.00; nx,ny = 83,83
+  elif grid=="medium": dx,dy = 2.00,2.00; nx,ny = 165,165
+  elif grid=="fine": dx,dy = 1.00,1.00; nx,ny = 329,329
+  elif grid=="finer": dx,dy = 0.50,0.50; nx,ny = 657,657
+  elif grid=="finest": dx,dy = 0.25,0.25; nx,ny = 1313,1313
+  sx,sy = Sampling(nx,dx,fx),Sampling(ny,dy,fy)
+  return sx,sy
+
+def samplingsLamont(grid="fine"):
   fx,fy = 29.0,60.5
+  dx,dy = 0.10,0.10; nx,ny = 210,291
+  if grid=="coarse":
+    dx,dy = 0.40,0.40; nx,ny = 53,73
+  elif grid=="medium":
+    dx,dy = 0.20,0.20; nx,ny = 105,146
+  elif grid=="fine":
+    dx,dy = 0.10,0.10; nx,ny = 210,291
+  elif grid=="finer":
+    dx,dy = 0.05,0.05; nx,ny = 420,581
   sx,sy = Sampling(nx,dx,fx),Sampling(ny,dy,fy)
   return sx,sy
  
@@ -75,6 +94,8 @@ def plot2Lamont(f,x1,x2,g,s1,s2,title=None,png=None):
   n1 = len(g[0])
   n2 = len(g)
   panel = panel2Lamont()
+  panel.setHLimits(29.0,49.5)
+  panel.setVLimits(60.5,89.0)
   panel.setHInterval(5.0)
   panel.setVInterval(5.0)
   panel.setHLabel("Easting (kft)")
@@ -87,10 +108,10 @@ def plot2Lamont(f,x1,x2,g,s1,s2,title=None,png=None):
   cv = panel.addContours(s1,s2,g)
   cv.setContours(Sampling(20,0.025,7.575)) # 7.575 - 8.050
   cv.setLineColor(Color.BLACK)
-  #pv = panel.addPoints(x1,x2)
-  #pv.setLineStyle(PointsView.Line.NONE)
-  #pv.setMarkStyle(PointsView.Mark.FILLED_CIRCLE)
-  #pv.setMarkSize(6)
+  pv = panel.addPoints(x1,x2)
+  pv.setLineStyle(PointsView.Line.NONE)
+  pv.setMarkStyle(PointsView.Mark.FILLED_CIRCLE)
+  pv.setMarkSize(6)
   frame2Lamont(panel,title,png)
 
 def plot3Lamont(f,x1,x2,g,s1,s2):
