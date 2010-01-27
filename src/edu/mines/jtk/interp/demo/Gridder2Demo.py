@@ -100,11 +100,11 @@ def makeGridders(f,x,y,sx,sy):
   gridders = []
   gridderNames = {}
   g = makeBiharmonicGridder(f,x,y)
-  gridders.append(g); gridderNames[g] = "Biharmonic"
+  gridders.append(g); gridderNames[g] = "Bi-harmonic radial basis"
   g = makeSplinesGridder(f,x,y,tension=0)
   gridders.append(g); gridderNames[g] = "Splines: t = 0"
-  g = makeBlendedGridder(f,x,y,smooth=0.75)
-  gridders.append(g); gridderNames[g] = "Blended: s = 0.75"
+  g = makeBlendedGridder(f,x,y,smooth=0.7)
+  gridders.append(g); gridderNames[g] = "Blended: s = 0.7"
   g = makeSibsonGridder(f,x,y,smooth=False)
   gridders.append(g); gridderNames[g] = "Sibson C0"
   """
