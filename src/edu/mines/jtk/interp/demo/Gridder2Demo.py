@@ -99,12 +99,14 @@ def putDataOnGrid(f,x,y,sx,sy):
 def makeGridders(f,x,y,sx,sy):
   gridders = []
   gridderNames = {}
-  g = makeSplinesGridder(f,x,y,tension=0)
-  gridders.append(g); gridderNames[g] = "Splines: t = 0"
   g = makeBiharmonicGridder(f,x,y)
   gridders.append(g); gridderNames[g] = "Biharmonic"
+  g = makeSplinesGridder(f,x,y,tension=0)
+  gridders.append(g); gridderNames[g] = "Splines: t = 0"
   g = makeBlendedGridder(f,x,y,smooth=0.75)
   gridders.append(g); gridderNames[g] = "Blended: s = 0.75"
+  g = makeSibsonGridder(f,x,y,smooth=False)
+  gridders.append(g); gridderNames[g] = "Sibson C0"
   """
   t = 0.7
   g = makeSplinesGridder(f,x,y,tension=t)
