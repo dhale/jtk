@@ -6,6 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -82,6 +84,13 @@ public class CleanFormatter extends Formatter {
         (level+ " " + s_time_formatter.format(new Date())
          + " "+ record.getLoggerName()+": ",
          message);
+    }
+    if (record.getThrown() != null) {
+      StringWriter sw = new StringWriter();
+      PrintWriter pw = new PrintWriter(sw);
+      record.getThrown().printStackTrace(pw);
+      pw.close();
+      message +=sw.toString();
     }
     lastLevel = level;
     return message;
