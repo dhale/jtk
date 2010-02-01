@@ -61,18 +61,6 @@ def dataLamont():
   z = mul(0.001,z)
   return x,y,z
 
-def samplingsNotreDame(grid="fine"):
-  fx,fy = -5.0,-5.0
-  dx,dy = 2.00,2.00; nx,ny = 165,165
-  if grid=="coarser": dx,dy = 8.00,8.00; nx,ny = 42,42
-  elif grid=="coarse": dx,dy = 4.00,4.00; nx,ny = 83,83
-  elif grid=="medium": dx,dy = 2.00,2.00; nx,ny = 165,165
-  elif grid=="fine": dx,dy = 1.00,1.00; nx,ny = 329,329
-  elif grid=="finer": dx,dy = 0.50,0.50; nx,ny = 657,657
-  elif grid=="finest": dx,dy = 0.25,0.25; nx,ny = 1313,1313
-  sx,sy = Sampling(nx,dx,fx),Sampling(ny,dy,fy)
-  return sx,sy
-
 def samplingsLamont(grid="fine"):
   fx,fy = 29.0,60.5
   dx,dy = 0.10,0.10; nx,ny = 210,291

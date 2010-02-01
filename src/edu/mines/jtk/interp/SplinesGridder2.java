@@ -134,6 +134,7 @@ public class SplinesGridder2 implements Gridder2 {
 
   /**
    * Sets the maximum number of conjugate-gradient iterations.
+   * The default maximum number of iterations is 10,000.
    * @param niter the maximum number of iterations.
    */
   public void setMaxIterations(int niter) {
@@ -146,24 +147,25 @@ public class SplinesGridder2 implements Gridder2 {
    * @return the number of iterations.
    */
   public int getIterationCount() {
-    return _updates.size();
+    return _residuals.size()-1;
   }
 
   /**
-   * Gets the maximum changes in gridded values, one for each iteration.
-   * The values returned correspond to the last use of this gridder.
+   * Gets the initial residual and one residual for each iteration.
+   * The residuals returned correspond to the last use of this gridder.
    * <p>
-   * In each conjugate-gradient iteration, as this gridder updates the
-   * gridded values, it remembers the largest change made to any of them.
-   * Iterations continue while that change exceeds a small fraction of 
-   * the difference between the maximum and minimum known sample values.
-   * @return an array of maximum changes, one for each iteration.
+   * Residuals are normalized root-mean-square differences between
+   * the left and right sides of the system of equations that are 
+   * solved iteratively when computing gridded values. The returned 
+   * residuals are normalized, so that the zeroth residual (before any 
+   * conjugate-gradient iterations are performed) is one.
+   * @return array of residuals.
    */
-  public float[] getMaxUpdates() {
-    int n = _updates.size();
+  public float[] getResiduals() {
+    int n = _residuals.size();
     float[] r = new float[n];
     for (int i=0; i<n; ++i)
-      r[i] = _updates.get(i);
+      r[i] = _residuals.get(i);
     return r;
   }
 
@@ -184,37 +186,21 @@ public class SplinesGridder2 implements Gridder2 {
   }
 
   /**
-   * Computes missing values beginning with specified initial values.
-   * @param m array of missing value flags; true where value is missing.
-   * @param q array in which missing values are to be computed. Values in
-   *  this array not flagged as missing are not modified by this method.
+   * Computes gridded values that are missing in the specified array.
+   * Missing values are those with missing-value flags set to true.
+   * @param m array of missing-value flags; true where value is missing.
+   * @param q array in which flagged missing values are to be replaced.
    */
   public void gridMissing(boolean[][] m, float[][] q) {
     int n1 = m[0].length;
     int n2 = m.length;
-    float qmin =  FLT_MAX;
-    float qmax = -FLT_MAX;
-    for (int i2=0; i2<n2; ++i2) {
-      for (int i1=0; i1<n1; ++i1) {
-        if (!m[i2][i1]) {
-          if (q[i2][i1]<qmin) 
-            qmin = q[i2][i1];
-          if (q[i2][i1]>qmax) 
-            qmax = q[i2][i1];
-        }
-      }
-    }
     float s = 0.02f*(n1-1+n2-1);
     float t = _tension/(1.0f-_tension)/(s*s);
-    //float qsmall = _small*(qmax-qmin);
-    //float qsmall = _small*(qmax-qmin)*sqrt(1.0e6f/n1/n2);
-    float qsmall = _small*(qmax-qmin)*1.0e5f/n1/n2;
     LaplaceOperator2 lop = new LaplaceOperator2(_ldk,_tensors,t,m);
     SmoothOperator2 sop = new SmoothOperator2();
     float[][] b = new float[n2][n1];
     lop.applyRhs(q,b);
-    szero(q);
-    solve(qsmall,lop,sop,b,q);
+    solve(lop,sop,b,q);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -254,7 +240,7 @@ public class SplinesGridder2 implements Gridder2 {
   private float[] _f,_x1,_x2;
   private float _small = 0.0001f;
   private int _niter = 10000;
-  private ArrayList<Float> _updates = new ArrayList<Float>();
+  private ArrayList<Float> _residuals = new ArrayList<Float>();
   private LocalDiffusionKernel _ldk = 
     new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D22);
 
@@ -398,33 +384,32 @@ public class SplinesGridder2 implements Gridder2 {
   }
 
   // Conjugate-gradient solution of Ax = b, with preconditioner M.
-  private void solve(float small, 
-    Operator2 a, Operator2 m, float[][] b, float[][] x) 
-  {
-    _updates.clear();
+  private void solve(Operator2 a, Operator2 m, float[][] b, float[][] x) {
+    _residuals.clear();
     int n1 = b[0].length;
     int n2 = b.length;
+    //float small = _small;
+    //float small = _small*sqrt(1.0e6f/n1/n2);
+    float small = _small*1.0e5f/n1/n2;
     float[][] d = new float[n2][n1];
     float[][] q = new float[n2][n1];
     float[][] r = new float[n2][n1];
     float[][] s = new float[n2][n1];
-    scopy(b,r); // r = b
-    a.apply(x,q); // q = Ax
-    saxpy(-1.0f,q,r); // r = r-q = b-Ax
+    szero(x); // begin with x = 0 to ensure x is always smooth
+    scopy(b,r); // r = b (because Ax = 0)
     m.apply(r,s); // s = Mr
     scopy(s,d); // d = s
     float delta = sdot(r,s); // r's = r'Mr
     float rnorm = sqrt(delta);
-    float dnorm = FLT_MAX;
+    float rnormBegin = rnorm;
+    float rnormSmall = rnorm*small;
+    _residuals.add(1.0f);
     log.fine("solve: small="+small);
     int iter;
-    for (iter=0; iter<_niter && dnorm>small; ++iter) {
-      log.finer("  iter="+iter+" rnorm="+rnorm+" dnorm="+dnorm);
-      //if (iter<50)
-      //  edu.mines.jtk.mosaic.SimplePlot.asPixels(x);
+    for (iter=0; iter<_niter && rnorm>rnormSmall; ++iter) {
+      log.finer("  iter="+iter+" rnorm="+(rnorm/rnormBegin));
       a.apply(d,q); // q = Ad
       float alpha = delta/sdot(d,q); // alpha = r'Mr/d'Ad
-      dnorm = alpha*normI(d); // max change in x
       saxpy( alpha,d,x); // x = x+alpha*d
       saxpy(-alpha,q,r); // r = r-alpha*q
       m.apply(r,s); // s = Mr
@@ -433,34 +418,9 @@ public class SplinesGridder2 implements Gridder2 {
       float beta = delta/deltaOld;
       sxpay(beta,s,d); // d = s+beta*d
       rnorm = sqrt(delta);
-      _updates.add(dnorm);
+      _residuals.add(rnorm/rnormBegin);
     }
-    log.fine("  iter="+iter+" rnorm="+rnorm+" dnorm="+dnorm);
-  }
-  private static float normI(float[][] x) {
-    int n1 = x[0].length;
-    int n2 = x.length;
-    float xmax = 0.0f;
-    for (int i2=0; i2<n2; ++i2) {
-      for (int i1=0; i1<n1; ++i1) {
-        float xi = x[i2][i1];
-        if (xi<0.0f) xi = -xi;
-        if (xi>xmax) xmax = xi;
-      }
-    }
-    return xmax;
-  }
-  private static float norm2(float[][] x) {
-    int n1 = x[0].length;
-    int n2 = x.length;
-    float xxsum = 0.0f;
-    for (int i2=0; i2<n2; ++i2) {
-      for (int i1=0; i1<n1; ++i1) {
-        float xi = x[i2][i1];
-        xxsum += xi*xi;
-      }
-    }
-    return sqrt(xxsum/n1/n2);
+    log.fine("        iter="+iter+" rnorm="+(rnorm/rnormBegin));
   }
   private static void szero(float[][] x) {
     zero(x);

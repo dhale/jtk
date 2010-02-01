@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -179,7 +180,7 @@ public class LocalSmoothingFilter {
   public void apply(
     Tensors2 d, float c, float[][] s, float[][] x, float[][] y) 
   {
-    Operator2 a = new LhsOperator2(_ldk,d,c,s);
+    Operator2 a = new A2(_ldk,d,c,s);
     scopy(x,y);
     solve(a,x,y);
   }
@@ -217,7 +218,7 @@ public class LocalSmoothingFilter {
   public void apply(
     Tensors3 d, float c, float[][][] s, float[][][] x, float[][][] y) 
   {
-    Operator3 a = new LhsOperator3(_ldk,d,c,s);
+    Operator3 a = new A3(_ldk,d,c,s);
     scopy(x,y);
     solve(a,x,y);
   }
@@ -288,8 +289,17 @@ public class LocalSmoothingFilter {
     public void apply(float[][][] x, float[][][] y);
   }
 
-  private static class LhsOperator2 implements Operator2 {
-    LhsOperator2(LocalDiffusionKernel ldk, Tensors2 d, float c, float[][] s) {
+  // Smoothing operator S'S used for preconditioning. Attenuates 
+  // frequencies near the Nyquist limit for which finite-difference 
+  // approximations in G'DG are poor.
+  private static class M2 implements Operator2 {
+    public void apply(float[][] x, float[][] y) {
+      smoothS(x,y);
+    }
+  }
+
+  private static class A2 implements Operator2 {
+    A2(LocalDiffusionKernel ldk, Tensors2 d, float c, float[][] s) {
       _ldk = ldk;
       _d = d;
       _c = c;
@@ -305,10 +315,8 @@ public class LocalSmoothingFilter {
     private float[][] _s;
   }
 
-  private static class LhsOperator3 implements Operator3 {
-    LhsOperator3(
-      LocalDiffusionKernel ldk, Tensors3 d, float c, float[][][] s) 
-    {
+  private static class A3 implements Operator3 {
+    A3(LocalDiffusionKernel ldk, Tensors3 d, float c, float[][][] s) {
       _ldk = ldk;
       _d = d;
       _c = c;

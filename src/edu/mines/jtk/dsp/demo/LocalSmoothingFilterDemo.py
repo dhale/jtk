@@ -21,7 +21,6 @@ def main(args):
   #demoCircleRandom2()
   #demoSphereImpulses3()
   #demoSphereRandom3()
-  #doInterpExample1()
   return
 
 lowpass,simple = "lowpass","simple"
@@ -299,7 +298,7 @@ jet = ColorMap.JET
 def plot2(f,cmin=0,cmax=0,cmap=gray,cbar=None,cbwm=None,
           title=None,hlabel=None,vlabel=None,
           width=750,height=750):
-  sp = SimplePlot(SimplePlot.Origin.UPPER_LEFT)
+  sp = SimplePlot(SimplePlot.Origin.LOWER_LEFT)
   sp.setFontSizeForSlide(1.0,1.0)
   sp.setSize(width,height)
   pv = sp.addPixels(f)

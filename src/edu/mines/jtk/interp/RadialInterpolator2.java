@@ -192,6 +192,8 @@ public class RadialInterpolator2 {
     _x1 = copy(x1);
     _x2 = copy(x2);
     _w = null;
+    if (_trend!=null)
+      _trend.detrend(_f,_x1,_x2);
   }
 
   /**
@@ -234,9 +236,10 @@ public class RadialInterpolator2 {
         _trend.restore(_f,_x1,_x2);
         _trend = null;
       }
-      if (_order!=-1) {
+      if (order!=-1) {
         _trend = new PolyTrend2(order,_f,_x1,_x2);
         _trend.detrend(_f,_x1,_x2);
+        dump(_f);
       }
       _order = order;
       _w = null;

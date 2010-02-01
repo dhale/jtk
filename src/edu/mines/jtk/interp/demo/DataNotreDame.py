@@ -65,7 +65,8 @@ def samplingsNotreDame(grid="fine"):
 #############################################################################
 # plotting
 
-def plot2NotreDame(f,x1,x2,g,s1,s2,title=None,png=None):
+def plot2NotreDame(f,x1,x2,g,s1,s2,title=None,png=None,
+                   contours=True,points=True):
   n1 = len(g[0])
   n2 = len(g)
   panel = panel2NotreDame()
@@ -80,13 +81,15 @@ def plot2NotreDame(f,x1,x2,g,s1,s2,title=None,png=None):
   pv.setClips(min(f),max(f))
   pv.setInterpolation(PixelsView.Interpolation.NEAREST)
   pv.setColorModel(ColorMap.JET)
-  cv = panel.addContours(s1,s2,g)
-  cv.setContours(Sampling(10,25.0,700.0)) # 700 - 925
-  cv.setLineColor(Color.BLACK)
-  pv = panel.addPoints(x1,x2)
-  pv.setLineStyle(PointsView.Line.NONE)
-  pv.setMarkStyle(PointsView.Mark.FILLED_CIRCLE)
-  pv.setMarkSize(6)
+  if contours:
+    cv = panel.addContours(s1,s2,g)
+    cv.setContours(Sampling(10,25.0,700.0)) # 700 - 925
+    cv.setLineColor(Color.BLACK)
+  if points:
+    pv = panel.addPoints(x1,x2)
+    pv.setLineStyle(PointsView.Line.NONE)
+    pv.setMarkStyle(PointsView.Mark.FILLED_CIRCLE)
+    pv.setMarkSize(6)
   frame2NotreDame(panel,title,png)
 
 def plot3NotreDame(f,x1,x2,g,s1,s2):
