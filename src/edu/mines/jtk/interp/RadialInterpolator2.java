@@ -239,7 +239,7 @@ public class RadialInterpolator2 {
       if (order!=-1) {
         _trend = new PolyTrend2(order,_f,_x1,_x2);
         _trend.detrend(_f,_x1,_x2);
-        dump(_f);
+        //dump(_f);
       }
       _order = order;
       _w = null;
