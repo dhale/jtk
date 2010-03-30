@@ -220,8 +220,6 @@ public class SplinesGridder2 implements Gridder2 {
     Check.state(_x2!=null,"scattered samples have been set");
     PolyTrend2 pt = new PolyTrend2(1,_f,_x1,_x2);
     pt.detrend();
-    int n1 = s1.getCount();
-    int n2 = s2.getCount();
     SimpleGridder2 sg = new SimpleGridder2(_f,_x1,_x2);
     sg.setNullValue(QNULL);
     float[][] q = sg.grid(s1,s2);

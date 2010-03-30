@@ -6,7 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.interp;
 
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,7 +54,7 @@ class TimeMarker3 {
   public enum Concurrency {
     PARALLEL,
     SERIAL
-  };
+  }
   
   /**
    * Constructs a time marker for the specified tensor field.
@@ -169,7 +168,6 @@ class TimeMarker3 {
   private Tensors3 _tensors;
   private Sample[][][] _s;
   private Concurrency _concurrency = Concurrency.PARALLEL;
-  private ArrayList<Sample> _stack = new ArrayList<Sample>(1024);
 
   private void init(int n1, int n2, int n3, Tensors3 tensors) {
     _n1 = n1;
@@ -361,7 +359,7 @@ class TimeMarker3 {
     private short[] _a = new short[2048];
   }
 
-  /**
+  /*
    * Returns arrays of indices of known samples with times zero.
    * Includes only known samples adjacent to at least one unknown sample.
    * (Does not include known samples surrounded by other known samples.)
@@ -375,9 +373,6 @@ class TimeMarker3 {
         for (int i1=0; i1<_n1; ++i1) {
           if (times[i3][i2][i1]==0.0f) {
             for (int k=0; k<6; ++k) {
-              int k1 = K1[k];
-              int k2 = K2[k];
-              int k3 = K3[k];
               int j1 = i1+K1[k];  if (j1<0 || j1>=_n1) continue;
               int j2 = i2+K2[k];  if (j2<0 || j2>=_n2) continue;
               int j3 = i3+K3[k];  if (j3<0 || j3>=_n3) continue;
@@ -398,7 +393,7 @@ class TimeMarker3 {
     return new short[][]{i1,i2,i3};
   }
 
-  /**
+  /*
    * Randomly (but consistently) shuffles the specified arrays of indices.
    */
   private static void shuffle(short[] i1, short[] i2, short[] i3) {
@@ -413,7 +408,7 @@ class TimeMarker3 {
     }
   }
 
-  /**
+  /*
    * Solves for times by sequentially processing each sample in active list.
    */
   private void solveSerial(
@@ -441,7 +436,7 @@ class TimeMarker3 {
     trace("             nratio="+(float)ntotal/(float)(_n1*_n2*_n3));
   }
   
-  /**
+  /*
    * Solves for times by processing samples in the active list in parallel.
    */
   private void solveParallel(
@@ -460,7 +455,7 @@ class TimeMarker3 {
     }
     final AtomicInteger ai = new AtomicInteger();
     int ntotal = 0;
-    int niter = 0;
+    //int niter = 0;
     while (!al.isEmpty()) {
       ai.set(0); // initialize the shared block index to zero
       final int n = al.size(); // number of samples in active (A) list
@@ -501,14 +496,14 @@ class TimeMarker3 {
         al.appendIfAbsent(bl[itask]);
         bl[itask].clear();
       }
-      ++niter;
+      //++niter;
     }
     es.shutdown();
     trace("solveParallel: ntotal="+ntotal);
     trace("               nratio="+(float)ntotal/(float)(_n1*_n2*_n3));
   }
 
-  /**
+  /*
    * Gets the current times during one solution of the eikonal equation.
    * Times for samples not yet activated are infinite.
    */
@@ -516,7 +511,7 @@ class TimeMarker3 {
     return wasActivated(_s[i3][i2][i1])?t[i3][i2][i1]:INFINITY;
   }
 
-  /**
+  /*
    * Processes one sample from the A list.
    * Appends samples not yet converged to the B list.
    */
@@ -586,7 +581,7 @@ class TimeMarker3 {
     }
   }
 
-  /**
+  /*
    * Determines whether to compute time for sample with specified indices.
    * A sample should be processed iff at least one of its neighbors is 
    * less than the minimum time computed so far.
@@ -625,7 +620,7 @@ class TimeMarker3 {
     return (++i3<_n3 && wasActivated(_s[i3][i2][i1]))?t[i3][i2][i1]:INFINITY;
   }
 
-  /**
+  /*
    * Returns a time t not greater than the current time for one sample.
    * Computations are limited to neighbor samples with specified offsets.
    */
@@ -705,7 +700,7 @@ class TimeMarker3 {
     return tc;
   }
 
-  /**
+  /*
    * Solves a 3D anisotropic eikonal equation for a positive time t0.
    * The equation is:
    *   d11*s1*s1*(t0-t1)*(t0-t1) + 
@@ -753,7 +748,7 @@ class TimeMarker3 {
     return t1+(float)u1;
   }
 
-  /**
+  /*
    * Solves a 2D anisotropic eikonal equation for a positive time t0.
    * The equation is:
    *   d11*s1*s1*(t1-t0)*(t1-t0) + 

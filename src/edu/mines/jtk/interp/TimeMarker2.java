@@ -6,7 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.interp;
 
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,7 +53,7 @@ class TimeMarker2 {
   public enum Concurrency {
     PARALLEL,
     SERIAL
-  };
+  }
   
   /**
    * Constructs a time marker for the specified tensor field.
@@ -158,7 +157,6 @@ class TimeMarker2 {
   private Tensors2 _tensors;
   private Sample[][] _s;
   private Concurrency _concurrency = Concurrency.PARALLEL;
-  private ArrayList<Sample> _stack = new ArrayList<Sample>(1024);
 
   private void init(int n1, int n2, Tensors2 tensors) {
     _n1 = n1;
@@ -325,7 +323,7 @@ class TimeMarker2 {
     private short[] _a = new short[2048];
   }
 
-  /**
+  /*
    * Returns arrays of indices of known samples with times zero.
    * Includes only known samples adjacent to at least one unknown sample.
    * (Does not include known samples surrounded by other known samples.)
@@ -337,8 +335,6 @@ class TimeMarker2 {
       for (int i1=0; i1<_n1; ++i1) {
         if (times[i2][i1]==0.0f) {
           for (int k=0; k<4; ++k) {
-            int k1 = K1[k];
-            int k2 = K2[k];
             int j1 = i1+K1[k];  if (j1<0 || j1>=_n1) continue;
             int j2 = i2+K2[k];  if (j2<0 || j2>=_n2) continue;
             if (times[j2][j1]!=0.0f) {
@@ -355,7 +351,7 @@ class TimeMarker2 {
     return new short[][]{i1,i2};
   }
 
-  /**
+  /*
    * Randomly (but consistently) shuffles the specified arrays of indices.
    */
   private static void shuffle(short[] i1, short[] i2) {
@@ -369,7 +365,7 @@ class TimeMarker2 {
     }
   }
 
-  /**
+  /*
    * Solves for times by sequentially processing each sample in active list.
    */
   private void solveSerial(
@@ -379,11 +375,11 @@ class TimeMarker2 {
   {
     float[] d = new float[3];
     ActiveList bl = new ActiveList();
-    int ntotal = 0;
+    //int ntotal = 0;
     while (!al.isEmpty()) {
       //al.shuffle(); // demonstrate that solution depends on order
       int n = al.size();
-      ntotal += n;
+      //ntotal += n;
       for (int i=0; i<n; ++i) {
         Sample s = al.get(i);
         solveOne(t,m,times,marks,s,bl,d);
@@ -397,7 +393,7 @@ class TimeMarker2 {
     //trace("             nratio="+(float)ntotal/(float)(_n1*_n2));
   }
   
-  /**
+  /*
    * Solves for times by processing samples in the active list in parallel.
    */
   private void solveParallel(
@@ -415,12 +411,12 @@ class TimeMarker2 {
       d[ithread] = new float[3];
     }
     final AtomicInteger ai = new AtomicInteger();
-    int ntotal = 0;
-    int niter = 0;
+    //int ntotal = 0;
+    //int niter = 0;
     while (!al.isEmpty()) {
       ai.set(0); // initialize the shared block index to zero
       final int n = al.size(); // number of samples in active (A) list
-      ntotal += n;
+      //ntotal += n;
       final int mb = 32; // size of blocks of samples
       final int nb = 1+(n-1)/mb; // number of blocks of samples
       int ntask = min(nb,nthread); // number of tasks (threads to be used)
@@ -457,7 +453,7 @@ class TimeMarker2 {
         al.appendIfAbsent(bl[itask]);
         bl[itask].clear();
       }
-      ++niter;
+      //++niter;
       //if (niter%100==1)
       //  plot(_t,ColorMap.JET);
     }
@@ -466,7 +462,7 @@ class TimeMarker2 {
     //trace("               nratio="+(float)ntotal/(float)(_n1*_n2));
   }
 
-  /**
+  /*
    * Gets the current times during one solution of the eikonal equation.
    * Times for samples not yet activated are infinite.
    */
@@ -474,7 +470,7 @@ class TimeMarker2 {
     return wasActivated(_s[i2][i1])?t[i2][i1]:INFINITY;
   }
 
-  /**
+  /*
    * Processes one sample from the A list.
    * Appends samples not yet converged to the B list.
    */
@@ -542,7 +538,7 @@ class TimeMarker2 {
     }
   }
 
-  /**
+  /*
    * Determines whether to compute time for sample with specified indices.
    * A sample should be processed iff at least one of its neighbors is 
    * less than the minimum time computed so far.
@@ -573,7 +569,7 @@ class TimeMarker2 {
     return (++i2<_n2 && wasActivated(_s[i2][i1]))?t[i2][i1]:INFINITY;
   }
 
-  /**
+  /*
    * Returns a time t not greater than the current time for one sample.
    * Computations are limited to neighbor samples with specified indices.
    */
@@ -611,7 +607,7 @@ class TimeMarker2 {
     return tc;
   }
 
-  /**
+  /*
    * Solves a 2D anisotropic eikonal equation for a positive time t0.
    * The equation is:
    *   d11*s1*s1*(t1-t0)*(t1-t0) + 

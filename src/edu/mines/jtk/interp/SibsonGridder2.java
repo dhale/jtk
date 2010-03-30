@@ -7,8 +7,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.interp;
 
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Gridding by Sibson interpolation of scattered samples of f(x1,x2).

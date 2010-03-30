@@ -26,19 +26,21 @@ def main(args):
 def demoTeapot():
   t,x,f = dataTeapot()
   st,sx,s = imageTeapot()
-  plot2Teapot(f,t,x,s,st,sx)
+  plot2Teapot(f,t,x,s,st,sx,None,"Painted value","tp2f")
   smooth = 1.00 # smoothness for blended gridder
-  tension = 0.0 # tension for splines gridder
-  bg = makeBlendedGridder(f,t,x,smooth=smooth)
+  fnull = -1.0
+  sg = SimpleGridder2(f,t,x)
+  sg.setNullValue(fnull)
+  p = sg.grid(st,sx)
   tensors = makeImageTensors(s)
+  bg = makeBlendedGridder(f,t,x,smooth=smooth)
   bg.setTensors(tensors)
-  #bg.setTimeMax(200)
-  bg.setBlending(False)
-  g = bg.grid(st,sx)
-  plot2Teapot(f,t,x,s,st,sx,g)
-  bg.setBlending(True)
-  g = bg.grid(st,sx)
-  plot2Teapot(f,t,x,s,st,sx,g)
+  d = bg.gridNearest(fnull,p)
+  plot2Teapot(f,t,x,s,st,sx,d,"Time (samples)","tp2t")
+  plot2Teapot(f,t,x,s,st,sx,p,"Nearest value","tp2p")
+  q = copy(p)
+  bg.gridBlended(d,p,q)
+  plot2Teapot(f,t,x,s,st,sx,q,"Blended value","tp2q")
 
 def demoBlendedGridder(data="SinSin",n=100):
   setupFor(data,n)

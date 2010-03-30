@@ -62,10 +62,10 @@ public class NearestGridder2 implements Gridder2 {
   // interface Gridder2
 
   public void setScattered(float[] f, float[] x1, float[] x2) {
-    _n = f.length;
     _f = copy(f);
     _mesh = new TriMesh();
-    for (int i=0; i<_n; ++i) {
+    int n = f.length;
+    for (int i=0; i<n; ++i) {
       TriMesh.Node node = new TriMesh.Node(x1[i],x2[i]);
       node.index = i;
       boolean added = _mesh.addNode(node);
@@ -84,7 +84,6 @@ public class NearestGridder2 implements Gridder2 {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
-  private int _n;
   private float[] _f;
   private TriMesh _mesh;
 }

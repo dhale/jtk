@@ -7,8 +7,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.interp;
 
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.Check;
-import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Simple griding of scattered samples of 3D functions f(x1,x2,x3).

@@ -132,6 +132,7 @@ public class BlendedGridder2 implements Gridder2 {
    * Sets the smoothness of the interpolation of gridded values.
    * The default is 0.5, which yields an interpolant with linear precision. 
    * Larger values yield smoother interpolants with plateaus at known samples.
+   * @param smoothness the smoothness.
    */
   public void setSmoothness(double smoothness) {
     _c = 0.25f/(float)smoothness;
@@ -273,7 +274,6 @@ public class BlendedGridder2 implements Gridder2 {
     float tnull = -FLT_MAX;
     sg.setNullValue(pnull);
     float[][] p = sg.grid(s1,s2);
-    sg = null;
     float[][] t = new float[n2][n1];
     for (int i2=0; i2<n2; ++i2) {
       for (int i1=0; i1<n1; ++i1) {

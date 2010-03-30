@@ -74,10 +74,10 @@ public class NearestGridder3 implements Gridder3 {
   // interface Gridder2
 
   public void setScattered(float[] f, float[] x1, float[] x2, float[] x3) {
-    _n = f.length;
     _f = copy(f);
     _mesh = new TetMesh();
-    for (int i=0; i<_n; ++i) {
+    int n = f.length;
+    for (int i=0; i<n; ++i) {
       TetMesh.Node node = new TetMesh.Node(x1[i],x2[i],x3[i]);
       node.index = i;
       boolean added = _mesh.addNode(node);
@@ -100,7 +100,6 @@ public class NearestGridder3 implements Gridder3 {
   private static Logger log = 
     Logger.getLogger(NearestGridder3.class.getName());
 
-  private int _n;
   private float[] _f;
   private TetMesh _mesh;
 }
