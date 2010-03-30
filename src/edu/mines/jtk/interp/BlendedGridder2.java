@@ -234,6 +234,7 @@ public class BlendedGridder2 implements Gridder2 {
 
     // Construct and apply a local smoothing filter.
     LocalSmoothingFilter lsf = new LocalSmoothingFilter(0.0001,10000,_ldk);
+    lsf.setPreconditioner(true);
     float[][] r = copy(p); 
     lsf.applySmoothS(r,r);
     lsf.apply(_tensors,_c,s,r,q);

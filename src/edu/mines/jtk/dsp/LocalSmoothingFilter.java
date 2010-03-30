@@ -6,7 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -79,8 +78,8 @@ public class LocalSmoothingFilter {
 
   /**
    * Constructs a local smoothing filter with specified parameters.
-   * @param small stop when norm of residuals is less than this factor times
-   *  the norm of the input array.
+   * @param small stop when norm of residuals is less than this factor 
+   *  times the norm of the input array.
    * @param niter stop when number of iterations exceeds this limit.
    * @param ldk the local diffusion kernel that computes y += (I+G'DG)x.
    */
@@ -90,6 +89,17 @@ public class LocalSmoothingFilter {
     _small = (float)small;
     _niter = niter;
     _ldk = ldk;
+  }
+
+  /**
+   * Sets the use of a preconditioner in this local smoothing filter.
+   * A preconditioner requires extra memory and more computing time
+   * per iteration, but may result in fewer iterations.
+   * The default is to not use a preconditioner.
+   * @param pc true, to use a preconditioner; false, otherwise.
+   */
+  public void setPreconditioner(boolean pc) {
+    _pc = pc;
   }
 
   /**
@@ -182,7 +192,12 @@ public class LocalSmoothingFilter {
   {
     Operator2 a = new A2(_ldk,d,c,s);
     scopy(x,y);
-    solve(a,x,y);
+    if (_pc) {
+      Operator2 m = new M2(d,c,s,x);
+      solve(a,m,x,y);
+    } else {
+      solve(a,x,y);
+    }
   }
 
   /**
@@ -220,7 +235,12 @@ public class LocalSmoothingFilter {
   {
     Operator3 a = new A3(_ldk,d,c,s);
     scopy(x,y);
-    solve(a,x,y);
+    if (_pc) {
+      Operator3 m = new M3(d,c,s,x);
+      solve(a,m,x,y);
+    } else {
+      solve(a,x,y);
+    }
   }
 
   /**
@@ -275,11 +295,12 @@ public class LocalSmoothingFilter {
 
   private float _small; // stop iterations when residuals are small
   private int _niter; // number of iterations
+  private boolean _pc; // true, for preconditioned CG iterations
   private LocalDiffusionKernel _ldk; // computes y += (I+G'DG)x
   private BandPassFilter _lpf; // lowpass filter, null until applied
   private double _kmax; // maximum wavenumber for lowpass filter
 
-  /**
+  /*
    * A symmetric positive-definite operator.
    */
   private static interface Operator2 {
@@ -287,15 +308,6 @@ public class LocalSmoothingFilter {
   }
   private static interface Operator3 {
     public void apply(float[][][] x, float[][][] y);
-  }
-
-  // Smoothing operator S'S used for preconditioning. Attenuates 
-  // frequencies near the Nyquist limit for which finite-difference 
-  // approximations in G'DG are poor.
-  private static class M2 implements Operator2 {
-    public void apply(float[][] x, float[][] y) {
-      smoothS(x,y);
-    }
   }
 
   private static class A2 implements Operator2 {
@@ -315,6 +327,28 @@ public class LocalSmoothingFilter {
     private float[][] _s;
   }
 
+  private static class M2 implements Operator2 {
+    M2(Tensors2 d, float c, float[][] s, float[][] x)  {
+      int n1 = x[0].length;
+      int n2 = x.length;
+      _p = new float[n2][n1];
+      float[] di = new float[3];
+      for (int i2=0; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          d.getTensor(i1,i2,di);
+          float d11 = di[0];
+          float d22 = di[2];
+          float si = s!=null?s[i2][i1]:1.0f;
+          _p[i2][i1] = 1.0f/(1.0f+c*si*(d11+d22));
+        }
+      }
+    }
+    public void apply(float[][] x, float[][] y) {
+      sxy(_p,x,y);
+    }
+    private float[][] _p;
+  }
+
   private static class A3 implements Operator3 {
     A3(LocalDiffusionKernel ldk, Tensors3 d, float c, float[][][] s) {
       _ldk = ldk;
@@ -332,7 +366,33 @@ public class LocalSmoothingFilter {
     private float[][][] _s;
   }
 
-  /**
+  private static class M3 implements Operator3 {
+    M3(Tensors3 d, float c, float[][][] s, float[][][] x)  {
+      int n1 = x[0][0].length;
+      int n2 = x[0].length;
+      int n3 = x.length;
+      _p = new float[n3][n2][n1];
+      float[] di = new float[6];
+      for (int i3=0; i3<n3; ++i3) {
+        for (int i2=0; i2<n2; ++i2) {
+          for (int i1=0; i1<n1; ++i1) {
+            d.getTensor(i1,i2,i3,di);
+            float d11 = di[0];
+            float d22 = di[3];
+            float d33 = di[5];
+            float si = s!=null?s[i3][i2][i1]:1.0f;
+            _p[i3][i2][i1] = 1.0f/(1.0f+c*si*(d11+d22+d33));
+          }
+        }
+      }
+    }
+    public void apply(float[][][] x, float[][][] y) {
+      sxy(_p,x,y);
+    }
+    private float[][][] _p;
+  }
+
+  /*
    * Computes y = lowpass(x). Arrays x and y may be the same array.
    */
   private void smoothL(double kmax, float[][] x, float[][] y) {
@@ -354,7 +414,7 @@ public class LocalSmoothingFilter {
     }
   }
 
-  /**
+  /*
    * Computes y = S'Sx. Arrays x and y may be the same array.
    */
   private static void smoothS(float[][] x, float[][] y) {
@@ -415,7 +475,7 @@ public class LocalSmoothingFilter {
     }
   }
 
-  /**
+  /*
    * Computes y = S'Sx. Arrays x and y may be the same array.
    */
   private static void smoothS(float[][][] x, float[][][] y) {
@@ -518,10 +578,8 @@ public class LocalSmoothingFilter {
     }
   }
 
-  /**
-   * Solves Ax = b via conjugate gradient iterations. (No preconditioner.)
-   * Uses the initial values of x; does not assume they are zero.
-   */
+  // Conjugate-gradient solution of Ax = b, with no preconditioner.
+  // Uses the initial values of x; does not assume they are zero.
   private void solve(Operator2 a, float[][] b, float[][] x) {
     int n1 = b[0].length;
     int n2 = b.length;
@@ -533,12 +591,14 @@ public class LocalSmoothingFilter {
     saxpy(-1.0f,q,r); // r = b-Ax
     scopy(r,d);
     float delta = sdot(r,r);
-    float deltaBegin = delta;
-    float deltaSmall = sdot(b,b)*_small*_small;
-    log.fine("solve: delta="+delta);
+    float bnorm = sqrt(sdot(b,b));
+    float rnorm = sqrt(delta);
+    float rnormBegin = rnorm;
+    float rnormSmall = rnorm*_small;
     int iter;
-    for (iter=0; iter<_niter && delta>deltaSmall; ++iter) {
-      log.finer("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
+    log.fine("solve: bnorm="+bnorm+" rnorm="+rnorm);
+    for (iter=0; iter<_niter && rnorm>rnormSmall; ++iter) {
+      log.finer("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
       a.apply(d,q);
       float dq = sdot(d,q);
       float alpha = delta/dq;
@@ -548,10 +608,44 @@ public class LocalSmoothingFilter {
       delta = sdot(r,r);
       float beta = delta/deltaOld;
       sxpay(beta,r,d);
+      rnorm = sqrt(delta);
     }
-    log.fine("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
+    log.fine("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
   }
   private void solve(Operator3 a, float[][][] b, float[][][] x) {
+    int n1 = b[0][0].length;
+    int n2 = b[0].length;
+    int n3 = b.length;
+    float[][][] d = new float[n3][n2][n1];
+    float[][][] q = new float[n3][n2][n1];
+    float[][][] r = new float[n3][n2][n1];
+    scopy(b,r);
+    a.apply(x,q);
+    saxpy(-1.0f,q,r); // r = b-Ax
+    scopy(r,d);
+    float delta = sdot(r,r);
+    float bnorm = sqrt(sdot(b,b));
+    float rnorm = sqrt(delta);
+    float rnormBegin = rnorm;
+    float rnormSmall = rnorm*_small;
+    int iter;
+    log.fine("solve: bnorm="+bnorm+" rnorm="+rnorm);
+    for (iter=0; iter<_niter && rnorm>rnormSmall; ++iter) {
+      log.finer("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
+      a.apply(d,q);
+      float dq = sdot(d,q);
+      float alpha = delta/dq;
+      saxpy( alpha,d,x);
+      saxpy(-alpha,q,r);
+      float deltaOld = delta;
+      delta = sdot(r,r);
+      float beta = delta/deltaOld;
+      sxpay(beta,r,d);
+      rnorm = sqrt(delta);
+    }
+    log.fine("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
+  }
+  private void xsolve(Operator3 a, float[][][] b, float[][][] x) {
     int n1 = b[0][0].length;
     int n2 = b[0].length;
     int n3 = b.length;
@@ -580,6 +674,78 @@ public class LocalSmoothingFilter {
       sxpay(beta,r,d);
     }
     log.fine("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
+  }
+
+  // Conjugate-gradient solution of Ax = b, with preconditioner M.
+  // Uses the initial values of x; does not assume they are zero.
+  private void solve(Operator2 a, Operator2 m, float[][] b, float[][] x) {
+    int n1 = b[0].length;
+    int n2 = b.length;
+    float[][] d = new float[n2][n1];
+    float[][] q = new float[n2][n1];
+    float[][] r = new float[n2][n1];
+    float[][] s = new float[n2][n1];
+    scopy(b,r);
+    a.apply(x,q);
+    saxpy(-1.0f,q,r); // r = b-Ax
+    float bnorm = sqrt(sdot(b,b));
+    float rnorm = sqrt(sdot(r,r));
+    float rnormBegin = rnorm;
+    float rnormSmall = rnorm*_small;
+    m.apply(r,s); // s = Mr
+    scopy(s,d); // d = s
+    float delta = sdot(r,s); // r's = r'Mr
+    int iter;
+    log.fine("msolve: bnorm="+bnorm+" rnorm="+rnorm);
+    for (iter=0; iter<_niter && rnorm>rnormSmall; ++iter) {
+      log.finer("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
+      a.apply(d,q); // q = Ad
+      float alpha = delta/sdot(d,q); // alpha = r'Mr/d'Ad
+      saxpy( alpha,d,x); // x = x+alpha*d
+      saxpy(-alpha,q,r); // r = r-alpha*q
+      m.apply(r,s); // s = Mr
+      float deltaOld = delta;
+      delta = sdot(r,s); // delta = r's = r'Mr
+      float beta = delta/deltaOld;
+      sxpay(beta,s,d); // d = s+beta*d
+      rnorm  = sqrt(sdot(r,r));
+    }
+    log.fine("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
+  }
+  private void solve(Operator3 a, Operator3 m, float[][][] b, float[][][] x) {
+    int n1 = b[0][0].length;
+    int n2 = b[0].length;
+    int n3 = b.length;
+    float[][][] d = new float[n3][n2][n1];
+    float[][][] q = new float[n3][n2][n1];
+    float[][][] r = new float[n3][n2][n1];
+    float[][][] s = new float[n3][n2][n1];
+    scopy(b,r);
+    a.apply(x,q);
+    saxpy(-1.0f,q,r); // r = b-Ax
+    float bnorm = sqrt(sdot(b,b));
+    float rnorm = sqrt(sdot(r,r));
+    float rnormBegin = rnorm;
+    float rnormSmall = rnorm*_small;
+    m.apply(r,s); // s = Mr
+    scopy(s,d); // d = s
+    float delta = sdot(r,s); // r's = r'Mr
+    int iter;
+    log.fine("msolve: bnorm="+bnorm+" rnorm="+rnorm);
+    for (iter=0; iter<_niter && rnorm>rnormSmall; ++iter) {
+      log.finer("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
+      a.apply(d,q); // q = Ad
+      float alpha = delta/sdot(d,q); // alpha = r'Mr/d'Ad
+      saxpy( alpha,d,x); // x = x+alpha*d
+      saxpy(-alpha,q,r); // r = r-alpha*q
+      m.apply(r,s); // s = Mr
+      float deltaOld = delta;
+      delta = sdot(r,s); // delta = r's = r'Mr
+      float beta = delta/deltaOld;
+      sxpay(beta,s,d); // d = s+beta*d
+      rnorm  = sqrt(sdot(r,r));
+    }
+    log.fine("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
   }
 
   // Zeros array x.
@@ -770,6 +936,46 @@ public class LocalSmoothingFilter {
         public void run() {
           for (int i3=a3.getAndIncrement(); i3<n3; i3=a3.getAndIncrement())
             sxpay(a,x[i3],y[i3]);
+        }
+      });
+    }
+    Threads.startAndJoin(threads);
+  }
+
+  // Computes z = x*y.
+  private static void sxy(float[][] x, float[][] y, float[][] z) {
+    int n1 = x[0].length;
+    int n2 = x.length;
+    for (int i2=0; i2<n2; ++i2) {
+      float[] x2 = x[i2], y2 = y[i2], z2 = z[i2];
+      for (int i1=0; i1<n1; ++i1) {
+        z2[i1] = x2[i1]*y2[i1];
+      }
+    }
+  }
+  private static void sxy(float[][][] x, float[][][] y, float[][][] z) {
+    if (PARALLEL) {
+      sxyP(x,y,z);
+    } else {
+      sxyS(x,y,z);
+    }
+  }
+  private static void sxyS(float[][][] x, float[][][] y, float[][][] z) {
+    int n3 = x.length;
+    for (int i3=0; i3<n3; ++i3)
+      sxy(x[i3],y[i3],z[i3]);
+  }
+  private static void sxyP(
+    final float[][][] x, final float[][][] y, final float[][][] z) 
+  {
+    final int n3 = x.length;
+    final AtomicInteger a3 = new AtomicInteger(0);
+    Thread[] threads = Threads.makeArray();
+    for (int ithread=0; ithread<threads.length; ++ithread) {
+      threads[ithread] = new Thread(new Runnable() {
+        public void run() {
+          for (int i3=a3.getAndIncrement(); i3<n3; i3=a3.getAndIncrement())
+            sxy(x[i3],y[i3],z[i3]);
         }
       });
     }

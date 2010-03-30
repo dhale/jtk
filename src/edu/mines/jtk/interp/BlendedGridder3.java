@@ -232,7 +232,7 @@ public class BlendedGridder3 implements Gridder3 {
     int n3 = t.length;
 
     // Compute time squared, shifted to account for the shift in the
-    // finite-difference stencil usd in the local smoothing filter.
+    // finite-difference stencil used in the local smoothing filter.
     float[][][] s = mul(t,t);
     for (int i3=n3-1; i3>0; --i3) {
       for (int i2=n2-1; i2>0; --i2) {
