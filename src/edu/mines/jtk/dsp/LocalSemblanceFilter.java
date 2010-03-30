@@ -68,12 +68,13 @@ public class LocalSemblanceFilter {
     for (int i1=0; i1<n1; ++i1) {
       float sni = sn[i1];
       float sdi = sd[i1];
-      if (sdi<=0.0f)
+      if (sdi<=0.0f || sni<0.0f) {
         s[i1] = 0.0f;
-      else if (sdi<sni)
+      } else if (sdi<sni) {
         s[i1] = 1.0f;
-      else
+      } else {
         s[i1] = sni/sdi;
+      }
     }
   }
 
@@ -115,7 +116,7 @@ public class LocalSemblanceFilter {
         float sdi = sd[i2][i1];
         if (sdi<=0.0f || sni<0.0f) {
           s[i2][i1] = 0.0f;
-        } if (sdi<sni) {
+        } else if (sdi<sni) {
           s[i2][i1] = 1.0f;
         } else {
           s[i2][i1] = sni/sdi;
