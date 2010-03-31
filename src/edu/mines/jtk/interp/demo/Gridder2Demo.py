@@ -14,12 +14,12 @@ from DataSinSin import *
 from DataTeapot import *
 
 def main(args):
-  #demoTeapot()
+  demoTeapot()
   #demoBlendedGridder("Saddle")
   #demoSplinesGridder("Saddle")
   #demoTensorGuided("NotreDame")
   #demoLamont()
-  demoNotreDame()
+  #demoNotreDame()
   #demoSaddle()
   #demoSinSin()
 
