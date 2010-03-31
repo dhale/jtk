@@ -139,9 +139,9 @@ def demoNotreDame():
     name = gridderNames[gridder]
     print name
     g = gridder.grid(sx,sy)
-    plot2(f,x,y,g,sx,sy,title=name)
+    #plot2(f,x,y,g,sx,sy,title=name)
     #plot2(f,x,y,g,sx,sy)
-    #plot3(f,x,y,g,sx,sy)
+    plot3(f,x,y,g,sx,sy)
 
 def setupFor(data="Saddle",n=100):
   global x,y,f,samplings,plot2,plot3

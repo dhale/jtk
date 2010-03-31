@@ -70,7 +70,8 @@ def demoCircle2(input,smooth):
   g = copy(f)
   for stencil in stencils2:
     ldk = LocalDiffusionKernel(stencil)
-    lsf = LocalSmoothingFilter(0.0001,1000,ldk)
+    lsf = LocalSmoothingFilter(0.01,1000,ldk)
+    lsf.setPreconditioner(True)
     lsf.apply(d,200.0,f,g)
     plot2(g,cmin=cmin,cmax=cmax,cmap=cmap,cbar=cbar,cbwm=cbwm,
           title=stencilName[stencil],hlabel=hlabel,vlabel=vlabel,
@@ -104,7 +105,8 @@ def demoSphere3(input,smooth):
   for stencil in stencils3:
     sw = Stopwatch()
     ldk = LocalDiffusionKernel(stencil)
-    lsf = LocalSmoothingFilter(0.0001,1000,ldk)
+    lsf = LocalSmoothingFilter(0.01,1000,ldk)
+    lsf.setPreconditioner(True)
     sw.start()
     lsf.apply(d,200.0,f,g)
     sw.stop()

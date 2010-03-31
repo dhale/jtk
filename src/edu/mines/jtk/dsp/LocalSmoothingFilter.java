@@ -578,6 +578,7 @@ public class LocalSmoothingFilter {
     }
   }
 
+
   // Conjugate-gradient solution of Ax = b, with no preconditioner.
   // Uses the initial values of x; does not assume they are zero.
   private void solve(Operator2 a, float[][] b, float[][] x) {
@@ -589,25 +590,25 @@ public class LocalSmoothingFilter {
     scopy(b,r);
     a.apply(x,q);
     saxpy(-1.0f,q,r); // r = b-Ax
-    scopy(r,d);
-    float delta = sdot(r,r);
+    scopy(r,d); // d = r
+    float delta = sdot(r,r); // delta = r'r
     float bnorm = sqrt(sdot(b,b));
     float rnorm = sqrt(delta);
     float rnormBegin = rnorm;
-    float rnormSmall = rnorm*_small;
+    float rnormSmall = bnorm*_small;
     int iter;
     log.fine("solve: bnorm="+bnorm+" rnorm="+rnorm);
     for (iter=0; iter<_niter && rnorm>rnormSmall; ++iter) {
       log.finer("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
-      a.apply(d,q);
-      float dq = sdot(d,q);
-      float alpha = delta/dq;
-      saxpy( alpha,d,x);
-      saxpy(-alpha,q,r);
+      a.apply(d,q); // q = Ad
+      float dq = sdot(d,q); // d'q = d'Ad
+      float alpha = delta/dq; // alpha = r'r/d'Ad
+      saxpy( alpha,d,x); // x = x+alpha*d
+      saxpy(-alpha,q,r); // r = r-alpha*q
       float deltaOld = delta;
-      delta = sdot(r,r);
+      delta = sdot(r,r); // delta = r'r
       float beta = delta/deltaOld;
-      sxpay(beta,r,d);
+      sxpay(beta,r,d); // d = r+beta*d
       rnorm = sqrt(delta);
     }
     log.fine("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
@@ -627,7 +628,7 @@ public class LocalSmoothingFilter {
     float bnorm = sqrt(sdot(b,b));
     float rnorm = sqrt(delta);
     float rnormBegin = rnorm;
-    float rnormSmall = rnorm*_small;
+    float rnormSmall = bnorm*_small;
     int iter;
     log.fine("solve: bnorm="+bnorm+" rnorm="+rnorm);
     for (iter=0; iter<_niter && rnorm>rnormSmall; ++iter) {
@@ -645,36 +646,6 @@ public class LocalSmoothingFilter {
     }
     log.fine("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
   }
-  private void xsolve(Operator3 a, float[][][] b, float[][][] x) {
-    int n1 = b[0][0].length;
-    int n2 = b[0].length;
-    int n3 = b.length;
-    float[][][] d = new float[n3][n2][n1];
-    float[][][] q = new float[n3][n2][n1];
-    float[][][] r = new float[n3][n2][n1];
-    scopy(b,r);
-    a.apply(x,q);
-    saxpy(-1.0f,q,r); // r = b-Ax
-    scopy(r,d);
-    float delta = sdot(r,r);
-    float deltaBegin = delta;
-    float deltaSmall = sdot(b,b)*_small*_small;
-    log.fine("solve: delta="+delta);
-    int iter;
-    for (iter=0; iter<_niter && delta>deltaSmall; ++iter) {
-      log.finer("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
-      a.apply(d,q);
-      float dq = sdot(d,q);
-      float alpha = delta/dq;
-      saxpy( alpha,d,x);
-      saxpy(-alpha,q,r);
-      float deltaOld = delta;
-      delta = sdot(r,r);
-      float beta = delta/deltaOld;
-      sxpay(beta,r,d);
-    }
-    log.fine("  iter="+iter+" delta="+delta+" ratio="+delta/deltaBegin);
-  }
 
   // Conjugate-gradient solution of Ax = b, with preconditioner M.
   // Uses the initial values of x; does not assume they are zero.
@@ -691,7 +662,7 @@ public class LocalSmoothingFilter {
     float bnorm = sqrt(sdot(b,b));
     float rnorm = sqrt(sdot(r,r));
     float rnormBegin = rnorm;
-    float rnormSmall = rnorm*_small;
+    float rnormSmall = bnorm*_small;
     m.apply(r,s); // s = Mr
     scopy(s,d); // d = s
     float delta = sdot(r,s); // r's = r'Mr
@@ -726,7 +697,7 @@ public class LocalSmoothingFilter {
     float bnorm = sqrt(sdot(b,b));
     float rnorm = sqrt(sdot(r,r));
     float rnormBegin = rnorm;
-    float rnormSmall = rnorm*_small;
+    float rnormSmall = bnorm*_small;
     m.apply(r,s); // s = Mr
     scopy(s,d); // d = s
     float delta = sdot(r,s); // r's = r'Mr
