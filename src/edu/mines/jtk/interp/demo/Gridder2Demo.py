@@ -33,6 +33,7 @@ def demoTeapot():
   sg.setNullValue(fnull)
   p = sg.grid(st,sx)
   tensors = makeImageTensors(s)
+  #tensors = setRandomEigenvalues(tensors)
   bg = makeBlendedGridder(f,t,x,smooth=smooth)
   bg.setTensors(tensors)
   d = bg.gridNearest(fnull,p)
@@ -286,6 +287,14 @@ def makeImageTensors(s):
   #SimplePlot.asPixels(s)
   #SimplePlot.asPixels(eu)
   #SimplePlot.asPixels(ev)
+  t.setEigenvalues(eu,ev)
+  return t
+
+def setRandomEigenvalues(t):
+  n1,n2 = t.n1,t.n2
+  eu = randfloat(n1,n2)
+  ev = randfloat(n1,n2)
+  eu = mul(0.01,eu)
   t.setEigenvalues(eu,ev)
   return t
 

@@ -331,18 +331,43 @@ public class LocalSmoothingFilter {
     M2(Tensors2 d, float c, float[][] s, float[][] x)  {
       int n1 = x[0].length;
       int n2 = x.length;
+      c *= 0.25f;
+      _p = fillfloat(1.0f,n1,n2);
+      float[] di = new float[3];
+      for (int i2=1,m2=0; i2<n2; ++i2,++m2) {
+        for (int i1=1,m1=0; i1<n1; ++i1,++m1) {
+          float si = s!=null?s[i2][i1]:1.0f;
+          float csi = c*si;
+          d.getTensor(i1,i2,di);
+          float d11 = di[0]*csi;
+          float d12 = di[1]*csi;
+          float d22 = di[2]*csi;
+          _p[i2][i1] += ( d11+d12)+( d12+d22);
+          _p[m2][m1] += ( d11+d12)+( d12+d22);
+          _p[i2][m1] += ( d11-d12)+(-d12+d22);
+          _p[m2][i1] += ( d11-d12)+(-d12+d22);
+        }
+      }
+      div(1.0f,_p,_p);
+    }
+    /*
+    M2(Tensors2 d, float c, float[][] s, float[][] x)  {
+      int n1 = x[0].length;
+      int n2 = x.length;
       _p = new float[n2][n1];
       float[] di = new float[3];
       for (int i2=0; i2<n2; ++i2) {
         for (int i1=0; i1<n1; ++i1) {
-          d.getTensor(i1,i2,di);
-          float d11 = di[0];
-          float d22 = di[2];
           float si = s!=null?s[i2][i1]:1.0f;
-          _p[i2][i1] = 1.0f/(1.0f+c*si*(d11+d22));
+          float csi = c*si;
+          d.getTensor(i1,i2,di);
+          float d11 = csi*di[0];
+          float d22 = csi*di[2];
+          _p[i2][i1] = 1.0f/(1.0f+d11+d22);
         }
       }
     }
+    */
     public void apply(float[][] x, float[][] y) {
       sxy(_p,x,y);
     }
@@ -371,6 +396,39 @@ public class LocalSmoothingFilter {
       int n1 = x[0][0].length;
       int n2 = x[0].length;
       int n3 = x.length;
+      c *= 0.0625f;
+      _p = fillfloat(1.0f,n1,n2,n3);
+      float[] di = new float[6];
+      for (int i3=1,m3=0; i3<n3; ++i3) {
+        for (int i2=1,m2=0; i2<n2; ++i2) {
+          for (int i1=1,m1=0; i1<n1; ++i1) {
+            float si = s!=null?s[i3][i2][i1]:1.0f;
+            float csi = c*si;
+            d.getTensor(i1,i2,i3,di);
+            float d11 = di[0]*csi;
+            float d12 = di[1]*csi;
+            float d13 = di[2]*csi;
+            float d22 = di[3]*csi;
+            float d23 = di[4]*csi;
+            float d33 = di[5]*csi;
+            _p[i3][i2][i1] += ( d11+d12+d13)+( d12+d22+d23)+( d13+d23+d33);
+            _p[m3][m2][m1] += ( d11+d12+d13)+( d12+d22+d23)+( d13+d23+d33);
+            _p[i3][m2][i1] += ( d11-d12+d13)+(-d12+d22-d23)+( d13-d23+d33);
+            _p[m3][i2][m1] += ( d11-d12+d13)+(-d12+d22-d23)+( d13-d23+d33);
+            _p[m3][i2][i1] += ( d11+d12-d13)+( d12+d22-d23)+(-d13-d23+d33);
+            _p[i3][m2][m1] += ( d11+d12-d13)+( d12+d22-d23)+(-d13-d23+d33);
+            _p[m3][m2][i1] += ( d11-d12-d13)+(-d12+d22+d23)+(-d13+d23+d33);
+            _p[i3][i2][m1] += ( d11-d12-d13)+(-d12+d22+d23)+(-d13+d23+d33);
+          }
+        }
+      }
+      div(1.0f,_p,_p);
+    }
+    /*
+    M3(Tensors3 d, float c, float[][][] s, float[][][] x)  {
+      int n1 = x[0][0].length;
+      int n2 = x[0].length;
+      int n3 = x.length;
       _p = new float[n3][n2][n1];
       float[] di = new float[6];
       for (int i3=0; i3<n3; ++i3) {
@@ -386,6 +444,7 @@ public class LocalSmoothingFilter {
         }
       }
     }
+    */
     public void apply(float[][][] x, float[][][] y) {
       sxy(_p,x,y);
     }
