@@ -294,7 +294,7 @@ def setRandomEigenvalues(t):
   n1,n2 = t.n1,t.n2
   eu = randfloat(n1,n2)
   ev = randfloat(n1,n2)
-  eu = mul(0.01,eu)
+  mul(0.01,eu,eu)
   t.setEigenvalues(eu,ev)
   return t
 

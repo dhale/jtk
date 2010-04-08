@@ -331,8 +331,8 @@ public class LocalSmoothingFilter {
     M2(Tensors2 d, float c, float[][] s, float[][] x)  {
       int n1 = x[0].length;
       int n2 = x.length;
-      c *= 0.25f;
       _p = fillfloat(1.0f,n1,n2);
+      c *= 0.25f;
       float[] di = new float[3];
       for (int i2=1,m2=0; i2<n2; ++i2,++m2) {
         for (int i1=1,m1=0; i1<n1; ++i1,++m1) {
@@ -396,12 +396,12 @@ public class LocalSmoothingFilter {
       int n1 = x[0][0].length;
       int n2 = x[0].length;
       int n3 = x.length;
-      c *= 0.0625f;
       _p = fillfloat(1.0f,n1,n2,n3);
+      c *= 0.0625f;
       float[] di = new float[6];
-      for (int i3=1,m3=0; i3<n3; ++i3) {
-        for (int i2=1,m2=0; i2<n2; ++i2) {
-          for (int i1=1,m1=0; i1<n1; ++i1) {
+      for (int i3=1,m3=0; i3<n3; ++i3,++m3) {
+        for (int i2=1,m2=0; i2<n2; ++i2,++m2) {
+          for (int i1=1,m1=0; i1<n1; ++i1,++m1) {
             float si = s!=null?s[i3][i2][i1]:1.0f;
             float csi = c*si;
             d.getTensor(i1,i2,i3,di);
@@ -679,9 +679,7 @@ public class LocalSmoothingFilter {
     float[][][] d = new float[n3][n2][n1];
     float[][][] q = new float[n3][n2][n1];
     float[][][] r = new float[n3][n2][n1];
-    scopy(b,r);
-    a.apply(x,q);
-    saxpy(-1.0f,q,r); // r = b-Ax
+    scopy(b,r); a.apply(x,q); saxpy(-1.0f,q,r); // r = b-Ax
     scopy(r,d);
     float delta = sdot(r,r);
     float bnorm = sqrt(sdot(b,b));
@@ -696,12 +694,18 @@ public class LocalSmoothingFilter {
       float dq = sdot(d,q);
       float alpha = delta/dq;
       saxpy( alpha,d,x);
-      saxpy(-alpha,q,r);
+      //saxpy(-alpha,q,r);
+      if (iter%50<49) {
+        saxpy(-alpha,q,r);
+      } else {
+        scopy(b,r); a.apply(x,q); saxpy(-1.0f,q,r); // r = b-Ax
+      }
       float deltaOld = delta;
       delta = sdot(r,r);
       float beta = delta/deltaOld;
       sxpay(beta,r,d);
       rnorm = sqrt(delta);
+      //if (iter==38) break;
     }
     log.fine("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
   }
@@ -750,9 +754,7 @@ public class LocalSmoothingFilter {
     float[][][] q = new float[n3][n2][n1];
     float[][][] r = new float[n3][n2][n1];
     float[][][] s = new float[n3][n2][n1];
-    scopy(b,r);
-    a.apply(x,q);
-    saxpy(-1.0f,q,r); // r = b-Ax
+    scopy(b,r); a.apply(x,q); saxpy(-1.0f,q,r); // r = b-Ax
     float bnorm = sqrt(sdot(b,b));
     float rnorm = sqrt(sdot(r,r));
     float rnormBegin = rnorm;
@@ -767,13 +769,19 @@ public class LocalSmoothingFilter {
       a.apply(d,q); // q = Ad
       float alpha = delta/sdot(d,q); // alpha = r'Mr/d'Ad
       saxpy( alpha,d,x); // x = x+alpha*d
-      saxpy(-alpha,q,r); // r = r-alpha*q
+      //saxpy(-alpha,q,r); // r = r-alpha*q
+      if (iter%50<49) {
+        saxpy(-alpha,q,r);
+      } else {
+        scopy(b,r); a.apply(x,q); saxpy(-1.0f,q,r); // r = b-Ax
+      }
       m.apply(r,s); // s = Mr
       float deltaOld = delta;
       delta = sdot(r,s); // delta = r's = r'Mr
       float beta = delta/deltaOld;
       sxpay(beta,s,d); // d = s+beta*d
       rnorm  = sqrt(sdot(r,r));
+      //if (iter==38) break;
     }
     log.fine("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
   }
