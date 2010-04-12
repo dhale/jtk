@@ -39,6 +39,28 @@ def dataTeapot():
   #x = add(0.0,mul(0.025,x))
   return t,x,f
 
+def dataTeapotShallow():
+  """
+  Values set interactively by Dave Hale. Omit deeper samples.
+  """
+  txf = [
+    30, 69,0.50,  99, 72,0.50,
+    63, 71,0.90, 128, 72,0.90,
+    29,172,0.35,  97,173,0.35,
+    63,173,0.75, 127,174,0.75,
+    33,272,0.20, 103,270,0.20,
+    70,271,0.60, 134,268,0.60]
+  n = len(txf)/3
+  t = zerofloat(n)
+  x = zerofloat(n)
+  f = zerofloat(n)
+  copy(n,0,3,txf,0,1,t)
+  copy(n,1,3,txf,0,1,x)
+  copy(n,2,3,txf,0,1,f)
+  #t = add(0.5,mul(0.004,t))
+  #x = add(0.0,mul(0.025,x))
+  return t,x,f
+
 def imageTeapot():
   #ft,fx = 0.500,0.000
   #dt,dx = 0.004,0.025
