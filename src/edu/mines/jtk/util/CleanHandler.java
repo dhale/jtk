@@ -103,19 +103,26 @@ public class CleanHandler extends Handler {
           ("java.util.logging.config.file") == null &&
           System.getProperties().getProperty
           ("java.util.logging.config.class") == null) {
-        try {
-          LogManager.getLogManager().readConfiguration
-            (new java.io.ByteArrayInputStream
-             ("handlers=edu.mines.jtk.util.CleanHandler\n.level=INFO\n"
-              .getBytes()));
-        } catch (java.io.IOException e) {
-          e.printStackTrace();
-          throw new IllegalStateException("This should never fail "+
-                                          e.getMessage());
-        }
+        overrideExistingHandlers(Level.INFO); // nothing set previously
       }
       s_setDefault = true;
     }
   }
+
+  /** Override any previously specified Handlers with the CleanHandler, and set Level.
+      @param level Logging level for CleanHandler.
+   */
+  public static void overrideExistingHandlers(Level level) {
+    try {
+      LogManager.getLogManager().readConfiguration
+        (new java.io.ByteArrayInputStream
+         (("handlers=edu.mines.jtk.util.CleanHandler\n.level="+level.getName()+"\n")
+          .getBytes()));
+    } catch (java.io.IOException e) {
+      throw new IllegalStateException
+        ("This should never fail with I/O from a byte array"+e.getMessage());
+    }
+  }
+
 }
 
