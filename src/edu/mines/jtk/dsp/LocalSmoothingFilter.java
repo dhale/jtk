@@ -694,18 +694,16 @@ public class LocalSmoothingFilter {
       float dq = sdot(d,q);
       float alpha = delta/dq;
       saxpy( alpha,d,x);
-      //saxpy(-alpha,q,r);
-      if (iter%50<49) {
+      if (iter%100<99) {
         saxpy(-alpha,q,r);
       } else {
-        scopy(b,r); a.apply(x,q); saxpy(-1.0f,q,r); // r = b-Ax
+        scopy(b,r); a.apply(x,q); saxpy(-1.0f,q,r);
       }
       float deltaOld = delta;
       delta = sdot(r,r);
       float beta = delta/deltaOld;
       sxpay(beta,r,d);
       rnorm = sqrt(delta);
-      //if (iter==38) break;
     }
     log.fine("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
   }
@@ -769,9 +767,8 @@ public class LocalSmoothingFilter {
       a.apply(d,q); // q = Ad
       float alpha = delta/sdot(d,q); // alpha = r'Mr/d'Ad
       saxpy( alpha,d,x); // x = x+alpha*d
-      //saxpy(-alpha,q,r); // r = r-alpha*q
-      if (iter%50<49) {
-        saxpy(-alpha,q,r);
+      if (iter%100<99) {
+        saxpy(-alpha,q,r); // r = r-alpha*q
       } else {
         scopy(b,r); a.apply(x,q); saxpy(-1.0f,q,r); // r = b-Ax
       }
@@ -781,7 +778,6 @@ public class LocalSmoothingFilter {
       float beta = delta/deltaOld;
       sxpay(beta,s,d); // d = s+beta*d
       rnorm  = sqrt(sdot(r,r));
-      //if (iter==38) break;
     }
     log.fine("  iter="+iter+" rnorm="+rnorm+" ratio="+rnorm/rnormBegin);
   }
