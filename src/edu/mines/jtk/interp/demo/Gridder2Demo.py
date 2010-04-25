@@ -26,7 +26,7 @@ def main(args):
 def demoTeapot():
   t,x,f = dataTeapot()
   st,sx,s = imageTeapot()
-  plot2Teapot(f,t,x,s,st,sx,None,"Painted value","tp2f")
+  plot2Teapot(f,t,x,s,st,sx,None,"Known value","tp2f")
   smooth = 1.00 # smoothness for blended gridder
   fnull = -1.0
   sg = SimpleGridder2(f,t,x)

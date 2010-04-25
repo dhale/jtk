@@ -14,8 +14,8 @@ from edu.mines.jtk.mosaic import *
 from edu.mines.jtk.sgl import *
 from edu.mines.jtk.util.ArrayMath import *
 
-pngDir = None # for no png images
-#pngDir = "." # for png images
+#pngDir = None # for no png images
+pngDir = "." # for png images
 
 def dataTeapot():
   """
@@ -85,15 +85,15 @@ def plot2Teapot(f,x1,x2,s,s1,s2,g=None,label=None,png=None):
   #panel.setVInterval(0.2)
   #panel.setHLabel("Distance (km)")
   #panel.setVLabel("Time (s)")
-  panel.setHInterval(100.0)
-  panel.setVInterval(100.0)
-  panel.setHLabel("Pixel")
-  panel.setVLabel("Pixel")
+  #panel.setHInterval(100.0)
+  #panel.setVInterval(100.0)
+  #panel.setHLabel("Pixel")
+  #panel.setVLabel("Pixel")
   if label:
     panel.addColorBar(label)
   else:
     panel.addColorBar()
-  panel.setColorBarWidthMinimum(160)
+  panel.setColorBarWidthMinimum(180)
   pv = panel.addPixels(s1,s2,s)
   pv.setInterpolation(PixelsView.Interpolation.LINEAR)
   pv.setColorModel(ColorMap.GRAY)
@@ -155,16 +155,16 @@ def makePointSets(cmap,f,x1,x2):
 def panel2Teapot():
   panel = PlotPanel(1,1,
     PlotPanel.Orientation.X1DOWN_X2RIGHT,
-    PlotPanel.AxesPlacement.LEFT_TOP)
+    PlotPanel.AxesPlacement.NONE)
   return panel
 
 def frame2Teapot(panel,png=None):
   frame = PlotFrame(panel)
   frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE)
-  frame.setFontSizeForPrint(8,240)
-  frame.setSize(1240,774)
-  #frame.setFontSizeForSlide(1.0,0.8)
-  #frame.setSize(1240,840)
+  #frame.setFontSizeForPrint(8,240)
+  #frame.setSize(1240,774)
+  frame.setFontSizeForSlide(1.0,0.8)
+  frame.setSize(1290,777)
   frame.setVisible(True)
   if png and pngDir:
     frame.paintToPng(400,3.2,pngDir+"/"+png+".png")

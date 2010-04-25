@@ -23,10 +23,16 @@ import static edu.mines.jtk.util.ArrayMath.*;
 public class EllipsoidGlyphTest {
 
   public static void main(String[] args) {
+    test0();
     test1();
     test2();
   }
 
+  public static void test0() {
+    show(new OneEllipsoid(1.0f));
+    show(new OneEllipsoid(0.3f));
+    show(new OneEllipsoid(0.1f));
+  }
   public static void test1() {
     show(new EightEllipsoidsInCube());
   }
@@ -44,6 +50,27 @@ public class EllipsoidGlyphTest {
     World world = new World();
     world.addChild(node);
     SimpleFrame sf = new SimpleFrame(world);
+  }
+
+  // One ellipsoid with specified thickness.
+  public static class OneEllipsoid extends Node {
+    public OneEllipsoid(float thickness) {
+      _thickness = thickness;
+    }
+    public void draw(DrawContext dc) {
+      float cx = 0.0f, cy = 0.0f, cz = 0.0f;
+      float ux = 0.0f, uy = 0.0f, uz = _thickness;
+      float vx = 0.0f, vy = 1.0f, vz = 0.0f;
+      float wx = 1.0f, wy = 0.0f, wz = 0.0f;
+      _ellipsoid.draw(cx,cy,cz,ux,uy,uz,vx,vy,vz,wx,wy,wz);
+    }
+    public BoundingSphere computeBoundingSphere(boolean finite) {
+      return _bs;
+    }
+    private float _thickness;
+    private EllipsoidGlyph _ellipsoid = new EllipsoidGlyph();
+    private BoundingSphere _bs = 
+      new BoundingSphere(new BoundingBox(-1,-1,-1,1,1,1));
   }
 
   // Eight ellipsoids at the corners of a cube.
