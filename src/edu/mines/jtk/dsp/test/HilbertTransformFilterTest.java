@@ -11,8 +11,8 @@ import java.util.Random;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.dsp.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.dsp.HilbertTransformFilter}.
@@ -50,7 +50,6 @@ public class HilbertTransformFilterTest extends TestCase {
       x[(lhtf-1)/2] = 1.0f;
       float[] y = new float[nxy];
       htf.apply(nxy,x,y);
-      dump(y);
       
       // Check amplitude spectrum.
       int nfft = FftReal.nfftSmall(16*nxy);

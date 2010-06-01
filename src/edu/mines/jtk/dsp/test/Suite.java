@@ -24,6 +24,7 @@ public class Suite extends TestSuite {
     suite.addTestSuite(EigenTensors3Test.class);
     suite.addTestSuite(FftComplexTest.class);
     suite.addTestSuite(FftRealTest.class);
+    suite.addTestSuite(HilbertTransformFilterTest.class);
     suite.addTestSuite(HistogramTest.class);
     suite.addTestSuite(LocalCausalFilterTest.class);
     suite.addTestSuite(LocalOrientFilterTest.class);
