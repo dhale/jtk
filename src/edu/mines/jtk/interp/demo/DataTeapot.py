@@ -14,8 +14,8 @@ from edu.mines.jtk.mosaic import *
 from edu.mines.jtk.sgl import *
 from edu.mines.jtk.util.ArrayMath import *
 
-#pngDir = None # for no png images
-pngDir = "." # for png images
+pngDir = None # for no png images
+#pngDir = "." # for png images
 
 def dataTeapot():
   """
