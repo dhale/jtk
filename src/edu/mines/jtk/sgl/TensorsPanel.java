@@ -115,7 +115,7 @@ public class TensorsPanel extends AxisAlignedPanel {
     double zmax = _sz.getLast();
 
     // Maximum length of eigenvectors u, v and w.
-    float dmax = (float)(0.5f*_ellipsoidSize);
+    float dmax = 0.5f*_ellipsoidSize;
     float dxmax = (float)dx*dmax;
     float dymax = (float)dy*dmax;
     float dzmax = (float)dz*dmax;

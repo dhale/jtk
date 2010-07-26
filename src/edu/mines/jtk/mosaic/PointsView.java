@@ -132,6 +132,7 @@ public class PointsView extends TiledView {
    * If x3 is not null, its length must equal that of x1 and x2.
    * @param x1 array of arrays of x1 coordinates.
    * @param x2 array of arrays of x2 coordinates.
+   * @param x3 array of arrays of x3 coordinates.
    */
   public PointsView(float[][] x1, float[][] x2, float[][] x3) {
     set(x1,x2,x3);

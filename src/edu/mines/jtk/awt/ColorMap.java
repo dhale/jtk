@@ -9,6 +9,7 @@ package edu.mines.jtk.awt;
 import java.awt.*;
 import java.awt.image.IndexColorModel;
 import javax.swing.event.EventListenerList;
+import static java.lang.Math.*;
 
 import edu.mines.jtk.util.Check;
 
@@ -358,10 +359,25 @@ public class ColorMap {
    * @return the color model.
    */
   public static IndexColorModel getHue(double h0, double h255) {
+    return getHue(h0,h255,1.0);
+  }
+
+  /**
+   * Gets a linear hue color model for the specified hues and alpha. 
+   * Hues equal to 0.00, 0.33, and 0.67, and 1.00 correspond 
+   * approximately to the colors red, green, blue, and red, respectively.
+   * @param h0 the hue corresponding to index value 0.
+   * @param h255 the hue corresponding to index value 255.
+   * @param alpha the opacity for all colors in this color model.
+   * @return the color model.
+   */
+  public static IndexColorModel getHue(double h0, double h255, double alpha) {
     Color[] c = new Color[256];
+    int a = (int)(0.5+max(0.0,min(1.0,alpha))*255);
     for (int i=0; i<256; ++i) {
       float h = (float)(h0+i*(h255-h0)/255.0);
-      c[i] = Color.getHSBColor(h,1.0f,1.0f);
+      Color rgb = Color.getHSBColor(h,1.0f,1.0f);
+      c[i] = new Color(rgb.getRed(),rgb.getGreen(),rgb.getBlue(),a);
     }
     return makeIndexColorModel(c);
   }
