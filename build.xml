@@ -20,7 +20,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <property name="build.cls" value="${build}/cls"/>
   <property name="build.doc" value="${build}/doc"/>
   <property name="build.jar" value="${build}/jar"/>
-  <property name="build.lib" value="${build}/lib"/>
 
   <!-- Other global settings -->
   <property name="title" value="MinesJTK"/>
@@ -36,19 +35,21 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <mkdir dir="${build.cls}"/>
     <mkdir dir="${build.doc}"/>
     <mkdir dir="${build.jar}"/>
-    <mkdir dir="${build.lib}"/>
   </target>
 
   <!-- Compile Java -->
   <target name="compile-java" depends="init">
-    <javac srcdir="${src}" destdir="${build.cls}" 
-      compiler="javac1.5"
+    <javac srcdir="${src}/main/java:${src}/test/java:${src}/demo/java" 
+      destdir="${build.cls}" 
+      compiler="javac1.6"
       memoryMaximumSize="500m"
       fork="true"
       debug="on" 
-      deprecation="on">
+      deprecation="on"
+      includeantruntime="false">
       <compilerarg value="-Xlint:all,-serial"/>
       <classpath refid="classpath"/>
+      <include name="**/util/**"/>
       <exclude name="**/old/**"/>
       <exclude name="**/new/**"/>
     </javac>
@@ -61,13 +62,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   </target>
   <target name="copy-resources">
     <copy todir="${build.cls}">
-      <fileset dir="${src}">
-        <include name="**/resources/*"/>
-      </fileset>
-    </copy>
-    <copy todir="${build.cls}">
-      <fileset dir="${src}" includes="edu/mines/jtk/**/*.properties" />
-      <mapper type="identity" />
+      <fileset dir="${src}/main/resources"/>
     </copy>
   </target>
 
@@ -80,11 +75,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       version="true"
       use="true"
       windowtitle="${title}">
-      <packageset dir="src" defaultexcludes="yes">
-        <include name="edu/mines/jtk/**"/>
+      <packageset dir="src/main/java" defaultexcludes="yes">
         <exclude name="edu/mines/jtk/**/new/**"/>
         <exclude name="edu/mines/jtk/**/old/**"/>
-        <exclude name="edu/mines/jtk/**/test/**"/>
       </packageset>
     </javadoc>
   </target>

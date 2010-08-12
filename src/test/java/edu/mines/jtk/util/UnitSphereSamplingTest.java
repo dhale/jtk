@@ -4,15 +4,12 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.util.test;
+package edu.mines.jtk.util;
 
 import static java.lang.Math.*;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import edu.mines.jtk.util.UnitSphereSampling;
-//import static edu.mines.jtk.util.ArrayMath.dump;
 
 /**
  * Tests {@link edu.mines.jtk.util.UnitSphereSampling}.
@@ -156,10 +153,10 @@ public class UnitSphereSamplingTest extends TestCase {
       // TODO: more assertions?
       /*
       trace("wa="+wa+" wb="+wb+" wc="+wc);
-      dump(p);
-      dump(qa);
-      dump(qb);
-      dump(qc);
+      ArrayMath.dump(p);
+      ArrayMath.dump(qa);
+      ArrayMath.dump(qb);
+      ArrayMath.dump(qc);
       */
     }
   }
@@ -185,9 +182,9 @@ public class UnitSphereSamplingTest extends TestCase {
     float dmaxDegrees = (float)(dmax*180.0/PI);
     trace("npoint="+npoint+" dmax="+dmax+" degrees="+dmaxDegrees);
     trace("pmax=");
-    dump(pmax);
+    ArrayMath.dump(pmax);
     trace("qmax=");
-    dump(qmax);
+    ArrayMath.dump(qmax);
     */
     assertTrue(dmax<error);
   }

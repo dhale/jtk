@@ -4,15 +4,12 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.util.test;
+package edu.mines.jtk.util;
 
 import java.util.Random;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import edu.mines.jtk.util.RandomFloat;
-import edu.mines.jtk.util.Stopwatch;
 
 /**
  * Tests {@link edu.mines.jtk.util.RandomFloat}.

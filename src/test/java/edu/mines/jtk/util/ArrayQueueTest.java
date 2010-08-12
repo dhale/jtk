@@ -1,11 +1,15 @@
-package edu.mines.jtk.util.test;
+/****************************************************************************
+Copyright (c) 2008, Colorado School of Mines and others. All rights reserved.
+This program and accompanying materials are made available under the terms of
+the Common Public License - v1.0, which accompanies this distribution, and is
+available at http://www.eclipse.org/legal/cpl-v10.html
+****************************************************************************/
+package edu.mines.jtk.util;
 
 import java.util.Random;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import edu.mines.jtk.util.ArrayQueue;
 
 /**
  * Tests {@link edu.mines.jtk.util.ArrayQueue}.
