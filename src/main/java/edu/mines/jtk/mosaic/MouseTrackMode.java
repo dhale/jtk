@@ -30,7 +30,7 @@ public class MouseTrackMode extends Mode {
   public MouseTrackMode(ModeManager modeManager) {
     super(modeManager);
     setName("Track");
-    setIcon(loadIcon(MouseTrackMode.class,"resources/Track24.gif"));
+    setIcon(loadIcon(MouseTrackMode.class,"Track24.gif"));
     setMnemonicKey(KeyEvent.VK_Z);
     setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_T,0));
     setShortDescription("Track mouse in tile");
