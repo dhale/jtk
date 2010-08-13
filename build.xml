@@ -52,6 +52,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <include name="**/awt/**"/>
       <include name="**/bench/**"/>
       <include name="**/dsp/**"/>
+      <include name="**/interp/**"/>
       <include name="**/util/**"/>
       <exclude name="**/old/**"/>
       <exclude name="**/new/**"/>

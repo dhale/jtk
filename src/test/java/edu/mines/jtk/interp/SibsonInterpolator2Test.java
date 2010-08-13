@@ -4,7 +4,7 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.interp.test;
+package edu.mines.jtk.interp;
 
 import javax.swing.*;
 
@@ -13,7 +13,6 @@ import junit.framework.TestSuite;
 
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.interp.SibsonInterpolator2;
 import edu.mines.jtk.mosaic.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
