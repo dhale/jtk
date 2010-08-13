@@ -4,12 +4,11 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is 
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.ogl.test;
+package edu.mines.jtk.ogl;
 
 import java.nio.*;
 
 import static edu.mines.jtk.ogl.Gl.*;
-import edu.mines.jtk.ogl.GlCanvas;
 
 /**
  * Simple OpenGL program to display a lit sphere using glDrawArrays.
@@ -17,7 +16,7 @@ import edu.mines.jtk.ogl.GlCanvas;
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.07.08
  */
-public class Sphere {
+public class SphereTest {
 
   private static GlCanvas canvas = new GlCanvas() {
 

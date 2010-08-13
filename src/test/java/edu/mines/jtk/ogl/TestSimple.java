@@ -4,7 +4,7 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is 
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.ogl.test;
+package edu.mines.jtk.ogl;
 
 import java.awt.*;
 import javax.swing.*;
@@ -17,7 +17,7 @@ import edu.mines.jtk.ogl.GlCanvas;
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.07.08
  */
-public class TestSimple {
+class TestSimple {
   public static void run(String[] args, GlCanvas canvas) {
     run(args,canvas,false);
   }

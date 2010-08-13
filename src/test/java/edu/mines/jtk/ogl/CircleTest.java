@@ -4,13 +4,12 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is 
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.ogl.test;
+package edu.mines.jtk.ogl;
 
 import static java.lang.Math.*;
 import java.util.Random;
 
 import static edu.mines.jtk.ogl.Gl.*;
-import edu.mines.jtk.ogl.GlCanvas;
 import edu.mines.jtk.util.Stopwatch;
 
 /**
@@ -18,7 +17,7 @@ import edu.mines.jtk.util.Stopwatch;
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.07.08
  */
-public class Circle {
+public class CircleTest {
   private static GlCanvas canvas = new GlCanvas() {
     public void glInit() {
       glClearColor(0.0f,0.0f,0.0f,0.0f);

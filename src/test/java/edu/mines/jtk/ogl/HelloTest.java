@@ -4,10 +4,9 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is 
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.ogl.test;
+package edu.mines.jtk.ogl;
 
 import static edu.mines.jtk.ogl.Gl.*;
-import edu.mines.jtk.ogl.GlCanvas;
 
 /**
  * Prints Opengl version and vendor and draws a white square.
@@ -15,7 +14,7 @@ import edu.mines.jtk.ogl.GlCanvas;
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.02
  */
-public class Hello {
+public class HelloTest {
   private static GlCanvas canvas = new GlCanvas() {
     public void glInit() {
       glClearColor(0.0f,0.0f,0.0f,0.0f);

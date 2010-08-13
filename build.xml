@@ -58,6 +58,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       <include name="**/lapack/**"/>
       <include name="**/mesh/**"/>
       <include name="**/mosaic/**"/>
+      <include name="**/ogl/**"/>
       <include name="**/util/**"/>
       <exclude name="**/old/**"/>
       <exclude name="**/new/**"/>
@@ -72,6 +73,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <target name="copy-resources">
     <copy todir="${build.cls}">
       <fileset dir="${src}/main/resources"/>
+      <fileset dir="${src}/test/resources"/>
       <fileset dir="${src}/demo/resources"/>
     </copy>
   </target>

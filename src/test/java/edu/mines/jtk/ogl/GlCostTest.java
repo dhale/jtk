@@ -4,7 +4,7 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is 
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.ogl.test;
+package edu.mines.jtk.ogl;
 
 import javax.media.opengl.*;
 import javax.swing.*;
@@ -17,11 +17,11 @@ import edu.mines.jtk.util.Stopwatch;
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.07.07
  */
-public class Bench extends JFrame implements GLEventListener {
+public class GlCostTest extends JFrame implements GLEventListener {
   private static final long serialVersionUID = 1L;
 
-  public Bench() {
-    super("Bench");
+  public GlCostTest() {
+    super("GlCostTest");
     GLCapabilities caps = new GLCapabilities();
     caps.setDoubleBuffered(true);
     System.out.println(caps);
@@ -90,7 +90,7 @@ public class Bench extends JFrame implements GLEventListener {
   }
 
   public static void main(String[] args) {
-    Bench frame = new Bench();
+    GlCostTest frame = new GlCostTest();
     frame.setSize(512,512);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setVisible(true);
