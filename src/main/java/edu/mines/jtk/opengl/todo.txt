@@ -1,4 +1,0 @@
-TODO for Dave:
-Put PIXELFORMATDESCRIPTOR/config jazz into GlCapabilities,
-   then remove redundant hardwired code in context classes.
-Implement off-screen bitmap/pixmap (pbuffer?) contexts.

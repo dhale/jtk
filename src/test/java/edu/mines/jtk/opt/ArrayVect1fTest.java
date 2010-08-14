@@ -1,4 +1,10 @@
-package edu.mines.jtk.opt.test;
+/****************************************************************************
+Copyright (c) 2003, Landmark Graphics and others. All rights reserved.
+This program and accompanying materials are made available under the terms of
+the Common Public License - v1.0, which accompanies this distribution, and is
+available at http://www.eclipse.org/legal/cpl-v10.html
+****************************************************************************/
+package edu.mines.jtk.opt;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
@@ -8,7 +14,6 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.opt.*;
 import edu.mines.jtk.util.Almost;
 
 /** Unit tests for edu.mines.jtk.opt.ArrayVect1f.

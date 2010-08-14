@@ -4,7 +4,7 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.opt.test;
+package edu.mines.jtk.opt;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -13,7 +13,7 @@ import junit.framework.TestSuite;
  * Tests all classes in package edu.mines.jtk.opt.
  * @author W.S. Harlan
  */
-public class Suite extends TestSuite {
+public class AllTest extends TestSuite {
 
   /** Get all tests in this package.
       @return A suite of all junit tests as a Test.

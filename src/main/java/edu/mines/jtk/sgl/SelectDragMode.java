@@ -29,8 +29,8 @@ public class SelectDragMode extends Mode {
     super(modeManager);
     setName("Select");
     Class<SelectDragMode> cls = SelectDragMode.class;
-    setIcon(loadIcon(cls,"resources/SelectDragIcon16.png"));
-    setCursor(loadCursor(cls,"resources/SelectDragCursor16.png",1,1));
+    setIcon(loadIcon(cls,"SelectDragIcon16.png"));
+    setCursor(loadCursor(cls,"SelectDragCursor16.png",1,1));
     setMnemonicKey(KeyEvent.VK_S);
     setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_S,0));
     setShortDescription("Select/drag");

@@ -4,12 +4,11 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.opt.test;
+package edu.mines.jtk.opt;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import edu.mines.jtk.opt.LineSearch;
 import static edu.mines.jtk.util.MathPlus.*;
 
 /**
