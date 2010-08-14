@@ -4,10 +4,9 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.sgl.test;
+package edu.mines.jtk.sgl;
 
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.sgl.*;
 import edu.mines.jtk.util.Float3;
 import static edu.mines.jtk.util.MathPlus.FLT_PI;
 import static edu.mines.jtk.util.MathPlus.sin;

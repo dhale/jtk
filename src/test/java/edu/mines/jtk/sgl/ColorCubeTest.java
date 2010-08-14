@@ -4,13 +4,12 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is 
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.sgl.test;
+package edu.mines.jtk.sgl;
 
 import java.awt.*;
 import java.nio.FloatBuffer;
 
 import static edu.mines.jtk.ogl.Gl.*;
-import edu.mines.jtk.sgl.*;
 import edu.mines.jtk.util.Direct;
 
 /**
@@ -18,7 +17,7 @@ import edu.mines.jtk.util.Direct;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.27
  */
-public class ColorCube extends Node implements Selectable {
+public class ColorCubeTest extends Node implements Selectable {
 
   public void pick(PickContext pc) {
     Segment ps = pc.getPickSegment();
@@ -48,7 +47,7 @@ public class ColorCube extends Node implements Selectable {
   // protected
 
   protected void selectedChanged() {
-    System.out.println("ColorCube: "+this+" selected="+isSelected());
+    System.out.println("ColorCubeTest: "+this+" selected="+isSelected());
     dirtyDraw();
   }
 
@@ -124,8 +123,8 @@ public class ColorCube extends Node implements Selectable {
     ms.setShininessFront(100.0f);
     states.add(ms);
 
-    ColorCube cc1 = new ColorCube();
-    ColorCube cc2 = new ColorCube();
+    ColorCubeTest cc1 = new ColorCubeTest();
+    ColorCubeTest cc2 = new ColorCubeTest();
     cc1.setStates(states);
     cc2.setStates(states);
 

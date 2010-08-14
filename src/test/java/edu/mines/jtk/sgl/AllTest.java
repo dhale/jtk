@@ -4,7 +4,7 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.sgl.test;
+package edu.mines.jtk.sgl;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -14,7 +14,7 @@ import junit.framework.TestSuite;
  * @author Dave Hale
  * @version 2005.05.20
  */
-public class Suite extends TestSuite {
+public class AllTest extends TestSuite {
 
   public static Test suite() {
     TestSuite suite = new TestSuite();

@@ -4,21 +4,20 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.sgl.test;
+package edu.mines.jtk.sgl;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 
 import edu.mines.jtk.awt.*;
-import edu.mines.jtk.sgl.*;
 
 /**
  * A frame for testing the package {@link edu.mines.jtk.sgl}.
  * @author Dave Hale
  * @version 2006.06.28
  */
-public class TestFrame extends JFrame {
+class TestFrame extends JFrame {
   private static final long serialVersionUID = 1L;
 
   public TestFrame(World world) {

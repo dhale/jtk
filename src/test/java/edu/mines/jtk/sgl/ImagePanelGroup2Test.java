@@ -1,22 +1,20 @@
 /****************************************************************************
-Copyright (c) 2007, Colorado School of Mines and others. All rights reserved.
+Copyright (c) 2008, Colorado School of Mines and others. All rights reserved.
 This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.sgl.test;
+package edu.mines.jtk.sgl;
 
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.sgl.ImagePanelGroup;
-import edu.mines.jtk.sgl.World;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * Tests {@link edu.mines.jtk.sgl.ImagePanelGroup}.
+ * Tests {@link edu.mines.jtk.sgl.ImagePanelGroup2}.
  * @author Dave Hale
- * @version 2007.01.19
+ * @version 2008.08.24
  */
-public class ImagePanelGroupTest {
+public class ImagePanelGroup2Test {
 
   public static void main(String[] args) {
     int n1 = 101;
@@ -34,9 +32,10 @@ public class ImagePanelGroupTest {
     float k1 = 4.0f*FLT_PI*(float)d1;
     float k2 = 4.0f*FLT_PI*(float)d2;
     float k3 = 4.0f*FLT_PI*(float)d3;
-    float[][][] f = sin(rampfloat(0.0f,k1,k2,k3,n1,n2,n3));
-    ImagePanelGroup ipg = new ImagePanelGroup(s1,s2,s3,f);
-    ipg.setPercentiles(1,99);
+    float[][][] fb = rampfloat(0.0f,k1,k2,k3,n1,n2,n3);
+    float[][][] fa = sin(fb);
+    ImagePanelGroup2 ipg = new ImagePanelGroup2(s1,s2,s3,fa,fb);
+    ipg.setPercentiles1(1,99);
     World world = new World();
     world.addChild(ipg);
     TestFrame frame = new TestFrame(world);
