@@ -49,19 +49,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
       includeantruntime="false">
       <compilerarg value="-Xlint:all,-serial"/>
       <classpath refid="classpath"/>
-      <include name="**/awt/**"/>
-      <include name="**/bench/**"/>
-      <include name="**/dsp/**"/>
-      <include name="**/interp/**"/>
-      <include name="**/io/**"/>
-      <include name="**/la/**"/>
-      <include name="**/lapack/**"/>
-      <include name="**/mesh/**"/>
-      <include name="**/mosaic/**"/>
-      <include name="**/ogl/**"/>
-      <include name="**/opt/**"/>
-      <include name="**/sgl/**"/>
-      <include name="**/util/**"/>
       <exclude name="**/old/**"/>
       <exclude name="**/new/**"/>
     </javac>
