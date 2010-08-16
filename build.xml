@@ -10,6 +10,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <description>
     The Colorado School of Mines Java Tool Kit
   </description>
+  <property name="title" value="MinesJTK"/>
 
   <!-- Project directories -->
   <property name="bin" value="${basedir}/bin"/>
@@ -21,9 +22,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <property name="build.doc" value="${build}/doc"/>
   <property name="build.jar" value="${build}/jar"/>
 
-  <!-- Other global settings -->
-  <property name="title" value="MinesJTK"/>
+  <!-- Where is Scala? -->
   <property environment="env"/>
+  <condition property="scala.home" value="${env.SCALA_HOME}">
+    <isset property="env.SCALA_HOME"/>
+  </condition>
+
+  <!-- Other global settings -->
   <path id="classpath">
     <fileset dir="${jar}" includes="**/*.jar"/>
   </path>
@@ -37,7 +42,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <mkdir dir="${build.jar}"/>
   </target>
 
-  <!-- Compile Java -->
+  <!-- Compile Java sources -->
   <target name="compile-java" depends="init">
     <javac srcdir="${src}/main/java:${src}/test/java:${src}/demo/java" 
       destdir="${build.cls}" 
@@ -54,8 +59,29 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     </javac>
   </target>
 
+  <!-- Compile Scala sources (only if SCALA_HOME defined) -->
+  <target if="scala.home" name="compile-scala" depends="init,compile-java">
+    <path id="scala.tools.classpath">
+      <pathelement location="${scala.home}/lib/scala-compiler.jar"/>
+      <pathelement location="${scala.home}/lib/scala-library.jar"/>
+    </path>
+    <path id="scala.build.classpath">
+      <pathelement location="${build.cls}"/>
+      <fileset dir="${jar}" includes="**/*.jar"/>
+      <pathelement location="${scala.home}/lib/scala-library.jar"/>
+    </path>
+    <taskdef resource="scala/tools/ant/antlib.xml">
+      <classpath refid="scala.tools.classpath"/>
+    </taskdef>
+    <scalac srcdir="${src}/main/scala:${src}/test/scala:${src}/demo/scala" 
+      destdir="${build.cls}" 
+      deprecation="on">
+      <classpath refid="scala.build.classpath"/>
+    </scalac>
+  </target>
+
   <!-- Build Java archive -->
-  <target name="jar" depends="compile-java,copy-resources"
+  <target name="jar" depends="compile-java,compile-scala,copy-resources"
       description="build Java archive">
     <jar jarfile="${build.jar}/edu_mines_jtk.jar" basedir="${build.cls}"/>
   </target>
