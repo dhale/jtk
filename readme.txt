@@ -196,3 +196,14 @@ not be someday included in the Mines JTK. (For convenience, the prefix
 for the package names in our private projects may be much shorter than 
 "edu.mines.jtk".) Only those Java packages that are both well written 
 and useful to others are eventually moved to edu.mines.jtk.
+
+
+Development using Scala
+-----------------------
+
+Scala is a relatively new programming language that supports both
+object-oriented and functional programming and the use of existing
+Java packages. The Mines JTK does not currently require Scala. 
+However, if you define the environment variable SCALA_HOME, the
+Ant build script build.xml will compile any Scala source files
+and include Scala classes in the JAR file edu_mines_jtk.jar.
