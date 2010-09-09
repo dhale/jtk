@@ -77,7 +77,7 @@ def imageTeapot():
 #############################################################################
 # plotting
 
-def plot2Teapot(f,x1,x2,s,s1,s2,g=None,label=None,png=None):
+def plot2Teapot(f,x1,x2,s,s1,s2,g=None,label=None,png=None,et=None):
   n1 = len(s[0])
   n2 = len(s)
   panel = panel2Teapot()
@@ -111,15 +111,22 @@ def plot2Teapot(f,x1,x2,s,s1,s2,g=None,label=None,png=None):
   else:
     pv.setClips(0.0,1.0)
   cmap = pv.getColorMap()
-  fs,x1s,x2s = makePointSets(cmap,f,x1,x2)
-  for i in range(len(fs)):
-    color = cmap.getColor(fs[i][0])
-    color = Color(color.red,color.green,color.blue)
-    pv = panel.addPoints(x1s[i],x2s[i])
-    pv.setLineStyle(PointsView.Line.NONE)
-    pv.setMarkStyle(PointsView.Mark.FILLED_CIRCLE)
-    pv.setMarkSize(10)
-    pv.setMarkColor(color)
+  if et:
+    tv = TensorsView(s1,s2,et)
+    tv.setOrientation(TensorsView.Orientation.X1DOWN_X2RIGHT)
+    tv.setLineColor(Color.YELLOW)
+    tv.setLineWidth(3.0)
+    panel.getTile(0,0).addTiledView(tv)
+  else:
+    fs,x1s,x2s = makePointSets(cmap,f,x1,x2)
+    for i in range(len(fs)):
+      color = cmap.getColor(fs[i][0])
+      color = Color(color.red,color.green,color.blue)
+      pv = panel.addPoints(x1s[i],x2s[i])
+      pv.setLineStyle(PointsView.Line.NONE)
+      pv.setMarkStyle(PointsView.Mark.FILLED_CIRCLE)
+      pv.setMarkSize(10)
+      pv.setMarkColor(color)
   frame2Teapot(panel,png)
 
 def makePointSets(cmap,f,x1,x2):

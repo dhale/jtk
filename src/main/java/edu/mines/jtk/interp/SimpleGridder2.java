@@ -38,6 +38,7 @@ public class SimpleGridder2 implements Gridder2 {
 
   /**
    * Sets the null value used for grid cells that contain no known samples.
+   * The default null value is zero.
    * @param fnull the null value.
    */
   public void setNullValue(float fnull) {

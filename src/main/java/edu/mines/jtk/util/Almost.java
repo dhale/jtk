@@ -207,7 +207,9 @@ public class Almost implements Serializable, Comparator<Number> {
       throw new IllegalArgumentException("Comparing a NaN");
 
     double er1 = _epsilon * ar1;
+    if (_minValue > er1) {er1 = _minValue;}
     double er2 = _epsilon * ar2;
+    if (_minValue > er2) {er2 = _minValue;}
     if (r1 - er1 > r2 + er2 )
       return 1;
     else if (r1 + er1 < r2 - er2 )

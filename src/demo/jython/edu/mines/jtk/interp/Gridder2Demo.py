@@ -33,6 +33,7 @@ def demoTeapot():
   sg.setNullValue(fnull)
   p = sg.grid(st,sx)
   tensors = makeImageTensors(s)
+  plot2Teapot(f,t,x,s,st,sx,None,"Known value","tp2f",et=tensors)
   #tensors = setRandomEigenvalues(tensors)
   bg = makeBlendedGridder(f,t,x,smooth=smooth)
   bg.setTensors(tensors)

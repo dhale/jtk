@@ -45,7 +45,7 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2009.01.06
  */
-class TimeMarker2 {
+public class TimeMarker2 {
 
   /**
    * Type of concurrency used by this transform.
