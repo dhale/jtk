@@ -22,7 +22,7 @@ def main(args):
   #demoNotreDame()
   #demoSaddle()
   #demoSinSin()
-
+ 
 def demoTeapot():
   t,x,f = dataTeapot()
   st,sx,s = imageTeapot()
@@ -183,6 +183,8 @@ def makeGridders(f,x,y,sx,sy):
   gridders.append(g); gridderNames[g] = "Splines: t = 0"
   g = makeBlendedGridder(f,x,y,smooth=0.7)
   gridders.append(g); gridderNames[g] = "Blended: s = 0.7"
+  g = makeBlendedGridder(f,x,y,smooth=0.5)
+  gridders.append(g); gridderNames[g] = "Blended: s = 0.5"
   g = makeSibsonGridder(f,x,y,smooth=False)
   gridders.append(g); gridderNames[g] = "Sibson C0"
   """
@@ -233,11 +235,13 @@ def makeBiharmonicGridder(f,x,y):
   rg.setPolyTrend(1)
   return rg
 
-def makeBlendedGridder(f,x,y,smooth=0.5,tmax=FLT_MAX):
+def makeBlendedGridder(f,x,y,smooth=0.5,tmax=FLT_MAX,tmx=False):
   bg = BlendedGridder2(f,x,y)
   bg.setSmoothness(smooth)
   if tmax<FLT_MAX:
     bg.setTimeMax(tmax)
+  if tmx:
+    bg.setTimeMarkerX(tmx)
   return bg
 
 def makeSibsonGridder(f,x,y,smooth=False):
