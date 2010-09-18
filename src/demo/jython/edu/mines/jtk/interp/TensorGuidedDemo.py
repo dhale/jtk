@@ -17,8 +17,8 @@ from edu.mines.jtk.util.ArrayMath import *
 # demos
 
 def main(args):
-  #demoCircleData2()
-  demoSphereData3()
+  demoCircleData2()
+  #demoSphereData3()
   return
 
 def demoCircleData2():
@@ -27,14 +27,14 @@ def demoCircleData2():
   fnull = -999.0
   s1,s2 = Sampling(n1),Sampling(n2)
   f,x1,x2 = makeCircleData2(n1,n2,kr,kt)
-  for au in [0.01]:
+  for au in [1.00,0.01]:
     sg = SimpleGridder2(f,x1,x2)
     sg.setNullValue(fnull)
     p = sg.grid(s1,s2)
     d = makeCircleTensors2(n1,n2,au)
     bg = BlendedGridder2(d,f,x1,x2)
     bg.setSmoothness(0.5)
-    bg.setTimeMarkerX(False)
+    bg.setTimeMarkerX(True)
     t = bg.gridNearest(fnull,p)
     q = copy(p)
     bg.gridBlended(t,p,q)
@@ -58,8 +58,7 @@ def demoSphereData3():
   fnull = -999.0
   s1,s2,s3 = Sampling(n1),Sampling(n2),Sampling(n3)
   f,x1,x2,x3 = makeSphereData3(n1,n2,n3,kr,kt,kp)
-  #for tmx in [False,True]:
-  for tmx in [False]:
+  for tmx in [False,True]:
     sg = SimpleGridder3(f,x1,x2,x3)
     sg.setNullValue(fnull)
     p = sg.grid(s1,s2,s3)
@@ -131,15 +130,12 @@ def makeCircleData2(n1,n2,kr,kt):
     if fi==0.0: fi = 1.0
     else: fi = 0.0
   """
-  for i in range(3,min(n1,n2),3):
+  for i in range(8,min(n1,n2),8):
     f.append(fi)
     x1.append(float(i))
     x2.append(float(i))
     if fi==0.0: fi = 1.0
     else: fi = 0.0
-  f.append(fi)
-  x1.append(4.0)
-  x2.append(4.0)
   """
   return f,x1,x2
 
