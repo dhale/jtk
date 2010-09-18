@@ -148,6 +148,19 @@ public class BlendedGridder2 implements Gridder2 {
   }
 
   /**
+   * Experimental use only.
+   */
+  public void setTimeMarkerX(boolean tmx) {
+    _tmx = tmx;
+  }
+  /**
+   * Experimental use only.
+   */
+  public double getTimeMarkerS() {
+    return _tms;
+  }
+
+  /**
    * Computes gridded values using nearest neighbors.
    * Gridded values in the array p are computed for only unknown 
    * samples with value equal to the specified null value. Any
@@ -236,9 +249,11 @@ public class BlendedGridder2 implements Gridder2 {
     LocalSmoothingFilter lsf = new LocalSmoothingFilter(0.01,10000,_ldk);
     lsf.setPreconditioner(true);
     float pavg = sum(p)/n1/n2;
-    float[][] r = copy(p);
-    sub(r,pavg,r);
-    lsf.applySmoothS(r,r);
+    float[][] r = sub(p,pavg);
+    // Smoothing attenuates finite-difference errors near Nyquist.
+    // The problem with this smoothing is that it makes q != p when
+    // known samples are adjacent, as when interpolating well logs.
+    //lsf.applySmoothS(r,r);
     lsf.apply(_tensors,_c,s,r,q);
     add(q,pavg,q);
 
@@ -296,6 +311,9 @@ public class BlendedGridder2 implements Gridder2 {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  private boolean _tmx; // true if using experimental time marker
+  private double _tms; // time marker CPU time in seconds
+
   private Tensors2 _tensors;
   private float[] _f,_x1,_x2;
   private boolean _blending = true;
@@ -324,8 +342,21 @@ public class BlendedGridder2 implements Gridder2 {
     }
 
     // Use the time marker to compute both times and marks.
-    TimeMarker2 tm = new TimeMarker2(n1,n2,_tensors);
-    tm.apply(t,m);
+    edu.mines.jtk.util.Stopwatch sw = new edu.mines.jtk.util.Stopwatch();
+    if (_tmx) {
+      TimeMarker2X tm = new TimeMarker2X(n1,n2,_tensors);
+      //tm.setConcurrency(TimeMarker2X.Concurrency.SERIAL);
+      sw.start();
+      tm.apply(t,m);
+      sw.stop();
+    } else {
+      TimeMarker2 tm = new TimeMarker2(n1,n2,_tensors);
+      //tm.setConcurrency(TimeMarker2.Concurrency.SERIAL);
+      sw.start();
+      tm.apply(t,m);
+      sw.stop();
+    }
+    _tms = sw.time();
 
     // Adjust times to ensure interpolation of known samples.
     adjustTimes(nmark,m,t);

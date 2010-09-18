@@ -6,6 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.interp;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,6 +17,8 @@ import edu.mines.jtk.util.Stopwatch;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
+ * EXPERIMENTAL: uses a heap instead of random shuffling of known samples.
+ * <p>
  * A time and closest-point transform for 3D anisotropic eikonal equations.
  * Transforms an array of times and marks for known samples into an array 
  * of times and marks for all samples. Known samples are those for which
@@ -47,7 +50,7 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2009.07.21
  */
-public class TimeMarker3 {
+class TimeMarker3X {
 
   /**
    * Type of concurrency used by this transform.
@@ -64,7 +67,7 @@ public class TimeMarker3 {
    * @param n3 number of samples in 2nd dimension.
    * @param tensors velocity-squared tensors.
    */
-  public TimeMarker3(int n1, int n2, int n3, Tensors3 tensors) {
+  public TimeMarker3X(int n1, int n2, int n3, Tensors3 tensors) {
     init(n1,n2,n3,tensors);
   }
 
@@ -98,25 +101,21 @@ public class TimeMarker3 {
     // Measure elapsed time in seconds.
     Stopwatch sw = new Stopwatch();
     sw.start();
-    log.fine("TimeMarker3.apply: begin time="+(int)sw.time());
+    log.fine("TimeMarker3X.apply: begin time="+(int)sw.time());
 
-    // Initialize all unknown times to infinity.
+    // Make a heap of the known samples.
+    TimeHeap3 theap = makeTimeHeap(times,marks);
+    int nk = theap.size();
+    log.fine("TimeMarker3X.apply: heap time="+(int)sw.time());
+
+    // Initialize all times to infinity.
     for (int i3=0; i3<_n3; ++i3) {
       for (int i2=0; i2<_n2; ++i2) {
         for (int i1=0; i1<_n1; ++i1) {
-          if (times[i3][i2][i1]!=0.0f)
-            times[i3][i2][i1] = INFINITY;
+          times[i3][i2][i1] = INFINITY;
         }
       }
     }
-
-    // Indices of known samples in random order.
-    short[][] kk = indexKnownSamples(times);
-    short[] k1 = kk[0];
-    short[] k2 = kk[1];
-    short[] k3 = kk[2];
-    shuffle(k1,k2,k3);
-    int nk = k1.length;
 
     // Array for the eikonal solution times.
     float[][][] t = new float[_n3][_n2][_n1];
@@ -128,37 +127,35 @@ public class TimeMarker3 {
     for (int ik=0; ik<nk; ++ik) {
       if (ik%(1+(nk-1)/100)==0)
         log.fine("  apply: ik/nk="+ik+"/"+nk+" time="+(int)sw.time());
-      int i1 = k1[ik];
-      int i2 = k2[ik];
-      int i3 = k3[ik];
+
+      // Remove known sample with largest time from the heap.
+      TimeHeap3.Entry ek = theap.remove();
+      int k1 = ek.i1;
+      int k2 = ek.i2;
+      int k3 = ek.i3;
+      int m = ek.mark;
+
+      // Known samples have zero time and specified mark.
+      times[k3][k2][k1] = 0.0f;
+      marks[k3][k2][k1] = m;
 
       // Clear activated flags so we can tell which samples become activated.
       clearActivated();
 
       // Put the known sample with time zero into the active list.
-      t[i3][i2][i1] = 0.0f;
-      al.append(_s[i3][i2][i1]);
-
-      // The mark for the known sample.
-      int m = marks[i3][i2][i1];
+      t[k3][k2][k1] = 0.0f;
+      al.append(_s[k3][k2][k1]);
 
       // Process the active list until empty.
       solve(al,t,m,times,marks);
+
+      // Update the time heap.
+      updateTimeHeap(times,marks,ek,theap);
     }
 
     // Log elapsed time.
     sw.stop();
-    log.fine("TimeMarker3.apply: end time="+(int)sw.time());
-  }
-
-  private void solve(
-    ActiveList al, float[][][] t, int m, float[][][] times, int[][][] marks) 
-  {
-    if (_concurrency==Concurrency.PARALLEL) {
-      solveParallel(al,t,m,times,marks);
-    } else {
-      solveSerial(al,t,m,times,marks);
-    }
+    log.fine("TimeMarker3X.apply: end time="+(int)sw.time());
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -177,6 +174,7 @@ public class TimeMarker3 {
   private int _n1,_n2,_n3;
   private Tensors3 _tensors;
   private Sample[][][] _s;
+  private ArrayList<Sample> _als = new ArrayList<Sample>(2048);
   private Concurrency _concurrency = Concurrency.PARALLEL;
 
   private void init(int n1, int n2, int n3, Tensors3 tensors) {
@@ -338,83 +336,149 @@ public class TimeMarker3 {
     return s.activated==_activated;
   }
 
-  // More efficient than ArrayStack<Short>.
-  private static class ShortStack {
-    void push(int k) {
-      if (_n==_a.length) {
-        short[] a = new short[2*_n];
-        System.arraycopy(_a,0,a,0,_n);
-        _a = a;
+  /*
+   * Returns a heap of known samples. At the top of the heap is
+   * the known sample nearest to the middle of the sampling grid.
+   */
+  private TimeHeap3 makeTimeHeap(float[][][] times, int[][][] marks) {
+
+    // Marks and indices of known samples.
+    int[][] kk = indexKnownSamples(times,marks);
+    int[] km = kk[0];
+    int[] k1 = kk[1];
+    int[] k2 = kk[2];
+    int[] k3 = kk[3];
+    int nk = km.length;
+
+    // Find the known sample nearest to the middle of the sampling grid.
+    int ikmid = 0;
+    float dkmid = INFINITY;
+    int m1 = _n1/2;
+    int m2 = _n2/2;
+    int m3 = _n3/2;
+    for (int ik=0; ik<nk; ++ik) {
+      int i1 = k1[ik];
+      int i2 = k2[ik];
+      int i3 = k3[ik];
+      float d1 = i1-m1;
+      float d2 = i2-m2;
+      float d3 = i3-m3;
+      float dk = d1*d1+d2*d2+d3*d3;
+      if (dk<dkmid) {
+        ikmid = ik;
+        dkmid = dk;
       }
-      _a[_n++] = (short)k;
     }
-    short pop() {
-      return _a[--_n];
+
+    // Build a heap of known samples. Ensure that the sample nearest 
+    // the middle of the sampling grid is at the top of the heap.
+    TimeHeap3 theap = new TimeHeap3(TimeHeap3.Type.MAX,_n1,_n2,_n3);
+    for (int ik=0; ik<nk; ++ik) {
+      if (ik==ikmid) {
+        theap.insert(k1[ik],k2[ik],k3[ik],INFINITY,km[ik]);
+      } else {
+        theap.insert(k1[ik],k2[ik],k3[ik],0.5f*INFINITY,km[ik]);
+      }
     }
-    int size() {
-      return _n;
-    }
-    void clear() {
-      _n = 0;
-    }
-    boolean isEmpty() {
-      return _n==0;
-    }
-    short[] array() {
-      short[] a = new short[_n];
-      System.arraycopy(_a,0,a,0,_n);
-      return a;
-    }
-    private int _n = 0;
-    private short[] _a = new short[2048];
+    return theap;
   }
 
   /*
-   * Returns arrays of indices of known samples with times zero.
-   * Includes only known samples adjacent to at least one unknown sample.
-   * (Does not include known samples surrounded by other known samples.)
+   * Updates the time heap. Should be called after times and marks 
+   * have been computed for the known sample with specified entry.
+   * This method reduces times for entries in the heap corresponding
+   * to known samples that were activated by the solver.
    */
-  private short[][] indexKnownSamples(float[][][] times) {
-    ShortStack ss1 = new ShortStack();
-    ShortStack ss2 = new ShortStack();
-    ShortStack ss3 = new ShortStack();
+  private void updateTimeHeap(
+    float[][][] times, int[][][] marks, TimeHeap3.Entry ek, TimeHeap3 theap)
+  {
+    if (theap.isEmpty()) 
+      return;
+
+    // Indices and mark for the specified entry.
+    int k1 = ek.i1;
+    int k2 = ek.i2;
+    int k3 = ek.i3;
+    int m = ek.mark;
+
+    // Clear the list of samples.
+    _als.clear();
+
+    // Add the known sample to the list.
+    addSampleToList(k1,k2,k3);
+
+    // While the list of samples is not empty, ...
+    while (!_als.isEmpty()) {
+
+      // Get the next sample from the list.
+      Sample s = _als.remove(_als.size()-1);
+      int i1 = s.i1;
+      int i2 = s.i2;
+      int i3 = s.i3;
+
+      // If sample has the current mark and is known, reduce its time.
+      if (m==marks[i3][i2][i1] && theap.contains(i1,i2,i3))
+        theap.reduce(i1,i2,i3,times[i3][i2][i1]);
+
+      // Add to the list any neighbor samples that were activated.
+      if (0<i1) addSampleToList(i1-1,i2,i3);
+      if (0<i2) addSampleToList(i1,i2-1,i3);
+      if (0<i3) addSampleToList(i1,i2,i3-1);
+      if (i1<_n1-1) addSampleToList(i1+1,i2,i3);
+      if (i2<_n2-1) addSampleToList(i1,i2+1,i3);
+      if (i3<_n3-1) addSampleToList(i1,i3,i3+1);
+    }
+  }
+  private void addSampleToList(int i1, int i2, int i3) {
+    if (wasActivated(_s[i3][i2][i1])) {
+      _als.add(_s[i3][i2][i1]);
+      clearActivated(_s[i3][i2][i1]);
+    }
+  }
+
+  /*
+   * Returns marks and indices of known samples with times zero.
+   */
+  private int[][] indexKnownSamples(float[][][] times, int[][][] marks) {
+    int nk = 0;
     for (int i3=0; i3<_n3; ++i3) {
       for (int i2=0; i2<_n2; ++i2) {
         for (int i1=0; i1<_n1; ++i1) {
+          if (times[i3][i2][i1]==0.0f)
+            ++nk;
+        }
+      }
+    }
+    int[] km = new int[nk];
+    int[] k1 = new int[nk];
+    int[] k2 = new int[nk];
+    int[] k3 = new int[nk];
+    for (int i3=0,ik=0; i3<_n3; ++i3) {
+      for (int i2=0; i2<_n2; ++i2) {
+        for (int i1=0; i1<_n1; ++i1) {
           if (times[i3][i2][i1]==0.0f) {
-            for (int k=0; k<6; ++k) {
-              int j1 = i1+K1[k];  if (j1<0 || j1>=_n1) continue;
-              int j2 = i2+K2[k];  if (j2<0 || j2>=_n2) continue;
-              int j3 = i3+K3[k];  if (j3<0 || j3>=_n3) continue;
-              if (times[j3][j2][j1]!=0.0f) {
-                ss1.push(i1);
-                ss2.push(i2);
-                ss3.push(i3);
-                break;
-              }
-            }
+            km[ik] = marks[i3][i2][i1];
+            k1[ik] = i1;
+            k2[ik] = i2;
+            k3[ik] = i3;
+            ++ik;
           }
         }
       }
     }
-    short[] i1 = ss1.array();
-    short[] i2 = ss2.array();
-    short[] i3 = ss3.array();
-    return new short[][]{i1,i2,i3};
+    return new int[][]{km,k1,k2,k3};
   }
 
   /*
-   * Randomly shuffles the specified arrays of indices.
+   * Solves for times and marks.
    */
-  private static void shuffle(short[] i1, short[] i2, short[] i3) {
-    int n = i1.length;
-    Random r = new Random(314159); // constant seed for consistency
-    short ii;
-    for (int i=n-1; i>0; --i) {
-      int j = r.nextInt(i+1);
-      ii = i1[i]; i1[i] = i1[j]; i1[j] = ii;
-      ii = i2[i]; i2[i] = i2[j]; i2[j] = ii;
-      ii = i3[i]; i3[i] = i3[j]; i3[j] = ii;
+  private void solve(
+    ActiveList al, float[][][] t, int m, float[][][] times, int[][][] marks) 
+  {
+    if (_concurrency==Concurrency.PARALLEL) {
+      solveParallel(al,t,m,times,marks);
+    } else {
+      solveSerial(al,t,m,times,marks);
     }
   }
 
