@@ -253,7 +253,7 @@ public class BlendedGridder2 implements Gridder2 {
     // Smoothing attenuates finite-difference errors near Nyquist.
     // The problem with this smoothing is that it makes q != p when
     // known samples are adjacent, as when interpolating well logs.
-    //lsf.applySmoothS(r,r);
+    lsf.applySmoothS(r,r);
     lsf.apply(_tensors,_c,s,r,q);
     add(q,pavg,q);
 
