@@ -9,7 +9,6 @@ package edu.mines.jtk.dsp;
 import java.util.logging.Logger;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import edu.mines.jtk.util.AtomicFloat;
 import edu.mines.jtk.util.Threads;
 import static edu.mines.jtk.util.ArrayMath.*;
 
@@ -879,7 +878,7 @@ public class LocalSmoothingFilter {
   }
   private static float sdotP(final float[][][] x, final float[][][] y) {
     final int n3 = x.length;
-    final AtomicFloat ad = new AtomicFloat(0.0f);
+    final float[] d3 = new float[n3];
     final AtomicInteger a3 = new AtomicInteger(0);
     Thread[] threads = Threads.makeArray();
     for (int ithread=0; ithread<threads.length; ++ithread) {
@@ -887,13 +886,15 @@ public class LocalSmoothingFilter {
         public void run() {
           float d = 0.0f;
           for (int i3=a3.getAndIncrement(); i3<n3; i3=a3.getAndIncrement())
-            d += sdot(x[i3],y[i3]);
-          ad.getAndAdd(d);
+            d3[i3] = sdot(x[i3],y[i3]);
         }
       });
     }
     Threads.startAndJoin(threads);
-    return ad.get();
+    float d = 0.0f;
+    for (int i3=0; i3<n3; ++i3)
+      d += d3[i3];
+    return d;
   }
 
   // Computes y = y + a*x.

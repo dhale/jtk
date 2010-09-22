@@ -17,10 +17,10 @@ from edu.mines.jtk.util.ArrayMath import *
 
 def main(args):
   #demoCircleChirp2()
-  demoCircleImpulses2()
+  #demoCircleImpulses2()
   #demoCircleRandom2()
   #demoSphereImpulses3()
-  #demoSphereRandom3()
+  demoSphereRandom3()
   return
 
 lowpass,simple = "lowpass","simple"
@@ -96,7 +96,7 @@ def demoSphere3(input,smooth):
     lsf.applySmoothL(0.40,f,f)
   elif smooth==simple:
     lsf.applySmoothS(f,f)
-  plot3(f,cmin=cmin,cmax=cmax,slices=slices)
+  #plot3(f,cmin=cmin,cmax=cmax,slices=slices)
   if input==impulses:
     cmin *= 0.01; cmax *= 0.01
   elif input==random:
@@ -111,7 +111,7 @@ def demoSphere3(input,smooth):
     lsf.apply(d,200.0,f,g)
     sw.stop()
     print "time =",sw.time()
-    plot3(g,cmin=cmin,cmax=cmax,slices=slices)
+    #plot3(g,cmin=cmin,cmax=cmax,slices=slices)
 
 #############################################################################
 # constants
@@ -139,11 +139,13 @@ stencilName = {
 # input images
 
 def makeRandomImage2(n1,n2):
-  r = sub(randfloat(n1,n2),0.5)
+  rand = Random(314159)
+  r = sub(randfloat(rand,n1,n2),0.5)
   return r
 
 def makeRandomImage3(n1,n2,n3):
-  r = sub(randfloat(n1,n2,n3),0.5)
+  rand = Random(314159)
+  r = sub(randfloat(rand,n1,n2,n3),0.5)
   return r
 
 def makeCircleChirp2(n1,n2,kmax):
