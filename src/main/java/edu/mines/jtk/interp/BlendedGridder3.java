@@ -263,8 +263,7 @@ public class BlendedGridder3 implements Gridder3 {
     }
 
     // Construct and apply a local smoothing filter.
-    //LocalSmoothingFilter lsf = new LocalSmoothingFilter(0.01,10000,_ldk);
-    LocalSmoothingFilter lsf = new LocalSmoothingFilter(0.01,100,_ldk);
+    LocalSmoothingFilter lsf = new LocalSmoothingFilter(0.01,10000,_ldk);
     lsf.setPreconditioner(true);
     float pavg = sum(p)/n1/n2/n3;
     float[][][] r = sub(p,pavg);
