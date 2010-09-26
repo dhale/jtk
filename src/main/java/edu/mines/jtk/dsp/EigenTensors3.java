@@ -87,7 +87,7 @@ public class EigenTensors3 implements Tensors3,Serializable {
 
   /**
    * Constructs tensors for specified array dimensions and eigenvalues.
-   * The 3rd components of eigenvectors u and v are computed from the 1st 
+   * The 3rd components of eigenvectors u and w are computed from the 1st 
    * and 2nd components and are assumed to be non-negative.
    * @param u1 array of 1st components of u.
    * @param u2 array of 2nd components of u.

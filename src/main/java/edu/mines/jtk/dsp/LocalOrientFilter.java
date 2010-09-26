@@ -41,7 +41,7 @@ import edu.mines.jtk.util.Threads;
  * eigenvector u is orthogonal to the best fitting plane, and the 1st 
  * component u1 of u is always non-negative. The 2nd eigenvector v is 
  * orthogonal to the best fitting line within the best fitting plane.
- * The 3rd eigenvector w is the cross product of u and v and is aligned
+ * The 3rd eigenvector w is orthogonal to both u and v and is aligned
  * with the direction in which the images changes least. The dip angle 
  * theta = acos(u1) is the angle between the 1st eigenvector u and axis 1; 
  * 0 &lt;= theta &lt;= pi/2. The azimuthal angle phi = atan2(u3,u2)
@@ -725,10 +725,10 @@ public class LocalOrientFilter {
     for (int ithread=0; ithread<threads.length; ++ithread) {
       threads[ithread] = new Thread(new Runnable() {
         public void run() {
+          double[][] a = new double[3][3];
+          double[][] z = new double[3][3];
+          double[] e = new double[3];
           for (int i3=ai.getAndIncrement(); i3<n3; i3=ai.getAndIncrement()) {
-            double[][] a = new double[3][3];
-            double[][] z = new double[3][3];
-            double[] e = new double[3];
             for (int i2=0; i2<n2; ++i2) {
               for (int i1=0; i1<n1; ++i1) {
                 a[0][0] = g11[i3][i2][i1];
@@ -747,6 +747,9 @@ public class LocalOrientFilter {
                 float v1i = (float)z[1][0];
                 float v2i = (float)z[1][1];
                 float v3i = (float)z[1][2];
+                float w1i = (float)z[2][0];
+                float w2i = (float)z[2][1];
+                float w3i = (float)z[2][2];
                 if (u1i<0.0f) {
                   u1i = -u1i;
                   u2i = -u2i;
@@ -757,9 +760,11 @@ public class LocalOrientFilter {
                   v2i = -v2i;
                   v3i = -v3i;
                 }
-                float w1i = u2i*v3i-u3i*v2i;
-                float w2i = u3i*v1i-u1i*v3i;
-                float w3i = u1i*v2i-u2i*v1i;
+                if (w3i<0.0f) {
+                  w1i = -w1i;
+                  w2i = -w2i;
+                  w3i = -w3i;
+                }
                 float eui = (float)e[0];
                 float evi = (float)e[1];
                 float ewi = (float)e[2];
