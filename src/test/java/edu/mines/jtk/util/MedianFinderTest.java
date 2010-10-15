@@ -30,7 +30,7 @@ public class MedianFinderTest extends TestCase {
     Random r = new Random();
     int ntest = 100;
     for (int itest=0; itest<ntest; ++itest) {
-      int n = 1+r.nextInt(100);
+      int n = 1+(r.nextBoolean()?r.nextInt(100):r.nextInt(10));
       float[] f = randfloat(n);
       float[] w = fillfloat(1.0f,n);
       if (r.nextBoolean()) {
@@ -48,7 +48,7 @@ public class MedianFinderTest extends TestCase {
     Random r = new Random();
     int ntest = 100;
     for (int itest=0; itest<ntest; ++itest) {
-      int n = 1+r.nextInt(100);
+      int n = 1+(r.nextBoolean()?r.nextInt(100):r.nextInt(10));
       float[] w = randfloat(n);
       float[] f = randfloat(n);
 
