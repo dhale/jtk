@@ -26,6 +26,13 @@ import edu.mines.jtk.util.Check;
  * found by quadratic interpolation of correlation functions sampled at
  * integer lags.
  * <p>
+ * The peak (maximum) correlation coefficient may be used to measure 
+ * quality of an estimated shift. However, because a correlation function 
+ * may have more than one peak (local maxima), a better measure of quality 
+ * may be the difference between the coefficients for the correlation peak 
+ * and next highest peak. Both the peak coefficient and this difference may 
+ * be computed with the shifts.
+ * <p>
  * Methods are provided to find and compensate for each component of shift 
  * sequentially. As each component is found, that component can be removed 
  * from the image g before estimating another component. For example, again 
@@ -115,7 +122,26 @@ public class LocalShiftFinder {
   public void find1(
     int min1, int max1, float[] f, float[] g, float[] u) 
   {
-    findShifts(min1,max1,f,g,u);
+    findShifts(min1,max1,f,g,u,null,null);
+  }
+
+  /**
+   * Finds shifts in the 1st (and only) dimension.
+   * Also computes peak correlation coefficients and differences between
+   * the peak and next-highest-peak coeffcients.
+   * @param min1 the minimum shift.
+   * @param max1 the maximum shift.
+   * @param f the input array f.
+   * @param g the input array g.
+   * @param u output array of shifts.
+   * @param c output array of peak correlation coefficients.
+   * @param d output array of differences, peak minus next-highest-peak.
+   */
+  public void find1(
+    int min1, int max1, float[] f, float[] g, 
+    float[] u, float[] c, float[] d)
+  {
+    findShifts(min1,max1,f,g,u,c,d);
   }
 
   /**
@@ -657,6 +683,74 @@ public class LocalShiftFinder {
   private LocalCorrelationFilter _lcfSimple;
   private SincInterpolator _si;
   private boolean _interpolateDisplacements = true;
+
+  private void findShifts(
+    int min, int max, float[] f, float[] g, float[] u, float[] c, float[] d) 
+  {
+    int n1 = f.length;
+
+    // Initially shifts, correlations, and differences are zero.
+    zero(u);
+    if (c!=null) 
+      zero(c);
+    else
+      c = zerofloat(n1);
+    if (d!=null) 
+      zero(d);
+
+    // Arrays to contain cross-correlations for three consecutive lags.
+    float[][] c3 = new float[3][n1];
+
+    // Correlate for min lag.
+    LocalCorrelationFilter lcf = _lcfSimple;
+    lcf.setInputs(f,g);
+    int lag1 = min;
+    lcf.correlate(lag1,c3[1]);
+    lcf.normalize(lag1,c3[1]);
+
+    // For all lags in range [min,max], ...
+    for (int lag=min; lag<=max; ++lag) {
+
+      // Arrays ca, cb, and cc will contain three cross-correlations. For 
+      // first and last lags, buffers a and c are the same. In other words, 
+      // assume that correlation values are symmetric about the min and max 
+      // lags scanned. This assumption enables local maxima to occur at the 
+      // specified min and max lags, but forces displacements to lie within 
+      // the range [min,max].
+      int i = lag-min;
+      float[] ca = (lag>min)?c3[(i  )%3]:c3[(i+2)%3];
+      float[] cb =           c3[(i+1)%3];
+      float[] cc = (lag<max)?c3[(i+2)%3]:c3[(i  )%3];
+
+      // Except for last lag, compute correlation for next lag in array cc.
+      if (lag<max) {
+        lag1 = lag+1;
+        lcf.correlate(lag1,cc);
+        lcf.normalize(lag1,cc);
+      }
+
+      // For each sample, check for a local max correlation value. For each 
+      // local max, update the correlation maximum value and displacement
+      // using quadratic interpolation of three correlation values.
+      for (int i1=0; i1<n1; ++i1) {
+        float ai = ca[i1];
+        float bi = cb[i1];
+        float ci = cc[i1];
+        if (bi>=ai && bi>=ci) {
+          double c0 = bi;
+          double c1 = 0.5*(ci-ai);
+          double c2 = 0.5*(ci+ai)-bi;
+          double up = (c2<0.0)?-0.5*c1/c2:0.0;
+          double cp = c0+up*(c1+up*c2);
+          if (cp>c[i1]) {
+            if (d!=null) d[i1] = (float)cp-c[i1];
+            c[i1] = (float)cp;
+            u[i1] = (float)(lag+up);
+          }
+        }
+      }
+    }
+  }
 
   private void findShifts(
     int min, int max, float[] f, float[] g, float[] u) 
