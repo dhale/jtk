@@ -12,8 +12,8 @@ import static edu.mines.jtk.util.ArrayMath.*;
 /**
  * Computes medians or weighted medians.
  * <p>
- * The weighted median is the value x that minimizes the following 
- * function:
+ * The weighted median of n values x[i] is the value x that minimizes 
+ * the following function:
  * <pre>
  *        n-1
  * f(x) = sum w[i]*abs(x-x[i])
