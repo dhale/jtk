@@ -22,9 +22,8 @@ import edu.mines.jtk.util.Stopwatch;
  */
 public class MtMatMulBench {
 
-  //public static final int NTHREAD = 
-  //  Runtime.getRuntime().availableProcessors();
-  public static final int NTHREAD = 8;
+  public static final int NTHREAD = 
+    Runtime.getRuntime().availableProcessors();
 
   public static void main(String[] args) {
     int m = 1001;
@@ -37,7 +36,7 @@ public class MtMatMulBench {
     float[][] c4 = zerofloat(m,m);
     Stopwatch s = new Stopwatch();
     double mflops = 2.0e-6*m*m*n;
-    double nmul,maxtime=5.0;
+    double maxtime = 5.0;
 
     System.out.println("Methods:");
     System.out.println("mul1 = single-threaded");
@@ -48,6 +47,7 @@ public class MtMatMulBench {
 
     for (int ntrial=0; ntrial<5; ++ntrial) {
       System.out.println();
+      int nmul;
 
       s.restart();
       for (nmul=0; s.time()<maxtime; ++nmul)
