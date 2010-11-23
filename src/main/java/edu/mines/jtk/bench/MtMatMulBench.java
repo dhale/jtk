@@ -26,8 +26,8 @@ public class MtMatMulBench {
     Runtime.getRuntime().availableProcessors();
 
   public static void main(String[] args) {
-    int m = 1001;
-    int n = 1002;
+    int m = 101;
+    int n = 102;
     float[][] a = randfloat(n,m);
     float[][] b = randfloat(m,n);
     float[][] c1 = zerofloat(m,m);

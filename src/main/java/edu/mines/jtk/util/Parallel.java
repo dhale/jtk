@@ -6,12 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
-import jsr166y.*; // change when JDK 7 is available
+import jsr166y.*; // until JDK 7 is available
 
 import static edu.mines.jtk.util.ArrayMath.*; // for testing only
 
 /**
- * Utilities for parallel computing of loops over independent tasks.
+ * Utilities for parallel computing in loops over independent tasks.
  * This class provides convenient methods for parallel processing of
  * tasks that require loops over indices, in which computations for 
  * different indices do not modify any shared mutable data.
@@ -83,7 +83,7 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  * <pre><code>
  * static float sumParallel(final float[][] a) {
  *   int n = a.length;
- *   return reduce(n,ReduceInt<Float>() {
+ *   return reduce(n,ReduceInt&lt;Float&gt;() {
  *     public Float compute(int i) {
  *       return sum(a[i]);
  *     }
@@ -96,7 +96,7 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  * In the parallel version, we implement the interface ReduceInt
  * with two methods, one to compute sums of array elements and
  * another to combine two such sums together. The same pattern
- * works for other reduce operations. For example, using similar 
+ * works for other reduce operations. For example, with similar 
  * functions we could compute both minimum and maximum values and
  * other summary statistics for any indexed sequence of values.
  * <p>
@@ -110,16 +110,16 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  * for (int i=begin; i&lt;end; i+=stride)
  *   // some computation that depends on i
  * </code></pre>
- * In addition to loop parameters begin, end, and stride, a fourth
- * parameter chunk may also be specified. This chunk parameter is a
- * threshold for splitting tasks so that they can be performed in
- * parallel. Tasks are forked only for sets of indices that are larger 
+ * In addition to the three loop parameters begin, end, and stride, a 
+ * fourth parameter chunk may be specified. This chunk parameter is 
+ * a threshold for splitting tasks so that they can be performed in
+ * parallel. Tasks are split only for sets of indices that are larger 
  * than the specified chunk size. Smaller sets of indices are processed 
  * serially. Increasing the chunk size will therefore reduce the number 
  * of tasks (and task overhead) but limit parallelism. The best chunk
  * size depends on the amount of computation performed for each index 
- * in the body of the loop. However, performance is usually stable for 
- * a wide range of chunk sizes.
+ * in the body of the loop. However, performance is typically stable 
+ * for a wide range of chunk sizes.
  *
  * TODO: discuss nested parallelism.
  *
@@ -329,8 +329,8 @@ public class Parallel {
 
   public static void main(String[] args) {
     benchArrayNorm();
-    //benchArrayAdd();
-    //benchMatrixMultiply();
+    benchArrayAdd();
+    benchMatrixMultiply();
   }
 
   // L2 norm of 3D array
