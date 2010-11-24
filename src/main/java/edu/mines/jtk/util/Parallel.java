@@ -53,9 +53,8 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  * index i is independent. The arrays a and b are declared final
  * as required for use in the implementation of {@code LoopInt}.
  * <p>
- * Note: the prefix {@code Parallel} for the method name {@code loop} 
- * and the interface name {@code LoopInt} can be omitted if we first 
- * import these names with 
+ * Note: the class name prefix {@code Parallel} for {@code loop} and 
+ * {@code LoopInt} can be omitted if we first import these names with 
  * <pre><code>
  * import static edu.mines.jtk.util.Parallel.*;
  * </code></pre>
@@ -101,11 +100,6 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  * we could compute minimum and maximum values (in a single reduce) for
  * any indexed sequence of values.
  * <p>
- * Static methods loop and reduce submit tasks to a fork-join framework
- * that maintains a pool of threads shared by all users of these methods.
- * These methods recursively fork tasks so that disjoint sets of indices 
- * are processed in parallel on different threads.
- * <p>
  * More general loops are supported, and are equivalent to the following 
  * serial code:
  * <pre><code>
@@ -117,6 +111,11 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  * ensures that reduce is always well-defined. The requirement that step
  * is positive ensures that the loop terminates.
  * <p>
+ * Static methods loop and reduce submit tasks to a fork-join framework
+ * that maintains a pool of threads shared by all users of these methods.
+ * These methods recursively fork tasks so that disjoint sets of indices 
+ * are processed in parallel on different threads.
+ * <p>
  * In addition to the three loop parameters begin, end, and step, a 
  * fourth parameter chunk may be specified. This chunk parameter is 
  * a threshold for splitting tasks so that they can be performed in
@@ -127,11 +126,12 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  * size depends on the amount of computation performed for each index 
  * in the body of the loop. However, performance is typically stable 
  * for a wide range of chunk sizes.
- *
+ * <p>
  * TODO: discuss nested parallelism.
- *
- * @see A Java Fork/Join Framework, by Doug Lea, for a description
- *  of the fork-join framework that will be included with JDK 7.
+ * <p>
+ * Reference: A Java Fork/Join Framework, by Doug Lea, describes the
+ * framework used to implement this class. This framework will be
+ * provided with JDK 7.
  * @author Dave Hale, Colorado School of Mines
  * @version 2010.11.23
  */
