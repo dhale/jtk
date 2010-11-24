@@ -13,53 +13,54 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
 /**
  * Utilities for parallel computing in loops over independent tasks.
  * This class provides convenient methods for parallel processing of
- * tasks that require loops over indices, in which computations for 
- * different indices do not modify any shared mutable data.
+ * tasks that involve loops over indices, in which computations for 
+ * different indices are independent, in that they do not modify any 
+ * shared data.
  * <p>
- * As a simple example, consider the following function that adds 
- * floats in two arrays and stores the results in a third array.
+ * As a simple example, consider the following function that squares 
+ * floats in one array and stores the results in a second array.
  * <pre><code>
- * static void add(float[] a, float[] b, float[] c) {
+ * static void sqr(float[] a, float[] b) {
  *   int n = a.length;
  *   for (int i=0; i&lt;n; ++i)
- *     c[i] = a[i]+b[i];
+ *     b[i] = a[i]*a[i];
  * }
  * </code></pre>
  * A serial version of a similar function for 2D arrays is:
  * <pre><code>
- * static void addSerial(
- *   float[][] a, 
- *   float[][] b, 
- *   float[][] c) 
+ * static void sqrSerial(float[][] a, float[][] b) 
  * {
  *   int n = a.length;
  *   for (int i=0; i&lt;n; ++i) {
- *     add(a[i],b[i],c[i]);
+ *     sqr(a[i],b[i]);
  * }
  * </code></pre>
  * Using this class, the parallel version for 2D arrays is:
  * <pre><code>
- * static void addParallel(
- *   final float[][] a, 
- *   final float[][] b, 
- *   final float[][] c) 
- * {
+ * static void sqrParallel(final float[][] a, final float[][] b) {
  *   int n = a.length;
- *   loop(n,new LoopInt() {
+ *   Parallel.loop(n,new Parallel.LoopInt() {
  *     public void compute(int i) {
- *       add(a[i],b[i],c[i]);
+ *       sqr(a[i],b[i]);
  *     }
  *   });
  * }
  * </code></pre>
- * In the parallel version, the method compute defined by the interface
- * LoopInt will be called n times for n different indices i in the range
- * [0,n-1]. The order of indices is both indeterminant and irrelevant 
- * because the computation for each index i is independent.
+ * In the parallel version, the method {@code compute} defined by the 
+ * interface {@code LoopInt} will be called n times for different 
+ * indices i in the range [0,n-1]. The order of indices is both 
+ * indeterminant and irrelevant because the computation for each 
+ * index i is independent. The arrays a and b are declared final
+ * as required for use in the implementation of {@code LoopInt}.
  * <p>
+ * Note: the prefix {@code Parallel} for the method name {@code loop} 
+ * and the interface name {@code LoopInt} can be omitted if we first 
+ * import these names with 
+ * <pre><code>
+ * import static edu.mines.jtk.util.Parallel.*;
+ * </code></pre>
  * A similar method facilitates tasks that reduce a sequence of indexed
- * values to one (or more) values. For example, given the following
- * method
+ * values to one or more values. For example, given the following method:
  * <pre><code>
  * static float sum(float[] a) {
  *   int n = a.length;
@@ -69,7 +70,7 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  *   return s;
  * }
  * </code></pre>
- * the serial and parallel versions for 2D arrays are:
+ * serial and parallel versions for 2D arrays may be written as:
  * <pre><code>
  * static float sumSerial(float[][] a) {
  *   int n = a.length;
@@ -83,7 +84,7 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  * <pre><code>
  * static float sumParallel(final float[][] a) {
  *   int n = a.length;
- *   return reduce(n,ReduceInt&lt;Float&gt;() {
+ *   return Parallel.reduce(n,Parallel.ReduceInt&lt;Float&gt;() {
  *     public Float compute(int i) {
  *       return sum(a[i]);
  *     }
@@ -93,24 +94,30 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  *   });
  * }
  * </code></pre>
- * In the parallel version, we implement the interface ReduceInt
- * with two methods, one to compute sums of array elements and
- * another to combine two such sums together. The same pattern
- * works for other reduce operations. For example, with similar 
- * functions we could compute both minimum and maximum values and
- * other summary statistics for any indexed sequence of values.
+ * In the parallel version, we implement the interface {@code ReduceInt}
+ * with two methods, one to {@code compute} sums of array elements and
+ * another to {@code combine} two such sums together. The same pattern
+ * works for other reduce operations. For example, with similar functions 
+ * we could compute minimum and maximum values (in a single reduce) for
+ * any indexed sequence of values.
  * <p>
  * Static methods loop and reduce submit tasks to a fork-join framework
  * that maintains a pool of threads shared by all users of these methods.
  * These methods recursively fork tasks so that disjoint sets of indices 
  * are processed in parallel on different threads.
  * <p>
- * More general loops are supported, equivalent to the following code:
+ * More general loops are supported, and are equivalent to the following 
+ * serial code:
  * <pre><code>
- * for (int i=begin; i&lt;end; i+=stride)
+ * for (int i=begin; i&lt;end; i+=step)
  *   // some computation that depends on i
  * </code></pre>
- * In addition to the three loop parameters begin, end, and stride, a 
+ * The methods loop and reduce require that begin is less than end and 
+ * that step is positive. The requirement that begin is less than end
+ * ensures that reduce is always well-defined. The requirement that step
+ * is positive ensures that the loop terminates.
+ * <p>
+ * In addition to the three loop parameters begin, end, and step, a 
  * fourth parameter chunk may be specified. This chunk parameter is 
  * a threshold for splitting tasks so that they can be performed in
  * parallel. Tasks are split only for sets of indices that are larger 
@@ -123,13 +130,16 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  *
  * TODO: discuss nested parallelism.
  *
+ * @see A Java Fork/Join Framework, by Doug Lea, for a description
+ *  of the fork-join framework that will be included with JDK 7.
  * @author Dave Hale, Colorado School of Mines
  * @version 2010.11.23
  */
 public class Parallel {
 
-  /** Loop body. */
+  /** A loop body that computes something for an int index. */
   public interface LoopInt {
+
     /**
      * Computes for the specified loop index.
      * @param i loop index.
@@ -137,8 +147,9 @@ public class Parallel {
     public void compute(int i);
   }
 
-  /** Loop body that returns a value. */
+  /** A loop body that computes and returns a value for an int index. */
   public interface ReduceInt<V> {
+
     /**
      * Returns a value computed for the specified loop index.
      * @param i loop index.
@@ -157,69 +168,108 @@ public class Parallel {
 
   /**
    * Performs a loop <code>for (int i=0; i&lt;end; ++i)</code>.
-   * @param end the end index for the loop.
+   * @param end the end index (not included) for the loop.
    * @param body the loop body.
    */
   public static void loop(int end, LoopInt body) {
-    loop(0,end,1,1,body);
+    loop(0,end,1,CHUNK_DEFAULT,body);
+ 
+  /**
+   * Performs a loop <code>for (int i=begin; i&lt;end; ++i)</code>.
+   * @param begin the begin index for the loop; must be less than end.
+   * @param end the end index (not included) for the loop.
+   * @param body the loop body.
+   */
   }
   public static void loop(int begin, int end, LoopInt body) {
-    loop(begin,end,1,1,body);
+    loop(begin,end,1,CHUNK_DEFAULT,body);
   }
-  public static void loop(int begin, int end, int step, LoopInt body) {
-    loop(begin,end,step,1,body);
-  }
-  /**
-   * Performs a loop <code>for (int i=begin; i&lt;end; i+=stride)</code>.
-   * This method recursively splits tasks only for sets of indices that 
-   * are larger than the specified chunk size. Smaller sets of indices
-   * are processed serially. A larger chunk size will therefore reduce 
-   * the number of tasks but limit the parallelism.
 
-   * while increasing the number of indices processed 
-   * serially within each task. The chunk size should 
-   * be chosen so that each task requires computation significant
-   * @param begin the being index for the loop.
-   * @param end the end index for the loop.
-   * @param step the index increment.
-   * @param chunk the chunk size.
+  /**
+   * Performs a loop <code>for (int i=begin; i&lt;end; i+=step)</code>.
+   * @param begin the begin index for the loop; must be less than end.
+   * @param end the end index (not included) for the loop.
+   * @param step the index increment; must be positive.
+   * @param body the loop body.
+   */
+  public static void loop(int begin, int end, int step, LoopInt body) {
+    loop(begin,end,step,CHUNK_DEFAULT,body);
+  }
+
+  /**
+   * Performs a loop <code>for (int i=begin; i&lt;end; i+=step)</code>.
+   * Forks parallel tasks for sets of indices that are larger than the
+   * specified chunk size. Processes smaller sets of indices serially.
+   * @param begin the begin index for the loop; must be less than end.
+   * @param end the end index (not included) for the loop.
+   * @param step the index increment; must be positive.
+   * @param chunk the chunk size; must be positive.
    * @param body the loop body.
    */
   public static void loop(
     int begin, int end, int step, int chunk, LoopInt body) 
   {
-    if (begin>=end)
-      return;
+    chunk = getChunkSize(begin,end,step,chunk);
     LoopIntAction task = new LoopIntAction(begin,end,step,chunk,body);
     if (LoopIntAction.inForkJoinPool()) {
-      // TODO: check number of tasks before parallelizing!
-      System.out.println("nested loop!");
       task.invoke();
     } else {
       _pool.invoke(task);
     }
   }
 
+  /**
+   * Performs a reduce <code>for (int i=0; i&lt;end; ++i)</code>.
+   * @param end the end index (not included) for the loop.
+   * @param body the loop body.
+   * @return the computed value.
+   */
   public static <V> V reduce(int end, ReduceInt<V> body) {
-    return reduce(0,end,1,1,body);
+    return reduce(0,end,1,CHUNK_DEFAULT,body);
   }
+
+  /**
+   * Performs a reduce <code>for (int i=begin; i&lt;end; ++i)</code>.
+   * @param begin the begin index for the loop; must be less than end.
+   * @param end the end index (not included) for the loop.
+   * @param body the loop body.
+   * @return the computed value.
+   */
   public static <V> V reduce(int begin, int end, ReduceInt<V> body) {
-    return reduce(begin,end,1,1,body);
+    return reduce(begin,end,1,CHUNK_DEFAULT,body);
   }
+
+  /**
+   * Performs a reduce <code>for (int i=begin; i&lt;end; i+=step)</code>.
+   * @param begin the begin index for the loop; must be less than end.
+   * @param end the end index (not included) for the loop.
+   * @param step the index increment; must be positive.
+   * @param body the loop body.
+   * @return the computed value.
+   */
   public static <V> V reduce(
     int begin, int end, int step, ReduceInt<V> body) 
   {
-    return reduce(begin,end,step,1,body);
+    return reduce(begin,end,step,CHUNK_DEFAULT,body);
   }
+
+  /**
+   * Performs a reduce <code>for (int i=begin; i&lt;end; i+=step)</code>.
+   * Forks parallel tasks for sets of indices that are larger than the
+   * specified chunk size. Processes smaller sets of indices serially.
+   * @param begin the begin index for the loop; must be less than end.
+   * @param end the end index (not included) for the loop.
+   * @param step the index increment; must be positive.
+   * @param chunk the chunk size; must be positive.
+   * @param body the loop body.
+   * @return the computed value.
+   */
   public static <V> V reduce(
     int begin, int end, int step, int chunk, ReduceInt<V> body) 
   {
-    if (begin>=end)
-      return null;
+    chunk = getChunkSize(begin,end,step,chunk);
     ReduceIntTask<V> task = new ReduceIntTask<V>(begin,end,step,chunk,body);
     if (ReduceIntTask.inForkJoinPool()) {
-      // TODO: check number of tasks before parallelizing!
-      System.out.println("nested reduce!");
       return task.invoke();
     } else {
       return _pool.invoke(task);
@@ -231,6 +281,29 @@ public class Parallel {
 
   // The pool shared by all fork-join tasks created through this class.
   private static ForkJoinPool _pool = new ForkJoinPool();
+
+  // Absurd default chunk size so we know when chunk is specified.
+  private static final int CHUNK_DEFAULT = -Integer.MAX_VALUE;
+
+  /**
+   * Checks loop arguments and returns a default chunk size. 
+   * The default is computed to maintain roughly eight times 
+   * as many tasks as threads.
+   */
+  private static int getChunkSize(int begin, int end, int step, int chunk) {
+    Check.argument(begin<end,"begin<end");
+    Check.argument(step>0,"step>0");
+    if (chunk!=CHUNK_DEFAULT) {
+      Check.argument(chunk>0,"chunk>0");
+    } else {
+      long ni = 1+(end-begin)/step;
+      long nthread = _pool.getParallelism();
+      long nqueued = _pool.getQueuedTaskCount();
+      long ntasks = (nthread>1)?nthread*8-nqueued:1;
+      chunk = (int)((ntasks>0)?ni/ntasks:ni);
+    }
+    return chunk;
+  }
 
   /**
    * Splits range [begin:end) into [begin:middle) and [middle:end). The
