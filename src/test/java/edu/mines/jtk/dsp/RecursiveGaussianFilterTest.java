@@ -123,7 +123,7 @@ public class RecursiveGaussianFilterTest extends TestCase {
         rf.apply000(x,y);
       sw.stop();
       float sum = sum(y);
-      double rate = 1.0e-6*nsample/sw.time();
+      double rate = 1.0e-6*niter*nsample/sw.time();
       System.out.println("rate = "+rate+"  sum = "+sum);
     }
   }
