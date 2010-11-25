@@ -9,6 +9,7 @@ package edu.mines.jtk.dsp;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import java.util.Random;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
@@ -108,8 +109,9 @@ public class RecursiveGaussianFilterTest extends TestCase {
     int n1 = 501;
     int n2 = 502;
     int n3 = 503;
-    float[][][] x = randfloat(n1,n2,n3);
-    float[][][] y = randfloat(n1,n2,n3);
+    Random r = new Random(314159);
+    float[][][] x = randfloat(r,n1,n2,n3);
+    float[][][] y = randfloat(r,n1,n2,n3);
     RecursiveGaussianFilter rf = new RecursiveGaussianFilter(3.0f);
     int niter;
     double maxtime = 5.0;
