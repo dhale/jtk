@@ -95,7 +95,7 @@ public class ParallelTest extends TestCase {
   ///////////////////////////////////////////////////////////////////////////
   // benchmark
 
-  public static void bench() {
+  private static void bench() {
     benchArraySqr();
     benchArraySum();
     benchMatrixMultiply();

@@ -8,8 +8,7 @@ package edu.mines.jtk.dsp;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import edu.mines.jtk.util.Cdouble;
-import edu.mines.jtk.util.Check;
+import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
@@ -495,6 +494,14 @@ public class RecursiveGaussianFilter {
         applyN(nd,x[i2],y[i2]);
     }
 
+    void xapplyNXX(final int nd, final float[][][] x, final float[][][] y) {
+      final int m3 = y.length;
+      Parallel.loop(m3,new Parallel.LoopInt() {
+        public void compute(int i3) {
+          applyNX(nd,x[i3],y[i3]);
+        }
+      });
+    }
     void applyNXX(final int nd, final float[][][] x, final float[][][] y) {
       final int m3 = y.length;
       final AtomicInteger ai = new AtomicInteger();
@@ -510,6 +517,14 @@ public class RecursiveGaussianFilter {
       startAndJoin(threads);
     }
 
+    void xapplyXNX(final int nd, final float[][][] x, final float[][][] y) {
+      final int m3 = y.length;
+      Parallel.loop(m3,new Parallel.LoopInt() {
+        public void compute(int i3) {
+          applyXN(nd,x[i3],y[i3]);
+        }
+      });
+    }
     void applyXNX(final int nd, final float[][][] x, final float[][][] y) {
       final int m3 = y.length;
       final AtomicInteger ai = new AtomicInteger();
@@ -525,6 +540,24 @@ public class RecursiveGaussianFilter {
       startAndJoin(threads);
     }
 
+    void xapplyXXN(final int nd, final float[][][] x, final float[][][] y) {
+      checkArrays(x,y);
+      final int m3 = y.length;
+      final int m2 = y[0].length;
+      final float[][][] tx = new float[m2][m3][];
+      final float[][][] ty = new float[m2][m3][];
+      for (int i3=0; i3<m3; ++i3) {
+        for (int i2=0; i2<m2; ++i2) {
+          tx[i2][i3] = x[i3][i2];
+          ty[i2][i3] = y[i3][i2];
+        }
+      }
+      Parallel.loop(m2,new Parallel.LoopInt() {
+        public void compute(int i2) {
+          applyXN(nd,tx[i2],ty[i2]);
+        }
+      });
+    }
     void applyXXN(final int nd, final float[][][] x, final float[][][] y) {
       checkArrays(x,y);
       final int m3 = y.length;
@@ -548,8 +581,7 @@ public class RecursiveGaussianFilter {
       }
       startAndJoin(threads);
     }
-
-    void xxxapplyXXN(int nd, float[][][] x, float[][][] y) {
+    void xxapplyXXN(int nd, float[][][] x, float[][][] y) {
       checkArrays(x,y);
       int m3 = y.length;
       int m2 = y[0].length;
