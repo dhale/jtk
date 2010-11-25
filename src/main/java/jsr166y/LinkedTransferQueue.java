@@ -997,8 +997,7 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
      * As the queue is unbounded, this method will never block or
      * return {@code false}.
      *
-     * @return {@code true} (as specified by
-     *  {@link BlockingQueue#offer(Object,long,TimeUnit) BlockingQueue.offer})
+     * @return {@code true}
      * @throws NullPointerException if the specified element is null
      */
     public boolean offer(E e, long timeout, TimeUnit unit) {
@@ -1240,8 +1239,7 @@ public class LinkedTransferQueue<E> extends AbstractQueue<E>
      * Always returns {@code Integer.MAX_VALUE} because a
      * {@code LinkedTransferQueue} is not capacity constrained.
      *
-     * @return {@code Integer.MAX_VALUE} (as specified by
-     *         {@link BlockingQueue#remainingCapacity()})
+     * @return {@code Integer.MAX_VALUE}
      */
     public int remainingCapacity() {
         return Integer.MAX_VALUE;
