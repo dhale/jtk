@@ -494,7 +494,7 @@ public class RecursiveGaussianFilter {
         applyN(nd,x[i2],y[i2]);
     }
 
-    void xapplyNXX(final int nd, final float[][][] x, final float[][][] y) {
+    void applyNXX(final int nd, final float[][][] x, final float[][][] y) {
       final int m3 = y.length;
       Parallel.loop(m3,new Parallel.LoopInt() {
         public void compute(int i3) {
@@ -502,7 +502,7 @@ public class RecursiveGaussianFilter {
         }
       });
     }
-    void applyNXX(final int nd, final float[][][] x, final float[][][] y) {
+    void xapplyNXX(final int nd, final float[][][] x, final float[][][] y) {
       final int m3 = y.length;
       final AtomicInteger ai = new AtomicInteger();
       Thread[] threads = newThreads();
@@ -517,7 +517,7 @@ public class RecursiveGaussianFilter {
       startAndJoin(threads);
     }
 
-    void xapplyXNX(final int nd, final float[][][] x, final float[][][] y) {
+    void applyXNX(final int nd, final float[][][] x, final float[][][] y) {
       final int m3 = y.length;
       Parallel.loop(m3,new Parallel.LoopInt() {
         public void compute(int i3) {
@@ -525,7 +525,7 @@ public class RecursiveGaussianFilter {
         }
       });
     }
-    void applyXNX(final int nd, final float[][][] x, final float[][][] y) {
+    void xapplyXNX(final int nd, final float[][][] x, final float[][][] y) {
       final int m3 = y.length;
       final AtomicInteger ai = new AtomicInteger();
       Thread[] threads = newThreads();
@@ -540,7 +540,7 @@ public class RecursiveGaussianFilter {
       startAndJoin(threads);
     }
 
-    void xapplyXXN(final int nd, final float[][][] x, final float[][][] y) {
+    void applyXXN(final int nd, final float[][][] x, final float[][][] y) {
       checkArrays(x,y);
       final int m3 = y.length;
       final int m2 = y[0].length;
@@ -558,7 +558,7 @@ public class RecursiveGaussianFilter {
         }
       });
     }
-    void applyXXN(final int nd, final float[][][] x, final float[][][] y) {
+    void xapplyXXN(final int nd, final float[][][] x, final float[][][] y) {
       checkArrays(x,y);
       final int m3 = y.length;
       final int m2 = y[0].length;
