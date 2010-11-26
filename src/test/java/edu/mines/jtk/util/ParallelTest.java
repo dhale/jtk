@@ -95,19 +95,13 @@ public class ParallelTest extends TestCase {
   ///////////////////////////////////////////////////////////////////////////
   // benchmark
 
-  private static void bench() {
-    benchArraySqr();
-    benchArraySum();
-    benchMatrixMultiply();
-  }
-
   // Squares of elements of 2D and 3D arrays
   private static void benchArraySqr() {
     int n1 = 501;
     int n2 = 502;
     int n3 = 503;
     System.out.println("Array sqr: n1="+n1+" n2="+n2+" n3="+n3);
-    int niter;
+    int niter,rate;
     double maxtime = 5.0;
     double mflop2 = 1.0e-6*n1*n2;
     double mflop3 = 1.0e-6*n1*n2*n3;
@@ -120,24 +114,28 @@ public class ParallelTest extends TestCase {
       for (niter=0; sw.time()<maxtime; ++niter)
         sqrS(a[0],bs[0]);
       sw.stop();
-      System.out.println("2D S: rate = "+(niter*mflop2)/sw.time());
+      rate = (int)((niter*mflop2)/sw.time());
+      System.out.println("2D S: rate = "+rate);
       sw.restart();
       for (niter=0; sw.time()<maxtime; ++niter)
         sqrP(a[0],bp[0]);
       sw.stop();
-      System.out.println("2D P: rate = "+(niter*mflop2)/sw.time());
-      System.out.println("    :  err = "+max(abs(sub(bp[0],bs[0]))));
+      rate = (int)((niter*mflop2)/sw.time());
+      System.out.println("2D P: rate = "+rate);
+      //System.out.println("    :  err = "+emax(bp[0],bs[0]));
       sw.restart();
       for (niter=0; sw.time()<maxtime; ++niter)
         sqrS(a,bs);
       sw.stop();
-      System.out.println("3D S: rate = "+(niter*mflop3)/sw.time());
+      rate = (int)((niter*mflop3)/sw.time());
+      System.out.println("3D S: rate = "+rate);
       sw.restart();
       for (niter=0; sw.time()<maxtime; ++niter)
         sqrP(a,bp);
       sw.stop();
-      System.out.println("3D P: rate = "+(niter*mflop3)/sw.time());
-      System.out.println("    :  err = "+max(abs(sub(bp,bs))));
+      rate = (int)((niter*mflop3)/sw.time());
+      System.out.println("3D P: rate = "+rate);
+      //System.out.println("    :  err = "+emax(bp,bs));
     }
   }
   private static void sqr(float[] a, float[] b) {
@@ -157,7 +155,7 @@ public class ParallelTest extends TestCase {
   }
   private static void sqrP(final float[][] a, final float[][] b) {
     int n = a.length;
-    int chunk = max(1,10000/n);
+    int chunk = max(1,10000/a[0].length);
     loop(0,n,1,chunk,new LoopInt() {
       public void compute(int i) {
         sqr(a[i],b[i]);
@@ -168,7 +166,7 @@ public class ParallelTest extends TestCase {
     int n = a.length;
     loop(n,new LoopInt() {
       public void compute(int i) {
-        sqrP(a[i],b[i]);
+        sqrP(a[i],b[i]); // nested parallelism
       }
     });
   }
@@ -179,7 +177,7 @@ public class ParallelTest extends TestCase {
     int n2 = 502;
     int n3 = 503;
     System.out.println("Array sum: n1="+n1+" n2="+n2+" n3="+n3);
-    int niter;
+    int niter,rate;
     double maxtime = 5.0;
     double mflop2 = 1.0e-6*n1*n2;
     double mflop3 = 1.0e-6*n1*n2*n3;
@@ -192,26 +190,30 @@ public class ParallelTest extends TestCase {
       for (niter=0; sw.time()<maxtime; ++niter)
         ss = sumS(a[0]);
       sw.stop();
-      System.out.println("2D S: rate = "+(niter*mflop2)/sw.time());
+      rate = (int)((niter*mflop2)/sw.time());
+      System.out.println("2D S: rate = "+rate);
       sw.restart();
       for (niter=0; sw.time()<maxtime; ++niter)
         sp = sumP(a[0]);
       sw.stop();
-      System.out.println("2D P: rate = "+(niter*mflop2)/sw.time());
-      System.out.println("    : sum = "+ss+" err = "+abs(sp-ss));
+      rate = (int)((niter*mflop2)/sw.time());
+      System.out.println("2D P: rate = "+rate);
+      //System.out.println("    : sum = "+ss+" err = "+abs(sp-ss));
       ss = 0.0f;
       sp = 0.0f;
       sw.restart();
       for (niter=0; sw.time()<maxtime; ++niter)
         ss = sumS(a);
       sw.stop();
-      System.out.println("3D S: rate = "+(niter*mflop3)/sw.time());
+      rate = (int)((niter*mflop3)/sw.time());
+      System.out.println("3D S: rate = "+rate);
       sw.restart();
       for (niter=0; sw.time()<maxtime; ++niter)
         sp = sumP(a);
       sw.stop();
-      System.out.println("3D P: rate = "+(niter*mflop3)/sw.time());
-      System.out.println("    : sum = "+ss+" err = "+abs(sp-ss));
+      rate = (int)((niter*mflop3)/sw.time());
+      System.out.println("3D P: rate = "+rate);
+      //System.out.println("    : sum = "+ss+" err = "+abs(sp-ss));
     }
   }
   private static float sum(float[] a) {
@@ -237,7 +239,7 @@ public class ParallelTest extends TestCase {
   }
   private static float sumP(final float[][] a) {
     int n = a.length;
-    int chunk = max(1,10000/n);
+    int chunk = max(1,10000/a[0].length);
     return reduce(0,n,1,chunk,new ReduceInt<Float>() {
       public Float compute(int i) {
         return sum(a[i]);
@@ -251,7 +253,7 @@ public class ParallelTest extends TestCase {
     int n = a.length;
     return reduce(n,new ReduceInt<Float>() {
       public Float compute(int i) {
-        return sumP(a[i]);
+        return sumP(a[i]); // nested parallelism
       }
       public Float combine(Float s1, Float s2) {
         return s1+s2;
@@ -268,7 +270,7 @@ public class ParallelTest extends TestCase {
     float[][] b = randfloat(m,n);
     float[][] cs = zerofloat(m,m);
     float[][] cp = zerofloat(m,m);
-    int niter;
+    int niter,rate;
     double maxtime = 5.0;
     double mflop = 2.0e-6*m*m*n;
     Stopwatch sw = new Stopwatch();
@@ -278,13 +280,15 @@ public class ParallelTest extends TestCase {
         matrixMultiplySerial(a,b,cs);
       }
       sw.stop();
-      System.out.println("S: rate = "+(niter*mflop)/sw.time());
+      rate = (int)((niter*mflop)/sw.time());
+      System.out.println("S: rate = "+rate+" mflops");
       sw.restart();
       for (niter=0; sw.time()<maxtime; ++niter) {
         matrixMultiplyParallel(a,b,cp);
       }
       sw.stop();
-      System.out.println("P: rate = "+(niter*mflop)/sw.time());
+      rate = (int)((niter*mflop)/sw.time());
+      System.out.println("P: rate = "+rate+" mflops");
     }
   }
   private static void matrixMultiplySerial(
@@ -309,11 +313,11 @@ public class ParallelTest extends TestCase {
     });
   }
   private static void computeColumn(
-    int j, float[][] a, float[][] b, float[][] c) 
+    final int j, final float[][] a, final float[][] b, final float[][] c) 
   {
-    int ni = c.length;
-    int nk = b.length;
-    float[] bj = new float[nk];
+    final int ni = c.length;
+    final int nk = b.length;
+    final float[] bj = new float[nk];
     for (int k=0; k<nk; ++k)
       bj[k] = b[k][j];
     for (int i=0; i<ni; ++i) {
@@ -330,5 +334,34 @@ public class ParallelTest extends TestCase {
       }
       c[i][j] = cij;
     }
+  }
+
+  private static float emax(float[] a, float[] b) {
+    int n = a.length;
+    float emax = 0.0f;
+    for (int i=0; i<n; ++i)
+      emax = max(emax,abs(b[i]-a[i]));
+    return emax;
+  }
+  private static float emax(float[][] a, float[][] b) {
+    int n = a.length;
+    float emax = 0.0f;
+    for (int i=0; i<n; ++i)
+      emax = emax(a[i],b[i]);
+    return emax;
+  }
+  private static float emax(float[][][] a, float[][][] b) {
+    int n = a.length;
+    float emax = 0.0f;
+    for (int i=0; i<n; ++i)
+      emax = emax(a[i],b[i]);
+    return emax;
+  }
+
+  private static void bench() {
+    //Parallel.setParallel(false);
+    benchArraySqr();
+    benchArraySum();
+    benchMatrixMultiply();
   }
 }

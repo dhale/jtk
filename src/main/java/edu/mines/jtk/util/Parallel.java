@@ -207,8 +207,6 @@ public class Parallel {
 
   /**
    * Performs a loop <code>for (int i=begin; i&lt;end; i+=step)</code>.
-   * Forks parallel tasks for sets of indices that are larger than the
-   * specified chunk size. Processes smaller sets of indices serially.
    * @param begin the begin index for the loop; must be less than end.
    * @param end the end index (not included) for the loop.
    * @param step the index increment; must be positive.
@@ -219,11 +217,17 @@ public class Parallel {
     int begin, int end, int step, int chunk, LoopInt body) 
   {
     checkArgs(begin,end,step,chunk);
-    LoopIntAction task = new LoopIntAction(begin,end,step,chunk,body);
-    if (LoopIntAction.inForkJoinPool()) {
-      task.invoke();
+    if (_serial || end<=begin+chunk*step) {
+      for (int i=begin; i<end; i+=step) {
+        body.compute(i);
+      }
     } else {
-      _pool.invoke(task);
+      LoopIntAction task = new LoopIntAction(begin,end,step,chunk,body);
+      if (LoopIntAction.inForkJoinPool()) {
+        task.invoke();
+      } else {
+        _pool.invoke(task);
+      }
     }
   }
 
@@ -264,8 +268,6 @@ public class Parallel {
 
   /**
    * Performs a reduce <code>for (int i=begin; i&lt;end; i+=step)</code>.
-   * Forks parallel tasks for sets of indices that are larger than the
-   * specified chunk size. Processes smaller sets of indices serially.
    * @param begin the begin index for the loop; must be less than end.
    * @param end the end index (not included) for the loop.
    * @param step the index increment; must be positive.
@@ -277,12 +279,31 @@ public class Parallel {
     int begin, int end, int step, int chunk, ReduceInt<V> body) 
   {
     checkArgs(begin,end,step,chunk);
-    ReduceIntTask<V> task = new ReduceIntTask<V>(begin,end,step,chunk,body);
-    if (ReduceIntTask.inForkJoinPool()) {
-      return task.invoke();
+    if (_serial || end<=begin+chunk*step) {
+      V v = body.compute(begin);
+      for (int i=begin+step; i<end; i+=step) {
+        V vi = body.compute(i);
+        v = body.combine(v,vi);
+      }
+      return v;
     } else {
-      return _pool.invoke(task);
+      ReduceIntTask<V> task = new ReduceIntTask<V>(begin,end,step,chunk,body);
+      if (ReduceIntTask.inForkJoinPool()) {
+        return task.invoke();
+      } else {
+        return _pool.invoke(task);
+      }
     }
+  }
+
+  /**
+   * Enables or disables parallel processing by all methods of this class.
+   * By default, parallel processing is enabled. If disabled, all tasks 
+   * will be executed on the current thread; useful for benchmarking.
+   * @param parallel true, for parallel processing; false, otherwise.
+   */
+  public static void setParallel(boolean parallel) {
+    _serial = !parallel;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -290,6 +311,9 @@ public class Parallel {
 
   // The pool shared by all fork-join tasks created through this class.
   private static ForkJoinPool _pool = new ForkJoinPool();
+
+  // Serial flag; true for no parallel processing.
+  private static boolean _serial = false;
 
   /**
    * Checks loop arguments.
