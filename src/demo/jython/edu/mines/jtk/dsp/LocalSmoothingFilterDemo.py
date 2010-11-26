@@ -96,7 +96,7 @@ def demoSphere3(input,smooth):
     lsf.applySmoothL(0.40,f,f)
   elif smooth==simple:
     lsf.applySmoothS(f,f)
-  #plot3(f,cmin=cmin,cmax=cmax,slices=slices)
+  plot3(f,cmin=cmin,cmax=cmax,slices=slices)
   if input==impulses:
     cmin *= 0.01; cmax *= 0.01
   elif input==random:
@@ -111,7 +111,7 @@ def demoSphere3(input,smooth):
     lsf.apply(d,200.0,f,g)
     sw.stop()
     print "time =",sw.time()
-    #plot3(g,cmin=cmin,cmax=cmax,slices=slices)
+    plot3(g,cmin=cmin,cmax=cmax,slices=slices)
 
 #############################################################################
 # constants

@@ -7,9 +7,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp;
 
 import java.util.logging.Logger;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import edu.mines.jtk.util.Threads;
+import edu.mines.jtk.util.Parallel;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
@@ -802,17 +801,11 @@ public class LocalSmoothingFilter {
   }
   private static void szeroP(final float[][][] x) {
     final int n3 = x.length;
-    final AtomicInteger a3 = new AtomicInteger(0);
-    Thread[] threads = Threads.makeArray();
-    for (int ithread=0; ithread<threads.length; ++ithread) {
-      threads[ithread] = new Thread(new Runnable() {
-        public void run() {
-          for (int i3=a3.getAndIncrement(); i3<n3; i3=a3.getAndIncrement())
-            szero(x[i3]);
-        }
-      });
-    }
-    Threads.startAndJoin(threads);
+    Parallel.loop(n3,new Parallel.LoopInt() {
+      public void compute(int i3) {
+        szero(x[i3]);
+      }
+    });
   }
 
   // Copys array x to array y.
@@ -836,17 +829,11 @@ public class LocalSmoothingFilter {
   }
   private static void scopyP(final float[][][] x, final float[][][] y) {
     final int n3 = x.length;
-    final AtomicInteger a3 = new AtomicInteger(0);
-    Thread[] threads = Threads.makeArray();
-    for (int ithread=0; ithread<threads.length; ++ithread) {
-      threads[ithread] = new Thread(new Runnable() {
-        public void run() {
-          for (int i3=a3.getAndIncrement(); i3<n3; i3=a3.getAndIncrement())
-            scopy(x[i3],y[i3]);
-        }
-      });
-    }
-    Threads.startAndJoin(threads);
+    Parallel.loop(n3,new Parallel.LoopInt() {
+      public void compute(int i3) {
+        scopy(x[i3],y[i3]);
+      }
+    });
   }
 
   // Returns the dot product x'y.
@@ -879,18 +866,11 @@ public class LocalSmoothingFilter {
   private static float sdotP(final float[][][] x, final float[][][] y) {
     final int n3 = x.length;
     final float[] d3 = new float[n3];
-    final AtomicInteger a3 = new AtomicInteger(0);
-    Thread[] threads = Threads.makeArray();
-    for (int ithread=0; ithread<threads.length; ++ithread) {
-      threads[ithread] = new Thread(new Runnable() {
-        public void run() {
-          float d = 0.0f;
-          for (int i3=a3.getAndIncrement(); i3<n3; i3=a3.getAndIncrement())
-            d3[i3] = sdot(x[i3],y[i3]);
-        }
-      });
-    }
-    Threads.startAndJoin(threads);
+    Parallel.loop(n3,new Parallel.LoopInt() {
+      public void compute(int i3) {
+        d3[i3] = sdot(x[i3],y[i3]);
+      }
+    });
     float d = 0.0f;
     for (int i3=0; i3<n3; ++i3)
       d += d3[i3];
@@ -924,17 +904,11 @@ public class LocalSmoothingFilter {
     final float a, final float[][][] x, final float[][][] y)
   {
     final int n3 = x.length;
-    final AtomicInteger a3 = new AtomicInteger(0);
-    Thread[] threads = Threads.makeArray();
-    for (int ithread=0; ithread<threads.length; ++ithread) {
-      threads[ithread] = new Thread(new Runnable() {
-        public void run() {
-          for (int i3=a3.getAndIncrement(); i3<n3; i3=a3.getAndIncrement())
-            saxpy(a,x[i3],y[i3]);
-        }
-      });
-    }
-    Threads.startAndJoin(threads);
+    Parallel.loop(n3,new Parallel.LoopInt() {
+      public void compute(int i3) {
+        saxpy(a,x[i3],y[i3]);
+      }
+    });
   }
 
   // Computes y = x + a*y.
@@ -964,17 +938,11 @@ public class LocalSmoothingFilter {
     final float a, final float[][][] x, final float[][][] y)
   {
     final int n3 = x.length;
-    final AtomicInteger a3 = new AtomicInteger(0);
-    Thread[] threads = Threads.makeArray();
-    for (int ithread=0; ithread<threads.length; ++ithread) {
-      threads[ithread] = new Thread(new Runnable() {
-        public void run() {
-          for (int i3=a3.getAndIncrement(); i3<n3; i3=a3.getAndIncrement())
-            sxpay(a,x[i3],y[i3]);
-        }
-      });
-    }
-    Threads.startAndJoin(threads);
+    Parallel.loop(n3,new Parallel.LoopInt() {
+      public void compute(int i3) {
+        sxpay(a,x[i3],y[i3]);
+      }
+    });
   }
 
   // Computes z = x*y.
@@ -1004,16 +972,10 @@ public class LocalSmoothingFilter {
     final float[][][] x, final float[][][] y, final float[][][] z) 
   {
     final int n3 = x.length;
-    final AtomicInteger a3 = new AtomicInteger(0);
-    Thread[] threads = Threads.makeArray();
-    for (int ithread=0; ithread<threads.length; ++ithread) {
-      threads[ithread] = new Thread(new Runnable() {
-        public void run() {
-          for (int i3=a3.getAndIncrement(); i3<n3; i3=a3.getAndIncrement())
-            sxy(x[i3],y[i3],z[i3]);
-        }
-      });
-    }
-    Threads.startAndJoin(threads);
+    Parallel.loop(n3,new Parallel.LoopInt() {
+      public void compute(int i3) {
+        sxy(x[i3],y[i3],z[i3]);
+      }
+    });
   }
 }
