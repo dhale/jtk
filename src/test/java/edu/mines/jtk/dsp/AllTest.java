@@ -31,6 +31,7 @@ public class AllTest extends TestSuite {
     suite.addTestSuite(LocalOrientFilterTest.class);
     suite.addTestSuite(Real1Test.class);
     suite.addTestSuite(Recursive2ndOrderFilterTest.class);
+    suite.addTestSuite(RecursiveGaussianFilterTest.class);
     suite.addTestSuite(SamplingTest.class);
     suite.addTestSuite(SincInterpolatorTest.class);
 

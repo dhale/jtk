@@ -317,6 +317,9 @@ public class Parallel {
   // right part is not empty, fork a new task. Then compute the left 
   // part in the current thread, and, if necessary, join the right part.
 
+  // Threshold for number of surplus queued tasks.
+  private static final int NSQT = 6;
+
   /**
    * Fork-join task for parallel loop.
    */
@@ -330,7 +333,7 @@ public class Parallel {
       _body = body;
     }
     protected void compute() {
-      if (_end<=_begin+_chunk*_step || getSurplusQueuedTaskCount()>3) {
+      if (_end<=_begin+_chunk*_step || getSurplusQueuedTaskCount()>NSQT) {
         for (int i=_begin; i<_end; i+=_step) {
           _body.compute(i);
         }
@@ -365,7 +368,7 @@ public class Parallel {
       _body = body;
     }
     protected V compute() {
-      if (_end<=_begin+_chunk*_step || getSurplusQueuedTaskCount()>3) {
+      if (_end<=_begin+_chunk*_step || getSurplusQueuedTaskCount()>NSQT) {
         V v = _body.compute(_begin);
         for (int i=_begin+_step; i<_end; i+=_step) {
           V vi = _body.compute(i);

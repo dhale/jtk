@@ -253,6 +253,20 @@ public class LocalDiffusionKernel {
   {
     final int n3 = x.length;
     for (int i3pass=0; i3pass<i3step; ++i3pass,++i3start) {
+      Parallel.loop(i3start,i3stop,i3step,new Parallel.LoopInt() {
+        public void compute(int i3) {
+          apply(i3,d,c,s,x,y);
+        }
+      });
+    }
+  }
+  private void xapplyParallel(
+    int i3start, final int i3step, final int i3stop,
+    final Tensors3 d, final float c, final float[][][] s, 
+    final float[][][] x, final float[][][] y) 
+  {
+    final int n3 = x.length;
+    for (int i3pass=0; i3pass<i3step; ++i3pass,++i3start) {
       final AtomicInteger ai3 = new AtomicInteger(i3start);
       Thread[] threads = Threads.makeArray();
       for (int ithread=0; ithread<threads.length; ++ithread) {
