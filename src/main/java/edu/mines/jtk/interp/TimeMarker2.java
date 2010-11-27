@@ -52,6 +52,7 @@ public class TimeMarker2 {
    * Type of concurrency used by this transform.
    */
   public enum Concurrency {
+    PARALLELX,
     PARALLEL,
     SERIAL
   }
@@ -139,6 +140,8 @@ public class TimeMarker2 {
   {
     if (_concurrency==Concurrency.PARALLEL) {
       solveParallel(al,t,m,times,marks);
+    } else if (_concurrency==Concurrency.PARALLELX) {
+      solveParallelX(al,t,m,times,marks);
     } else {
       solveSerial(al,t,m,times,marks);
     }
@@ -259,7 +262,7 @@ public class TimeMarker2 {
       }
     }
     private int _n;
-    private Sample[] _a = new Sample[1024];
+    private Sample[] _a = new Sample[128];
     private void growTo(int capacity) {
       Sample[] a = new Sample[capacity];
       System.arraycopy(_a,0,a,0,_n);
@@ -397,7 +400,7 @@ public class TimeMarker2 {
   /*
    * Solves for times by processing samples in the active list in parallel.
    */
-  private void solveParallel(
+  private void solveParallelX(
     final ActiveList al,
     final float[][] t, final int m,
     final float[][] times, final int[][] marks)
@@ -466,12 +469,12 @@ public class TimeMarker2 {
   /*
    * Solves for times by processing samples in the active list in parallel.
    */
-  private void solveParallelX(
+  private void solveParallel(
     final ActiveList al,
     final float[][] t, final int m,
     final float[][] times, final int[][] marks)
   {
-    int mbmin = 32; // minimum number of samples per block
+    int mbmin = 64; // minimum number of samples per block
     int nbmax = 256; // maximum number of blocks
     final float[][] dtask = new float[nbmax][];
     final ActiveList[] bltask = new ActiveList[nbmax];
@@ -481,7 +484,7 @@ public class TimeMarker2 {
       final int nb = 1+(n-1)/mb; // number of blocks <= nbmax
       Parallel.loop(nb,new Parallel.LoopInt() {
         public void compute(int ib) {
-          if (dtask[ib]==null) {
+          if (bltask[ib]==null) {
             dtask[ib] = new float[3];
             bltask[ib] = new ActiveList();
           }
