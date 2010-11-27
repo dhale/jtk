@@ -11,6 +11,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.mines.jtk.dsp.Tensors2;
+import edu.mines.jtk.util.Parallel;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
@@ -460,6 +461,50 @@ public class TimeMarker2 {
     es.shutdown();
     //trace("solveParallel: ntotal="+ntotal);
     //trace("               nratio="+(float)ntotal/(float)(_n1*_n2));
+  }
+  
+  /*
+   * Solves for times by processing samples in the active list in parallel.
+   */
+  private void solveParallelX(
+    final ActiveList al,
+    final float[][] t, final int m,
+    final float[][] times, final int[][] marks)
+  {
+    int mbmin = 32; // minimum number of samples per block
+    int nbmax = 256; // maximum number of blocks
+    final float[][] dtask = new float[nbmax][];
+    final ActiveList[] bltask = new ActiveList[nbmax];
+    while (!al.isEmpty()) {
+      final int n = al.size(); // number of samples in active (A) list
+      final int mb = max(mbmin,1+(n-1)/nbmax); // samples per block
+      final int nb = 1+(n-1)/mb; // number of blocks <= nbmax
+      Parallel.loop(nb,new Parallel.LoopInt() {
+        public void compute(int ib) {
+          if (dtask[ib]==null) {
+            dtask[ib] = new float[3];
+            bltask[ib] = new ActiveList();
+          }
+          int i = ib*mb; // beginning of block
+          int j = min(i+mb,n); // beginning of next block (or end)
+          for (int k=i; k<j; ++k) { // for each sample in block, ...
+            Sample s = al.get(k); // get k'th sample from A list
+            solveOne(t,m,times,marks,s,bltask[ib],dtask[ib]); // solve
+          }
+          bltask[ib].setAllAbsent(); // needed when merging B lists below
+        }
+      });
+      // Merge samples from all B lists to a new A list. As samples
+      // are appended, their absent flags are set to false, so that 
+      // each sample is appended no more than once to the new A list.
+      al.clear();
+      for (int ib=0; ib<nb; ++ib) {
+        if (bltask[ib]!=null) {
+          al.appendIfAbsent(bltask[ib]);
+          bltask[ib].clear();
+        }
+      }
+    }
   }
 
   /*

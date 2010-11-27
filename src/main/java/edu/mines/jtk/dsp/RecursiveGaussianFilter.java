@@ -6,8 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
@@ -502,20 +500,6 @@ public class RecursiveGaussianFilter {
         }
       });
     }
-    void xapplyNXX(final int nd, final float[][][] x, final float[][][] y) {
-      final int m3 = y.length;
-      final AtomicInteger ai = new AtomicInteger();
-      Thread[] threads = newThreads();
-      for (int ithread=0; ithread<threads.length; ++ithread) {
-        threads[ithread] = new Thread(new Runnable() {
-          public void run() {
-            for (int i3=ai.getAndIncrement(); i3<m3; i3=ai.getAndIncrement())
-              applyNX(nd,x[i3],y[i3]);
-          }
-        });
-      }
-      startAndJoin(threads);
-    }
 
     void applyXNX(final int nd, final float[][][] x, final float[][][] y) {
       final int m3 = y.length;
@@ -524,20 +508,6 @@ public class RecursiveGaussianFilter {
           applyXN(nd,x[i3],y[i3]);
         }
       });
-    }
-    void xapplyXNX(final int nd, final float[][][] x, final float[][][] y) {
-      final int m3 = y.length;
-      final AtomicInteger ai = new AtomicInteger();
-      Thread[] threads = newThreads();
-      for (int ithread=0; ithread<threads.length; ++ithread) {
-        threads[ithread] = new Thread(new Runnable() {
-          public void run() {
-            for (int i3=ai.getAndIncrement(); i3<m3; i3=ai.getAndIncrement())
-              applyXN(nd,x[i3],y[i3]);
-          }
-        });
-      }
-      startAndJoin(threads);
     }
 
     void applyXXN(final int nd, final float[][][] x, final float[][][] y) {
@@ -558,30 +528,8 @@ public class RecursiveGaussianFilter {
         }
       });
     }
-    void xapplyXXN(final int nd, final float[][][] x, final float[][][] y) {
-      checkArrays(x,y);
-      final int m3 = y.length;
-      final int m2 = y[0].length;
-      final AtomicInteger ai = new AtomicInteger();
-      Thread[] threads = newThreads();
-      for (int ithread=0; ithread<threads.length; ++ithread) {
-        threads[ithread] = new Thread(new Runnable() {
-          public void run() {
-            float[][] x2 = new float[m3][];
-            float[][] y2 = new float[m3][];
-            for (int i2=ai.getAndIncrement(); i2<m2; i2=ai.getAndIncrement()) {
-              for (int i3=0; i3<m3; ++i3) {
-                x2[i3] = x[i3][i2];
-                y2[i3] = y[i3][i2];
-              }
-              applyXN(nd,x2,y2);
-            }
-          }
-        });
-      }
-      startAndJoin(threads);
-    }
-    void xxapplyXXN(int nd, float[][][] x, float[][][] y) {
+    /* Should be equivalent to the parallel version above.
+    void applyXXN(int nd, float[][][] x, float[][][] y) {
       checkArrays(x,y);
       int m3 = y.length;
       int m2 = y[0].length;
@@ -595,22 +543,7 @@ public class RecursiveGaussianFilter {
         applyXN(nd,x2,y2);
       }
     }
-  }
-
-  private static Thread[] newThreads() {
-    int nthread = Runtime.getRuntime().availableProcessors();
-    return new Thread[nthread];
-  }
-
-  private static void startAndJoin(Thread[] threads) {
-    for (Thread thread:threads)
-      thread.start();
-    try {
-      for (Thread thread:threads)
-        thread.join();
-    } catch (InterruptedException ie) {
-      throw new RuntimeException(ie);
-    }
+    */
   }
 
   ///////////////////////////////////////////////////////////////////////////

@@ -6,9 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import edu.mines.jtk.util.Threads;
+import edu.mines.jtk.util.Parallel;
 
 /**
  * Local Laplacian filter defined by non-constant diffusion tensors. 
@@ -122,30 +120,18 @@ public class LocalLaplacianFilter {
     final int n3 = x.length;
 
     // i3 = 1, 3, 5, ...
-    final AtomicInteger a1 = new AtomicInteger(1);
-    Thread[] thread1 = Threads.makeArray();
-    for (int ithread=0; ithread<thread1.length; ++ithread) {
-      thread1[ithread] = new Thread(new Runnable() {
-        public void run() {
-          for (int i3=a1.getAndAdd(2); i3<n3; i3=a1.getAndAdd(2))
-            applySlice3(i3,d,x,y);
-        }
-      });
-    }
-    Threads.startAndJoin(thread1);
+    Parallel.loop(1,n3,2,new Parallel.LoopInt() {
+      public void compute(int i3) {
+        applySlice3(i3,d,x,y);
+      }
+    });
 
     // i3 = 2, 4, 6, ...
-    final AtomicInteger a2 = new AtomicInteger(2);
-    Thread[] thread2 = Threads.makeArray();
-    for (int ithread=0; ithread<thread2.length; ++ithread) {
-      thread2[ithread] = new Thread(new Runnable() {
-        public void run() {
-          for (int i3=a2.getAndAdd(2); i3<n3; i3=a2.getAndAdd(2))
-            applySlice3(i3,d,x,y);
-        }
-      });
-    }
-    Threads.startAndJoin(thread2);
+    Parallel.loop(2,n3,2,new Parallel.LoopInt() {
+      public void compute(int i3) {
+        applySlice3(i3,d,x,y);
+      }
+    });
   }
 
   // Computes y = y+G'DGx for one constant-i3 slice.

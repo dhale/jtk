@@ -7,7 +7,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.dsp;
 
 import java.util.logging.Logger;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.ArrayMath.*;
@@ -258,28 +257,6 @@ public class LocalDiffusionKernel {
           apply(i3,d,c,s,x,y);
         }
       });
-    }
-  }
-  private void xapplyParallel(
-    int i3start, final int i3step, final int i3stop,
-    final Tensors3 d, final float c, final float[][][] s, 
-    final float[][][] x, final float[][][] y) 
-  {
-    final int n3 = x.length;
-    for (int i3pass=0; i3pass<i3step; ++i3pass,++i3start) {
-      final AtomicInteger ai3 = new AtomicInteger(i3start);
-      Thread[] threads = Threads.makeArray();
-      for (int ithread=0; ithread<threads.length; ++ithread) {
-        threads[ithread] = new Thread(new Runnable() {
-          public void run() {
-            for (int i3=ai3.getAndAdd(i3step); 
-                 i3<i3stop; 
-                 i3=ai3.getAndAdd(i3step))
-              apply(i3,d,c,s,x,y);
-          }
-        });
-      }
-      Threads.startAndJoin(threads);
     }
   }
 

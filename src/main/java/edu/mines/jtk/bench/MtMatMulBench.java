@@ -10,10 +10,8 @@ import static java.lang.Math.min;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static edu.mines.jtk.util.ArrayMath.randfloat;
-import static edu.mines.jtk.util.ArrayMath.zerofloat;
-import edu.mines.jtk.util.Check;
-import edu.mines.jtk.util.Stopwatch;
+import edu.mines.jtk.util.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Benchmark single- and multi-threaded matrix multiplication.
@@ -26,26 +24,29 @@ public class MtMatMulBench {
     Runtime.getRuntime().availableProcessors();
 
   public static void main(String[] args) {
-    int m = 101;
-    int n = 102;
+    int m = 1001;
+    int n = 1002;
     float[][] a = randfloat(n,m);
     float[][] b = randfloat(m,n);
     float[][] c1 = zerofloat(m,m);
     float[][] c2 = zerofloat(m,m);
     float[][] c3 = zerofloat(m,m);
     float[][] c4 = zerofloat(m,m);
+    float[][] c5 = zerofloat(m,m);
     Stopwatch s = new Stopwatch();
     double mflops = 2.0e-6*m*m*n;
     double maxtime = 5.0;
 
+    System.out.println("Matrix multiply benchmark");
+    System.out.println("m="+m+" n="+n+" nthread="+NTHREAD);
     System.out.println("Methods:");
     System.out.println("mul1 = single-threaded");
     System.out.println("mul2 = multi-threaded (equal chunks)");
     System.out.println("mul3 = multi-threaded (atomic-integer)");
     System.out.println("mul4 = multi-threaded (thread-pool)");
-    System.out.println("number of threads = "+NTHREAD);
+    System.out.println("mul5 = multi-threaded (fork-join)");
 
-    for (int ntrial=0; ntrial<5; ++ntrial) {
+    for (int ntrial=0; ntrial<3; ++ntrial) {
       System.out.println();
       int nmul;
 
@@ -73,9 +74,16 @@ public class MtMatMulBench {
       s.stop();
       System.out.println("mul4: rate="+(int)(nmul*mflops/s.time())+" mflops");
 
+      s.restart();
+      for (nmul=0; s.time()<maxtime; ++nmul)
+        mul5(a,b,c5);
+      s.stop();
+      System.out.println("mul5: rate="+(int)(nmul*mflops/s.time())+" mflops");
+
       assertEquals(c1,c2);
       assertEquals(c1,c3);
       assertEquals(c1,c4);
+      assertEquals(c1,c5);
     }
   }
 
@@ -188,6 +196,21 @@ public class MtMatMulBench {
       throw new RuntimeException(ie);
     }
     es.shutdown();
+  }
+
+  /**
+   * Multi-threaded fork-join version.
+   */
+  private static void mul5(
+    final float[][] a, final float[][] b, final float[][] c) 
+  {
+    checkDimensions(a,b,c);
+    final int nj = c[0].length;
+    Parallel.loop(nj,new Parallel.LoopInt() {
+      public void compute(int j) {
+        computeColumn(j,a,b,c);
+      }
+    });
   }
 
   /**
