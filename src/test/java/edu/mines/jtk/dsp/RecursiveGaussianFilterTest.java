@@ -21,7 +21,7 @@ import static edu.mines.jtk.util.ArrayMath.*;
 public class RecursiveGaussianFilterTest extends TestCase {
   public static void main(String[] args) {
     if (args.length>0 && args[0].equals("bench")) {
-      boolean parallel = (args.length>1 && args[1].equals("false")) ?
+      boolean parallel = (args.length>1 && args[1].equals("serial")) ?
         false : true;
       bench(parallel);
     }

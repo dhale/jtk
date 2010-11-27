@@ -787,19 +787,7 @@ public class LocalSmoothingFilter {
   private static void szero(float[][] x) {
     zero(x);
   }
-  private static void szero(float[][][] x) {
-    if (PARALLEL) {
-      szeroP(x);
-    } else {
-      szeroS(x);
-    }
-  }
-  private static void szeroS(float[][][] x) {
-    int n3 = x.length;
-    for (int i3=0; i3<n3; ++i3)
-      szero(x[i3]);
-  }
-  private static void szeroP(final float[][][] x) {
+  private static void szero(final float[][][] x) {
     final int n3 = x.length;
     Parallel.loop(n3,new Parallel.LoopInt() {
       public void compute(int i3) {
@@ -815,19 +803,7 @@ public class LocalSmoothingFilter {
   private static void scopy(float[][] x, float[][] y) {
     copy(x,y);
   }
-  private static void scopy(float[][][] x, float[][][] y) {
-    if (PARALLEL) {
-      scopyP(x,y);
-    } else {
-      scopyS(x,y);
-    }
-  }
-  private static void scopyS(float[][][] x, float[][][] y) {
-    int n3 = x.length;
-    for (int i3=0; i3<n3; ++i3)
-      scopy(x[i3],y[i3]);
-  }
-  private static void scopyP(final float[][][] x, final float[][][] y) {
+  private static void scopy(final float[][][] x, final float[][][] y) {
     final int n3 = x.length;
     Parallel.loop(n3,new Parallel.LoopInt() {
       public void compute(int i3) {
@@ -849,21 +825,7 @@ public class LocalSmoothingFilter {
     }
     return d;
   }
-  private static float sdot(float[][][] x, float[][][] y) {
-    if (PARALLEL) {
-      return sdotP(x,y);
-    } else {
-      return sdotS(x,y);
-    }
-  }
-  private static float sdotS(float[][][] x, float[][][] y) {
-    int n3 = x.length;
-    float d = 0.0f;
-    for (int i3=0; i3<n3; ++i3)
-      d += sdot(x[i3],y[i3]);
-    return d;
-  }
-  private static float sdotP(final float[][][] x, final float[][][] y) {
+  private static float sdot(final float[][][] x, final float[][][] y) {
     final int n3 = x.length;
     final float[] d3 = new float[n3];
     Parallel.loop(n3,new Parallel.LoopInt() {
@@ -888,19 +850,7 @@ public class LocalSmoothingFilter {
       }
     }
   }
-  private static void saxpy(float a, float[][][] x, float[][][] y) {
-    if (PARALLEL) {
-      saxpyP(a,x,y);
-    } else {
-      saxpyS(a,x,y);
-    }
-  }
-  private static void saxpyS(float a, float[][][] x, float[][][] y) {
-    int n3 = x.length;
-    for (int i3=0; i3<n3; ++i3)
-      saxpy(a,x[i3],y[i3]);
-  }
-  private static void saxpyP(
+  private static void saxpy(
     final float a, final float[][][] x, final float[][][] y)
   {
     final int n3 = x.length;
@@ -922,19 +872,7 @@ public class LocalSmoothingFilter {
       }
     }
   }
-  private static void sxpay(float a, float[][][] x, float[][][] y) {
-    if (PARALLEL) {
-      sxpayP(a,x,y);
-    } else {
-      sxpayS(a,x,y);
-    }
-  }
-  private static void sxpayS(float a, float[][][] x, float[][][] y) {
-    int n3 = x.length;
-    for (int i3=0; i3<n3; ++i3)
-      sxpay(a,x[i3],y[i3]);
-  }
-  private static void sxpayP(
+  private static void sxpay(
     final float a, final float[][][] x, final float[][][] y)
   {
     final int n3 = x.length;
@@ -956,19 +894,7 @@ public class LocalSmoothingFilter {
       }
     }
   }
-  private static void sxy(float[][][] x, float[][][] y, float[][][] z) {
-    if (PARALLEL) {
-      sxyP(x,y,z);
-    } else {
-      sxyS(x,y,z);
-    }
-  }
-  private static void sxyS(float[][][] x, float[][][] y, float[][][] z) {
-    int n3 = x.length;
-    for (int i3=0; i3<n3; ++i3)
-      sxy(x[i3],y[i3],z[i3]);
-  }
-  private static void sxyP(
+  private static void sxy(
     final float[][][] x, final float[][][] y, final float[][][] z) 
   {
     final int n3 = x.length;

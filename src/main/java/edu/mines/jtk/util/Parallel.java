@@ -134,9 +134,8 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  * <p>
  * For example, an implementation of the method {@code sqrParallel} for 
  * 3D arrays could simply call the 2D version listed above. Tasks will 
- * naturally be split for outer loops, but not inner loops, thereby 
- * reducing the relative significance of time spent splitting and 
- * queueing tasks. 
+ * naturally tend to be split for outer loops, but not inner loops, 
+ * thereby reducing overhead, time spent splitting and queueing tasks.
  * <p>
  * Reference: A Java Fork/Join Framework, by Doug Lea, describes the
  * framework used to implement this class. This framework will be part 
@@ -299,7 +298,11 @@ public class Parallel {
   /**
    * Enables or disables parallel processing by all methods of this class.
    * By default, parallel processing is enabled. If disabled, all tasks 
-   * will be executed on the current thread; useful for benchmarking.
+   * will be executed on the current thread.
+   * <p>
+   * <em>Setting this flag to false disables parallel processing for all
+   * users of this class.</em> This method should therefore be used for 
+   * testing and benchmarking only.
    * @param parallel true, for parallel processing; false, otherwise.
    */
   public static void setParallel(boolean parallel) {
@@ -308,6 +311,20 @@ public class Parallel {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  // Implementation notes:
+  // Each fork-join task below has a range of indices to be processed.
+  // If the range is less than or equal to the chunk size, or if the
+  // queue for the current thread holds too many tasks already, then
+  // simply process the range on the current thread. Otherwise, split 
+  // the range into two parts that are approximately equal, ensuring
+  // that the left part is at least as large as the right part. If the
+  // right part is not empty, fork a new task. Then compute the left 
+  // part in the current thread, and, if necessary, join the right part.
+
+  // Threshold for number of surplus queued tasks. Used below to
+  // determine whether or not to split a task into two subtasks.
+  private static final int NSQT = 6;
 
   // The pool shared by all fork-join tasks created through this class.
   private static ForkJoinPool _pool = new ForkJoinPool();
@@ -331,18 +348,6 @@ public class Parallel {
   private static int middle(int begin, int end, int step) {
     return begin+step+((end-begin-1)/2)/step*step;
   }
-
-  // Each fork-join task below has a range of indices to be processed.
-  // If the range is less than or equal to the chunk size, or if the
-  // queue for the current thread holds too many tasks already, then
-  // simply process the range on the current thread. Otherwise, split 
-  // the range into two parts that are approximately equal, ensuring
-  // that the left part is at least as large as the right part. If the
-  // right part is not empty, fork a new task. Then compute the left 
-  // part in the current thread, and, if necessary, join the right part.
-
-  // Threshold for number of surplus queued tasks.
-  private static final int NSQT = 6;
 
   /**
    * Fork-join task for parallel loop.
