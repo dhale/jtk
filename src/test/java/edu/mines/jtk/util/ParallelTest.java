@@ -21,8 +21,11 @@ import static edu.mines.jtk.util.Parallel.*;
  */
 public class ParallelTest extends TestCase {
   public static void main(String[] args) {
-    if (args.length>0 && args[0].equals("bench"))
-      bench();
+    if (args.length>0 && args[0].equals("bench")) {
+      boolean parallel = (args.length>1 && args[1].equals("false")) ?
+        false : true;
+      bench(parallel);
+    }
     TestSuite suite = new TestSuite(ParallelTest.class);
     junit.textui.TestRunner.run(suite);
   }
@@ -358,10 +361,84 @@ public class ParallelTest extends TestCase {
     return emax;
   }
 
-  private static void bench() {
-    //Parallel.setParallel(false);
+  private static void bench(boolean parallel) {
+    Parallel.setParallel(parallel);
     benchArraySqr();
     benchArraySum();
     benchMatrixMultiply();
   }
 }
+
+/*
+2010.11.26
+banjer: j edu.mines.jtk.util.ParallelTest bench
+Array sqr: n1=501 n2=502 n3=503
+2D S: rate = 1663
+2D P: rate = 1709
+3D S: rate = 561
+3D P: rate = 777
+2D S: rate = 1669
+2D P: rate = 1752
+3D S: rate = 563
+3D P: rate = 776
+2D S: rate = 1602
+2D P: rate = 1531
+3D S: rate = 549
+3D P: rate = 773
+Array sum: n1=501 n2=502 n3=503
+2D S: rate = 1095
+2D P: rate = 1737
+3D S: rate = 712
+3D P: rate = 1487
+2D S: rate = 1086
+2D P: rate = 1831
+3D S: rate = 725
+3D P: rate = 1459
+2D S: rate = 1089
+2D P: rate = 1832
+3D S: rate = 739
+3D P: rate = 1528
+Matrix multiply for m=1001 n=1002
+S: rate = 1706 mflops
+P: rate = 4622 mflops
+S: rate = 1704 mflops
+P: rate = 4647 mflops
+S: rate = 1680 mflops
+P: rate = 4735 mflops
+
+2010.11.26
+brooks: j edu.mines.jtk.util.ParallelTest bench
+Array sqr: n1=501 n2=502 n3=503
+2D S: rate = 1700
+2D P: rate = 1560
+3D S: rate = 722
+3D P: rate = 2558
+2D S: rate = 1700
+2D P: rate = 1606
+3D S: rate = 710
+3D P: rate = 2395
+2D S: rate = 1681
+2D P: rate = 1606
+3D S: rate = 711
+3D P: rate = 2582
+Array sum: n1=501 n2=502 n3=503
+2D S: rate = 1120
+2D P: rate = 1450
+3D S: rate = 822
+3D P: rate = 5593
+2D S: rate = 1115
+2D P: rate = 1758
+3D S: rate = 691
+3D P: rate = 5956
+2D S: rate = 1115
+2D P: rate = 1723
+3D S: rate = 696
+3D P: rate = 6052
+Matrix multiply for m=1001 n=1002
+S: rate = 2151 mflops
+P: rate = 31102 mflops
+S: rate = 2058 mflops
+P: rate = 31003 mflops
+S: rate = 2124 mflops
+P: rate = 30858 mflops
+*/

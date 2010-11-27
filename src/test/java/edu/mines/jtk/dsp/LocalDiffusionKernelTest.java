@@ -20,8 +20,11 @@ import static edu.mines.jtk.util.ArrayMath.*;
  */
 public class LocalDiffusionKernelTest extends TestCase {
   public static void main(String[] args) {
-    if (args.length>0 && args[0].equals("bench"))
-      bench();
+    if (args.length>0 && args[0].equals("bench")) {
+      boolean parallel = (args.length>1 && args[1].equals("false")) ?
+        false : true;
+      bench(parallel);
+    }
     TestSuite suite = new TestSuite(LocalDiffusionKernelTest.class);
     junit.textui.TestRunner.run(suite);
   }
@@ -44,7 +47,8 @@ public class LocalDiffusionKernelTest extends TestCase {
     }
   }
 
-  private static void bench() {
+  private static void bench(boolean parallel) {
+    Parallel.setParallel(parallel);
     bench3();
   }
 
@@ -68,7 +72,7 @@ public class LocalDiffusionKernelTest extends TestCase {
         ldf.apply(d,0.5f,s,x,y);
       sw.stop();
       float sum = sum(y);
-      double rate = 1.0e-6*niter*nsample/sw.time();
+      int rate = (int)(1.0e-6*niter*nsample/sw.time());
       System.out.println("rate = "+rate+"  sum = "+sum);
     }
   }
