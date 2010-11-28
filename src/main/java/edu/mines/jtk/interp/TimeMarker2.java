@@ -49,7 +49,7 @@ import static edu.mines.jtk.util.ArrayMath.*;
 public class TimeMarker2 {
 
   /**
-   * Type of concurrency used by this transform.
+   * Type of concurrency used by this transform. Default is PARALLEL.
    */
   public enum Concurrency {
     PARALLELX,
@@ -482,24 +482,26 @@ public class TimeMarker2 {
       final int n = al.size(); // number of samples in active (A) list
       final int mb = max(mbmin,1+(n-1)/nbmax); // samples per block
       final int nb = 1+(n-1)/mb; // number of blocks <= nbmax
-      Parallel.loop(nb,new Parallel.LoopInt() {
+      Parallel.loop(nb,new Parallel.LoopInt() { // for all blocks, ...
         public void compute(int ib) {
-          if (bltask[ib]==null) {
-            dtask[ib] = new float[3];
-            bltask[ib] = new ActiveList();
+          if (bltask[ib]==null) { // if necessary for this block, make ...
+            dtask[ib] = new float[3]; // work array for tensor coefficients
+            bltask[ib] = new ActiveList(); // and an empty active list
           }
           int i = ib*mb; // beginning of block
           int j = min(i+mb,n); // beginning of next block (or end)
           for (int k=i; k<j; ++k) { // for each sample in block, ...
             Sample s = al.get(k); // get k'th sample from A list
-            solveOne(t,m,times,marks,s,bltask[ib],dtask[ib]); // solve
+            solveOne(t,m,times,marks,s,bltask[ib],dtask[ib]); // do sample
           }
           bltask[ib].setAllAbsent(); // needed when merging B lists below
         }
       });
-      // Merge samples from all B lists to a new A list. As samples
-      // are appended, their absent flags are set to false, so that 
-      // each sample is appended no more than once to the new A list.
+      // Merge samples from all B lists to a new A list. All samples
+      // in B lists are currently marked as absent in the A list. As 
+      // samples in B lists are appended to the A list, their absent 
+      // flags are set to false, so that no sample is appended more 
+      // than once to the new A list.
       al.clear();
       for (int ib=0; ib<nb; ++ib) {
         if (bltask[ib]!=null) {

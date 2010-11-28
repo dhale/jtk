@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 import edu.mines.jtk.dsp.Tensors3;
+import edu.mines.jtk.util.Parallel;
 import edu.mines.jtk.util.Stopwatch;
 import static edu.mines.jtk.util.ArrayMath.*;
 
@@ -50,9 +51,10 @@ import static edu.mines.jtk.util.ArrayMath.*;
 public class TimeMarker3 {
 
   /**
-   * Type of concurrency used by this transform.
+   * Type of concurrency used by this transform. Default is PARALLEL.
    */
   public enum Concurrency {
+    PARALLELX,
     PARALLEL,
     SERIAL
   }
@@ -156,6 +158,8 @@ public class TimeMarker3 {
   {
     if (_concurrency==Concurrency.PARALLEL) {
       solveParallel(al,t,m,times,marks);
+    } else if (_concurrency==Concurrency.PARALLELX) {
+      solveParallelX(al,t,m,times,marks);
     } else {
       solveSerial(al,t,m,times,marks);
     }
@@ -449,7 +453,7 @@ public class TimeMarker3 {
   /*
    * Solves for times by processing samples in the active list in parallel.
    */
-  private void solveParallel(
+  private void solveParallelX(
     final ActiveList al,
     final float[][][] t, final int m,
     final float[][][] times, final int[][][] marks)
@@ -511,6 +515,52 @@ public class TimeMarker3 {
     es.shutdown();
     //trace("solveParallel: ntotal="+ntotal);
     //trace("               nratio="+(float)ntotal/(float)(_n1*_n2*_n3));
+  }
+  
+  /*
+   * Solves for times by processing samples in the active list in parallel.
+   */
+  private void solveParallel(
+    final ActiveList al,
+    final float[][][] t, final int m,
+    final float[][][] times, final int[][][] marks)
+  {
+    int mbmin = 64; // minimum number of samples per block
+    int nbmax = 256; // maximum number of blocks
+    final float[][] dtask = new float[nbmax][];
+    final ActiveList[] bltask = new ActiveList[nbmax];
+    while (!al.isEmpty()) {
+      final int n = al.size(); // number of samples in active (A) list
+      final int mb = max(mbmin,1+(n-1)/nbmax); // samples per block
+      final int nb = 1+(n-1)/mb; // number of blocks <= nbmax
+      Parallel.loop(nb,new Parallel.LoopInt() { // for all blocks, ...
+        public void compute(int ib) {
+          if (bltask[ib]==null) { // if necessary for this block, make ...
+            dtask[ib] = new float[6]; // work array for tensor coefficients
+            bltask[ib] = new ActiveList(); // and an empty active list
+          }
+          int i = ib*mb; // beginning of block
+          int j = min(i+mb,n); // beginning of next block (or end)
+          for (int k=i; k<j; ++k) { // for each sample in block, ...
+            Sample s = al.get(k); // get k'th sample from A list
+            solveOne(t,m,times,marks,s,bltask[ib],dtask[ib]); // do sample
+          }
+          bltask[ib].setAllAbsent(); // needed when merging B lists below
+        }
+      });
+      // Merge samples from all B lists to a new A list. All samples
+      // in B lists are currently marked as absent in the A list. As 
+      // samples in B lists are appended to the A list, their absent 
+      // flags are set to false, so that no sample is appended more 
+      // than once to the new A list.
+      al.clear();
+      for (int ib=0; ib<nb; ++ib) {
+        if (bltask[ib]!=null) {
+          al.appendIfAbsent(bltask[ib]);
+          bltask[ib].clear();
+        }
+      }
+    }
   }
 
   /*
