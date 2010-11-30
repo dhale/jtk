@@ -371,6 +371,7 @@ public class ParallelTest extends TestCase {
 
 /*
 2010.11.26
+banjer: 2 x 2.66 GHz Intel Core i7, 8 GB 1067 MHz DDR3 RAM
 banjer: j edu.mines.jtk.util.ParallelTest bench
 Array sqr: n1=501 n2=502 n3=503
 2D S: rate = 1663

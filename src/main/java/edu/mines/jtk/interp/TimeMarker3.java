@@ -525,14 +525,15 @@ public class TimeMarker3 {
     final float[][][] t, final int m,
     final float[][][] times, final int[][][] marks)
   {
-    int mbmin = 64; // minimum number of samples per block
+    int mbmin = 64; // target minimum number of samples per block
     int nbmax = 256; // maximum number of blocks
     final float[][] dtask = new float[nbmax][];
     final ActiveList[] bltask = new ActiveList[nbmax];
     while (!al.isEmpty()) {
       final int n = al.size(); // number of samples in active (A) list
-      final int mb = max(mbmin,1+(n-1)/nbmax); // samples per block
-      final int nb = 1+(n-1)/mb; // number of blocks <= nbmax
+      final int mbmax = max(mbmin,1+(n-1)/nbmax); // max samples per block
+      final int nb = 1+(n-1)/mbmax; // number of blocks <= nbmax
+      final int mb = 1+(n-1)/nb; // evenly distribute samples per block
       Parallel.loop(nb,new Parallel.LoopInt() { // for all blocks, ...
         public void compute(int ib) {
           if (bltask[ib]==null) { // if necessary for this block, make ...

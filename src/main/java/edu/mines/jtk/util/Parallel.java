@@ -181,6 +181,7 @@ public class Parallel {
    */
   public static void loop(int end, LoopInt body) {
     loop(0,end,1,1,body);
+  }
  
   /**
    * Performs a loop <code>for (int i=begin; i&lt;end; ++i)</code>.
@@ -188,7 +189,6 @@ public class Parallel {
    * @param end the end index (not included) for the loop.
    * @param body the loop body.
    */
-  }
   public static void loop(int begin, int end, LoopInt body) {
     loop(begin,end,1,1,body);
   }
