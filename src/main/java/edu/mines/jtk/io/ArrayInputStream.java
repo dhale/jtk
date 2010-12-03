@@ -77,7 +77,8 @@ public class ArrayInputStream
   public ArrayInputStream(FileInputStream fis, ByteOrder bo) {
     super(fis);
     _ai = new ArrayInputAdapter(
-      fis.getChannel(),new DataInputStream(fis),bo);
+      //fis.getChannel(),new DataInputStream(fis),bo); // slower?
+      new DataInputStream(new BufferedInputStream(fis)),bo);
     _bo = bo;
   }
 

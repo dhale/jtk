@@ -77,7 +77,8 @@ public class ArrayOutputStream
   public ArrayOutputStream(FileOutputStream fos, ByteOrder bo) {
     super(fos);
     _ao = new ArrayOutputAdapter(
-      fos.getChannel(),new DataOutputStream(fos),bo);
+      //fos.getChannel(),new DataOutputStream(fos),bo); // slower?
+      new DataOutputStream(new BufferedOutputStream(fos)),bo);
     _bo = bo;
   }
 
