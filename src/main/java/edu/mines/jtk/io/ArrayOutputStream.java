@@ -30,7 +30,6 @@ public class ArrayOutputStream
 
   /**
    * Constructs an array output stream for the specified file output stream.
-   * The file channel of the file output stream enables more efficient writes.
    * The default byte order is BIG_ENDIAN.
    * @param fos the file output stream.
    */
@@ -63,22 +62,8 @@ public class ArrayOutputStream
    */
   public ArrayOutputStream(OutputStream os, ByteOrder bo) {
     super(os);
-    _ao = new ArrayOutputAdapter(new DataOutputStream(os),bo);
-    _bo = bo;
-  }
-
-  /**
-   * Constructs an array output stream for the specified file output stream 
-   * and byte order.
-   * The file channel of the file output stream enables more efficient writes.
-   * @param fos the file output stream.
-   * @param bo the byte order.
-   */
-  public ArrayOutputStream(FileOutputStream fos, ByteOrder bo) {
-    super(fos);
-    _ao = new ArrayOutputAdapter(
-      //fos.getChannel(),new DataOutputStream(fos),bo); // slower?
-      new DataOutputStream(new BufferedOutputStream(fos)),bo);
+    _dos = new DataOutputStream(new BufferedOutputStream(os));
+    _ao = new ArrayOutputAdapter(_dos,bo);
     _bo = bo;
   }
 
@@ -105,6 +90,14 @@ public class ArrayOutputStream
     throws FileNotFoundException 
   {
     this(new FileOutputStream(file),bo);
+  }
+
+  /**
+   * Closes this array output stream.
+   */
+  public void close() throws IOException {
+    _dos.flush();
+    super.close();
   }
 
   /**
@@ -406,6 +399,7 @@ public class ArrayOutputStream
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  private DataOutputStream _dos;
   private ArrayOutput _ao;
   private ByteOrder _bo;
 }

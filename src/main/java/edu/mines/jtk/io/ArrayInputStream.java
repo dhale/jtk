@@ -30,7 +30,6 @@ public class ArrayInputStream
 
   /**
    * Constructs an array input stream for the specified file input stream.
-   * The file channel of the file input stream enables more efficient reads.
    * The default byte order is BIG_ENDIAN.
    * @param fis the file input stream.
    */
@@ -63,22 +62,8 @@ public class ArrayInputStream
    */
   public ArrayInputStream(InputStream is, ByteOrder bo) {
     super(is);
-    _ai = new ArrayInputAdapter(new DataInputStream(is),bo);
-    _bo = bo;
-  }
-
-  /**
-   * Constructs an array input stream for the specified file input stream 
-   * and byte order.
-   * The file channel of the file input stream enables more efficient reads.
-   * @param fis the file input stream.
-   * @param bo the byte order.
-   */
-  public ArrayInputStream(FileInputStream fis, ByteOrder bo) {
-    super(fis);
-    _ai = new ArrayInputAdapter(
-      //fis.getChannel(),new DataInputStream(fis),bo); // slower?
-      new DataInputStream(new BufferedInputStream(fis)),bo);
+    _dis = new DataInputStream(new BufferedInputStream(is));
+    _ai = new ArrayInputAdapter(_dis,bo);
     _bo = bo;
   }
 
@@ -105,6 +90,14 @@ public class ArrayInputStream
     throws FileNotFoundException 
   {
     this(new FileInputStream(file),bo);
+  }
+
+  /**
+   * Closes this array input stream.
+   */
+  public void close() throws IOException {
+    // Anything else to do?
+    super.close();
   }
 
   /**
@@ -423,6 +416,7 @@ public class ArrayInputStream
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  private DataInputStream _dis;
   private ArrayInput _ai;
   private ByteOrder _bo;
 }
