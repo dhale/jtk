@@ -16,7 +16,7 @@ import edu.mines.jtk.dsp.Sampling;
 /**
  * A simple frame for 3D graphics.
  * @author Chris Engelsma and Dave Hale, Colorado School of Mines.
- * @version 2009.07.20
+ * @version 2010.12.09
  */
 public class SimpleFrame extends JFrame {
 
@@ -58,10 +58,10 @@ public class SimpleFrame extends JFrame {
     _canvas = new ViewCanvas();
     _canvas.setView(_view);
 
-    ModeManager mm = new ModeManager();
-    mm.add(_canvas);
-    OrbitViewMode ovm = new OrbitViewMode(mm);
-    SelectDragMode sdm = new SelectDragMode(mm);
+    _modeManager = new ModeManager();
+    _modeManager.add(_canvas);
+    OrbitViewMode ovm = new OrbitViewMode(_modeManager);
+    SelectDragMode sdm = new SelectDragMode(_modeManager);
 
     JPopupMenu.setDefaultLightWeightPopupEnabled(false);
     ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
@@ -87,21 +87,37 @@ public class SimpleFrame extends JFrame {
     menuBar.add(fileMenu);
     menuBar.add(modeMenu);
 
-    JToolBar toolBar = new JToolBar(SwingConstants.VERTICAL);
-    toolBar.setRollover(true);
+    _toolBar = new JToolBar(SwingConstants.VERTICAL);
+    _toolBar.setRollover(true);
     JToggleButton ovmButton = new ModeToggleButton(ovm);
-    toolBar.add(ovmButton);
+    _toolBar.add(ovmButton);
     JToggleButton sdmButton = new ModeToggleButton(sdm);
-    toolBar.add(sdmButton);
+    _toolBar.add(sdmButton);
 
     ovm.setActive(true);
 
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setSize(new Dimension(SIZE,SIZE));
     this.add(_canvas,BorderLayout.CENTER);
-    this.add(toolBar,BorderLayout.WEST);
+    this.add(_toolBar,BorderLayout.WEST);
     this.setJMenuBar(menuBar);
     this.setVisible(true);
+  }
+
+  /**
+   * Gets the mode manager for this simple frame.
+   * @return the mode manager.
+   */
+  public ModeManager getModeManager() {
+    return _modeManager;
+  }
+
+  /**
+   * Gets the JToolBar for this simple frame.
+   * @return the JToolBar.
+   */
+  public JToolBar getJToolBar() {
+    return _toolBar;
   }
 
   /**
@@ -375,6 +391,8 @@ public class SimpleFrame extends JFrame {
   private ViewCanvas _canvas;
   private OrbitView _view;
   private World _world;
+  private ModeManager _modeManager;
+  private JToolBar _toolBar;
   private static final int SIZE = 600;
 
 }
