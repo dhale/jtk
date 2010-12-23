@@ -1,10 +1,6 @@
 @echo off
 setlocal
 
-rem Where is the Java Runtime Environment (JRE)?
-rem We use the JRE *inside* the JDK, because it has the Hotspot server VM.
-set JRE_HOME=c:\pro\jdk\jre
-
 rem Where is the Mines JTK? (Where is your build.xml?)
 set MINES_JTK_HOME=c:\dhale\box\jtk\trunk
 
@@ -18,8 +14,9 @@ set CLASSPATH=^
 .
 
 rem Where are the relevant native (non-Java) code libraries?
+rem For 32-bit Windows, change x64 to x86.
 set JAVA_LIBRARY_PATH=^
-%MINES_JTK_HOME%\lib\windows\x86
+%MINES_JTK_HOME%\lib\windows\x64
 
 rem Run a server VM with assertions enabled and a 1GB max Java heap.
 rem Modify these flags and properties as necessary for your system.
