@@ -92,11 +92,16 @@ public class ArrayOutputStream
     this(new FileOutputStream(file),bo);
   }
 
+  public void flush() throws IOException {
+    _dos.flush();
+    super.flush();
+  }
+
   /**
    * Closes this array output stream.
    */
   public void close() throws IOException {
-    _dos.flush();
+    flush();
     super.close();
   }
 

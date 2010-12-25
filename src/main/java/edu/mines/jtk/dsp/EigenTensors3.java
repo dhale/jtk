@@ -666,5 +666,6 @@ public class EigenTensors3 implements Tensors3,Serializable {
       aos.writeFloats(_w2);
     }
     aos.writeFloats(_as);
+    aos.flush();
   }
 }
