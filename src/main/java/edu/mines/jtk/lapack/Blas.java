@@ -14,8 +14,8 @@ package edu.mines.jtk.lapack;
  */
 class Blas {
 
-  static final int ROW_MAJOR = 101;
-  static final int COL_MAJOR = 102;
+  static final int ROW_MAJOR = 101; // for cblas only, so do not use!
+  static final int COL_MAJOR = 102; // for cblas only, so do not use!
 
   static final int NO_TRANS = 111;
   static final int TRANS = 112;
