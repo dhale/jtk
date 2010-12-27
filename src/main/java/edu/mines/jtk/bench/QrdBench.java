@@ -10,7 +10,7 @@ import static edu.mines.jtk.util.ArrayMath.sum;
 import edu.mines.jtk.util.Stopwatch;
 
 /**
- * Benchmark Pure Java and LAPACK's QR decompositions.
+ * Benchmark QR decompositions in packages la and lapack.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.12.14
  */
@@ -39,31 +39,31 @@ public class QrdBench {
     Stopwatch sw = new Stopwatch();
     for (int niter=0; niter<5; ++niter) {
 
-      // Pure Java.
-      edu.mines.jtk.la.DMatrixQrd qrdj;
-      edu.mines.jtk.la.DMatrix xj = new edu.mines.jtk.la.DMatrix(1,1);
+      // edu.mines.jtk.la
+      edu.mines.jtk.la.DMatrixQrd qrd1;
+      edu.mines.jtk.la.DMatrix x1 = new edu.mines.jtk.la.DMatrix(1,1);
       sw.restart();
       for (nqrd=0;  sw.time()<maxtime; ++nqrd) {
-        qrdj = new edu.mines.jtk.la.DMatrixQrd(aj);
-        xj = qrdj.solve(bj);
+        qrd1 = new edu.mines.jtk.la.DMatrixQrd(aj);
+        x1 = qrd1.solve(bj);
       }
       sw.stop();
-      sum = sum(xj.getArray());
+      sum = sum(x1.getArray());
       rate = nqrd/sw.time();
-      System.out.println("Pure Java: rate="+rate+" sum="+sum);
+      System.out.println("edu.mines.jtk.la:     rate="+rate+" sum="+sum);
 
-      // LAPACK.
-      edu.mines.jtk.lapack.DMatrixQrd qrdl;
-      edu.mines.jtk.lapack.DMatrix xl = new edu.mines.jtk.lapack.DMatrix(1,1);
+      // edu.mines.jtk.lapack
+      edu.mines.jtk.lapack.DMatrixQrd qrd2;
+      edu.mines.jtk.lapack.DMatrix x2 = new edu.mines.jtk.lapack.DMatrix(1,1);
       sw.restart();
       for (nqrd=0;  sw.time()<maxtime; ++nqrd) {
-        qrdl = new edu.mines.jtk.lapack.DMatrixQrd(al);
-        xl = qrdl.solve(bl);
+        qrd2 = new edu.mines.jtk.lapack.DMatrixQrd(al);
+        x2 = qrd2.solve(bl);
       }
       sw.stop();
-      sum = sum(xl.getArray());
+      sum = sum(x2.getArray());
       rate = nqrd/sw.time();
-      System.out.println("   LAPACK: rate="+rate+" sum="+sum);
+      System.out.println("edu.mines.jtk.lapack: rate="+rate+" sum="+sum);
     }
   }
 }
