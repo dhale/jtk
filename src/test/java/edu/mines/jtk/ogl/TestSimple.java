@@ -26,13 +26,17 @@ class TestSimple {
   {
     run(canvas,autoRepaint);
   }
-  public static void run(GlCanvas canvas, boolean autoRepaint) {
-    canvas.setAutoRepaint(autoRepaint);
-    JFrame frame = new JFrame();
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setSize(new Dimension(SIZE,SIZE));
-    frame.getContentPane().add(canvas,BorderLayout.CENTER);
-    frame.setVisible(true);
+  public static void run(final GlCanvas canvas, final boolean autoRepaint) {
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        canvas.setAutoRepaint(autoRepaint);
+        JFrame frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(new Dimension(SIZE,SIZE));
+        frame.getContentPane().add(canvas,BorderLayout.CENTER);
+        frame.setVisible(true);
+      }
+    });
   }
   private static final int SIZE = 600;
 }
