@@ -13,18 +13,6 @@ software libraries for science and engineering. Applications currently
 include digital signal processing, linear algebra, optimization, meshing,
 interpolation, and 2-D and 3-D graphics.
 
-To take advantage of useful existing software not written in Java, we wrap 
-such software using the Java Native Interface (JNI). Where needed, we load
-JNI libraries dynamically via Java's System.loadLibrary method. An example
-is our JNI library that wraps parts of the LAPACK library for dense linear 
-algebra. 
-
-To simplify development, we include pre-compiled binaries for our JNI 
-libraries with the source code for the Mines JTK. Currently, we provide
-JNI libraries for 32-bit (x86) systems running Linux or Windows and 64-bit
-(x64) systems running Linux or Mac OS X. For these platforms, you need only 
-a Java compiler to use everything in the Mines JTK.
-
 Note: if you modify (or port, or translate, or ...) our source code, then
 you have created a "derived work", and should review carefully the terms
 of the license that accompanies this software.
@@ -59,7 +47,7 @@ bin/  - platform-dependent scripts (e.g., antrun.sh and javarun.sh)
 data/ - data used for demos and testing
 doc/  - documentation for tools we use but do not build (e.g., JUnit)
 jar/  - JAR files (e.g., junit.jar)
-lib/  - platform-specific JNI libraries (e.g., edu_mines_jtk_lapack.dll)
+lib/  - platform-specific JNI libraries (e.g., jogl.dll)
 src/  - source code files (e.g., main/java/edu/mines/jtk/util/Stopwatch.java)
 
 
@@ -110,7 +98,7 @@ After you have built the Mines JTK, you should have the JAR file
 jtk/trunk/build/jar/edu_mines_jtk.jar.
 You may use this file as you would any other JAR file.
 
-Some packages (e.g., edu.mines.jtk.lapack) require Java native interface
+Some packages (e.g., edu.mines.jtk.ogl) require Java native interface
 (JNI) libraries of native (non-Java) code. These platform-specific 
 libraries should be in a subdirectory of jtk/trunk/lib/, such as 
 jtk/trunk/lib/linux/x86/.
@@ -128,20 +116,8 @@ your PATH, (2) edit the script to specify the correct directories, and
 For example, you might run JUnit tests for edu.mines.jtk.util by typing
 javarun edu.mines.jtk.util.AllTest
 If any of these tests fail, then you may need to edit your javarun script.
-These tests depends on only pure Java code; they do not depend on our JNI
+These tests depend on only pure Java code; they do not depend on our JNI
 libraries. Many of our Java packages contain AllTest suites like this one.
-
-To test something that requires one of our JNI libraries, type
-javarun edu.mines.jtk.lapack.AllTest
-Again, if this test fails, then you may need to edit your javarun script.
-Or the JNI library for the package edu.mines.jtk.lapack is perhaps not
-provided for your platform.
-
-If your javarun script is ok, then perhaps you have an old version of 
-the standard C++ library. We compile and link our JNI libraries with a 
-recent version of that library, but your system may have an older and
-incompatible version. In such cases, if you cannot upgrade your standard
-C++ library, then you must build the JNI libraries yourself.
 
 
 3-D graphics in the Mines JTK

@@ -6,8 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack;
 
-import static edu.mines.jtk.lapack.Blas.LOWER;
-import static edu.mines.jtk.lapack.Lapack.*;
+import org.netlib.util.intW;
+import org.netlib.lapack.LAPACK;
 import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
 
@@ -39,30 +39,34 @@ public class DMatrixEvd {
     _d = new double[_n];
     _e = new double[_n];
     double[] aa = a.getPackedColumns();
+    LapackInfo li = new LapackInfo();
+    intW mW = new intW(0);
     if (a.isSymmetric()) {
-      int[] m = new int[1]; // not used (m[0] will equal _n)
       int[] isuppz = new int[2*_n]; // not used
       double[] work = new double[1];
       int[] iwork = new int[1];
-      int info = dsyevr(JOB_V,RANGE_A,LOWER,
-        _n,aa,_n,0.0,0.0,0,0,0.0,m,_d,_v,_n,isuppz,work,-1,iwork,-1);
-      if (info>0)
+      _lapack.dsyevr("V","A","L",
+        _n,aa,_n,0.0,0.0,0,0,0.0,mW,_d,_v,_n,isuppz,
+        work,-1,iwork,-1,li);
+      if (li.get("dsyevr")>0)
         throw new RuntimeException("internal error in LAPACK dsyevr");
       int lwork = (int)work[0];
       work = new double[lwork];
       int liwork = iwork[0];
       iwork = new int[liwork];
-      info = dsyevr(JOB_V,RANGE_A,LOWER,
-        _n,aa,_n,0.0,0.0,0,0,0.0,m,_d,_v,_n,isuppz,work,lwork,iwork,liwork);
-      if (info>0)
+      _lapack.dsyevr("V","A","L",
+        _n,aa,_n,0.0,0.0,0,0,0.0,mW,_d,_v,_n,isuppz,
+        work,lwork,iwork,liwork,li);
+      if (li.get("dsyevr")>0)
         throw new RuntimeException("internal error in LAPACK dsyevr");
     } else {
       double[] work = new double[1];
-      dgeev(JOB_N,JOB_V,_n,aa,_n,_d,_e,_v,_n,_v,_n,work,-1);
+      _lapack.dgeev("N","V",_n,aa,_n,_d,_e,_v,_n,_v,_n,work,-1,li);
+      li.check("dgeev");
       int lwork = (int)work[0];
       work = new double[lwork];
-      int info = dgeev(JOB_N,JOB_V,_n,aa,_n,_d,_e,_v,_n,_v,_n,work,lwork);
-      if (info>0)
+      _lapack.dgeev("N","V",_n,aa,_n,_d,_e,_v,_n,_v,_n,work,lwork,li);
+      if (li.get("dgeev")>0)
         throw new RuntimeException("LAPACK dgeev failed to converge");
     }
   }
@@ -113,6 +117,8 @@ public class DMatrixEvd {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  private static final LAPACK _lapack = LAPACK.getInstance();
 
   private int _n; // row and column dimensions for square matrix V
   private double[] _v; // eigenvectors V

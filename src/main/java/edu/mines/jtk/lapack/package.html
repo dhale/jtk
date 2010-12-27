@@ -4,11 +4,12 @@
 <body bgcolor="white">
 Linear algebra via LAPACK.
 <p>
-This Java package depends on CLAPACK, which is LAPACK (Linear Algebra 
-PACKage), written in Fortran and converted to C.
-The computational efficiency of CLAPACK depends primarily on the BLAS 
-(Basic Linear Algebra Subroutines).
-BLAS libraries are typically tuned for different processors.
+This Java package depends on the 
+<a href="http://code.google.com/p/netlib-java/">netlib-java project</a>,
+which has translated LAPACK (Linear Algebra PACKage) Fortran subroutines
+into Java methods.
+This package works as pure Java, but can also use native implementations 
+of BLAS and LAPACK if provided.
 <p>
 For more information on LAPACK, see
 Anderson, E., Bai, Z., Bischof, C., Blackford, S., Demmel, J., Dongarra, J., 

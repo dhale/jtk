@@ -10,12 +10,15 @@ export JAVA_VERSION=1.6.0
 # Add other jars to this list as necessary.
 export CLASSPATH=\
 $MINES_JTK_HOME/build/jar/edu_mines_jtk.jar:\
+$MINES_JTK_HOME/jar/arpack-java.jar:\
+$MINES_JTK_HOME/jar/netlib-java.jar:\
 $MINES_JTK_HOME/jar/gluegen-rt.jar:\
 $MINES_JTK_HOME/jar/jogl.jar:\
 $MINES_JTK_HOME/jar/junit.jar:\
 .
 
 # Where are the relevant native (non-Java) code libraries?
+# For Mac OS X, change linux to macosx.
 export JAVA_LIBRARY_PATH=\
 $MINES_JTK_HOME/lib/linux/x64
 

@@ -8,9 +8,7 @@ package edu.mines.jtk.lapack;
 
 import static java.lang.Math.min;
 
-import static edu.mines.jtk.lapack.Blas.NO_TRANS;
-import static edu.mines.jtk.lapack.Lapack.dgetrf;
-import static edu.mines.jtk.lapack.Lapack.dgetrs;
+import org.netlib.lapack.LAPACK;
 import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
 
@@ -41,7 +39,9 @@ public class DMatrixLud {
     _lu = a.getPackedColumns();
     _npiv = min(_m,_n);
     _ipiv = new int[_npiv];
-    int info = dgetrf(_m,_n,_lu,_m,_ipiv);
+    LapackInfo li = new LapackInfo();
+    _lapack.dgetrf(_m,_n,_lu,_m,_ipiv,li);
+    int info = li.get("dgetrf");
     _p = new int[_m];
     for (int i=0; i<_m; ++i)
       _p[i] = i;
@@ -159,12 +159,16 @@ public class DMatrixLud {
     int[] ipiv = _ipiv;
     double[] ba = b.getPackedColumns();
     int ldb = _m;
-    dgetrs(NO_TRANS,n,nrhs,aa,lda,ipiv,ba,ldb);
+    LapackInfo li = new LapackInfo();
+    _lapack.dgetrs("N",n,nrhs,aa,lda,ipiv,ba,ldb,li);
+    li.check("dgetrs");
     return new DMatrix(_m,nrhs,ba);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  private static final LAPACK _lapack = LAPACK.getInstance();
 
   private int _m; // number of rows
   private int _n; // number of columns

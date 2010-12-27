@@ -6,9 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack;
 
-import static edu.mines.jtk.lapack.Blas.LOWER;
-import static edu.mines.jtk.lapack.Lapack.dpotrf;
-import static edu.mines.jtk.lapack.Lapack.dpotrs;
+import org.netlib.lapack.LAPACK;
 import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
 
@@ -40,8 +38,11 @@ public class DMatrixChd {
       }
     }
 
-    // Decompose.`
-    int info = dpotrf(LOWER,_n,_l,_n);
+    // Decompose.
+    LapackInfo li = new LapackInfo();
+    _lapack.dpotrf("L",_n,_l,_n,li);
+    int info = li.get("dpotrf");
+
     _pd = info==0;
 
     _det = 1.0;
@@ -93,12 +94,16 @@ public class DMatrixChd {
     int lda = _n;
     double[] ba = b.getPackedColumns();
     int ldb = _n;
-    dpotrs(LOWER,n,nrhs,aa,lda,ba,ldb);
+    LapackInfo li = new LapackInfo();
+    _lapack.dpotrs("L",n,nrhs,aa,lda,ba,ldb,li);
+    li.check("dpotrs");
     return new DMatrix(_n,nrhs,ba);
   }
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  private static final LAPACK _lapack = LAPACK.getInstance();
 
   private int _n; // number of rows equals number of columns
   private double[] _l; // factor L

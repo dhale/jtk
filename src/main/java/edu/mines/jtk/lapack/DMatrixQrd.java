@@ -6,8 +6,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack;
 
-import static edu.mines.jtk.lapack.Blas.*;
-import static edu.mines.jtk.lapack.Lapack.*;
+import org.netlib.blas.BLAS;
+import org.netlib.lapack.LAPACK;
 import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
 
@@ -38,10 +38,13 @@ public class DMatrixQrd {
     _qr = a.getPackedColumns();
     _tau = new double[_k];
     _work = new double[1];
-    dgeqrf(_m,_n,_qr,_m,_tau,_work,-1);
+    LapackInfo li = new LapackInfo();
+    _lapack.dgeqrf(_m,_n,_qr,_m,_tau,_work,-1,li);
+    li.check("dgeqrf");
     _lwork = (int)_work[0];
     _work = new double[_lwork];
-    dgeqrf(_m,_n,_qr,_m,_tau,_work,_lwork);
+    _lapack.dgeqrf(_m,_n,_qr,_m,_tau,_work,_lwork,li);
+    li.check("dgeqrf");
   }
 
   /**
@@ -62,7 +65,9 @@ public class DMatrixQrd {
    */
   public DMatrix getQ() {
     double[] q = copy(_qr);
-    dorgqr(_m,_n,_k,q,_m,_tau,_work,_lwork);
+    LapackInfo li = new LapackInfo();
+    _lapack.dorgqr(_m,_n,_k,q,_m,_tau,_work,_lwork,li);
+    li.check("dorgqr");
     return new DMatrix(_m,_n,q);
   }
 
@@ -96,10 +101,17 @@ public class DMatrixQrd {
     int nrhs = b.getN();
     DMatrix c = new DMatrix(b);
     double[] ca = c.getArray();
-    dormqr(LEFT,TRANS,_m,nrhs,_k,_qr,_m,_tau,ca,_m,_work,_lwork);
+    double[] work = new double[1];
+    LapackInfo li = new LapackInfo();
+    _lapack.dormqr("L","T",_m,nrhs,_k,_qr,_m,_tau,ca,_m,work,-1,li);
+    li.check("dormqr");
+    int lwork = (int)work[0];
+    work = new double[lwork];
+    _lapack.dormqr("L","T",_m,nrhs,_k,_qr,_m,_tau,ca,_m,work,lwork,li);
+    li.check("dormqr");
 
     // Solve R*X = C.  R is n-by-n, X is n-by-nrhs, and C is m-by-nrhs.
-    dtrsm(COL_MAJOR,LEFT,UPPER,NO_TRANS,NON_UNIT,_n,nrhs,1.0,_qr,_m,ca,_m);
+    _blas.dtrsm("L","U","N","N",_n,nrhs,1.0,_qr,_m,ca,_m);
 
     // Discard the extra n-m rows in X.
     DMatrix x = c.get(0,_n-1,null);
@@ -108,6 +120,9 @@ public class DMatrixQrd {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  private static final BLAS _blas = BLAS.getInstance();
+  private static final LAPACK _lapack = LAPACK.getInstance();
 
   int _m; // number of rows
   int _n; // number of columns

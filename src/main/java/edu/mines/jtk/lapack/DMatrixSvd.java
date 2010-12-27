@@ -6,8 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack;
 
-import static edu.mines.jtk.lapack.Lapack.JOB_S;
-import static edu.mines.jtk.lapack.Lapack.dgesvd;
+import org.netlib.lapack.LAPACK;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
@@ -39,10 +38,13 @@ public class DMatrixSvd {
     _u = new double[_m*_mn];
     _vt = new double[_mn*_n];
     double[] work = new double[1];
-    dgesvd(JOB_S,JOB_S,_m,_n,aa,_m,_s,_u,_m,_vt,_mn,work,-1);
+    LapackInfo li = new LapackInfo();
+    _lapack.dgesvd("S","S",_m,_n,aa,_m,_s,_u,_m,_vt,_mn,work,-1,li);
+    li.check("dgesvd");
     int lwork = (int)work[0];
     work = new double[lwork];
-    dgesvd(JOB_S,JOB_S,_m,_n,aa,_m,_s,_u,_m,_vt,_mn,work,lwork);
+    _lapack.dgesvd("S","S",_m,_n,aa,_m,_s,_u,_m,_vt,_mn,work,lwork,li);
+    li.check("dgesvd");
   }
 
   /**
@@ -122,6 +124,8 @@ public class DMatrixSvd {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  private static final LAPACK _lapack = LAPACK.getInstance();
 
   int _m; // number of rows
   int _n; // number of columns

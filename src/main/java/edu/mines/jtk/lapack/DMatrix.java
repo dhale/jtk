@@ -6,7 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.lapack;
 
-import static edu.mines.jtk.lapack.Blas.*;
+import org.netlib.blas.BLAS;
 import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
 
@@ -824,8 +824,7 @@ public class DMatrix {
     Check.argument(_n==b._m,
       "number of columns in A equals number of rows in B");
     DMatrix c = new DMatrix(_m,b._n);
-    dgemm(COL_MAJOR,NO_TRANS,NO_TRANS,
-      _m,b._n,_n,1.0,_a,_m,b._a,b._m,1.0,c._a,c._m);
+    _blas.dgemm("N","N",_m,b._n,_n,1.0,_a,_m,b._a,b._m,1.0,c._a,c._m);
     return c;
   }
 
@@ -840,8 +839,7 @@ public class DMatrix {
     Check.argument(_n==b._n,
       "number of columns in A equals number of columns in B");
     DMatrix c = new DMatrix(_m,b._m);
-    dgemm(COL_MAJOR,NO_TRANS,TRANS,
-      _m,b._m,_n,1.0,_a,_m,b._a,b._m,1.0,c._a,c._m);
+    _blas.dgemm("N","T",_m,b._n,_n,1.0,_a,_m,b._a,b._m,1.0,c._a,c._m);
     return c;
   }
 
@@ -856,8 +854,7 @@ public class DMatrix {
     Check.argument(_m==b._m,
       "number of rows in A equals number of rows in B");
     DMatrix c = new DMatrix(_n,b._n);
-    dgemm(COL_MAJOR,TRANS,NO_TRANS,
-      _n,b._n,_m,1.0,_a,_m,b._a,b._m,1.0,c._a,c._m);
+    _blas.dgemm("T","N",_n,b._n,_m,1.0,_a,_m,b._a,b._m,1.0,c._a,c._m);
     return c;
   }
 
@@ -990,6 +987,8 @@ public class DMatrix {
 
   ///////////////////////////////////////////////////////////////////////////
   // private
+
+  private static final BLAS _blas = BLAS.getInstance();
 
   private int _m; // number of rows
   private int _n; // number of columns

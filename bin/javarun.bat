@@ -8,6 +8,8 @@ rem Where will Java look for classes?
 rem Add other jars to this list as necessary.
 set CLASSPATH=^
 %MINES_JTK_HOME%\build\jar\edu_mines_jtk.jar;^
+%MINES_JTK_HOME%\jar\arpack-java.jar:^
+%MINES_JTK_HOME%\jar\netlib-java.jar:^
 %MINES_JTK_HOME%\jar\gluegen-rt.jar;^
 %MINES_JTK_HOME%\jar\jogl.jar;^
 %MINES_JTK_HOME%\jar\junit.jar;^
