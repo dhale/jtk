@@ -105,6 +105,15 @@ public class TensorsView extends TiledView {
   }
 
   /**
+   * Sets the scale factor for ellipse size.
+   * @param scale the scale factor.
+   */
+  public void setScale(double scale) {
+    _scale = scale;
+    updateTensorEllipses();
+  }
+
+  /**
    * Sets the line width.
    * The default width is zero, for the thinnest lines.
    * @param width the line width.
@@ -195,6 +204,7 @@ public class TensorsView extends TiledView {
   private Orientation _orientation = Orientation.X1RIGHT_X2UP;
   private float _lineWidth = 0.0f;
   private Color _lineColor = null;
+  private double _scale; // scale factor for ellipse size
 
   private void updateTensorEllipses() {
     int n1 = _s1.getCount();
@@ -229,6 +239,9 @@ public class TensorsView extends TiledView {
     // Maximum radius (in samples) of any ellipse.
     // Reduce radius slightly to ensure a gap between ellipses.
     double r = (emax>0.0)?0.48*ns/sqrt(emax):0.0;
+
+    // Scale factor.
+    r *= _scale;
 
     // Ellipse (x1,x2) coordinates.
     _x1 = new float[nm][np];
