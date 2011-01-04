@@ -204,7 +204,7 @@ public class TensorsView extends TiledView {
   private Orientation _orientation = Orientation.X1RIGHT_X2UP;
   private float _lineWidth = 0.0f;
   private Color _lineColor = null;
-  private double _scale; // scale factor for ellipse size
+  private double _scale = 1.0; // scale factor for ellipse size
 
   private void updateTensorEllipses() {
     int n1 = _s1.getCount();
