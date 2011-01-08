@@ -595,6 +595,22 @@ public class SimplePlot extends PlotFrame {
   }
 
   /**
+   * Sets the tic interval for the horizontal axis.
+   * @param interval the major labeled tic interval.
+   */
+  public void setHInterval(double interval) {
+    _panel.setHInterval(interval);
+  }
+
+  /**
+   * Sets the tic interval for the vertical axis.
+   * @param interval the major labeled tic interval.
+   */
+  public void setVInterval(double interval) {
+    _panel.setVInterval(interval);
+  }
+
+  /**
    * Sets the label for the horizontal axis.
    * @param label the label.
    */

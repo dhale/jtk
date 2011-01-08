@@ -83,7 +83,7 @@ import static edu.mines.jtk.util.ArrayMath.*; // for testing only
  * <pre><code>
  * static float sumParallel(final float[][] a) {
  *   int n = a.length;
- *   return Parallel.reduce(n,Parallel.ReduceInt&lt;Float&gt;() {
+ *   return Parallel.reduce(n,new Parallel.ReduceInt&lt;Float&gt;() {
  *     public Float compute(int i) {
  *       return sum(a[i]);
  *     }
