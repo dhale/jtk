@@ -306,6 +306,8 @@ public class LocalOrientFilter {
         float v2i = u1i;
         float eui = e[0];
         float evi = e[1];
+        if (evi<0.0f) evi = 0.0f;
+        if (eui<evi) eui = evi;
         if (theta!=null) theta[i2][i1] = asin(u2i);
         if (u1!=null) u1[i2][i1] = u1i;
         if (u2!=null) u2[i2][i1] = u2i;
