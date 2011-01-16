@@ -116,6 +116,7 @@ def plot2Teapot(f,x1,x2,s,s1,s2,g=None,label=None,png=None,et=None):
     tv.setOrientation(TensorsView.Orientation.X1DOWN_X2RIGHT)
     tv.setLineColor(Color.YELLOW)
     tv.setLineWidth(3.0)
+    tv.setScale(2.0)
     panel.getTile(0,0).addTiledView(tv)
   else:
     fs,x1s,x2s = makePointSets(cmap,f,x1,x2)

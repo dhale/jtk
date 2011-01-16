@@ -73,6 +73,14 @@ public class EigenTensors2 implements Tensors2 {
   }
 
   /**
+   * Constructs tensors from the specified tensors.
+   * @param t the tensors from which to copy eigenvectors and eigenvalues.
+   */
+  public EigenTensors2(EigenTensors2 t) {
+    this(t._u1,t._u2,t._au,t._av);
+  }
+
+  /**
    * Gets the number of tensors in the 1st dimension.
    * @return the number of tensors in the 1st dimension.
    */
@@ -300,6 +308,90 @@ public class EigenTensors2 implements Tensors2 {
    */
   public void setEigenvectorU(int i1, int i2, float[] u) {
     setEigenvectorU(i1,i2,u[0],u[1]);
+  }
+
+  /**
+   * Scales eigenvalues of these tensors by specified factors.
+   * @param s array of scale factors.
+   */
+  public void scale(float[][] s) {
+    for (int i2=0; i2<_n2; ++i2) {
+      for (int i1=0; i1<_n1; ++i1) {
+        _au[i2][i1] *= s[i2][i1];
+        _av[i2][i1] *= s[i2][i1];
+      }
+    }
+  }
+
+  /**
+   * Inverts these tensors by inverting their eigenvalues.
+   * Takes no care to avoid division by zero eigenvalues.
+   */
+  public void invert() {
+    for (int i2=0; i2<_n2; ++i2) {
+      for (int i1=0; i1<_n1; ++i1) {
+        _au[i2][i1] = 1.0f/_au[i2][i1];
+        _av[i2][i1] = 1.0f/_av[i2][i1];
+      }
+    }
+  }
+
+  /**
+   * Inverts these tensors as structure tensors.
+   * After inversion, all eigenvalues are in the range (0,1].
+   * Specifically, after inversion, 0 &lt; au &lt;= av &lt;= 1.
+   * <p>
+   * Before inversion, tensors are assumed to be structure tensors, 
+   * for which eigenvalues au are not less than their corresponding 
+   * eigenvalues av. (Any eigenvalues au for which this condition is 
+   * not satisfied are set equal to the corresponding eigenvalue av.) 
+   * Structure tensors can, for example, be computed using 
+   * {@link LocalOrientFilter}.
+   * <p>
+   * Then, if any eigenvalues are equal to zero, this method adds a 
+   * small fraction of the largest eigenvalue au to all eigenvalues.
+   * If am is the minimum of the eigenvalues av after this perturbation,
+   * then the parameter p0 is used to compute a0 = pow(am/av,p0) and
+   * the parameter p1 is used to compute a1 = pow(av/au,p1). Inverted 
+   * eigenvalues are then au = a0*a1 and av = a0. 
+   * <p>
+   * In this way, p0 emphasizes overall amplitude and p1 emphasizes 
+   * linearity. For amplitude-independent tensors with all eigenvalues
+   * av equal to one, set p0 = 0.0. To enhance linearity, set p1 &gt; 1.0. 
+   * To simply invert (and normalize) these tensors, set p0 = p1 = 1.0.
+   * @param p0 power for amplitude.
+   * @param p1 power for linearity.
+   */
+  public void invertStructure(double p0, double p1) {
+    float amax = 0.0f;
+    float amin = FLT_MAX;
+    for (int i2=0; i2<_n2; ++i2) {
+      for (int i1=0; i1<_n1; ++i1) {
+        float aui = _au[i2][i1];
+        float avi = _av[i2][i1];
+        if (avi<0.0f) avi = 0.0f;
+        if (aui< avi) aui = avi;
+        if (avi<amin) amin = avi;
+        if (aui>amax) amax = aui;
+        _au[i2][i1] = aui;
+        _av[i2][i1] = avi;
+      }
+    }
+    float aeps = (amin==0.0f)?max(FLT_MIN*100.0f,FLT_EPSILON*amax):0.0f;
+    amin += aeps;
+    amax += aeps;
+    float fp0 = (float)p0;
+    float fp1 = (float)p1;
+    for (int i2=0; i2<_n2; ++i2) {
+      for (int i1=0; i1<_n1; ++i1) {
+        float aui = _au[i2][i1]+aeps;
+        float avi = _av[i2][i1]+aeps;
+        float a0i = pow(amin/avi,fp0);
+        float a1i = pow( avi/aui,fp1);
+        _au[i2][i1] = a0i*a1i;
+        _av[i2][i1] = a0i;
+      }
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////

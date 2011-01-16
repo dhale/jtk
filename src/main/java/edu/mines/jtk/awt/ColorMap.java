@@ -503,19 +503,44 @@ public class ColorMap {
     Color[] c = new Color[256];
     for (int i=0; i<256; ++i) {
       float x = (float)i/255.0f;
-      if (x<0.125f) {
+      if (x<0.125f) { // 0.0, 0.0, 0.5:1.0
         float y = x/0.125f;
         c[i] = new Color(0.0f,0.0f,0.5f+0.5f*y,a);
-      } else if (x<0.375f) {
+      } else if (x<0.375f) { // 0.0, 0.0:1.0, 1.0
         float y = (x-0.125f)/0.25f;
         c[i] = new Color(0.0f,y,1.0f,a);
-      } else if (x<0.625f) {
+      } else if (x<0.625f) { // 0.0:1.0, 1.0, 1.0:0.0
         float y = (x-0.375f)/0.25f;
         c[i] = new Color(y,1.0f,1.0f-y,a);
-      } else if (x<0.875f) {
+      } else if (x<0.875f) { // 1.0, 1.0:0.0, 0.0
         float y = (x-0.625f)/0.25f;
         c[i] = new Color(1.0f,1.0f-y,0.0f,a);
-      } else {
+      } else { // 1.0:0.5, 0.0, 0.0
+        float y = (x-0.875f)/0.125f;
+        c[i] = new Color(1.0f-0.5f*y,0.0f,0.0f,a);
+      }
+    }
+    return c;
+  }
+
+  private static Color[] getGmtJetColors(double alpha) {
+    float a = (float)alpha;
+    Color[] c = new Color[256];
+    for (int i=0; i<256; ++i) {
+      float x = (float)i/255.0f;
+      if (x<0.125f) { // R=0.0, G=0.0, B=0.5:1.0
+        float y = x/0.125f;
+        c[i] = new Color(0.0f,0.0f,0.5f+0.5f*y,a);
+      } else if (x<0.375f) { // R=0.0, G=0.0:1.0, B=1.0
+        float y = (x-0.125f)/0.25f;
+        c[i] = new Color(0.0f,y,1.0f,a);
+      } else if (x<0.625f) { // R=1.0, G=1.0, B=1.0:0.5
+        float y = (x-0.375f)/0.25f;
+        c[i] = new Color(1.0f,1.0f,1.0f-0.5f*y,a);
+      } else if (x<0.875f) { // R=1.0, G=1.0:0.0, B=0.0
+        float y = (x-0.625f)/0.25f;
+        c[i] = new Color(1.0f,1.0f-y,0.0f,a);
+      } else { // R=1.0:0.5, G=0.0, B=0.0
         float y = (x-0.875f)/0.125f;
         c[i] = new Color(1.0f-0.5f*y,0.0f,0.0f,a);
       }

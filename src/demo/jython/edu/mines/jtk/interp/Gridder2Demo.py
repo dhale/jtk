@@ -34,7 +34,6 @@ def demoTeapot():
   p = sg.grid(st,sx)
   tensors = makeImageTensors(s)
   plot2Teapot(f,t,x,s,st,sx,None,"Known value","tp2f",et=tensors)
-  #tensors = setRandomEigenvalues(tensors)
   bg = makeBlendedGridder(f,t,x,smooth=smooth)
   bg.setTensors(tensors)
   d = bg.gridNearest(fnull,p)
@@ -271,36 +270,14 @@ def makeImageTensors(s):
   """ 
   Returns tensors for guiding along features in specified image.
   """
-  n1,n2 = len(s[0]),len(s)
   sigma = 3
+  n1,n2 = len(s[0]),len(s)
   lof = LocalOrientFilter(sigma)
-  t = lof.applyForTensors(s)
-  su = zerofloat(n1,n2)
-  sv = zerofloat(n1,n2)
-  t.getEigenvalues(su,sv)
-  c = coherence(sigma,t,s)
-  c = clip(0.0,0.99,c) # coherence in range [0,1)
-  eu = div(1.0,su) # inverse of eigenvalues
-  ev = div(1.0,sv) # from structure tensor
-  es = div(1.0,sub(1.0,c)) # scale eigenvalues by 1/(1-c)
-  eu = mul(es,eu) # scale eigenvalue for u
-  ev = mul(es,ev) # scale eigenvalue for v
-  es = 1.0/max(ev) # scale largest eigenvalue ev to be 1.0
-  eu = mul(es,eu) # scale eigenvalue for u
-  ev = mul(es,ev) # scale eigenvalue for v
-  #SimplePlot.asPixels(c)
-  #SimplePlot.asPixels(s)
-  #SimplePlot.asPixels(eu)
-  #SimplePlot.asPixels(ev)
-  t.setEigenvalues(eu,ev)
-  return t
-
-def setRandomEigenvalues(t):
-  n1,n2 = t.n1,t.n2
-  eu = randfloat(n1,n2)
-  ev = randfloat(n1,n2)
-  mul(0.01,eu,eu)
-  t.setEigenvalues(eu,ev)
+  t = lof.applyForTensors(s) # structure tensors
+  c = coherence(sigma,t,s) # structure-oriented coherence c
+  c = clip(0.0,0.99,c) # c clipped to range [0,1)
+  t.scale(sub(1.0,c)) # scale structure tensors by 1-c
+  t.invertStructure(1.0,1.0) # invert and normalize
   return t
 
 def coherence(sigma,t,s):
