@@ -337,7 +337,7 @@ public class EigenTensors2 implements Tensors2 {
   }
 
   /**
-   * Inverts these tensors as structure tensors.
+   * Inverts these tensors, assumed to be structure tensors.
    * After inversion, all eigenvalues are in the range (0,1].
    * Specifically, after inversion, 0 &lt; au &lt;= av &lt;= 1.
    * <p>
@@ -377,7 +377,8 @@ public class EigenTensors2 implements Tensors2 {
         _av[i2][i1] = avi;
       }
     }
-    float aeps = (amin==0.0f)?max(FLT_MIN*100.0f,FLT_EPSILON*amax):0.0f;
+    //float aeps = (amin==0.0f)?max(FLT_MIN*100.0f,FLT_EPSILON*amax):0.0f;
+    float aeps = max(FLT_MIN*100.0f,FLT_EPSILON*amax);
     amin += aeps;
     amax += aeps;
     float fp0 = (float)p0;
