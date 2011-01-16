@@ -317,8 +317,9 @@ public class EigenTensors2 implements Tensors2 {
   public void scale(float[][] s) {
     for (int i2=0; i2<_n2; ++i2) {
       for (int i1=0; i1<_n1; ++i1) {
-        _au[i2][i1] *= s[i2][i1];
-        _av[i2][i1] *= s[i2][i1];
+        float si = s[i2][i1];
+        _au[i2][i1] *= si;
+        _av[i2][i1] *= si;
       }
     }
   }

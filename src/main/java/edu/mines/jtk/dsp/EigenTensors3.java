@@ -569,6 +569,120 @@ public class EigenTensors3 implements Tensors3,Serializable {
     setEigenvectorW(i1,i2,i3,w[0],w[1],w[2]);
   }
 
+  /**
+   * Scales eigenvalues of these tensors by specified factors.
+   * @param s array of scale factors.
+   */
+  public void scale(float[][][] s) {
+    float[] a = new float[3];
+    for (int i3=0; i3<_n3; ++i3) {
+      for (int i2=0; i2<_n2; ++i2) {
+        for (int i1=0; i1<_n1; ++i1) {
+          float si = s[i3][i2][i1];
+          getEigenvalues(i1,i2,i3,a);
+          a[0] *= si;
+          a[1] *= si;
+          a[2] *= si;
+          setEigenvalues(i1,i2,i3,a);
+        }
+      }
+    }
+  }
+
+  /**
+   * Inverts these tensors by inverting their eigenvalues.
+   * Takes no care to avoid division by zero eigenvalues.
+   */
+  public void invert() {
+    float[] a = new float[3];
+    for (int i3=0; i3<_n3; ++i3) {
+      for (int i2=0; i2<_n2; ++i2) {
+        for (int i1=0; i1<_n1; ++i1) {
+          getEigenvalues(i1,i2,i3,a);
+          a[0] = 1.0f/a[0];
+          a[1] = 1.0f/a[1];
+          a[2] = 1.0f/a[2];
+          setEigenvalues(i1,i2,i3,a);
+        }
+      }
+    }
+  }
+
+  /**
+   * Inverts these tensors, assumed to be structure tensors.
+   * After inversion, all eigenvalues are in the range (0,1].
+   * Specifically, after inversion, 0 &lt; au &lt;= av &lt;= aw &lt;= 1.
+   * <p>
+   * Before inversion, tensors are assumed to be structure tensors, 
+   * for which eigenvalues au are not less than their corresponding 
+   * eigenvalues av which are not less than their corresponding aw. 
+   * (Any eigenvalues au for which this condition is not satisfied 
+   * are set equal to the corresponding eigenvalue av; likewise for 
+   * av and aw.) Structure tensors can, for example, be computed using 
+   * {@link LocalOrientFilter}.
+   * <p>
+   * Then, if any eigenvalues are equal to zero, this method adds a 
+   * small fraction of the largest eigenvalue au to all eigenvalues.
+   * If am is the minimum of the eigenvalues aw after this perturbation,
+   * then the parameter p0 is used to compute a0 = pow(am/aw,p0), the 
+   * parameter p1 is used to compute a1 = pow(aw/av,p1), and the parameter
+   * p2 is used to compute a2 = pow(av/au,p2). Inverted eigenvalues are 
+   * then au = a0*a1*a2, av = a0*a1 and aw = a0. 
+   * <p>
+   * In this way, p0 emphasizes overall amplitude, p1 emphasizes 
+   * linearity and p2 emphasizes planarity. For amplitude-independent 
+   * tensors with all eigenvalues av equal to one, set p0 = 0.0. To 
+   * enhance linearity, set p1 &gt; 1.0. To enhance planarity, set
+   * p2 &gt; 1.0. To simply invert (and normalize) these tensors, set 
+   * p0 = p1 = p2 = 1.0.
+   * @param p0 power for amplitude.
+   * @param p1 power for linearity.
+   * @param p2 power for planarity.
+   */
+  public void invertStructure(double p0, double p1, double p2) {
+    float[] a = new float[3];
+    float amax = 0.0f;
+    float amin = FLT_MAX;
+    for (int i3=0; i3<_n3; ++i3) {
+      for (int i2=0; i2<_n2; ++i2) {
+        for (int i1=0; i1<_n1; ++i1) {
+          getEigenvalues(i1,i2,i3,a);
+          float aui = a[0], avi = a[1], awi = a[2];
+          if (awi<0.0f) awi = 0.0f;
+          if (avi< awi) avi = awi;
+          if (aui< avi) aui = avi;
+          if (aui<amin) amin = aui;
+          if (aui>amax) amax = aui;
+          setEigenvalues(i1,i2,i3,aui,avi,awi);
+        }
+      }
+    }
+    float aeps = max(FLT_MIN*100.0f,FLT_EPSILON*amax);
+    amin += aeps;
+    amax += aeps;
+    float fp0 = (float)p0;
+    float fp1 = (float)p1;
+    float fp2 = (float)p2;
+    for (int i3=0; i3<_n3; ++i3) {
+      for (int i2=0; i2<_n2; ++i2) {
+        for (int i1=0; i1<_n1; ++i1) {
+          getEigenvalues(i1,i2,i3,a);
+          float aui = a[0], avi = a[1], awi = a[2];
+          aui += aeps;
+          avi += aeps;
+          awi += aeps;
+          float a0i = pow(amin/awi,fp0);
+          float a1i = pow( awi/avi,fp1);
+          float a2i = pow( avi/aui,fp2);
+          aui = a0i*a1i*a2i;
+          avi = a0i*a1i;
+          awi = a0i;
+          setEigenvalues(i1,i2,i3,aui,avi,awi);
+        }
+      }
+    }
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
