@@ -126,6 +126,29 @@ public class EigenTensors3 implements Tensors3,Serializable {
   }
 
   /**
+   * Constructs tensors from the specified tensors.
+   * @param t the tensors from which to copy eigenvectors and eigenvalues.
+   */
+  public EigenTensors3(EigenTensors3 t) {
+    this(t._n1,t._n2,t._n3,t._compressed);
+    float[] a = new float[3];
+    float[] u = new float[3];
+    float[] w = new float[3];
+    for (int i3=0; i3<_n3; ++i3) {
+      for (int i2=0; i2<_n2; ++i2) {
+        for (int i1=0; i1<_n1; ++i1) {
+          t.getEigenvalues(i1,i2,i3,a);
+          t.getEigenvectorU(i1,i2,i3,u);
+          t.getEigenvectorW(i1,i2,i3,w);
+          setEigenvalues(i1,i2,i3,a);
+          setEigenvectorU(i1,i2,i3,u);
+          setEigenvectorW(i1,i2,i3,w);
+        }
+      }
+    }
+  }
+
+  /**
    * Gets the number of tensors in the 1st dimension.
    * @return the number of tensors in the 1st dimension.
    */
