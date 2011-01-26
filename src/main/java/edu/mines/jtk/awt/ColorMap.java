@@ -45,6 +45,11 @@ public class ColorMap {
   public static final IndexColorModel JET = getJet();
 
   /**
+   * Color model for red to blue like GMT's jet color map.
+   */
+  public static final IndexColorModel GMT_JET = getGmtJet();
+
+  /**
    * Color model for hues from red to blue. 
    */
   public static final IndexColorModel HUE = getHue();
@@ -316,6 +321,23 @@ public class ColorMap {
    */
   public static IndexColorModel getJet(double alpha) {
     return makeIndexColorModel(getJetColors(alpha));
+  }
+
+  /**
+   * Gets a red-to-blue color model like GMT's jet color map.
+   * @return the color model.
+   */
+  public static IndexColorModel getGmtJet() {
+    return getGmtJet(1.0);
+  }
+
+  /**
+   * Gets a red-to-blue color model like GMT's jet color map.
+   * @param alpha the opacity for all colors in this color model.
+   * @return the color model.
+   */
+  public static IndexColorModel getGmtJet(double alpha) {
+    return makeIndexColorModel(getGmtJetColors(alpha));
   }
 
   /**

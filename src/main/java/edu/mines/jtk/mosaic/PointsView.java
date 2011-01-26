@@ -448,11 +448,14 @@ public class PointsView extends TiledView {
     Graphics2D gline = null;
     if (_lineStyle!=Line.NONE) {
       gline = (Graphics2D)g2d.create();
+      float width = lineWidth;
+      if (_lineWidth!=0.0f)
+        width *= _lineWidth;
       float[] dash = null;
       if (_lineStyle!=Line.SOLID) {
-        float dotLength = lineWidth;
-        float dashLength = 5.0f*lineWidth;
-        float gapLength = 5.0f*lineWidth;
+        float dotLength = 0.5f*width;
+        float dashLength = 2.0f*width;
+        float gapLength = 2.0f*dotLength+dashLength;
         if (_lineStyle==Line.DASH) {
           dash = new float[]{dashLength,gapLength};
         } else if (_lineStyle==Line.DOT) {
@@ -461,9 +464,6 @@ public class PointsView extends TiledView {
           dash = new float[]{dashLength,gapLength,dotLength,gapLength};
         }
       }
-      float width = lineWidth;
-      if (_lineWidth!=0.0f)
-        width *= _lineWidth;
       BasicStroke bs;
       if (dash!=null) {
         int cap = BasicStroke.CAP_ROUND;

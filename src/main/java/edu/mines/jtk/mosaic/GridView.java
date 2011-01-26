@@ -284,13 +284,14 @@ public class GridView extends TiledView {
       BasicStroke bs = (BasicStroke)stroke;
       lineWidth = bs.getLineWidth();
     }
+    float width = lineWidth;
 
     // Line style and color.
     float[] dash = null;
     if (_style!=Style.SOLID) {
-      float dotLength = lineWidth;
-      float dashLength = 5.0f*lineWidth;
-      float gapLength = 5.0f*lineWidth;
+      float dotLength = 0.5f*width;
+      float dashLength = 2.0f*width;
+      float gapLength = 2.0f*dotLength+dashLength;
       if (_style==Style.DASH) {
         dash = new float[]{dashLength,gapLength};
       } else if (_style==Style.DOT) {
@@ -299,7 +300,6 @@ public class GridView extends TiledView {
         dash = new float[]{dashLength,gapLength,dotLength,gapLength};
       }
     }
-    float width = lineWidth;
     BasicStroke bs;
     if (dash!=null) {
       int cap = BasicStroke.CAP_ROUND;
