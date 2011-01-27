@@ -387,6 +387,56 @@ public class Sampling {
   }
 
   /**
+   * Returns the nearest sample index to a coordinate for the regularly sampled case.
+   * Sample indices begin at 0, but the returned index may be negative or exceed the number of samples,
+   * depending on the coordinate.  An example of the use of this method is to return the index of the
+   * sample at a particular time on a seismic trace.
+   *
+   * @param  coordinate  a coordinate.
+   * @return  the nearest sample index.
+   */
+  public int getIndex(double coordinate) {
+    if (!isUniform()) throw new IllegalStateException("getIndex(double) is undefined for the non-uniform case");
+    return (int)Math.round((coordinate-_f) / _d);
+  }
+
+  /**
+   * Returns true if the coordinate is bounds for the regularly sampled case, otherwise false.
+   *
+   * @param  index  an index.
+   * @return  true  if the index is bounds, otherwise false.
+   */
+  public boolean inBounds(double coordinate) {
+    return this.inBounds(this.getIndex(coordinate));
+  }
+
+  /**
+   * Returns the coordinate at a sample index for the regularly sampled case.  An example of the use of
+   * this method is to return the time associated with the index of a seismic trace sample.
+   * Sample indices begin at 0 and can be negative or exceed the number of samples.
+   *
+   * @param  sampleIndex  a sample index, which can be negative or exceed the number of samples.
+   * @return  the coordiante.
+   */
+  public double getCoordinate(int index) {
+    if (!isUniform()) throw new IllegalStateException("getCoordinate(int) is undefined for the non-uniform case");
+    return _f + (double)index * _d;
+  }
+
+  /**
+   * Returns true if the index is bounds for the regularly sampled case, otherwise false.
+   *
+   * @param  index  an index.
+   * @return  true  if the index is bounds, otherwise false.
+   */
+  public boolean inBounds(int index) {
+    if (!isUniform()) throw new IllegalStateException("inBounds(int) is undefined for the non-uniform case");
+    if (index < 0) return false;
+    if (index >= _n) return false;
+    return true;
+  }
+
+  /**
    * Determines the overlap between this sampling and the specified sampling.
    * Both the specified sampling and this sampling represent a first-to-last
    * range of sample values. The overlap is a contiguous set of samples that 
