@@ -106,24 +106,24 @@ public class SamplingTest extends TestCase {
     assertEquals(f,si.getFirst(),tiny);
   }
 
-  public void testCoordinateMethods() {
-    Sampling s = new Sampling(11, 1.0, 0.0);
-    assert s.getIndex(-0.5001) == -1;
-    assert s.getIndex(-0.4999) == 0;
-    assert s.getIndex(0.0) == 0;
-    assert s.getIndex(0.4999) == 0;
-    assert s.getIndex(0.5001) == 1;
-    assert s.getIndex(1.0) == 1;
-    assert s.getIndex(1.4999) == 1;
-    assert s.getIndex(1.5001) == 2;
-    assert s.getCoordinate(-1) == -1.0;
-    assert s.getCoordinate(0) == 0.0;
-    assert s.getCoordinate(10) == 10.0;
-    assert s.getCoordinate(11) == 11.0;
-    assert s.inBounds(-0.5001) == false;
-    assert s.inBounds(-0.4999) == true;
-    assert s.inBounds(10.4999) == true;
-    assert s.inBounds(10.5001) == false;
+  public void testBoundsAndForUniform() {
+    Sampling s = new Sampling(11,1.0,0.0);
+    assertEquals(s.isInBoundsExtended(-0.5001),false);
+    assertEquals(s.isInBoundsExtended(-0.4999),true);
+    assertEquals(s.isInBoundsExtended(10.4999),true);
+    assertEquals(s.isInBoundsExtended(10.5001),false);
+    assertEquals(s.getValueExtended(-1),-1.0);
+    assertEquals(s.getValueExtended(0),0.0);
+    assertEquals(s.getValueExtended(10),10.0);
+    assertEquals(s.getValueExtended(11),11.0);
+    assertEquals(s.indexOfNearestExtended(-0.5001),-1);
+    assertEquals(s.indexOfNearestExtended(-0.4999),0);
+    assertEquals(s.indexOfNearestExtended(0.0),0);
+    assertEquals(s.indexOfNearestExtended(0.4999),0);
+    assertEquals(s.indexOfNearestExtended(0.5001),1);
+    assertEquals(s.indexOfNearestExtended(1.0),1);
+    assertEquals(s.indexOfNearestExtended(1.4999),1);
+    assertEquals(s.indexOfNearestExtended(1.5001),2);
   }
 
 }

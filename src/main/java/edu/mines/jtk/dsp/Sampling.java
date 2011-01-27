@@ -387,53 +387,77 @@ public class Sampling {
   }
 
   /**
-   * Returns the nearest sample index to a coordinate for the regularly sampled case.
-   * Sample indices begin at 0, but the returned index may be negative or exceed the number of samples,
-   * depending on the coordinate.  An example of the use of this method is to return the index of the
-   * sample at a particular time on a seismic trace.
-   *
-   * @param  coordinate  a coordinate.
-   * @return  the nearest sample index.
+   * Determines whether the specified index is in the bounds of this sampling.
+   * An index is in bounds iff in the range [0,count-1] of the first and last
+   * sample indices.
+   * @param i the index.
+   * @return true, if in bounds; false, otherwise.
    */
-  public int getIndex(double coordinate) {
-    if (!isUniform()) throw new IllegalStateException("getIndex(double) is undefined for the non-uniform case");
-    return (int)Math.round((coordinate-_f) / _d);
+  public boolean isInBounds(int i) {
+    return 0<=i && i<_n; 
   }
 
   /**
-   * Returns true if the coordinate is bounds for the regularly sampled case, otherwise false.
-   *
-   * @param  index  an index.
-   * @return  true  if the index is bounds, otherwise false.
+   * Determines whether the specified value is in the bounds of this sampling.
+   * A value is in bounds iff in the range [first,last] defined by the first 
+   * and last sample values.
+   * @param x the value.
+   * @return true, if in bounds; false, otherwise.
    */
-  public boolean inBounds(double coordinate) {
-    return this.inBounds(this.getIndex(coordinate));
+  public boolean isInBounds(double x) {
+    return getFirst()<=x && x<=getLast();
   }
 
   /**
-   * Returns the coordinate at a sample index for the regularly sampled case.  An example of the use of
-   * this method is to return the time associated with the index of a seismic trace sample.
-   * Sample indices begin at 0 and can be negative or exceed the number of samples.
-   *
-   * @param  sampleIndex  a sample index, which can be negative or exceed the number of samples.
-   * @return  the coordiante.
+   * Determines whether the specified value is in the bounds of this sampling,
+   * which is assumed to be uniform. A value is in bounds iff in the range
+   * [first-0.5*delta,last+0.5*delta] defined by the first and last sample 
+   * values and the sampling interval delta. In effect, this method extends
+   * the bounds of this sampling by one-half sample when testing the value.
+   * @param x the value.
+   * @return true, if in bounds; false, otherwise.
    */
-  public double getCoordinate(int index) {
-    if (!isUniform()) throw new IllegalStateException("getCoordinate(int) is undefined for the non-uniform case");
-    return _f + (double)index * _d;
+  public boolean isInBoundsExtended(double x) {
+    Check.state(isUniform(),"sampling is uniform");
+    double dhalf = 0.5*_d;
+    return getFirst()-dhalf<=x && x<=getLast()+dhalf;
   }
 
   /**
-   * Returns true if the index is bounds for the regularly sampled case, otherwise false.
-   *
-   * @param  index  an index.
-   * @return  true  if the index is bounds, otherwise false.
+   * Gets the value for the specified index, assuming uniform sampling.
+   * The index and the returned value need not be in the bounds of this 
+   * sampling, which must be uniform. That is, the specified index may be 
+   * less than zero or greater than or equal to the number of samples.
+   * @param i the index.
+   * @return the value.
    */
-  public boolean inBounds(int index) {
-    if (!isUniform()) throw new IllegalStateException("inBounds(int) is undefined for the non-uniform case");
-    if (index < 0) return false;
-    if (index >= _n) return false;
-    return true;
+  public double getValueExtended(int i) {
+    Check.state(isUniform(),"sampling is uniform");
+    return _f+i*_d;
+  }
+
+  /**
+   * Returns the index of the sample nearest the specified value, assuming 
+   * uniform sampling. The value and the returned index need not be in the 
+   * bounds of this sampling, which must be uniform. Specifically, the
+   * returned index may be less than zero or greater than or equal to the 
+   * number of samples.
+   * @param x the value.
+   */
+  public int indexOfNearestExtended(double x) {
+    Check.state(isUniform(),"sampling is uniform");
+    return (int)Math.round((x-_f)/_d);
+  }
+
+  /**
+   * Returns the value of the sample nearest to the specified value, 
+   * assuming uniform sampling. The specified and returned values need 
+   * not be in the bounds of this sampling, which must be uniform.
+   * @param x the value.
+   * @return the value of the nearest sample.
+   */
+  public double valueOfNearestExtended(double x) {
+    return getValueExtended(indexOfNearestExtended(x));
   }
 
   /**
