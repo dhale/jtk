@@ -75,6 +75,11 @@ public class ColorMap {
   public static final IndexColorModel RED_WHITE_BLUE = getRedWhiteBlue();
 
   /**
+   * Color model for gray to yellow to red.
+   */
+  public static final IndexColorModel GRAY_YELLOW_RED = getGrayYellowRed();
+
+  /**
    * Constructs a color map for values in [0,1] the index color model.
    * The integers 0 and 255 must be valid pixels for the color model.
    * @param colorModel the index color model.
@@ -418,6 +423,26 @@ public class ColorMap {
       } else {
         float a = (x-0.5f)/0.5f;
         c[i] = new Color(1.0f-a,1.0f-a,1.0f);
+      }
+    }
+    return makeIndexColorModel(c);
+  }
+
+  /**
+   * Gets the gray-yellow-red color model.
+   * @return the color model.
+   */
+  public static IndexColorModel getGrayYellowRed() {
+    Color[] c = new Color[256];
+    for (int i=0; i<256; ++i) {
+      float x = (float)i/255.0f;
+      if (x<0.5f) {
+        float y = 2.0f*x;
+        c[i] = new Color(y,y,y);
+      } else {
+        float g = (x<0.67f)?1.0f:3.0f-3.0f*x;
+        float b = 2.0f-2.0f*x;
+        c[i] = new Color(1.0f,g,b);
       }
     }
     return makeIndexColorModel(c);
