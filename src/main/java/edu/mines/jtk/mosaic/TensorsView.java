@@ -97,11 +97,31 @@ public class TensorsView extends TiledView {
    * ellipses or a smaller number of larger ellipses.
    * <p>
    * The default number is 20.
+   * <p>
+   * Calling this method overrides any ellipse samplings specified
+   * previously by calling the method 
+   * {@link setEllipsesDisplayed(Sampling,Sampling)}.
    * @param ne the number of ellipses displayed along the larger dimension.
    */
   public void setEllipsesDisplayed(int ne) {
     _ne = ne;
     updateTensorEllipses();
+  }
+
+  /**
+   * Sets the samplings of ellipses displayed. The specified ellipse 
+   * samplings are typically a subset of the samplings of the tensors 
+   * for this view.
+   * <p>
+   * Calling this method with non-null samplings overrides any number
+   * of ellipses specified previously by calling the method 
+   * {@link #setEllipsesDisplayed(int)}.
+   * @param e1 ellipse sampling in 1st dimension.
+   * @param e2 ellipse sampling in 2nd dimension.
+   */
+  public void setEllipsesDisplayed(Sampling e1, Sampling e2) {
+    _e1 = e1;
+    _e2 = e2;
   }
 
   /**
@@ -197,6 +217,8 @@ public class TensorsView extends TiledView {
   private Sampling _s1; // sampling of x1 axis
   private Sampling _s2; // sampling of x2 axis
   private EigenTensors2 _et; // the tensors
+  private Sampling _e1; // sampling of ellipses along x1 axis
+  private Sampling _e2; // sampling of ellipses along x2 axis
   private int _ne = 20; // number of ellipses along longer axis
   private int _np = 50; // number of points in each ellipse polyline
   private float[][] _x1; // x1 coordinates of points in ellipse polylines
@@ -214,17 +236,27 @@ public class TensorsView extends TiledView {
     double f1 = _s1.getFirst();
     double f2 = _s2.getFirst();
 
-    // Ellipse sampling.
+    // Ellipse samplings.
+    Sampling e1 = _e1;
+    Sampling e2 = _e2;
+    if (e1==null || e2==null) {
+      int ne = min(_ne,n1,n2); // nominal number of ellipses for long axis
+      int ns = max(n1/ne,n2/ne); // number of samples between ellipses
+      int m1 = (n1-1)/ns; // number of ellipses along x1 axis
+      int m2 = (n2-1)/ns; // number of ellipses along x2 axis
+      int j1 = (n1-1-(m1-1)*ns)/2; // index of first ellipse along x1 axis
+      int j2 = (n2-1-(m2-1)*ns)/2; // index of first ellipse along x2 axis
+      e1 = new Sampling(m1,ns*d1,j1*d1);
+      e2 = new Sampling(m2,ns*d2,j1*d2);
+    }
+    int m1 = e1.getCount();
+    int m2 = e2.getCount();
+    int nm = m1*m2; // total number of ellipses
+
+   // Ellipse polygon sampling.
     int np = _np; // number of points in polygon approximating ellipse
     double dp = 2.0*PI/np; // increment in angle for points on ellipse
     double fp = 0.0f; // angle for first point on ellipse
-    int ne = min(_ne,n1,n2); // nominal number of ellipses for long axis
-    int ns = max(n1/ne,n2/ne); // span in samples of largest ellipse
-    int m1 = (n1-1)/ns; // number of ellipses along x1 axis
-    int m2 = (n2-1)/ns; // number of ellipses along x2 axis
-    int j1 = (n1-1-(m1-1)*ns)/2; // index of first ellipse along x1 axis
-    int j2 = (n2-1-(m2-1)*ns)/2; // index of first ellipse along x2 axis
-    int nm = m1*m2; // total number of ellipses
 
     // Maximum eigenvalue.
     float emax = 0.0f;
@@ -238,19 +270,22 @@ public class TensorsView extends TiledView {
 
     // Maximum radius (in samples) of any ellipse.
     // Reduce radius slightly to ensure a gap between ellipses.
-    double r = (emax>0.0)?0.48*ns/sqrt(emax):0.0;
-
-    // Scale factor.
+    double ratio = min(e1.getDelta()/d1,e2.getDelta()/d2);
+    double r = (emax>0.0)?0.48*ratio/sqrt(emax):0.0;
     r *= _scale;
 
     // Ellipse (x1,x2) coordinates.
     _x1 = new float[nm][np];
     _x2 = new float[nm][np];
     float[] u = new float[2];
-    for (int i2=j2,k2=0,im=0; i2<n2 && k2<m2; i2+=ns,++k2) {
-      for (int i1=j1,k1=0; i1<n1 && k1<m1; i1+=ns,++k1,++im) {
-        _et.getEigenvalues(i1,i2,a);
-        _et.getEigenvectorU(i1,i2,u);
+    for (int i2=0,im=0; i2<m2; ++i2) {
+      int j2 = _s2.indexOfNearest(e2.getValue(i2));
+      double x2 = _s2.getValue(j2);
+      for (int i1=0; i1<m1; ++i1,++im) {
+        int j1 = _s1.indexOfNearest(e1.getValue(i1));
+        double x1 = _s1.getValue(j1); // center of ellipse is (x1,x2)
+        _et.getEigenvalues(j1,j2,a);
+        _et.getEigenvectorU(j1,j2,u);
         double u1 = u[0];
         double u2 = u[1];
         double v1 = -u2;
@@ -263,8 +298,8 @@ public class TensorsView extends TiledView {
           double p = fp+ip*dp;
           double cosp = cos(p);
           double sinp = sin(p);
-          _x1[im][ip] = (float)(f1+d1*(i1+ru*cosp*u1-rv*sinp*u2));
-          _x2[im][ip] = (float)(f2+d2*(i2+rv*sinp*u1+ru*cosp*u2));
+          _x1[im][ip] = (float)(x1+d1*(ru*cosp*u1-rv*sinp*u2));
+          _x2[im][ip] = (float)(x2+d2*(rv*sinp*u1+ru*cosp*u2));
         }
       }
     }
