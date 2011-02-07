@@ -122,6 +122,7 @@ public class TensorsView extends TiledView {
   public void setEllipsesDisplayed(Sampling e1, Sampling e2) {
     _e1 = e1;
     _e2 = e2;
+    updateTensorEllipses();
   }
 
   /**
@@ -279,11 +280,13 @@ public class TensorsView extends TiledView {
     _x2 = new float[nm][np];
     float[] u = new float[2];
     for (int i2=0,im=0; i2<m2; ++i2) {
-      int j2 = _s2.indexOfNearest(e2.getValue(i2));
-      double x2 = _s2.getValue(j2);
+      double x2 = e2.getValue(i2);
+      int j2 = _s2.indexOfNearest(x2);
+      //x2 = _s2.getValue(j2);
       for (int i1=0; i1<m1; ++i1,++im) {
-        int j1 = _s1.indexOfNearest(e1.getValue(i1));
-        double x1 = _s1.getValue(j1); // center of ellipse is (x1,x2)
+        double x1 = e1.getValue(i1);
+        int j1 = _s1.indexOfNearest(x1);
+        //x1 = _s1.getValue(j1);
         _et.getEigenvalues(j1,j2,a);
         _et.getEigenvectorU(j1,j2,u);
         double u1 = u[0];
