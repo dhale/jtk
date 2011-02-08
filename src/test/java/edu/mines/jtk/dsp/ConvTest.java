@@ -41,6 +41,10 @@ public class ConvTest extends TestCase {
       float[] y = randfloat(ly);
       float[] zs = zerofloat(lz);
       float[] zf = zerofloat(lz);
+      if (_random.nextBoolean()) {
+        y = x; 
+        ly = lx; ky = kx;
+      }
 
       convSimple(lx,kx,x,ly,ky,y,lz,kz,zs);
       Conv.conv(lx,kx,x,ly,ky,y,lz,kz,zf);
@@ -75,6 +79,11 @@ public class ConvTest extends TestCase {
       float[][] y = randfloat(ly1,ly2);
       float[][] zs = zerofloat(lz1,lz2);
       float[][] zf = zerofloat(lz1,lz2);
+      if (_random.nextBoolean()) {
+        y = x; 
+        ly1 = lx1; ky1 = kx1; 
+        ly2 = lx2; ky2 = kx2;
+      }
 
       convSimple(lx1,lx2,kx1,kx2,x,ly1,ly2,ky1,ky2,y,lz1,lz2,kz1,kz2,zs);
       Conv.conv(lx1,lx2,kx1,kx2,x,ly1,ly2,ky1,ky2,y,lz1,lz2,kz1,kz2,zf);
@@ -115,6 +124,12 @@ public class ConvTest extends TestCase {
       float[][][] y = randfloat(ly1,ly2,ly3);
       float[][][] zs = zerofloat(lz1,lz2,lz3);
       float[][][] zf = zerofloat(lz1,lz2,lz3);
+      if (_random.nextBoolean()) {
+        y = x; 
+        ly1 = lx1; ky1 = kx1; 
+        ly2 = lx2; ky2 = kx2; 
+        ly3 = lx3; ky3 = kx3;
+      }
 
       convSimple(lx1,lx2,lx3,kx1,kx2,kx3,x,
                  ly1,ly2,ly3,ky1,ky2,ky3,y,

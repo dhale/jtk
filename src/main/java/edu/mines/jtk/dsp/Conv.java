@@ -6,8 +6,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Computes the convolution (or cross-correlation) of two sequences.
@@ -191,10 +190,11 @@ public class Conv {
     int ly, int ky, float[] y,
     int lz, int kz, float[] z)
   {
-    reverse(lx,x);
+    boolean copy = x==y;
+    x = reverse(lx,x,copy);
     kx = 1-kx-lx;
     conv(lx,kx,x,ly,ky,y,lz,kz,z);
-    reverse(lx,x);
+    reverse(lx,x,!copy);
   }
 
   /**
@@ -220,11 +220,12 @@ public class Conv {
     int ly1, int ly2, int ky1, int ky2, float[][] y,
     int lz1, int lz2, int kz1, int kz2, float[][] z)
   {
-    reverse(lx1,lx2,x);
+    boolean copy = x==y;
+    x = reverse(lx1,lx2,x,copy);
     kx1 = 1-kx1-lx1;
     kx2 = 1-kx2-lx2;
     conv(lx1,lx2,kx1,kx2,x,ly1,ly2,ky1,ky2,y,lz1,lz2,kz1,kz2,z);
-    reverse(lx1,lx2,x);
+    reverse(lx1,lx2,x,!copy);
   }
 
   /**
@@ -256,14 +257,15 @@ public class Conv {
     int ly1, int ly2, int ly3, int ky1, int ky2, int ky3, float[][][] y,
     int lz1, int lz2, int lz3, int kz1, int kz2, int kz3, float[][][] z)
   {
-    reverse(lx1,lx2,lx3,x);
+    boolean copy = x==y;
+    x = reverse(lx1,lx2,lx3,x,copy);
     kx1 = 1-kx1-lx1;
     kx2 = 1-kx2-lx2;
     kx3 = 1-kx3-lx3;
     conv(lx1,lx2,lx3,kx1,kx2,kx3,x,
          ly1,ly2,ly3,ky1,ky2,ky3,y,
          lz1,lz2,lz3,kz1,kz2,kz3,z);
-    reverse(lx1,lx2,lx3,x);
+    reverse(lx1,lx2,lx3,x,!copy);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -636,31 +638,42 @@ public class Conv {
       zero(n1,n2,z[i3]);
   }
 
-  private static void reverse(int n1, float[] z) {
+  private static float[] reverse(int n1, float[] z, boolean copy) {
+    if (copy) 
+      z = copy(n1,z);
     for (int i1=0,j1=n1-1; i1<j1; ++i1,--j1) {
       float zt = z[i1];
       z[i1] = z[j1];
       z[j1] = zt;
     }
+    return z;
   }
 
-  private static void reverse(int n1, int n2, float[][] z) {
+  private static float[][] reverse(int n1, int n2, float[][] z, boolean copy) {
+    if (copy) 
+      z = copy(n1,n2,z);
     for (int i2=0,j2=n2-1; i2<j2; ++i2,--j2) {
       float[] zt = z[i2];
       z[i2] = z[j2];
       z[j2] = zt;
     }
     for (int i2=0; i2<n2; ++i2)
-      reverse(n1,z[i2]);
+      reverse(n1,z[i2],false);
+    return z;
   }
 
-  private static void reverse(int n1, int n2, int n3, float[][][] z) {
+  private static float[][][] reverse(
+    int n1, int n2, int n3, float[][][] z, boolean copy) 
+  {
+    if (copy) 
+      z = copy(n1,n2,n3,z);
     for (int i3=0,j3=n3-1; i3<j3; ++i3,--j3) {
       float[][] zt = z[i3];
       z[i3] = z[j3];
       z[j3] = zt;
     }
     for (int i3=0; i3<n3; ++i3)
-      reverse(n1,n2,z[i3]);
+      reverse(n1,n2,z[i3],false);
+    return z;
   }
 }
