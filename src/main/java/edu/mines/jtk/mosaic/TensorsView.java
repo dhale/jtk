@@ -247,8 +247,8 @@ public class TensorsView extends TiledView {
       int m2 = (n2-1)/ns; // number of ellipses along x2 axis
       int j1 = (n1-1-(m1-1)*ns)/2; // index of first ellipse along x1 axis
       int j2 = (n2-1-(m2-1)*ns)/2; // index of first ellipse along x2 axis
-      e1 = new Sampling(m1,ns*d1,j1*d1);
-      e2 = new Sampling(m2,ns*d2,j1*d2);
+      e1 = new Sampling(m1,ns*d1,f1+j1*d1);
+      e2 = new Sampling(m2,ns*d2,f2+j2*d2);
     }
     int m1 = e1.getCount();
     int m2 = e2.getCount();
