@@ -385,17 +385,41 @@ public class SincInterpolator {
    * @return the value xmax for which y(xmax) is a local maximum.
    */
   public double findMax(double x) {
+    return findMax(x,1.0);
+  }
+
+  /**
+   * Finds a local minimum or maximum of the function y(x) near the
+   * specified value x.  The type type of extremum is determined by
+   * the second argument:  Any positive value means find the maximum,
+   * otherwise find the minimum.  For simplicity and readibility,
+   * use 1 for maximum, -1 for minimum.  The search for the extremum
+   * is restricted to an interval centered at the specified x and having
+   * width equal to the current uniform sampling interval.
+   * <p>
+   * Typically, the specified x corresponds to an uniform sample for which 
+   * the value y(x) of that sample is not less than the values of the two 
+   * nearest neighboring samples.
+   * @param x the center of the interval in which y(x) is an extremum.
+   * @param type the type of extremum; 1 for maximum, -1 for minimum.
+   * @return the value xmax for which y(xmax) is a local minimum or maximum.
+   */
+  public double findMax(double x, double type) {
     double a = x-0.5*_dxu;
     double b = x+0.5*_dxu;
     double tol = _dsinc*_dxu;
-    return _maxFinder.findMin(a,b,tol);
+
+    final double sign = type > 0 ? -1 : 1;
+    BrentMinFinder finder = new BrentMinFinder(
+      new BrentMinFinder.Function(){
+        public double evaluate(double x) {
+          return sign*interpolate(x);
+        }
+      });
+
+    return finder.findMin(a,b,tol);
   }
-  private BrentMinFinder _maxFinder = new BrentMinFinder(
-    new BrentMinFinder.Function(){
-      public double evaluate(double x) {
-        return -interpolate(x);
-      }
-    });
+
 
   /**
    * Sets the current sampling for a uniformly-sampled function y(x1,x2).
