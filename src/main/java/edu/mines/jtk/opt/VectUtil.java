@@ -6,12 +6,16 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.io.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import edu.mines.jtk.util.Almost;
 import edu.mines.jtk.util.LoggerStream;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** Implements convenience methods for Vect.
     @author W.S. Harlan
@@ -20,7 +24,9 @@ public class VectUtil {
   private static final Logger LOG
     = Logger.getLogger(VectUtil.class.getName());
 
-  /** Scale a vector by a scalar constant.
+  private VectUtil() {}
+
+    /** Scale a vector by a scalar constant.
       @param v Vector to scale.
       @param scalar Factor to scale the vector.
   */

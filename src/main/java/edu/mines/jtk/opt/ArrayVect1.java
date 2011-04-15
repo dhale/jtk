@@ -6,9 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.util.logging.Logger;
-
 import edu.mines.jtk.util.Almost;
+
+import java.util.logging.Logger;
 
 /** Implements a Vect by wrapping an array of doubles.
     The embedded data are exposed by a getData method.  For all practical
@@ -48,7 +48,7 @@ public class ArrayVect1 implements Vect {
       will divide all samples by this number.  Pass a value
       of 1 if you do not care.
   */
-  protected void init(double[] data, double variance) {
+  protected final void init(double[] data, double variance) {
     _data = data;
     _variance = variance;
   }
@@ -78,6 +78,7 @@ public class ArrayVect1 implements Vect {
   }
 
   // VectConst
+  @Override
   public double dot(VectConst other) {
     double result = 0;
     ArrayVect1 rhs = (ArrayVect1) other;
@@ -92,7 +93,7 @@ public class ArrayVect1 implements Vect {
     StringBuilder sb = new StringBuilder();
     sb.append("(");
     for (int i=0; i<_data.length; ++i) {
-      sb.append(""+_data[i]);
+      sb.append(String.valueOf(_data[i]));
       if (i < _data.length -1) {sb.append(", ");}
     }
     sb.append(")");
@@ -100,23 +101,28 @@ public class ArrayVect1 implements Vect {
   }
 
   // Vect
+  @Override
   public void dispose() {
     _data = null;
   }
 
   // Vect
+  @Override
   public void multiplyInverseCovariance() {
     double scale = Almost.FLOAT.divide (1., getSize()*_variance, 0.);
     VectUtil.scale(this, scale);
   }
 
   // Vect
+  @Override
   public void constrain() {}
 
   // Vect
+  @Override
   public void postCondition() {}
 
   // Vect
+  @Override
   public void add(double scaleThis, double scaleOther, VectConst other)  {
     ArrayVect1 rhs = (ArrayVect1) other;
     for (int i=0; i<_data.length; ++i) {
@@ -125,11 +131,13 @@ public class ArrayVect1 implements Vect {
   }
 
   // Vect
+  @Override
   public void project(double scaleThis, double scaleOther, VectConst other)  {
     add(scaleThis, scaleOther, other);
   }
 
   // VectConst
+  @Override
   public double magnitude() {
     return Almost.FLOAT.divide (this.dot(this), getSize()*_variance, 0.);
   }

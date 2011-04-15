@@ -6,10 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
+import edu.mines.jtk.util.Almost;
+
 import java.io.IOException;
 import java.util.logging.Logger;
-
-import edu.mines.jtk.util.Almost;
 
 /** Implements a Vect as a collection of ArrayVect1f's of fixed size.
     @author W.S. Harlan
@@ -66,6 +66,7 @@ public class ArrayVect1fs implements Vect {
   }
 
   // Vect
+  @Override
   public double dot(VectConst other) {
     double result = 0;
     ArrayVect1fs rhs = (ArrayVect1fs) other;
@@ -80,7 +81,7 @@ public class ArrayVect1fs implements Vect {
     StringBuilder sb = new StringBuilder();
     sb.append("(");
     for (int i=0; i<_data.length; ++i) {
-      sb.append(""+_data[i]);
+      sb.append(String.valueOf(_data[i]));
       if (i < _data.length -1) {sb.append(", ");}
     }
     sb.append(")");
@@ -88,33 +89,38 @@ public class ArrayVect1fs implements Vect {
   }
 
   // Vect
+  @Override
   public void dispose() {
-    for (int i=0; i<_data.length; ++i) {
-      _data[i].dispose();
-    }
+      for (ArrayVect1f a_data : _data) {
+          a_data.dispose();
+      }
     _data = null;
   }
 
   // Vect
+  @Override
   public void multiplyInverseCovariance() {
     double scale = Almost.FLOAT.divide (1., getSize(), 0.);
-    for (int i=0; i<_data.length; ++i) {
-      _data[i].multiplyInverseCovariance();
-      VectUtil.scale(_data[i], scale);
-    }
+      for (ArrayVect1f a_data : _data) {
+          a_data.multiplyInverseCovariance();
+          VectUtil.scale(a_data, scale);
+      }
   }
 
   // Vect
+  @Override
   public void constrain() {
-    for (int i=0; i<_data.length; ++i) {
-      _data[i].constrain();
-    }
+      for (ArrayVect1f a_data : _data) {
+          a_data.constrain();
+      }
   }
 
   // Vect
+  @Override
   public void postCondition() {}
 
   // Vect
+  @Override
   public void add(double scaleThis, double scaleOther, VectConst other)  {
     ArrayVect1fs rhs = (ArrayVect1fs) other;
     for (int i=0; i<_data.length; ++i) {
@@ -123,16 +129,18 @@ public class ArrayVect1fs implements Vect {
   }
 
   // Vect
+  @Override
   public void project(double scaleThis, double scaleOther, VectConst other)  {
     add(scaleThis, scaleOther, other);
   }
 
   // VectConst
+  @Override
   public double magnitude() {
     double result = 0.;
-    for (int i=0; i<_data.length; ++i) {
-      result += _data[i].magnitude();
-    }
+      for (ArrayVect1f a_data : _data) {
+          result += a_data.magnitude();
+      }
     result = Almost.FLOAT.divide (result, getSize() , 0.);
     return result;
   }
@@ -141,9 +149,9 @@ public class ArrayVect1fs implements Vect {
   private void writeObject(java.io.ObjectOutputStream out)
     throws IOException {
     out.writeInt(_data.length);
-    for (int i=0; i<_data.length; ++i) {
-      out.writeObject(_data[i]);
-    }
+      for (ArrayVect1f a_data : _data) {
+          out.writeObject(a_data);
+      }
   }
 
   // Serializable

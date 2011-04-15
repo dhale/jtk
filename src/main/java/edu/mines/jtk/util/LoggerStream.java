@@ -59,13 +59,13 @@ public class LoggerStream extends PrintStream {
 
   // from PrintStream
   @Override public synchronized void println(Object x) {
-    super.print(x); // flush already adds a newline
+    print(x); // flush already adds a newline
     flush();
   }
 
   // from PrintStream
   @Override public synchronized void println(String x) {
-    super.print(x); // flush already adds a newline
+    print(x); // flush already adds a newline
     flush();
   }
 

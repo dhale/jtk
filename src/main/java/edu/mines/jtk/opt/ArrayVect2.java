@@ -6,9 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.util.logging.Logger;
-
 import edu.mines.jtk.util.Almost;
+
+import java.util.logging.Logger;
 
 /** Implement a Vect as a two dimensional array of doubles.
     The embedded data are exposed by a getData method.  For all practical
@@ -66,6 +66,7 @@ public class ArrayVect2 implements Vect {
   public int getSize() {return _data.length*_data[0].length;}
 
   // Vect interface
+  @Override
   public void add(double scaleThis, double scaleOther, VectConst other) {
     ArrayVect2 o = (ArrayVect2) other;
     for (int i=0; i<_data.length && _data.length > 0; ++i) {
@@ -76,30 +77,36 @@ public class ArrayVect2 implements Vect {
   }
 
   // Vect interface
+  @Override
   public void project(double scaleThis, double scaleOther, VectConst other) {
     add(scaleThis, scaleOther, other);
   }
 
   // Vect interface
+  @Override
   public void dispose() {
     _data = null;
   }
 
   // Vect interface
+  @Override
   public void multiplyInverseCovariance() {
     double scale = Almost.FLOAT.divide (1., getSize()*_variance, 0.);
     VectUtil.scale(this, scale);
   }
 
   // VectConst interface
+  @Override
   public double magnitude() {
     return Almost.FLOAT.divide (this.dot(this), getSize()*_variance, 0.);
   }
 
   // Vect interface
+  @Override
   public void constrain() {}
 
   // Vect interface
+  @Override
   public void postCondition() {}
 
   // VectConst interface
@@ -120,6 +127,7 @@ public class ArrayVect2 implements Vect {
   }
 
   // VectConst interface
+  @Override
   public double dot(VectConst other) {
     ArrayVect2 rhs = (ArrayVect2) other;
     double result = 0.;

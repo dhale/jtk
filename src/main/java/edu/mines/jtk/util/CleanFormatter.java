@@ -58,7 +58,7 @@ public class CleanFormatter extends Formatter {
     if (level.equals(Level.INFO)) {
       // do nothing
     } else if (level.equals(Level.WARNING)) {
-      if (message.indexOf("WARNING") == -1) {
+      if (!message.contains("WARNING")) {
         message = prependToLines(s_prefix+level+": ", message);
       } else {
         message = s_prefix+message;
@@ -76,7 +76,7 @@ public class CleanFormatter extends Formatter {
                || level.equals(Level.FINER)
                || level.equals(Level.FINEST)) {
       String shortPackage = record.getLoggerName();
-      int index = shortPackage.lastIndexOf(".");
+      int index = shortPackage.lastIndexOf('.');
       if (index>0) shortPackage = shortPackage.substring(index+1);
       message = prependToLines (level+" "+shortPackage+": ", message);
     } else {

@@ -125,9 +125,7 @@ public class CoordinateTransform {
         QuadraticSolver qs = new QuadraticSolver(lq);
         ArrayVect1 solution = (ArrayVect1) qs.solve(_nin+4, null);
         double[] data = solution.getData();
-        for (int i=0; i< _nin; ++i) {
-          _a[o][i] = data[i];
-        }
+        System.arraycopy(data, 0, _a[o], 0, _nin);
         solution.dispose();
       }
     }
@@ -143,13 +141,14 @@ public class CoordinateTransform {
 
   // describes normal equations.
   private class LinearQuadratic implements Quadratic {
-    int _o = -1;
+    private int _o = -1;
 
     /** Constructor for normal equations
         @param o Index of output dimension
     */
     public LinearQuadratic (int o) {_o = o;}
 
+    @Override
     public void multiplyHessian(Vect x) {
       ArrayVect1 m = (ArrayVect1) x;
       double[] data = m.getData();
@@ -162,10 +161,12 @@ public class CoordinateTransform {
       }
     }
 
+    @Override
     public Vect getB() {
       return new ArrayVect1(_b[_o].clone(), 1.);
     }
 
+    @Override
     public void inverseHessian(Vect x) {} // not necessary
   }
 

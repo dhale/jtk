@@ -6,9 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.util.logging.Logger;
+import edu.mines.jtk.util.Almost;
+import edu.mines.jtk.util.Monitor;
+import edu.mines.jtk.util.PartialMonitor;
 
-import edu.mines.jtk.util.*;
+import java.util.logging.Logger;
 
 /** Solve least-squares inverse of a non-linear Transform.
     See QuadraticSolver to solve least-squares inverse of a linear Transform.
@@ -17,8 +19,11 @@ import edu.mines.jtk.util.*;
 public class GaussNewtonSolver {
   private static boolean s_expensiveDebug = false;
 
-private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
-  /**
+  private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
+
+  private GaussNewtonSolver() { }
+
+    /**
     Solve nonquadratic objective function with Gauss Newton iterations.
     Minimizes
     <pre>
@@ -107,7 +112,7 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
     if (linearizationIterations < 1) linearizationIterations = 1;
 
     // iteratively linearize transform
-  LINEARIZE:
+    LINEARIZE:
     for (int iter=0; iter < linearizationIterations; ++iter) {
       double frac = (3.*conjugateGradIterations)
         /(3.*conjugateGradIterations + lineSearchIterations);
@@ -168,13 +173,12 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
   // Evaluates the unapproximated objective function for a given scale factor
   //  of the perturbation to the reference model.
   private static class TransformFunction implements ScalarSolver.Function {
-    VectConst _data;
-    VectConst _referenceModel;
-    VectConst _perturbation;
-    Vect _model;
-    TransformQuadratic _transformQuadratic;
+    private VectConst _referenceModel;
+    private VectConst _perturbation;
+    private Vect _model;
+    private TransformQuadratic _transformQuadratic;
 
-    /** Constructor
+    /* Constructor
        @param transform
        @param data
        @param referenceModel
@@ -186,7 +190,6 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
                              VectConst referenceModel,
                              VectConst perturbation,
                              boolean dampOnlyPerturbation) {
-      _data = data;
       _referenceModel = referenceModel;
       _model = _referenceModel.clone();
       _perturbation = perturbation;
@@ -194,11 +197,11 @@ private static final Logger LOG = Logger.getLogger("edu.mines.jtk.opt");
         (data, referenceModel, null, transform, dampOnlyPerturbation);
     }
 
+    @Override
     public double function(double scalar) {
       VectUtil.copy(_model, _referenceModel);
       _model.project(1., scalar, _perturbation);
-      double result = _transformQuadratic.evalFullObjectiveFunction(_model);
-      return result;
+      return _transformQuadratic.evalFullObjectiveFunction(_model);
     }
 
     /** Free resources */

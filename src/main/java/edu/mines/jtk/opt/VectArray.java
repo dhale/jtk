@@ -6,9 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.util.logging.Logger;
-
 import edu.mines.jtk.util.Almost;
+
+import java.util.logging.Logger;
 
 /** A VectContainer implemented as an array, with sequential indices.
     Keys will be returned in the index order.
@@ -30,32 +30,35 @@ public class VectArray implements VectContainer {
   }
 
   // VectContainer
+  @Override
   public void put(int index, Vect vect) {
     _vect[index] = vect;
   }
 
   // VectContainer
+  @Override
   public Vect get(int index) {
     return _vect[index];
   }
 
   // VectContainer
+  @Override
   public int size() {return _vect.length;}
 
   // VectContainer
+  @Override
   public boolean containsKey(int index) {
-    if (index >=0 && index <_vect.length) {
-      return _vect[index] != null;
-    }
-        return false;
+    return index >= 0 && index < _vect.length && _vect[index] != null;
   }
 
   // VectContainer
+  @Override
   public int[] getKeys() {
     return _keys;
   }
 
   // VectConst
+  @Override
   public double dot(VectConst other) {
     VectArray otherMap = (VectArray) other;
     double result = 0.;
@@ -67,7 +70,7 @@ public class VectArray implements VectContainer {
 
   // VectConst
   @Override public VectArray clone() {
-    VectArray result = null;
+    VectArray result;
     try {
       result = (VectArray) super.clone();
       result._vect = new Vect[_vect.length];
@@ -85,40 +88,46 @@ public class VectArray implements VectContainer {
   }
 
   // Vect
+  @Override
   public void dispose() {
     _vect = null;
     _keys = null;
   }
 
   // Vect
+  @Override
   public void multiplyInverseCovariance() {
     double scale = Almost.FLOAT.divide (1., _vect.length, 0.);
-    for (int i=0; i<_vect.length; ++i) {
-      _vect[i].multiplyInverseCovariance();
-      VectUtil.scale(_vect[i], scale);
-    }
+      for (Vect a_vect : _vect) {
+          a_vect.multiplyInverseCovariance();
+          VectUtil.scale(a_vect, scale);
+      }
   }
 
   // Vect
+  @Override
   public void constrain() {
-    for (int i=0; i<_vect.length; ++i) {
-      _vect[i].constrain();
-    }
+      for (Vect a_vect : _vect) {
+          a_vect.constrain();
+      }
   }
 
   // Vect
+  @Override
   public void postCondition() {
-    for (int i=0; i<_vect.length; ++i) {
-      _vect[i].postCondition();
-    }
+      for (Vect a_vect : _vect) {
+          a_vect.postCondition();
+      }
   }
 
   // Vect
+  @Override
   public void add(double scaleThis, double scaleOther, VectConst other)  {
     addOrProject(scaleThis, scaleOther, other, false);
   }
 
   // Vect
+  @Override
   public void project(double scaleThis, double scaleOther, VectConst other)  {
     addOrProject(scaleThis, scaleOther, other, true);
   }
@@ -142,11 +151,12 @@ public class VectArray implements VectContainer {
   }
 
   // Vect
+  @Override
   public double magnitude() {
     double result = 0.;
-    for (int i=0; i<_vect.length; ++i) {
-      result += _vect[i].magnitude();
-    }
+      for (Vect a_vect : _vect) {
+          result += a_vect.magnitude();
+      }
     result = Almost.FLOAT.divide (result, _vect.length, 0.);
     return result;
   }

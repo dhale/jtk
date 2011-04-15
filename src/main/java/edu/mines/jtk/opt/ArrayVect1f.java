@@ -6,11 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.io.IOException;
+import edu.mines.jtk.util.Almost;
+
 import java.util.Arrays;
 import java.util.logging.Logger;
-
-import edu.mines.jtk.util.Almost;
 
 /** Implements a Vect by wrapping an array of floats.
     The embedded data are exposed by a getData method.  For all practical
@@ -61,7 +60,7 @@ public class ArrayVect1f implements Vect {
       will divide all samples by this number.  Pass a value
       of 1 if you do not care.
   */
-  protected void init(float[] data, int firstSample, double variance) {
+  protected final void init(float[] data, int firstSample, double variance) {
     _data = data;
     _firstSample = firstSample;
     _variance = variance;
@@ -142,7 +141,7 @@ public class ArrayVect1f implements Vect {
     StringBuilder sb = new StringBuilder();
     sb.append("(");
     for (int i=0; i<_data.length; ++i) {
-      sb.append(""+_data[i]);
+      sb.append(String.valueOf(_data[i]));
       if (i < _data.length -1) {sb.append(", ");}
     }
     sb.append(")");
@@ -150,6 +149,7 @@ public class ArrayVect1f implements Vect {
   }
 
   // VectConst
+  @Override
   public double dot(VectConst other) {
     double result = 0;
     ArrayVect1f rhs = (ArrayVect1f) other;
@@ -162,22 +162,26 @@ public class ArrayVect1f implements Vect {
   }
 
   //Vect
+  @Override
   public void dispose() {
     _data = null;
   }
 
   // Vect
+  @Override
   public void multiplyInverseCovariance() {
     double scale = Almost.FLOAT.divide (1., getSize()*_variance, 0.);
     VectUtil.scale(this, scale);
   }
 
   // Vect
+  @Override
   public void constrain() {
     Arrays.fill(_data, 0, _firstSample, 0.f); // remute
   }
 
   // Vect
+  @Override
   public void add(double scaleThis, double scaleOther, VectConst other)  {
     float s1 = (float) scaleThis;
     float s2 = (float) scaleOther;
@@ -188,16 +192,19 @@ public class ArrayVect1f implements Vect {
   }
 
   // Vect
+  @Override
   public void project(double scaleThis, double scaleOther, VectConst other)  {
     add(scaleThis, scaleOther, other);
   }
 
   // VectConst
+  @Override
   public double magnitude() {
     return Almost.FLOAT.divide (this.dot(this), getSize()*_variance, 0.);
   }
 
   // Vect
+  @Override
   public void postCondition() {}
 
   // Serializable

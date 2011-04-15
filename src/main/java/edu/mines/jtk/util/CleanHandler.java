@@ -6,21 +6,26 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.*;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 /** An alternative to ConsoleHandler.  Uses CleanFormatter
     and System.out instead of SimpleFormatter and System.err
     @author W.S. Harlan, Landmark Graphics
 */
 public class CleanHandler extends Handler {
-  private static List<PrintStream> s_printStreams
-    = new LinkedList<PrintStream>();
+  private static Collection<PrintStream> s_printStreams = new LinkedList<PrintStream>();
 
   /** Keep track of whether CleanHandler has been set as a default */
-  private static boolean s_setDefault;
+  private static boolean s_setDefault = false;
 
   /** Construct a new CleanHandler. */
   public CleanHandler() {
@@ -34,8 +39,7 @@ public class CleanHandler extends Handler {
   public static void addGlobalLogFile(String fileName)
     throws FileNotFoundException
   {
-    s_printStreams.add(new PrintStream(new FileOutputStream(fileName),
-                                       true));
+    s_printStreams.add(new PrintStream(new FileOutputStream(fileName), true));
   }
 
   @Override public void publish(LogRecord record) {

@@ -71,6 +71,7 @@ public interface Vect extends VectConst {
   public void postCondition();
 
   // Cloneable, but override return type
+  @Override
   public Vect clone();
 }
 

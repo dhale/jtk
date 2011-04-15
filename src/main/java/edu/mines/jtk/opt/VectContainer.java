@@ -46,5 +46,6 @@ public interface VectContainer extends Vect {
   public int[] getKeys() ;
 
   // Override Object return type
+  @Override
   public VectContainer clone();
 }

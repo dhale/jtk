@@ -21,7 +21,7 @@ import static edu.mines.jtk.util.MathPlus.FLT_EPSILON;
 */
 public class Almost implements Serializable, Comparator<Number> {
   static final long serialVersionUID = 1;
-    private static final Logger LOG
+  private static final Logger LOG
     = Logger.getLogger(Almost.class.getName());
 
   /** Default epsilon assumes math has destroyed one digit of accuracy.*/
@@ -312,6 +312,7 @@ public class Almost implements Serializable, Comparator<Number> {
   }
 
   // Comparator
+  @Override
   public int compare(Number n1, Number n2) {
     return cmp(n1.doubleValue(),n2.doubleValue());
   }

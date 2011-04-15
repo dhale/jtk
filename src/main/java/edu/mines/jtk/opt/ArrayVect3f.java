@@ -6,9 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.util.logging.Logger;
-
 import edu.mines.jtk.util.Almost;
+
+import java.util.logging.Logger;
 
 /** Implement a Vect as a three-dimensional array of floats.
  The embedded data are exposed by a getData method.  For all practical
@@ -57,7 +57,7 @@ public class ArrayVect3f implements Vect {
       @param variance This variance will be used to divide data in
       multiplyInverseCovariance.
   */
-  protected void init(float[][][] data, double variance) {
+  protected final void init(float[][][] data, double variance) {
     this._data = data;
     _variance = variance;
   }
@@ -76,6 +76,7 @@ public class ArrayVect3f implements Vect {
   }
 
   // Vect interface
+  @Override
   public void add(double scaleThis, double scaleOther, VectConst other) {
     float s1 = (float) scaleThis;
     float s2 = (float) scaleOther;
@@ -90,30 +91,36 @@ public class ArrayVect3f implements Vect {
   }
 
   // Vect interface
+  @Override
   public void project(double scaleThis, double scaleOther, VectConst other) {
     add(scaleThis, scaleOther, other);
   }
 
   // Vect interface
+  @Override
   public void dispose() {
     _data = null;
   }
 
   // Vect interface
+  @Override
   public void multiplyInverseCovariance() {
     double scale = Almost.FLOAT.divide (1., getSize()*_variance, 0.);
     VectUtil.scale(this, scale);
   }
 
   // VectConst interface
+  @Override
   public double magnitude() {
     return Almost.FLOAT.divide (this.dot(this), getSize()*_variance, 0.);
   }
 
   // Vect interface
+  @Override
   public void constrain() {}
 
   // Vect interface
+  @Override
   public void postCondition() {}
 
   // VectConst interface
@@ -136,6 +143,7 @@ public class ArrayVect3f implements Vect {
   }
 
   // VectConst interface
+  @Override
   public double dot(VectConst other) {
     double result = 0.;
     ArrayVect3f rhs = (ArrayVect3f) other;

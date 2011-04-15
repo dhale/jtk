@@ -6,9 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.util.logging.Logger;
-
 import edu.mines.jtk.util.Almost;
+
+import java.util.logging.Logger;
 
 /** For a linearized transform, implement the Gauss-Newton
     quadratic approximation of a damped least-squares objective function.
@@ -170,6 +170,7 @@ public class TransformQuadratic implements Quadratic {
   /** Multiply by Hessian <code> H = F'NF + M </code>
       @param x Vector to be multiplied and modified
    */
+  @Override
   public void multiplyHessian(Vect x) {
     Vect data = _data.clone();
     _transform.forwardLinearized(data, x,_referenceModel); // data is Fx
@@ -180,6 +181,7 @@ public class TransformQuadratic implements Quadratic {
   }
 
   // Quadratic
+  @Override
   public void inverseHessian(Vect x) {
     _transform.inverseHessian(x, _referenceModel);
   }
@@ -191,13 +193,14 @@ public class TransformQuadratic implements Quadratic {
       if dampOnlyPerturbation is false, and
       <code> b = -F' N [data - f(m)] </code> if dampOnlyPerturbation is true.
   */
+  @Override
   public Vect getB() {
     Vect data = VectUtil.cloneZero(_data); // data is data with zeros
     _transform.forwardNonlinear(data, _referenceModel); // data is f(m)
     data.add(1., -1.,_data);                  // data is -e = -(d - f(m))
     _transform.adjustRobustErrors(data);      // (remove outliers from e)
     data.multiplyInverseCovariance();         // data is -Ne
-    Vect b = null;
+    Vect b;
     if (_dampOnlyPerturbation) {
       if (_perturbModel != null) {
         b = VectUtil.cloneZero(_perturbModel);  // b is 0

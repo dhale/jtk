@@ -6,11 +6,11 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.util.Arrays;
-import java.util.logging.Logger;
-
 import edu.mines.jtk.util.Almost;
 import edu.mines.jtk.util.Monitor;
+
+import java.util.Arrays;
+import java.util.logging.Logger;
 
 /** Search a single variable for a value that minimizes a function
     @author W.S. Harlan
@@ -62,7 +62,7 @@ public class ScalarSolver {
     if (monitor == null) monitor = Monitor.NULL_MONITOR;
     monitor.report(0.);
 
-    int iter =0, nter = numberIterations;
+    int iter, nter = numberIterations;
     if (nter < 6) nter = 6;
     double[] xs  = {0., 0.25, 0.75, 1.}; // Assume bias toward endpoints
     double[] fs  = new double[4];
@@ -71,11 +71,11 @@ public class ScalarSolver {
     }
     iter = 4;
 
-    double xmin = Float.MAX_VALUE;
+    double xmin;
     double error = 1.;
     double previousError = 1.;
-    double previousPreviousError = 1.;
-    double fraction = 1.;
+    double previousPreviousError;
+    double fraction;
     while (true) {
       monitor.report(((double)iter)/nter);
       // Find new minimum point
@@ -113,11 +113,11 @@ public class ScalarSolver {
       // Find next point to evaluate function
       double xnew = Float.MAX_VALUE;
       if (imin == 0) { // Move fast toward left endpoint
-        assert (xs[imin] == 0. ):(  "Left endpoint should be zero");
+        assert (xs[imin] == 0. ):(  "Left endpoint should be zero, not "+xs[imin]);
         xnew = xs[1] * 0.1;
         // LOG.fine("Move rapidly to left");
       } else if (imin == 3) { // Move fast toward right endpoint
-        assert (xs[imin] == 1. ):(  "Right endpoint should be one");
+        assert (xs[imin] == 1. ):(  "Right endpoint should be one, not "+xs[imin]);
         xnew = 1. - 0.1 * (1.-xs[2]);
         // LOG.fine("Move rapidly to right");
       } else if (imin == 1 || imin == 2) { // Have bounded minimum
@@ -256,9 +256,9 @@ public class ScalarSolver {
        @throws IllegalArgumentException If input values lead to degenerate
        solutions.
   */
-  private double minParabola(double x1, double f1,
-                             double x2, double f2,
-                             double x3, double f3)
+  private static double minParabola(double x1, double f1,
+                                    double x2, double f2,
+                                    double x3, double f3)
     throws BadParabolaException, IllegalArgumentException {
     if (!Almost.FLOAT.le(x1,x2) || !Almost.FLOAT.le(x2,x3)) {
       throw new BadParabolaException
@@ -297,8 +297,7 @@ public class ScalarSolver {
       throw new BadParabolaException
         ("Poor numerical conditioning a="+a+" b="+b+" xm="+xm);
     }
-    double result = xm*(x3-x1) + x1;
-    return result;
+    return xm*(x3-x1) + x1;
   }
 
   private static class BadParabolaException extends Exception {
@@ -345,13 +344,14 @@ public class ScalarSolver {
     /** For sorting with Arrays.sort */
     private class MyComparable implements Comparable<MyComparable> {
       /** Array index */
-      public int index = 0;
+      private int index = 0;
 
       /** Constructor.
           @param index index into array.
       */
       public MyComparable(int index) {this.index = index;}
 
+      @Override
       public int compareTo(MyComparable o) {
         return s_almost.cmp(_values[index], _values[o.index]);
       }

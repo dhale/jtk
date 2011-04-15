@@ -52,6 +52,7 @@ public class LogMonitor implements Monitor {
   }
 
   // Monitor
+  @Override
   public void initReport(double initFraction) {
     if (_initFraction != 0 || initFraction < _initFraction) {
       throw new IllegalStateException
@@ -65,6 +66,7 @@ public class LogMonitor implements Monitor {
   }
 
   // Monitor
+  @Override
   public void report(double fraction) {
     // convert internally to fraction from 0 to 1
     fraction = (fraction - _initFraction)/(1. - _initFraction);
@@ -214,7 +216,7 @@ public class LogMonitor implements Monitor {
           }
         }
       } catch (InterruptedException e) {
-        return;
+        // finished and return
       }
     }
   }

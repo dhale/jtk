@@ -31,7 +31,7 @@ public class Localize {
     // see if entire string is a key
     try {
       message = catalog.getString(message);
-    } catch (MissingResourceException ex) {} // do not substitute
+    } catch (MissingResourceException ex) {/*no substitution*/}
 
     // see if substrings are keys
     Matcher matcher = s_tokens.matcher(message);
@@ -52,7 +52,7 @@ public class Localize {
         int end = mr.end();
         message = message.substring(0,start) + replacement
           + message.substring(end);
-      } catch (MissingResourceException ex) {} // do not substitute
+      } catch (MissingResourceException ex) {/* do not substitute */}
     }
     return message;
   }
