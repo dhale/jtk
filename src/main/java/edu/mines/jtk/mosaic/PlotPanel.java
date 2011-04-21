@@ -125,7 +125,7 @@ public class PlotPanel extends IPanel {
     super();
     _orientation = orientation;
     _axesPlacement = axesPlacement;
-    this.setLayout(new GridBagLayout());
+    setLayout(new GridBagLayout());
     Set<Mosaic.AxesPlacement> axesPlacementSet;
     if (axesPlacement==AxesPlacement.LEFT_TOP) {
       axesPlacementSet = EnumSet.of(
@@ -150,9 +150,9 @@ public class PlotPanel extends IPanel {
     gbc.weightx = 100;
     gbc.weighty = 100;
     gbc.fill = GridBagConstraints.BOTH;
-    this.add(_mosaic,gbc);
-    this.setPreferredSize(new Dimension(200+300*ncol,100+300*nrow));
-    this.revalidate();
+    add(_mosaic,gbc);
+    setPreferredSize(new Dimension(200+300*ncol,100+300*nrow));
+    revalidate();
   }
 
   /**
@@ -228,12 +228,11 @@ public class PlotPanel extends IPanel {
         _colorBar.setWidthMinimum(_colorBarWidthMinimum);
       if (_colorMapped!=null)
         _colorMapped.getColorMap().addListener(_colorBar);
-      this.add(_colorBar,makeColorBarConstraints());
-      this.revalidate();
+      add(_colorBar,makeColorBarConstraints());
     } else {
       _colorBar.setLabel(label);
-      this.revalidate();
     }
+    revalidate();
     return _colorBar;
   }
 
@@ -250,7 +249,7 @@ public class PlotPanel extends IPanel {
     _colorBarWidthMinimum = widthMinimum;
     if (_colorBar!=null) {
       _colorBar.setWidthMinimum(widthMinimum);
-      this.revalidate();
+      revalidate();
     }
   }
 
@@ -265,7 +264,7 @@ public class PlotPanel extends IPanel {
     _colorBarFormat = format;
     if (_colorBar!=null) {
       _colorBar.setFormat(format);
-      this.revalidate();
+      revalidate();
     }
   }
 
@@ -274,8 +273,8 @@ public class PlotPanel extends IPanel {
    */
   public void removeColorBar() {
     if (_colorBar!=null) {
-      this.remove(_colorBar);
-      this.revalidate();
+      remove(_colorBar);
+      revalidate();
       _colorBar = null;
     }
   }
@@ -316,14 +315,14 @@ public class PlotPanel extends IPanel {
         gbc.insets.right = 0;
         //gbc.insets.left = _mosaic.getWidthAxesLeft();
         //gbc.insets.right = _mosaic.getWidthAxesRight();
-        this.add(_title,gbc);
-        this.revalidate();
+        add(_title,gbc);
+        revalidate();
       } else {
         _title.set(title);
       }
     } else if (_title!=null) {
-      this.remove(_title);
-      this.revalidate();
+      remove(_title);
+      revalidate();
       _title = null;
     }
   }
@@ -1185,11 +1184,11 @@ public class PlotPanel extends IPanel {
    */
   private void adjustColorBar() {
     if (_colorBar!=null) {
-      GridBagLayout gbl = (GridBagLayout)this.getLayout();
+      GridBagLayout gbl = (GridBagLayout)getLayout();
       gbl.setConstraints(_colorBar,makeColorBarConstraints());
-      this.revalidate();
-      //this.remove(_colorBar);
-      //this.add(_colorBar,makeColorBarConstraints());
+      revalidate();
+      //remove(_colorBar);
+      //add(_colorBar,makeColorBarConstraints());
     }
   }
 
@@ -1270,7 +1269,7 @@ public class PlotPanel extends IPanel {
         _colorMapped.getColorMap().removeListener(_colorBar);
       _colorMapped = cm;
       _colorMapped.getColorMap().addListener(_colorBar);
-      this.revalidate();
+      revalidate();
     }
   }
 

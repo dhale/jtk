@@ -1,5 +1,29 @@
 Dave Hale's notes on the TileAxis resizing problem.
 
+During layout, a child must provide it's preferred size.
+Suppose the child's preferred width depends on its height. 
+Then, when the parent sets its height, child needs a way
+to indicate that its preferred size has changed. The
+child cannot invalidate or revalidate itself during a
+validate traversal and layout, because validate will 
+mark the child and its ancestors valid.
+
+/////////////////////////////////////////////////////////////////////////////
+Current solution
+
+Implement a field revalidatePending and method revalidateLater in 
+the class TileAxis. The method revalidateLater uses invokeLater to
+queue a runnable that will call revalidate *after* the current
+validate traversal is complete. This method also sets the field
+revalidatePending to true. We must call revalidateLater only in 
+the method setBounds. Elsewhere we can simply call revalidate.
+
+Also provide a static method revalidatePending in TileAxis that 
+will return true if any TileAxis child of a specified container
+has the revalidatePending flag set to true. Then, such containers 
+can delay any processing (using invokeLater) until no revalidates 
+are pending.
+
 /////////////////////////////////////////////////////////////////////////////
 Important methods
 
@@ -16,6 +40,18 @@ Component.invalidate
   nullifies cached prefSize,minSize,maxSize
   if parent is valid,
     parent.invalidate()
+
+Container.validate
+  if not valid:
+    calls validateTree on self
+      calls doLayout on self
+      calls validate on children
+    valid = true
+
+Component.validate
+  if not valid:
+    calls layout on peer
+    valid = true
 
 RepaintManager.addInvalidComponent(this)
   maintains a list of components to update
@@ -34,18 +70,8 @@ RepaintManager.validateInvalidComponents
   for all components c in ic
     c.validate()
 
-Container.validate
-  calls validateTree on self
-    calls doLayout on self
-    calls validate on children
-  valid = true
-
-Component.validate
-  calls layout on peer
-  valid = true
-
 /////////////////////////////////////////////////////////////////////////////
-Problem
+Problem, in terms of classes and methods outlined above
 
 when first validated, axis minimum size is too big
 when axis bounds are first set by mosaic doLayout,

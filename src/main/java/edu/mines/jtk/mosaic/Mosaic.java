@@ -60,7 +60,6 @@ public class Mosaic extends IPanel {
   public Mosaic(int nrow, int ncol, Set<AxesPlacement> axesPlacement) {
     _nrow = nrow;
     _ncol = ncol;
-    //_axesPlacement = axesPlacement;
 
     // Tiles.
     _tiles = new Tile[nrow][ncol];
@@ -243,6 +242,7 @@ public class Mosaic extends IPanel {
    */
   public void setWidthMinimum(int icol, int widthMinimum) {
     _wm[icol] = widthMinimum;
+    revalidate();
   }
 
   /**
@@ -256,6 +256,7 @@ public class Mosaic extends IPanel {
    */
   public void setWidthElastic(int icol, int widthElastic) {
     _we[icol] = widthElastic;
+    revalidate();
   }
 
   /**
@@ -268,6 +269,7 @@ public class Mosaic extends IPanel {
    */
   public void setHeightMinimum(int irow, int heightMinimum) {
     _hm[irow] = heightMinimum;
+    revalidate();
   }
 
   /**
@@ -281,6 +283,7 @@ public class Mosaic extends IPanel {
    */
   public void setHeightElastic(int irow, int heightElastic) {
     _he[irow] = heightElastic;
+    revalidate();
   }
 
   /**
@@ -656,7 +659,6 @@ public class Mosaic extends IPanel {
 
   private int _nrow; // number of rows
   private int _ncol; // number of columns
-  //private Set<AxesPlacement> _axesPlacement; // axes placement
   private Tile[][] _tiles; // array[nrow][ncol] of tiles
   private TileAxis[] _axesTop; // array[ncol] of top axes; null, if none
   private TileAxis[] _axesLeft; // array[nrow] of left axes; null, if none

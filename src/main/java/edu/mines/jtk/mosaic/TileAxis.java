@@ -7,6 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic;
 
 import java.awt.*;
+import java.awt.event.InvocationEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.geom.Rectangle2D;
@@ -150,7 +151,8 @@ public class TileAxis extends IPanel {
    */
   public void setInterval(double interval) {
     _interval = interval;
-    updateAxisTics();
+    if (updateAxisTics())
+      revalidate();
     repaint();
   }
 
@@ -160,7 +162,8 @@ public class TileAxis extends IPanel {
    */
   public void setLabel(String label) {
     _label = label;
-    updateAxisTics();
+    if (updateAxisTics())
+      revalidate();
     repaint();
   }
 
@@ -173,21 +176,24 @@ public class TileAxis extends IPanel {
    */
   public void setFormat(String format) {
     _format = format;
-    updateAxisTics();
+    if (updateAxisTics())
+      revalidate();
     repaint();
   }
 
   // Override base class implementation, so we can update axis tics.
   public void setFont(Font font) {
     super.setFont(font);
-    updateAxisTics();
+    if (updateAxisTics())
+      revalidate();
     repaint();
   }
 
   // Override base class implementation, so we can update axis tics.
   public void setBounds(int x, int y, int width, int height) {
     super.setBounds(x,y,width,height);
-    updateAxisTics();
+    if (updateAxisTics())
+      revalidateLater(); // revalidating now will not work!
     repaint();
   }
 
@@ -199,7 +205,8 @@ public class TileAxis extends IPanel {
    */
   public void setVerticalAxisRotated(boolean rotated) {
     _isRotated = rotated;
-    updateAxisTics();
+    if (updateAxisTics())
+      revalidate();
     repaint();
   }
 
@@ -410,6 +417,10 @@ public class TileAxis extends IPanel {
     if (_widthMinimum!=0)
       return _widthMinimum;
     FontMetrics fm = getFontMetrics(getFont());
+    if (_ticLabelWidth==0)
+      if (updateAxisTics())
+        //revalidateLater(); // postpone any revalidate?
+        revalidate();
     int ticLabelWidth = _ticLabelWidth;
     if (ticLabelWidth==0)
       ticLabelWidth = maxTicLabelWidth(fm);
@@ -432,6 +443,7 @@ public class TileAxis extends IPanel {
   // Hack!
   void setWidthMinimum(int widthMinimum) {
     _widthMinimum = widthMinimum;
+    revalidate();
   }
   private int _widthMinimum;
 
@@ -464,22 +476,24 @@ public class TileAxis extends IPanel {
    * mosaic lays out its tile axes using their minimum (preferred) widths 
    * and heights. The minimum width and height depend on axis tic labels 
    * that, in turn, depend on the axis width and height. To help manage 
-   * this circular dependency, this method calls a special private method
-   * revalidateLater when its minimum width or height is changed by this 
-   * update. 
+   * this circular dependency, this method remembers whether or not the
+   * size of this axis is valid, so that the mosaic can adjust its size
+   * if necessary.
+   * @return true, if this update changes the preferred size of this axis;
+   *  false, otherwise.
    */
-  void updateAxisTics() {
+  boolean updateAxisTics() {
 
     // Adjacent tile.
     Tile tile = getTile();
     if (tile==null)
-      return;
+      return false;
 
     // Width and height of this axis.
     int w = getWidth();
     int h = getHeight();
     if (w==0 || h==0)
-      return;
+      return false;
 
     // Projector and transcaler from adjacent tile.
     Projector p = (isHorizontal()) ?
@@ -574,7 +588,6 @@ public class TileAxis extends IPanel {
       if (_interval!=0.0)
         break;
 
-      //System.out.println("ntic:" + ntic + " tlw:" + ticLabelWidth);
       // Otherwise, assume that all tic labels have the max width and height.
       // If those tic labels use less than a fraction of the space available, 
       // then we have a good fit and stop looking.
@@ -597,12 +610,14 @@ public class TileAxis extends IPanel {
     // of world coordinates. These axis tics are painted by this axis.
     _axisTics = new AxisTics(v0,v1,dtic);
 
-    // If either the tic label max width or height has changed, remember 
-    // the new values and revalidate this axis before returning true.
+    // If either the tic label max width or height has changed,
+    // then the preferred size of this axis may have changed as well.
     if (_ticLabelWidth!=ticLabelWidth || _ticLabelHeight!=ticLabelHeight) {
       _ticLabelWidth = ticLabelWidth;
       _ticLabelHeight = ticLabelHeight;
-      revalidateLater();
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -643,6 +658,22 @@ public class TileAxis extends IPanel {
     g.dispose();
   }
 
+  static boolean revalidatePending(Container parent) {
+    int n = parent.getComponentCount();
+    for (int i=0; i<n; ++i) {
+      Component child = parent.getComponent(i);
+      if (child instanceof TileAxis) {
+        TileAxis ta = (TileAxis)child;
+        if (ta._revalidatePending)
+          return true;
+      } else if (child instanceof Container) {
+        if (revalidatePending((Container)child))
+          return true;
+      }
+    }
+    return false;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
@@ -658,6 +689,28 @@ public class TileAxis extends IPanel {
   private int _ticLabelWidth;
   private int _ticLabelHeight;
   private AxisTics _axisTics;
+  private boolean _revalidatePending;
+
+  /**
+   * Called by this axis when it needs to be revalidated because a 
+   * change in its bounds has caused its preferred size to change.
+   * Typically, we would simply call revalidate. However, calling
+   * that method during layout in a validate traversal will not
+   * work, because the parent will set its valid flag to true
+   * after layout of this axis. We must therefore call revalidate 
+   * later, after the validate traversal is complete.
+   */
+  private void revalidateLater() {
+    if (!_revalidatePending) {
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          revalidate();
+          _revalidatePending = false;
+        }
+      });
+      _revalidatePending = true;
+    }
+  }
 
   // Returns the maximum possible tic label width.
   // This method should be called only when this axis does not yet have axis 
@@ -673,45 +726,5 @@ public class TileAxis extends IPanel {
     String s = String.format(_format,v);
     s = StringUtil.removeTrailingZeros(s);
     return s;
-  }
-
-  /**
-   * Queues an event to validate this axis. Simply calling revalidate
-   * will not always work. In particular, calling revalidate while in 
-   * doLayout (as this axis and its parents are being validated) does not 
-   * cause this axis to be validated again.
-   */
-  private void revalidateLater() {
-
-    // We cannot invalidate/validate now, because we may already be in the
-    // process of validating the hierarchy that contains this axis. So we
-    // postpone this work by putting it on the Swing event queue.
-    SwingUtilities.invokeLater(new Runnable() {
-
-      // When this is called, we know that Swing is not in the middle of
-      // something, like validating this axis and its parents.
-      public void run() {
-
-        // Mark this axis and parents up to root not valid.
-        // (Just like JComponent.revalidate.)
-        invalidate();
-
-        // Add this axis to repaint manager's invalid list. This also queues 
-        // a work request to validate invalid components and to paint dirty 
-        // regions. (Just like JComponent.revalidate.)
-        RepaintManager.
-          currentManager(TileAxis.this).
-          addInvalidComponent(TileAxis.this);
-
-        // Now validate any invalid components. We do not wait for the work
-        // request that we just queued, because other events may already be on 
-        // the queue and this component should be validated before processing 
-        // those other events. When that queued work request is processed, it
-        // should do nothing, because the components are already valid.
-        RepaintManager.
-          currentManager(TileAxis.this).
-          validateInvalidComponents();
-      }
-    });
   }
 }

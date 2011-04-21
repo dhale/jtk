@@ -78,7 +78,7 @@ public class PlotFrame extends JFrame {
     this.setBackground(DEFAULT_BACKGROUND);
     this.setSize(DEFAULT_WIDTH,DEFAULT_HEIGHT);
     addModeManager();
-    addResizeListener();
+    addResizedShownListener();
   }
 
   /**
@@ -117,7 +117,7 @@ public class PlotFrame extends JFrame {
     this.setFont(DEFAULT_FONT);
     this.setSize(DEFAULT_WIDTH,DEFAULT_HEIGHT);
     addModeManager();
-    addResizeListener();
+    addResizedShownListener();
   }
 
   /**
@@ -189,18 +189,44 @@ public class PlotFrame extends JFrame {
    * @param win the image width, in inches.
    * @param fileName the name of the file to contain the PNG image.  
    */
-  public void paintToPng(
-    final double dpi, final double win, final String fileName) 
-  {
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        try {
-          _panelMain.paintToPng(dpi,win,fileName);
-        } catch (IOException ioe) {
-          throw new RuntimeException(ioe);
-        }
+  public void paintToPng(double dpi, double win, String fileName) {
+
+    // If our main panel is valid, this is the Swing thread, and
+    // no tile axis has a revalidate pending, then paint the main 
+    // panel to the specified PNG image file. Otherwise, invoke 
+    // this method later on the Swing thread.
+    if (canPaintToPngNow()) {
+      try {
+        _panelMain.paintToPng(dpi,win,fileName);
+      } catch (IOException ioe) {
+        throw new RuntimeException(ioe);
       }
-    });
+    } else {
+      final double fdpi = dpi;
+      final double fwin = win;
+      final String ffileName = fileName;
+      SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          paintToPng(fdpi,fwin,ffileName);
+        }
+      });
+    }
+  }
+  private boolean canPaintToPngNow() {
+    if (!_panelMain.isValid()) {
+      //trace("PlotFrame: main panel not valid");
+      return false;
+    }
+    if (!SwingUtilities.isEventDispatchThread()) {
+      //trace("PlotFrame: not event dispatch thread");
+      return false;
+    }
+    if (TileAxis.revalidatePending(this)) {
+      //trace("PlotFrame: revalidate pending");
+      return false;
+    }
+    //trace("PlotFrame: can paint to PNG");
+    return true;
   }
 
   /**
@@ -373,16 +399,22 @@ public class PlotFrame extends JFrame {
   }
 
   // When this frame is resized, we may need to adjust the font size.
-  private void addResizeListener() {
+  private void addResizedShownListener() {
     this.addComponentListener(new ComponentAdapter() {
       public void componentResized(ComponentEvent e) {
-        if (_fontSizeForPrint) {
-          adjustFontSizeForPrint();
-        } else if (_fontSizeForSlide) {
-          adjustFontSizeForSlide();
-        }
+        adjustFontSize();
+      }
+      public void componentShown(ComponentEvent e) {
+        adjustFontSize();
       }
     });
+  }
+  private void adjustFontSize() {
+    if (_fontSizeForPrint) {
+      adjustFontSizeForPrint();
+    } else if (_fontSizeForSlide) {
+      adjustFontSizeForSlide();
+    }
   }
 
   // Sets font size for a slide with width/height ratio = 4/3.
