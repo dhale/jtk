@@ -112,6 +112,7 @@ public class Sampling {
     Check.argument(d>0.0,"d>0.0");
     _n = n;
     _d = d;
+    _di = 1.0/d;
     _f = f;
     _v = null;
     _t = t;
@@ -149,6 +150,7 @@ public class Sampling {
     Check.argument(isIncreasing(v),"v is increasing");
     _n = v.length;
     _d = (_n<2)?1.0:(v[_n-1]-v[0])/(_n-1);
+    _di = 1.0/_d;
     _f = v[0];
     _t = t;
     _td = _t*_d;
@@ -388,7 +390,7 @@ public class Sampling {
 
   /**
    * Determines whether the specified index is in the bounds of this sampling.
-   * An index is in bounds iff in the range [0,count-1] of the first and last
+   * An index is in bounds if in the range [0,count-1] of the first and last
    * sample indices.
    * @param i the index.
    * @return true, if in bounds; false, otherwise.
@@ -399,7 +401,7 @@ public class Sampling {
 
   /**
    * Determines whether the specified value is in the bounds of this sampling.
-   * A value is in bounds iff in the range [first,last] defined by the first 
+   * A value is in bounds if in the range [first,last] defined by the first 
    * and last sample values.
    * @param x the value.
    * @return true, if in bounds; false, otherwise.
@@ -410,7 +412,7 @@ public class Sampling {
 
   /**
    * Determines whether the specified value is in the bounds of this sampling,
-   * which is assumed to be uniform. A value is in bounds iff in the range
+   * which is assumed to be uniform. A value is in bounds if in the range
    * [first-0.5*delta,last+0.5*delta] defined by the first and last sample 
    * values and the sampling interval delta. In effect, this method extends
    * the bounds of this sampling by one-half sample when testing the value.
@@ -447,6 +449,33 @@ public class Sampling {
   public int indexOfNearestExtended(double x) {
     Check.state(isUniform(),"sampling is uniform");
     return (int)Math.round((x-_f)/_d);
+  }
+
+  /**
+   * Returns the index of the floor (sample before or at) of the specified value,
+   * assuming uniform sampling. The value and the returned index need not be in
+   * in the bounds of this sampling, which must be uniform. Specifically, the
+   * returned index may be less than zero or greater than or equal to the 
+   * number of samples.
+   * @param x the value.
+   */
+  public int indexOfFloorExtended(double x) {
+    Check.state(isUniform(),"sampling is uniform");
+    double d = x-_f;
+    return (d<0.0)?(int)Math.round((d*_di)-0.5):(int)(d*_di);
+  }
+
+  /**
+   * Returns the fraction of an index (0.0 to 1.0) from the floor to the specified value,
+   * assuming uniform sampling. The value need not be in in the bounds of this sampling, which
+   * must be uniform.
+   * @param x the value.
+   * @param floorIndex the index of the floor, as returned from indexOfFloorExtended(x).
+   */
+  public double remainderOfFloorExtended(double x, int floorIndex) {
+    Check.state(isUniform(),"sampling is uniform");
+    double c = _f+(double)floorIndex*_d;
+    return (x-c)*_di;
   }
 
   /**
@@ -706,6 +735,7 @@ public class Sampling {
 
   private int _n; // number of samples
   private double _d; // sampling interval
+  private double _di; // inverse of sampling interval (1/_d).  Cached to minimize float divides.
   private double _f; // value of first sample
   private double[] _v; // array[n] of sample values; null, if uniform
   private double _t; // sampling tolerance, as a fraction of _d
