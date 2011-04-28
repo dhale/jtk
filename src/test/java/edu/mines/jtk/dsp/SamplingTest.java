@@ -124,6 +124,24 @@ public class SamplingTest extends TestCase {
     assertEquals(s.indexOfNearestExtended(1.0),1);
     assertEquals(s.indexOfNearestExtended(1.4999),1);
     assertEquals(s.indexOfNearestExtended(1.5001),2);
+    assertEquals(s.remainderOfFloorExtended(1.5,s.indexOfFloorExtended(1.5)),0.5);
+    s = new Sampling(10,1.0,-5.0);
+    assertEquals(s.indexOfFloorExtended(-6.0),-1);
+    assertEquals(s.indexOfFloorExtended(-5.9999),-1);
+    assertEquals(s.indexOfFloorExtended(-5.5),-1);
+    assertEquals(s.indexOfFloorExtended(-5.0001),-1);
+    assertEquals(s.indexOfFloorExtended(-5.0),0);
+    assertEquals(s.indexOfFloorExtended(-4.9999),0);
+    assertEquals(s.indexOfFloorExtended(-4.5),0);
+    assertEquals(s.indexOfFloorExtended(-4.0001),0);
+    assertEquals(s.indexOfFloorExtended(-4.0),1);
+    assertEquals(s.indexOfFloorExtended(0.0),5);
+    s = new Sampling(10,2.0,10.0);
+    assertEquals(s.remainderOfFloorExtended(10.0,s.indexOfFloorExtended(10.0)),0.0);
+    assertEquals(s.remainderOfFloorExtended(10.5,s.indexOfFloorExtended(10.5)),0.25);
+    assertEquals(s.remainderOfFloorExtended(11.0,s.indexOfFloorExtended(11.0)),0.5);
+    assertEquals(s.remainderOfFloorExtended(11.5,s.indexOfFloorExtended(11.5)),0.75);
+    assertEquals(s.remainderOfFloorExtended(12.0,s.indexOfFloorExtended(12.0)),0.0);
   }
 
 }
