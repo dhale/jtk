@@ -8,7 +8,7 @@ package edu.mines.jtk.util;
 
 import jsr166y.*; // until JDK 7 is available
 
-import static edu.mines.jtk.util.ArrayMath.*; // for testing only
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utilities for parallel computing in loops over independent tasks.
@@ -172,6 +172,70 @@ public class Parallel {
      * @return the combined value.
      */
     public V combine(V v1, V v2);
+  }
+
+  /**
+   * A wrapper for objects that are not thread-safe. Such objects
+   * have methods that cannot safely be executed concurrently in 
+   * multiple threads. To use an unsafe object within a parallel 
+   * computation, first construct an instance of this wrapper. 
+   * Then, within the compute method, get the unsafe object; if 
+   * null, construct and set a new unsafe object in this wrapper, 
+   * before using the unsafe object to perform the computation. 
+   * This pattern ensures that each thread computes using a 
+   * distinct unsafe object. For example,
+   * <pre><code>
+   * final Parallel.Unsafe&lt;Worker&gt; nts = new Parallel.Unsafe&lt;Worker&gt;();
+   * Parallel.loop(count,new Parallel.LoopInt() {
+   *   public void compute(int i) {
+   *     Worker w = nts.get(); // get worker for the current thread
+   *     if (w==null) nts.set(w=new Worker()); // if null, make one
+   *     w.work(); // the method work need not be thread-safe
+   *   }
+   * });
+   * </code></pre>
+   * This wrapper is most useful when (1) the cost of constructing an 
+   * unsafe object is high, relative to the cost of each call to compute, 
+   * and (2) the number of threads calling compute is significantly 
+   * lower than the total number of such calls. Otherwise, if either
+   * of these conditions is false, then simply construct a new unsafe 
+   * object within the compute method.
+   * <p>
+   * This wrapper works much like the Java standard class ThreadLocal,
+   * except that an object within this wrapper can be garbage-collected 
+   * before its thread dies. This difference is important because 
+   * fork-join worker threads are pooled and will typically die only 
+   * when a program ends.
+   */
+  public static class Unsafe<T> {
+    
+    /**
+     * Constructs a wrapper for objects that are not thread-safe.
+     */
+    public Unsafe() {
+      int initialCapacity = 16; // the default initial capacity
+      float loadFactor = 0.5f; // huge numbers of threads are unlikely
+      int concurrencyLevel = 2*_pool.getParallelism();
+      _map = new ConcurrentHashMap<Thread,T>(
+        initialCapacity,loadFactor,concurrencyLevel);
+    }
+
+    /**
+     * Gets the object in this wrapper for the current thread.
+     * @return the object; null, of not yet set for the current thread.
+     */
+    public T get() {
+      return _map.get(Thread.currentThread());
+    }
+
+    /**
+     * Sets the object in this wrapper for the current thread.
+     * @param object the object.
+     */
+    public void set(T object) {
+      _map.put(Thread.currentThread(),object);
+    }
+    ConcurrentHashMap<Thread,T> _map;
   }
 
   /**
