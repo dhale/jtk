@@ -75,6 +75,6 @@ public class PlotFrameTest {
       panel.setTitle("Graphic for slide");
     }
     frame.setVisible(true);
-    //frame.paintToPng(720,3.333333,"junk.png");
+    frame.paintToPng(720,3.333333,"junk.png");
   }
 }

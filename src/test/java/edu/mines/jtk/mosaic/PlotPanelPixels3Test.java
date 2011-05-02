@@ -46,13 +46,13 @@ public class PlotPanelPixels3Test {
       PlotPanelPixels3.Orientation.X1RIGHT,
       PlotPanelPixels3.AxesPlacement.LEFT_BOTTOM,
       s1,s2,s3,f);
+    plot.addColorBar();
     plot.setLabel1("axis 1");
     plot.setLabel2("axis 2");
     plot.setLabel3("axis 3");
     //plot.setInterval1(2);
     //plot.setInterval2(3);
     //plot.setInterval3(4);
-    plot.addColorBar();
     plot.setLineColor(null);
     //plot.setSlices(1,1,1);
     //plot.setSlices(n1-1,n2-1,n3-1);

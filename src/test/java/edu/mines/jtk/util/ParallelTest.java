@@ -85,6 +85,39 @@ public class ParallelTest extends TestCase {
     });
   }
 
+  public void testUnsafe() {
+    final Unsafe<Worker> nts = new Unsafe<Worker>();
+    loop(20,new LoopInt() {
+      public void compute(int i) {
+        Worker w = nts.get();
+        if (w==null) nts.set(w=new Worker());
+        w.work();
+      }
+    });
+    /* This simpler version will fail on multicore systems.
+    final Worker w = new Worker();
+    loop(20,new LoopInt() {
+      public void compute(int i) {
+        w.work();
+      }
+    });
+    */
+  }
+  private static class Worker { // a simple class that is not thread safe
+    public void work() { // should fail if entered from multiple threads
+      assertTrue(!_working);
+      _working = true;
+      try {
+        Thread.sleep(10);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      _working = false;
+    }
+    private boolean _working;
+  }
+
+
   private static void assertEquals(float[] e, float[] a, float t) {
     int n = e.length;
     for (int i=0; i<n; ++i)
