@@ -235,7 +235,8 @@ public class Parallel {
     public void set(T object) {
       _map.put(Thread.currentThread(),object);
     }
-    ConcurrentHashMap<Thread,T> _map;
+
+    private ConcurrentHashMap<Thread,T> _map;
   }
 
   /**
