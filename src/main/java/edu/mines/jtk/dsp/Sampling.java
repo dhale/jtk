@@ -452,25 +452,27 @@ public class Sampling {
   }
 
   /**
-   * Returns the index of the floor (sample before or at) of the specified value,
-   * assuming uniform sampling. The value and the returned index need not be in
-   * in the bounds of this sampling, which must be uniform. Specifically, the
-   * returned index may be less than zero or greater than or equal to the 
-   * number of samples.
+   * Returns the index of the floor (sample before or at) of the specified
+   * value, assuming uniform sampling. The value and the returned index need
+   * not be in in the bounds of this sampling, which must be uniform.
+   * Specifically, the returned index may be less than zero or greater than or
+   * equal to the number of samples.
    * @param x the value.
    */
   public int indexOfFloorExtended(double x) {
     Check.state(isUniform(),"sampling is uniform");
     double d = x-_f;
-    return (d<0.0)?(int)Math.round((d*_di)-0.5):(int)(d*_di);
+    return (d<0.0)?(int)Math.round(d*_di-0.5):(int)(d*_di);
   }
 
   /**
-   * Returns the fraction of an index (0.0 to 1.0) from the floor to the specified value,
-   * assuming uniform sampling. The value need not be in in the bounds of this sampling, which
+   * Returns the fraction of an index from the floor to the specified value,
+   * in the range from 0.0 (inclusive) to 1.0 (exclusive), assuming uniform
+   * sampling. The value need not be in the bounds of this sampling, which
    * must be uniform.
    * @param x the value.
-   * @param floorIndex the index of the floor, as returned from indexOfFloorExtended(x).
+   * @param floorIndex the index of the floor, as returned from
+   *  the {@link #indexOfFloorExtended(double)} method.
    */
   public double remainderOfFloorExtended(double x, int floorIndex) {
     Check.state(isUniform(),"sampling is uniform");
