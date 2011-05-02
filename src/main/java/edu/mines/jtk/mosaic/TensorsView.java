@@ -100,7 +100,7 @@ public class TensorsView extends TiledView {
    * <p>
    * Calling this method overrides any ellipse samplings specified
    * previously by calling the method 
-   * {@link setEllipsesDisplayed(Sampling,Sampling)}.
+   * {@link #setEllipsesDisplayed(Sampling,Sampling)}.
    * @param ne the number of ellipses displayed along the larger dimension.
    */
   public void setEllipsesDisplayed(int ne) {
