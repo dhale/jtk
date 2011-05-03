@@ -112,7 +112,6 @@ public class Sampling {
     Check.argument(d>0.0,"d>0.0");
     _n = n;
     _d = d;
-    _di = 1.0/d;
     _f = f;
     _v = null;
     _t = t;
@@ -150,7 +149,6 @@ public class Sampling {
     Check.argument(isIncreasing(v),"v is increasing");
     _n = v.length;
     _d = (_n<2)?1.0:(v[_n-1]-v[0])/(_n-1);
-    _di = 1.0/_d;
     _f = v[0];
     _t = t;
     _td = _t*_d;
@@ -452,35 +450,6 @@ public class Sampling {
   }
 
   /**
-   * Returns the index of the floor (sample before or at) of the specified
-   * value, assuming uniform sampling. The value and the returned index need
-   * not be in in the bounds of this sampling, which must be uniform.
-   * Specifically, the returned index may be less than zero or greater than or
-   * equal to the number of samples.
-   * @param x the value.
-   */
-  public int indexOfFloorExtended(double x) {
-    Check.state(isUniform(),"sampling is uniform");
-    double d = x-_f;
-    return (d<0.0)?(int)Math.round(d*_di-0.5):(int)(d*_di);
-  }
-
-  /**
-   * Returns the fraction of an index from the floor to the specified value,
-   * in the range from 0.0 (inclusive) to 1.0 (exclusive), assuming uniform
-   * sampling. The value need not be in the bounds of this sampling, which
-   * must be uniform.
-   * @param x the value.
-   * @param floorIndex the index of the floor, as returned from
-   *  the {@link #indexOfFloorExtended(double)} method.
-   */
-  public double remainderOfFloorExtended(double x, int floorIndex) {
-    Check.state(isUniform(),"sampling is uniform");
-    double c = _f+(double)floorIndex*_d;
-    return (x-c)*_di;
-  }
-
-  /**
    * Returns the value of the sample nearest to the specified value, 
    * assuming uniform sampling. The specified and returned values need 
    * not be in the bounds of this sampling, which must be uniform.
@@ -489,6 +458,36 @@ public class Sampling {
    */
   public double valueOfNearestExtended(double x) {
     return getValueExtended(indexOfNearestExtended(x));
+  }
+
+  /**
+   * Returns the index of the floor of the specified value.
+   * The floor is the largest sampled value less than or equal to the 
+   * specified value. The value and the returned index need not be in 
+   * the bounds of this sampling, which must be uniform.
+   * Specifically, the returned index may be less than zero or greater 
+   * than or equal to the number of samples.
+   * @param x the value.
+   */
+  public int indexOfFloorExtended(double x) {
+    Check.state(isUniform(),"sampling is uniform");
+    double xn = (x-_f)/_d;
+    int ix = (int)xn;
+    return (ix<=xn)?ix:ix-1;
+  }
+
+  /**
+   * Returns the normalized difference between a specified value and 
+   * the sampled value for a specified index. Normalized difference is
+   * the difference (specified value minus sampled value) divided by 
+   * the sampling interval. The specified value and index not be in 
+   * the bounds of this sampling, which must be uniform.
+   * @param x the value.
+   * @param i the index.
+   */
+  public double normalizedDifferenceExtended(double x, int i) {
+    Check.state(isUniform(),"sampling is uniform");
+    return (x-(_f+i*_d))/_d;
   }
 
   /**
@@ -737,7 +736,6 @@ public class Sampling {
 
   private int _n; // number of samples
   private double _d; // sampling interval
-  private double _di; // inverse of sampling interval (1/_d).  Cached to minimize float divides.
   private double _f; // value of first sample
   private double[] _v; // array[n] of sample values; null, if uniform
   private double _t; // sampling tolerance, as a fraction of _d
