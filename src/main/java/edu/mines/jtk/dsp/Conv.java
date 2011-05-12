@@ -194,7 +194,8 @@ public class Conv {
     x = reverse(lx,x,copy);
     kx = 1-kx-lx;
     conv(lx,kx,x,ly,ky,y,lz,kz,z);
-    reverse(lx,x,!copy);
+    if (!copy)
+      reverse(lx,x,false);
   }
 
   /**
@@ -225,7 +226,8 @@ public class Conv {
     kx1 = 1-kx1-lx1;
     kx2 = 1-kx2-lx2;
     conv(lx1,lx2,kx1,kx2,x,ly1,ly2,ky1,ky2,y,lz1,lz2,kz1,kz2,z);
-    reverse(lx1,lx2,x,!copy);
+    if (!copy)
+      reverse(lx1,lx2,x,false);
   }
 
   /**
@@ -265,7 +267,8 @@ public class Conv {
     conv(lx1,lx2,lx3,kx1,kx2,kx3,x,
          ly1,ly2,ly3,ky1,ky2,ky3,y,
          lz1,lz2,lz3,kz1,kz2,kz3,z);
-    reverse(lx1,lx2,lx3,x,!copy);
+    if (!copy)
+      reverse(lx1,lx2,lx3,x,false);
   }
 
   ///////////////////////////////////////////////////////////////////////////
