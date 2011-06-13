@@ -57,7 +57,7 @@ Tools for building
 To build the Mines JTK, you need these freely available tools:
 * Java SE JDK 6.0 (or later):
   http://www.oracle.com/technetwork/java/javase/downloads
-* Apache Ant 1.6 (or later): 
+* Apache Ant 1.7 (or later): 
   http://ant.apache.org
 
 On Windows, we like to put tools such as the JDK and Ant in a folder named 
