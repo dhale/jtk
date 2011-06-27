@@ -16,7 +16,7 @@ public interface Monitor {
       @param initFraction Fraction of work done when
       process started, from 0 to 1.
   */
-  public void initReport(double initFraction);
+  void initReport(double initFraction);
 
   /** This method will be called with the current fraction
       of work done.  Values range from 0 at the beginning
@@ -25,13 +25,24 @@ public interface Monitor {
       This value must equal or exceed all values previously
       passed to this method or to initReport.
   */
-  public void report(double fraction);
+  void report(double fraction);
+
+    /**
+     * If true, then any further progress should be cancelled.
+     * @return true, when any requested work should be interrupted.
+     * False, if progress is expected to run to completion.
+     */
+  boolean isCanceled();
 
   /** Empty implementation that does nothing.
    */
-  public static Monitor NULL_MONITOR = new Monitor() {
-      public void initReport(double initFraction) {}
-      public void report(double fraction) {}
-    };
+  Monitor NULL_MONITOR = new Monitor() {
+      @Override
+      public void initReport(final double initFraction) {}
+      @Override
+      public void report(final double fraction) {}
+      @Override
+      public boolean isCanceled() { return false; }
+  };
 }
 
