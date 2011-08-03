@@ -94,7 +94,7 @@ public class ParallelTest extends TestCase {
         w.work();
       }
     });
-    /* This simpler version will fail on multicore systems.
+    /* this simpler version will fail with multithreading
     final Worker w = new Worker();
     loop(20,new LoopInt() {
       public void compute(int i) {
