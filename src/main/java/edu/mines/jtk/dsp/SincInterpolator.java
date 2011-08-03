@@ -1042,8 +1042,8 @@ public class SincInterpolator {
     double x2 = lxu-dxu*_lsinc/2;
     double x1n = (x1-fx)/dx;
     double x2n = (x2-fx)/dx;
-    int ix1 = max(0,min(nx,(int)x1n)+1);
-    int ix2 = max(0,min(nx,(int)x2n)-1);
+    int ix1 = max(0,min(nx,(int)x1n+1));
+    int ix2 = max(0,min(nx,(int)x2n-1));
 
     // Interpolate output samples near beginning of uniform sequence.
     for (int ix=0; ix<ix1; ++ix) {
