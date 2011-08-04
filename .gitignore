@@ -1,19 +1,8 @@
-
-# /
 /.classpath
 /.project
 /.pydevproject
 /.idea
 
-# /src/main/java/edu/mines/jtk/interp/
-/src/main/java/edu/mines/jtk/interp/.LasserreVolume.java.swp
-
-# /src/main/java/edu/mines/jtk/la/
-/src/main/java/edu/mines/jtk/la/.TridiagonalFMatrix.java.swp
-
-# /src/main/java/edu/mines/jtk/mesh/
-/src/main/java/edu/mines/jtk/mesh/.TriMesh.java.swp
-
-# /src/main/java/edu/mines/jtk/mosaic/
-/src/main/java/edu/mines/jtk/mosaic/.PlotPanel.java.swp
-/src/main/java/edu/mines/jtk/mosaic/.TileAxis.java.swp
+/build
+*.swp
+*.class
