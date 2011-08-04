@@ -21,28 +21,32 @@ of the license that accompanies this software.
 Getting the source code
 -----------------------
 
-To build the Mines JTK from source, you must first use Subversion (SVN)
-client software to checkout (co) the source code from our SVN repository:
-http://boole.mines.edu/jtk.
+To build and use the Mines JTK, you must first download its source
+code from GitHub at https://github.com/dhale/jtk. If you clone this
+source code repository using git, then you will be able to easily
+update your copy as others make changes. Alternatively, you may use
+the Downloads link provided by GitHub to obtain a current snapshot
+of the code; but this copy cannot be conveniently updated with git.
 
-If you are using Linux, an SVN client is likely available with your Linux 
-distribution. If not yet installed, perhaps you simply need to install it. 
-In a terminal window, type "svn". If that command is found, then (1) cd to 
-the directory that will contain your directory jtk and (2) type the command
-svn co http://boole.mines.edu/jtk
+If you are using Linux or Mac OS X (10.7+), then you already have 
+a git command-line client. Various git clients with graphical user
+interfaces are also available for Linux, Mac OS X, and Windows, 
+and git is also available within popular integrated development 
+environments, such as Eclipse, Netbeans, and IntelliJ IDEA. Note 
+that git will be necessary if you wish to propose changes (submit 
+pull requests) for the master branch of the source code repository. 
+
+To determine if you have a git command-line client, in a terminal 
+window type "git". If that command is found, then cd to the 
+directory that will contain your directory jtk and (2) type the 
+command
+git clone https://github.com/dhale/jtk.git
 This command will create a directory jtk in your current working
-directory.
+directory. The subdirectory .git contains a complete copy of the
+repository for the Mines Java Toolkit. If instead you simply use
+the GitHub Downloads link, then this subdirectory will be absent.
 
-For Windows, we recommand that you download and install TortoiseSVN from 
-http://tortoisesvn.tigris.org. TortoiseSVN integrates nicely with the
-Windows Explorer. After installing TortoiseSVN, (1) make a folder jtk 
-(in the same folder as your jtk folder), (2) right-click on your jtk 
-folder and select "SVN checkout ..." from the menu, (3) enter the URL
-http://boole.mines.edu/jtk, and (4) enter the output path, including
-the jtk directory.
-
-After SVN checkout, you should have a directory jtk/trunk/ with
-the following subdirectories:
+The directory jtk/ has the following subdirectories:
 bin/  - platform-dependent scripts (e.g., antrun.sh and javarun.sh)
 data/ - data used for demos and testing
 doc/  - documentation for tools we use but do not build (e.g., JUnit)
