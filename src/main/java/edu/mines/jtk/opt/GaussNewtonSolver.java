@@ -195,11 +195,11 @@ public class GaussNewtonSolver {
           @param perturbation
           @param dampOnlyPerturbation
         */
-        public TransformFunction(final Transform transform,
-                                 final VectConst data,
-                                 final VectConst referenceModel,
-                                 final VectConst perturbation,
-                                 final boolean dampOnlyPerturbation) {
+        private TransformFunction(final Transform transform,
+                                  final VectConst data,
+                                  final VectConst referenceModel,
+                                  final VectConst perturbation,
+                                  final boolean dampOnlyPerturbation) {
             _referenceModel = referenceModel;
             _model = _referenceModel.clone();
             _perturbation = perturbation;

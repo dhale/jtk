@@ -71,7 +71,6 @@ public class QuadraticSolver {
      * @return Optimized solution
      */
     public Vect solve(final int numberIterations, Monitor monitor) {
-        int iter;
         if (monitor == null) {
             monitor = Monitor.NULL_MONITOR;
         }
@@ -97,7 +96,7 @@ public class QuadraticSolver {
         final Vect qa = g.clone();     // double use for instance 5
 
         SOLVE:
-        for (iter = 0; iter < numberIterations && !monitor.isCanceled(); iter++) {
+        for (int iter = 0; iter < numberIterations && !monitor.isCanceled(); iter++) {
             double beta = 0.0;
             {
                 final Vect q = qa;
