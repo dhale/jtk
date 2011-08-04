@@ -3,6 +3,7 @@
 /.pydevproject
 /.idea
 
-/build
+build/
 *.swp
 *.class
+*.DS_Store
