@@ -75,7 +75,7 @@ environment (IDE), such as NetBeans, Eclipse, or IntelliJ IDEA.
 Building the Mines JTK
 ----------------------
 
-In your jtk/trunk/bin/ directory are scripts for running Ant. Choose an
+In your jtk/bin/ directory are scripts for running Ant. Choose an
 appropriate script for your platform, and copy it to some directory that is 
 in your PATH. From any directory, you will want to type the command antrun 
 and have this script be found. You may of course rename this script to 
@@ -87,9 +87,9 @@ the script will find your JDK and Ant. (For Linux and Mac OS X systems,
 these are in installed in standard locations, so no environment variables
 are necessary.)
 
-Then cd to your jtk/trunk/ directory (the one that contains build.xml) 
-and type "antrun" (or whatever you called your ant script). This command 
-should build the Mines Java Toolkit.
+Then cd to your jtk/ directory (the one that contains build.xml) and type 
+"antrun" (or whatever you called your ant script). This command should 
+build the Mines Java Toolkit.
 
 Type "antrun -p" to learn more about other build targets, such as clean 
 and doc.
@@ -99,18 +99,18 @@ Using the Mines JTK
 -------------------
 
 After you have built the Mines JTK, you should have the JAR file
-jtk/trunk/build/jar/edu_mines_jtk.jar.
+jtk/build/jar/edu_mines_jtk.jar.
 You may use this file as you would any other JAR file.
 
 Some packages (e.g., edu.mines.jtk.ogl) require Java native interface
 (JNI) libraries of native (non-Java) code. These platform-specific 
-libraries should be in a subdirectory of jtk/trunk/lib/, such as 
-jtk/trunk/lib/linux/x86/.
+libraries should be in a subdirectory of jtk/lib/, such as 
+jtk/lib/linux/x86/.
 
 To use the Mines JTK, we must launch a Java virtual machine, specifying 
 all of these JAR files and the locations of our JNI libraries.
 
-In jtk/trunk/bin/ are scripts (e.g., javarun.sh) that illustrate how
+In jtk/bin/ are scripts (e.g., javarun.sh) that illustrate how
 we do this for different platforms. To use the Mines JTK from the command
 line, you should (1) copy the appropriate script to some directory in
 your PATH, (2) edit the script to specify the correct directories, and
@@ -145,7 +145,7 @@ be less than 1.2.
 
 If you get a "java.lang.UnsatisfiedLinkError", the JOGL JAR files or JNI 
 libraries are perhaps not provided for your platform, or they may be in 
-directories (e.g., jtk/trunk/lib/linux/x86/) that have not been specified 
+directories (e.g., jtk/lib/linux/x86/) that have not been specified 
 correctly in your javarun script.
 
 
