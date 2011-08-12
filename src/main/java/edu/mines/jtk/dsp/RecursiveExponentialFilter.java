@@ -15,8 +15,8 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * the edges of input and output arrays, the impulse response of this 
  * two-sided filter is symmetric and decays exponentially from its peak 
  * value at zero lag. Specifically, the impulse response has the form
- * h[n] = a^abs(n)*(1-a)/(1+a), where a is a constant derived from a 
- * specified filter half-width sigma.
+ * h[n] = a^abs(n)*(1-a)/(1+a), where a is a parameter in the range
+ * [0:1) derived from a specified half-width sigma.
  * <p>
  * Like the Gaussian filter, the impulse response of the exponential
  * filter is nowhere zero. The half-width sigma for the exponential 
@@ -375,6 +375,9 @@ public class RecursiveExponentialFilter {
   }
 
   // Smooth a 1D array for output boundary conditions.
+  // Adapted from Algorithm 4.1 in Boisvert, R.F., Algorithms for
+  // special tridiagonal systems: SIAM J. Sci. Stat. Comput., v. 12,
+  // no. 2, pp. 423-442.
   private static void smooth1Eo(
     boolean zs, float a, float[] x, float[] y)
   {
