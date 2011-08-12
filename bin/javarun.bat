@@ -2,7 +2,7 @@
 setlocal
 
 rem Where is the Mines JTK? (Where is your build.xml?)
-set MINES_JTK_HOME=c:\dhale\box\jtk\trunk
+set MINES_JTK_HOME=c:\dhale\git\jtk
 
 rem Where will Java look for classes? 
 rem Add other jars to this list as necessary.
