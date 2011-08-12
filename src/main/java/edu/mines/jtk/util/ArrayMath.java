@@ -7342,7 +7342,262 @@ public class ArrayMath {
   }
 
   ///////////////////////////////////////////////////////////////////////////
-  // equal
+  // distinct arrays reference no shared elements
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(byte[] x, byte[] y) {
+    return x!=y;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(byte[][] x, byte[][] y) {
+    if (x==y)
+      return false;
+    int n2 = x.length;
+    for (int i2=0; i2<n2; ++i2)
+      if (!distinct(x[i2],y[i2]))
+        return false;
+    return true;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(byte[][][] x, byte[][][] y) {
+    if (x==y)
+      return false;
+    int n3 = x.length;
+    for (int i3=0; i3<n3; ++i3)
+      if (!distinct(x[i3],y[i3]))
+        return false;
+    return true;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(short[] x, short[] y) {
+    return x!=y;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(short[][] x, short[][] y) {
+    if (x==y)
+      return false;
+    int n2 = x.length;
+    for (int i2=0; i2<n2; ++i2)
+      if (!distinct(x[i2],y[i2]))
+        return false;
+    return true;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(short[][][] x, short[][][] y) {
+    if (x==y)
+      return false;
+    int n3 = x.length;
+    for (int i3=0; i3<n3; ++i3)
+      if (!distinct(x[i3],y[i3]))
+        return false;
+    return true;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(int[] x, int[] y) {
+    return x!=y;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(int[][] x, int[][] y) {
+    if (x==y)
+      return false;
+    int n2 = x.length;
+    for (int i2=0; i2<n2; ++i2)
+      if (!distinct(x[i2],y[i2]))
+        return false;
+    return true;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(int[][][] x, int[][][] y) {
+    if (x==y)
+      return false;
+    int n3 = x.length;
+    for (int i3=0; i3<n3; ++i3)
+      if (!distinct(x[i3],y[i3]))
+        return false;
+    return true;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(long[] x, long[] y) {
+    return x!=y;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(long[][] x, long[][] y) {
+    if (x==y)
+      return false;
+    int n2 = x.length;
+    for (int i2=0; i2<n2; ++i2)
+      if (!distinct(x[i2],y[i2]))
+        return false;
+    return true;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(long[][][] x, long[][][] y) {
+    if (x==y)
+      return false;
+    int n3 = x.length;
+    for (int i3=0; i3<n3; ++i3)
+      if (!distinct(x[i3],y[i3]))
+        return false;
+    return true;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(float[] x, float[] y) {
+    return x!=y;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(float[][] x, float[][] y) {
+    if (x==y)
+      return false;
+    int n2 = x.length;
+    for (int i2=0; i2<n2; ++i2)
+      if (!distinct(x[i2],y[i2]))
+        return false;
+    return true;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(float[][][] x, float[][][] y) {
+    if (x==y)
+      return false;
+    int n3 = x.length;
+    for (int i3=0; i3<n3; ++i3)
+      if (!distinct(x[i3],y[i3]))
+        return false;
+    return true;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(double[] x, double[] y) {
+    return x!=y;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(double[][] x, double[][] y) {
+    if (x==y)
+      return false;
+    int n2 = x.length;
+    for (int i2=0; i2<n2; ++i2)
+      if (!distinct(x[i2],y[i2]))
+        return false;
+    return true;
+  }
+
+  /**
+   * Determines whether the two specified arrays are distinct.
+   * @param x an array.
+   * @param y an array.
+   * @return true, if distinct; false, otherwise.
+   */
+  public static boolean distinct(double[][][] x, double[][][] y) {
+    if (x==y)
+      return false;
+    int n3 = x.length;
+    for (int i3=0; i3<n3; ++i3)
+      if (!distinct(x[i3],y[i3]))
+        return false;
+    return true;
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // equal arrays are those for which all elements have equal values
 
   /**
    * Determines whether all elements in two specified arrays are equal.
