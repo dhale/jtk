@@ -318,10 +318,14 @@ public class RecursiveExponentialFilter {
   {
     int n1 = x.length;
     float b = 1.0f-a;
-    float yi = y[0] = zs?x[0]:b*x[0];
+    float sx = zs?1.0f:b;
+    float sy = a;
+    float yi = y[0] = sx*x[0];
     for (int i1=1; i1<n1-1; ++i1)
       y[i1] = yi = a*yi+b*x[i1];
-    y[n1-1] = yi = (zs?a*yi+x[n1-1]:a*yi+b*x[n1-1])/(1.0f+a);
+    sx /= 1.0f+a;
+    sy /= 1.0f+a;
+    y[n1-1] = yi = sy*yi+sx*x[n1-1];
     for (int i1=n1-2; i1>=0; --i1)
       y[i1] = yi = a*yi+b*y[i1];
   }
@@ -333,15 +337,15 @@ public class RecursiveExponentialFilter {
     int n1 = x[0].length;
     int n2 = x.length;
     float b = 1.0f-a;
-    float sx,sy;
-    sx = zs?1.0f:b;
+    float sx = zs?1.0f:b;
+    float sy = a;
     for (int i1=0; i1<n1; ++i1)
       y[0][i1] = sx*x[0][i1];
     for (int i2=1; i2<n2-1; ++i2)
       for (int i1=0; i1<n1; ++i1)
         y[i2][i1] = a*y[i2-1][i1]+b*x[i2][i1];
-    sx = (zs?1.0f:b)/(1.0f+a);
-    sy = a/(1.0f+a);
+    sx /= 1.0f+a;
+    sy /= 1.0f+a;
     for (int i1=0; i1<n1; ++i1)
       y[n2-1][i1] = sy*y[n2-2][i1]+sx*x[n2-1][i1];
     for (int i2=n2-2; i2>=0; --i2)
