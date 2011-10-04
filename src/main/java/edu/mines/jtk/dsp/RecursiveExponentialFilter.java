@@ -318,17 +318,12 @@ public class RecursiveExponentialFilter {
   {
     int n1 = x.length;
     float b = 1.0f-a;
-    float xnm1 = x[n1-1];
-
-    // forward
-    y[0] = zs?x[0]:b*x[0];
-    for (int i1=1; i1<n1; ++i1)
-      y[i1] = a*y[i1-1]+b*x[i1];
-
-    // reverse
-    y[n1-1] = zs?(y[n1-1]+a*xnm1)/(1.0f+a):y[n1-1]/(1.0f+a);
+    float yi = y[0] = zs?x[0]:b*x[0];
+    for (int i1=1; i1<n1-1; ++i1)
+      y[i1] = yi = a*yi+b*x[i1];
+    y[n1-1] = yi = (zs?a*yi+x[n1-1]:a*yi+b*x[n1-1])/(1.0f+a);
     for (int i1=n1-2; i1>=0; --i1)
-      y[i1] = a*y[i1+1]+b*y[i1];
+      y[i1] = yi = a*yi+b*y[i1];
   }
 
   // Smooth along 2nd dimension of a 2D array for input boundary conditions.
@@ -338,40 +333,20 @@ public class RecursiveExponentialFilter {
     int n1 = x[0].length;
     int n2 = x.length;
     float b = 1.0f-a;
-    float[] xnm1 = x[n2-1];
-    if (zs && !distinct(x,y))
-      xnm1 = copy(x[n2-1]);
-    float[] xi,yi,yp,ym;
     float sx,sy;
-
-    // forward
-    xi = x[0];
-    yi = y[0];
     sx = zs?1.0f:b;
     for (int i1=0; i1<n1; ++i1)
-      yi[i1] = sx*xi[i1];
-    for (int i2=1; i2<n2; ++i2) {
-      xi = x[i2];
-      yi = y[i2];
-      ym = y[i2-1];
+      y[0][i1] = sx*x[0][i1];
+    for (int i2=1; i2<n2-1; ++i2)
       for (int i1=0; i1<n1; ++i1)
-        yi[i1] = a*ym[i1]+b*xi[i1];
-    }
-
-    // reverse
-    sx = zs?a/(1.0f+a):0.0f;
-    sy = 1.0f/(1.0f+a);
-    xi = xnm1;
-    yi = y[n2-1];
+        y[i2][i1] = a*y[i2-1][i1]+b*x[i2][i1];
+    sx = (zs?1.0f:b)/(1.0f+a);
+    sy = a/(1.0f+a);
     for (int i1=0; i1<n1; ++i1)
-      yi[i1] = sy*yi[i1]+sx*xi[i1];
-    for (int i2=n2-2; i2>=0; --i2) {
-      xi = x[i2];
-      yi = y[i2];
-      yp = y[i2+1];
+      y[n2-1][i1] = sy*y[n2-2][i1]+sx*x[n2-1][i1];
+    for (int i2=n2-2; i2>=0; --i2)
       for (int i1=0; i1<n1; ++i1)
-        yi[i1] = a*yp[i1]+b*yi[i1];
-    }
+        y[i2][i1] = a*y[i2+1][i1]+b*y[i2][i1];
   }
 
   // Smooth a 1D array for output boundary conditions.
