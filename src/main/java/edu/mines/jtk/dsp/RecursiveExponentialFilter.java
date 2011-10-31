@@ -43,8 +43,8 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * All smoothing can be performed in place, so that input and output 
  * arrays can be the same array.
  *
- * @author Dave Hale, Colorado School of Mines
- * @version 2011.08.11
+ * @author Dave Hale &amp; Simon Luo, Colorado School of Mines
+ * @version 2011.10.01
  */
 public class RecursiveExponentialFilter {
 
