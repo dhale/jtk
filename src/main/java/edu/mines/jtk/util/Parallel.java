@@ -8,6 +8,7 @@ package edu.mines.jtk.util;
 
 import jsr166y.*; // until JDK 7 is available
 
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -234,6 +235,15 @@ public class Parallel {
      */
     public void set(T object) {
       _map.put(Thread.currentThread(),object);
+    }
+
+    /**
+     * Returns a collection of all unsafe objects in this wrapper.
+     * This method is useful only after parallel loops have ended. 
+     * @return the collection of unsafe objects.
+     */
+    public Collection<T> getAll() {
+      return _map.values();
     }
 
     private ConcurrentHashMap<Thread,T> _map;
