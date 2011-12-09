@@ -300,7 +300,7 @@ public class TriangleGroup extends Group implements Selectable {
     int nv = xyz.length/3;
     int nt = nv/3;
 
-    // ArrayMath of vertex indices, one per vertex.
+    // Array of vertex indices, one per vertex.
     int[] ijk = new int[nv];
 
     // For sequential indexing, simply fill the array. For non-sequential 
