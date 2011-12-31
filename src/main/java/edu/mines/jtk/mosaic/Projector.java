@@ -9,6 +9,7 @@ package edu.mines.jtk.mosaic;
 import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.util.MathPlus.max;
 import static edu.mines.jtk.util.MathPlus.min;
+import static edu.mines.jtk.util.MathPlus.signum;
 
 /**
  * Converts (projects) world coordinates v to/from normalized coordinates u.
@@ -173,6 +174,12 @@ public class Projector {
     double v0b = p._v0;
     double v1b = p._v1;
 
+    // If sign of B does not equal sign of A, flip B.
+    if (signum(v1a-v0a)!=signum(v1b-v0b)) {
+    	v0b = p._v1;
+    	v1b = p._v0;
+    }
+
     // Merged world coordinate bounds. Preserve sign of projector A.
     double vmin = min(min(v0a,v1a),min(v0b,v1b));
     double vmax = max(max(v0a,v1a),max(v0b,v1b));
@@ -186,21 +193,15 @@ public class Projector {
     //   u0+r1a*(u1-u0) = (1-r1a)*u0+r1a*u1 <= ua1
     //   u0+r1b*(u1-u0) = (1-r1b)*u0+r1b*u1 <= ub1
     // where r0a, r0b, r1a, and r1b are defined below.
-    // If sign of B does not equal sign of A, flip B.
     double r0a = (v0a-_v0)/(_v1-_v0); // 0 <= r0a <  1
     double r0b = (v0b-_v0)/(_v1-_v0); // 0 <= r0b <  1
     double r1a = (v1a-_v0)/(_v1-_v0); // 0 <  r1a <= 1
     double r1b = (v1b-_v0)/(_v1-_v0); // 0 <  r1b <= 1
-    if (r1b<0.0) {
-      r0b = -r0b;
-      r1b = -r1b;
-      double u0t = u0b;
-      u0b = 1.0-u1b;
-      u1b = 1.0-u0t;
-      //double v0t = v0b;
-      //v0b = v1b;
-      //v1b = v0t;
-    }
+    assert 0<=r0a && r0a<1 : r0a;
+    assert 0<=r0b && r0b<1 : r0b;
+    assert 0<r1a && r1a<=1 : r1a;
+    assert 0<r1b && r1b<=1 : r1b;
+
     double u0 = 0.0;
     double u1 = 1.0;
     int niter = 0;

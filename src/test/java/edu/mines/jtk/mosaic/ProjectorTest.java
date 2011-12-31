@@ -26,9 +26,9 @@ public class ProjectorTest extends TestCase {
 	public void testMergeC () {
 		Projector pa = new Projector(1, 0);
 		Projector pb = new Projector(0, 1);
-		pa.merge(pb);                  // Fails if assertions are enabled.
-		assertEquals(0, pa.u0(), eps); // Fails if assertions not enabled.
-		assertEquals(1, pa.u1(), eps); // Fails if assertions not enabled.
+		pa.merge(pb);
+		assertEquals(0, pa.u0(), eps);
+		assertEquals(1, pa.u1(), eps);
 		assertEquals(1, pa.v0(), eps);
 		assertEquals(0, pa.v1(), eps);
 	}
