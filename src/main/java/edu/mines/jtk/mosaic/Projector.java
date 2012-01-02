@@ -176,6 +176,8 @@ public class Projector {
 
     // If sign of B does not equal sign of A, flip B.
     if (signum(v1a-v0a)!=signum(v1b-v0b)) {
+    	u0b = 1.0-p._u1;
+    	u1b = 1.0-p._u0;
     	v0b = p._v1;
     	v1b = p._v0;
     }
@@ -237,6 +239,7 @@ public class Projector {
     return _vscale/p._vscale;
   }
 
+  @Override
   public boolean equals(Object obj) {
     if (this==obj)
       return true;
@@ -249,6 +252,7 @@ public class Projector {
            this._v1==that._v1;
   }
 
+  @Override
   public int hashCode() {
     long u0bits = Double.doubleToLongBits(_u0);
     long u1bits = Double.doubleToLongBits(_u1);
@@ -260,6 +264,12 @@ public class Projector {
                  v1bits^(v1bits>>>32));
   }
 
+  @Override
+  public String toString() {
+	return "Projector("+_v0+", "+_v1+", "+_u0+", "+_u1+")";
+  }
+
+  
   ///////////////////////////////////////////////////////////////////////////
   // private
 
