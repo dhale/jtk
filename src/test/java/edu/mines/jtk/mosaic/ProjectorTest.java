@@ -1,9 +1,20 @@
 package edu.mines.jtk.mosaic;
 
 import junit.framework.TestCase;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
 
 public class ProjectorTest extends TestCase {
   private static final double eps = 1.0e-10;
+
+  public static void main(String[] args) {
+    TestSuite suite = new TestSuite(ProjectorTest.class);
+    TestResult result = junit.textui.TestRunner.run(suite);
+
+    // Check result and exit with nonzero status if any failed.
+    if (!result.wasSuccessful())
+      fail("Tests failed.");
+  }
 
   public void testMergeA () {
     Projector pa = new Projector(0, 1);
