@@ -16,7 +16,7 @@ import java.util.StringTokenizer;
  * However, you cannot convert s/ft to ft/s.
  * <p>
  * A typical pattern for dealing with units is to (1) check the dimensions, 
- * (2) convert paramaters to SI units, and (3) use the parameters, now with
+ * (2) convert parameters to SI units, and (3) use the parameters, now with
  * consistent (SI) units.
  * <p>
  * Here is a simple example:

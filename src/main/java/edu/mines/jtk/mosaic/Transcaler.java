@@ -183,10 +183,10 @@ public class Transcaler {
    */
   public int width(double wu) {
     double wd = _xuscale*wu;
-    if (wd<DMIN) {
-      wd = DMIN;
-    } else if (wd>DMAX) {
-      wd = DMAX;
+    if (wd<DMINW) {
+      wd = DMINW;
+    } else if (wd>DMAXW) {
+      wd = DMAXW;
     }
     return (int)(wd+1.5);
   }
@@ -198,10 +198,10 @@ public class Transcaler {
    */
   public int height(double hu) {
     double hd = _yuscale*hu;
-    if (hd<DMIN) {
-      hd = DMIN;
-    } else if (hd>DMAX) {
-      hd = DMAX;
+    if (hd<DMINW) {
+      hd = DMINW;
+    } else if (hd>DMAXW) {
+      hd = DMAXW;
     }
     return (int)(hd+1.5);
   }
@@ -247,6 +247,8 @@ public class Transcaler {
 
   private static final double DMIN = -32768.0; // device min coordinate
   private static final double DMAX =  32767.0; // device max coordinate
+  private static final double DMINW = DMIN-DMAX; // device min width
+  private static final double DMAXW = DMAX-DMIN; // device max width
 
   private double _x1u,_y1u,_x2u,_y2u;
   private int    _x1d,_y1d,_x2d,_y2d;
