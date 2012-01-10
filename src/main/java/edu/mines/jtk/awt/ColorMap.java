@@ -75,12 +75,17 @@ public class ColorMap {
   public static final IndexColorModel RED_WHITE_BLUE = getRedWhiteBlue();
 
   /**
+   * Color model for blue to white to red.
+   */
+  public static final IndexColorModel BLUE_WHITE_RED = getBlueWhiteRed();
+
+  /**
    * Color model for gray to yellow to red.
    */
   public static final IndexColorModel GRAY_YELLOW_RED = getGrayYellowRed();
 
   /**
-   * Constructs a color map for values in [0,1] the index color model.
+   * Constructs a color map for values in [0,1].
    * The integers 0 and 255 must be valid pixels for the color model.
    * @param colorModel the index color model.
    */
@@ -89,7 +94,7 @@ public class ColorMap {
   }
 
   /**
-   * Constructs a color map for specified values and index color model.
+   * Constructs a color map for specified values.
    * The integers 0 and 255 must be valid pixels for the color model.
    * @param vmin the minimum value.
    * @param vmax the maximum value.
@@ -256,7 +261,7 @@ public class ColorMap {
 
   /**
    * Adds the specified color map listener.
-   * Then notifies the listener that this colormap has changed.
+   * Then notifies the listener that this color map has changed.
    * @param cml the listener.
    */
   public void addListener(ColorMapListener cml) {
@@ -429,6 +434,25 @@ public class ColorMap {
   }
 
   /**
+   * Gets a blue-white-red color model.
+   * @return the color model.
+   */
+  public static IndexColorModel getBlueWhiteRed() {
+    Color[] c = new Color[256];
+    for (int i=0; i<256; ++i) {
+      float x = (float)i/255.0f;
+      if (x<0.5f) {
+        float a = x/0.5f;
+        c[i] = new Color(a,a,1.0f);
+      } else {
+        float a = (x-0.5f)/0.5f;
+        c[i] = new Color(1.0f,1.0f-a,1.0f-a);
+      }
+    }
+    return makeIndexColorModel(c);
+  }
+
+  /**
    * Gets the gray-yellow-red color model.
    * @return the color model.
    */
@@ -473,6 +497,50 @@ public class ColorMap {
     for (int i=0; i<256; ++i)
       colors[i] = c;
     return makeIndexColorModel(colors);
+  }
+
+  /**
+   * Returns an index color model with specified opacity (alpha).
+   * @param icm an index color model from which to copy RGBs.
+   * @param alpha opacity in the range [0.0,1.0].
+   * @return the index color model with alpha.
+   */
+  public static IndexColorModel setAlpha(IndexColorModel icm, double alpha) {
+    int bits = icm.getPixelSize();
+    int size = icm.getMapSize();
+    byte[] r = new byte[size];
+    byte[] g = new byte[size];
+    byte[] b = new byte[size];
+    byte[] a = new byte[size];
+    icm.getReds(r);
+    icm.getGreens(g);
+    icm.getBlues(b);
+    byte ia = (byte)(255.0*alpha+0.5);
+    for (int i=0; i<size; ++i)
+      a[i] = ia;
+    return new IndexColorModel(bits,size,r,g,b,a);
+  }
+
+  /**
+   * Returns an index color model with specified opacities (alphas).
+   * @param icm an index color model from which to copy RGBs.
+   * @param alpha array of opacities in the range [0.0,1.0].
+   * @return the index color model with alphas.
+   */
+  public static IndexColorModel setAlpha(IndexColorModel icm, float[] alpha) {
+    int bits = icm.getPixelSize();
+    int size = icm.getMapSize();
+    byte[] r = new byte[size];
+    byte[] g = new byte[size];
+    byte[] b = new byte[size];
+    byte[] a = new byte[size];
+    icm.getReds(r);
+    icm.getGreens(g);
+    icm.getBlues(b);
+    int n = min(size,alpha.length);
+    for (int i=0; i<n; ++i)
+      a[i] = (byte)(255.0f*alpha[i]+0.5f);
+    return new IndexColorModel(bits,size,r,g,b,a);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -543,6 +611,32 @@ public class ColorMap {
     for (int i=0; i<n; ++i)
       b[i] = (byte)(f[i]*255.0f+0.5f);
     return b;
+  }
+
+  private static Color[] addAlpha(Color[] color, double alpha) {
+    int n = color.length;
+    float a = (float)alpha;
+    Color[] c = new Color[n];
+    for (int i=0; i<n; ++i) {
+      float r = color[i].getRed()/255.0f;
+      float g = color[i].getGreen()/255.0f;
+      float b = color[i].getBlue()/255.0f;
+      c[i] = new Color(r,g,b,a);
+    }
+    return c;
+  }
+
+  private static Color[] addAlpha(Color[] color, float[] alpha) {
+    int n = color.length;
+    Color[] c = new Color[n];
+    for (int i=0; i<n; ++i) {
+      float r = color[i].getRed()/255.0f;
+      float g = color[i].getGreen()/255.0f;
+      float b = color[i].getBlue()/255.0f;
+      float a = alpha[i];
+      c[i] = new Color(r,g,b,a);
+    }
+    return c;
   }
 
   private static Color[] getJetColors(double alpha) {
