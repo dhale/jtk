@@ -6,10 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
-import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.util.MathPlus.max;
 import static edu.mines.jtk.util.MathPlus.min;
 import static edu.mines.jtk.util.MathPlus.signum;
+import edu.mines.jtk.util.Check;
 
 /**
  * Converts (projects) world coordinates v to/from normalized coordinates u.
@@ -176,10 +176,10 @@ public class Projector {
 
     // If sign of B does not equal sign of A, flip B.
     if (signum(v1a-v0a)!=signum(v1b-v0b)) {
-    	u0b = 1.0-p._u1;
-    	u1b = 1.0-p._u0;
-    	v0b = p._v1;
-    	v1b = p._v0;
+      u0b = 1.0-p._u1;
+      u1b = 1.0-p._u0;
+      v0b = p._v1;
+      v1b = p._v0;
     }
 
     // Merged world coordinate bounds. Preserve sign of projector A.
@@ -266,7 +266,7 @@ public class Projector {
 
   @Override
   public String toString() {
-	return "Projector("+_v0+", "+_v1+", "+_u0+", "+_u1+")";
+    return "Projector("+_v0+", "+_v1+", "+_u0+", "+_u1+")";
   }
 
   
