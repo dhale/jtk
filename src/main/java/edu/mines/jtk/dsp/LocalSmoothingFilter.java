@@ -156,20 +156,51 @@ public class LocalSmoothingFilter {
   }
 
   /**
-   * Applies this filter for specified tensor coefficients.
-   * @param d tensor coefficients.
+   * Applies this filter for identity tensors.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float[][] x, float[][] y) 
+  {
+    apply(null,1.0f,null,x,y);
+  }
+
+  /**
+   * Applies this filter for identity tensors and specified scale factor.
+   * @param c constant scale factor.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float c, float[][] x, float[][] y) {
+    apply(null,c,null,x,y);
+  }
+
+  /**
+   * Applies this filter for identity tensors and specified scale factors.
+   * @param c constant scale factor.
+   * @param s array of scale factors.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float c, float[][] s, float[][] x, float[][] y) {
+    apply(null,c,s,x,y);
+  }
+
+  /**
+   * Applies this filter for specified tensors.
+   * @param d tensors.
    * @param x input array.
    * @param y output array.
    */
   public void apply(Tensors2 d, float[][] x, float[][] y) 
   {
-    apply(d,1.0f,x,y);
+    apply(d,1.0f,null,x,y);
   }
 
   /**
-   * Applies this filter for specified tensor coefficients and scale factor.
-   * @param d tensor coefficients.
-   * @param c constant scale factor for tensor coefficients.
+   * Applies this filter for specified tensors and scale factor.
+   * @param d tensors.
+   * @param c constant scale factor for tensors.
    * @param x input array.
    * @param y output array.
    */
@@ -178,10 +209,10 @@ public class LocalSmoothingFilter {
   }
 
   /**
-   * Applies this filter for specified tensor coefficients and scale factors.
-   * @param d tensor coefficients.
-   * @param c constant scale factor for tensor coefficients.
-   * @param s array of scale factors for tensor coefficients.
+   * Applies this filter for specified tensors and scale factors.
+   * @param d tensors.
+   * @param c constant scale factor for tensors.
+   * @param s array of scale factors for tensors.
    * @param x input array.
    * @param y output array.
    */
@@ -199,20 +230,51 @@ public class LocalSmoothingFilter {
   }
 
   /**
-   * Applies this filter for specified tensor coefficients.
-   * @param d tensor coefficients.
+   * Applies this filter for identity tensors.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float[][][] x, float[][][] y) 
+  {
+    apply(null,1.0f,null,x,y);
+  }
+
+  /**
+   * Applies this filter for identity tensors and specified scale factor.
+   * @param c constant scale factor.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float c, float[][][] x, float[][][] y) {
+    apply(null,c,null,x,y);
+  }
+
+  /**
+   * Applies this filter for identity tensors and specified scale factors.
+   * @param c constant scale factor.
+   * @param s array of scale factors.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float c, float[][][] s, float[][][] x, float[][][] y) {
+    apply(null,c,s,x,y);
+  }
+
+  /**
+   * Applies this filter for specified tensors.
+   * @param d tensors.
    * @param x input array.
    * @param y output array.
    */
   public void apply(Tensors3 d, float[][][] x, float[][][] y) 
   {
-    apply(d,1.0f,x,y);
+    apply(d,1.0f,null,x,y);
   }
 
   /**
-   * Applies this filter for specified tensor coefficients and scale factor.
-   * @param d tensor coefficients.
-   * @param c constant scale factor for tensor coefficients.
+   * Applies this filter for specified tensors and scale factor.
+   * @param d tensors.
+   * @param c constant scale factor for tensors.
    * @param x input array.
    * @param y output array.
    */
@@ -221,10 +283,10 @@ public class LocalSmoothingFilter {
   }
 
   /**
-   * Applies this filter for specified tensor coefficients and scale factors.
-   * @param d tensor coefficients.
-   * @param c constant scale factor for tensor coefficients.
-   * @param s array of scale factors for tensor coefficients.
+   * Applies this filter for specified tensors and scale factors.
+   * @param d tensors.
+   * @param c constant scale factor for tensors.
+   * @param s array of scale factors for tensors.
    * @param x input array.
    * @param y output array.
    */
@@ -336,36 +398,23 @@ public class LocalSmoothingFilter {
         for (int i1=1,m1=0; i1<n1; ++i1,++m1) {
           float si = s!=null?s[i2][i1]:1.0f;
           float csi = c*si;
-          d.getTensor(i1,i2,di);
-          float d11 = di[0]*csi;
-          float d12 = di[1]*csi;
-          float d22 = di[2]*csi;
-          _p[i2][i1] += ( d11+d12)+( d12+d22);
-          _p[m2][m1] += ( d11+d12)+( d12+d22);
-          _p[i2][m1] += ( d11-d12)+(-d12+d22);
-          _p[m2][i1] += ( d11-d12)+(-d12+d22);
+          float d11 = csi;
+          float d12 = 0.0f;
+          float d22 = csi;
+          if (d!=null) {
+            d.getTensor(i1,i2,di);
+            d11 = di[0]*csi;
+            d12 = di[1]*csi;
+            d22 = di[2]*csi;
+          }
+          _p[i2][i1] += (d11+d12)+( d12+d22);
+          _p[m2][m1] += (d11+d12)+( d12+d22);
+          _p[i2][m1] += (d11-d12)+(-d12+d22);
+          _p[m2][i1] += (d11-d12)+(-d12+d22);
         }
       }
       div(1.0f,_p,_p);
     }
-    /*
-    M2(Tensors2 d, float c, float[][] s, float[][] x)  {
-      int n1 = x[0].length;
-      int n2 = x.length;
-      _p = new float[n2][n1];
-      float[] di = new float[3];
-      for (int i2=0; i2<n2; ++i2) {
-        for (int i1=0; i1<n1; ++i1) {
-          float si = s!=null?s[i2][i1]:1.0f;
-          float csi = c*si;
-          d.getTensor(i1,i2,di);
-          float d11 = csi*di[0];
-          float d22 = csi*di[2];
-          _p[i2][i1] = 1.0f/(1.0f+d11+d22);
-        }
-      }
-    }
-    */
     public void apply(float[][] x, float[][] y) {
       sxy(_p,x,y);
     }
@@ -402,13 +451,21 @@ public class LocalSmoothingFilter {
           for (int i1=1,m1=0; i1<n1; ++i1,++m1) {
             float si = s!=null?s[i3][i2][i1]:1.0f;
             float csi = c*si;
-            d.getTensor(i1,i2,i3,di);
-            float d11 = di[0]*csi;
-            float d12 = di[1]*csi;
-            float d13 = di[2]*csi;
-            float d22 = di[3]*csi;
-            float d23 = di[4]*csi;
-            float d33 = di[5]*csi;
+            float d11 = csi;
+            float d12 = 0.0f;
+            float d13 = 0.0f;
+            float d22 = csi;
+            float d23 = 0.0f;
+            float d33 = csi;
+            if (d!=null) {
+              d.getTensor(i1,i2,i3,di);
+              d11 = di[0]*csi;
+              d12 = di[1]*csi;
+              d13 = di[2]*csi;
+              d22 = di[3]*csi;
+              d23 = di[4]*csi;
+              d33 = di[5]*csi;
+            }
             _p[i3][i2][i1] += ( d11+d12+d13)+( d12+d22+d23)+( d13+d23+d33);
             _p[m3][m2][m1] += ( d11+d12+d13)+( d12+d22+d23)+( d13+d23+d33);
             _p[i3][m2][i1] += ( d11-d12+d13)+(-d12+d22-d23)+( d13-d23+d33);
@@ -422,27 +479,6 @@ public class LocalSmoothingFilter {
       }
       div(1.0f,_p,_p);
     }
-    /*
-    M3(Tensors3 d, float c, float[][][] s, float[][][] x)  {
-      int n1 = x[0][0].length;
-      int n2 = x[0].length;
-      int n3 = x.length;
-      _p = new float[n3][n2][n1];
-      float[] di = new float[6];
-      for (int i3=0; i3<n3; ++i3) {
-        for (int i2=0; i2<n2; ++i2) {
-          for (int i1=0; i1<n1; ++i1) {
-            d.getTensor(i1,i2,i3,di);
-            float d11 = di[0];
-            float d22 = di[3];
-            float d33 = di[5];
-            float si = s!=null?s[i3][i2][i1]:1.0f;
-            _p[i3][i2][i1] = 1.0f/(1.0f+c*si*(d11+d22+d33));
-          }
-        }
-      }
-    }
-    */
     public void apply(float[][][] x, float[][][] y) {
       sxy(_p,x,y);
     }

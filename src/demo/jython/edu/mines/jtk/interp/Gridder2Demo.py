@@ -237,6 +237,8 @@ def makeBiharmonicGridder(f,x,y):
 def makeBlendedGridder(f,x,y,smooth=0.5,tmax=FLT_MAX,tmx=False):
   bg = BlendedGridder2(f,x,y)
   bg.setSmoothness(smooth)
+  #bg.setBlendingKernel(
+  #  LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D21))
   if tmax<FLT_MAX:
     bg.setTimeMax(tmax)
   if tmx:

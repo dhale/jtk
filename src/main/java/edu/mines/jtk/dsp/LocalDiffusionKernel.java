@@ -54,6 +54,14 @@ public class LocalDiffusionKernel {
    */
   public enum Stencil {
     /** 
+     * A 2x1 stencil.
+     * The 2D version has 3 non-zero coefficients.
+     * The 3D version has 4 non-zero coefficients.
+     * This stencil should be specified for isotropic diffusion only.
+     * When using this stencil, any specified tensors D are ignored.
+     */
+    D21,
+    /** 
      * A 2x2 stencil. 
      * The 2D version has 4 non-zero coefficients.
      * The 3D version has 8 non-zero coefficients.
@@ -108,6 +116,16 @@ public class LocalDiffusionKernel {
   }
 
   /**
+   * Applies this filter for constant isotropic identity tensor.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float[][] x, float[][] y) 
+  {
+    apply(null,1.0f,x,y);
+  }
+
+  /**
    * Applies this filter for specified tensor coefficients.
    * @param d tensor coefficients.
    * @param x input array.
@@ -116,6 +134,17 @@ public class LocalDiffusionKernel {
   public void apply(Tensors2 d, float[][] x, float[][] y) 
   {
     apply(d,1.0f,x,y);
+  }
+
+  /**
+   * Applies this filter for specified scale factor.
+   * Uses a constant isotropic identity tensor.
+   * @param c constant scale factor for tensor coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float c, float[][] x, float[][] y) {
+    apply(null,c,null,x,y);
   }
 
   /**
@@ -130,6 +159,18 @@ public class LocalDiffusionKernel {
   }
 
   /**
+   * Applies this filter for specified scale factors.
+   * Uses a constant isotropic identity tensor.
+   * @param c constant scale factor for tensor coefficients.
+   * @param s array of scale factors for tensor coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float c, float[][] s, float[][] x, float[][] y) {
+    apply(null,c,s,x,y);
+  }
+
+  /**
    * Applies this filter for specified tensor coefficients and scale factors.
    * @param d tensor coefficients.
    * @param c constant scale factor for tensor coefficients.
@@ -140,7 +181,11 @@ public class LocalDiffusionKernel {
   public void apply(
     Tensors2 d, float c, float[][] s, float[][] x, float[][] y) 
   {
-    if (_stencil==Stencil.D22) {
+    if (d==null)
+      d = IDENTITY_TENSORS2;
+    if (_stencil==Stencil.D21) {
+      apply21(c,s,x,y);
+    } else if (_stencil==Stencil.D22) {
       apply22(d,c,s,x,y);
     } else if (_stencil==Stencil.D24) {
       apply24(d,c,s,x,y);
@@ -154,14 +199,33 @@ public class LocalDiffusionKernel {
   }
 
   /**
+   * Applies this filter for a constant isotropic identity tensor.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float[][][] x, float[][][] y) {
+    apply(null,1.0f,x,y);
+  }
+
+  /**
    * Applies this filter for specified tensor coefficients.
    * @param d tensor coefficients.
    * @param x input array.
    * @param y output array.
    */
-  public void apply(Tensors3 d, float[][][] x, float[][][] y) 
-  {
+  public void apply(Tensors3 d, float[][][] x, float[][][] y) {
     apply(d,1.0f,x,y);
+  }
+
+  /**
+   * Applies this filter for specified scale factor.
+   * Uses a constant isotropic identity tensor.
+   * @param c constant scale factor for tensor coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float c, float[][][] x, float[][][] y) {
+    apply(null,c,null,x,y);
   }
 
   /**
@@ -173,6 +237,18 @@ public class LocalDiffusionKernel {
    */
   public void apply(Tensors3 d, float c, float[][][] x, float[][][] y) {
     apply(d,c,null,x,y);
+  }
+
+  /**
+   * Applies this filter for specified scale factors.
+   * Uses a constant isotropic identity tensor.
+   * @param c constant scale factor for tensor coefficients.
+   * @param s array of scale factors for tensor coefficients.
+   * @param x input array.
+   * @param y output array.
+   */
+  public void apply(float c, float[][][] s, float[][][] x, float[][][] y) {
+    apply(null,c,s,x,y);
   }
 
   /**
@@ -190,7 +266,11 @@ public class LocalDiffusionKernel {
     int i3start = 0;
     int i3step = 1;
     int i3stop = n3;
-    if (_stencil==Stencil.D22) {
+    if (d==null)
+      d = IDENTITY_TENSORS3;
+    if (_stencil==Stencil.D21) {
+      i3start = 0; i3step = 2; i3stop = n3;
+    } else if (_stencil==Stencil.D22) {
       i3start = 1; i3step = 2; i3stop = n3;
     } else if (_stencil==Stencil.D24) {
       i3start = 1; i3step = 4; i3stop = n3;
@@ -209,6 +289,25 @@ public class LocalDiffusionKernel {
   ///////////////////////////////////////////////////////////////////////////
   // private
 
+  private static Tensors2 IDENTITY_TENSORS2 = new Tensors2() {
+    public void getTensor(int i1, int i2, float[] d) {
+      d[0] = 1.0f;
+      d[1] = 0.0f;
+      d[2] = 1.0f;
+    }
+  };
+
+  private static Tensors3 IDENTITY_TENSORS3 = new Tensors3() {
+    public void getTensor(int i1, int i2, int i3, float[] d) {
+      d[0] = 1.0f;
+      d[1] = 0.0f;
+      d[2] = 0.0f;
+      d[3] = 1.0f;
+      d[4] = 0.0f;
+      d[5] = 1.0f;
+    }
+  };
+
   private Stencil _stencil;
   private boolean _parallel = true;
 
@@ -219,7 +318,9 @@ public class LocalDiffusionKernel {
   private void apply(
     int i3, Tensors3 d, float c, float[][][] s, float[][][] x, float[][][] y) 
   {
-    if (_stencil==Stencil.D22) {
+    if (_stencil==Stencil.D21) {
+      apply21(i3,c,s,x,y);
+    } else if (_stencil==Stencil.D22) {
       apply22(i3,d,c,s,x,y);
     } else if (_stencil==Stencil.D24) {
       //apply24(i3,d,c,s,x,y);
@@ -257,6 +358,65 @@ public class LocalDiffusionKernel {
           apply(i3,d,c,s,x,y);
         }
       });
+    }
+  }
+
+  ///////////////////////////////////////////////////////////////////////////
+  // D21 (for isotropic diffusion only)
+
+  private void apply21(float c, float[][] s, float[][] x, float[][] y) {
+    int n1 = x[0].length;
+    int n2 = x.length;
+    for (int i2=0; i2<n2; ++i2) {
+      int m2 = (i2>0)?i2-1:0;
+      for (int i1=0; i1<n1; ++i1) {
+        int m1 = (i1>0)?i1-1:0;
+        float cs1 = c;
+        float cs2 = c;
+        if (s!=null) {
+          cs1 *= 0.5f*(s[i2][i1]+s[i2][m1]);
+          cs2 *= 0.5f*(s[i2][i1]+s[m2][i1]);
+        }
+        float x1 = x[i2][i1]-x[i2][m1];
+        float x2 = x[i2][i1]-x[m2][i1];
+        float y1 = cs1*x1;
+        float y2 = cs2*x2;
+        y[i2][i1] += y1+y2;
+        y[i2][m1] -= y1;
+        y[m2][i1] -= y2;
+      }
+    }
+  }
+  private void apply21(
+    int i3, float c, float[][][] s, float[][][] x, float[][][] y) 
+  {
+    int n1 = x[0][0].length;
+    int n2 = x[0].length;
+    int m3 = (i3>0)?i3-1:0;
+    for (int i2=0; i2<n2; ++i2) {
+      int m2 = (i2>0)?i2-1:0;
+      for (int i1=0; i1<n1; ++i1) {
+        int m1 = (i1>0)?i1-1:0;
+        float cs1 = c;
+        float cs2 = c;
+        float cs3 = c;
+        if (s!=null) {
+          cs1 *= 0.5f*(s[i3][i2][i1]+s[i3][i2][m1]);
+          cs2 *= 0.5f*(s[i3][i2][i1]+s[i3][m2][i1]);
+          cs3 *= 0.5f*(s[i3][i2][i1]+s[m3][i2][i1]);
+        }
+        float csi = (s!=null)?c*s[i3][i2][i1]:c;
+        float x1 = x[i3][i2][i1]-x[i3][i2][m1];
+        float x2 = x[i3][i2][i1]-x[i3][m2][i1];
+        float x3 = x[i3][i2][i1]-x[m3][i2][i1];
+        float y1 = cs1*x1;
+        float y2 = cs2*x2;
+        float y3 = cs3*x3;
+        y[i3][i2][i1] += y1+y2+y3;
+        y[i3][i2][m1] -= y1;
+        y[i3][m2][i1] -= y2;
+        y[m3][i2][i1] -= y3;
+      }
     }
   }
 

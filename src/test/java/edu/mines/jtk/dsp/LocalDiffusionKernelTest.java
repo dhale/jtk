@@ -29,9 +29,81 @@ public class LocalDiffusionKernelTest extends TestCase {
     junit.textui.TestRunner.run(suite);
   }
 
-  public void test() {
-    // TODO: implement tests
+  ///////////////////////////////////////////////////////////////////////////
+  // test
+
+  public void testD1() {
+    LocalDiffusionKernel ldk = 
+      new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D21);
+    testSpd2(ldk);
+    testSpd3(ldk);
+    /*
+    float[][] s = fillfloat(1.0f,5,5);
+    float[][] x = zerofloat(5,5);
+    float[][] y = zerofloat(5,5);
+    //s[1][1] = 2.0f; s[1][2] = 2.0f; s[1][3] = 2.0f;
+    //s[2][1] = 2.0f; s[2][2] = 2.0f; s[2][3] = 2.0f;
+    //s[3][1] = 2.0f; s[3][2] = 2.0f; s[3][3] = 2.0f;
+    s[2][2] = 2.0f;
+    x[0][0] = 1.0f;
+    x[0][4] = 1.0f;
+    x[4][0] = 1.0f;
+    x[4][4] = 1.0f;
+    x[2][2] = 1.0f;
+    ldk.apply(1.0f,s,x,y);
+    dump(x);
+    dump(y);
+    */
   }
+
+  private void testSpd2(LocalDiffusionKernel ldk) {
+    int n1 = 5;
+    int n2 = 6;
+    for (int iter=0; iter<10; ++iter) {
+      float[][] s = randfloat(n1,n2);
+      float[][] x = sub(randfloat(n1,n2),0.5f);
+      float[][] y = sub(randfloat(n1,n2),0.5f);
+      float[][] dx = zerofloat(n1,n2);
+      float[][] dy = zerofloat(n1,n2);
+      ldk.apply(1.0f,s,x,dx);
+      ldk.apply(1.0f,s,y,dy);
+      float xdx = dot(x,dx);
+      float ydy = dot(y,dy);
+      float ydx = dot(y,dx);
+      float xdy = dot(x,dy);
+      assertTrue(xdx>=0.0f);
+      assertTrue(ydy>=0.0f);
+      assertEquals(xdy,ydx,0.0001);
+    }
+  }
+  private void testSpd3(LocalDiffusionKernel ldk) {
+    int n1 = 5;
+    int n2 = 6;
+    int n3 = 7;
+    for (int iter=0; iter<10; ++iter) {
+      float[][][] s = randfloat(n1,n2,n3);
+      float[][][] x = sub(randfloat(n1,n2,n3),0.5f);
+      float[][][] y = sub(randfloat(n1,n2,n3),0.5f);
+      float[][][] dx = zerofloat(n1,n2,n3);
+      float[][][] dy = zerofloat(n1,n2,n3);
+      ldk.apply(null,1.0f,s,x,dx);
+      ldk.apply(null,1.0f,s,y,dy);
+      float xdx = dot(x,dx);
+      float ydy = dot(y,dy);
+      float ydx = dot(y,dx);
+      float xdy = dot(x,dy);
+      assertTrue(xdx>=0.0f);
+      assertTrue(ydy>=0.0f);
+      assertEquals(xdy,ydx,0.0001);
+    }
+  }
+  private float dot(float[][] x, float[][] y) {
+    return sum(mul(x,y));
+  }
+  private float dot(float[][][] x, float[][][] y) {
+    return sum(mul(x,y));
+  }
+
 
   ///////////////////////////////////////////////////////////////////////////
   // benchmark

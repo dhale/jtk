@@ -244,20 +244,22 @@ public class BlendedGridder3 implements Gridder3 {
     int n2 = t[0].length;
     int n3 = t.length;
 
-    // Compute time squared, shifted to account for the shift in the
-    // finite-difference stencil used in the local smoothing filter.
+    // Compute time squared. If necessary, shift to account for the shift 
+    // in the finite-difference stencil used in the local diffusion kernel.
     float[][][] s = mul(t,t);
-    for (int i3=n3-1; i3>0; --i3) {
-      for (int i2=n2-1; i2>0; --i2) {
-        for (int i1=n1-1; i1>0; --i1) {
-          s[i3][i2][i1] = 0.125f*(s[i3  ][i2  ][i1  ] +
-                                  s[i3  ][i2  ][i1-1] +
-                                  s[i3  ][i2-1][i1  ] +
-                                  s[i3  ][i2-1][i1-1] +
-                                  s[i3-1][i2  ][i1  ] +
-                                  s[i3-1][i2  ][i1-1] +
-                                  s[i3-1][i2-1][i1  ] +
-                                  s[i3-1][i2-1][i1-1]);
+    if (_ldk.getStencil()!=LocalDiffusionKernel.Stencil.D21) {
+      for (int i3=n3-1; i3>0; --i3) {
+        for (int i2=n2-1; i2>0; --i2) {
+          for (int i1=n1-1; i1>0; --i1) {
+            s[i3][i2][i1] = 0.125f*(s[i3  ][i2  ][i1  ] +
+                                    s[i3  ][i2  ][i1-1] +
+                                    s[i3  ][i2-1][i1  ] +
+                                    s[i3  ][i2-1][i1-1] +
+                                    s[i3-1][i2  ][i1  ] +
+                                    s[i3-1][i2  ][i1-1] +
+                                    s[i3-1][i2-1][i1  ] +
+                                    s[i3-1][i2-1][i1-1]);
+          }
         }
       }
     }
@@ -270,13 +272,16 @@ public class BlendedGridder3 implements Gridder3 {
     // Smoothing attenuates finite-difference errors near Nyquist.
     // The problem with this smoothing is that it makes q != p when
     // known samples are adjacent, as when interpolating well logs.
-    lsf.applySmoothS(r,r);
+    // This smoothing should be unnecessary for Stencil.D21.
+    if (_ldk.getStencil()!=LocalDiffusionKernel.Stencil.D21)
+      lsf.applySmoothS(r,r);
     lsf.apply(_tensors,_c,s,r,q);
     add(q,pavg,q);
 
     // Restore the known sample values. Due to errors in finite-difference
     // approximations, these values may have changed during smoothing.
-    /* Should no longer be necessary after time adjustments.
+    // Even with time adjustments, this restoration is still necessary
+    // if we used applySmoothS above. Best to just do this in any case.
     for (int i3=0; i3<n3; ++i3) {
       for (int i2=0; i2<n2; ++i2) {
         for (int i1=0; i1<n1; ++i1) {
@@ -286,7 +291,6 @@ public class BlendedGridder3 implements Gridder3 {
         }
       }
     }
-    */
   }
 
 
