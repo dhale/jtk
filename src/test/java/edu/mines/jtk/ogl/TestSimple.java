@@ -26,7 +26,12 @@ class TestSimple {
   {
     run(canvas,autoRepaint);
   }
-  public static void run(final GlCanvas canvas, final boolean autoRepaint) {
+  public static void run(GlCanvas canvas, boolean autoRepaint) {
+    run(canvas,autoRepaint,null);
+  }
+  public static void run(
+    final GlCanvas canvas, final boolean autoRepaint, final String fileName) 
+  {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         canvas.setAutoRepaint(autoRepaint);
@@ -35,6 +40,8 @@ class TestSimple {
         frame.setSize(new Dimension(SIZE,SIZE));
         frame.getContentPane().add(canvas,BorderLayout.CENTER);
         frame.setVisible(true);
+        if (fileName!=null)
+          canvas.paintToFile(fileName);
       }
     });
   }

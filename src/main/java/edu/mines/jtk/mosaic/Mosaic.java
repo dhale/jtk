@@ -287,6 +287,15 @@ public class Mosaic extends IPanel {
   }
 
   /**
+   * Sets the width in pixels of spacing between adjacent tiles.
+   * @param wts the width of the inter-tile spacing.
+   */
+  public void setWidthTileSpacing(int wts) {
+    _wts = wts;
+    revalidate();
+  }
+
+  /**
    * Gets the mode manager for this mosaic.
    * @return the mode manager.
    */
@@ -668,6 +677,7 @@ public class Mosaic extends IPanel {
   private ArrayList<TileAxis> _axisList; // simple list of all axes
   private HScrollBar[] _hsb; // horizontal scroll bars
   private VScrollBar[] _vsb; // vertical scroll bars
+  private int _wts = 2; // width of tile spacing, in pixels
   private int[] _wm; // array[ncol] of width minimums
   private int[] _we; // array[ncol] of width elastics
   private int[] _hm; // array[nrow] of height minimums
@@ -692,7 +702,7 @@ public class Mosaic extends IPanel {
   }
 
   private int widthTileSpacing() {
-    return 2; // currently hardwired
+    return _wts;
   }
 
   private int widthFixed() {

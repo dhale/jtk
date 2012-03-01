@@ -40,6 +40,10 @@ public class HelloTest {
     }
   };
   public static void main(String[] args) {
-    TestSimple.run(args,canvas);
+    if (args.length==0) {
+      TestSimple.run(canvas,false);
+    } else {
+      TestSimple.run(canvas,false,args[0]);
+    }
   }
 }

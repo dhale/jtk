@@ -16,21 +16,23 @@ import javax.swing.SwingUtilities;
  */
 public class SimpleFrameTest {
 
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        go();
+        go(args);
       }
     });
   }
 
-  public static void go() {
+  public static void go(String[] args) {
     float[] xyz = makeSineWave();
     xyz = addBulge(xyz);
     xyz = addTear(xyz);
     SimpleFrame sf = new SimpleFrame();
     TriangleGroup tg = sf.addTriangles(xyz);
     tg.setColor(Color.BLUE);
+    if (args.length>0)
+      sf.paintToFile(args[0]);
   }
 
   private static float[] makeSineWave() {

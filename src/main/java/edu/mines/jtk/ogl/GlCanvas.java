@@ -7,7 +7,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.ogl;
 
 import java.awt.*;
+import java.io.File;
 import javax.media.opengl.*;
+import com.sun.opengl.util.Screenshot;
 
 /**
  * A canvas that paints via OpenGL. To paint a canvas using OpenGL, 
@@ -75,6 +77,16 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
   }
 
   /**
+   * Paints this canvas to an image in a file with specified name.
+   * Uses the file suffix to determine the format of the image.
+   * @param fileName name of the file to contain the image.
+   */
+  public void paintToFile(String fileName) {
+    _fileName = fileName;
+    repaint();
+  }
+
+  /**
    * Initializes OpenGL state when this canvas is first painted.
    * This method is called before the methods 
    * {@link #glResize(int,int,int,int)} and {@link #glPaint()} when (1)
@@ -127,6 +139,17 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
       _runnable.run();
     } else {
       glPaint();
+      if (_fileName!=null) {
+        try {
+          File file = new File(_fileName);
+          int w = getWidth();
+          int h = getHeight();
+          Screenshot.writeToFile(file,w,h);
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
+        _fileName = null;
+      }
       if (_autoRepaint)
         repaint();
     }
@@ -142,4 +165,5 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
 
   private boolean _autoRepaint;
   private Runnable _runnable;
+  private String _fileName;
 }

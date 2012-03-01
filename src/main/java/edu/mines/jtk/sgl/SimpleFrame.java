@@ -385,6 +385,15 @@ public class SimpleFrame extends JFrame {
     _view.setWorldSphere(bs);
   }
 
+  /**
+   * Paints the view canvas to an image in a file with specified name.
+   * Uses the file suffix to determine the format of the image.
+   * @param fileName name of the file to contain the image.
+   */
+  public void paintToFile(String fileName) {
+    _canvas.paintToFile(fileName);
+  }
+
 /////////////////////////////////////////////////////////////////////////////
 // private
 
