@@ -23,11 +23,11 @@ class TestFrame extends JFrame {
   public TestFrame(World world) {
     OrbitView view = (world!=null)?new OrbitView(world):new OrbitView();
     view.setAxesOrientation(AxesOrientation.XRIGHT_YOUT_ZDOWN);
-    ViewCanvas canvas = new ViewCanvas(view);
-    canvas.setView(view);
+    _canvas = new ViewCanvas(view);
+    _canvas.setView(view);
 
     ModeManager mm = new ModeManager();
-    mm.add(canvas);
+    mm.add(_canvas);
     OrbitViewMode ovm = new OrbitViewMode(mm);
     SelectDragMode sdm = new SelectDragMode(mm);
 
@@ -67,7 +67,7 @@ class TestFrame extends JFrame {
 
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     this.setSize(new Dimension(SIZE,SIZE));
-    this.add(canvas,BorderLayout.CENTER);
+    this.add(_canvas,BorderLayout.CENTER);
     this.add(toolBar,BorderLayout.WEST);
     this.setJMenuBar(menuBar);
 
@@ -78,6 +78,10 @@ class TestFrame extends JFrame {
     return _view;
   }
 
+  public ViewCanvas getViewCanvas() {
+    return _canvas;
+  }
+
   public static void main(String[] args) {
     TestFrame frame = new TestFrame(null);
     frame.setVisible(true);
@@ -85,4 +89,5 @@ class TestFrame extends JFrame {
 
   private static final int SIZE = 600;
   private OrbitView _view;
+  private ViewCanvas _canvas;
 }

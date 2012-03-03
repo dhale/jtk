@@ -9,6 +9,7 @@ package edu.mines.jtk.ogl;
 import java.awt.*;
 import java.io.File;
 import javax.media.opengl.*;
+import javax.swing.SwingUtilities;
 import com.sun.opengl.util.Screenshot;
 
 /**
@@ -83,7 +84,9 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
    */
   public void paintToFile(String fileName) {
     _fileName = fileName;
-    repaint();
+    Graphics g = getGraphics();
+    paint(g);
+    g.dispose();
   }
 
   /**
