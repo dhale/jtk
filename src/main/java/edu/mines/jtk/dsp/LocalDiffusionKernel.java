@@ -116,6 +116,16 @@ public class LocalDiffusionKernel {
   }
 
   /**
+   * Sets the number of kernel passes in each apply of this filter.
+   * For example, if npass = 2, then the output is computed in two
+   * passes: (1) y += G'DGx, (2) y += G'DGy.
+   * The default is one pass.
+   */
+  public void setNumberOfPasses(int npass) {
+    _npass = npass;
+  }
+
+  /**
    * Applies this filter for constant isotropic identity tensor.
    * @param x input array.
    * @param y output array.
@@ -181,20 +191,24 @@ public class LocalDiffusionKernel {
   public void apply(
     Tensors2 d, float c, float[][] s, float[][] x, float[][] y) 
   {
-    if (d==null)
-      d = IDENTITY_TENSORS2;
-    if (_stencil==Stencil.D21) {
-      apply21(c,s,x,y);
-    } else if (_stencil==Stencil.D22) {
-      apply22(d,c,s,x,y);
-    } else if (_stencil==Stencil.D24) {
-      apply24(d,c,s,x,y);
-    } else if (_stencil==Stencil.D33) {
-      apply33(d,c,s,x,y);
-    } else if (_stencil==Stencil.D71) {
-      apply71(d,c,s,x,y);
-    } else if (_stencil==Stencil.D91) {
-      apply91(d,c,s,x,y);
+    for (int ipass=0; ipass<_npass; ++ipass) {
+      if (ipass>0)
+        x = copy(y);
+      if (d==null)
+        d = IDENTITY_TENSORS2;
+      if (_stencil==Stencil.D21) {
+        apply21(c,s,x,y);
+      } else if (_stencil==Stencil.D22) {
+        apply22(d,c,s,x,y);
+      } else if (_stencil==Stencil.D24) {
+        apply24(d,c,s,x,y);
+      } else if (_stencil==Stencil.D33) {
+        apply33(d,c,s,x,y);
+      } else if (_stencil==Stencil.D71) {
+        apply71(d,c,s,x,y);
+      } else if (_stencil==Stencil.D91) {
+        apply91(d,c,s,x,y);
+      }
     }
   }
 
@@ -266,23 +280,27 @@ public class LocalDiffusionKernel {
     int i3start = 0;
     int i3step = 1;
     int i3stop = n3;
-    if (d==null)
-      d = IDENTITY_TENSORS3;
-    if (_stencil==Stencil.D21) {
-      i3start = 0; i3step = 2; i3stop = n3;
-    } else if (_stencil==Stencil.D22) {
-      i3start = 1; i3step = 2; i3stop = n3;
-    } else if (_stencil==Stencil.D24) {
-      i3start = 1; i3step = 4; i3stop = n3;
-    } else if (_stencil==Stencil.D33) {
-      i3start = 1; i3step = 3; i3stop = n3-1;
-    } else if (_stencil==Stencil.D71) {
-      i3start = 0; i3step = 7; i3stop = n3;
-    }
-    if (_parallel) {
-      applyParallel(i3start,i3step,i3stop,d,c,s,x,y);
-    } else {
-      applySerial(i3start,1,i3stop,d,c,s,x,y);
+    for (int ipass=0; ipass<_npass; ++ipass) {
+      if (ipass>0)
+        x = copy(y);
+      if (d==null)
+        d = IDENTITY_TENSORS3;
+      if (_stencil==Stencil.D21) {
+        i3start = 0; i3step = 2; i3stop = n3;
+      } else if (_stencil==Stencil.D22) {
+        i3start = 1; i3step = 2; i3stop = n3;
+      } else if (_stencil==Stencil.D24) {
+        i3start = 1; i3step = 4; i3stop = n3;
+      } else if (_stencil==Stencil.D33) {
+        i3start = 1; i3step = 3; i3stop = n3-1;
+      } else if (_stencil==Stencil.D71) {
+        i3start = 0; i3step = 7; i3stop = n3;
+      }
+      if (_parallel) {
+        applyParallel(i3start,i3step,i3stop,d,c,s,x,y);
+      } else {
+        applySerial(i3start,1,i3stop,d,c,s,x,y);
+      }
     }
   }
 
@@ -309,6 +327,7 @@ public class LocalDiffusionKernel {
   };
 
   private Stencil _stencil;
+  private int _npass = 1;
   private boolean _parallel = true;
 
   private static void trace(String s) {

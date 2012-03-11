@@ -46,6 +46,117 @@ public class SimpleGridder2 implements Gridder2 {
   }
 
   /**
+   * Returns samples adjusted to lie on a specified grid.
+   * @param s1 sampling of x1.
+   * @param s2 sampling of x2.
+   * @param f array of sample values f(x1,x2).
+   * @param x1 array of sample x1 coordinates.
+   * @param x2 array of sample x2 coordinates.
+   * @return array {f,x1,x2} of arrays of samples after gridding.
+   */
+  public static float[][] samplesOnGrid(
+    Sampling s1, Sampling s2, float[] f, float[] x1, float[] x2)
+  {
+    float[][] fxs = samplesOnGrid(s1,s2,f,x1,x2,null);
+    return new float[][]{fxs[0],fxs[1],fxs[2]};
+  }
+
+  /**
+   * Returns samples adjusted to lie on a specified grid.
+   * Sample values may have uncertainties, specified as standard
+   * deviations of errors assumed to be uncorrelated and to have
+   * zero mean.
+   * @param s1 sampling of x1.
+   * @param s2 sampling of x2.
+   * @param f array of sample values f(x1,x2).
+   * @param x1 array of sample x1 coordinates.
+   * @param x2 array of sample x2 coordinates.
+   * @param sd array of std dev for sample values; null, if none.
+   * @return array {f,x1,x2,sd} of arrays of samples after gridding.
+   */
+  public static float[][] samplesOnGrid(
+    Sampling s1, Sampling s2, float[] f, float[] x1, float[] x2, float[] sd)
+  {
+    int n = f.length;
+    int n1 = s1.getCount();
+    int n2 = s2.getCount();
+    double d1 = s1.getDelta();
+    double d2 = s2.getDelta();
+    double f1 = s1.getFirst();
+    double f2 = s2.getFirst();
+    double l1 = s1.getLast();
+    double l2 = s2.getLast();
+    f1 -= 0.5*d1; l1 += 0.5*d1;
+    f2 -= 0.5*d2; l2 += 0.5*d2;
+
+    // If errors, determine which samples, if any, have zero error.
+    boolean[][] ez = null;
+    if (sd!=null) {
+      ez = new boolean[n2][n1];
+      for (int i=0; i<n; ++i) {
+        if (sd[i]==0.0f) {
+          double x1i = x1[i];
+          double x2i = x2[i];
+          if (f1<=x1i && x1i<=l1 && f2<=x2i && x2i<=l2) {
+            int i1 = s1.indexOfNearest(x1i);
+            int i2 = s2.indexOfNearest(x2i);
+            ez[i2][i1] = true;
+          }
+        }
+      }
+    }
+
+    // Accumulate weighted sample values and weights.
+    float[][] g = new float[n2][n1];
+    float[][] w = new float[n2][n1];
+    for (int i=0; i<n; ++i) {
+      double x1i = x1[i];
+      double x2i = x2[i];
+      if (f1<=x1i && x1i<=l1 && f2<=x2i && x2i<=l2) {
+        int i1 = s1.indexOfNearest(x1i);
+        int i2 = s2.indexOfNearest(x2i);
+        if (sd==null || ez[i2][i1] && sd[i]==0.0f) {
+          g[i2][i1] += f[i];
+          w[i2][i1] += 1.0f;
+        } else if (!ez[i2][i1]) {
+          float wi = 1.0f/(sd[i]*sd[i]); // weight = 1/variance
+          g[i2][i1] += wi*f[i];
+          w[i2][i1] += wi;
+        }
+      }
+    }
+
+    // Count the number of samples after gridding.
+    n = 0;
+    for (int i2=0; i2<n2; ++i2) {
+      for (int i1=0; i1<n1; ++i1) {
+        if (w[i2][i1]>0.0f)
+          ++n;
+      }
+    }
+
+    // Complete computation of gridded samples.
+    f = new float[n];
+    x1 = new float[n];
+    x2 = new float[n];
+    if (sd!=null)
+      sd = new float[n];
+    for (int i2=0,i=0; i2<n2; ++i2) {
+      for (int i1=0; i1<n1; ++i1) {
+        if (w[i2][i1]>0.0f) {
+          f[i] = g[i2][i1]/w[i2][i1];
+          x1[i] = (float)s1.getValue(i1);
+          x2[i] = (float)s2.getValue(i2);
+          if (sd!=null)
+            sd[i] = ez[i2][i1]?0.0f:1.0f/(float)Math.sqrt(w[i2][i1]);
+          ++i;
+        }
+      }
+    }
+    return new float[][]{f,x1,x2,sd};
+  }
+
+  /**
    * Gets the non-null samples from the specified gridded sample values.
    * @param fnull the null value.
    * @param s1 sampling of x1.
