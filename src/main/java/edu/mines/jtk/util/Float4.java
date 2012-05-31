@@ -223,7 +223,7 @@ public interface Float4 {
   public void get1234(
     int m1, int m2, int m3, int m4, 
     int j1, int j2, int j3, int j4,
-    float[] s);
+    float[][][][] s);
 
   /**
    * Gets the specified subarray of elements into the specified 1-D array.
@@ -427,7 +427,7 @@ public interface Float4 {
   public void set1234(
     int m1, int m2, int m3, int m4, 
     int j1, int j2, int j3, int j4,
-    float[] s);
+    float[][][][] s);
 
   /**
    * Sets the specified subarray of elements from the specified 1-D array.
