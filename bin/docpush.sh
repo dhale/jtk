@@ -15,7 +15,7 @@
 ###################################################################
 
 # Get the current branch so we can switch back to it at the end
-CURRENT_BRANCH=`git branch --no-color | awk '/*/ {print $2}'`
+CURRENT_BRANCH=`git branch --no-color | awk '/\*/ {print $2}'`
 echo "Currently in branch $CURRENT_BRANCH"
 
 # Move the docs to tmp. If we merge or force the checkout
