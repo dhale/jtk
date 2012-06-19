@@ -109,6 +109,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     </javadoc>
   </target>
 
+  <!--Build javadocs and push to github -->
+  <target name="doc-push" depends="init,doc" description="build javadocs and push to github">
+    <exec executable="/bin/bash" failonerror="true">
+      <arg value="${bin}/docpush.sh"/>
+    </exec>
+  </target>
+
   <!-- Build everything (except javadocs) -->
   <target name="all" depends="jar"
       description="build everything"/>
