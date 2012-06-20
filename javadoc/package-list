@@ -1,0 +1,14 @@
+edu.mines.jtk.awt
+edu.mines.jtk.bench
+edu.mines.jtk.dsp
+edu.mines.jtk.interp
+edu.mines.jtk.io
+edu.mines.jtk.la
+edu.mines.jtk.lapack
+edu.mines.jtk.mesh
+edu.mines.jtk.mosaic
+edu.mines.jtk.ogl
+edu.mines.jtk.opt
+edu.mines.jtk.sgl
+edu.mines.jtk.util
+jsr166y
