@@ -81,9 +81,9 @@ public class CoordinateTransform {
      * a unique linear mapping.
      * To allow translation, include a constant 1 as an input coordinate.
      *
-     * @param out A set of observered output coordinates
+     * @param out A set of observed output coordinates
      *            with an unknown linear relationship to input coordinates.
-     * @param in  A set of observered input coordinates
+     * @param in  A set of observed input coordinates
      *            that should be linearly combined to calculate each of the
      *            output coordinates.
      *            To allow translation, include a constant 1.
