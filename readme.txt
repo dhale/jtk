@@ -115,13 +115,26 @@ we do this for different platforms. To use the Mines JTK from the command
 line, you should (1) copy the appropriate script to some directory in
 your PATH, (2) edit the script to specify the correct directories, and
 (3) run a Mines JTK program by typing "javarun name_of_a_java_class". 
-(Again, you may want to use a shorter name, such as "j" for this script.
+(Again, you may want to use a shorter name, such as "j" for this script.)
 
 For example, you might run JUnit tests for edu.mines.jtk.util by typing
 javarun edu.mines.jtk.util.AllTest
 If any of these tests fail, then you may need to edit your javarun script.
 These tests depend on only pure Java code; they do not depend on our JNI
 libraries. Many of our Java packages contain AllTest suites like this one.
+
+The Mines JTK also comes with demos in jtk/src/demo. There are demos in
+multiple languages, but the majority are in Jython. Scripting in Jython
+is a powerful and robust way to utilize the Java classes in the Mines JTK,
+and is the way that most of us work. We include Jython in a jar file as
+well as scripts in the jtk/bin directory so these demos can be run
+without any additional installations.
+ 
+To execute the Jython demos you should (1) copy the appropriate script
+(jythonrun.sh or jythonrun.bat) to some directory in your PATH, (2) edit
+the script to specify the correct directories, and (3) run a Jython
+program by typing "jythonrun program_name.py". (You may want to use a
+shorter name, such as "jy" for this script.)
 
 
 3-D graphics in the Mines JTK
