@@ -1,8 +1,6 @@
 package edu.mines.jtk.dsp;
 
-import java.io.*;
 import edu.mines.jtk.dsp.*;
-import edu.mines.jtk.io.*;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
@@ -56,9 +54,38 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * atypical applications and research.
  *
  * @author Dave Hale, Colorado School of Mines
- * @version 2012.06.01
+ * @version 2012.07.05
  */
 public class DynamicWarping {
+
+  /**
+   * The method used to extrapolate alignment errors.
+   * Alignment errors |f[i]-g[i+l]| cannot be computed for indices
+   * i and lags l for which the sum i+l is out of bounds. For such
+   * indices and lags, errors are missing and must be extrapolated.
+   * <p>
+   * The extrapolation methods provided are designed to work best 
+   * in the case where errors are low for one particular lag l, that 
+   * is, when the sequences f and g are related by a constant shift.
+   */
+  public enum ErrorExtrapolation {
+    /**
+     * For each lag, extrapolate alignment errors using the nearest
+     * error not missing for that lag. This method is most sensitive 
+     * to the values of the first and last samples of the sequences 
+     * to be aligned.
+     * <p>
+     * This is the default extrapolation method.
+     */
+    NEAREST,
+    /**
+     * For each lag, extrapolate alignment errors using the average
+     * of all errors not missing for that lag. This method is less
+     * sensitive to the values of the first and last samples of the
+     * sequences to be aligned.
+     */
+    AVERAGE
+  }
 
   /**
    * Constructs a dynamic warping for specified bounds on shifts.
@@ -71,6 +98,7 @@ public class DynamicWarping {
     _lmax = shiftMax;
     _nl = 1+_lmax-_lmin;
     _si = new SincInterpolator();
+    _extrap = ErrorExtrapolation.NEAREST;
   }
 
   /**
@@ -118,6 +146,17 @@ public class DynamicWarping {
     _bstrain2 = (int)ceil(1.0/strainMax2);
     _bstrain3 = (int)ceil(1.0/strainMax3);
     updateSmoothingFilters();
+  }
+
+  /**
+   * Sets the method used to extrapolate alignment errors.
+   * Extrapolation is necessary when the sum i+l of sample index
+   * i and lag l is out of bounds. The default method is to use 
+   * the error computed for the nearest index i and the same lag l.
+   * @param ee the error extrapolation method.
+   */
+  public void setErrorExtrapolation(ErrorExtrapolation ee) {
+    _extrap = ee;
   }
 
   /**
@@ -252,6 +291,20 @@ public class DynamicWarping {
   }
 
   /**
+   * Computes and returns 1D shifts u for specified 3D images f and g.
+   * This method is useful in the case that shifts vary only slightly 
+   * (or perhaps not at all) in the 2nd and 3rd image dimensions.
+   * @param f array[n3][n2][n1] for the image f.
+   * @param g array[n3][n2][n1] for the image g.
+   * @return array[n1] of shifts u.
+   */
+  public float[] findShifts1(float[][][] f, float[][][] g) {
+    float[] u = like(f[0][0]);
+    findShifts1(f,g,u);
+    return u;
+  }
+
+  /**
    * Computes shifts for specified sequences.
    * @param f input array for the sequence f.
    * @param g input array for the sequence g.
@@ -321,6 +374,7 @@ public class DynamicWarping {
           }
         }
         computeErrors(fw,gw,ew);
+        normalizeErrors(ew);
         for (int is=0; is<_esmooth; ++is)
           smoothErrors(ew);
         computeShifts(ew,uw);
@@ -335,6 +389,40 @@ public class DynamicWarping {
       }
     }
     smoothShifts(u);
+  }
+
+  /**
+   * Computes 1D shifts u for specified 2D images f and g.
+   * This method is useful in the case that shifts vary only slightly 
+   * (or perhaps not at all) in the 2nd image dimension.
+   * @param f input array[n2][n1] for the image f.
+   * @param g input array[n2][n1] for the image g.
+   * @param u output array[n1] of shifts u.
+   */
+  public void findShifts1(float[][] f, float[][] g, float[] u) {
+    float[][] e = computeErrors1(f,g);
+    for (int is=0; is<_esmooth; ++is)
+      smoothErrors(e,e);
+    float[][] d = accumulateForward(e);
+    backtrackReverse(d,e,u);
+    smoothShifts(u,u);
+  }
+
+  /**
+   * Computes 1D shifts u for specified 3D images f and g.
+   * This method is useful in the case that shifts vary only slightly 
+   * (or perhaps not at all) in the 2nd and 3rd image dimensions.
+   * @param f input array[n3][n2][n1] for the image f.
+   * @param g input array[n3][n2][n1] for the image g.
+   * @param u output array[n1] of shifts u.
+   */
+  public void findShifts1(float[][][] f, float[][][] g, float[] u) {
+    float[][] e = computeErrors1(f,g);
+    for (int is=0; is<_esmooth; ++is)
+      smoothErrors(e,e);
+    float[][] d = accumulateForward(e);
+    backtrackReverse(d,e,u);
+    smoothShifts(u,u);
   }
 
   /**
@@ -439,14 +527,13 @@ public class DynamicWarping {
 
   /**
    * Returns normalized alignment errors for all samples and lags.
-   * Alignment errors are normalized to be in range [0,1].
    * The number of lags nl = 1+shiftMax-shiftMin. Lag indices 
    * il = 0, 1, 2, ..., nl-1 correspond to integer shifts in 
    * [shiftMin,shiftMax]. Alignment errors are a monotonically
    * increasing function of |f[i1]-g[i1+il+shiftMin]|.
    * @param f array[n1] for the sequence f[i1].
    * @param g array[n1] for the sequence g[i1].
-   * @return array[n1][nl] of squared errors.
+   * @return array[n1][nl] of alignment errors.
    */
   public float[][] computeErrors(float[] f, float[] g) {
     int n1 = f.length;
@@ -458,14 +545,13 @@ public class DynamicWarping {
 
   /**
    * Returns normalized alignment errors for all samples and lags.
-   * Alignment errors are normalized to be in range [0,1].
    * The number of lags nl = 1+shiftMax-shiftMin. Lag indices 
    * il = 0, 1, 2, ..., nl-1 correspond to integer shifts in 
    * [shiftMin,shiftMax]. Alignment errors are a monotonically
    * increasing function of |f[i2][i1]-g[i2][i1+il+shiftMin]|.
    * @param f array[n2][n1] for the image f[i2][i1].
-   * @param g array[n2][n1] for the sequence g[i2][i1].
-   * @return array[n2][n1][nl] of squared errors.
+   * @param g array[n2][n1] for the image g[i2][i1].
+   * @return array[n2][n1][nl] of alignment errors.
    */
   public float[][][] computeErrors(float[][] f, float[][] g) {
     final int n1 = f[0].length;
@@ -479,6 +565,61 @@ public class DynamicWarping {
     }});
     normalizeErrors(ef);
     return ef;
+  }
+
+  /**
+   * Returns normalized 1D alignment errors for 2D images.
+   * The number of lags nl = 1+shiftMax-shiftMin. Lag indices 
+   * il = 0, 1, 2, ..., nl-1 correspond to integer shifts in 
+   * [shiftMin,shiftMax].
+   * @param f array[n2][n1] for the image f[i2][i1].
+   * @param g array[n2][n1] for the image g[i2][i1].
+   * @return array[n1][nl] of alignment errors.
+   */
+  public float[][] computeErrors1(float[][] f, float[][] g) {
+    final float[][] ff = f;
+    final float[][] gf = g;
+    final int nl = 1+_lmax-_lmin;
+    final int n1 = f[0].length;
+    final int n2 = f.length;
+    float[][] e = Parallel.reduce(n2,new Parallel.ReduceInt<float[][]>() {
+    public float[][] compute(int i2) {
+      return computeErrors(ff[i2],gf[i2]);
+    }
+    public float[][] combine(float[][] ea, float[][] eb) {
+      return add(ea,eb);
+    }});
+    normalizeErrors(e);
+    return e;
+  }
+
+  /**
+   * Returns normalized 1D alignment errors for 3D images.
+   * The number of lags nl = 1+shiftMax-shiftMin. Lag indices 
+   * il = 0, 1, 2, ..., nl-1 correspond to integer shifts in 
+   * [shiftMin,shiftMax].
+   * @param f array[n3][n2][n1] for the image f[i3][i2][i1].
+   * @param g array[n3][n2][n1] for the image g[i3][i2][i1].
+   * @return array[n1][nl] of alignment errors.
+   */
+  public float[][] computeErrors1(float[][][] f, float[][][] g) {
+    final float[][][] ff = f;
+    final float[][][] gf = g;
+    final int nl = 1+_lmax-_lmin;
+    final int n1 = f[0][0].length;
+    final int n2 = f[0].length;
+    final int n3 = f.length;
+    float[][] e = Parallel.reduce(n2*n3,new Parallel.ReduceInt<float[][]>() {
+    public float[][] compute(int i23) {
+      int i2 = i23%n2;
+      int i3 = i23/n2;
+      return computeErrors(ff[i3][i2],gf[i3][i2]);
+    }
+    public float[][] combine(float[][] ea, float[][] eb) {
+      return add(ea,eb);
+    }});
+    normalizeErrors(e);
+    return e;
   }
 
   /**
@@ -927,6 +1068,7 @@ public class DynamicWarping {
 
   private int _nl; // number of lags
   private int _lmin,_lmax; // min,max lags
+  private ErrorExtrapolation _extrap; // method for error extrapolation
   private float _epow = 2; // exponent used for alignment errors |f-g|^e
   private int _esmooth = 0; // number of nonlinear smoothings of errors
   private double _usmooth1 = 0.0; // extent of smoothing shifts in 1st dim
@@ -958,7 +1100,7 @@ public class DynamicWarping {
   }
 
   /**
-   * Computes alignment errors.
+   * Computes alignment errors, not normalized.
    * @param f input array[ni] for sequence f.
    * @param g input array[ni] for sequence g.
    * @param e output array[ni][nl] of alignment errors.
@@ -967,28 +1109,71 @@ public class DynamicWarping {
     int n1 = f.length;
     int nl = _nl;
     int n1m = n1-1;
+    boolean average = _extrap==ErrorExtrapolation.AVERAGE;
+    boolean nearest = _extrap==ErrorExtrapolation.NEAREST;
+    float[] eavg = average?new float[nl]:null; 
+    int[] navg = average?new int[nl]:null;
+    float emax = 0.0f;
+
+    // Notes for indexing:
     // 0 <= il < nl, where il is index for lag
     // 0 <= i1 < n1, where i1 is index for sequence f
-    // 0 <= j1 < n1, where j1 index for sequence g
+    // 0 <= j1 < n1, where j1 is index for sequence g
     // j1 = i1+il+lmin, where il+lmin = lag
     // 0 <= i1+il+lmin < n1, so that j1 is in bounds
     // max(0,-lmin-i1) <= il < min(nl,n1-lmin-i1)
     // max(0,-lmin-il) <= i1 < min(n1,n1-lmin-il)
-    // j1 = 0    => i1 = -lmin-il
+    // j1 = 0    => i1 =     -lmin-il
     // j1 = n1-1 => i1 = n1-1-lmin-il
+
+    // Compute errors where indices are in bounds for both f and g.
     for (int i1=0; i1<n1; ++i1) {
-      int illo = min(nl-1,max(0,-_lmin-i1)); // see notes
-      int ilhi = max(0,min(nl,n1-_lmin-i1)); // above
-      for (int il=0,j1=i1+il+_lmin; il<illo; ++il,++j1)
-        e[i1][il] = (j1>=0) ?
-          error(f[i1],g[j1]) : 
-          error(f[-_lmin-il],g[0]);
-      for (int il=illo,j1=i1+il+_lmin; il<ilhi; ++il,++j1)
-        e[i1][il] = error(f[i1],g[j1]);
-      for (int il=ilhi,j1=i1+il+_lmin; il<nl; ++il,++j1)
-        e[i1][il] = (j1<n1) ?
-          error(f[i1],g[j1]) : 
-          error(f[n1-1-_lmin-il],g[n1-1]);
+      int illo = max(0,   -_lmin-i1); // see notes
+      int ilhi = min(nl,n1-_lmin-i1); // above
+      for (int il=illo,j1=i1+il+_lmin; il<ilhi; ++il,++j1) {
+        float ei = error(f[i1],g[j1]);
+        e[i1][il] = ei;
+        if (average) {
+          eavg[il] += ei;
+          navg[il] += 1;
+        }
+        if (ei>emax) 
+          emax = ei;
+      }
+    }
+
+    // If necessary, complete computation of average errors for each lag.
+    if (average) {
+      for (int il=0; il<nl; ++il) {
+        if (navg[il]>0)
+          eavg[il] /= navg[il];
+      }
+    }
+
+    // For indices where errors have not yet been computed, extrapolate.
+    for (int i1=0; i1<n1; ++i1) {
+      int illo = max(0,   -_lmin-i1); // same as
+      int ilhi = min(nl,n1-_lmin-i1); // above
+      for (int il=0; il<nl; ++il) {
+        if (il<illo || il>=ilhi) {
+          if (average) {
+            if (navg[il]>0) {
+              e[i1][il] = eavg[il];
+            } else {
+              e[i1][il] = emax;
+            }
+          } else if (nearest) {
+            int k1 = (il<illo)?-_lmin-il:n1m-_lmin-il;
+            if (0<=k1 && k1<n1) {
+              e[i1][il] = e[k1][il];
+            } else {
+              e[i1][il] = emax;
+            }
+          } else {
+            e[i1][il] = emax;
+          }
+        }
+      }
     }
   }
 
