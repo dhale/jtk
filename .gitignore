@@ -5,6 +5,7 @@
 
 build/
 *.png
+*.zip
 *.swp
 *.class
 *.DS_Store
