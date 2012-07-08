@@ -354,15 +354,16 @@ public class DynamicWarping {
     int n1 = f[0][0].length;
     int n2 = f[0].length;
     int n3 = f.length;
-    int l2 = _owl2, l3 = _owl3;
-    double f2 = _owf2, f3 = _owf3;
+    OverlappingWindows2 ow = 
+      new OverlappingWindows2(n2,n3,_owl2,_owl3,_owf2,_owf3);
+    int m2 = ow.getM1();
+    int m3 = ow.getM2();
+    int l2 = ow.getL1();
+    int l3 = ow.getL2();
     float[][][] fw = new float[l3][l2][];
     float[][][] gw = new float[l3][l2][];
     float[][][] uw = new float[l3][l2][n1];
     float[][][][] ew = new float[l3][l2][n1][_nl];
-    OverlappingWindows2 ow = new OverlappingWindows2(n2,n3,l2,l3,f2,f3);
-    int m2 = ow.getM1();
-    int m3 = ow.getM2();
     for (int k3=0; k3<m3; ++k3) {
       int i3 = ow.getI2(k3);
       for (int k2=0; k2<m2; ++k2) {
