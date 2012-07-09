@@ -1234,25 +1234,16 @@ public class DynamicWarping {
     int ie = (dir>0)?nim1:0;
     int is = (dir>0)?1:-1;
     int ii = ib;
-    int il = nlm1/2;
-    int illo=0,ilhi=nlm1;
-    float dlm = d[ii][il];
-    float dllo=dlm,dlhi=dlm;
-    for (int jl=0; jl<il; ++jl) {
-      if (d[ii][jl]<dllo) {
-        dllo = d[ii][jl];
-        illo = jl;
+    // Initialize the lag index such that if all accumulated
+    // errors are equal at ii, we minimize the initial shift.
+    int il = (nlm1+lmin<=0)?nlm1:(lmin<=0)?abs(lmin):0;
+    float dl = d[ii][il];
+    for (int jl=0; jl<nl; ++jl) {
+      if (d[ii][jl]<dl) {
+        dl = d[ii][jl];
+        il = jl;
       }
     }
-    for (int jl=il+1; jl<nl; ++jl) {
-      if (d[ii][jl]<dlhi) {
-        dlhi = d[ii][jl];
-        ilhi = jl;
-      }
-    }
-    float dl = min3(dlm,dllo,dlhi);
-    if (dl!=dlm)
-      il = (dllo<dlhi) ? illo : ilhi;
     u[ii] = il+lmin;
     while (ii!=ie) {
       int ji = max(0,min(nim1,ii+is));
