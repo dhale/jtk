@@ -291,6 +291,20 @@ public class DynamicWarping {
   }
 
   /**
+   * Computes and returns 1D shifts u for specified 2D images f and g.
+   * This method is useful in the case that shifts vary only slightly 
+   * (or perhaps not at all) in the 2nd image dimension.
+   * @param f array[n2][n1] for the image f.
+   * @param g array[n2][n1] for the image g.
+   * @return array[n1] of shifts u.
+   */
+  public float[] findShifts1(float[][] f, float[][] g) {
+    float[] u = like(f[0]);
+    findShifts1(f,g,u);
+    return u;
+  }
+
+  /**
    * Computes and returns 1D shifts u for specified 3D images f and g.
    * This method is useful in the case that shifts vary only slightly 
    * (or perhaps not at all) in the 2nd and 3rd image dimensions.
@@ -585,7 +599,9 @@ public class DynamicWarping {
     final int n2 = f.length;
     float[][] e = Parallel.reduce(n2,new Parallel.ReduceInt<float[][]>() {
     public float[][] compute(int i2) {
-      return computeErrors(ff[i2],gf[i2]);
+      float[][] e = new float[n1][nl];
+      computeErrors(ff[i2],gf[i2],e);
+      return e;
     }
     public float[][] combine(float[][] ea, float[][] eb) {
       return add(ea,eb);
@@ -614,7 +630,9 @@ public class DynamicWarping {
     public float[][] compute(int i23) {
       int i2 = i23%n2;
       int i3 = i23/n2;
-      return computeErrors(ff[i3][i2],gf[i3][i2]);
+      float[][] e = new float[n1][nl];
+      computeErrors(ff[i3][i2],gf[i3][i2],e);
+      return e;
     }
     public float[][] combine(float[][] ea, float[][] eb) {
       return add(ea,eb);
