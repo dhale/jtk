@@ -71,20 +71,21 @@ public class DynamicWarping {
   public enum ErrorExtrapolation {
     /**
      * For each lag, extrapolate alignment errors using the nearest
-     * error not missing for that lag. This method is most sensitive 
-     * to the values of the first and last samples of the sequences 
-     * to be aligned.
+     * error not missing for that lag.
      * <p>
      * This is the default extrapolation method.
      */
     NEAREST,
     /**
      * For each lag, extrapolate alignment errors using the average
-     * of all errors not missing for that lag. This method is less
-     * sensitive to the values of the first and last samples of the
-     * sequences to be aligned.
+     * of all errors not missing for that lag.
      */
-    AVERAGE
+    AVERAGE,
+    /**
+     * For each lag, extrapolate alignment errors using a reflection
+     * of nearby errors not missing for that lag.
+     */
+    REFLECT
   }
 
   /**
@@ -1130,6 +1131,7 @@ public class DynamicWarping {
     int n1m = n1-1;
     boolean average = _extrap==ErrorExtrapolation.AVERAGE;
     boolean nearest = _extrap==ErrorExtrapolation.NEAREST;
+    boolean reflect = _extrap==ErrorExtrapolation.REFLECT;
     float[] eavg = average?new float[nl]:null; 
     int[] navg = average?new int[nl]:null;
     float emax = 0.0f;
@@ -1181,8 +1183,10 @@ public class DynamicWarping {
             } else {
               e[i1][il] = emax;
             }
-          } else if (nearest) {
+          } else if (nearest || reflect) {
             int k1 = (il<illo)?-_lmin-il:n1m-_lmin-il;
+            if (reflect)
+              k1 += k1-i1;
             if (0<=k1 && k1<n1) {
               e[i1][il] = e[k1][il];
             } else {
