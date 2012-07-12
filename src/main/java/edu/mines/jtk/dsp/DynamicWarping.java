@@ -1,6 +1,5 @@
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
@@ -543,6 +542,14 @@ public class DynamicWarping {
     return e;
   }
 
+  public float[][] computeErrorsFrac(float[] f, float[] g, int r) {
+    int n1 = f.length;
+    int nlx = (_nl-1)*r+1;
+    float[][] e = new float[n1][nlx];
+    computeErrorsFrac(f,g,e,r);
+    normalizeErrors(e);
+    return e;
+  }
   /**
    * Returns normalized alignment errors for all samples and lags.
    * The number of lags nl = 1+shiftMax-shiftMin. Lag indices 
@@ -566,6 +573,21 @@ public class DynamicWarping {
     normalizeErrors(ef);
     return ef;
   }
+  
+  public float[][][] computeErrorsFrac(float[][] f, float[][] g, int r) {
+    final int n1 = f[0].length;
+    final int n2 = f.length;
+    final int rf = r;
+    final float[][] ff = f;
+    final float[][] gf = g;
+    final float[][][] ef = new float[n2][n1][];
+    Parallel.loop(n2,new Parallel.LoopInt() {
+    public void compute(int i2) {
+      ef[i2] = computeErrorsFrac(ff[i2],gf[i2],rf);
+    }});
+    normalizeErrors(ef);
+    return ef;
+  }
 
   /**
    * Returns normalized 1D alignment errors for 2D images.
@@ -579,8 +601,6 @@ public class DynamicWarping {
   public float[][] computeErrors1(float[][] f, float[][] g) {
     final float[][] ff = f;
     final float[][] gf = g;
-    final int nl = 1+_lmax-_lmin;
-    final int n1 = f[0].length;
     final int n2 = f.length;
     float[][] e = Parallel.reduce(n2,new Parallel.ReduceInt<float[][]>() {
     public float[][] compute(int i2) {
@@ -605,8 +625,6 @@ public class DynamicWarping {
   public float[][] computeErrors1(float[][][] f, float[][][] g) {
     final float[][][] ff = f;
     final float[][][] gf = g;
-    final int nl = 1+_lmax-_lmin;
-    final int n1 = f[0][0].length;
     final int n2 = f[0].length;
     final int n3 = f.length;
     float[][] e = Parallel.reduce(n2*n3,new Parallel.ReduceInt<float[][]>() {
@@ -729,6 +747,17 @@ public class DynamicWarping {
     float[][] d = like(e);
     accumulateForward(e,d);
     return d;
+  }
+  
+  public float[][][] accumulateForward(float[][][] e) {
+    int n2 = e.length;
+    final float[][][] ef = e;
+    final float[][][] df = new float[n2][][];
+    Parallel.loop(n2,new Parallel.LoopInt() {
+    public void compute(int i2) {
+      df[i2] = accumulateForward(ef[i2]);
+    }});
+    return df;
   }
 
   /**
@@ -874,6 +903,12 @@ public class DynamicWarping {
     backtrackReverse(d,e,u);
     return u;
   }
+  
+  public float[] backtrackReverseFrac(float[][] d, float[][] e, int r) {
+    float[] u = new float[d.length];
+    backtrackReverseFrac(d,e,u,r);
+    return u;
+  }
 
   /**
    * Returns shifts found by backtracking in reverse in 1st dimension.
@@ -884,6 +919,19 @@ public class DynamicWarping {
     float[][] u = new float[d.length][d[0].length];
     backtrackReverse1(d,e,u);
     return u;
+  }
+  
+  public float[][] backtrackReverseFrac(float[][][] d, float[][][] e, int r) {
+    int n2 = d.length;
+    final int rf = r;
+    final float[][][] df = d;
+    final float[][][] ef = e;
+    final float[][] uf = new float[n2][];
+    Parallel.loop(n2, new Parallel.LoopInt() {
+    public void compute(int i2) {
+      uf[i2] = backtrackReverseFrac(df[i2],ef[i2],rf);
+    }});
+    return uf;
   }
 
   /**
@@ -906,7 +954,17 @@ public class DynamicWarping {
   public void backtrackReverse(float[][] d, float[][] e, float[] u) {
     backtrack(-1,_bstrain1,_lmin,d,e,u);
   }
-
+  
+  public void backtrackReverseFrac(float[][] d, float[][] e, float[]u, int r) {
+    int nlx = d[0].length;
+    double dx = 1.0/r;
+    Sampling s = new Sampling(nlx,dx,_lmin);
+    backtrack(-1,_bstrain1,_lmin,d,e,u);
+    for (int i1=0; i1<u.length; ++i1) {
+      u[i1] = (float)s.getValue((int)u[i1]-_lmin);
+    }
+  }
+  
   /**
    * Computes shifts by backtracking in reverse direction in 1st dimension.
    * @param d input array of accumulated errors.
@@ -1176,6 +1234,98 @@ public class DynamicWarping {
       }
     }
   }
+  
+  /**
+   * Computes alignment errors for fractional shifts, not normalized
+   * @param f input array[ni] for sequence f.
+   * @param g input array[ni] for sequence g.
+   * @param e output array[ni][nlx] of alignment errors.
+   * @param ff factor for computing errors at fractional shifts. Errors will
+   *  be computed at fractional intervals of 1.0/ff
+   */
+  private void computeErrorsFrac(float[] f, float[] g, float[][] e, int ff) { 
+    int n1 = f.length;
+    int n1m = n1-1;
+    int nlx = e[0].length;
+    float dx = 1.0f/ff;
+    Sampling s = new Sampling(nlx,dx,_lmin);
+    double[] v = s.getValues();
+    SincInterpolator si = new SincInterpolator();
+    si.setUniformSampling(n1, 1.0f, 0.0f);
+    si.setUniformSamples(g);
+    boolean average = _extrap==ErrorExtrapolation.AVERAGE;
+    boolean nearest = _extrap==ErrorExtrapolation.NEAREST;
+    float[] eavg = average?new float[nlx]:null; 
+    int[] navg = average?new int[nlx]:null;
+    float emax = 0.0f;
+
+    // Notes for indexing:
+    // ff = fractional factor. Fractional error is measured at interval 1.0/ff
+    // 0 <= ilx < nlx, where ilx is the fractional lag index, and nlx has
+    //                 length (nl-1)*ff+1
+    // 0 <=  i1 <  n1, where i1 is index for sequence f
+    // 0 <=  j1 <  n1, where j1 is a fractional value for sequence g that will
+    //                 be interpolated         
+    // j1 = i1+v[ilx], where v[ilx] = fractional lag value
+    // ilxlo = max(0,ff*(-lmin-i1)), where ilxlo is the minimum ilx that is
+    //                               in bounds of sequence g, relative to the
+    //                               current index of sequence f
+    // ilxhi = min(nlx,ff*(n1-lmin-i1)), where ilxhi is the maximum ilx that is
+    //                                   in bounds of sequence g, relative to
+    //                                   the current index of sequence f
+
+    // Compute errors where indices are in bounds for both f and g.
+    for (int i1=0; i1<n1; ++i1) {
+      int ilxlo = max(  0,ff*(  -_lmin-i1)); // see notes
+      int ilxhi = min(nlx,ff*(n1-_lmin-i1)); // above
+      for (int ilx=ilxlo; ilx<ilxhi; ++ilx) {
+        double j1 = i1+v[ilx];
+        float gx = si.interpolate(j1);
+        float ei = error(f[i1], gx);
+        e[i1][ilx] = ei;
+        if (average) {
+          eavg[ilx] += ei;
+          navg[ilx] += 1;
+        }
+        if (ei>emax)
+          emax = ei;
+      }
+    }
+
+    // If necessary, complete computation of average errors for each lag.
+    if (average) {
+      for (int ilx=0; ilx<nlx; ++ilx) {
+        if (navg[ilx]>0)
+          eavg[ilx] /= navg[ilx];
+      }
+    }
+
+    // For indices where errors have not yet been computed, extrapolate.
+    for (int i1=0; i1<n1; ++i1) {
+      int ilxlo = max(  0,ff*(  -_lmin-i1)); // same as
+      int ilxhi = min(nlx,ff*(n1-_lmin-i1)); // above
+      for (int ilx=0; ilx<nlx; ++ilx) {
+        if (ilx<ilxlo || ilx>=ilxhi) {
+          if (average) {
+            if (navg[ilx]>0) {
+              e[i1][ilx] = eavg[ilx];
+            } else {
+              e[i1][ilx] = emax;
+            }
+          } else if (nearest) {
+            int k1 = (ilx<ilxlo)?-_lmin-(ilx/ff):n1m-_lmin-(ilx/ff);
+            if (0<=k1 && k1<n1) {
+              e[i1][ilx] = e[k1][ilx];
+            } else {
+              e[i1][ilx] = emax;
+            }
+          } else {
+            e[i1][ilx] = emax;
+          }
+        }
+      }
+    }
+  }
 
   /**
    * Non-linear accumulation of alignment errors.
@@ -1414,8 +1564,6 @@ public class DynamicWarping {
   // for 3D image warping
 
   private void computeErrors(float[][][] f, float[][][] g, float[][][][] e) {
-    final int nl = e[0][0][0].length;
-    final int n1 = e[0][0].length;
     final int n2 = e[0].length;
     final int n3 = e.length;
     final float[][][] ff = f;
@@ -1475,8 +1623,6 @@ public class DynamicWarping {
     }});
   }
   private void smoothErrors(float[][][][] e) {
-    final int nl = e[0][0][0].length;
-    final int n1 = e[0][0].length;
     final int n2 = e[0].length;
     final int n3 = e.length;
     final float[][][][] ef = e;
