@@ -1,6 +1,5 @@
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.dsp.*;
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
