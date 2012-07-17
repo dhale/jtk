@@ -1248,6 +1248,7 @@ public class DynamicWarping {
   private static void backtrack(
     int dir, int b, int lmin, float[][] d, float[][] e, float[] u) 
   {
+    float ob = 1.0f/b;
     int nl = d[0].length;
     int ni = d.length;
     int nlm1 = nl-1;
@@ -1256,7 +1257,7 @@ public class DynamicWarping {
     int ie = (dir>0)?nim1:0;
     int is = (dir>0)?1:-1;
     int ii = ib;
-    int il = 0;
+    int il = max(0,min(nlm1,-lmin));
     float dl = d[ii][il];
     for (int jl=1; jl<nl; ++jl) {
       if (d[ii][jl]<dl) {
@@ -1288,9 +1289,11 @@ public class DynamicWarping {
       ii += is;
       u[ii] = il+lmin;
       if (il==ilm1 || il==ilp1) {
+        float du = (u[ii]-u[ii-is])*ob;
+        u[ii] = u[ii-is]+du;
         for (int kb=ji; kb!=jb; kb+=is) {
           ii += is;
-          u[ii] = il+lmin;
+          u[ii] = u[ii-is]+du;
         }
       }
     }
