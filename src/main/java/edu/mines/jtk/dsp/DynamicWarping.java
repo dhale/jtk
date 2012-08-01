@@ -7,9 +7,9 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * Dynamic warping of sequences and images.
  * <p>
  * For sequences f and g, dynamic warping finds a sequence of 
- * integer shifts u such that f[i1] ~ g[i1+u[i1]], subject to a 
- * bound b1 on strain, the rate at which the shifts u[i1] vary 
- * with sample index i1.
+ * shifts u such that f[i1] ~ g[i1+u[i1]], subject to a bound b1 
+ * on strain, the rate at which the shifts u[i1] vary with sample 
+ * index i1.
  * <p>
  * An increasing u[i1] = u[i1-1] + 1 implies that, between indices
  * i1-1 and i1, g[i1] is a stretched version of f[i1] ~ g[i1+u[i1]].
@@ -20,19 +20,16 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * <p>
  * In practice, 100% strain (stretching or squeezing) may be extreme.
  * Therefore, the upper bound on strain may be smaller than one. For 
- * example, if the bound b1 = 0.5, then the local average strain is 
- * bounded by 0.5. This constraint is complicated by the fact that 
- * the shifts u[i1] are integers. The actual constraint for the bound 
- * b1 = 0.5 is |u[i1-1]-u[i1-2]| + |u[i1]-u[i1-1]| &le; 1.
+ * example, if the bound b1 = 0.5, then |u[i1]-u[i1-1]| &le; 0.5.
  * <p>
- * For 2D images f and g, dynamic warping finds a 2D array of integer 
- * shifts u[i2][i1] such that f[i2][i1] ~ g[i2][i1+u[i2][i1]], 
- * subject to bounds b1 and b2 on strains, the rates at which shifts 
- * u[i2][i1] vary with samples indices i1 and i2, respectively.
+ * For 2D images f and g, dynamic warping finds a 2D array of shifts
+ * u[i2][i1] such that f[i2][i1] ~ g[i2][i1+u[i2][i1]], subject to 
+ * bounds b1 and b2 on strains, the rates at which shifts u[i2][i1] 
+ * vary with samples indices i1 and i2, respectively.
  * <p>
- * For 3D images f and g, dynamic warping finds a 3D array of integer 
- * shifts u[i3][i2][i1] in a similar way. However, finding shifts for 
- * 3D images may require an excessive amount of memory. Dynamic image 
+ * For 3D images f and g, dynamic warping finds a 3D array of shifts
+ * u[i3][i2][i1] in a similar way. However, finding shifts for 3D 
+ * images may require an excessive amount of memory. Dynamic image 
  * warping requires a temporary array of nlag*nsample floats, where 
  * the number of lags nlag = 1+shiftMax-shiftMin and nsample is the 
  * number of image samples. For 3D images, the product nlag*nsample 
@@ -40,12 +37,11 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * access memory (RAM). In this case, shifts u are obtained by blending 
  * together shifts computed from overlapping subsets of the 3D image.
  * <p>
- * Estimated shifts u are integers, but can be smoothed to obtain
- * non-integer shifts. The extent of smoothing along each dimension 
- * is inversely proportional to the strain limit for that dimension, 
- * and these extents can be scaled by specified factors for more or 
- * less smoothing. The default scale factors are zero, for no 
- * smoothing.
+ * Estimated shifts u can be smoothed, and the extent of smoothing 
+ * along each dimension is inversely proportional to the strain limit 
+ * for that dimension. These extents can be scaled by specified factors 
+ * for more or less smoothing. The default scale factors are zero, for 
+ * no smoothing.
  * <p>
  * This class provides numerous methods, but typical applications
  * require only several of these, usually only the methods that find
@@ -184,7 +180,7 @@ public class DynamicWarping {
   }
 
   /**
-   * Sets extent of smoothing filters used to smooth integer shifts.
+   * Sets extent of smoothing filters used to smooth shifts.
    * Half-widths of smoothing filters are inversely proportional to
    * strain limits, and are scaled by the specified factor. Default 
    * factor is zero, for no smoothing.
@@ -195,7 +191,7 @@ public class DynamicWarping {
   }
 
   /**
-   * Sets extents of smoothing filters used to smooth integer shifts.
+   * Sets extents of smoothing filters used to smooth shifts.
    * Half-widths of smoothing filters are inversely proportional to
    * strain limits, and are scaled by the specified factors. Default 
    * factors are zero, for no smoothing.
@@ -207,7 +203,7 @@ public class DynamicWarping {
   }
 
   /**
-   * Sets extents of smoothing filters used to smooth integer shifts.
+   * Sets extents of smoothing filters used to smooth shifts.
    * Half-widths of smoothing filters are inversely proportional to
    * strain limits, and are scaled by the specified factors. Default 
    * factors are zero, for no smoothing.
