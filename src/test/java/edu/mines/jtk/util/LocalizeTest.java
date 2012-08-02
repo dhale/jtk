@@ -34,9 +34,8 @@ public class LocalizeTest extends TestCase {
             final Localize fr = new Localize(LocalizeTest.class, null, Locale.FRENCH);
             final int i = 42;
             final String sFr = fr.format("msg1", 3.14, i);
-            if (!"Un nombre 3,14000 ici, et un autre #42".equals(sFr)) {
-              LOG.info("Old behavior for localization of French numbers: "+ sFr);
-            }
+            assert "Un nombre 3,14000 ici, et un autre #42".equals(sFr) ||
+                   "Un nombre 3.14000 ici, et un autre #42".equals(sFr) : sFr;
         }
         { // for testing, we specify an alternate file LocalizeTestAlt[_*].properties
             final Localize alt = new Localize(LocalizeTest.class, "LocalizeTestAlt");
