@@ -20,6 +20,9 @@ public class HelloTest {
       glClearColor(0.0f,0.0f,0.0f,0.0f);
       System.out.println("OpenGL version="+glGetString(GL_VERSION));
       System.out.println("OpenGL vendor="+glGetString(GL_VENDOR));
+      int[] param = new int[1];
+      glGetIntegerv(GL_MAX_ELEMENTS_VERTICES,param,0);
+      System.out.println("GL_MAX_ELEMENTS_VERTICES="+param[0]);
     }
     public void glResize(int x, int y, int width, int height) {
       glViewport(0,0,width,height);

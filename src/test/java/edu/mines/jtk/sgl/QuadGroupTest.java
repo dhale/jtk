@@ -23,6 +23,7 @@ public class QuadGroupTest {
     xyz = addTear(xyz);
     float[] rgb = makeColors(xyz);
 
+    System.out.println("Making QuadGroup ...");
     QuadGroup tg = new QuadGroup(true,xyz,rgb);
     System.out.println("QuadGroup bounding sphere =\n" +
       tg.getBoundingSphere(true));
@@ -56,7 +57,7 @@ public class QuadGroupTest {
     int ny = 100;
     float dx = 10.0f/(float)nx;
     float dy = 10.0f/(float)ny;
-    float[] xyz = new float[4*6*nx*ny];
+    float[] xyz = new float[3*4*nx*ny];
     for (int ix=0,i=0; ix<nx; ++ix) {
       float x0 = ix*dx;
       float x1 = (ix+1)*dx;
