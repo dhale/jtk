@@ -11,7 +11,7 @@ The Colorado School of Mines Java Toolkit
 The Mines Java Toolkit (JTK) is a set of Java packages and native (non-Java) 
 software libraries for science and engineering. Applications currently 
 include digital signal processing, linear algebra, optimization, meshing,
-interpolation, and 2-D and 3-D graphics.
+interpolation, and 2D and 3D graphics.
 
 Note: if you modify (or port, or translate, or ...) our source code, then
 you have created a "derived work", and should review carefully the terms
@@ -102,11 +102,6 @@ After you have built the Mines JTK, you should have the JAR file
 jtk/build/jar/edu_mines_jtk.jar.
 You may use this file as you would any other JAR file.
 
-Some packages (e.g., edu.mines.jtk.ogl) require Java native interface
-(JNI) libraries of native (non-Java) code. These platform-specific 
-libraries should be in a subdirectory of jtk/lib/, such as 
-jtk/lib/linux/x86/.
-
 To use the Mines JTK, we must launch a Java virtual machine, specifying 
 all of these JAR files and the locations of our JNI libraries.
 
@@ -127,7 +122,7 @@ The Mines JTK also comes with demos in jtk/src/demo. There are demos in
 multiple languages, but the majority are in Jython. Scripting in Jython
 is a powerful and robust way to utilize the Java classes in the Mines JTK,
 and is the way that most of us work. We include Jython in a jar file as
-well as scripts in the jtk/bin directory so these demos can be run
+well as scripts in the jtk/bin/ directory, so that these demos can be run
 without any additional installations.
  
 To execute the Jython demos you should (1) copy the appropriate script
@@ -137,29 +132,22 @@ program by typing "jythonrun program_name.py". (You may want to use a
 shorter name, such as "jy" for this script.)
 
 
-3-D graphics in the Mines JTK
+3D graphics in the Mines JTK
 -----------------------------
 
-Our packages for 3-D graphics are built on JOGL, a Java binding for the 
-OpenGL API. Like the Mines JTK, JOGL provides both JAR files and JNI
-libraries; and the JNI libraries are platform-specific. In the future, 
-JOGL is likely to become part of standard Java Runtime Environment (JRE). 
-
-Until then, the JAR files and JNI libraries for JOGL are provided with 
-the JTK for most platforms. For other platforms, you may download these
-libraries from the JOGL website.
-
-To ensure that you have the JOGL JAR files and JNI libraries installed
-correctly, type
-javarun edu.mines.jtk.ogl.HelloTest
+Our packages for 3D graphics are built on JOGL, a Java binding for the 
+OpenGL API. JAR files for JOGL on 64-bit operating systems are provided 
+with the Mines JTK. To test 3D graphics on Linux or Mac OS X, type
+javarun.sh edu.mines.jtk.ogl.HelloTest
 You should see a white square, painted via OpenGL. This program also
 prints the OpenGL vendor and version number. That number should not 
 be less than 1.2.
 
-If you get a "java.lang.UnsatisfiedLinkError", the JOGL JAR files or JNI 
-libraries are perhaps not provided for your platform, or they may be in 
-directories (e.g., jtk/lib/linux/x86/) that have not been specified 
-correctly in your javarun script.
+If instead you see a "java.lang.UnsatisfiedLinkError", then perhaps
+the JOGL JAR files required for your operating system are not provided 
+with the Mines JTK. You can check the JOGL web site for appropriate 
+JAR files. Put them with the other platform-specific JAR files in
+the directory jtk/jar/.
 
 
 Development using the Mines JTK

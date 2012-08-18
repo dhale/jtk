@@ -2,42 +2,59 @@ package edu.mines.jtk.ogl;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Makes OpenGL wrapper class Gl.java for JOGL's javax.media.opengl.GL.
+ * Makes OpenGL wrapper class Gl.java for JOGL.
  *GL.
- * To make a new Gl.java, save the javadoc file GL.html from JOGL as a 
- * text file Gl.txt (note the change in case from GL to Gl), and run this 
- * program.
+ * To make a new Gl.java, copy the javadoc files GL*.html from JOGL
+ * and run this program. The currently required files GL*.html are
+ * in the list of inputFileNames declared below.
  * <p>
- * This program may require modification if the format of JOGL's javadoc
- * files changes. Check the output file Gl.java before using.
+ * NOTE: This program does not currently generate a Gl.java that will
+ * compile, mostly due to duplicate declarations of constants and
+ * functions in the various GL* interfaces provided by JOGL. Therefore,
+ * some editing of the generated Gl.java is required.
+ * <p>
+ * This program will require modification if the format of JOGL's 
+ * javadoc-generated html files changes.
  * <p>
  * An alternative to this program would be to use reflection on the JOGL
  * class file javax.media.opengl.GL.class, but this alternative would not
  * preserve the names of method parameters. A better alternative would be
  * for JOGL to provide these bindings.
  * @author Dave Hale, Colorado School of Mines
- * @version 2006.07.10
+ * @version 2012.08.16
  */
 class MakeGl {
 
   public static void main(String[] args) {
-    String inputFileName = "Gl.txt";
+    String[] inputFileNames = {
+      "GL.html",
+      "GLBase.html",
+      "GLLightingFunc.html",
+      "GLMatrixFunc.html",
+      "GLPointerFunc.html",
+      "GL2.html",
+      "GL2ES1.html",
+      "GL2ES2.html",
+      "GL2GL3.html",
+    };
     String outputFileName = "Gl.java";
     try {
-      BufferedReader br = null;
-      BufferedWriter bw = null;
-      br = new BufferedReader(new FileReader(inputFileName));
-      bw = new BufferedWriter(new FileWriter(outputFileName));
-      for (int i=0; i<PROLOG.length; ++i)
-        bw.write(PROLOG[i]+NEWLINE);
-      guts(br,bw);
-      for (int i=0; i<EPILOG.length; ++i)
-        bw.write(EPILOG[i]+NEWLINE);
-      br.close();
+      BufferedWriter bw = new BufferedWriter(new FileWriter(outputFileName));
+      for (String line:PROLOG)
+        bw.write(line+NEWLINE);
+      for (String inputFileName:inputFileNames) {
+        BufferedReader br = new BufferedReader(new FileReader(inputFileName));
+        bw.write(NEWLINE+"  // Generated from "+inputFileName+NEWLINE+NEWLINE);
+        guts(br,bw);
+        br.close();
+      }
+      for (String line:EPILOG)
+        bw.write(line+NEWLINE);
       bw.close();
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
@@ -56,13 +73,13 @@ class MakeGl {
 "package edu.mines.jtk.ogl;",
 "",
 "import java.nio.*;",
-"import javax.media.opengl.GL;",
-"import javax.media.opengl.GLContext;",
+"import javax.media.opengl.*;",
+"import com.jogamp.common.nio.PointerBuffer;",
 "",
 "/**",
-" * OpenGL standard constants and methods.",
+" * OpenGL standard constants and functions.",
 " * @author Dave Hale, Colorado School of Mines",
-" * @version 2006.07.07",
+" * @version 2012.08.17",
 " */",
 "public class Gl {",
 "",
@@ -73,11 +90,15 @@ class MakeGl {
 "    return gl().isExtensionAvailable(extensionName);",
 "  }",
 "",
-"  private static GL gl() {",
-"    return GLContext.getCurrent().getGL();",
+"  public static void setSwapInterval(int interval) {",
+"    gl().setSwapInterval(interval);",
 "  }",
 "",
-" ///////////////////////////////////////////////////////////////////////////",
+"  private static GL2 gl() {",
+"    return (GL2)GLContext.getCurrentGL();",
+"  }",
+"",
+"  ///////////////////////////////////////////////////////////////////////////",
 "  // private",
 "",
 "  private Gl() {",
@@ -85,54 +106,84 @@ class MakeGl {
 "}",
 };
 
-  private static void guts(BufferedReader br, BufferedWriter bw) 
+  // These patterns and functions depend on format of javadoc html files!
+  private static final Pattern _conName =
+    Pattern.compile("int <B>(GL_\\w*)</B>");
+  private static final Pattern _funType = 
+    Pattern.compile("(\\w+)(?:</A>)?((?:\\[\\])*) <B>gl");
+  private static final Pattern _parType = 
+    Pattern.compile("(\\w+)(?:</A>)?((?:\\[\\])*)&nbsp");
+  private static final Pattern _funName =
+    Pattern.compile("<B>(gl\\w+)</B>");
+  private static final Pattern _parName = 
+    Pattern.compile("&nbsp;(\\w+)");
+  private static boolean hasConstant(String input) {
+    return input.contains("static final int <B>GL_");
+  }
+  private static boolean hasFunction(String input) {
+    return input.contains(" <B>gl");
+  }
+  private static boolean endFunction(String input) {
+    return input.endsWith(")</PRE>");
+  }
+  private static String getConName(String input) {
+    Matcher m = _conName.matcher(input);
+    return m.find()?m.group(1):null;
+  }
+  private static String getFunType(String input) {
+    Matcher m = _funType.matcher(input);
+    return m.find()?m.group(1)+m.group(2):null;
+  }
+  private static String getFunName(String input) {
+    Matcher m = _funName.matcher(input);
+    return m.find()?m.group(1):null;
+  }
+  private static String getParType(String input) {
+    Matcher m = _parType.matcher(input);
+    return m.find()?m.group(1)+m.group(2):null;
+  }
+  private static String getParName(String input) {
+    Matcher m = _parName.matcher(input);
+    return m.find()?m.group(1):null;
+  }
+  private static void guts(BufferedReader br, BufferedWriter bw)
     throws IOException 
   {
-    String input,output,name;
-    for (input=br.readLine(); input!=null; input=br.readLine()) {
-      if (input.startsWith("public")) {
-        if (!input.startsWith("public static"))
-          break;
-        int i = input.indexOf("GL_");
-        name = input.substring(i);
-        output = "  "+input+NEWLINE +
-                        "    = GL."+name+";"+NEWLINE+NEWLINE;
-        bw.write(output);
-      }
-    }
     ArrayList<String> parList = new ArrayList<String>();
-    Pattern parPattern = Pattern.compile(".*\\s(\\w*)[,\\)]");
-    for (; input!=null; input=br.readLine()) {
-      if (input.startsWith("public")) {
-        int i = input.indexOf("gl");
-        int j = input.indexOf("(");
-        if (i<0 || j<=i)
-          break;
-        boolean isVoid = input.indexOf("void ")>=0;
-        name = input.substring(i,j);
+    for (String input=br.readLine(); input!=null; input=br.readLine()) {
+      if (hasConstant(input)) {
+        String conName = getConName(input);
+        String output = 
+          "  public static final int "+conName+NEWLINE +
+          "    = GL2."+conName+";"+NEWLINE+NEWLINE;
+        bw.write(output);
+      } else if (hasFunction(input)) {
         parList.clear();
-        output = "";
-        for (boolean first=true; input!=null; input=br.readLine(),first=false) {
-          if (first) {
-            int k = input.indexOf(" ");
-            output = "  public static"+input.substring(k);
-          } else {
-            output = "         "+input;
-          }
-          Matcher parMatcher = parPattern.matcher(input);
-          if (parMatcher.matches())
-            parList.add(parMatcher.group(1));
-          if (input.endsWith(")")) {
-            output = output+" {";
-            break;
-          }
-          bw.write(output+NEWLINE);
+        String funType = getFunType(input);
+        String funName = getFunName(input);
+        String output = 
+          "  public static "+funType+" "+funName+"("+NEWLINE +
+          "    ";
+        String parType = getParType(input);
+        String parName = getParName(input);
+        if (parType!=null && parName!=null) {
+          output += parType+" "+parName;
+          parList.add(parName);
         }
-        bw.write(output+NEWLINE);
-        if (isVoid) {
-          output = "    gl()."+name+"(";
+        while (!endFunction(input)) {
+          output += ","+NEWLINE;
+          input = br.readLine(); 
+          parType = getParType(input);
+          parName = getParName(input);
+          parList.add(parName);
+          output += "    "+parType+" "+parName;
+        }
+        output += ") {"+NEWLINE;
+        bw.write(output);
+        if (funType.equals("void")) {
+          output = "    gl()."+funName+"(";
         } else {
-          output = "    return gl()."+name+"(";
+          output = "    return gl()."+funName+"(";
         }
         int n = parList.size();
         if (n==0) {

@@ -9,8 +9,9 @@ package edu.mines.jtk.ogl;
 import java.awt.*;
 import java.io.File;
 import javax.media.opengl.*;
+import javax.media.opengl.awt.*;
 import javax.swing.SwingUtilities;
-import com.sun.opengl.util.Screenshot;
+import com.jogamp.opengl.util.awt.Screenshot;
 
 /**
  * A canvas that paints via OpenGL. To paint a canvas using OpenGL, 
@@ -21,16 +22,20 @@ import com.sun.opengl.util.Screenshot;
  * @version 2006.07.08
  */
 public class GlCanvas extends GLCanvas implements GLEventListener {
+//public class GlCanvas extends GLJPanel implements GLEventListener {
+// If GLCanvas does not work (e.g., in JOGL2 RC9 on Mac OS X 10.8),
+// we may have more luck extending GLJPanel instead of GLCanvas.
+
   private static final long serialVersionUID = 1L;
     
- /**
+  /**
    * Constructs a canvas with default capabilities.
    */
   public GlCanvas() {
     this.addGLEventListener(this);
   }
 
- /**
+  /**
    * Constructs a canvas with specified capabilities.
    */
   public GlCanvas(GLCapabilities capabilities) {
@@ -38,9 +43,11 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
     this.addGLEventListener(this);
   }
 
- /**
+  /*
    * Constructs a canvas with specified capabilities.
    */
+  /* Not supported if this class extends GLJPanel,
+   * which we may need to do of GLCanvas does not work.
   public GlCanvas(
     GLCapabilities capabilities,
     GLCapabilitiesChooser chooser,
@@ -50,6 +57,7 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
     super(capabilities,chooser,shareWith,device);
     this.addGLEventListener(this);
   }
+  */
 
   /**
    * Enables or disables automatic repainting. If enabled, then,
@@ -156,6 +164,9 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
       if (_autoRepaint)
         repaint();
     }
+  }
+
+  public void dispose(GLAutoDrawable drawable) {
   }
 
   public void displayChanged(
