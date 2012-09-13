@@ -454,7 +454,7 @@ public class Cfloat {
    * @param x a complex number.
    * @return the complex inverse.
    */
-  public Cfloat inv(Cfloat x) {
+  public static Cfloat inv(Cfloat x) {
     float d = x.norm();
     return new Cfloat(x.r/d,-x.i/d);
   }

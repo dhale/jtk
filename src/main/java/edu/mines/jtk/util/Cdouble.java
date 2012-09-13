@@ -454,7 +454,7 @@ public class Cdouble {
    * @param x a complex number.
    * @return the complex inverse.
    */
-  public Cdouble inv(Cdouble x) {
+  public static Cdouble inv(Cdouble x) {
     double d = x.norm();
     return new Cdouble(x.r/d,-x.i/d);
   }
