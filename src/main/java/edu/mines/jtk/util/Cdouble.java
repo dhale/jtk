@@ -242,8 +242,9 @@ public class Cdouble {
    * @return z = inv(z).
    */
   public Cdouble invEquals() {
-    r = -r;
-    i = -i;
+    double d = norm();
+    r =  r/d;
+    i = -i/d;
     return this;
   }
 
@@ -252,9 +253,8 @@ public class Cdouble {
    * @return z = neg(z).
    */
   public Cdouble negEquals() {
-    double d = norm();
-    r =  r/d;
-    i = -i/d;
+    r = -r;
+    i = -i;
     return this;
   }
 

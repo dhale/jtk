@@ -242,8 +242,9 @@ public class Cfloat {
    * @return z = inv(z).
    */
   public Cfloat invEquals() {
-    r = -r;
-    i = -i;
+    float d = norm();
+    r =  r/d;
+    i = -i/d;
     return this;
   }
 
@@ -252,9 +253,8 @@ public class Cfloat {
    * @return z = neg(z).
    */
   public Cfloat negEquals() {
-    float d = norm();
-    r =  r/d;
-    i = -i/d;
+    r = -r;
+    i = -i;
     return this;
   }
 
