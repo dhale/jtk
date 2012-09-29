@@ -32,7 +32,7 @@ public class LocalDiffusionKernelTest extends TestCase {
   ///////////////////////////////////////////////////////////////////////////
   // test
 
-  public void testD1() {
+  public void testD21() {
     LocalDiffusionKernel ldk = 
       new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D21);
     testSpd2(ldk);
@@ -55,8 +55,15 @@ public class LocalDiffusionKernelTest extends TestCase {
     dump(y);
     */
   }
+  public void testD22() {
+    LocalDiffusionKernel ldk = 
+      new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D22);
+    testSpd2(ldk);
+    testSpd3(ldk);
+    testSpd2RandomTensors(ldk);
+  }
 
-  private void testSpd2(LocalDiffusionKernel ldk) {
+  private static void testSpd2(LocalDiffusionKernel ldk) {
     int n1 = 5;
     int n2 = 6;
     for (int iter=0; iter<10; ++iter) {
@@ -76,7 +83,28 @@ public class LocalDiffusionKernelTest extends TestCase {
       assertEquals(xdy,ydx,0.0001);
     }
   }
-  private void testSpd3(LocalDiffusionKernel ldk) {
+  private static void testSpd2RandomTensors(LocalDiffusionKernel ldk) {
+    int n1 = 5;
+    int n2 = 6;
+    for (int iter=0; iter<10; ++iter) {
+      float[][] s = randfloat(n1,n2);
+      float[][] x = sub(randfloat(n1,n2),0.5f);
+      float[][] y = sub(randfloat(n1,n2),0.5f);
+      float[][] dx = zerofloat(n1,n2);
+      float[][] dy = zerofloat(n1,n2);
+      Tensors2 t = new RandomTensors2(n1,n2);
+      ldk.apply(t,1.0f,s,x,dx);
+      ldk.apply(t,1.0f,s,y,dy);
+      float xdx = dot(x,dx);
+      float ydy = dot(y,dy);
+      float ydx = dot(y,dx);
+      float xdy = dot(x,dy);
+      assertTrue(xdx>=0.0f);
+      assertTrue(ydy>=0.0f);
+      assertEquals(xdy,ydx,0.0001);
+    }
+  }
+  private static void testSpd3(LocalDiffusionKernel ldk) {
     int n1 = 5;
     int n2 = 6;
     int n3 = 7;
@@ -97,16 +125,30 @@ public class LocalDiffusionKernelTest extends TestCase {
       assertEquals(xdy,ydx,0.0001);
     }
   }
-  private float dot(float[][] x, float[][] y) {
+  private static float dot(float[][] x, float[][] y) {
     return sum(mul(x,y));
   }
-  private float dot(float[][][] x, float[][][] y) {
+  private static float dot(float[][][] x, float[][][] y) {
     return sum(mul(x,y));
   }
 
-
-  ///////////////////////////////////////////////////////////////////////////
-  // benchmark
+  private static class RandomTensors2 extends EigenTensors2 {
+    RandomTensors2(int n1, int n2) {
+      super(n1,n2);
+      Random r = new Random();
+      for (int i2=0; i2<n2; ++i2) {
+        for (int i1=0; i1<n1; ++i1) {
+          float a = 2.0f*FLT_PI*r.nextFloat();
+          float u1 = cos(a);
+          float u2 = sin(a);
+          float du = 0.01f+0.09f*r.nextFloat();
+          float dv = 0.01f+0.99f*r.nextFloat();
+          setEigenvectorU(i1,i2,u1,u2);
+          setEigenvalues(i1,i2,du,dv);
+        }
+      }
+    }
+  }
 
   private static class IdentityTensors3 implements Tensors3 {
     public void getTensor(int i1, int i2, int i3, float[] a) {
@@ -118,6 +160,10 @@ public class LocalDiffusionKernelTest extends TestCase {
       a[5] = 1.0f;
     }
   }
+
+
+  ///////////////////////////////////////////////////////////////////////////
+  // benchmark
 
   private static void bench(boolean parallel) {
     Parallel.setParallel(parallel);

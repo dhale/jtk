@@ -8535,6 +8535,7 @@ public class Gl {
       buffer);
   }
 
+/*
   public static void glFeedbackBuffer(
     int size,
     int type,
@@ -8546,6 +8547,7 @@ public class Gl {
       buffer,
       buffer_offset);
   }
+*/
 
   public static void glFinishFenceAPPLE(
     int fence) {
@@ -17523,6 +17525,7 @@ public class Gl {
       buffer);
   }
 
+/*
   public static void glSelectBuffer(
     int size,
     int[] buffer,
@@ -17532,6 +17535,7 @@ public class Gl {
       buffer,
       buffer_offset);
   }
+*/
 
   public static void glSelectPerfMonitorCountersAMD(
     int monitor,
