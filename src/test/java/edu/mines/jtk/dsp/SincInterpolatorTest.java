@@ -17,6 +17,7 @@ import junit.framework.TestSuite;
  * @author Dave Hale, Colorado School of Mines; Bill Harlan, Landmark Graphics
  * @version 2005.08.01
  */
+@SuppressWarnings("deprecation")
 public class SincInterpolatorTest extends TestCase {
   public static void main(String[] args) {
     TestSuite suite = new TestSuite(SincInterpolatorTest.class);

@@ -49,12 +49,13 @@ import edu.mines.jtk.util.Check;
  * with high maximum frequencies and small maximum errors are most accurate.
  * <p>
  * When interpolating multiple values of y(x) from a single sequence of
- * uniformly sampled values, some improved efficiency may be gained by using
- * one of the methods that enables specification of multiple x values at which
- * to interpolate.
+ * uniformly sampled values, efficiency may be improved by using one of the
+ * methods that enables specification of multiple x values at which to
+ * interpolate.
  *
- * @author Dave Hale, Colorado School of Mines; Bill Harlan, Landmark Graphics
- * @version 2012.12.20
+ * @author Dave Hale, Colorado School of Mines
+ * @author Bill Harlan, Landmark Graphics
+ * @version 2012.12.21
  */
 public class SincInterp {
 
@@ -73,7 +74,7 @@ public class SincInterp {
   /**
    * Returns a sinc interpolator with specified maximum error and length.
    * Computes the maximum frequency fmax. Note that for some parameters
-   * emax and lmax, the maximum freuency fmax may be zero. In this case,
+   * emax and lmax, the maximum frequency fmax may be zero. In this case,
    * the returned interpolator is useless.
    * @param emax the maximum error for frequencies less than fmax; e.g., 
    *  0.01 for 1% percent error. 0.0 &lt; emax &lt;= 0.1 is required.
@@ -582,7 +583,7 @@ public class SincInterp {
       Check.argument(emax<=0.1,"emax<=0.1");
       Check.argument(fmax<0.5,"fmax<0.5");
     }
-    _table = makeTable(new Design(emax,fmax,lmax));
+    _table = getTable(emax,fmax,lmax);
     _lsinc = _table.lsinc;
     _nsinc = _table.nsinc;
     _nsincm1 = _table.nsincm1;
@@ -604,8 +605,10 @@ public class SincInterp {
       this.lmax = lmax;
     }
     public int hashCode() {
-      return new Double(emax).hashCode() ^
-             new Double(fmax).hashCode() ^
+      long lemax = Double.doubleToLongBits(emax);
+      long lfmax = Double.doubleToLongBits(fmax);
+      return (int)(lemax^(lemax>>>32)) ^
+             (int)(lfmax^(lfmax>>>32)) ^
              lmax;
     }
     public boolean equals(Object object) {
@@ -620,7 +623,7 @@ public class SincInterp {
    * Table of sinc interpolator coefficients.
    */
   private static class Table {
-    Design design;
+    Design design; // here, all three design parameters are non-zero
     int lsinc,nsinc,nsincm1,ishift;
     double dsinc;
     float[][] asinc;
@@ -628,6 +631,7 @@ public class SincInterp {
 
   /**
    * Builds a table of interpolators for specified design parameters.
+   * Exactly one of the design parameters must be zero.
    */
   private static Table makeTable(Design design) {
     double emax = design.emax;
@@ -704,12 +708,9 @@ public class SincInterp {
       nsinc *= 2;
     ++nsinc;
     int lsinc = lmax;
-    design.emax = emax;
-    design.fmax = fmax;
-    design.lmax = lmax;
     Table table = makeTable(nsinc,lsinc,kwin);
-    table.design = design;
-    _tables.put(design,table);
+    table.design = new Design(emax,fmax,lmax);
+    _tables.put(design,table); // key is design with one zero parameter
     return table;
   }
 

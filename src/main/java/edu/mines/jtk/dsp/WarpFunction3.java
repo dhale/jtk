@@ -1,6 +1,6 @@
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.dsp.SincInterpolator;
+import edu.mines.jtk.dsp.SincInterp;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
@@ -453,14 +453,13 @@ public abstract class WarpFunction3 {
    * @return array of values g(y) = f(y-u1(x(y)).
    */
   public float[][][] warp1(float[][][] f) {
-    SincInterpolator si = new SincInterpolator();
-    si.setUniformSampling(_n1,1.0,0.0);
+    SincInterp si = new SincInterp();
     float[][][] g = new float[_n3][_n2][_n1];
     for (int i3=0; i3<_n3; ++i3) {
       for (int i2=0; i2<_n2; ++i2) {
-        si.setUniformSamples(f[i3][i2]);
         for (int i1=0; i1<_n1; ++i1) {
-          g[i3][i2][i1] = si.interpolate(i1-u1y(i1,i2,i3));
+          g[i3][i2][i1] = si.interpolate(
+            _n1,1.0,0.0,f[i3][i2],i1-u1y(i1,i2,i3));
         }
       }
     }
@@ -473,8 +472,7 @@ public abstract class WarpFunction3 {
    * @return array of values g(y) = f(y-u(x(y)).
    */
   public float[][][] warp(float[][][] f) {
-    SincInterpolator si = new SincInterpolator();
-    si.setUniform(_n1,1.0,0.0,_n2,1.0,0.0,_n3,1.0,0.0,f);
+    SincInterp si = new SincInterp();
     float[][][] g = new float[_n3][_n2][_n1];
     for (int i3=0; i3<_n3; ++i3) {
       double y3 = i3;
@@ -485,7 +483,9 @@ public abstract class WarpFunction3 {
           double x1 = y1-u1y(y1,y2,y3);
           double x2 = y2-u2y(y1,y2,y3);
           double x3 = y3-u3y(y1,y2,y3);
-          g[i3][i2][i1] = si.interpolate(x1,x2,x3);
+          g[i3][i2][i1] = si.interpolate(
+            _n1,1.0,0.0,_n2,1.0,0.0,_n3,1.0,0.0,f,
+            x1,x2,x3);
         }
       }
     }
@@ -498,14 +498,13 @@ public abstract class WarpFunction3 {
    * @return array of values f(x) = g(x+u1(x)).
    */
   public float[][][] unwarp1(float[][][] g) {
-    SincInterpolator si = new SincInterpolator();
-    si.setUniformSampling(_n1,1.0,0.0);
+    SincInterp si = new SincInterp();
     float[][][] f = new float[_n3][_n2][_n1];
     for (int i3=0; i3<_n3; ++i3) {
       for (int i2=0; i2<_n2; ++i2) {
-        si.setUniformSamples(g[i3][i2]);
         for (int i1=0; i1<_n1; ++i1) {
-          f[i3][i2][i1] = si.interpolate(i1+u1x(i1,i2,i3));
+          f[i3][i2][i1] = si.interpolate(
+            _n1,1.0,0.0,g[i3][i2],i1+u1x(i1,i2,i3));
         }
       }
     }
@@ -518,8 +517,7 @@ public abstract class WarpFunction3 {
    * @return array of values f(x) = g(x+u(x)).
    */
   public float[][][] unwarp(float[][][] g) {
-    SincInterpolator si = new SincInterpolator();
-    si.setUniform(_n1,1.0,0.0,_n2,1.0,0.0,_n3,1.0,0.0,g);
+    SincInterp si = new SincInterp();
     float[][][] f = new float[_n3][_n2][_n1];
     for (int i3=0; i3<_n3; ++i3) {
       double x3 = i3;
@@ -530,7 +528,9 @@ public abstract class WarpFunction3 {
           double y1 = x1+u1x(x1,x2,x3);
           double y2 = x2+u2x(x1,x2,x3);
           double y3 = x3+u3x(x1,x2,x3);
-          f[i3][i2][i1] = si.interpolate(y1,y2,y3);
+          f[i3][i2][i1] = si.interpolate(
+            _n1,1.0,0.0,_n2,1.0,0.0,_n3,1.0,0.0,g,
+            y1,y2,y3);
         }
       }
     }

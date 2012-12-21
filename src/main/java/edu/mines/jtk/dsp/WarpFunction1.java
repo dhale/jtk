@@ -1,6 +1,6 @@
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.dsp.SincInterpolator;
+import edu.mines.jtk.dsp.SincInterp;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
@@ -150,13 +150,12 @@ public abstract class WarpFunction1 {
    * @return array of values g(y) = f(y-u(x(y)).
    */
   public float[] warp(float[] f) {
-    SincInterpolator si = new SincInterpolator();
-    si.setUniform(_n,1.0,0.0,f);
+    SincInterp si = new SincInterp();
     float[] g = new float[_n];
     for (int i=0; i<_n; ++i) {
       double y = i;
       double x = y-uy(y);
-      g[i] = si.interpolate(x);
+      g[i] = si.interpolate(_n,1.0,0.0,f,x);
     }
     return g;
   }
@@ -167,13 +166,12 @@ public abstract class WarpFunction1 {
    * @return array of values f(x) = g(x+u(x)).
    */
   public float[] unwarp(float[] g) {
-    SincInterpolator si = new SincInterpolator();
-    si.setUniform(_n,1.0,0.0,g);
+    SincInterp si = new SincInterp();
     float[] f = new float[_n];
     for (int i=0; i<_n; ++i) {
       double x = i;
       double y = x+ux(x);
-      f[i] = si.interpolate(y);
+      f[i] = si.interpolate(_n,1.0,0.0,g,y);
     }
     return f;
   }

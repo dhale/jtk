@@ -99,7 +99,7 @@ public class DynamicWarping {
     _lmin = shiftMin;
     _lmax = shiftMax;
     _nl = 1+_lmax-_lmin;
-    _si = new SincInterpolator();
+    _si = new SincInterp();
     _extrap = ErrorExtrapolation.NEAREST;
   }
 
@@ -486,10 +486,8 @@ public class DynamicWarping {
    */
   public void applyShifts(float[] u, float[] g, float[] h) {
     int n1 = u.length;
-    _si.setUniformSampling(n1,1.0,0.0);
-    _si.setUniformSamples(g);
     for (int i1=0; i1<n1; ++i1) {
-      h[i1] = _si.interpolate(i1+u[i1]);
+      h[i1] = _si.interpolate(n1,1.0,0.0,g,i1+u[i1]);
     }
   }
 
@@ -505,19 +503,10 @@ public class DynamicWarping {
     final float[][] uf = u;
     final float[][] gf = g;
     final float[][] hf = h;
-    final Parallel.Unsafe<SincInterpolator> siu =
-      new Parallel.Unsafe<SincInterpolator>();
     Parallel.loop(n2,new Parallel.LoopInt() {
     public void compute(int i2) {
-      SincInterpolator si = siu.get();
-      if (si==null) {
-        si = new SincInterpolator();
-        si.setUniformSampling(n1,1.0,0.0);
-        siu.set(si);
-      }
-      si.setUniformSamples(gf[i2]);
       for (int i1=0; i1<n1; ++i1) {
-        hf[i2][i1] = si.interpolate(i1+uf[i2][i1]);
+        hf[i2][i1] = _si.interpolate(n1,1.0,0.0,gf[i2],i1+uf[i2][i1]);
       }
     }});
   }
@@ -1101,7 +1090,7 @@ public class DynamicWarping {
   private RecursiveExponentialFilter _ref1; // for smoothing shifts
   private RecursiveExponentialFilter _ref2; // for smoothing shifts
   private RecursiveExponentialFilter _ref3; // for smoothing shifts
-  private SincInterpolator _si; // for warping with non-integer shifts
+  private SincInterp _si; // for warping with non-integer shifts
   private int _owl2 = 50; // window size in 2nd dimension for 3D images
   private int _owl3 = 50; // window size in 3rd dimension for 3D images
   private double _owf2 = 0.5; // fraction of window overlap in 2nd dimension

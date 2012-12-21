@@ -34,7 +34,8 @@ public class AllTest extends TestSuite {
     suite.addTestSuite(RecursiveExponentialFilterTest.class);
     suite.addTestSuite(RecursiveGaussianFilterTest.class);
     suite.addTestSuite(SamplingTest.class);
-    suite.addTestSuite(SincInterpolatorTest.class);
+    suite.addTestSuite(SincInterpTest.class);
+    //suite.addTestSuite(SincInterpolatorTest.class); // deprecated
 
     return suite;
   }

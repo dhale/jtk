@@ -251,12 +251,12 @@ public class SteerablePyramid {
       }
       int m2 = (nl2-1)/2+1;
       int m1 = (nl1-1)/2+1;
-      SincInterpolator si = new SincInterpolator();
-      si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
-      si.setUniform(m1,2,0,m2,2,0,spyr[lev+1][0]);
+      SincInterp si = new SincInterp();
+      si.setExtrapolation(SincInterp.Extrapolation.CONSTANT);
       for (int i2=0; i2<nl2; ++i2) {
         for (int i1=0; i1<nl1; ++i1) {
-          spyr[lev][0][i2][i1] += si.interpolate(i1,i2);
+          spyr[lev][0][i2][i1] += si.interpolate(
+            m1,2,0,m2,2,0,spyr[lev+1][0],i1,i2);
         }
       }
       nl2 = (nl2-1)*2+1;
@@ -299,8 +299,8 @@ public class SteerablePyramid {
       float[] lo11 = zerofloat(m1);
       float[] lo12 = zerofloat(m2);
       float[] lo13 = zerofloat(m3);
-      SincInterpolator si = SincInterpolator.fromErrorAndFrequency(0.001,0.4);
-      si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
+      SincInterp si = SincInterp.fromErrorAndFrequency(0.001,0.4);
+      si.setExtrapolation(SincInterp.Extrapolation.CONSTANT);
       for (int i3=0; i3<nl3; i3=i3+2) {
         j3 = i3/2;
         for (int i2=0; i2<nl2; i2=i2+2) {
@@ -310,9 +310,8 @@ public class SteerablePyramid {
             lo11[j1] = spyr[lev+1][0][j3][j2][j1];
             spyr[lev][1][i3][i2][i1] = lo11[j1];
           }
-          si.setUniform(m1,2,0,lo11);
           for (int i1=1; i1<nl1; i1=i1+2) {
-            spyr[lev][1][i3][i2][i1] = si.interpolate(i1);
+            spyr[lev][1][i3][i2][i1] = si.interpolate(m1,2,0,lo11,i1);
           }
         }
       }
@@ -322,9 +321,8 @@ public class SteerablePyramid {
             j2 = i2/2;
             lo12[j2] = spyr[lev][1][i3][i2][i1];
           }
-          si.setUniform(m2,2,0,lo12);
           for (int i2=1; i2<nl2; i2=i2+2) {
-            spyr[lev][1][i3][i2][i1] = si.interpolate(i2);
+            spyr[lev][1][i3][i2][i1] = si.interpolate(m2,2,0,lo12,i2);
           }
         }
       }
@@ -334,9 +332,8 @@ public class SteerablePyramid {
             j3 = i3/2;
             lo13[j3] = spyr[lev][1][i3][i2][i1];
           }
-          si.setUniform(m3,2,0,lo13);
           for (int i3=1; i3<nl3; i3=i3+2) {
-            spyr[lev][1][i3][i2][i1] = si.interpolate(i3);
+            spyr[lev][1][i3][i2][i1] = si.interpolate(m3,2,0,lo13,i3);
           }
         }
       }

@@ -13,6 +13,12 @@ import edu.mines.jtk.util.Check;
 
 /**
  * A sinc interpolator for bandlimited uniformly-sampled functions y(x). 
+ * <p>
+ * <em>
+ * This class is deprecated because it is not thread-safe. 
+ * Use the thread-safe class {@link edu.mines.jtk.dsp.SincInterp} instead.
+ * </em>
+ * <p>
  * Interpolators can be designed for any two of three parameters: maximum 
  * error (emax), maximum frequency (fmax) and maximum length (lmax). The 
  * parameter not specified is computed when an interpolator is designed.
@@ -60,9 +66,11 @@ import edu.mines.jtk.util.Check;
  * the table can easily exceed that of interpolating one sequence of 
  * samples, depending on the number of uniform samples. Therefore, one 
  * typically constructs an interpolator and uses it more than once.
+ * @deprecated 
  * @author Dave Hale, Colorado School of Mines; Bill Harlan, Landmark Graphics
  * @version 2005.08.07
  */
+@Deprecated
 public class SincInterpolator {
 
   /**
