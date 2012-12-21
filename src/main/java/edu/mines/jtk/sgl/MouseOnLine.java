@@ -110,8 +110,8 @@ public class MouseOnLine extends MouseConstrained {
     else if (_mode==Mode.PUSH_PULL) {
 
       // Use mouse y coordinate only to determine distance along line.
-      Canvas canvas = (Canvas)event.getSource();
-      double height = canvas.getHeight();
+      Component component = (Component)event.getSource();
+      double height = component.getHeight();
       double ymouse = event.getY();
       double scale = 0.05*(_ymouse-ymouse)/height;
       point = _origin.plus(_vector.times(scale*_length));

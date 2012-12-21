@@ -17,6 +17,9 @@ import edu.mines.jtk.awt.ColorMap;
  * @author Chris Engelsma, Colorado School of Mines
  * @version 2009.07.17
  */
+@SuppressWarnings({"rawtypes","unchecked"}) 
+// Use of JComboBox below is OK in Java 6, 
+// but must be JComboBox<E> in Java 7
 public class ContoursViewTest {
 
   public static void main(String[] args) {

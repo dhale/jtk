@@ -25,6 +25,7 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
 //public class GlCanvas extends GLJPanel implements GLEventListener {
 // If GLCanvas does not work (e.g., in JOGL2 RC9 on Mac OS X 10.8),
 // we may have more luck extending GLJPanel instead of GLCanvas.
+// GLJPanel now does not work correctly with ImagePanelGroup.
 
   private static final long serialVersionUID = 1L;
     

@@ -36,7 +36,7 @@ public class TriangleGroupTest {
     states.add(lms);
     MaterialState ms = new MaterialState();
     ms.setColorMaterial(GL_AMBIENT_AND_DIFFUSE);
-    ms.setSpecular(Color.white);
+    ms.setSpecular(Color.WHITE);
     ms.setShininess(100.0f);
     states.add(ms);
     tg.setStates(states);

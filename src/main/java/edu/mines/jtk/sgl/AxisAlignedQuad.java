@@ -101,6 +101,7 @@ public class AxisAlignedQuad extends Group implements Selectable, Dragable {
       _qb = _frame.getCornerMax();
     }
     public void drag(DragContext dc) {
+      assert _mouseConstrained!=null:"mouseConstrained!=null";
       Point3 point = _mouseConstrained.getPoint(dc.getMouseEvent());
       //BoxConstraint constraint = _frame.getBoxConstraint();
       //if (constraint!=null && !constraint.containsPoint(point))

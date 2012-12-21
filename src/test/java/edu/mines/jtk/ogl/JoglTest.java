@@ -69,6 +69,7 @@ public class JoglTest {
     System.out.println("main");
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
+        System.out.println("main:run");
         GLCanvas canvas = new GLCanvas();
         GLJPanel jpanel = new GLJPanel();
         canvas.addGLEventListener(new Guts("GLCanvas"));
