@@ -40,7 +40,7 @@ public class ColorBar extends IPanel implements ColorMapListener {
     _mosaic = new Mosaic(1,1,EnumSet.of(Mosaic.AxesPlacement.RIGHT));
     if (label!=null)
       _mosaic.getTileAxisRight(0).setLabel(label);
-    _mosaic.setWidthMinimum(0,25);
+    _mosaic.setWidthMinimum(0,15);
     _mosaic.setWidthElastic(0,0);
     _tile = _mosaic.getTile(0,0);
     this.setLayout(new BorderLayout());
