@@ -10,10 +10,6 @@ import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.util.ArrayMath.*;
 
-// TESTING ONLY
-import edu.mines.jtk.awt.*;
-import edu.mines.jtk.sgl.*;
-
 /**
  * Piecewise tricubic polynomial interpolation of a function y(x1,x2,x3).
  * The interpolated function has continuous first derivatives dy/d1, dy/d2,
@@ -454,7 +450,7 @@ public class TricubicInterpolator3 {
 
   // From org.apache.commons.math3.analysis.interpolation.
   // TricubicSplineInterpolatingFunction.java
-  private static final float[][] CINV = {
+  private static final float[][] AINV = {
     {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -592,7 +588,6 @@ public class TricubicInterpolator3 {
      -4,-4,4,2,2,2,2,-2,-2,-2,-2,2,2,-2,-2,2,2,-2,-2,2,-2,2,-2,2,-2,2,-2,1,1,
      1,1,1,1,1,1}
   };
-
   private static float[][][] getA(float[] dxs, float[][] yds) {
     float d1 = dxs[1];
     float d2 = dxs[2];
@@ -604,8 +599,8 @@ public class TricubicInterpolator3 {
           float am = 0.0f;
           for (int jd=0,j=0; jd<8; ++jd) { // for all eight derivatives, ...
             for (int jp=0; jp<8; ++jp,++j) { // for all eight points, ...
-              if (CINV[i][j]!=0)
-                am += CINV[i][j]*yds[jd][jp]*dxs[jd];
+              if (AINV[i][j]!=0)
+                am += AINV[i][j]*yds[jd][jp]*dxs[jd];
             }
           }
           am /= pow(d1,m1)*pow(d2,m2)*pow(d3,m3);
@@ -833,50 +828,5 @@ public class TricubicInterpolator3 {
       }
     }
     return a;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // testing
-
-  public static void main(String[] args) {
-    test1(17,19,13);
-  }
-  private static void test1(int n1, int n2, int n3) {
-    float[] x1 = mul(2.0f,randfloat(n1));
-    float[] x2 = mul(2.0f,randfloat(n2));
-    float[] x3 = mul(2.0f,randfloat(n3));
-    quickSort(x1);
-    quickSort(x2);
-    quickSort(x3);
-    float[][][] y = new float[n3][n2][n1];
-    for (int i3=0; i3<n3; ++i3) {
-      for (int i2=0; i2<n2; ++i2) {
-        for (int i1=0; i1<n1; ++i1) {
-          y[i3][i2][i1] = (1.0f+x1[i1])*(1.0f+x2[i2])*(1.0f+x3[i3]);
-          /*
-          y[i3][i2][i1] = sin(0.5f*FLT_PI*x1[i1]) *
-                          sin(0.5f*FLT_PI*x2[i2]) *
-                          sin(0.5f*FLT_PI*x3[i3]);
-          */
-        }
-      }
-    }
-    TricubicInterpolator3 ti = new TricubicInterpolator3(x1,x2,x3,y);
-    int n1s = 101;
-    int n2s = 102;
-    int n3s = 103;
-    float x1min = min(x1), x1max = max(x1);
-    float x2min = min(x2), x2max = max(x2);
-    float x3min = min(x3), x3max = max(x3);
-    double d1s = (x1max-x1min)/(n1s-1);
-    double d2s = (x2max-x2min)/(n2s-1);
-    double d3s = (x3max-x3min)/(n3s-1);
-    Sampling s1 = new Sampling(n1s,(x1max-x1min)/(n1s-1),x1min);
-    Sampling s2 = new Sampling(n2s,(x2max-x2min)/(n2s-1),x2min);
-    Sampling s3 = new Sampling(n3s,(x3max-x3min)/(n3s-1),x3min);
-    float[][][] yi = ti.interpolate000(s1,s2,s3);
-    SimpleFrame sf = new SimpleFrame();
-    ImagePanelGroup ipg = sf.addImagePanels(s1,s2,s3,yi);
-    ipg.setColorModel(ColorMap.JET);
   }
 }

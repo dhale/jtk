@@ -10,10 +10,6 @@ import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.util.ArrayMath.*;
 
-// TESTING ONLY
-import edu.mines.jtk.awt.*;
-import edu.mines.jtk.mosaic.*;
-
 /**
  * Piecewise bicubic polynomial interpolation of a function y(x1,x2).
  * The interpolated function has continuous first derivatives dy/d1, dy/d2 and
@@ -319,21 +315,10 @@ public class BicubicInterpolator2 {
   }
 
   private static float eval00(float[][] a, float d1, float d2) {
-    float sum2 = 0.0f;
-    for (int m2=3; m2>=0; --m2) {
-      float sum1 = 0.0f;
-      for (int m1=3; m1>=0; --m1) {
-        sum1 = a[m2][m1]+d1*sum1;
-      }
-      sum2 = sum1+d2*sum2;
-    }
-    return sum2;
-    /*
     return a[0][0]+d1*(a[0][1]+d1*(a[0][2]+d1*a[0][3])) +
        d2*(a[1][0]+d1*(a[1][1]+d1*(a[1][2]+d1*a[1][3])) +
        d2*(a[2][0]+d1*(a[2][1]+d1*(a[2][2]+d1*a[2][3])) +
        d2*(a[3][0]+d1*(a[3][1]+d1*(a[3][2]+d1*a[3][3])))));
-    */
   }
   private static float eval10(float[][] a, float d1, float d2) {
     return      a[0][1]+d2*(a[1][1]+d2*(a[2][1]+d2*a[3][1])) +
@@ -347,7 +332,7 @@ public class BicubicInterpolator2 {
   }
 
   // See http://en.wikipedia.org/wiki/Bicubic_interpolation
-  private static final float[][] CINV = {
+  private static final float[][] AINV = {
     {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     {0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0},
     {-3,3,0,0,-2,-1,0,0,0,0,0,0,0,0,0,0},
@@ -374,8 +359,8 @@ public class BicubicInterpolator2 {
         float am = 0.0f;
         for (int jd=0,j=0; jd<4; ++jd) { // for all four derivatives, ...
           for (int jp=0; jp<4; ++jp,++j) { // for all four points, ...
-            if (CINV[i][j]!=0)
-              am += CINV[i][j]*yds[jd][jp]*dxs[jd];
+            if (AINV[i][j]!=0)
+              am += AINV[i][j]*yds[jd][jp]*dxs[jd];
           }
         }
         am /= pow(d1,m1)*pow(d2,m2);
@@ -471,40 +456,5 @@ public class BicubicInterpolator2 {
       }
     }
     return a;
-  }
-
-  ///////////////////////////////////////////////////////////////////////////
-  // testing
-
-  public static void main(String[] args) {
-    test1(17,19);
-    test1(57,59);
-    test1(97,99);
-  }
-  private static void test1(int n1, int n2) {
-    float[] x1 = mul(2.0f,randfloat(n1));
-    float[] x2 = mul(2.0f,randfloat(n2));
-    quickSort(x1);
-    quickSort(x2);
-    float[][] y = new float[n2][n1];
-    for (int i2=0; i2<n2; ++i2)
-      for (int i1=0; i1<n1; ++i1)
-        //y[i2][i1] = (1.0f+x1[i1])*(1.0f+x2[i2]);
-        y[i2][i1] = sin(0.5f*FLT_PI*x1[i1])*sin(0.5f*FLT_PI*x2[i2]);
-    BicubicInterpolator2 bi = new BicubicInterpolator2(x1,x2,y);
-    int n1s = 201;
-    int n2s = 205;
-    float x1min = min(x1), x1max = max(x1);
-    float x2min = min(x2), x2max = max(x2);
-    double d1s = (x1max-x1min)/(n1s-1);
-    double d2s = (x2max-x2min)/(n2s-1);
-    Sampling s1 = new Sampling(n1s,(x1max-x1min)/(n1s-1),x1min);
-    Sampling s2 = new Sampling(n2s,(x2max-x2min)/(n2s-1),x2min);
-    float[][] yi = bi.interpolate00(s1,s2);
-    SimplePlot sp = new SimplePlot();
-    sp.setLimits(0.0,0.0,2.0,2.0);
-    PixelsView pv = sp.addPixels(s1,s2,yi);
-    pv.setColorModel(ColorMap.JET);
-    sp.addColorBar();
   }
 }
