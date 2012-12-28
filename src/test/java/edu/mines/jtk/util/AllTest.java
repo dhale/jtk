@@ -27,7 +27,6 @@ public class AllTest extends TestSuite {
     suite.addTestSuite(CfloatTest.class);
     suite.addTestSuite(CleanFormatterTest.class);
     suite.addTestSuite(ClipsTest.class);
-    suite.addTestSuite(CubicInterpolatorTest.class);
     suite.addTestSuite(LocalizeTest.class);
     suite.addTestSuite(MathPlusTest.class);
     suite.addTestSuite(ParameterTest.class);
