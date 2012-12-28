@@ -4,7 +4,7 @@ This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
-package edu.mines.jtk.util;
+package edu.mines.jtk.interp;
 
 import java.util.Random;
 
@@ -14,7 +14,7 @@ import junit.framework.TestSuite;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * Tests {@link edu.mines.jtk.util.CubicInterpolator}.
+ * Tests {@link edu.mines.jtk.interp.CubicInterpolator}.
  * @author Dave Hale, Zachary Pember, Colorado School of Mines
  * @version 2000.02.21, 2006.08.22
  */
@@ -24,6 +24,30 @@ public class CubicInterpolatorTest extends TestCase {
     TestSuite suite = new TestSuite(CubicInterpolatorTest.class);
     junit.textui.TestRunner.run(suite);
   }
+
+  public void testArrayMethods() {
+    int nc = 10;
+    int ni = 100;
+    float[] xc = randfloat(nc);
+    float[] yc = randfloat(nc);
+    quickSort(xc);
+    CubicInterpolator ci = new CubicInterpolator(xc,yc);
+    float[] xi = randfloat(ni);
+    float[] yi = zerofloat(ni);
+    ci.interpolate(xi,yi);
+    for (int i=0; i<ni; ++i)
+      assertEqual(yi[i],ci.interpolate(xi[i]));
+    ci.interpolate1(xi,yi);
+    for (int i=0; i<ni; ++i)
+      assertEqual(yi[i],ci.interpolate1(xi[i]));
+    ci.interpolate2(xi,yi);
+    for (int i=0; i<ni; ++i)
+      assertEqual(yi[i],ci.interpolate2(xi[i]));
+    ci.interpolate3(xi,yi);
+    for (int i=0; i<ni; ++i)
+      assertEqual(yi[i],ci.interpolate3(xi[i]));
+  }
+
 
   public void testLinearAndSpline() {
     //create set of data points
