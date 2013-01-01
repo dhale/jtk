@@ -57,7 +57,9 @@ public class TricubicInterpolator3 {
    * @param x3 array[n3] of x3 coordinates; monotonically increasing.
    * @param y array[n3][n2][n1] of sampled values y(x1,x2,x3).
    */
-  TricubicInterpolator3(float[] x1, float[] x2, float[] x3, float[][][] y) {
+  public TricubicInterpolator3(
+    float[] x1, float[] x2, float[] x3, float[][][] y) 
+  {
     this(Method.MONOTONIC,Method.MONOTONIC,Method.MONOTONIC,x1,x2,x3,y);
   }
 
@@ -71,7 +73,7 @@ public class TricubicInterpolator3 {
    * @param x3 array[n3] of x3 coordinates; monotonically increasing.
    * @param y array[n3][n2][n1] of sampled values y(x1,x2,x3).
    */
-  TricubicInterpolator3(
+  public TricubicInterpolator3(
     Method method1, Method method2, Method method3,
     float[] x1, float[] x2, float[] x3, float[][][] y) 
   {
@@ -91,7 +93,7 @@ public class TricubicInterpolator3 {
    * @param x3 array[n3] of x3 coordinates; monotonically increasing.
    * @param y array[n3][n2][n1] of sampled values y(x1,x2,x3).
    */
-  TricubicInterpolator3(
+  public TricubicInterpolator3(
     Method method1, Method method2, Method method3,
     int n1, int n2, int n3, 
     float[] x1, float[] x2, float[] x3, float[][][] y) 

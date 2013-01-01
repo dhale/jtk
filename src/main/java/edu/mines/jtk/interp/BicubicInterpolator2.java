@@ -54,7 +54,7 @@ public class BicubicInterpolator2 {
    * @param x2 array[n2] of x2 coordinates; monotonically increasing.
    * @param y array[n2][n1] of sampled values y(x1,x2).
    */
-  BicubicInterpolator2(float[] x1, float[] x2, float[][] y) {
+  public BicubicInterpolator2(float[] x1, float[] x2, float[][] y) {
     this(Method.MONOTONIC,Method.MONOTONIC,x1,x2,y);
   }
 
@@ -66,7 +66,7 @@ public class BicubicInterpolator2 {
    * @param x2 array[n2] of x2 coordinates; monotonically increasing.
    * @param y array[n2][n1] of sampled values y(x1,x2).
    */
-  BicubicInterpolator2(
+  public BicubicInterpolator2(
     Method method1, Method method2, 
     float[] x1, float[] x2, float[][] y) 
   {
@@ -83,7 +83,7 @@ public class BicubicInterpolator2 {
    * @param x2 array[n2] of x2 coordinates; monotonically increasing.
    * @param y array[n2][n1] of sampled values y(x1,x2).
    */
-  BicubicInterpolator2(
+  public BicubicInterpolator2(
     Method method1, Method method2,
     int n1, int n2, float[] x1, float[] x2, float[][] y) 
   {
