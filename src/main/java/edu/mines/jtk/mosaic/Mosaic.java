@@ -7,8 +7,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic;
 
 import java.awt.*;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
+import java.awt.event.*;
 import static java.lang.Math.*;
 import java.util.ArrayList;
 import java.util.Set;
@@ -121,6 +120,32 @@ public class Mosaic extends IPanel {
     for (int icol=0; icol<_ncol; ++icol) {
       HScrollBar hsb = _hsb[icol] = new HScrollBar(icol);
       add(hsb);
+    }
+
+    // Mouse wheel listeners for scrolling.
+    for (int irow=0; irow<nrow; ++irow) {
+      for (int icol=0; icol<ncol; ++icol) {
+        Tile tile = _tiles[irow][icol];
+        tile.addMouseWheelListener(new MouseWheelListener() {
+          public void mouseWheelMoved(MouseWheelEvent event) {
+            double u = event.getWheelRotation();
+            //double u = event.getPreciseWheelRotation(); // JDK 1.7 only
+            Tile tile = (Tile)event.getSource();
+            DRectangle vr = tile.getViewRectangle();
+            if (event.isShiftDown() && vr.width<1.0) { // horizontal
+              HScrollBar hsb = _hsb[tile.getColumnIndex()];
+              vr.x += u*hsb.getUnitIncrement(1)*SCROLL_SCL;
+              vr.x = max(0.0,min(1.0-vr.width,vr.x));
+              tile.setViewRectangle(vr);
+            } else if (!event.isShiftDown() && vr.height<1.0) { // vertical
+              VScrollBar vsb = _vsb[tile.getRowIndex()];
+              vr.y += u*vsb.getUnitIncrement(1)*SCROLL_SCL;
+              vr.y = max(0.0,min(1.0-vr.height,vr.y));
+              tile.setViewRectangle(vr);
+            }
+          }
+        });
+      }
     }
 
     // Width elastic and minimum for each column.
