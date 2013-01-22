@@ -117,7 +117,7 @@ def plot3(s1,s2,s3,f,title=None,xs=None):
   sf.setSize(600,650)
 
 def makeImage2():
-  n1,n2 = 301,302
+  n1,n2 = 201,202
   d1,d2 = 1.0/(n1-1),1.0/(n2-1)
   f1,f2 = 0.0,0.0
   s1,s2 = Sampling(n1,d1,f1),Sampling(n2,d2,f2)
@@ -129,7 +129,7 @@ def function2(x1,x2):
   return sin(2*PI*x1)*sin(2*PI*x2)
 
 def makeImage3():
-  n1,n2,n3 = 301,302,303
+  n1,n2,n3 = 201,202,203
   d1,d2,d3 = 1.0/(n1-1),1.0/(n2-1),1.0/(n3-1)
   f1,f2,f3 = 0.0,0.0,0.0
   s1,s2,s3 = Sampling(n1,d1,f1),Sampling(n2,d2,f2),Sampling(n3,d3,f3)
