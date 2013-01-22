@@ -20,12 +20,14 @@ public class AllTest extends TestSuite {
     TestSuite suite = new TestSuite();
 
     suite.addTestSuite(BicubicInterpolator2Test.class);
+    suite.addTestSuite(BilinearInterpolator2Test.class);
     suite.addTestSuite(CubicInterpolatorTest.class);
     suite.addTestSuite(Gridder2Test.class);
     suite.addTestSuite(LasserreVolumeTest.class);
     suite.addTestSuite(SibsonInterpolator2Test.class);
     suite.addTestSuite(SibsonInterpolator3Test.class);
     suite.addTestSuite(TricubicInterpolator3Test.class);
+    suite.addTestSuite(TrilinearInterpolator3Test.class);
 
     return suite;
   }
