@@ -353,7 +353,7 @@ public class MathPlus {
    * @return the hyperbolic sine.
    */
   public static float sinh(float x) {
-    return (float)Math.sinh((double)x);
+    return (float)Math.sinh(x);
   }
 
   /**
@@ -362,7 +362,7 @@ public class MathPlus {
    * @return the hyperbolic sine.
    */
   public static double sinh(double x) {
-    return 0.5*(Math.exp(x)-Math.exp(-x));
+    return Math.sinh(x);
   }
 
   /**
@@ -371,7 +371,7 @@ public class MathPlus {
    * @return the hyperbolic cosine.
    */
   public static float cosh(float x) {
-    return (float)Math.cosh((double)x);
+    return (float)Math.cosh(x);
   }
 
   /**
@@ -380,7 +380,7 @@ public class MathPlus {
    * @return the hyperbolic cosine.
    */
   public static double cosh(double x) {
-    return 0.5*(Math.exp(x)+Math.exp(-x));
+    return Math.cosh(x);
   }
 
   /**
@@ -389,7 +389,7 @@ public class MathPlus {
    * @return the hyperbolic cosine.
    */
   public static float tanh(float x) {
-    return (float)tanh((double)x);
+    return (float)Math.tanh(x);
   }
 
   /**
@@ -398,9 +398,7 @@ public class MathPlus {
    * @return the hyperbolic cosine.
    */
   public static double tanh(double x) {
-    double ep = Math.exp(x);
-    double em = Math.exp(-x);
-    return (ep-em)/(ep+em);
+    return Math.tanh(x);
   }
 
   /**
@@ -491,7 +489,7 @@ public class MathPlus {
    * @return the signum.
    */
   public static float signum(float x) {
-    return (x>0.0f)?1.0f:((x<0.0f)?-1.0f:0.0f);
+    return Math.signum(x);
   }
 
   /**
@@ -502,7 +500,7 @@ public class MathPlus {
    * @return the signum.
    */
   public static double signum(double x) {
-    return (x>0.0)?1.0:((x<0.0)?-1.0:0.0);
+    return Math.signum(x);
   }
 
   /**
@@ -511,7 +509,7 @@ public class MathPlus {
    * @return the absolute value.
    */
   public static int abs(int x) {
-    return (x>0)?x:-x;
+    return Math.abs(x);
   }
 
   /**
@@ -520,7 +518,7 @@ public class MathPlus {
    * @return the absolute value.
    */
   public static long abs(long x) {
-    return (x>0L)?x:-x;
+    return Math.abs(x);
   }
 
   /**
@@ -529,7 +527,7 @@ public class MathPlus {
    * @return the absolute value.
    */
   public static float abs(float x) {
-    return (x>0.0f)?x:-x;
+    return Math.abs(x);
   }
 
   /**
@@ -538,7 +536,7 @@ public class MathPlus {
    * @return the absolute value.
    */
   public static double abs(double x) {
-    return (x>=0.0d)?x:-x;
+    return Math.abs(x);
   }
 
   /**
@@ -548,7 +546,7 @@ public class MathPlus {
    * @return the maximum value.
    */
   public static int max(int a, int b) {
-    return (a>=b)?a:b;
+    return Math.max(a,b);
   }
 
   /**
@@ -581,7 +579,7 @@ public class MathPlus {
    * @return the maximum value.
    */
   public static long max(long a, long b) {
-    return (a>=b)?a:b;
+    return Math.max(a,b);
   }
 
   /**
@@ -614,7 +612,7 @@ public class MathPlus {
    * @return the maximum value.
    */
   public static float max(float a, float b) {
-    return (a>=b)?a:b;
+    return Math.max(a,b);
   }
 
   /**
@@ -647,7 +645,7 @@ public class MathPlus {
    * @return the maximum value.
    */
   public static double max(double a, double b) {
-    return (a>=b)?a:b;
+    return Math.max(a,b);
   }
 
   /**
@@ -680,7 +678,7 @@ public class MathPlus {
    * @return the minimum value.
    */
   public static int min(int a, int b) {
-    return (a<=b)?a:b;
+    return Math.min(a,b);
   }
 
   /**
@@ -713,7 +711,7 @@ public class MathPlus {
    * @return the minimum value.
    */
   public static long min(long a, long b) {
-    return (a<=b)?a:b;
+    return Math.min(a,b);
   }
 
   /**
@@ -746,7 +744,7 @@ public class MathPlus {
    * @return the minimum value.
    */
   public static float min(float a, float b) {
-    return (a<=b)?a:b;
+    return Math.min(a,b);
   }
 
   /**
@@ -779,7 +777,7 @@ public class MathPlus {
    * @return the minimum value.
    */
   public static double min(double a, double b) {
-    return (a<=b)?a:b;
+    return Math.min(a,b);
   }
 
   /**
