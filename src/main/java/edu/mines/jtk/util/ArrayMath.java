@@ -452,7 +452,7 @@ public class ArrayMath {
    * @return the hyperbolic sine.
    */
   public static float sinh(float x) {
-    return (float)Math.sinh((double)x);
+    return (float)Math.sinh(x);
   }
 
   /**
@@ -461,7 +461,7 @@ public class ArrayMath {
    * @return the hyperbolic sine.
    */
   public static double sinh(double x) {
-    return 0.5*(Math.exp(x)-Math.exp(-x));
+    return Math.sinh(x);
   }
 
   /**
@@ -470,7 +470,7 @@ public class ArrayMath {
    * @return the hyperbolic cosine.
    */
   public static float cosh(float x) {
-    return (float)Math.cosh((double)x);
+    return (float)Math.cosh(x);
   }
 
   /**
@@ -479,27 +479,25 @@ public class ArrayMath {
    * @return the hyperbolic cosine.
    */
   public static double cosh(double x) {
-    return 0.5*(Math.exp(x)+Math.exp(-x));
+    return Math.cosh(x);
   }
 
   /**
    * Returns the hyperbolic tangent of the specified value.
    * @param x the value.
-   * @return the hyperbolic cosine.
+   * @return the hyperbolic tangent.
    */
   public static float tanh(float x) {
-    return (float)tanh((double)x);
+    return (float)Math.tanh(x);
   }
 
   /**
    * Returns the hyperbolic tangent of the specified value.
    * @param x the value.
-   * @return the hyperbolic cosine.
+   * @return the hyperbolic tangent.
    */
   public static double tanh(double x) {
-    double ep = Math.exp(x);
-    double em = Math.exp(-x);
-    return (ep-em)/(ep+em);
+    return Math.tanh(x);
   }
 
   /**
@@ -610,7 +608,7 @@ public class ArrayMath {
    * @return the absolute value.
    */
   public static int abs(int x) {
-    return (x>0)?x:-x;
+    return (x>=0)?x:-x;
   }
 
   /**
@@ -619,7 +617,7 @@ public class ArrayMath {
    * @return the absolute value.
    */
   public static long abs(long x) {
-    return (x>0L)?x:-x;
+    return (x>=0L)?x:-x;
   }
 
   /**
@@ -628,7 +626,7 @@ public class ArrayMath {
    * @return the absolute value.
    */
   public static float abs(float x) {
-    return (x>0.0f)?x:-x;
+    return (x>=0.0f)?x:-x;
   }
 
   /**

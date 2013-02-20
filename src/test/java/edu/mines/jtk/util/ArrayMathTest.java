@@ -6,12 +6,12 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
+import static edu.mines.jtk.util.ArrayMath.*;
+
 import java.util.Random;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
  * Tests {@link edu.mines.jtk.util.ArrayMath}.
@@ -590,6 +590,10 @@ public class ArrayMathTest extends TestCase {
     assertEquals(2L,abs(-2L));
     assertEquals(2.0f,abs(-2.0f));
     assertEquals(2.0d,abs(-2.0d));
+    assertEquals("abs(float) changed sign of 0",
+                 0, Float.floatToIntBits(abs(0.0f)));
+    assertEquals("abs(double) changed sign of 0",
+                 0, Double.doubleToLongBits(abs(0.0d)));
 
     assertEquals(4,max(1,3,4,2));
     assertEquals(4L,max(1L,3L,4L,2L));
