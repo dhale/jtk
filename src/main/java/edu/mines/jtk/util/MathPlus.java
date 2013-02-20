@@ -489,7 +489,7 @@ public class MathPlus {
    * @return the signum.
    */
   public static float signum(float x) {
-    return Math.signum(x);
+    return (x>0.0f)?1.0f:((x<0.0f)?-1.0f:0.0f);
   }
 
   /**
@@ -500,7 +500,7 @@ public class MathPlus {
    * @return the signum.
    */
   public static double signum(double x) {
-    return Math.signum(x);
+    return (x>0.0)?1.0:((x<0.0)?-1.0:0.0);
   }
 
   /**
@@ -546,7 +546,7 @@ public class MathPlus {
    * @return the maximum value.
    */
   public static int max(int a, int b) {
-    return Math.max(a,b);
+    return (a>=b)?a:b;
   }
 
   /**
@@ -579,7 +579,7 @@ public class MathPlus {
    * @return the maximum value.
    */
   public static long max(long a, long b) {
-    return Math.max(a,b);
+    return (a>=b)?a:b;
   }
 
   /**
@@ -612,7 +612,7 @@ public class MathPlus {
    * @return the maximum value.
    */
   public static float max(float a, float b) {
-    return Math.max(a,b);
+    return (a>=b)?a:b;
   }
 
   /**
@@ -645,7 +645,7 @@ public class MathPlus {
    * @return the maximum value.
    */
   public static double max(double a, double b) {
-    return Math.max(a,b);
+    return (a>=b)?a:b;
   }
 
   /**
@@ -678,7 +678,7 @@ public class MathPlus {
    * @return the minimum value.
    */
   public static int min(int a, int b) {
-    return Math.min(a,b);
+    return (a<=b)?a:b;
   }
 
   /**
@@ -711,7 +711,7 @@ public class MathPlus {
    * @return the minimum value.
    */
   public static long min(long a, long b) {
-    return Math.min(a,b);
+    return (a<=b)?a:b;
   }
 
   /**
@@ -744,7 +744,7 @@ public class MathPlus {
    * @return the minimum value.
    */
   public static float min(float a, float b) {
-    return Math.min(a,b);
+    return (a<=b)?a:b;
   }
 
   /**
@@ -777,7 +777,7 @@ public class MathPlus {
    * @return the minimum value.
    */
   public static double min(double a, double b) {
-    return Math.min(a,b);
+    return (a<=b)?a:b;
   }
 
   /**
