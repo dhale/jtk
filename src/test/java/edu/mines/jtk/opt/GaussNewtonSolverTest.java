@@ -6,12 +6,13 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.opt;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
 import edu.mines.jtk.util.Almost;
 
 /** Solve least-squares inverse of a Transform.
@@ -214,7 +215,7 @@ public class GaussNewtonSolverTest extends TestCase {
       model.dispose();
       result.dispose();
     }
-    assert TestVect.max <10 : "max="+TestVect.max;
+    assert TestVect.max <=10 : "max="+TestVect.max;
     // use full interface
     for (int twice=0; twice<2; ++twice) {
       boolean project = (twice==1);
