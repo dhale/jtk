@@ -386,7 +386,7 @@ public class MathPlus {
   /**
    * Returns the hyperbolic tangent of the specified value.
    * @param x the value.
-   * @return the hyperbolic cosine.
+   * @return the hyperbolic tangent.
    */
   public static float tanh(float x) {
     return (float)Math.tanh(x);
@@ -395,7 +395,7 @@ public class MathPlus {
   /**
    * Returns the hyperbolic tangent of the specified value.
    * @param x the value.
-   * @return the hyperbolic cosine.
+   * @return the hyperbolic tangent.
    */
   public static double tanh(double x) {
     return Math.tanh(x);
