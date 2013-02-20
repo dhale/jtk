@@ -509,7 +509,7 @@ public class MathPlus {
    * @return the absolute value.
    */
   public static int abs(int x) {
-    return Math.abs(x);
+    return (x>=0)?x:-x;
   }
 
   /**
@@ -518,25 +518,31 @@ public class MathPlus {
    * @return the absolute value.
    */
   public static long abs(long x) {
-    return Math.abs(x);
+    return (x>=0L)?x:-x;
   }
 
   /**
    * Returns the absolute value of the specified value.
+   * Note that {@code abs(-0.0f)} returns {@code -0.0f};
+   * the sign bit is not cleared.
+   * If this is a problem, use {@code Math.abs}.
    * @param x the value.
    * @return the absolute value.
    */
   public static float abs(float x) {
-    return Math.abs(x);
+    return (x>=0.0f)?x:-x;
   }
 
   /**
    * Returns the absolute value of the specified value.
+   * Note that {@code abs(-0.0d)} returns {@code -0.0d};
+   * the sign bit is not cleared.
+   * If this is a problem, use {@code Math.abs}.
    * @param x the value.
    * @return the absolute value.
    */
   public static double abs(double x) {
-    return Math.abs(x);
+    return (x>=0.0d)?x:-x;
   }
 
   /**

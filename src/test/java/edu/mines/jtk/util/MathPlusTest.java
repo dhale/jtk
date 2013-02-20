@@ -6,10 +6,9 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
+import static edu.mines.jtk.util.MathPlus.*;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import static edu.mines.jtk.util.MathPlus.*;
 
 /**
  * Tests {@link edu.mines.jtk.util.MathPlus}.
@@ -106,10 +105,6 @@ public class MathPlusTest extends TestCase {
                  0, Float.floatToIntBits(abs(0.0f)));
     assertEquals("abs(double) changed sign of 0",
                  0, Double.doubleToLongBits(abs(0.0d)));
-    assertEquals("abs(float) did not remove sign from -0",
-                 0, Float.floatToIntBits(abs(-0.0f)));
-    assertEquals("abs(double) did not remove sign from -0",
-                 0, Double.doubleToLongBits(abs(-0.0d)));
 
     assertEquals(4,max(1,3,4,2));
     assertEquals(4L,max(1L,3L,4L,2L));
