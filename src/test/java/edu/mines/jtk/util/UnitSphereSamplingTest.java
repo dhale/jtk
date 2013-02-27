@@ -35,6 +35,16 @@ public class UnitSphereSamplingTest extends TestCase {
     testTriangle(8);
     testTriangle(16);
   }
+
+  public void testTriangle1() {
+    // This used to fail due to rounding errors when computing r and s.
+    float[] p = {-0.82179755f,0.56977963f,0.0f};
+    UnitSphereSampling uss = new UnitSphereSampling(16);
+    int i = uss.getIndex(p);
+    int[] abc = uss.getTriangle(p);
+    int ia = abc[0], ib = abc[1], ic = abc[2];
+    assertTrue(i==ia || i==ib || i==ic);
+  }
   
   public void testWeights() {
     testWeights(8);

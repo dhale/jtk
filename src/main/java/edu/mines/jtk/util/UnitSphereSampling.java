@@ -101,26 +101,11 @@ public class UnitSphereSampling {
     double ax = (x>=0.0f)?x:-x;
     double ay = (y>=0.0f)?y:-y;
     double az = (z>=0.0f)?z:-z;
-    double scale = 1.0/(ax+ay+az);
+    double scale = ALMOST_ONE/(ax+ay+az);
     double r = x*scale;
     double s = y*scale;
     int ir = (int)(0.5+(r+1.0)*_od);
     int is = (int)(0.5+(s+1.0)*_od);
-    int jr = ir-_m;
-    int js = is-_m;
-    if (jr+js>_m) {
-      --ir;
-      --is;
-    } else if (-jr+js>_m) {
-      ++ir;
-      --is;
-    } else if (-jr-js>_m) {
-      ++ir;
-      ++is;
-    } else if (jr-js>_m) {
-      --ir;
-      ++is;
-    }
     int index = _ip[is][ir];
     assert index>0:"index>0";
     return (z>=0.0f)?index:index-_nindex;
@@ -152,7 +137,7 @@ public class UnitSphereSampling {
     double ax = (x>=0.0f)?x:-x;
     double ay = (y>=0.0f)?y:-y;
     double az = (z>=0.0f)?z:-z;
-    double scale = 1.0/(ax+ay+az);
+    double scale = ALMOST_ONE/(ax+ay+az);
     double r = x*scale;
     double s = y*scale;
 
@@ -432,6 +417,9 @@ public class UnitSphereSampling {
   // number of unique points sampled is 64518. This number is close to
   // but less than the maximum of 65536 points that could possibly be 
   // represented in 16 bits.
+
+  // Used instead of 1.0 when computing r and s to ensure |r|+|s| <= m.
+  private static final double ALMOST_ONE = 1.0-5.0*ulp(1.0);
   
   private int _m; // number of samples for positive r and s, not including zero
   private int _n; // number of samples of r and s
