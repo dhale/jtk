@@ -681,9 +681,9 @@ public class PlotPanel extends IPanel {
   /**
    * Adds a pixels view of the specified sampled function f(x1,x2).
    * Assumes zero first sample values and unit sampling intervals.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
-   *  n1 = f[0][0].length, n2 = f[0].length, and nc is the number 
-   *  of components.
+   * @param f array[nc][n2][n1] of sampled function values f(x1,x2), 
+   *  where n1 = f[0][0].length, n2 = f[0].length, and nc is the 
+   *  number of components.
    * @return the pixels view.
    */
   public PixelsView addPixels(float[][][] f) {
@@ -694,9 +694,9 @@ public class PlotPanel extends IPanel {
    * Adds a pixels view of the specified sampled function f(x1,x2).
    * @param s1 the sampling of the variable x1; must be uniform.
    * @param s2 the sampling of the variable x2; must be uniform.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), where 
-   *  n1 = f[0][0].length, n2 = f[0].length, and nc is the number 
-   *  of components.
+   * @param f array[nc][n2][n1] of sampled function values f(x1,x2), 
+   *  where n1 = f[0][0].length, n2 = f[0].length, and nc is the 
+   *  number of components.
    * @return the pixels view.
    */
   public PixelsView addPixels(Sampling s1, Sampling s2, float[][][] f) {
@@ -708,9 +708,9 @@ public class PlotPanel extends IPanel {
    * Assumes zero first sample values and unit sampling intervals.
    * @param irow the tile row index.
    * @param icol the tile column index.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), 
-   *  n1 = f[0][0].length, n2 = f[0].length, and nc is the number 
-   *  of components.
+   * @param f array[nc][n2][n1] of sampled function values f(x1,x2), 
+   *  where n1 = f[0][0].length, n2 = f[0].length, and nc is the 
+   *  number of components.
    * @return the pixels view.
    */
   public PixelsView addPixels(int irow, int icol, float[][][] f) {
@@ -724,9 +724,9 @@ public class PlotPanel extends IPanel {
    * @param icol the tile column index.
    * @param s1 the sampling of the variable x1; must be uniform.
    * @param s2 the sampling of the variable x2; must be uniform.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), 
-   *  n1 = f[0][0].length, n2 = f[0].length, and nc is the number 
-   *  of components.
+   * @param f array[nc][n2][n1] of sampled function values f(x1,x2), 
+   *  where n1 = f[0][0].length, n2 = f[0].length, and nc is the 
+   *  number of components.
    * @return the pixels view.
    */
   public PixelsView addPixels(
@@ -1260,7 +1260,7 @@ public class PlotPanel extends IPanel {
   }
 
   /**
-   * Verifies the correct color mapped is being used.
+   * Ensures that the colorbar (if any) reflects the correct color map.
    */
   private void updateColorMapped() {
     ColorMapped cm = findBestColorMapped();
@@ -1272,11 +1272,6 @@ public class PlotPanel extends IPanel {
       revalidate();
     }
   }
-
-  /**
-   * Private inner class that handles a change in the color mapped by
-   * listening to the color map.
-   */
   private class ColorMapHandler implements ColorMapListener {
 
     /**

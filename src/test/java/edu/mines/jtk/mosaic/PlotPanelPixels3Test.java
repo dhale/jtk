@@ -88,7 +88,8 @@ public class PlotPanelPixels3Test {
     float[][][][] f = new float[][][][]{f0,f1,f2};
 
     PlotPanelPixels3 plot = new PlotPanelPixels3(
-      PlotPanelPixels3.Orientation.X1RIGHT,
+      //PlotPanelPixels3.Orientation.X1RIGHT,
+      PlotPanelPixels3.Orientation.X1DOWN,
       PlotPanelPixels3.AxesPlacement.LEFT_BOTTOM,
       s1,s2,s3,f);
     plot.setLabel1("axis 1");

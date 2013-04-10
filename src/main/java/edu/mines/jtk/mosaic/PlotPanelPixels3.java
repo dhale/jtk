@@ -408,10 +408,12 @@ public class PlotPanelPixels3 extends PlotPanel {
    * @param colorModel the index color model.
    */
   public void setColorModel(IndexColorModel colorModel) {
-    _colorMap.setColorModel(colorModel);
-    _p12.setColorModel(colorModel);
-    _p13.setColorModel(colorModel);
-    _p23.setColorModel(colorModel);
+    if (_nc==1) {
+      _colorMap.setColorModel(colorModel);
+      _p12.setColorModel(colorModel);
+      _p13.setColorModel(colorModel);
+      _p23.setColorModel(colorModel);
+    }
   }
 
   /**
@@ -707,7 +709,7 @@ public class PlotPanelPixels3 extends PlotPanel {
     float[][] xic = new float[_n3][_n2];
     for (int ic=0; ic<_nc; ++ic) {
       _f3[ic].get23(_n2,_n3,_k1,0,0,xic);
-      x[ic] = (_transpose23)?transpose(xic):xic;
+      x[ic] = (_transpose23)?transpose(xic):copy(xic);
     }
     return x;
   }

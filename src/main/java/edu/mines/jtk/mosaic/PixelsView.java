@@ -240,8 +240,10 @@ public class PixelsView extends TiledView implements ColorMapped {
    * @param colorModel the index color model.
    */
   public void setColorModel(IndexColorModel colorModel) {
-    _colorMap.setColorModel(colorModel);
-    repaint();
+    if (_nc==1) {
+      _colorMap.setColorModel(colorModel);
+      repaint();
+    }
   }
 
   /**
