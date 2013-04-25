@@ -17,10 +17,10 @@ from edu.mines.jtk.util.ArrayMath import *
 
 def main(args):
   #demoCircleChirp2()
-  #demoCircleImpulses2()
+  demoCircleImpulses2()
   #demoCircleRandom2()
-  #demoSphereImpulses3()
-  demoSphereRandom3()
+  demoSphereImpulses3()
+  #demoSphereRandom3()
   return
 
 lowpass,simple = "lowpass","simple"

@@ -1319,8 +1319,8 @@ public class LocalDiffusionKernel {
     trace("ygx="+ygx);
     trace("xgy="+xgy);
   }
-  private static void main(String[] args) {
-    testGrad1();
-    testGrad2();
+  public static void main(String[] args) {
+    //testGrad1();
+    //testGrad2();
   }
 }

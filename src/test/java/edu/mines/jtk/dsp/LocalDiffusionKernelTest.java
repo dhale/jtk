@@ -167,7 +167,41 @@ public class LocalDiffusionKernelTest extends TestCase {
 
   private static void bench(boolean parallel) {
     Parallel.setParallel(parallel);
+    //bench2();
     bench3();
+  }
+
+  private static void bench2() {
+    int n1 = 501;
+    int n2 = 502;
+    Random r = new Random(314159);
+    float[][] x = randfloat(r,n1,n2);
+    float[][] y = randfloat(r,n1,n2);
+    float[][] s = randfloat(r,n1,n2);
+    Tensors2 d = new RandomTensors2(n1,n2);
+    String[] stencilNames = {"D22","D24","D71"};
+    LocalDiffusionKernel.Stencil[] stencils = {
+      LocalDiffusionKernel.Stencil.D22,
+      LocalDiffusionKernel.Stencil.D24,
+      LocalDiffusionKernel.Stencil.D71,
+    };
+    for (int i=0; i<stencils.length; ++i) {
+      System.out.println(stencilNames[i]);
+      LocalDiffusionKernel ldf = new LocalDiffusionKernel(stencils[i]);
+      int niter;
+      double maxtime = 5.0;
+      double nsample = (double)n1*(double)n2;
+      Stopwatch sw = new Stopwatch();
+      for (int itest=0; itest<3; ++itest) {
+        sw.restart();
+        for (niter=0; sw.time()<maxtime; ++niter)
+          ldf.apply(d,0.5f,s,x,y);
+        sw.stop();
+        float sum = sum(y);
+        int rate = (int)(1.0e-6*niter*nsample/sw.time());
+        System.out.println("rate = "+rate+"  sum = "+sum);
+      }
+    }
   }
 
   private static void bench3() {
@@ -179,19 +213,28 @@ public class LocalDiffusionKernelTest extends TestCase {
     float[][][] y = randfloat(r,n1,n2,n3);
     float[][][] s = randfloat(r,n1,n2,n3);
     IdentityTensors3 d = new IdentityTensors3();
-    LocalDiffusionKernel ldf = new LocalDiffusionKernel();
-    int niter;
-    double maxtime = 5.0;
-    double nsample = (double)n1*(double)n2*(double)n3;
-    Stopwatch sw = new Stopwatch();
-    for (int itest=0; itest<3; ++itest) {
-      sw.restart();
-      for (niter=0; sw.time()<maxtime; ++niter)
-        ldf.apply(d,0.5f,s,x,y);
-      sw.stop();
-      float sum = sum(y);
-      int rate = (int)(1.0e-6*niter*nsample/sw.time());
-      System.out.println("rate = "+rate+"  sum = "+sum);
+    String[] stencilNames = {"D22","D33","D71"};
+    LocalDiffusionKernel.Stencil[] stencils = {
+      LocalDiffusionKernel.Stencil.D22,
+      LocalDiffusionKernel.Stencil.D33,
+      LocalDiffusionKernel.Stencil.D71,
+    };
+    for (int i=0; i<stencils.length; ++i) {
+      System.out.println(stencilNames[i]);
+      LocalDiffusionKernel ldf = new LocalDiffusionKernel(stencils[i]);
+      int niter;
+      double maxtime = 5.0;
+      double nsample = (double)n1*(double)n2*(double)n3;
+      Stopwatch sw = new Stopwatch();
+      for (int itest=0; itest<3; ++itest) {
+        sw.restart();
+        for (niter=0; sw.time()<maxtime; ++niter)
+          ldf.apply(d,0.5f,s,x,y);
+        sw.stop();
+        float sum = sum(y);
+        int rate = (int)(1.0e-6*niter*nsample/sw.time());
+        System.out.println("rate = "+rate+"  sum = "+sum);
+      }
     }
   }
 }
