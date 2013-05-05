@@ -4,6 +4,7 @@
 /.idea
 
 build/
+*.iml
 *.png
 *.zip
 *.swp
