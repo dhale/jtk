@@ -64,6 +64,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
     <path id="scala.tools.classpath">
       <pathelement location="${scala.home}/lib/scala-compiler.jar"/>
       <pathelement location="${scala.home}/lib/scala-library.jar"/>
+      <pathelement location="${scala.home}/lib/scala-reflect.jar"/>
     </path>
     <path id="scala.build.classpath">
       <pathelement location="${build.cls}"/>
