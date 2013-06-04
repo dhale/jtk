@@ -6,10 +6,10 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
-import jsr166y.*; // until JDK 7 is available
+//import jsr166y.*; // until JDK 7 is available
 
 import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 /**
  * Utilities for parallel computing in loops over independent tasks.
