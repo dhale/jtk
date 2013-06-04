@@ -5,5 +5,5 @@
 # Runtime Environment). The JDK has a javac compiler; the JRE does not.
 export JDK_HOME=/usr/java/jdk
 
-# Run ant without adornments.
-ant -e $*
+# Run ant without adornments, quietly, and search for build.xml.
+ant -e -q -s build.xml $*

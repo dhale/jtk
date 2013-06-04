@@ -10,7 +10,7 @@ set JDK_HOME=C:\pro\jdk
 rem Include the JDK and Ant bin folders in our PATH.
 set PATH=%JDK_HOME%\bin;%ANT_HOME%\bin;%PATH%
 
-rem Run ant without adornments.
-ant -e %*
+rem Run ant without adornments, quietly, and search for build.xml.
+ant -e -q -s build.xml %*
 
 endlocal

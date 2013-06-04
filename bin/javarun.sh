@@ -4,7 +4,7 @@
 export MINES_JTK_HOME=$HOME/git/jtk
 
 # If Mac OS X, which version of Java should we use?
-export JAVA_VERSION=1.6.0
+export JAVA_VERSION=1.7.0
 
 # Where will Java look for classes? 
 # Add other jars to this list as necessary.
@@ -21,5 +21,4 @@ $MINES_JTK_HOME/jar/junit.jar:\
 # Modify these flags and properties as necessary for your system.
 java -server -d64 -ea -Xmx1g \
 -Djava.util.logging.config.file=$HOME/.java_logging_config \
--Dapple.awt.graphicsUseQuartz=true \
 $*
