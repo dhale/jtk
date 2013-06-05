@@ -108,8 +108,6 @@ public class LocalSemblanceFilter {
     sd = mul(f,f);
     sd = smooth1(d,t,sd);
     sd = smooth2(d,t,sd);
-    int count0 = 0;
-    int count1 = 0;
     for (int i2=0; i2<n2; ++i2) {
       for (int i1=0; i1<n1; ++i1) {
         float sni = sn[i2][i1];

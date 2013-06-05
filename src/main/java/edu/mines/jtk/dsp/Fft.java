@@ -794,7 +794,6 @@ public class Fft {
   private void uncenter1(float[] f) {
     if (!_center1)
       return;
-    int nk1 = _sk1.getCount();
     int nfft1 = _nfft1;
     boolean even1 = nfft1%2==0;
     if (_complex) {

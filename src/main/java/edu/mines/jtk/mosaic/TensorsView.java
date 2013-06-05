@@ -8,7 +8,6 @@ package edu.mines.jtk.mosaic;
 
 import java.awt.*;
 
-import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.EigenTensors2;
 import edu.mines.jtk.dsp.Sampling;
 import static edu.mines.jtk.util.ArrayMath.*;
@@ -291,8 +290,6 @@ public class TensorsView extends TiledView {
         _et.getEigenvectorU(j1,j2,u);
         double u1 = u[0];
         double u2 = u[1];
-        double v1 = -u2;
-        double v2 =  u1;
         double du = a[0];
         double dv = a[1];
         double ru = r*sqrt(du);

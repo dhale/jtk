@@ -1030,7 +1030,7 @@ public class TriSurf {
    * Returns the distance squared between the specified node and a point
    * with specified coordinates.
    */
-  private static final double distanceSquared(
+  private static double distanceSquared(
     Node node, double x, double y, double z)
   {
     double dx = x-node.x();
@@ -1140,7 +1140,7 @@ public class TriSurf {
    * to tag faces that have already been visited.
    * @param face the face to mark (red).
    */
-  private final void mark(Face face) {
+  private void mark(Face face) {
     face._mark = _faceMarkRed;
   }
 
@@ -1149,7 +1149,7 @@ public class TriSurf {
    * This is equivalent to simply marking the face.
    * @param face the face to mark red.
    */
-  private final void markRed(Face face) {
+  private void markRed(Face face) {
     face._mark = _faceMarkRed;
   }
 
@@ -1157,7 +1157,7 @@ public class TriSurf {
    * Marks the specified face blue.
    * @param face the face to mark blue.
    */
-  private final void markBlue(Face face) {
+  private void markBlue(Face face) {
     face._mark = _faceMarkBlue;
   }
 
@@ -1166,7 +1166,7 @@ public class TriSurf {
    * @param face the face.
    * @return true, if the face is marked (red); false, otherwise.
    */
-  private final boolean isMarked(Face face) {
+  private boolean isMarked(Face face) {
     return face._mark==_faceMarkRed;
   }
 
@@ -1175,7 +1175,7 @@ public class TriSurf {
    * @param face the face.
    * @return true, if the face is marked red; false, otherwise.
    */
-  private final boolean isMarkedRed(Face face) {
+  private boolean isMarkedRed(Face face) {
     return face._mark==_faceMarkRed;
   }
 
@@ -1184,7 +1184,7 @@ public class TriSurf {
    * @param face the face.
    * @return true, if the face is marked blue; false, otherwise.
    */
-  private final boolean isMarkedBlue(Face face) {
+  private boolean isMarkedBlue(Face face) {
     return face._mark==_faceMarkBlue;
   }
 

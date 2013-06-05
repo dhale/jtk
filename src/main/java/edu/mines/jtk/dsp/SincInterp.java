@@ -756,7 +756,7 @@ public class SincInterp {
    * Map from design parameters to tables of coefficients.
    * This map saves both time and space required to compute the tables.
    */
-  private static HashMap<Design,Table> _tables = new HashMap<Design,Table>();
+  private final static HashMap<Design,Table> _tables = new HashMap<Design,Table>();
   private static Table getTable(double emax, double fmax, int lmax) {
     Design design = new Design(emax,fmax,lmax);
     synchronized(_tables) {

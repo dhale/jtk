@@ -112,7 +112,7 @@ public class StringParser {
   private String replaceEscapes(String s) {
     final char backslash = '\\';
     if (s==null || s.indexOf(backslash)<0) return s;
-    StringBuffer sb = new StringBuffer(s.length());
+    StringBuilder sb = new StringBuilder(s.length());
     boolean in_escape = false;
     for (int i=0; i<s.length(); ++i) {
       char c = s.charAt(i);

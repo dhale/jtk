@@ -42,7 +42,7 @@ public class BandPassFilter {
      * Extrapolate values at the ends with zero slope.
      */
     ZERO_SLOPE
-  };
+  }
 
   /**
    * Constructs a band-pass filter with specified parameters.

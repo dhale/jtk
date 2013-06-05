@@ -7,7 +7,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.mosaic;
 
 import java.awt.*;
-import java.awt.event.InvocationEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.geom.Rectangle2D;
@@ -140,7 +139,7 @@ public class TileAxis extends IPanel {
    * @return true, if vertical and rotated; false, otherwise.
    */
   public boolean isVerticalRotated() {
-    return isVertical() && (_isRotated==true);
+    return isVertical() && _isRotated;
   }
   /**
    * Sets the interval between major labeled tics for this axis.

@@ -35,7 +35,7 @@ class TimeHeap3 {
    * and removed in O(log N) complexity, where N is the number times in the
    * heap.
    */
-  public enum Type {MIN,MAX};
+  public enum Type {MIN,MAX}
 
   /**
    * An entry in the heap has sample indices (i1,i2) and a time t.

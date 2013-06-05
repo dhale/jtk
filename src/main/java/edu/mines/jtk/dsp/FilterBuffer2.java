@@ -112,7 +112,7 @@ public class FilterBuffer2 {
      * Extrapolate values at the ends with zero slope.
      */
     ZERO_SLOPE
-  };
+  }
 
   /**
    * Constructs a buffer for the specified array. The buffer will 

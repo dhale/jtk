@@ -244,9 +244,9 @@ public class DMatrixEvd {
    
       // If m==l, d[l] is an eigenvalue; otherwise, iterate.
       if (m>l) {
-        int iter = 0;
+        //int iter = 0;
         do {
-          ++iter;  // (Could check iteration count here.)
+          //++iter;  // (Could check iteration count here.)
 
           // Compute implicit shift
           double g = _d[l];

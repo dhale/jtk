@@ -10,7 +10,6 @@ import java.awt.*;
 import java.io.File;
 import javax.media.opengl.*;
 import javax.media.opengl.awt.*;
-import javax.swing.SwingUtilities;
 import com.jogamp.opengl.util.awt.Screenshot;
 
 /**

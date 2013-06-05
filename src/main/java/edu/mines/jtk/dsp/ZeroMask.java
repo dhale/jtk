@@ -50,11 +50,7 @@ public class ZeroMask {
     _mask2 = new boolean[_n2][_n1];
     for (int i2=0; i2<_n2; ++i2) {
       for (int i1=0; i1<_n1; ++i1) {
-        if (t[i2][i1]<small*a) {
-          _mask2[i2][i1] = false;
-        } else {
-          _mask2[i2][i1] = true;
-        }
+        _mask2[i2][i1] = t[i2][i1]>=small*a;
       }
     }
   }
@@ -87,11 +83,7 @@ public class ZeroMask {
     for (int i3=0; i3<_n3; ++i3) {
       for (int i2=0; i2<_n2; ++i2) {
         for (int i1=0; i1<_n1; ++i1) {
-          if (b[i3][i2][i1]<small*a) {
-            _mask3[i3][i2][i1] = false;
-          } else {
-            _mask3[i3][i2][i1] = true;
-          }
+          _mask3[i3][i2][i1] = b[i3][i2][i1]>=small*a;
         }
       }
     }

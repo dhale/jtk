@@ -28,7 +28,7 @@ class XmlUtil {
     s = replaceAll("\n","&#10;",s);
     s = replaceAll("\t","&#9;",s);
     String quote = "\"";
-    if (s.indexOf("\"")>=0 && s.indexOf("\'")<0) {
+    if (s.contains("\"") && !s.contains("\'")) {
       quote = "\'";
     } else {
       s = replaceAll("\"","&quot;",s);
@@ -80,7 +80,7 @@ class XmlUtil {
     int from = 0;
     int to = s.indexOf(x,from);
     if (to<0) return s;
-    StringBuffer d = new StringBuffer(s.length()+32);
+    StringBuilder d = new StringBuilder(s.length()+32);
     while (to>=0) {
       d.append(s.substring(from,to));
       d.append(y);

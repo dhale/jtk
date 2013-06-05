@@ -6,8 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
-import java.util.logging.Logger;
-
 import edu.mines.jtk.util.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
@@ -360,7 +358,6 @@ public class LocalDiffusionKernel {
     int i3start, int i3step, int i3stop,
     Tensors3 d, float c, float[][][] s, float[][][] x, float[][][] y) 
   {
-    int n3 = x.length;
     for (int i3=i3start; i3<i3stop; i3+=i3step)
       apply(i3,d,c,s,x,y);
   }
@@ -370,7 +367,6 @@ public class LocalDiffusionKernel {
     final Tensors3 d, final float c, final float[][][] s, 
     final float[][][] x, final float[][][] y) 
   {
-    final int n3 = x.length;
     for (int i3pass=0; i3pass<i3step; ++i3pass,++i3start) {
       Parallel.loop(i3start,i3stop,i3step,new Parallel.LoopInt() {
         public void compute(int i3) {
@@ -424,7 +420,6 @@ public class LocalDiffusionKernel {
           cs2 *= 0.5f*(s[i3][i2][i1]+s[i3][m2][i1]);
           cs3 *= 0.5f*(s[i3][i2][i1]+s[m3][i2][i1]);
         }
-        float csi = (s!=null)?c*s[i3][i2][i1]:c;
         float x1 = x[i3][i2][i1]-x[i3][i2][m1];
         float x2 = x[i3][i2][i1]-x[i3][m2][i1];
         float x3 = x[i3][i2][i1]-x[m3][i2][i1];

@@ -528,12 +528,12 @@ class TimeMarker3X {
       d[ithread] = new float[6];
     }
     final AtomicInteger ai = new AtomicInteger();
-    int ntotal = 0;
+    //int ntotal = 0;
     //int niter = 0;
     while (!al.isEmpty()) {
       ai.set(0); // initialize the shared block index to zero
       final int n = al.size(); // number of samples in active (A) list
-      ntotal += n;
+      //ntotal += n;
       final int mb = 32; // size of blocks of samples
       final int nb = 1+(n-1)/mb; // number of blocks of samples
       int ntask = min(nb,nthread); // number of tasks (threads to be used)

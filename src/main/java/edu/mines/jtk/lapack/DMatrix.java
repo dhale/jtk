@@ -947,7 +947,7 @@ public class DMatrix {
 
   public String toString() {
     String ls = System.getProperty("line.separator");
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     String[][] s = format(_m,_n,_a);
     int max = maxlen(s);
     String format = "%"+max+"s";

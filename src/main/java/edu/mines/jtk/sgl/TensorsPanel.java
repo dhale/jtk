@@ -10,7 +10,6 @@ import java.awt.Color;
 
 import edu.mines.jtk.dsp.*;
 import static edu.mines.jtk.util.ArrayMath.*;
-import static edu.mines.jtk.ogl.Gl.GL_AMBIENT_AND_DIFFUSE;
 
 /**
  * An axis-aligned panel that displays a slice of a 3D metric tensor field.

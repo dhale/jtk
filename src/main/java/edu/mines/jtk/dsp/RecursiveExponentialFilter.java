@@ -79,7 +79,7 @@ public class RecursiveExponentialFilter {
      * A filter with this boundary condition (the default) is SPD.
      */
     OUTPUT_ZERO_SLOPE
-  };
+  }
 
   /**
    * Constructs a filter with specified half-width.
@@ -178,9 +178,7 @@ public class RecursiveExponentialFilter {
    * @param y output array.
    */
   public void apply1(float[][] x, float[][] y) {
-    int n1 = x[0].length;
     int n2 = x.length;
-    float[] xt = null;
     for (int i2=0; i2<n2; ++i2) {
       float[] x2 = x[i2];
       float[] y2 = y[i2];
@@ -207,12 +205,10 @@ public class RecursiveExponentialFilter {
   public void apply1(float[][][] x, float[][][] y) {
     final float[][][] xx = x;
     final float[][][] yy = y;
-    final int n1 = x[0][0].length;
     final int n2 = x[0].length;
     final int n3 = x.length;
     Parallel.loop(n3,new Parallel.LoopInt() {
       public void compute(int i3) {
-        float[] xtt = null;
         for (int i2=0; i2<n2; ++i2) {
           float[] x32 = xx[i3][i2];
           float[] y32 = yy[i3][i2];
@@ -231,12 +227,9 @@ public class RecursiveExponentialFilter {
   public void apply2(float[][][] x, float[][][] y) {
     final float[][][] xx = x;
     final float[][][] yy = y;
-    final int n1 = x[0][0].length;
-    final int n2 = x[0].length;
     final int n3 = x.length;
     Parallel.loop(n3,new Parallel.LoopInt() {
       public void compute(int i3) {
-        float[][] xt = null;
         float[][] x3 = xx[i3];
         float[][] y3 = yy[i3];
         smooth2(_ei,_zs,_a2,x3,y3);
@@ -253,14 +246,12 @@ public class RecursiveExponentialFilter {
   public void apply3(float[][][] x, float[][][] y) {
     final float[][][] xx = x;
     final float[][][] yy = y;
-    final int n1 = x[0][0].length;
     final int n2 = x[0].length;
     final int n3 = x.length;
     Parallel.loop(n2,new Parallel.LoopInt() {
       public void compute(int i2) {
         float[][] x2 = new float[n3][];
         float[][] y2 = new float[n3][];
-        float[][] xt = null;
         for (int i3=0; i3<n3; ++i3) {
           x2[i3] = xx[i3][i2];
           y2[i3] = yy[i3][i2];

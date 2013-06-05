@@ -523,8 +523,6 @@ public class MathPlus {
 
   /**
    * Returns the absolute value of the specified value.
-   * Note that {@code abs(-0.0f)} returns {@code -0.0f};
-   * the sign bit is not cleared.
    * If this is a problem, use {@code Math.abs}.
    * @param x the value.
    * @return the absolute value.
@@ -535,8 +533,6 @@ public class MathPlus {
 
   /**
    * Returns the absolute value of the specified value.
-   * Note that {@code abs(-0.0d)} returns {@code -0.0d};
-   * the sign bit is not cleared.
    * If this is a problem, use {@code Math.abs}.
    * @param x the value.
    * @return the absolute value.

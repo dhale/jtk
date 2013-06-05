@@ -64,7 +64,7 @@ public class PlotFrame extends JFrame {
 
   /**
    * Constructs a plot frame for the specified plot panel.
-   * @param panel
+   * @param panel the plot panel.
    */
   public PlotFrame(PlotPanel panel) {
     _panelTL = panel;

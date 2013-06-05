@@ -1428,8 +1428,6 @@ public class DynamicWarping {
   // for 3D image warping
 
   private void computeErrors(float[][][] f, float[][][] g, float[][][][] e) {
-    final int nl = e[0][0][0].length;
-    final int n1 = e[0][0].length;
     final int n2 = e[0].length;
     final int n3 = e.length;
     final float[][][] ff = f;
@@ -1489,8 +1487,6 @@ public class DynamicWarping {
     }});
   }
   private void smoothErrors(float[][][][] e) {
-    final int nl = e[0][0][0].length;
-    final int n1 = e[0][0].length;
     final int n2 = e[0].length;
     final int n3 = e.length;
     final float[][][][] ef = e;

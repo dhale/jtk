@@ -6,7 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.util;
 
-import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
@@ -153,7 +152,6 @@ public class MedianFinder {
   private static void quickPartition(float[] w, float[] x, int[] m) {
     int p = m[0];
     int q = m[1];
-    int n = q-p+1;
     int k = med3(x,p,(p+q)/2,q);
     float y = x[k];
     int a=p,b=p;

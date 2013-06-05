@@ -68,7 +68,7 @@ public class FftFilter {
      * Extrapolate values at the ends with zero slope.
      */
     ZERO_SLOPE
-  };
+  }
 
   /**
    * Constructs an FFT filter for specified filter coefficients.

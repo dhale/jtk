@@ -1,6 +1,5 @@
 package edu.mines.jtk.dsp;
 
-import edu.mines.jtk.dsp.SincInterp;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
