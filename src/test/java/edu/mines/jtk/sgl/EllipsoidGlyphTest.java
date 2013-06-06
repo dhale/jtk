@@ -7,11 +7,8 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 package edu.mines.jtk.sgl;
 
 import java.awt.*;
-import java.util.*;
 
 import edu.mines.jtk.la.*;
-import edu.mines.jtk.util.*;
-import static edu.mines.jtk.ogl.Gl.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**

@@ -6,7 +6,6 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.interp;
 
-import java.util.logging.*;
 import javax.swing.*;
 
 import junit.framework.TestCase;
