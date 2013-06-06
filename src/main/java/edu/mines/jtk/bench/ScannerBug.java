@@ -37,6 +37,7 @@ public class ScannerBug {
       s.findInLine("5");
       System.out.println(s.nextLine());
     }
+    s.close();
   }
   public static void main(String[] args) {
     System.out.println("Scanning input with empty lines (incorrectly):");

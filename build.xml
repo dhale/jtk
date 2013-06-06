@@ -46,7 +46,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
   <target name="compile-java" depends="init">
     <javac srcdir="${src}/main/java:${src}/test/java:${src}/demo/java" 
       destdir="${build.cls}" 
-      compiler="javac1.6"
+      compiler="javac1.7"
       memoryMaximumSize="500m"
       fork="true"
       debug="on" 

@@ -107,7 +107,9 @@ public class Localize {
             format = key;
         }
         final Formatter formatter = new Formatter(locale);
-        return formatter.format(format, args).out().toString().trim();
+        String s = formatter.format(format, args).out().toString().trim();
+        formatter.close();
+        return s;
     }
 
     /**

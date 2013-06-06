@@ -69,7 +69,7 @@ def imageTeapot():
   nt,nx = 251,357
   image = zerofloat(nt,nx)
   st,sx = Sampling(nt,dt,ft),Sampling(nx,dx,fx)
-  ais = ArrayInputStream("/Users/dhale/Home/git/jtk/data/tp73.dat")
+  ais = ArrayInputStream("/Users/dhale/Home/git/dave/jtk/data/tp73.dat")
   ais.readFloats(image)
   ais.close()
   return st,sx,image

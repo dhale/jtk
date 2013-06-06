@@ -194,6 +194,7 @@ public class LogMonitor implements Monitor {
      *                     when work started.
      * @return Progress report as a string.
      */
+    @SuppressWarnings("deprecation")
     public static String getProgressReport
     (final long startTime, final long currentTime, final double fraction, final double initFraction) {
 

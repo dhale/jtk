@@ -741,6 +741,7 @@ public class EigenTensors3 implements Tensors3,Serializable {
       int n1 = _n1 = ois.readInt();
       int n2 = _n2 = ois.readInt();
       int n3 = _n3 = ois.readInt();
+      @SuppressWarnings("resource")
       ArrayInputStream ais = new ArrayInputStream(ois);
       if (compressed) {
         _bu = new short[n3][n2][n1];
@@ -788,6 +789,7 @@ public class EigenTensors3 implements Tensors3,Serializable {
     oos.writeInt(_n1);
     oos.writeInt(_n2);
     oos.writeInt(_n3);
+    @SuppressWarnings("resource")
     ArrayOutputStream aos = new ArrayOutputStream(oos);
     if (_compressed) {
       aos.writeShorts(_bu);
