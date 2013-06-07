@@ -1,7 +1,8 @@
 package edu.mines.jtk.util
 
 /**
- * Demonstrates the use of {@link edu.mines.jtk.util.Stopwatch}.
+ * Demonstrates the use of edu.mines.jtk.util.Stopwatch.
+ * @see edu.mines.jtk.util.Stopwatch
  * @author Dave Hale, Colorado School of Mines
  * @version 2010.08.15
  */
