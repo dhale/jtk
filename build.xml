@@ -14,8 +14,7 @@ available at http://www.eclipse.org/legal/cpl-v10.html
 
   <!-- Project directories -->
   <property name="bin" value="${basedir}/bin"/>
-  <property name="jar" value="${basedir}/jar"/>
-  <property name="lib" value="${basedir}/lib"/>
+  <property name="jar" value="${basedir}/libs"/>
   <property name="src" value="${basedir}/src"/>
   <property name="build" value="${basedir}/build"/>
   <property name="build.cls" value="${build}/cls"/>

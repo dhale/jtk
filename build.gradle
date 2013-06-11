@@ -1,0 +1,43 @@
+apply plugin: 'java'
+apply plugin: 'scala'
+
+task wrapper(type: Wrapper) {
+  gradleVersion = '1.6'
+}
+
+defaultTasks 'jar'
+
+description = 'Mines Java Toolkit'
+sourceCompatibility = 1.7
+
+sourceSets {
+  main {
+    output.resourcesDir = output.classesDir
+  }
+  test {
+    output.resourcesDir = output.classesDir
+  }
+  demo {
+    output.resourcesDir = output.classesDir
+    compileClasspath += sourceSets.main.runtimeClasspath
+  }
+}
+
+jar {
+  baseName 'edu_mines_jtk'
+  manifest {
+    attributes 'Implementation-Title': project.description
+  }
+  from sourceSets.demo.output // include demos
+  from sourceSets.test.output // include tests
+}
+
+javadoc {
+  title = project.description
+}
+
+repositories.mavenCentral() // for Scala jars
+dependencies {
+  compile fileTree('libs') // contains jars provided with the Mines JTK
+  compile 'org.scala-lang:scala-library:2.10.+' // contains Scala jars
+}
