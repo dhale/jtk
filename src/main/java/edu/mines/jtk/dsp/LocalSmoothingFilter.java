@@ -538,35 +538,6 @@ public class LocalSmoothingFilter {
       }
     }
   }
-  private static void xsmoothS(float[][] x, float[][] y) {
-    int n1 = x[0].length;
-    int n2 = x.length;
-    float[][] t = new float[2][n1];
-    scopy(x[0],t[0]);
-    szero(y[0]);
-    for (int i2=1,i2m=0; i2<n2; ++i2,++i2m) {
-      int j2  = (i2 )%2;
-      int j2m = (i2m)%2;
-      scopy(x[i2],t[j2]);
-      szero(y[i2]);
-      float[] x0 = t[j2 ];
-      float[] x1 = t[j2m];
-      float[] y0 = y[i2 ];
-      float[] y1 = y[i2m];
-      for (int i1=1,i1m=0; i1<n1; ++i1,++i1m) {
-        float x00 = x0[i1 ];
-        float x01 = x0[i1m];
-        float x10 = x1[i1 ];
-        float x11 = x1[i1m];
-        //         0.0625 = 1/16
-        float xs = 0.0625f*(x00+x01+x10+x11);
-        y0[i1 ] += xs;
-        y0[i1m] += xs;
-        y1[i1 ] += xs;
-        y1[i1m] += xs;
-      }
-    }
-  }
 
   /*
    * Computes y = S'Sx. Arrays x and y may be the same array.
@@ -626,51 +597,6 @@ public class LocalSmoothingFilter {
       }
     }
   }
-  private static void xsmoothS(float[][][] x, float[][][] y) {
-    int n1 = x[0][0].length;
-    int n2 = x[0].length;
-    int n3 = x.length;
-    float[][][] t = new float[2][n2][n1];
-    scopy(x[0],t[0]);
-    szero(y[0]);
-    for (int i3=1,i3m=0; i3<n3; ++i3,++i3m) {
-      int j3  = (i3  )%2;
-      int j3m = (i3-1)%2;
-      scopy(x[i3],t[j3]);
-      szero(y[i3]);
-      for (int i2=1,i2m=0; i2<n2; ++i2,++i2m) {
-        float[] x00 = t[j3 ][i2 ];
-        float[] x01 = t[j3 ][i2m];
-        float[] x10 = t[j3m][i2 ];
-        float[] x11 = t[j3m][i2m];
-        float[] y00 = y[i3 ][i2 ];
-        float[] y01 = y[i3 ][i2m];
-        float[] y10 = y[i3m][i2 ];
-        float[] y11 = y[i3m][i2m];
-        for (int i1=1,i1m=0; i1<n1; ++i1,++i1m) {
-          float x000 = x00[i1 ];
-          float x001 = x00[i1m];
-          float x010 = x01[i1 ];
-          float x011 = x01[i1m];
-          float x100 = x10[i1 ];
-          float x101 = x10[i1m];
-          float x110 = x11[i1 ];
-          float x111 = x11[i1m];
-          //         0.015625 = 1/64
-          float xs = 0.015625f*(x000+x001+x010+x011+x100+x101+x110+x111);
-          y00[i1 ] += xs;
-          y00[i1m] += xs;
-          y01[i1 ] += xs;
-          y01[i1m] += xs;
-          y10[i1 ] += xs;
-          y10[i1m] += xs;
-          y11[i1 ] += xs;
-          y11[i1m] += xs;
-        }
-      }
-    }
-  }
-
 
   // Conjugate-gradient solution of Ax = b, with no preconditioner.
   // Uses the initial values of x; does not assume they are zero.
