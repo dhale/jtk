@@ -1082,7 +1082,6 @@ public class PlotPanel extends IPanel {
       g2d.setRenderingHint(
         RenderingHints.KEY_ANTIALIASING,
         RenderingHints.VALUE_ANTIALIAS_ON);
-
       Font font = g2d.getFont();
       FontMetrics fm = g2d.getFontMetrics();
       FontRenderContext frc = g2d.getFontRenderContext();
@@ -1091,7 +1090,7 @@ public class PlotPanel extends IPanel {
       //int fa = round(lm.getAscent());
       int fd = round(lm.getDescent());
       int wt = fm.stringWidth(text);
-      int xt = max(0,min(w-wt,(w-wt)/2));
+      int xt = max(0,(w-wt)/2);
       int yt = h-1-2*fd;
       g2d.drawString(text,xt,yt);
       g2d.dispose();
@@ -1111,7 +1110,7 @@ public class PlotPanel extends IPanel {
         int fh = fm.getHeight();
         int fd = fm.getDescent();
         int wt = fm.stringWidth(text);
-        return new Dimension(wt,fd+fh);
+        return new Dimension(wt+4*fh,fd+fh);
       }
     }
     public Dimension getPreferredSize() {
