@@ -674,7 +674,7 @@ public class EigenTensors3 implements Tensors3,Serializable {
           if (awi<0.0f) awi = 0.0f;
           if (avi< awi) avi = awi;
           if (aui< avi) aui = avi;
-          if (aui<amin) amin = aui;
+          if (awi<amin) amin = awi;
           if (aui>amax) amax = aui;
           setEigenvalues(i1,i2,i3,aui,avi,awi);
         }
