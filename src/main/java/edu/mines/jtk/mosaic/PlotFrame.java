@@ -258,16 +258,35 @@ public class PlotFrame extends JFrame {
    * This method causes the font size to change as this frame is resized,
    * so that text height will be about 1/25 of slide height if this frame
    * is saved to an image.
+   * Specified fractions indicate indicate how much of the slide is
+   * available for this plot. These fractions may be less than one,
+   * to leave room for titles, other plots, etc.
    * <p>
-   * The width/height ratio of the slide is assumed to be 4/3. However,
-   * only fractions of the slide width and height may be available if,
-   * for example, more than one plot will be shown on the same slide.
+   * This method uses a default width/height aspect ratio = 4.0/3.0.
+   * To explicitly specify the aspect ratio, use the method
+   * {@link #setFontSizeForSlide(double,double,double)}.
    * @param fracWidth the fraction of slide width available.
    * @param fracHeight the fraction of slide height available.
    */
   public void setFontSizeForSlide(double fracWidth, double fracHeight) {
+    setFontSizeForSlide(fracWidth,fracHeight,4.0/3.0);
+  }
+
+  /**
+   * Sets font size automatically for a slide in presentations.
+   * This method causes the font size to change as this frame is resized,
+   * so that text height will be about 1/25 of slide height if this frame
+   * is saved to an image.
+   * @param fracWidth the fraction of slide width available.
+   * @param fracHeight the fraction of slide height available.
+   * @param aspectRatio the width/height ratio for slides; e.g., 16.0/9.0.
+   */
+  public void setFontSizeForSlide(
+    double fracWidth, double fracHeight, double aspectRatio) 
+  {
     _fracWidthSlide = fracWidth;
     _fracHeightSlide = fracHeight;
+    _aspectRatioSlide = aspectRatio;
     _fontSizeForSlide = true;
     _fontSizeForPrint = false;
   }
@@ -336,6 +355,7 @@ public class PlotFrame extends JFrame {
   private boolean _fontSizeForSlide; // true if auto font size for slide
   private double _fracWidthSlide; // fraction of slide height available
   private double _fracHeightSlide; // fraction of slide width available
+  private double _aspectRatioSlide; // width/height ratio for slides 
   private double _fontSizePrint; // font size for print
   private double _plotWidthPrint; // plot width for print
 
@@ -417,7 +437,7 @@ public class PlotFrame extends JFrame {
     }
   }
 
-  // Sets font size for a slide with width/height ratio = 4/3.
+  // Sets font size for a slide.
   private void adjustFontSizeForSlide() {
 
     // Width and height of the main panel for this frame.
@@ -427,9 +447,11 @@ public class PlotFrame extends JFrame {
       return;
 
     // Part of the slide that is available for the main panel.
-    // Here we assume that the slide has a 4:3 aspect ratio.
-    double slideWidth = 4.0*_fracWidthSlide;
-    double slideHeight = 3.0*_fracHeightSlide;
+    double slideWidth = _fracWidthSlide;
+    double slideHeight = _fracHeightSlide;
+
+    // Adjust for aspect (width/height) ratio of slide.
+    slideWidth *= _aspectRatioSlide;
 
     // The aspect ratio of this panel will typically not match that of
     // the space available on the slide. Therefore, the panel height may
