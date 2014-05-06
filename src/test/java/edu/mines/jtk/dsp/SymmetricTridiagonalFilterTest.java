@@ -85,6 +85,26 @@ public class SymmetricTridiagonalFilterTest extends TestCase {
     assertEqual(x,y);
   }
 
+  public void test2Transpose() {
+    int n1 = 4;
+    int n2 = 5;
+    double af,ai,al,b;
+    //af = al = 0.50; // zero-value
+    af = al = 0.76; // nearly zero-slope, but invertible
+    ai = 0.52;
+    b  = 0.24;
+    SymmetricTridiagonalFilter f = new SymmetricTridiagonalFilter(af,ai,al,b);
+    float[][] x = randfloat(n1,n2);
+    float[][] y = zerofloat(n1,n2);
+    float[][] z = zerofloat(n2,n1);
+    f.apply1(x,y);
+    x = transpose(x);
+    f.apply2(x,z);
+    z = transpose(z);
+    //dump(y); dump(z);
+    assertEqual(y,z);
+  }
+
   public void test1Random() {
     java.util.Random r = new java.util.Random();
     int ntest = 1000;
