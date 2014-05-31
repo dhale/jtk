@@ -22,7 +22,7 @@ public class SimpleFrame extends JFrame {
 
   /**
    * Constructs a simple frame with default parameters.
-   * Axes orientation defaults to x-right, y-top and z-down.
+   * Axes orientation defaults to x-right, y-out and z-down.
    */
   public SimpleFrame() {
     this(null,null);
