@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright (c) 2005, Colorado School of Mines and others. All rights reserved.
+Copyright (c) 2012, Colorado School of Mines and others. All rights reserved.
 This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
@@ -13,32 +13,20 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Tests {@link edu.mines.jtk.dsp.SincInterpolator}.
- * @author Dave Hale, Colorado School of Mines; Bill Harlan, Landmark Graphics
- * @version 2005.08.01
+ * Tests {@link SincInterpolator}.
+ * @author Dave Hale, Colorado School of Mines
+ * @author Bill Harlan, Landmark Graphics
+ * @version 2012.12.21
  */
-@SuppressWarnings("deprecation")
 public class SincInterpolatorTest extends TestCase {
   public static void main(String[] args) {
     TestSuite suite = new TestSuite(SincInterpolatorTest.class);
     junit.textui.TestRunner.run(suite);
   }
 
-  //private double[] _emaxs = {0.1,0.01,0.001,0.0001}; // takes too long
   private double[] _emaxs = {0.1,0.01,0.001};
   private double[] _fmaxs = {0.10,0.30,0.40,0.45};
   private int[] _lmaxs = {8,10,12,14,16};
-
-  public void testKenLarner() {
-    for (int lmax=8; lmax<=16; lmax+=2) {
-      trace("testKenLarner: lmax="+lmax);
-      SincInterpolator si = SincInterpolator.fromKenLarner(lmax);
-      testInterpolator(si);
-      double fmax = si.getMaximumFrequency();
-      si = SincInterpolator.fromFrequencyAndLength(fmax,lmax);
-      testInterpolator(si);
-    }
-  }
 
   public void testExtrapolation() {
     SincInterpolator si = new SincInterpolator();
@@ -63,17 +51,13 @@ public class SincInterpolatorTest extends TestCase {
       yc[npad+nxu+ipad] = yc[npad+nxu-1];
     }
     si.setExtrapolation(SincInterpolator.Extrapolation.ZERO);
-    si.setUniform(nxu,dxu,fxu,yi);
-    si.interpolate(nx,dx,fx,yo);
-    si.setUniform(npad+nxu+npad,dxu,0.0,yz);
-    si.interpolate(nx,dx,fx,yt);
+    si.interpolate(nxu,dxu,fxu,yi,nx,dx,fx,yo);
+    si.interpolate(npad+nxu+npad,dxu,0.0,yz,nx,dx,fx,yt);
     for (int ix=0; ix<nx; ++ix)
       assertEquals(yo[ix],yt[ix],0.0);
     si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
-    si.setUniform(nxu,dxu,fxu,yi);
-    si.interpolate(nx,dx,fx,yo);
-    si.setUniform(npad+nxu+npad,dxu,0.0,yc);
-    si.interpolate(nx,dx,fx,yt);
+    si.interpolate(nxu,dxu,fxu,yi,nx,dx,fx,yo);
+    si.interpolate(npad+nxu+npad,dxu,0.0,yc,nx,dx,fx,yt);
     for (int ix=0; ix<nx; ++ix)
       assertEquals(yo[ix],yt[ix],0.0);
   }
@@ -91,7 +75,6 @@ public class SincInterpolatorTest extends TestCase {
       yr[ixu] = yc[2*ixu  ] = random.nextFloat();
       yi[ixu] = yc[2*ixu+1] = random.nextFloat();
     }
-    si.setUniformSampling(nxu,dxu,fxu);
     int nx = 200;
     double dx = -0.9*dxu;
     double fx = fxu+(nxu+30)*dxu;
@@ -99,23 +82,17 @@ public class SincInterpolatorTest extends TestCase {
     float[] zi = new float[nx];
     float[] zc = new float[2*nx];
     si.setExtrapolation(SincInterpolator.Extrapolation.ZERO);
-    si.setUniformSamples(yr);
-    si.interpolate(nx,dx,fx,zr);
-    si.setUniformSamples(yi);
-    si.interpolate(nx,dx,fx,zi);
-    si.setUniformSamples(yc);
-    si.interpolateComplex(nx,dx,fx,zc);
+    si.interpolate(nxu,dxu,fxu,yr,nx,dx,fx,zr);
+    si.interpolate(nxu,dxu,fxu,yi,nx,dx,fx,zi);
+    si.interpolateComplex(nxu,dxu,fxu,yc,nx,dx,fx,zc);
     for (int ix=0; ix<nx; ++ix) {
       assertEquals(zr[ix],zc[2*ix  ],0.0);
       assertEquals(zi[ix],zc[2*ix+1],0.0);
     }
     si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
-    si.setUniformSamples(yr);
-    si.interpolate(nx,dx,fx,zr);
-    si.setUniformSamples(yi);
-    si.interpolate(nx,dx,fx,zi);
-    si.setUniformSamples(yc);
-    si.interpolateComplex(nx,dx,fx,zc);
+    si.interpolate(nxu,dxu,fxu,yr,nx,dx,fx,zr);
+    si.interpolate(nxu,dxu,fxu,yi,nx,dx,fx,zi);
+    si.interpolateComplex(nxu,dxu,fxu,yc,nx,dx,fx,zc);
     for (int ix=0; ix<nx; ++ix) {
       assertEquals(zr[ix],zc[2*ix  ],0.0);
       assertEquals(zi[ix],zc[2*ix+1],0.0);
@@ -146,7 +123,7 @@ public class SincInterpolatorTest extends TestCase {
     for (double fmax:_fmaxs) {
       for (int lmax:_lmaxs) {
         if ((1.0-2.0*fmax)*lmax>1.0) {
-          SincInterpolator si = 
+          SincInterpolator si =
             SincInterpolator.fromFrequencyAndLength(fmax,lmax);
           testInterpolator(si);
         }
@@ -180,17 +157,14 @@ public class SincInterpolatorTest extends TestCase {
         // Same interpolator for both directions
         SincInterpolator si = new SincInterpolator();
         si.setExtrapolation(extrapolation);
-        si.setUniformSampling(nxu, dxu, fxu);
 
         // forward interpolation
         float[] yi = new float[nx]; // interpolated
-        si.setUniformSamples(yu);
-        si.interpolate(nx, x, yi);
+        si.interpolate(nxu, dxu, fxu, yu, nx, x, yi);
 
-        // transpose accumuation
+        // transpose accumulation
         float[] ya = new float[nxu]; // accumulated
-        si.setUniformSamples(ya);
-        si.accumulate(nx, x, y);
+        si.accumulate(nx, x, y, nxu, dxu, fxu, ya);
 
         // Check transpose with dot product: yu.ya = y.yi
         double yuYa = 0;
@@ -233,7 +207,6 @@ public class SincInterpolatorTest extends TestCase {
       double x = fxu+ixu*dxu;
       yu[ixu] = (float)sweep(fmax,nmax,x);
     }
-    si.setUniform(nxu,dxu,fxu,yu);
     si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
     //trace("xmax="+xmax+" nmax="+nmax+" nxu="+nxu);
 
@@ -243,7 +216,7 @@ public class SincInterpolatorTest extends TestCase {
     int nx = 1+(int)((xmax-fx)/dx);
     dx = (xmax-fx)/(nx-1);
     float[] y = new float[nx];
-    si.interpolate(nx,dx,fx,y);
+    si.interpolate(nxu,dxu,fxu,yu,nx,dx,fx,y);
 
     // Compute the maximum error and compare with emax.
     double error = 0.0;
@@ -266,7 +239,7 @@ public class SincInterpolatorTest extends TestCase {
     nx = nxu;
     dx = dxu;
     fx = fxu+shift;
-    si.interpolate(nx,dx,fx,y);
+    si.interpolate(nxu,dxu,fxu,yu,nx,dx,fx,y);
     error = 0.0;
     for (int ix=0; ix<nx; ++ix) {
       double x = fx+ix*dx;
@@ -293,136 +266,4 @@ public class SincInterpolatorTest extends TestCase {
   private static void trace(String s) {
     //System.out.println(s);
   }
-
-
-  ///////////////////////////////////////////////////////////////////////////
-  // more test code that was useful in debugging, and might be again
-
-  /*
-  private void testInterpolatorWithSine(SincInterpolator si) {
-
-    // Interpolator design parameters.
-    int lmax = si.getMaximumLength();
-    double fmax = si.getMaximumFrequency();
-    double emax = si.getMaximumError();
-    trace("lmax="+lmax+" fmax="+fmax+" emax="+emax);
-    if (fmax==0.0)
-      return;
-
-    // Sampling and arrays for input signal.
-    int nxu = 2+lmax;
-    double dxu = 0.1;
-    double fxu = (-lmax/2)*dxu;
-    float[] yu = new float[nxu];
-
-    // Sampling for interpolated output.
-    int nx = 51;
-    double dx = dxu/(nx-1);
-    double fx = 0.0;
-    float[] x = new float[nx];
-    float[] y = new float[nx];
-    for (int ix=0; ix<nx; ++ix) {
-      double xi = fx+ix*dx;
-      x[ix] = (float)xi;
-    }
-
-    // Loop over frequencies near maximum frequency.
-    int nk = 51;
-    double dk = 2.0*PI*fmax/((nk-1)*dxu);
-    double fk = 0.0;
-    for (int ik=0; ik<nk; ++ik) {
-      double k = fk+ik*dk;
-
-      // Uniformly-sampled sine wave.
-      for (int ixu=0; ixu<nxu; ++ixu) {
-        double xu = fxu+ixu*dxu;
-        yu[ixu] = sine(k*xu);
-      }
-      si.setUniform(nxu,dxu,fxu,yu);
-
-      // Interpolated sine wave.
-      si.interpolate(nx,dx,fx,y);
-      for (int ix=0; ix<nx; ++ix) {
-        double xi = fx+ix*dx;
-        float yi = y[ix];
-        float ye = sine(k*xi);
-        if (abs(ye-yi)>emax)
-          trace("k="+k+" x="+x+" ye="+ye+" yi="+yi);
-        assertEquals(ye,yi,emax);
-      }
-    }
-  }
- 
-  // A simple sine wave, with an arbitrary but hardwired shift.
-  private static float sine(double x) {
-    return (float)sin(1+x);
-  }
- */
-
-  // Used to test design via Kaiser windows. Shows the effect of summing 
-  // multiple aliases of Kaiser window spectra into the passband of an 
-  // interpolator.
-  /*
-  private void xtestDesign() {
-    int m = 100;
-    int lsinc = 8;
-    double xmax = lsinc/2;
-    double kmax = 0.325;
-    double wwin = 1.0-2.0*kmax;
-    double lwin = lsinc;
-    KaiserWindow kwin = KaiserWindow.fromWidthAndLength(wwin,lwin);
-    double ewin = kwin.getError();
-    trace("wwin="+wwin+" lwin="+lwin+" ewin="+ewin);
-
-    int nx = m*lsinc;
-    double dx = 1.0/m;
-    double fx = 0.0;
-    int nxfft = FftReal.nfftFast(10*nx);
-    int nk = nxfft/2+1;
-    double dk = 2.0*PI/(nxfft*dx);
-    double fk = 0.0;
-    FftReal fft = new FftReal(nxfft);
-    trace("nxfft="+nxfft);
-
-    float[] sx = new float[nxfft];
-    sx[0] = 1.0f;
-    for (int ix=1,jx=nxfft-1; ix<nx/2; ++ix,--jx) {
-      double x = fx+ix*dx;
-      sx[ix] = (float)(x<=xmax?sinc(PI*x)*kwin.evaluate(x):0.0);
-      sx[jx] = sx[ix];
-      trace("s("+x+") = "+sx[ix]);
-    }
-
-    float[] sk = new float[2*nk];
-    fft.realToComplex(-1,sx,sk);
-    float[] ak = cabs(sk);
-    ak = mul(ak,(float)(1.0/m));
-    for (int ik=0; ik<=nk/10; ++ik) {
-      double k = (fk+ik*dk)/(2.0*PI);
-      if (k<=kmax && abs(ak[ik]-1.0)>ewin)
-        trace("a("+k+") = "+ak[ik]);
-    }
-
-    float[] tx = new float[nxfft];
-    for (int ix=0,jx=m/2; ix<lsinc/2; ++ix,jx+=m) {
-      tx[        ix] = sx[jx];
-      tx[nxfft-1-ix] = sx[nxfft-jx];
-      trace("tx["+ix+"] = "+          tx[ix]);
-      trace("tx["+(nxfft-1-ix)+"] = "+tx[nxfft-1-ix]);
-    }
-
-    float[] tk = new float[2*nk];
-    fft.realToComplex(-1,tx,tk);
-    ak = cabs(tk);
-    for (int ik=0; ik<nk; ++ik) {
-      double k = (fk+ik*dk)/(2.0*PI*m);
-      if (k<=kmax && abs(ak[ik]-1.0)>2.0*ewin)
-        trace("a("+k+") = "+ak[ik]);
-    }
-  }
-
-  private double sinc(double x) {
-    return (x==0.0)?1.0:sin(x)/x;
-  }
-  */
 }

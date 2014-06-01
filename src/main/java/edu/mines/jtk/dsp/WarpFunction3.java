@@ -452,7 +452,7 @@ public abstract class WarpFunction3 {
    * @return array of values g(y) = f(y-u1(x(y)).
    */
   public float[][][] warp1(float[][][] f) {
-    SincInterp si = new SincInterp();
+    SincInterpolator si = new SincInterpolator();
     float[][][] g = new float[_n3][_n2][_n1];
     for (int i3=0; i3<_n3; ++i3) {
       for (int i2=0; i2<_n2; ++i2) {
@@ -471,7 +471,7 @@ public abstract class WarpFunction3 {
    * @return array of values g(y) = f(y-u(x(y)).
    */
   public float[][][] warp(float[][][] f) {
-    SincInterp si = new SincInterp();
+    SincInterpolator si = new SincInterpolator();
     float[][][] g = new float[_n3][_n2][_n1];
     for (int i3=0; i3<_n3; ++i3) {
       double y3 = i3;
@@ -497,7 +497,7 @@ public abstract class WarpFunction3 {
    * @return array of values f(x) = g(x+u1(x)).
    */
   public float[][][] unwarp1(float[][][] g) {
-    SincInterp si = new SincInterp();
+    SincInterpolator si = new SincInterpolator();
     float[][][] f = new float[_n3][_n2][_n1];
     for (int i3=0; i3<_n3; ++i3) {
       for (int i2=0; i2<_n2; ++i2) {
@@ -516,7 +516,7 @@ public abstract class WarpFunction3 {
    * @return array of values f(x) = g(x+u(x)).
    */
   public float[][][] unwarp(float[][][] g) {
-    SincInterp si = new SincInterp();
+    SincInterpolator si = new SincInterpolator();
     float[][][] f = new float[_n3][_n2][_n1];
     for (int i3=0; i3<_n3; ++i3) {
       double x3 = i3;

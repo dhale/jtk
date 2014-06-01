@@ -1,24 +1,18 @@
 /****************************************************************************
-Copyright (c) 2004, Colorado School of Mines and others. All rights reserved.
+Copyright (c) 2012, Colorado School of Mines and others. All rights reserved.
 This program and accompanying materials are made available under the terms of
 the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.dsp;
 
+import java.util.HashMap;
 
-import edu.mines.jtk.opt.BrentMinFinder;
 import static edu.mines.jtk.util.ArrayMath.*;
 import edu.mines.jtk.util.Check;
 
 /**
  * A sinc interpolator for bandlimited uniformly-sampled functions y(x). 
- * <p>
- * <em>
- * This class is deprecated because it is not thread-safe. 
- * Use the thread-safe class {@link edu.mines.jtk.dsp.SincInterp} instead.
- * </em>
- * <p>
  * Interpolators can be designed for any two of three parameters: maximum 
  * error (emax), maximum frequency (fmax) and maximum length (lmax). The 
  * parameter not specified is computed when an interpolator is designed.
@@ -54,23 +48,15 @@ import edu.mines.jtk.util.Check;
  * Interpolators with small maximum lengths are most efficient, and those 
  * with high maximum frequencies and small maximum errors are most accurate.
  * <p>
- * When interpolating multiple uniformly sampled functions y(x) that share 
- * a common sampling of x, some redundant computations can be eliminated by 
- * specifying the sampling only once before interpolating multiple times. 
- * The resulting performance increase may be especially significant when 
- * only a few (perhaps only one) values are interpolated for each sequence 
- * of uniform samples.
- * <p>
- * For efficiency, interpolation coefficients (sinc approximations) are 
- * tabulated when an interpolator is constructed. The cost of building 
- * the table can easily exceed that of interpolating one sequence of 
- * samples, depending on the number of uniform samples. Therefore, one 
- * typically constructs an interpolator and uses it more than once.
- * @deprecated 
- * @author Dave Hale, Colorado School of Mines; Bill Harlan, Landmark Graphics
- * @version 2005.08.07
+ * When interpolating multiple values of y(x) from a single sequence of
+ * uniformly sampled values, efficiency may be improved by using one of the
+ * methods that enables specification of multiple x values at which to
+ * interpolate.
+ *
+ * @author Dave Hale, Colorado School of Mines
+ * @author Bill Harlan, Landmark Graphics
+ * @version 2012.12.21
  */
-@Deprecated
 public class SincInterpolator {
 
   /**
@@ -88,7 +74,7 @@ public class SincInterpolator {
   /**
    * Returns a sinc interpolator with specified maximum error and length.
    * Computes the maximum frequency fmax. Note that for some parameters
-   * emax and lmax, the maximum freuency fmax may be zero. In this case,
+   * emax and lmax, the maximum frequency fmax may be zero. In this case,
    * the returned interpolator is useless.
    * @param emax the maximum error for frequencies less than fmax; e.g., 
    *  0.01 for 1% percent error. 0.0 &lt; emax &lt;= 0.1 is required.
@@ -138,33 +124,6 @@ public class SincInterpolator {
   }
 
   /**
-   * Returns a sinc interpolator using Ken Larner's least-squares method.
-   * This interpolator is based on a Technical Memorandum written in 1980
-   * by Ken Larner while at Western Geophysical. It is included here only
-   * for historical and testing purposes. It is less flexible and yields 
-   * more interpolation error than other interpolators constructed by this
-   * class.
-   * @param lmax the maximum interpolator length, in samples. 
-   *  Must be an even integer between 8 and 16, inclusive.
-   * @return the sinc interpolator.
-   */
-  public static SincInterpolator fromKenLarner(int lmax) {
-    return new SincInterpolator(lmax);
-  }
-  private SincInterpolator(int lmax) {
-    Check.argument(lmax%2==0,"lmax is even");
-    Check.argument(lmax>=8,"lmax>=8");
-    Check.argument(lmax<=16,"lmax<=16");
-    _emax = 0.01;
-    _fmax = 0.033+0.132*log(lmax); // Ken's empirical relationship
-    _lmax = lmax;
-    _nsinc = 2049;
-    _dsinc = 1.0/(_nsinc-1);
-    _lsinc = lmax;
-    makeTableKenLarner();
-  }
-
-  /**
    * Constructs a default sinc interpolator. The default design parameters 
    * are fmax = 0.3 cycles/sample (60% of Nyquist) and lmax = 8 samples.
    * For these parameters, the computed maximum error is less than 0.007
@@ -179,7 +138,7 @@ public class SincInterpolator {
    * @return the maximum error.
    */
   public double getMaximumError() {
-    return _emax;
+    return _table.design.emax;
   }
 
   /**
@@ -187,7 +146,7 @@ public class SincInterpolator {
    * @return the maximum frequency.
    */
   public double getMaximumFrequency() {
-    return _fmax;
+    return _table.design.fmax;
   }
 
   /**
@@ -195,21 +154,20 @@ public class SincInterpolator {
    * @return the maximum length.
    */
   public int getMaximumLength() {
-    return _lmax;
+    return _table.design.lmax;
   }
 
   /**
    * Gets the number of bytes consumed by the table of interpolators.
    * The use of interpolators with small emax and large lmax may require 
    * the computation of large tables. This method can be used to determine 
-   * how much memory is consumed by the table of an interpolator, before 
-   * that is computed (when the interpolator is used for the first time).
+   * how much memory is consumed by the table for an interpolator.
    * @return the number of bytes.
    */
   public long getTableBytes() {
     long nbytes = 4L;
-    nbytes *= _lsinc;
-    nbytes *= _nsinc;
+    nbytes *= _table.lsinc;
+    nbytes *= _table.nsinc;
     return nbytes;
   }
 
@@ -231,562 +189,355 @@ public class SincInterpolator {
   }
 
   /**
-   * Sets the current sampling for a uniformly-sampled function y(x).
-   * In some applications, this sampling never changes, and this method 
-   * may be called only once for this interpolator.
-   * @param nxu the number of uniform samples.
-   * @param dxu the uniform sampling interval.
-   * @param fxu the value x corresponding to the first uniform sample yu[0].
+   * Interpolates one real value y(x).
+   * @param nxu number of input samples.
+   * @param dxu input sampling interval.
+   * @param fxu first input sampled x value.
+   * @param yu input array of sampled values y(x).
+   * @param xi value x at which to interpolate.
+   * @return interpolated value y(x).
    */
-  public void setUniformSampling(int nxu, double dxu, double fxu) {
-    if (_asinc==null)
-      makeTable();
-    _nxu = nxu;
-    _dxu = dxu;
-    _fxu = fxu;
-    _xf = fxu;
-    _xs = 1.0/dxu;
-    _xb = _lsinc-_xf*_xs;
-    _nxum = nxu-_lsinc;
+  public float interpolate(
+    int nxu, double dxu, double fxu, float[] yu, double xi)
+  {
+    double xscale = 1.0/dxu;
+    double xshift = _lsinc-fxu*xscale;
+    int nxum = nxu-_lsinc;
+    return interpolate(xscale,xshift,nxum,nxu,yu,xi);
   }
 
   /**
-   * Sets the current samples for a uniformly-sampled function y(x).
-   * If sample values are complex numbers, real and imaginary parts are 
-   * packed in the array as real, imaginary, real, imaginary, and so on.
-   * <p>
-   * Sample values are passed by reference, not by copy. Changes to sample
-   * values in the specified array will yield changes in interpolated values.
-   * @param yu array[nxu] of uniform samples of y(x); 
-   *  by reference, not by copy.
+   * Interpolates multiple real values y(x).
+   * @param nxu number of input samples.
+   * @param dxu input sampling interval.
+   * @param fxu first input sampled x value.
+   * @param yu input array of sampled values y(x).
+   * @param nxi number of output samples.
+   * @param xi input array of x values at which to interpolate.
+   * @param yi output array of interpolated values y(x).
    */
-  public void setUniformSamples(float[] yu) {
-    _yu = yu;
+  public void interpolate(
+    int nxu, double dxu, double fxu, float[] yu, 
+    int nxi, float[] xi, float[] yi)
+  {
+    double xscale = 1.0/dxu;
+    double xshift = _lsinc-fxu*xscale;
+    int nxum = nxu-_lsinc;
+    for (int ixi=0; ixi<nxi; ++ixi)
+      yi[ixi] = interpolate(xscale,xshift,nxum,nxu,yu,xi[ixi]);
   }
 
   /**
-   * Sets the current sampling and samples for a function y(x). 
-   * This method simply calls the two methods 
-   * {@link #setUniformSampling(int,double,double)} and
-   * {@link #setUniformSamples(float[])} 
-   * with the specified parameters.
-   * @param nxu the number of uniform samples.
-   * @param dxu the uniform sampling interval.
-   * @param fxu the value x corresponding to the first uniform sample yu[0].
-   * @param yu array[nxu] of uniform samples of y(x); 
-   *  by reference, not by copy.
+   * Interpolates multiple real values y(x).
+   * @param nxu number of input samples.
+   * @param dxu input sampling interval.
+   * @param fxu first input sampled x value.
+   * @param yu input array of sampled values y(x).
+   * @param nxi number of output samples.
+   * @param dxi output sampling interval.
+   * @param fxi first output sampled x value.
+   * @param yi output array of interpolated values y(x).
    */
-  public void setUniform(int nxu, double dxu, double fxu, float[] yu) {
-    setUniformSampling(nxu,dxu,fxu);
-    setUniformSamples(yu);
-  }
-
-  /**
-   * Interpolates the current uniform samples as real numbers.
-   * @param x the value x at which to interpolate y(x).
-   * @return the interpolated y(x).
-   */
-  public float interpolate(double x) {
-
-    // Which uniform samples?
-    double xn = _xb+x*_xs;
-    int ixn = (int)xn;
-    int kyu = _ib+ixn;
-
-    // Which sinc approximation?
-    double frac = xn-ixn;
-    if (frac<0.0)
-      frac += 1.0;
-    int ksinc = (int)(frac*_nsincm1+0.5);
-    float[] asinc = _asinc[ksinc];
-
-    // If no extrapolation is necessary, use a fast loop.
-      // Otherwise, extrapolate uniform samples, as necessary.
-    float yr = 0.0f;
-    if (kyu>=0 && kyu<=_nxum) {
-      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu)
-        yr += _yu[kyu]*asinc[isinc];
-    } else if (_extrap==Extrapolation.ZERO) {
-      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
-        if (0<=kyu && kyu<_nxu)
-          yr += _yu[kyu]*asinc[isinc];
-      }
-    } else if (_extrap==Extrapolation.CONSTANT) {
-      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
-        int jyu = (kyu<0)?0:(_nxu<=kyu)?_nxu-1:kyu;
-        yr += _yu[jyu]*asinc[isinc];
-      }
+  public void interpolate(
+    int nxu, double dxu, double fxu, float[] yu, 
+    int nxi, double dxi, double fxi, float[] yi)
+  {
+    double xscale = 1.0/dxu;
+    double xshift = _lsinc-fxu*xscale;
+    int nxum = nxu-_lsinc;
+    for (int ixi=0; ixi<nxi; ++ixi) {
+      double xi = fxi+ixi*dxi;
+      yi[ixi] = interpolate(xscale,xshift,nxum,nxu,yu,xi);
     }
-    return yr;
   }
 
   /**
-   * Interpolates the current uniform samples as real numbers.
-   * @param nx the number of output samples.
-   * @param x array[nx] of values x at which to interpolate y(x).
-   * @param y array[nx] of interpolated output y(x).
+   * Interpolates one real value y(x1,x2).
+   * @param nx1u number of input samples in 1st dimension.
+   * @param dx1u input sampling interval in 1st dimension.
+   * @param fx1u first input sampled x value in 1st dimension.
+   * @param nx2u number of input samples in 2nd dimension.
+   * @param dx2u input sampling interval in 2nd dimension.
+   * @param fx2u first input sampled x value in 2nd dimension.
+   * @param yu input array of sampled values y(x).
+   * @param x1i 1st coordinate of x at which to interpolate.
+   * @param x2i 2nd coordinate of x at which to interpolate.
+   * @return interpolated value y(x).
    */
-  public void interpolate(int nx, float[] x, float[] y) {
-    for (int ix=0;  ix<nx; ++ix)
-      y[ix] = interpolate(x[ix]);
+  public float interpolate(
+    int nx1u, double dx1u, double fx1u, 
+    int nx2u, double dx2u, double fx2u, 
+    float[][] yu, double x1i, double x2i)
+  {
+    double x1scale = 1.0/dx1u;
+    double x2scale = 1.0/dx2u;
+    double x1shift = _lsinc-fx1u*x1scale;
+    double x2shift = _lsinc-fx2u*x2scale;
+    int nx1um = nx1u-_lsinc;
+    int nx2um = nx2u-_lsinc;
+    return interpolate(
+      x1scale,x1shift,nx1um,nx1u,
+      x2scale,x2shift,nx2um,nx2u,
+      yu,x1i,x2i);
   }
 
   /**
-   * Interpolates the current uniform samples as real numbers. 
-   * <p>
-   * This method does not perform any anti-alias filtering, which may or 
-   * may not be necessary to avoid aliasing when the specified output
-   * sampling interval exceeds the current uniform sampling interval.
-   * @param nx the number of output samples.
-   * @param dx the output sampling interval.
-   * @param fx the value x corresponding to the first output sample y[0].
-   * @param y array[nx] of interpolated output y(x).
+   * Interpolates one real value y(x1,x2,x3).
+   * @param nx1u number of input samples in 1st dimension.
+   * @param dx1u input sampling interval in 1st dimension.
+   * @param fx1u first input sampled x value in 1st dimension.
+   * @param nx2u number of input samples in 2nd dimension.
+   * @param dx2u input sampling interval in 2nd dimension.
+   * @param fx2u first input sampled x value in 2nd dimension.
+   * @param nx3u number of input samples in 3rd dimension.
+   * @param dx3u input sampling interval in 3rd dimension.
+   * @param fx3u first input sampled x value in 3rd dimension.
+   * @param yu input array of sampled values y(x).
+   * @param x1i 1st coordinate of x at which to interpolate.
+   * @param x2i 2nd coordinate of x at which to interpolate.
+   * @param x3i 3rd coordinate of x at which to interpolate.
+   * @return interpolated value y(x).
    */
-  public void interpolate(int nx, double dx, double fx, float[] y) {
-    if (dx==_dxu) {
-      shift(nx,fx,y);
+  public float interpolate(
+    int nx1u, double dx1u, double fx1u, 
+    int nx2u, double dx2u, double fx2u, 
+    int nx3u, double dx3u, double fx3u, 
+    float[][][] yu, double x1i, double x2i, double x3i)
+  {
+    double x1scale = 1.0/dx1u;
+    double x2scale = 1.0/dx2u;
+    double x3scale = 1.0/dx3u;
+    double x1shift = _lsinc-fx1u*x1scale;
+    double x2shift = _lsinc-fx2u*x2scale;
+    double x3shift = _lsinc-fx3u*x3scale;
+    int nx1um = nx1u-_lsinc;
+    int nx2um = nx2u-_lsinc;
+    int nx3um = nx3u-_lsinc;
+    return interpolate(
+      x1scale,x1shift,nx1um,nx1u,
+      x2scale,x2shift,nx2um,nx2u,
+      x3scale,x3shift,nx3um,nx3u,
+      yu,x1i,x2i,x3i);
+  }
+
+  /**
+   * Interpolates one real value y(x).
+   * @param sxu sampling of input samples.
+   * @param yu input array of uniformly sampled values y(x).
+   * @param xi value x at which to interpolate.
+   * @return interpolated value y(x).
+   */
+  public float interpolate(Sampling sxu, float[] yu, double xi) {
+    Check.argument(sxu.isUniform(),"input sampling is uniform");
+    return interpolate(sxu.getCount(),sxu.getDelta(),sxu.getFirst(),yu,xi);
+  }
+
+  /**
+   * Interpolates multiple real values y(x).
+   * @param sxu sampling of input samples.
+   * @param yu input array of uniformly sampled values y(x).
+   * @param sxi sampling of output samples.
+   * @param yi output array of interpolated values y(x).
+   */
+  public void interpolate(
+    Sampling sxu, float[] yu, 
+    Sampling sxi, float[] yi) 
+  {
+    Check.argument(sxu.isUniform(),"input sampling is uniform");
+    if (sxi.isUniform()) {
+      interpolate(sxu.getCount(),sxu.getDelta(),sxu.getFirst(),yu,
+                  sxi.getCount(),sxi.getDelta(),sxi.getFirst(),yi);
     } else {
-      for (int ix=0; ix<nx; ++ix)
-        y[ix] = interpolate(fx+ix*dx);
+      int nxu = sxu.getCount();
+      int nxi = sxi.getCount();
+      double xscale = 1.0/sxu.getDelta();
+      double xshift = _lsinc-sxu.getFirst()*xscale;
+      int nxum = nxu-_lsinc;
+      for (int ixi=0; ixi<nxi; ++ixi) {
+        double xi = sxi.getValue(ixi);
+        yi[ixi] = interpolate(xscale,xshift,nxum,nxu,yu,xi);
+      }
     }
   }
 
   /**
-   * Interpolates the current uniform samples as complex numbers. 
-   * Complex output samples are packed in the specified output array as 
-   * real, imaginary, real, imaginary, and so on.
-   * @param nx the number of output samples.
-   * @param x array[nx] of values x at which to interpolate y(x).
-   * @param y array[2*nx] of interpolated output y(x).
+   * Interpolates one real value y(x1,x2).
+   * @param sx1u sampling of input x in 1st dimension.
+   * @param sx2u sampling of input x in 2nd dimension.
+   * @param yu input array of sampled values y(x).
+   * @param x1i 1st coordinate of x at which to interpolate.
+   * @param x2i 2nd coordinate of x at which to interpolate.
+   * @return interpolated value y(x).
    */
-  public void interpolateComplex(int nx, float[] x, float[] y) {
-    for (int ix=0;  ix<nx; ++ix)
-      interpolateComplex(ix,x[ix],y);
+  public float interpolate(
+    Sampling sx1u, Sampling sx2u,
+    float[][] yu, double x1i, double x2i)
+  {
+    Check.argument(sx1u.isUniform(),"input sampling of x1 is uniform");
+    Check.argument(sx2u.isUniform(),"input sampling of x2 is uniform");
+    return interpolate(
+      sx1u.getCount(),sx1u.getDelta(),sx1u.getFirst(),
+      sx2u.getCount(),sx2u.getDelta(),sx2u.getFirst(),
+      yu,x1i,x2i);
   }
 
   /**
-   * Interpolates the current uniform samples as complex numbers. 
+   * Interpolates one real value y(x1,x2,x3).
+   * @param sx1u sampling of input x in 1st dimension.
+   * @param sx2u sampling of input x in 2nd dimension.
+   * @param sx3u sampling of input x in 3rd dimension.
+   * @param yu input array of sampled values y(x).
+   * @param x1i 1st coordinate of x at which to interpolate.
+   * @param x2i 2nd coordinate of x at which to interpolate.
+   * @param x3i 3rd coordinate of x at which to interpolate.
+   * @return interpolated value y(x).
+   */
+  public float interpolate(
+    Sampling sx1u, Sampling sx2u, Sampling sx3u,
+    float[][][] yu, double x1i, double x2i, double x3i)
+  {
+    Check.argument(sx1u.isUniform(),"input sampling of x1 is uniform");
+    Check.argument(sx2u.isUniform(),"input sampling of x2 is uniform");
+    Check.argument(sx3u.isUniform(),"input sampling of x3 is uniform");
+    return interpolate(
+      sx1u.getCount(),sx1u.getDelta(),sx1u.getFirst(),
+      sx2u.getCount(),sx2u.getDelta(),sx2u.getFirst(),
+      sx3u.getCount(),sx3u.getDelta(),sx3u.getFirst(),
+      yu,x1i,x2i,x3i);
+  }
+
+  /**
+   * Interpolates multiple complex values y(x).
    * Complex output samples are packed in the specified output array as 
-   * real, imaginary, real, imaginary, and so on.
-   * @param nx the number of output samples.
-   * @param dx the output sampling interval.
-   * @param fx the value x corresponding to the first output sample (y[0],y[1]).
-   * @param y array[2*nx] of interpolated output y(x).
+   * real, imag, real, imag, ....
+   * @param nxu number of input samples.
+   * @param dxu input sampling interval.
+   * @param fxu first input sampled x value.
+   * @param yu input array[2*nxu] of sampled complex values y(x).
+   * @param nxi number of output samples.
+   * @param dxi output sampling interval.
+   * @param fxi first output sampled x value.
+   * @param yi output array[2*nxi] of interpolated complex values y(x).
    */
   public void interpolateComplex(
-    int nx, double dx, double fx, float[] y) 
+    int nxu, double dxu, double fxu, float[] yu, 
+    int nxi, double dxi, double fxi, float[] yi)
   {
-    for (int ix=0;  ix<nx; ++ix)
-      interpolateComplex(ix,fx+ix*dx,y);
-  }
-
-  /**
-   * Finds a local maximum of the function y(x) near the specified value x.
-   * The search for the maximum is restricted to an interval centered at the 
-   * specified x and having width equal to the current uniform sampling 
-   * interval.
-   * <p>
-   * Typically, the specified x corresponds to an uniform sample for which 
-   * the value y(x) of that sample is not less than the values of the two 
-   * nearest neighboring samples.
-   * @param x the center of the interval in which y(x) is a maximum.
-   * @return the value xmax for which y(xmax) is a local maximum.
-   */
-  public double findMax(double x) {
-    return findMax(x,1.0);
-  }
-
-  /**
-   * Finds a local minimum or maximum of the function y(x) near the
-   * specified value x.  The type type of extremum is determined by
-   * the second argument:  Any positive value means find the maximum,
-   * otherwise find the minimum.  For simplicity and readibility,
-   * use 1 for maximum, -1 for minimum.  The search for the extremum
-   * is restricted to an interval centered at the specified x and having
-   * width equal to the current uniform sampling interval.
-   * <p>
-   * Typically, the specified x corresponds to an uniform sample for which 
-   * the value y(x) of that sample is not less than the values of the two 
-   * nearest neighboring samples.
-   * @param x the center of the interval in which y(x) is an extremum.
-   * @param type the type of extremum; 1 for maximum, -1 for minimum.
-   * @return the value xmax for which y(xmax) is a local minimum or maximum.
-   */
-  public double findMax(double x, double type) {
-    double a = x-0.5*_dxu;
-    double b = x+0.5*_dxu;
-    double tol = _dsinc*_dxu;
-
-    final double sign = type > 0 ? -1 : 1;
-    BrentMinFinder finder = new BrentMinFinder(
-      new BrentMinFinder.Function(){
-        public double evaluate(double x) {
-          return sign*interpolate(x);
-        }
-      });
-
-    return finder.findMin(a,b,tol);
-  }
-
-
-  /**
-   * Sets the current sampling for a uniformly-sampled function y(x1,x2).
-   * In some applications, this sampling never changes, and this method 
-   * may be called only once for this interpolator.
-   * @param nx1u the number of uniform samples in 1st dimension.
-   * @param dx1u the uniform sampling interval in 1st dimension.
-   * @param fx1u the value x1 correponding to the first sample yu[0][0].
-   * @param nx2u the number of uniform samples in 2nd dimension.
-   * @param dx2u the uniform sampling interval in 2nd dimension.
-   * @param fx2u the value x2 correponding to the first sample yu[0][0].
-   */
-  public void setUniformSampling(
-    int nx1u, double dx1u, double fx1u,
-    int nx2u, double dx2u, double fx2u) {
-    if (_asinc==null)
-      makeTable();
-    _nx1u = nx1u;
-    //_dx1u = dx1u;
-    //_fx1u = fx1u;
-    _x1f = fx1u;
-    _x1s = 1.0/dx1u;
-    _x1b = _lsinc-_x1f*_x1s;
-    _nx1um = nx1u-_lsinc;
-    _nx2u = nx2u;
-    //_dx2u = dx2u;
-    //_fx2u = fx2u;
-    _x2f = fx2u;
-    _x2s = 1.0/dx2u;
-    _x2b = _lsinc-_x2f*_x2s;
-    _nx2um = nx2u-_lsinc;
-  }
-
-  /**
-   * Sets the current samples for a uniformly-sampled function y(x1,x2).
-   * If sample values are complex numbers, real and imaginary parts are 
-   * packed in the array as real, imaginary, real, imaginary, and so on.
-   * <p>
-   * Sample values are passed by reference, not by copy. Changes to sample
-   * values in the specified array will yield changes in interpolated values.
-   * @param yu array[nx2u][nx1u] of samples of y(x1,x2); 
-   *  by reference, not by copy.
-   */
-  public void setUniformSamples(float[][] yu) {
-    _yyu = yu;
-  }
-
-  /**
-   * Sets the current sampling and samples for a function y(x1,x2). 
-   * This method simply calls the two methods 
-   * {@link #setUniformSampling(int,double,double,int,double,double)} and
-   * {@link #setUniformSamples(float[][])} 
-   * with the specified parameters.
-   * @param nx1u the number of uniform samples in 1st dimension.
-   * @param dx1u the uniform sampling interval in 1st dimension.
-   * @param fx1u the value x1 correponding to the first sample yu[0][0].
-   * @param nx2u the number of uniform samples in 2nd dimension.
-   * @param dx2u the uniform sampling interval in 2nd dimension.
-   * @param fx2u the value x2 correponding to the first sample yu[0][0].
-   * @param yu array[nx2u][nx1u] of samples of y(x1,x2); 
-   *  by reference, not by copy.
-   */
-  public void setUniform(
-    int nx1u, double dx1u, double fx1u,
-    int nx2u, double dx2u, double fx2u,
-    float[][] yu) {
-    setUniformSampling(nx1u,dx1u,fx1u,nx2u,dx2u,fx2u);
-    setUniformSamples(yu);
-  }
-
-  /**
-   * Interpolates the current uniform samples as real numbers.
-   * @param x1 the value x1 at which to interpolate y(x1,x2).
-   * @param x2 the value x2 at which to interpolate y(x1,x2).
-   * @return the interpolated y(x1,x2).
-   */
-  public float interpolate(double x1, double x2) {
-
-    // Which uniform samples?
-    double x1n = _x1b+x1*_x1s;
-    double x2n = _x2b+x2*_x2s;
-    int ix1n = (int)x1n;
-    int ix2n = (int)x2n;
-    int ky1u = _ib+ix1n;
-    int ky2u = _ib+ix2n;
-
-    // Which sinc approximations?
-    double frac1 = x1n-ix1n;
-    double frac2 = x2n-ix2n;
-    if (frac1<0.0)
-      frac1 += 1.0;
-    if (frac2<0.0)
-      frac2 += 1.0;
-    int ksinc1 = (int)(frac1*_nsincm1+0.5);
-    int ksinc2 = (int)(frac2*_nsincm1+0.5);
-    float[] asinc1 = _asinc[ksinc1];
-    float[] asinc2 = _asinc[ksinc2];
-
-    // If no extrapolation is necessary, use a fast loop.
-    // Otherwise, extrapolate uniform samples, as necessary.
-    float yr = 0.0f;
-    if (ky1u>=0 && ky1u<=_nx1um &&  ky2u>=0 &&  ky2u<=_nx2um) {
-      for (int i2sinc=0; i2sinc<_lsinc; ++i2sinc,++ky2u) {
-        float asinc22 = asinc2[i2sinc];
-        float[] yyuk2 = _yyu[ky2u];
-        float yr2 = 0.0f;
-        for (int i1sinc=0,my1u=ky1u; i1sinc<_lsinc; ++i1sinc,++my1u)
-          yr2 += yyuk2[my1u]*asinc1[i1sinc];
-        yr += asinc22*yr2;
-      }
-    } else if (_extrap==Extrapolation.ZERO) {
-      for (int i2sinc=0; i2sinc<_lsinc; ++i2sinc,++ky2u) {
-        if (0<=ky2u && ky2u<_nx2u) {
-          for (int i1sinc=0,my1u=ky1u; i1sinc<_lsinc; ++i1sinc,++my1u) {
-            if (0<=my1u && my1u<_nx1u)
-              yr += _yyu[ky2u][my1u]*asinc2[i2sinc]*asinc1[i1sinc];
-          }
-        }
-      }
-    } else if (_extrap==Extrapolation.CONSTANT) {
-      for (int i2sinc=0; i2sinc<_lsinc; ++i2sinc,++ky2u) {
-        int jy2u = (ky2u<0)?0:(_nx2u<=ky2u)?_nx2u-2:ky2u;
-        for (int i1sinc=0,my1u=ky1u; i1sinc<_lsinc; ++i1sinc,++my1u) {
-          int jy1u = (my1u<0)?0:(_nx1u<=my1u)?_nx1u-1:my1u;
-          yr += _yyu[jy2u][jy1u]*asinc2[i2sinc]*asinc1[i1sinc];
-        }
-      }
+    double xscale = 1.0/dxu;
+    double xshift = _lsinc-fxu*xscale;
+    int nxum = nxu-_lsinc;
+    for (int ixi=0; ixi<nxi; ++ixi) {
+      double xi = fxi+ixi*dxi;
+      interpolateComplex(xscale,xshift,nxum,nxu,yu,ixi,xi,yi);
     }
-    return yr;
   }
 
   /**
-   * Sets the current sampling for a uniformly-sampled function y(x1,x2,x3).
-   * In some applications, this sampling never changes, and this method 
-   * may be called only once for this interpolator.
-   * @param nx1u the number of uniform samples in 1st dimension.
-   * @param dx1u the uniform sampling interval in 1st dimension.
-   * @param fx1u the value x1 correponding to the first sample yu[0][0][0].
-   * @param nx2u the number of uniform samples in 2nd dimension.
-   * @param dx2u the uniform sampling interval in 2nd dimension.
-   * @param fx2u the value x2 correponding to the first sample yu[0][0][0].
-   * @param nx3u the number of uniform samples in 3rd dimension.
-   * @param dx3u the uniform sampling interval in 3rd dimension.
-   * @param fx3u the value x3 correponding to the first sample yu[0][0][0].
+   * Interpolates multiple complex values y(x).
+   * Complex output samples are packed in the specified output array as 
+   * real, imag, real, imag, ....
+   * @param nxu number of input samples.
+   * @param dxu input sampling interval.
+   * @param fxu first input sampled x value.
+   * @param yu input array[2*nxu] of sampled complex values y(x).
+   * @param nxi number of output samples.
+   * @param xi input array[nxi] of x values at which to interpolate.
+   * @param yi output array[2*nxi] of interpolated complex values y(x).
    */
-  public void setUniformSampling(
-    int nx1u, double dx1u, double fx1u,
-    int nx2u, double dx2u, double fx2u,
-    int nx3u, double dx3u, double fx3u) 
+  public void interpolateComplex(
+    int nxu, double dxu, double fxu, float[] yu, 
+    int nxi, float[] xi, float[] yi)
   {
-    if (_asinc==null)
-      makeTable();
-    _nx1u = nx1u;
-    //_dx1u = dx1u;
-    //_fx1u = fx1u;
-    _x1f = fx1u;
-    _x1s = 1.0/dx1u;
-    _x1b = _lsinc-_x1f*_x1s;
-    _nx1um = nx1u-_lsinc;
-    _nx2u = nx2u;
-    //_dx2u = dx2u;
-    //_fx2u = fx2u;
-    _x2f = fx2u;
-    _x2s = 1.0/dx2u;
-    _x2b = _lsinc-_x2f*_x2s;
-    _nx2um = nx2u-_lsinc;
-    _nx3u = nx3u;
-    //_dx3u = dx3u;
-    //_fx3u = fx3u;
-    _x3f = fx3u;
-    _x3s = 1.0/dx3u;
-    _x3b = _lsinc-_x3f*_x3s;
-    _nx3um = nx3u-_lsinc;
+    double xscale = 1.0/dxu;
+    double xshift = _lsinc-fxu*xscale;
+    int nxum = nxu-_lsinc;
+    for (int ixi=0; ixi<nxi; ++ixi)
+      interpolateComplex(xscale,xshift,nxum,nxu,yu,ixi,xi[ixi],yi);
   }
 
   /**
-   * Sets the current samples for a uniformly-sampled function y(x1,x2,x3).
-   * If sample values are complex numbers, real and imaginary parts are 
-   * packed in the array as real, imaginary, real, imaginary, and so on.
-   * <p>
-   * Sample values are passed by reference, not by copy. Changes to sample
-   * values in the specified array will yield changes in interpolated values.
-   * @param yu array[nx3u][nx2u][nx1u] of samples of y(x1,x2,x3); 
-   *  by reference, not by copy.
+   * Interpolates multiple complex values y(x).
+   * Complex output samples are packed in the specified output array as 
+   * real, imag, real, imag, ....
+   * @param sxu sampling of input samples.
+   * @param yu input array[2*nxu] of sampled complex values y(x).
+   * @param sxi sampling of output samples.
+   * @param yi output array[2*nxi] of interpolated complex values y(x).
    */
-  public void setUniformSamples(float[][][] yu) {
-    _yyyu = yu;
-  }
-
-  /**
-   * Sets the current sampling and samples for a function y(x1,x2,x3). 
-   * This method simply calls the two methods 
-   * {@link #setUniformSampling(
-   *          int,double,double,int,double,double,int,double,double)} and
-   * {@link #setUniformSamples(float[][][])} 
-   * with the specified parameters.
-   * @param nx1u the number of uniform samples in 1st dimension.
-   * @param dx1u the uniform sampling interval in 1st dimension.
-   * @param fx1u the value x1 correponding to the first sample yu[0][0][0].
-   * @param nx2u the number of uniform samples in 2nd dimension.
-   * @param dx2u the uniform sampling interval in 2nd dimension.
-   * @param fx2u the value x2 correponding to the first sample yu[0][0][0].
-   * @param nx3u the number of uniform samples in 3rd dimension.
-   * @param dx3u the uniform sampling interval in 3rd dimension.
-   * @param fx3u the value x3 correponding to the first sample yu[0][0][0].
-   * @param yu array[nx3u][nx2u][nx1u] of samples of y(x1,x2,x3); 
-   *  by reference, not by copy.
-   */
-  public void setUniform(
-    int nx1u, double dx1u, double fx1u,
-    int nx2u, double dx2u, double fx2u,
-    int nx3u, double dx3u, double fx3u,
-    float[][][] yu) 
+  public void interpolateComplex(
+    Sampling sxu, float[] yu, 
+    Sampling sxi, float[] yi)
   {
-    setUniformSampling(nx1u,dx1u,fx1u,nx2u,dx2u,fx2u,nx3u,dx3u,fx3u);
-    setUniformSamples(yu);
-  }
-
-  /**
-   * Interpolates the current uniform samples as real numbers.
-   * @param x1 the value x1 at which to interpolate y(x1,x2,x3).
-   * @param x2 the value x2 at which to interpolate y(x1,x2,x3).
-   * @param x3 the value x3 at which to interpolate y(x1,x2,x3).
-   * @return the interpolated y(x1,x2,x3).
-   */
-  public float interpolate(double x1, double x2, double x3) {
-
-    // Which uniform samples?
-    double x1n = _x1b+x1*_x1s;
-    double x2n = _x2b+x2*_x2s;
-    double x3n = _x3b+x3*_x3s;
-    int ix1n = (int)x1n;
-    int ix2n = (int)x2n;
-    int ix3n = (int)x3n;
-    int ky1u = _ib+ix1n;
-    int ky2u = _ib+ix2n;
-    int ky3u = _ib+ix3n;
-
-    // Which sinc approximations?
-    double frac1 = x1n-ix1n;
-    double frac2 = x2n-ix2n;
-    double frac3 = x3n-ix3n;
-    if (frac1<0.0)
-      frac1 += 1.0;
-    if (frac2<0.0)
-      frac2 += 1.0;
-    if (frac3<0.0)
-      frac3 += 1.0;
-    int ksinc1 = (int)(frac1*_nsincm1+0.5);
-    int ksinc2 = (int)(frac2*_nsincm1+0.5);
-    int ksinc3 = (int)(frac3*_nsincm1+0.5);
-    float[] asinc1 = _asinc[ksinc1];
-    float[] asinc2 = _asinc[ksinc2];
-    float[] asinc3 = _asinc[ksinc3];
-
-    // If no extrapolation is necessary, use a fast loop.
-    // Otherwise, extrapolate uniform samples, as necessary.
-    float yr = 0.0f;
-    if (ky1u>=0 && ky1u<=_nx1um &&  
-        ky2u>=0 && ky2u<=_nx2um &&  
-        ky3u>=0 && ky3u<=_nx3um) {
-      for (int i3sinc=0; i3sinc<_lsinc; ++i3sinc,++ky3u) {
-        float asinc33 = asinc3[i3sinc];
-        float[][] yyy3 = _yyyu[ky3u];
-        float yr2 = 0.0f;
-        for (int i2sinc=0,my2u=ky2u; i2sinc<_lsinc; ++i2sinc,++my2u) {
-          float asinc22 = asinc2[i2sinc];
-          float[] yyy32 = yyy3[my2u];
-          float yr1 = 0.0f;
-          for (int i1sinc=0,my1u=ky1u; i1sinc<_lsinc; ++i1sinc,++my1u)
-            yr1 += yyy32[my1u]*asinc1[i1sinc];
-          yr2 += asinc22*yr1;
-        }
-        yr += asinc33*yr2;
-      }
-    } else if (_extrap==Extrapolation.ZERO) {
-      for (int i3sinc=0; i3sinc<_lsinc; ++i3sinc,++ky3u) {
-        if (0<=ky3u && ky3u<_nx3u) {
-          for (int i2sinc=0,my2u=ky2u; i2sinc<_lsinc; ++i2sinc,++my2u) {
-            if (0<=my2u && my2u<_nx2u) {
-              for (int i1sinc=0,my1u=ky1u; i1sinc<_lsinc; ++i1sinc,++my1u) {
-                if (0<=my1u && my1u<_nx1u)
-                  yr += _yyyu[ky3u][my2u][my1u] *
-                        asinc3[i3sinc] *
-                        asinc2[i2sinc] *
-                        asinc1[i1sinc];
-              }
-            }
-          }
-        }
-      }
-    } else if (_extrap==Extrapolation.CONSTANT) {
-      for (int i3sinc=0; i3sinc<_lsinc; ++i3sinc,++ky3u) {
-        int jy3u = (ky3u<0)?0:(_nx3u<=ky3u)?_nx3u-2:ky3u;
-        for (int i2sinc=0,my2u=ky2u; i2sinc<_lsinc; ++i2sinc,++my2u) {
-          int jy2u = (my2u<0)?0:(_nx2u<=my2u)?_nx2u-2:my2u;
-          for (int i1sinc=0,my1u=ky1u; i1sinc<_lsinc; ++i1sinc,++my1u) {
-            int jy1u = (my1u<0)?0:(_nx1u<=my1u)?_nx1u-1:my1u;
-            yr += _yyyu[jy3u][jy2u][jy1u] *
-                  asinc3[i3sinc] *
-                  asinc2[i2sinc] *
-                  asinc1[i1sinc];
-          }
-        }
-      }
-    }
-    return yr;
-  }
-
-  /**
-   * Accumulates a specified real value y(x) into the current samples.
-   * Accumulation is like the transpose (not the inverse) of interpolation.
-   * This method modifies the current uniform sample values yu.
-   * @param x the value x at which to accumulate y(x).
-   * @param y the value y(x) to accumulate.
-   */
-  public void accumulate(double x, float y) {
-
-    // Which uniform samples?
-    double xn = _xb+x*_xs;
-    int ixn = (int)xn;
-    int kyu = _ib+ixn;
-
-    // Which sinc approximation?
-    double frac = xn-ixn;
-    if (frac<0.0)
-      frac += 1.0;
-    int ksinc = (int)(frac*_nsincm1+0.5);
-    float[] asinc = _asinc[ksinc];
-
-    // If no extrapolation is necessary, use a fast loop.
-      // Otherwise, extrapolate uniform samples, as necessary.
-    if (kyu>=0 && kyu<=_nxum) {
-      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu)
-        _yu[kyu] += y*asinc[isinc];
-    } else if (_extrap==Extrapolation.ZERO) {
-      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
-        if (0<=kyu && kyu<_nxu)
-          _yu[kyu] += y*asinc[isinc];
-      }
-    } else if (_extrap==Extrapolation.CONSTANT) {
-      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
-        int jyu = (kyu<0)?0:(_nxu<=kyu)?_nxu-1:kyu;
-        _yu[jyu] += y*asinc[isinc];
+    Check.argument(sxu.isUniform(),"input sampling is uniform");
+    if (sxi.isUniform()) {
+      interpolateComplex(sxu.getCount(),sxu.getDelta(),sxu.getFirst(),yu,
+                         sxi.getCount(),sxi.getDelta(),sxi.getFirst(),yi);
+    } else {
+      int nxu = sxu.getCount();
+      int nxi = sxi.getCount();
+      double xscale = 1.0/sxu.getDelta();
+      double xshift = _lsinc-sxu.getFirst()*xscale;
+      int nxum = nxu-_lsinc;
+      for (int ixi=0; ixi<nxi; ++ixi) {
+        double xi = sxi.getValue(ixi);
+        interpolateComplex(xscale,xshift,nxum,nxu,yu,ixi,xi,yi);
       }
     }
   }
 
   /**
-   * Accumulates an array of real values y(x) into the current samples.
-   * Accumulation is like the transpose (not the inverse) of interpolation.
-   * This method modifies the current uniform sample values yu.
-   * @param nx the number of values to accumulate.
-   * @param x array[nx] of values x at which to accumulate y(x).
-   * @param y array[nx] of values y(x) to accumulate.
+   * Accumulates a specified real value y(x) into uniformly-sampled yu.
+   * Accumulation is the transpose (not the inverse) of interpolation.
+   * Whereas interpolation gathers from uniformly sampled values.
+   * accumulation scatters into uniformly sampled values.
+   * @param xa value x at which to accumulate.
+   * @param ya value y(x) to accumulate.
+   * @param nxu number of input/output samples.
+   * @param dxu input/output sampling interval.
+   * @param fxu first input/output sampled x value.
+   * @param yu input/output array of sampled values y(x).
    */
-  public void accumulate(int nx, float[] x, float[] y) {
-    for (int ix=0; ix<nx; ++ix)
-      accumulate(x[ix],y[ix]);
+  public void accumulate(
+    double xa, float ya,
+    int nxu, double dxu, double fxu, float[] yu) 
+  {
+    double xscale = 1.0/dxu;
+    double xshift = _lsinc-fxu*xscale;
+    int nxum = nxu-_lsinc;
+    accumulate(xscale,xshift,nxum,xa,ya,nxu,yu);
+  }
+
+  /**
+   * Accumulates a specified real value y(x) into uniformly-sampled yu.
+   * Accumulation is the transpose (not the inverse) of interpolation.
+   * Whereas interpolation gathers from uniformly sampled values.
+   * accumulation scatters into uniformly sampled values.
+   * @param nxa number of values to accumulate.
+   * @param xa input array of values x at which to accumulate.
+   * @param ya input array of values y(x) to accumulate.
+   * @param nxu number of input/output samples.
+   * @param dxu input/output sampling interval.
+   * @param fxu first input/output sampled x value.
+   * @param yu input/output array of sampled values y(x).
+   */
+  public void accumulate(
+    int nxa, float[] xa, float[] ya,
+    int nxu, double dxu, double fxu, float[] yu) 
+  {
+    double xscale = 1.0/dxu;
+    double xshift = _lsinc-fxu*xscale;
+    int nxum = nxu-_lsinc;
+    for (int ixa=0; ixa<nxa; ++ixa)
+      accumulate(xscale,xshift,nxum,xa[ixa],ya[ixa],nxu,yu);
+  }
+
+  /**
+   * Get a copy of the interpolation table.  Returns a copy of this
+   * interpolator's table of sinc interpolation coefficients.
+   * @return A copy of the table.
+   */
+  public float[][] getTable() {
+    return copy(_table.asinc);
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -798,55 +549,23 @@ public class SincInterpolator {
   // Maximum table size, when maximum error and frequency are specified.
   private static final int NTAB_MAX = 16385;
 
-  // Design parameters.
-  private double _emax;
-  private double _fmax;
-  private int _lmax;
-  
-  // Kaiser window used in design.
-  private KaiserWindow _kwin;
-
   // Extrapolation method.
   private Extrapolation _extrap = Extrapolation.ZERO;
 
-  // Current uniform sampling.
-  private int _nxu;
-  private double _dxu;
-  private double _fxu;
-  private double _xf;
-  private double _xs;
-  private double _xb;
-  private int _nxum;
-
-  // Current uniform samples.
-  private float[] _yu; // real or complex samples
-
-  // Current 2-D or 3-D uniform sampling.
-  private int _nx1u,_nx2u,_nx3u;
-  //private double _dx1u,_dx2u,_dx3u;
-  //private double _fx1u,_fx2u,_fx3u;
-  private double _x1f,_x2f,_x3f;
-  private double _x1s,_x2s,_x3s;
-  private double _x1b,_x2b,_x3b;
-  private int _nx1um,_nx2um,_nx3um;
-
-  // Current 2-D or 3-D uniform samples.
-  private float[][] _yyu;
-  private float[][][] _yyyu;
-
   // Table of sinc interpolation coefficients.
+  private Table _table; // with all fields cached below
   private int _lsinc; // length of sinc approximations
   private int _nsinc; // number of sinc approximations
   private double _dsinc; // sampling interval in table
   private float[][] _asinc; // array[nsinc][lsinc] of sinc approximations
   private double _nsincm1; // nsinc-1
-  private int _ib; // -lsinc-lsinc/2+1
+  private int _ishift; // -lsinc-lsinc/2+1
 
   /**
    * Constructs a sinc interpolator with specified parameters.
    * Exactly one of the parameters must be zero, and is computed here.
    */
-  private SincInterpolator(double emax, double fmax, int lmax) {
+  private SincInterpolator(double emax,double fmax,int lmax) {
     Check.argument(emax==0.0 && fmax!=0.0 && lmax!=0 ||
                    emax!=0.0 && fmax==0.0 && lmax!=0 ||
                    emax!=0.0 && fmax!=0.0 && lmax==0,
@@ -864,6 +583,60 @@ public class SincInterpolator {
       Check.argument(emax<=0.1,"emax<=0.1");
       Check.argument(fmax<0.5,"fmax<0.5");
     }
+    _table = getTable(emax,fmax,lmax);
+    _lsinc = _table.lsinc;
+    _nsinc = _table.nsinc;
+    _nsincm1 = _table.nsincm1;
+    _ishift = _table.ishift;
+    _dsinc = _table.dsinc;
+    _asinc = _table.asinc;
+  }
+
+  /**
+   * Design parameters.
+   */
+  private static class Design {
+    double emax;
+    double fmax; 
+    int lmax;
+    Design(double emax, double fmax, int lmax) {
+      this.emax = emax;
+      this.fmax = fmax;
+      this.lmax = lmax;
+    }
+    public int hashCode() {
+      long lemax = Double.doubleToLongBits(emax);
+      long lfmax = Double.doubleToLongBits(fmax);
+      return (int)(lemax^(lemax>>>32)) ^
+             (int)(lfmax^(lfmax>>>32)) ^
+             lmax;
+    }
+    public boolean equals(Object object) {
+      Design that = (Design)object;
+      return this.emax==that.emax &&
+             this.fmax==that.fmax &&
+             this.lmax==that.lmax;
+    }
+  }
+
+  /**
+   * Table of sinc interpolator coefficients.
+   */
+  private static class Table {
+    Design design; // here, all three design parameters are non-zero
+    int lsinc,nsinc,nsincm1,ishift;
+    double dsinc;
+    float[][] asinc;
+  }
+
+  /**
+   * Builds a table of interpolators for specified design parameters.
+   * Exactly one of the design parameters must be zero.
+   */
+  private static Table makeTable(Design design) {
+    double emax = design.emax;
+    double fmax = design.fmax;
+    int lmax = design.lmax;
 
     // The Kaiser window transition width is twice the difference 
     // between the Nyquist frequency 0.5 and the maximum frequency.
@@ -928,73 +701,80 @@ public class SincInterpolator {
     // The number of interpolators is a power of two plus 1, so that table 
     // lookup error is zero when interpolating halfway between samples.
     double etab = emax-ewin;
-    _dsinc = (fmax>0.0)?etab/(PI*fmax):1.0;
-    int nsincMin = 1+(int)ceil(1.0/_dsinc);
-    _nsinc = 2;
-    while (_nsinc<nsincMin)
-      _nsinc *= 2;
-    ++_nsinc;
-    _dsinc = 1.0/(_nsinc-1);
-    _lsinc = lmax;
-
-    // Save design parameters and Kaiser window, so we can build the table.
-    _emax = emax;
-    _fmax = fmax;
-    _lmax = lmax;
-    _kwin = kwin;
+    double dsinc = (fmax>0.0)?etab/(PI*fmax):1.0;
+    int nsincMin = 1+(int)ceil(1.0/dsinc);
+    int nsinc = 2;
+    while (nsinc<nsincMin)
+      nsinc *= 2;
+    ++nsinc;
+    int lsinc = lmax;
+    Table table = makeTable(nsinc,lsinc,kwin);
+    table.design = new Design(emax,fmax,lmax);
+    _tables.put(design,table); // key is design with one zero parameter
+    return table;
   }
 
   /**
-   * Builds the table of interpolators. This may be costly, so we do it 
-   * only when an interpolator is used, not when it is constructed. Users` 
-   * may construct more than one interpolator, perhaps in a search for 
-   * optimal design parameters, without actually using all of them.
+   * Builds a table of interpolators for a specified Kaiser window.
    */
-  private void makeTable() {
-    _asinc = new float[_nsinc][_lsinc];
-    _nsincm1 = _nsinc-1;
-    _ib = -_lsinc-_lsinc/2+1;
+  private static Table makeTable(int nsinc, int lsinc, KaiserWindow kwin) {
+    float[][] asinc = new float[nsinc][lsinc];
+    int nsincm1 = nsinc-1;
+    int ishift = -lsinc-lsinc/2+1;
+    double dsinc = 1.0/(nsinc-1);
 
     // The first and last interpolators are shifted unit impulses.
     // Handle these two cases exactly, with no rounding errors.
-    for (int j=0; j<_lsinc; ++j) {
-      _asinc[       0][j] = 0.0f;
-      _asinc[_nsinc-1][j] = 0.0f;
+    for (int j=0; j<lsinc; ++j) {
+      asinc[      0][j] = 0.0f;
+      asinc[nsinc-1][j] = 0.0f;
     }
-    _asinc[       0][_lsinc/2-1] = 1.0f;
-    _asinc[_nsinc-1][_lsinc/2  ] = 1.0f;
+    asinc[      0][lsinc/2-1] = 1.0f;
+    asinc[nsinc-1][lsinc/2  ] = 1.0f;
 
     // Other interpolators are sampled Kaiser-windowed sinc functions.
-    for (int isinc=1; isinc<_nsinc-1; ++isinc) {
-      double x = -_lsinc/2+1-_dsinc*isinc;
-      for (int i=0; i<_lsinc; ++i,x+=1.0) {
-        _asinc[isinc][i] = (float)(sinc(x)*_kwin.evaluate(x));
+    for (int isinc=1; isinc<nsinc-1; ++isinc) {
+      double x = -lsinc/2+1-dsinc*isinc;
+      for (int i=0; i<lsinc; ++i,x+=1.0) {
+        asinc[isinc][i] = (float)(sinc(x)*kwin.evaluate(x));
       }
     }
+    Table table = new Table();
+    table.lsinc = lsinc;
+    table.nsinc = nsinc;
+    table.nsincm1 = nsincm1;
+    table.ishift = ishift;
+    table.dsinc = dsinc;
+    table.asinc = asinc;
+    return table;
   }
-
-  /**
-   * Get a copy of the interpolation table.  Returns a copy of this
-   * interpolator's table of sinc interpolation coefficients.
-   * @return A copy of the table.
-   */
-  public float[][] getTable() {
-    if (_asinc==null)
-      makeTable();
-    assert _asinc != null;
-    return copy(_asinc);
-  }
-
   private static double sinc(double x) {
     return (x!=0.0)?sin(PI*x)/(PI*x):1.0;
   }
 
-  private void interpolateComplex(int ix, double x, float[] y) {
+  /**
+   * Map from design parameters to tables of coefficients.
+   * This map saves both time and space required to compute the tables.
+   */
+  private final static HashMap<Design,Table> _tables = new HashMap<Design,Table>();
+  private static Table getTable(double emax, double fmax, int lmax) {
+    Design design = new Design(emax,fmax,lmax);
+    synchronized(_tables) {
+      Table table = _tables.get(design);
+      if (table==null)
+        table = makeTable(design);
+      return table;
+    }
+  }
 
+  private float interpolate(
+    double xscale, double xshift, int nxum, int nxu, 
+    float[] yu, double x)
+  {
     // Which uniform samples?
-    double xn = _xb+x*_xs;
+    double xn = xshift+x*xscale;
     int ixn = (int)xn;
-    int kyu = _ib+ixn;
+    int kyu = _ishift+ixn;
 
     // Which sinc approximation?
     double frac = xn-ixn;
@@ -1006,71 +786,59 @@ public class SincInterpolator {
     // If no extrapolation is necessary, use a fast loop.
       // Otherwise, extrapolate uniform samples, as necessary.
     float yr = 0.0f;
-    float yi = 0.0f;
-    if (kyu>=0 && kyu<=_nxum) {
-      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
-        int jyu = 2*kyu;
-        float asinci = asinc[isinc];
-        yr += _yu[jyu  ]*asinci;
-        yi += _yu[jyu+1]*asinci;
-      }
+    if (kyu>=0 && kyu<=nxum) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu)
+        yr += yu[kyu]*asinc[isinc];
     } else if (_extrap==Extrapolation.ZERO) {
       for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
-        if (0<=kyu && kyu<_nxu) {
-          int jyu = 2*kyu;
-          float asinci = asinc[isinc];
-          yr += _yu[jyu  ]*asinci;
-          yi += _yu[jyu+1]*asinci;
-        }
+        if (0<=kyu && kyu<nxu)
+          yr += yu[kyu]*asinc[isinc];
       }
     } else if (_extrap==Extrapolation.CONSTANT) {
       for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
-        int jyu = (kyu<0)?0:(_nxu<=kyu)?2*_nxu-2:2*kyu;
-        float asinci = asinc[isinc];
-        yr += _yu[jyu  ]*asinci;
-        yi += _yu[jyu+1]*asinci;
+        int jyu = (kyu<0)?0:(nxu<=kyu)?nxu-1:kyu;
+        yr += yu[jyu]*asinc[isinc];
       }
     }
-    int jx = 2*ix;
-    y[jx  ] = yr;
-    y[jx+1] = yi;
+    return yr;
   }
 
-  private void shift(int nx, double fx, float[] y) {
-
-    // Uniform sampling.
-    int nxu = _nxu;
-    double dxu = _dxu;
-    double fxu = _fxu;
+  private void shift(
+    int nxu, double dxu, double fxu, float[] yu,
+    int nxi,             double fxi, float[] yi)
+  {
     double lxu = fxu+(nxu-1)*dxu;
+    double xscale = 1.0/dxu;
+    double xshift = _lsinc-fxu*xscale;
+    int nxum = nxu-_lsinc;
 
     // Which output samples are near beginning and end of uniform sequence?
     double dx = dxu;
     double x1 = fxu+dxu*_lsinc/2;
     double x2 = lxu-dxu*_lsinc/2;
-    double x1n = (x1-fx)/dx;
-    double x2n = (x2-fx)/dx;
-    int ix1 = max(0,min(nx,(int)x1n+1));
-    int ix2 = max(0,min(nx,(int)x2n-1));
+    double x1n = (x1-fxi)/dx;
+    double x2n = (x2-fxi)/dx;
+    int ix1 = max(0,min(nxi,(int)x1n+1));
+    int ix2 = max(0,min(nxi,(int)x2n-1));
 
     // Interpolate output samples near beginning of uniform sequence.
-    for (int ix=0; ix<ix1; ++ix) {
-      double x = fx+ix*dx;
-      y[ix] = interpolate(x);
+    for (int ixi=0; ixi<ix1; ++ixi) {
+      double xi = fxi+ixi*dx;
+      yi[ixi] = interpolate(xscale,xshift,nxum,nxu,yu,xi);
     }
 
     // Interpolate output samples near end of uniform sequence.
-    for (int ix=ix2; ix<nx; ++ix) {
-      double x = fx+ix*dx;
-      y[ix] = interpolate(x);
+    for (int ixi=ix2; ixi<nxi; ++ixi) {
+      double xi = fxi+ixi*dx;
+      yi[ixi] = interpolate(xscale,xshift,nxum,nxu,yu,xi);
     }
 
     // Now we ignore the ends, and use a single sinc approximation.
 
     // Which uniform samples?
-    double xn = _xb+(fx+ix1*dx)*_xs;
+    double xn = xshift+(fxi+ix1*dx)*xscale;
     int ixn = (int)xn;
-    int kyu = _ib+ixn;
+    int kyu = _ishift+ixn;
 
     // Which sinc approximation?
     double frac = xn-ixn;
@@ -1083,79 +851,237 @@ public class SincInterpolator {
     for (int ix=ix1; ix<ix2; ++ix,++kyu) {
       float yr = 0.0f;
       for (int isinc=0,jyu=kyu; isinc<_lsinc; ++isinc,++jyu)
-        yr += _yu[jyu]*asinc[isinc];
-      y[ix] = yr;
+        yr += yu[jyu]*asinc[isinc];
+      yi[ix] = yr;
     }
   }
 
-  /**
-   * Builds the table of interpolators using Ken Larner's old method. 
-   * This method exists for comparison with the Kaiser window method.
-   * Ken's method is the one that has been in SU and ProMAX for years.
-   */
-  private void makeTableKenLarner() {
-    _asinc = new float[_nsinc][_lsinc];
-    _nsincm1 = _nsinc-1;
-    _ib = -_lsinc-_lsinc/2+1;
-
-    // The first and last interpolators are shifted unit impulses.
-    // Handle these two cases exactly, with no rounding errors.
-    for (int j=0; j<_lsinc; ++j) {
-      _asinc[       0][j] = 0.0f;
-      _asinc[_nsinc-1][j] = 0.0f;
-    }
-    _asinc[       0][_lsinc/2-1] = 1.0f;
-    _asinc[_nsinc-1][_lsinc/2  ] = 1.0f;
-
-    // Other interpolators are least-squares approximations to sincs.
-    for (int isinc=1; isinc<_nsinc-1; ++isinc) {
-      double frac = (double)isinc/(double)(_nsinc-1);
-      mksinc(frac,_lsinc,_asinc[isinc]);
-    }
-  }
-  private static void mksinc(double d, int lsinc, float[] sinc) {
-    double[] s = new double[lsinc];
-    double[] a = new double[lsinc];
-    double[] c = new double[lsinc];
-    double[] w = new double[lsinc];
-    double fmax = 0.033+0.132*log(lsinc);
-    if (fmax>0.5)
-      fmax = 0.5;
-    for (int j=0; j<lsinc; ++j) {
-      a[j] = sinc(2.0*fmax*j);
-      c[j] = sinc(2.0*fmax*(lsinc/2-j-1+d));
-    }
-    stoepd(lsinc,a,c,s,w);
-    for (int j=0; j<lsinc; ++j)
-      sinc[j] = (float)s[j];
-  }
-  private static void stoepd (
-    int n, double[] r, double[] g, double[] f, double[] a)
+  private void accumulate(
+    double xscale, double xshift, int nxum,
+    double x, float y, int nxu, float[] yu) 
   {
-    if (r[0]==0.0) 
-      return;
-    a[0] = 1.0;
-    double v = r[0];
-    f[0] = g[0]/r[0];
-    for (int j=1; j<n; j++) {
-      a[j] = 0.0;
-      f[j] = 0.0;
-      double e = 0.0;
-      for (int i=0; i<j; i++)
-        e += a[i]*r[j-i];
-      double c = e/v;
-      v -= c*e;
-      for (int i=0; i<=j/2; i++) {
-        double bot = a[j-i]-c*a[i];
-        a[i] -= c*a[j-i];
-        a[j-i] = bot;
+    // Which uniform samples?
+    double xn = xshift+x*xscale;
+    int ixn = (int)xn;
+    int kyu = _ishift+ixn;
+
+    // Which sinc approximation?
+    double frac = xn-ixn;
+    if (frac<0.0)
+      frac += 1.0;
+    int ksinc = (int)(frac*_nsincm1+0.5);
+    float[] asinc = _asinc[ksinc];
+
+    // If no extrapolation is necessary, use a fast loop.
+      // Otherwise, extrapolate uniform samples, as necessary.
+    if (kyu>=0 && kyu<=nxum) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu)
+        yu[kyu] += y*asinc[isinc];
+    } else if (_extrap==Extrapolation.ZERO) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
+        if (0<=kyu && kyu<nxu)
+          yu[kyu] += y*asinc[isinc];
       }
-      double w = 0.0;
-      for (int i=0; i<j; i++)
-        w += f[i]*r[j-i];
-      c = (w-g[j])/v;
-      for (int i=0; i<=j; i++)
-        f[i] -= c*a[j-i];
+    } else if (_extrap==Extrapolation.CONSTANT) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
+        int jyu = (kyu<0)?0:(nxu<=kyu)?nxu-1:kyu;
+        yu[jyu] += y*asinc[isinc];
+      }
     }
+  }
+
+  private float interpolate(
+    double x1scale, double x1shift, int nx1um, int nx1u,
+    double x2scale, double x2shift, int nx2um, int nx2u,
+    float[][] yu, double x1, double x2)
+  {
+    // Which uniform samples?
+    double x1n = x1shift+x1*x1scale;
+    double x2n = x2shift+x2*x2scale;
+    int ix1n = (int)x1n;
+    int ix2n = (int)x2n;
+    int ky1u = _ishift+ix1n;
+    int ky2u = _ishift+ix2n;
+
+    // Which sinc approximations?
+    double frac1 = x1n-ix1n;
+    double frac2 = x2n-ix2n;
+    if (frac1<0.0)
+      frac1 += 1.0;
+    if (frac2<0.0)
+      frac2 += 1.0;
+    int ksinc1 = (int)(frac1*_nsincm1+0.5);
+    int ksinc2 = (int)(frac2*_nsincm1+0.5);
+    float[] asinc1 = _asinc[ksinc1];
+    float[] asinc2 = _asinc[ksinc2];
+
+    // If no extrapolation is necessary, use a fast loop.
+    // Otherwise, extrapolate uniform samples, as necessary.
+    float yr = 0.0f;
+    if (ky1u>=0 && ky1u<=nx1um &&  ky2u>=0 &&  ky2u<=nx2um) {
+      for (int i2sinc=0; i2sinc<_lsinc; ++i2sinc,++ky2u) {
+        float asinc22 = asinc2[i2sinc];
+        float[] yuk2 = yu[ky2u];
+        float yr2 = 0.0f;
+        for (int i1sinc=0,my1u=ky1u; i1sinc<_lsinc; ++i1sinc,++my1u)
+          yr2 += yuk2[my1u]*asinc1[i1sinc];
+        yr += asinc22*yr2;
+      }
+    } else if (_extrap==Extrapolation.ZERO) {
+      for (int i2sinc=0; i2sinc<_lsinc; ++i2sinc,++ky2u) {
+        if (0<=ky2u && ky2u<nx2u) {
+          for (int i1sinc=0,my1u=ky1u; i1sinc<_lsinc; ++i1sinc,++my1u) {
+            if (0<=my1u && my1u<nx1u)
+              yr += yu[ky2u][my1u]*asinc2[i2sinc]*asinc1[i1sinc];
+          }
+        }
+      }
+    } else if (_extrap==Extrapolation.CONSTANT) {
+      for (int i2sinc=0; i2sinc<_lsinc; ++i2sinc,++ky2u) {
+        int jy2u = (ky2u<0)?0:(nx2u<=ky2u)?nx2u-2:ky2u;
+        for (int i1sinc=0,my1u=ky1u; i1sinc<_lsinc; ++i1sinc,++my1u) {
+          int jy1u = (my1u<0)?0:(nx1u<=my1u)?nx1u-1:my1u;
+          yr += yu[jy2u][jy1u]*asinc2[i2sinc]*asinc1[i1sinc];
+        }
+      }
+    }
+    return yr;
+  }
+
+  private float interpolate(
+    double x1scale, double x1shift, int nx1um, int nx1u,
+    double x2scale, double x2shift, int nx2um, int nx2u,
+    double x3scale, double x3shift, int nx3um, int nx3u,
+    float[][][] yu, double x1, double x2, double x3)
+  {
+    // Which uniform samples?
+    double x1n = x1shift+x1*x1scale;
+    double x2n = x2shift+x2*x2scale;
+    double x3n = x3shift+x3*x3scale;
+    int ix1n = (int)x1n;
+    int ix2n = (int)x2n;
+    int ix3n = (int)x3n;
+    int ky1u = _ishift+ix1n;
+    int ky2u = _ishift+ix2n;
+    int ky3u = _ishift+ix3n;
+
+    // Which sinc approximations?
+    double frac1 = x1n-ix1n;
+    double frac2 = x2n-ix2n;
+    double frac3 = x3n-ix3n;
+    if (frac1<0.0)
+      frac1 += 1.0;
+    if (frac2<0.0)
+      frac2 += 1.0;
+    if (frac3<0.0)
+      frac3 += 1.0;
+    int ksinc1 = (int)(frac1*_nsincm1+0.5);
+    int ksinc2 = (int)(frac2*_nsincm1+0.5);
+    int ksinc3 = (int)(frac3*_nsincm1+0.5);
+    float[] asinc1 = _asinc[ksinc1];
+    float[] asinc2 = _asinc[ksinc2];
+    float[] asinc3 = _asinc[ksinc3];
+
+    // If no extrapolation is necessary, use a fast loop.
+    // Otherwise, extrapolate uniform samples, as necessary.
+    float yr = 0.0f;
+    if (ky1u>=0 && ky1u<=nx1um &&  
+        ky2u>=0 && ky2u<=nx2um &&  
+        ky3u>=0 && ky3u<=nx3um) {
+      for (int i3sinc=0; i3sinc<_lsinc; ++i3sinc,++ky3u) {
+        float asinc33 = asinc3[i3sinc];
+        float[][] yu3 = yu[ky3u];
+        float yr2 = 0.0f;
+        for (int i2sinc=0,my2u=ky2u; i2sinc<_lsinc; ++i2sinc,++my2u) {
+          float asinc22 = asinc2[i2sinc];
+          float[] yu32 = yu3[my2u];
+          float yr1 = 0.0f;
+          for (int i1sinc=0,my1u=ky1u; i1sinc<_lsinc; ++i1sinc,++my1u)
+            yr1 += yu32[my1u]*asinc1[i1sinc];
+          yr2 += asinc22*yr1;
+        }
+        yr += asinc33*yr2;
+      }
+    } else if (_extrap==Extrapolation.ZERO) {
+      for (int i3sinc=0; i3sinc<_lsinc; ++i3sinc,++ky3u) {
+        if (0<=ky3u && ky3u<nx3u) {
+          for (int i2sinc=0,my2u=ky2u; i2sinc<_lsinc; ++i2sinc,++my2u) {
+            if (0<=my2u && my2u<nx2u) {
+              for (int i1sinc=0,my1u=ky1u; i1sinc<_lsinc; ++i1sinc,++my1u) {
+                if (0<=my1u && my1u<nx1u)
+                  yr += yu[ky3u][my2u][my1u] *
+                        asinc3[i3sinc] *
+                        asinc2[i2sinc] *
+                        asinc1[i1sinc];
+              }
+            }
+          }
+        }
+      }
+    } else if (_extrap==Extrapolation.CONSTANT) {
+      for (int i3sinc=0; i3sinc<_lsinc; ++i3sinc,++ky3u) {
+        int jy3u = (ky3u<0)?0:(nx3u<=ky3u)?nx3u-2:ky3u;
+        for (int i2sinc=0,my2u=ky2u; i2sinc<_lsinc; ++i2sinc,++my2u) {
+          int jy2u = (my2u<0)?0:(nx2u<=my2u)?nx2u-2:my2u;
+          for (int i1sinc=0,my1u=ky1u; i1sinc<_lsinc; ++i1sinc,++my1u) {
+            int jy1u = (my1u<0)?0:(nx1u<=my1u)?nx1u-1:my1u;
+            yr += yu[jy3u][jy2u][jy1u] *
+                  asinc3[i3sinc] *
+                  asinc2[i2sinc] *
+                  asinc1[i1sinc];
+          }
+        }
+      }
+    }
+    return yr;
+  }
+
+  private void interpolateComplex(
+    double xscale, double xshift, int nxum, int nxu, 
+    float[] yu, int ix, double x, float[] y) 
+  {
+    // Which uniform samples?
+    double xn = xshift+x*xscale;
+    int ixn = (int)xn;
+    int kyu = _ishift+ixn;
+
+    // Which sinc approximation?
+    double frac = xn-ixn;
+    if (frac<0.0)
+      frac += 1.0;
+    int ksinc = (int)(frac*_nsincm1+0.5);
+    float[] asinc = _asinc[ksinc];
+
+    // If no extrapolation is necessary, use a fast loop.
+      // Otherwise, extrapolate uniform samples, as necessary.
+    float yr = 0.0f;
+    float yi = 0.0f;
+    if (kyu>=0 && kyu<=nxum) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
+        int jyu = 2*kyu;
+        float asinci = asinc[isinc];
+        yr += yu[jyu  ]*asinci;
+        yi += yu[jyu+1]*asinci;
+      }
+    } else if (_extrap==Extrapolation.ZERO) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
+        if (0<=kyu && kyu<nxu) {
+          int jyu = 2*kyu;
+          float asinci = asinc[isinc];
+          yr += yu[jyu  ]*asinci;
+          yi += yu[jyu+1]*asinci;
+        }
+      }
+    } else if (_extrap==Extrapolation.CONSTANT) {
+      for (int isinc=0; isinc<_lsinc; ++isinc,++kyu) {
+        int jyu = (kyu<0)?0:(nxu<=kyu)?2*nxu-2:2*kyu;
+        float asinci = asinc[isinc];
+        yr += yu[jyu  ]*asinci;
+        yi += yu[jyu+1]*asinci;
+      }
+    }
+    int jx = 2*ix;
+    y[jx  ] = yr;
+    y[jx+1] = yi;
   }
 }

@@ -251,8 +251,8 @@ public class SteerablePyramid {
       }
       int m2 = (nl2-1)/2+1;
       int m1 = (nl1-1)/2+1;
-      SincInterp si = new SincInterp();
-      si.setExtrapolation(SincInterp.Extrapolation.CONSTANT);
+      SincInterpolator si = new SincInterpolator();
+      si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
       for (int i2=0; i2<nl2; ++i2) {
         for (int i1=0; i1<nl1; ++i1) {
           spyr[lev][0][i2][i1] += si.interpolate(
@@ -299,8 +299,8 @@ public class SteerablePyramid {
       float[] lo11 = zerofloat(m1);
       float[] lo12 = zerofloat(m2);
       float[] lo13 = zerofloat(m3);
-      SincInterp si = SincInterp.fromErrorAndFrequency(0.001,0.4);
-      si.setExtrapolation(SincInterp.Extrapolation.CONSTANT);
+      SincInterpolator si = SincInterpolator.fromErrorAndFrequency(0.001,0.4);
+      si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
       for (int i3=0; i3<nl3; i3=i3+2) {
         j3 = i3/2;
         for (int i2=0; i2<nl2; i2=i2+2) {

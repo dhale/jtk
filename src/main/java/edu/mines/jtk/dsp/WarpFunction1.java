@@ -149,7 +149,7 @@ public abstract class WarpFunction1 {
    * @return array of values g(y) = f(y-u(x(y)).
    */
   public float[] warp(float[] f) {
-    SincInterp si = new SincInterp();
+    SincInterpolator si = new SincInterpolator();
     float[] g = new float[_n];
     for (int i=0; i<_n; ++i) {
       double y = i;
@@ -165,7 +165,7 @@ public abstract class WarpFunction1 {
    * @return array of values f(x) = g(x+u(x)).
    */
   public float[] unwarp(float[] g) {
-    SincInterp si = new SincInterp();
+    SincInterpolator si = new SincInterpolator();
     float[] f = new float[_n];
     for (int i=0; i<_n; ++i) {
       double x = i;

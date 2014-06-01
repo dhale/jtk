@@ -97,8 +97,8 @@ public class LocalShiftFinder {
       LocalCorrelationFilter.Type.SIMPLE,
       LocalCorrelationFilter.Window.GAUSSIAN,
       sigma1,sigma2,sigma3);
-    _si = new SincInterp();
-    _si.setExtrapolation(SincInterp.Extrapolation.CONSTANT);
+    _si = new SincInterpolator();
+    _si.setExtrapolation(SincInterpolator.Extrapolation.CONSTANT);
   }
 
   /**
@@ -655,7 +655,7 @@ public class LocalShiftFinder {
   // private
 
   private LocalCorrelationFilter _lcfSimple;
-  private SincInterp _si;
+  private SincInterpolator _si;
   private boolean _interpolateDisplacements = true;
 
   private void findShifts(

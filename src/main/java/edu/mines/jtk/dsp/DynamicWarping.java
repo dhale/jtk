@@ -99,7 +99,7 @@ public class DynamicWarping {
     _lmin = shiftMin;
     _lmax = shiftMax;
     _nl = 1+_lmax-_lmin;
-    _si = new SincInterp();
+    _si = new SincInterpolator();
     _extrap = ErrorExtrapolation.NEAREST;
   }
 
@@ -1090,7 +1090,7 @@ public class DynamicWarping {
   private RecursiveExponentialFilter _ref1; // for smoothing shifts
   private RecursiveExponentialFilter _ref2; // for smoothing shifts
   private RecursiveExponentialFilter _ref3; // for smoothing shifts
-  private SincInterp _si; // for warping with non-integer shifts
+  private SincInterpolator _si; // for warping with non-integer shifts
   private int _owl2 = 50; // window size in 2nd dimension for 3D images
   private int _owl3 = 50; // window size in 3rd dimension for 3D images
   private double _owf2 = 0.5; // fraction of window overlap in 2nd dimension
