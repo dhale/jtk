@@ -242,12 +242,16 @@ public class SincInterpolator {
     int nxu, double dxu, double fxu, float[] yu, 
     int nxi, double dxi, double fxi, float[] yi)
   {
-    double xscale = 1.0/dxu;
-    double xshift = _lsinc-fxu*xscale;
-    int nxum = nxu-_lsinc;
-    for (int ixi=0; ixi<nxi; ++ixi) {
-      double xi = fxi+ixi*dxi;
-      yi[ixi] = interpolate(xscale,xshift,nxum,nxu,yu,xi);
+    if (dxu==dxi) {
+      shift(nxu,dxu,fxu,yu,nxi,fxi,yi);
+    } else {
+      double xscale = 1.0/dxu;
+      double xshift = _lsinc-fxu*xscale;
+      int nxum = nxu-_lsinc;
+      for (int ixi=0; ixi<nxi; ++ixi) {
+        double xi = fxi+ixi*dxi;
+        yi[ixi] = interpolate(xscale,xshift,nxum,nxu,yu,xi);
+      }
     }
   }
 
