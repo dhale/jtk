@@ -2,6 +2,7 @@ package edu.mines.jtk.ogl;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +26,7 @@ import java.util.regex.Pattern;
  * preserve the names of method parameters. A better alternative would be
  * for JOGL to provide these bindings.
  * @author Dave Hale, Colorado School of Mines
- * @version 2012.08.16
+ * @version 2014.06.10
  */
 class MakeGl {
 
@@ -39,22 +40,28 @@ class MakeGl {
       "GL2.html",
       "GL2ES1.html",
       "GL2ES2.html",
+      "GL2ES3.html",
       "GL2GL3.html",
     };
     String outputFileName = "Gl.java";
+    HashSet<String> cs = new HashSet<String>();
+    HashSet<String> fs = new HashSet<String>();
     try {
+      trace("MakeGl begin ...");
       BufferedWriter bw = new BufferedWriter(new FileWriter(outputFileName));
       for (String line:PROLOG)
         bw.write(line+NEWLINE);
       for (String inputFileName:inputFileNames) {
+        trace("processing "+inputFileName);
         BufferedReader br = new BufferedReader(new FileReader(inputFileName));
         bw.write(NEWLINE+"  // Generated from "+inputFileName+NEWLINE+NEWLINE);
-        guts(br,bw);
+        guts(cs,fs,br,bw);
         br.close();
       }
       for (String line:EPILOG)
         bw.write(line+NEWLINE);
       bw.close();
+      trace("... done");
     } catch (IOException ioe) {
       throw new RuntimeException(ioe);
     }
@@ -78,17 +85,18 @@ class MakeGl {
 "/**",
 " * OpenGL standard constants and functions.",
 " * @author Dave Hale, Colorado School of Mines",
-" * @version 2012.08.17",
+" * @version 2014.06.10",
 " */",
+"@SuppressWarnings(\"deprecation\")",
 "public class Gl {",
 "",
 };
 
   private static final String[] EPILOG = {
-"  public static boolean isExtensionAvailable(String extensionName) {",
-"    return gl().isExtensionAvailable(extensionName);",
-"  }",
-"",
+//"  public static boolean isExtensionAvailable(String extensionName) {",
+//"    return gl().isExtensionAvailable(extensionName);",
+//"  }",
+//"",
 "  public static void setSwapInterval(int interval) {",
 "    gl().setSwapInterval(interval);",
 "  }",
@@ -107,23 +115,25 @@ class MakeGl {
 
   // These patterns and functions depend on format of javadoc html files!
   private static final Pattern _conName =
-    Pattern.compile("int <B>(GL_\\w*)</B>");
+    Pattern.compile("final&nbsp;int (GL_\\w*)</pre>");
   private static final Pattern _funType = 
-    Pattern.compile("(\\w+)(?:</A>)?((?:\\[\\])*) <B>gl");
+    Pattern.compile("(\\w+)(?:</a>)?((?:\\[\\])*)&nbsp;\\w+\\(");
   private static final Pattern _parType = 
-    Pattern.compile("(\\w+)(?:</A>)?((?:\\[\\])*)&nbsp");
+    Pattern.compile("(\\w+)(?:</a>)?((?:\\[\\])*)&nbsp;\\w+[,\\)]");
   private static final Pattern _funName =
-    Pattern.compile("<B>(gl\\w+)</B>");
+    Pattern.compile("&nbsp;(\\w+)\\(");
   private static final Pattern _parName = 
-    Pattern.compile("&nbsp;(\\w+)");
+    Pattern.compile("(\\w+)(?:</a>)?((?:\\[\\])*)&nbsp;(\\w+)[,\\)]");
   private static boolean hasConstant(String input) {
-    return input.contains("static final int <B>GL_");
+    return input.contains("static final&nbsp;int GL_");
   }
   private static boolean hasFunction(String input) {
-    return input.contains(" <B>gl");
+    return input.startsWith("<pre>") &&
+           (input.contains("&nbsp;gl") || 
+            input.contains("&nbsp;is"));
   }
   private static boolean endFunction(String input) {
-    return input.endsWith(")</PRE>");
+    return input.endsWith(")</pre>");
   }
   private static String getConName(String input) {
     Matcher m = _conName.matcher(input);
@@ -143,28 +153,35 @@ class MakeGl {
   }
   private static String getParName(String input) {
     Matcher m = _parName.matcher(input);
-    return m.find()?m.group(1):null;
+    return m.find()?m.group(3):null;
   }
-  private static void guts(BufferedReader br, BufferedWriter bw)
+  private static void guts(
+      HashSet<String> cs, HashSet<String> fs, 
+      BufferedReader br, BufferedWriter bw)
     throws IOException 
   {
     ArrayList<String> parList = new ArrayList<String>();
     for (String input=br.readLine(); input!=null; input=br.readLine()) {
       if (hasConstant(input)) {
         String conName = getConName(input);
+        if (!cs.add(conName)) {
+          trace("  duplicate: "+conName);
+          continue;
+        }
         String output = 
           "  public static final int "+conName+NEWLINE +
           "    = GL2."+conName+";"+NEWLINE+NEWLINE;
         bw.write(output);
       } else if (hasFunction(input)) {
-        parList.clear();
         String funType = getFunType(input);
         String funName = getFunName(input);
+        String funHash = funName+"(";
         String output = 
           "  public static "+funType+" "+funName+"("+NEWLINE +
           "    ";
         String parType = getParType(input);
         String parName = getParName(input);
+        parList.clear();
         if (parType!=null && parName!=null) {
           output += parType+" "+parName;
           parList.add(parName);
@@ -175,9 +192,15 @@ class MakeGl {
           parType = getParType(input);
           parName = getParName(input);
           parList.add(parName);
+          funHash += parType;
           output += "    "+parType+" "+parName;
         }
         output += ") {"+NEWLINE;
+        funHash += ")";
+        if (!fs.add(funHash)) {
+          trace("  duplicate: "+funHash);
+          continue;
+        }
         bw.write(output);
         if (funType.equals("void")) {
           output = "    gl()."+funName+"(";
@@ -201,5 +224,8 @@ class MakeGl {
         bw.write("  }"+NEWLINE+NEWLINE);
       }
     }
+  }
+  private static void trace(String s) {
+    System.out.println(s);
   }
 }

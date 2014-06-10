@@ -13,8 +13,9 @@ import com.jogamp.common.nio.PointerBuffer;
 /**
  * OpenGL standard constants and functions.
  * @author Dave Hale, Colorado School of Mines
- * @version 2012.08.17
+ * @version 2014.06.10
  */
+@SuppressWarnings("deprecation")
 public class Gl {
 
 
@@ -347,12 +348,6 @@ public class Gl {
   public static final int GL_SHORT
     = GL2.GL_SHORT;
 
-  public static final int GL_UNSIGNED_SHORT
-    = GL2.GL_UNSIGNED_SHORT;
-
-  public static final int GL_UNSIGNED_INT
-    = GL2.GL_UNSIGNED_INT;
-
   public static final int GL_FLOAT
     = GL2.GL_FLOAT;
 
@@ -629,9 +624,6 @@ public class Gl {
   public static final int GL_RGB565
     = GL2.GL_RGB565;
 
-  public static final int GL_DEPTH_COMPONENT16
-    = GL2.GL_DEPTH_COMPONENT16;
-
   public static final int GL_STENCIL_INDEX8
     = GL2.GL_STENCIL_INDEX8;
 
@@ -758,6 +750,30 @@ public class Gl {
   public static final int GL_BGRA
     = GL2.GL_BGRA;
 
+  public static final int GL_RGBA16F
+    = GL2.GL_RGBA16F;
+
+  public static final int GL_RGB16F
+    = GL2.GL_RGB16F;
+
+  public static final int GL_MAP_READ_BIT
+    = GL2.GL_MAP_READ_BIT;
+
+  public static final int GL_MAP_WRITE_BIT
+    = GL2.GL_MAP_WRITE_BIT;
+
+  public static final int GL_MAP_INVALIDATE_RANGE_BIT
+    = GL2.GL_MAP_INVALIDATE_RANGE_BIT;
+
+  public static final int GL_MAP_INVALIDATE_BUFFER_BIT
+    = GL2.GL_MAP_INVALIDATE_BUFFER_BIT;
+
+  public static final int GL_MAP_FLUSH_EXPLICIT_BIT
+    = GL2.GL_MAP_FLUSH_EXPLICIT_BIT;
+
+  public static final int GL_MAP_UNSYNCHRONIZED_BIT
+    = GL2.GL_MAP_UNSYNCHRONIZED_BIT;
+
   public static final int GL_UNSIGNED_SHORT_4_4_4_4_REV_EXT
     = GL2.GL_UNSIGNED_SHORT_4_4_4_4_REV_EXT;
 
@@ -806,35 +822,29 @@ public class Gl {
   public static final int GL_TEXTURE_IMMUTABLE_FORMAT
     = GL2.GL_TEXTURE_IMMUTABLE_FORMAT;
 
+  public static final int GL_ALPHA8
+    = GL2.GL_ALPHA8;
+
   public static final int GL_RGBA32F
     = GL2.GL_RGBA32F;
 
   public static final int GL_RGB32F
     = GL2.GL_RGB32F;
 
-  public static final int GL_ALPHA32F_ARB
-    = GL2.GL_ALPHA32F_ARB;
+  public static final int GL_ALPHA32F
+    = GL2.GL_ALPHA32F;
 
-  public static final int GL_LUMINANCE32F_ARB
-    = GL2.GL_LUMINANCE32F_ARB;
-
-  public static final int GL_LUMINANCE_ALPHA32F_ARB
-    = GL2.GL_LUMINANCE_ALPHA32F_ARB;
-
-  public static final int GL_ALPHA16F_ARB
-    = GL2.GL_ALPHA16F_ARB;
-
-  public static final int GL_LUMINANCE16F_ARB
-    = GL2.GL_LUMINANCE16F_ARB;
-
-  public static final int GL_LUMINANCE_ALPHA16F_ARB
-    = GL2.GL_LUMINANCE_ALPHA16F_ARB;
+  public static final int GL_ALPHA16F
+    = GL2.GL_ALPHA16F;
 
   public static final int GL_RGB10_A2
     = GL2.GL_RGB10_A2;
 
   public static final int GL_RGB10
     = GL2.GL_RGB10;
+
+  public static final int GL_BGRA8
+    = GL2.GL_BGRA8;
 
   public static final int GL_COMPRESSED_RGBA_S3TC_DXT3_EXT
     = GL2.GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
@@ -949,6 +959,15 @@ public class Gl {
 
   public static final int GL_HALF_FLOAT
     = GL2.GL_HALF_FLOAT;
+
+  public static final int GL_DEPTH_COMPONENT16
+    = GL2.GL_DEPTH_COMPONENT16;
+
+  public static final int GL_UNSIGNED_INT
+    = GL2.GL_UNSIGNED_INT;
+
+  public static final int GL_UNSIGNED_SHORT
+    = GL2.GL_UNSIGNED_SHORT;
 
   public static void glActiveTexture(
     int texture) {
@@ -1336,18 +1355,6 @@ public class Gl {
     int mode,
     int count,
     int type,
-    Buffer indices) {
-    gl().glDrawElements(
-      mode,
-      count,
-      type,
-      indices);
-  }
-
-  public static void glDrawElements(
-    int mode,
-    int count,
-    int type,
     long indices_buffer_offset) {
     gl().glDrawElements(
       mode,
@@ -1370,6 +1377,16 @@ public class Gl {
   public static void glFlush(
     ) {
     gl().glFlush();
+  }
+
+  public static void glFlushMappedBufferRange(
+    int target,
+    long offset,
+    long length) {
+    gl().glFlushMappedBufferRange(
+      target,
+      offset,
+      length);
   }
 
   public static void glFramebufferRenderbuffer(
@@ -1770,6 +1787,18 @@ public class Gl {
       access);
   }
 
+  public static ByteBuffer glMapBufferRange(
+    int target,
+    long offset,
+    long length,
+    int access) {
+    return gl().glMapBufferRange(
+      target,
+      offset,
+      length,
+      access);
+  }
+
   public static void glPixelStorei(
     int pname,
     int param) {
@@ -2094,13 +2123,13 @@ public class Gl {
       pixels_buffer_offset);
   }
 
-  public static void glTextureStorage1DEXT(
+  public static void glTextureStorage1D(
     int texture,
     int target,
     int levels,
     int internalformat,
     int width) {
-    gl().glTextureStorage1DEXT(
+    gl().glTextureStorage1D(
       texture,
       target,
       levels,
@@ -2108,14 +2137,14 @@ public class Gl {
       width);
   }
 
-  public static void glTextureStorage2DEXT(
+  public static void glTextureStorage2D(
     int texture,
     int target,
     int levels,
     int internalformat,
     int width,
     int height) {
-    gl().glTextureStorage2DEXT(
+    gl().glTextureStorage2D(
       texture,
       target,
       levels,
@@ -2124,7 +2153,7 @@ public class Gl {
       height);
   }
 
-  public static void glTextureStorage3DEXT(
+  public static void glTextureStorage3D(
     int texture,
     int target,
     int levels,
@@ -2132,7 +2161,7 @@ public class Gl {
     int width,
     int height,
     int depth) {
-    gl().glTextureStorage3DEXT(
+    gl().glTextureStorage3D(
       texture,
       target,
       levels,
@@ -2163,6 +2192,133 @@ public class Gl {
 
   // Generated from GLBase.html
 
+  public static boolean isGL(
+    ) {
+    return gl().isGL();
+  }
+
+  public static boolean isGL4bc(
+    ) {
+    return gl().isGL4bc();
+  }
+
+  public static boolean isGL4(
+    ) {
+    return gl().isGL4();
+  }
+
+  public static boolean isGL3bc(
+    ) {
+    return gl().isGL3bc();
+  }
+
+  public static boolean isGL3(
+    ) {
+    return gl().isGL3();
+  }
+
+  public static boolean isGL2(
+    ) {
+    return gl().isGL2();
+  }
+
+  public static boolean isGLES1(
+    ) {
+    return gl().isGLES1();
+  }
+
+  public static boolean isGLES2(
+    ) {
+    return gl().isGLES2();
+  }
+
+  public static boolean isGLES3(
+    ) {
+    return gl().isGLES3();
+  }
+
+  public static boolean isGLES(
+    ) {
+    return gl().isGLES();
+  }
+
+  public static boolean isGL2ES1(
+    ) {
+    return gl().isGL2ES1();
+  }
+
+  public static boolean isGL2ES2(
+    ) {
+    return gl().isGL2ES2();
+  }
+
+  public static boolean isGL2ES3(
+    ) {
+    return gl().isGL2ES3();
+  }
+
+  public static boolean isGL3ES3(
+    ) {
+    return gl().isGL3ES3();
+  }
+
+  public static boolean isGL4ES3(
+    ) {
+    return gl().isGL4ES3();
+  }
+
+  public static boolean isGL2GL3(
+    ) {
+    return gl().isGL2GL3();
+  }
+
+  public static boolean isGL4core(
+    ) {
+    return gl().isGL4core();
+  }
+
+  public static boolean isGL3core(
+    ) {
+    return gl().isGL3core();
+  }
+
+  public static boolean isGLcore(
+    ) {
+    return gl().isGLcore();
+  }
+
+  public static boolean isGLES2Compatible(
+    ) {
+    return gl().isGLES2Compatible();
+  }
+
+  public static boolean isGLES3Compatible(
+    ) {
+    return gl().isGLES3Compatible();
+  }
+
+  public static boolean isFunctionAvailable(
+    String glFunctionName) {
+    return gl().isFunctionAvailable(
+      glFunctionName);
+  }
+
+  public static boolean isExtensionAvailable(
+    String glExtensionName) {
+    return gl().isExtensionAvailable(
+      glExtensionName);
+  }
+
+  public static boolean isNPOTTextureAvailable(
+    ) {
+    return gl().isNPOTTextureAvailable();
+  }
+
+  public static boolean isTextureFormatBGRA8888Available(
+    ) {
+    return gl().isTextureFormatBGRA8888Available();
+  }
+
   public static void glClearDepth(
     double depth) {
     gl().glClearDepth(
@@ -2184,19 +2340,29 @@ public class Gl {
   }
 
   public static long glGetBufferSize(
-    int buffer) {
+    int bufferName) {
     return gl().glGetBufferSize(
-      buffer);
+      bufferName);
   }
 
-  public static boolean glIsVBOArrayEnabled(
+  public static boolean glIsVBOArrayBound(
     ) {
-    return gl().glIsVBOArrayEnabled();
+    return gl().glIsVBOArrayBound();
   }
 
-  public static boolean glIsVBOElementArrayEnabled(
+  public static boolean isVBOArrayBound(
     ) {
-    return gl().glIsVBOElementArrayEnabled();
+    return gl().isVBOArrayBound();
+  }
+
+  public static boolean glIsVBOElementArrayBound(
+    ) {
+    return gl().glIsVBOElementArrayBound();
+  }
+
+  public static boolean isVBOElementArrayBound(
+    ) {
+    return gl().isVBOElementArrayBound();
   }
 
 
@@ -2641,9 +2807,6 @@ public class Gl {
   public static final int GL_4_BYTES
     = GL2.GL_4_BYTES;
 
-  public static final int GL_QUADS
-    = GL2.GL_QUADS;
-
   public static final int GL_QUAD_STRIP
     = GL2.GL_QUAD_STRIP;
 
@@ -2658,9 +2821,6 @@ public class Gl {
 
   public static final int GL_LINE_STIPPLE_REPEAT
     = GL2.GL_LINE_STIPPLE_REPEAT;
-
-  public static final int GL_POLYGON_MODE
-    = GL2.GL_POLYGON_MODE;
 
   public static final int GL_POLYGON_STIPPLE
     = GL2.GL_POLYGON_STIPPLE;
@@ -3181,9 +3341,6 @@ public class Gl {
   public static final int GL_ALPHA4
     = GL2.GL_ALPHA4;
 
-  public static final int GL_ALPHA8
-    = GL2.GL_ALPHA8;
-
   public static final int GL_ALPHA12
     = GL2.GL_ALPHA12;
 
@@ -3303,15 +3460,6 @@ public class Gl {
 
   public static final int GL_T4F_C4F_N3F_V4F
     = GL2.GL_T4F_C4F_N3F_V4F;
-
-  public static final int GL_LIGHT_MODEL_COLOR_CONTROL
-    = GL2.GL_LIGHT_MODEL_COLOR_CONTROL;
-
-  public static final int GL_SINGLE_COLOR
-    = GL2.GL_SINGLE_COLOR;
-
-  public static final int GL_SEPARATE_SPECULAR_COLOR
-    = GL2.GL_SEPARATE_SPECULAR_COLOR;
 
   public static final int GL_CONVOLUTION_1D
     = GL2.GL_CONVOLUTION_1D;
@@ -3505,6 +3653,15 @@ public class Gl {
   public static final int GL_CONVOLUTION_BORDER_COLOR
     = GL2.GL_CONVOLUTION_BORDER_COLOR;
 
+  public static final int GL_LIGHT_MODEL_COLOR_CONTROL
+    = GL2.GL_LIGHT_MODEL_COLOR_CONTROL;
+
+  public static final int GL_SINGLE_COLOR
+    = GL2.GL_SINGLE_COLOR;
+
+  public static final int GL_SEPARATE_SPECULAR_COLOR
+    = GL2.GL_SEPARATE_SPECULAR_COLOR;
+
   public static final int GL_TRANSPOSE_MODELVIEW_MATRIX
     = GL2.GL_TRANSPOSE_MODELVIEW_MATRIX;
 
@@ -3676,6 +3833,210 @@ public class Gl {
   public static final int GL_ALPHA_INTEGER
     = GL2.GL_ALPHA_INTEGER;
 
+  public static final int GL_INDEX
+    = GL2.GL_INDEX;
+
+  public static final int GL_TEXTURE_LUMINANCE_TYPE
+    = GL2.GL_TEXTURE_LUMINANCE_TYPE;
+
+  public static final int GL_TEXTURE_INTENSITY_TYPE
+    = GL2.GL_TEXTURE_INTENSITY_TYPE;
+
+  public static final int GL_RGBA_FLOAT_MODE
+    = GL2.GL_RGBA_FLOAT_MODE;
+
+  public static final int GL_FRAGMENT_PROGRAM_ARB
+    = GL2.GL_FRAGMENT_PROGRAM_ARB;
+
+  public static final int GL_PROGRAM_ALU_INSTRUCTIONS_ARB
+    = GL2.GL_PROGRAM_ALU_INSTRUCTIONS_ARB;
+
+  public static final int GL_PROGRAM_TEX_INSTRUCTIONS_ARB
+    = GL2.GL_PROGRAM_TEX_INSTRUCTIONS_ARB;
+
+  public static final int GL_PROGRAM_TEX_INDIRECTIONS_ARB
+    = GL2.GL_PROGRAM_TEX_INDIRECTIONS_ARB;
+
+  public static final int GL_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB
+    = GL2.GL_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB;
+
+  public static final int GL_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB
+    = GL2.GL_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB;
+
+  public static final int GL_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB
+    = GL2.GL_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB;
+
+  public static final int GL_MAX_PROGRAM_ALU_INSTRUCTIONS_ARB
+    = GL2.GL_MAX_PROGRAM_ALU_INSTRUCTIONS_ARB;
+
+  public static final int GL_MAX_PROGRAM_TEX_INSTRUCTIONS_ARB
+    = GL2.GL_MAX_PROGRAM_TEX_INSTRUCTIONS_ARB;
+
+  public static final int GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB
+    = GL2.GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB;
+
+  public static final int GL_MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB
+    = GL2.GL_MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB;
+
+  public static final int GL_MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB
+    = GL2.GL_MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB;
+
+  public static final int GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB
+    = GL2.GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB;
+
+  public static final int GL_MAX_TEXTURE_COORDS_ARB
+    = GL2.GL_MAX_TEXTURE_COORDS_ARB;
+
+  public static final int GL_MAX_TEXTURE_IMAGE_UNITS_ARB
+    = GL2.GL_MAX_TEXTURE_IMAGE_UNITS_ARB;
+
+  public static final int GL_MAX_MATRIX_PALETTE_STACK_DEPTH_ARB
+    = GL2.GL_MAX_MATRIX_PALETTE_STACK_DEPTH_ARB;
+
+  public static final int GL_CURRENT_MATRIX_INDEX_ARB
+    = GL2.GL_CURRENT_MATRIX_INDEX_ARB;
+
+  public static final int GL_PROGRAM_OBJECT_ARB
+    = GL2.GL_PROGRAM_OBJECT_ARB;
+
+  public static final int GL_SHADER_OBJECT_ARB
+    = GL2.GL_SHADER_OBJECT_ARB;
+
+  public static final int GL_OBJECT_TYPE_ARB
+    = GL2.GL_OBJECT_TYPE_ARB;
+
+  public static final int GL_OBJECT_SUBTYPE_ARB
+    = GL2.GL_OBJECT_SUBTYPE_ARB;
+
+  public static final int GL_FLOAT_VEC2_ARB
+    = GL2.GL_FLOAT_VEC2_ARB;
+
+  public static final int GL_FLOAT_VEC3_ARB
+    = GL2.GL_FLOAT_VEC3_ARB;
+
+  public static final int GL_FLOAT_VEC4_ARB
+    = GL2.GL_FLOAT_VEC4_ARB;
+
+  public static final int GL_INT_VEC2_ARB
+    = GL2.GL_INT_VEC2_ARB;
+
+  public static final int GL_INT_VEC3_ARB
+    = GL2.GL_INT_VEC3_ARB;
+
+  public static final int GL_INT_VEC4_ARB
+    = GL2.GL_INT_VEC4_ARB;
+
+  public static final int GL_BOOL_ARB
+    = GL2.GL_BOOL_ARB;
+
+  public static final int GL_BOOL_VEC2_ARB
+    = GL2.GL_BOOL_VEC2_ARB;
+
+  public static final int GL_BOOL_VEC3_ARB
+    = GL2.GL_BOOL_VEC3_ARB;
+
+  public static final int GL_BOOL_VEC4_ARB
+    = GL2.GL_BOOL_VEC4_ARB;
+
+  public static final int GL_FLOAT_MAT2_ARB
+    = GL2.GL_FLOAT_MAT2_ARB;
+
+  public static final int GL_FLOAT_MAT3_ARB
+    = GL2.GL_FLOAT_MAT3_ARB;
+
+  public static final int GL_FLOAT_MAT4_ARB
+    = GL2.GL_FLOAT_MAT4_ARB;
+
+  public static final int GL_SAMPLER_1D_ARB
+    = GL2.GL_SAMPLER_1D_ARB;
+
+  public static final int GL_SAMPLER_2D_ARB
+    = GL2.GL_SAMPLER_2D_ARB;
+
+  public static final int GL_SAMPLER_3D_ARB
+    = GL2.GL_SAMPLER_3D_ARB;
+
+  public static final int GL_SAMPLER_CUBE_ARB
+    = GL2.GL_SAMPLER_CUBE_ARB;
+
+  public static final int GL_SAMPLER_1D_SHADOW_ARB
+    = GL2.GL_SAMPLER_1D_SHADOW_ARB;
+
+  public static final int GL_SAMPLER_2D_SHADOW_ARB
+    = GL2.GL_SAMPLER_2D_SHADOW_ARB;
+
+  public static final int GL_SAMPLER_2D_RECT_ARB
+    = GL2.GL_SAMPLER_2D_RECT_ARB;
+
+  public static final int GL_SAMPLER_2D_RECT_SHADOW_ARB
+    = GL2.GL_SAMPLER_2D_RECT_SHADOW_ARB;
+
+  public static final int GL_OBJECT_DELETE_STATUS_ARB
+    = GL2.GL_OBJECT_DELETE_STATUS_ARB;
+
+  public static final int GL_OBJECT_COMPILE_STATUS_ARB
+    = GL2.GL_OBJECT_COMPILE_STATUS_ARB;
+
+  public static final int GL_OBJECT_LINK_STATUS_ARB
+    = GL2.GL_OBJECT_LINK_STATUS_ARB;
+
+  public static final int GL_OBJECT_VALIDATE_STATUS_ARB
+    = GL2.GL_OBJECT_VALIDATE_STATUS_ARB;
+
+  public static final int GL_OBJECT_INFO_LOG_LENGTH_ARB
+    = GL2.GL_OBJECT_INFO_LOG_LENGTH_ARB;
+
+  public static final int GL_OBJECT_ATTACHED_OBJECTS_ARB
+    = GL2.GL_OBJECT_ATTACHED_OBJECTS_ARB;
+
+  public static final int GL_OBJECT_ACTIVE_UNIFORMS_ARB
+    = GL2.GL_OBJECT_ACTIVE_UNIFORMS_ARB;
+
+  public static final int GL_OBJECT_ACTIVE_UNIFORM_MAX_LENGTH_ARB
+    = GL2.GL_OBJECT_ACTIVE_UNIFORM_MAX_LENGTH_ARB;
+
+  public static final int GL_OBJECT_SHADER_SOURCE_LENGTH_ARB
+    = GL2.GL_OBJECT_SHADER_SOURCE_LENGTH_ARB;
+
+  public static final int GL_SHADING_LANGUAGE_VERSION_ARB
+    = GL2.GL_SHADING_LANGUAGE_VERSION_ARB;
+
+  public static final int GL_TEXTURE_COMPARE_FAIL_VALUE_ARB
+    = GL2.GL_TEXTURE_COMPARE_FAIL_VALUE_ARB;
+
+  public static final int GL_TEXTURE_BUFFER_FORMAT
+    = GL2.GL_TEXTURE_BUFFER_FORMAT;
+
+  public static final int GL_INTENSITY32F
+    = GL2.GL_INTENSITY32F;
+
+  public static final int GL_LUMINANCE32F
+    = GL2.GL_LUMINANCE32F;
+
+  public static final int GL_LUMINANCE_ALPHA32F
+    = GL2.GL_LUMINANCE_ALPHA32F;
+
+  public static final int GL_INTENSITY16F
+    = GL2.GL_INTENSITY16F;
+
+  public static final int GL_LUMINANCE16F
+    = GL2.GL_LUMINANCE16F;
+
+  public static final int GL_LUMINANCE_ALPHA16F
+    = GL2.GL_LUMINANCE_ALPHA16F;
+
+  public static final int GL_TEXTURE_RECTANGLE_ARB
+    = GL2.GL_TEXTURE_RECTANGLE_ARB;
+
+  public static final int GL_TEXTURE_BINDING_RECTANGLE_ARB
+    = GL2.GL_TEXTURE_BINDING_RECTANGLE_ARB;
+
+  public static final int GL_PROXY_TEXTURE_RECTANGLE_ARB
+    = GL2.GL_PROXY_TEXTURE_RECTANGLE_ARB;
+
+  public static final int GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB
+    = GL2.GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB;
+
   public static final int GL_ACTIVE_VERTEX_UNITS_ARB
     = GL2.GL_ACTIVE_VERTEX_UNITS_ARB;
 
@@ -3783,15 +4144,6 @@ public class Gl {
 
   public static final int GL_MODELVIEW31_ARB
     = GL2.GL_MODELVIEW31_ARB;
-
-  public static final int GL_MAX_MATRIX_PALETTE_STACK_DEPTH_ARB
-    = GL2.GL_MAX_MATRIX_PALETTE_STACK_DEPTH_ARB;
-
-  public static final int GL_CURRENT_MATRIX_INDEX_ARB
-    = GL2.GL_CURRENT_MATRIX_INDEX_ARB;
-
-  public static final int GL_TEXTURE_COMPARE_FAIL_VALUE_ARB
-    = GL2.GL_TEXTURE_COMPARE_FAIL_VALUE_ARB;
 
   public static final int GL_COLOR_SUM_ARB
     = GL2.GL_COLOR_SUM_ARB;
@@ -4030,188 +4382,446 @@ public class Gl {
   public static final int GL_MATRIX31_ARB
     = GL2.GL_MATRIX31_ARB;
 
-  public static final int GL_FRAGMENT_PROGRAM_ARB
-    = GL2.GL_FRAGMENT_PROGRAM_ARB;
+  public static final int GL_PALETTE4_RGB8_OES
+    = GL2.GL_PALETTE4_RGB8_OES;
 
-  public static final int GL_PROGRAM_ALU_INSTRUCTIONS_ARB
-    = GL2.GL_PROGRAM_ALU_INSTRUCTIONS_ARB;
+  public static final int GL_PALETTE4_RGBA8_OES
+    = GL2.GL_PALETTE4_RGBA8_OES;
 
-  public static final int GL_PROGRAM_TEX_INSTRUCTIONS_ARB
-    = GL2.GL_PROGRAM_TEX_INSTRUCTIONS_ARB;
+  public static final int GL_PALETTE4_R5_G6_B5_OES
+    = GL2.GL_PALETTE4_R5_G6_B5_OES;
 
-  public static final int GL_PROGRAM_TEX_INDIRECTIONS_ARB
-    = GL2.GL_PROGRAM_TEX_INDIRECTIONS_ARB;
+  public static final int GL_PALETTE4_RGBA4_OES
+    = GL2.GL_PALETTE4_RGBA4_OES;
 
-  public static final int GL_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB
-    = GL2.GL_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB;
+  public static final int GL_PALETTE4_RGB5_A1_OES
+    = GL2.GL_PALETTE4_RGB5_A1_OES;
 
-  public static final int GL_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB
-    = GL2.GL_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB;
+  public static final int GL_PALETTE8_RGB8_OES
+    = GL2.GL_PALETTE8_RGB8_OES;
 
-  public static final int GL_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB
-    = GL2.GL_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB;
+  public static final int GL_PALETTE8_RGBA8_OES
+    = GL2.GL_PALETTE8_RGBA8_OES;
 
-  public static final int GL_MAX_PROGRAM_ALU_INSTRUCTIONS_ARB
-    = GL2.GL_MAX_PROGRAM_ALU_INSTRUCTIONS_ARB;
+  public static final int GL_PALETTE8_R5_G6_B5_OES
+    = GL2.GL_PALETTE8_R5_G6_B5_OES;
 
-  public static final int GL_MAX_PROGRAM_TEX_INSTRUCTIONS_ARB
-    = GL2.GL_MAX_PROGRAM_TEX_INSTRUCTIONS_ARB;
+  public static final int GL_PALETTE8_RGBA4_OES
+    = GL2.GL_PALETTE8_RGBA4_OES;
 
-  public static final int GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB
-    = GL2.GL_MAX_PROGRAM_TEX_INDIRECTIONS_ARB;
+  public static final int GL_PALETTE8_RGB5_A1_OES
+    = GL2.GL_PALETTE8_RGB5_A1_OES;
 
-  public static final int GL_MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB
-    = GL2.GL_MAX_PROGRAM_NATIVE_ALU_INSTRUCTIONS_ARB;
+  public static final int GL_MAX_DEBUG_MESSAGE_LENGTH_AMD
+    = GL2.GL_MAX_DEBUG_MESSAGE_LENGTH_AMD;
 
-  public static final int GL_MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB
-    = GL2.GL_MAX_PROGRAM_NATIVE_TEX_INSTRUCTIONS_ARB;
+  public static final int GL_VERTEX_ELEMENT_SWIZZLE_AMD
+    = GL2.GL_VERTEX_ELEMENT_SWIZZLE_AMD;
 
-  public static final int GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB
-    = GL2.GL_MAX_PROGRAM_NATIVE_TEX_INDIRECTIONS_ARB;
+  public static final int GL_VERTEX_ID_SWIZZLE_AMD
+    = GL2.GL_VERTEX_ID_SWIZZLE_AMD;
 
-  public static final int GL_MAX_TEXTURE_COORDS_ARB
-    = GL2.GL_MAX_TEXTURE_COORDS_ARB;
+  public static final int GL_DATA_BUFFER_AMD
+    = GL2.GL_DATA_BUFFER_AMD;
 
-  public static final int GL_MAX_TEXTURE_IMAGE_UNITS_ARB
-    = GL2.GL_MAX_TEXTURE_IMAGE_UNITS_ARB;
+  public static final int GL_PERFORMANCE_MONITOR_AMD
+    = GL2.GL_PERFORMANCE_MONITOR_AMD;
 
-  public static final int GL_PROGRAM_OBJECT_ARB
-    = GL2.GL_PROGRAM_OBJECT_ARB;
+  public static final int GL_QUERY_OBJECT_AMD
+    = GL2.GL_QUERY_OBJECT_AMD;
 
-  public static final int GL_SHADER_OBJECT_ARB
-    = GL2.GL_SHADER_OBJECT_ARB;
+  public static final int GL_VERTEX_ARRAY_OBJECT_AMD
+    = GL2.GL_VERTEX_ARRAY_OBJECT_AMD;
 
-  public static final int GL_OBJECT_TYPE_ARB
-    = GL2.GL_OBJECT_TYPE_ARB;
+  public static final int GL_SAMPLER_OBJECT_AMD
+    = GL2.GL_SAMPLER_OBJECT_AMD;
 
-  public static final int GL_OBJECT_SUBTYPE_ARB
-    = GL2.GL_OBJECT_SUBTYPE_ARB;
+  public static final int GL_COUNTER_TYPE_AMD
+    = GL2.GL_COUNTER_TYPE_AMD;
 
-  public static final int GL_FLOAT_VEC2_ARB
-    = GL2.GL_FLOAT_VEC2_ARB;
+  public static final int GL_COUNTER_RANGE_AMD
+    = GL2.GL_COUNTER_RANGE_AMD;
 
-  public static final int GL_FLOAT_VEC3_ARB
-    = GL2.GL_FLOAT_VEC3_ARB;
+  public static final int GL_UNSIGNED_INT64_AMD
+    = GL2.GL_UNSIGNED_INT64_AMD;
 
-  public static final int GL_FLOAT_VEC4_ARB
-    = GL2.GL_FLOAT_VEC4_ARB;
+  public static final int GL_PERCENTAGE_AMD
+    = GL2.GL_PERCENTAGE_AMD;
 
-  public static final int GL_INT_VEC2_ARB
-    = GL2.GL_INT_VEC2_ARB;
+  public static final int GL_PERFMON_RESULT_AVAILABLE_AMD
+    = GL2.GL_PERFMON_RESULT_AVAILABLE_AMD;
 
-  public static final int GL_INT_VEC3_ARB
-    = GL2.GL_INT_VEC3_ARB;
+  public static final int GL_PERFMON_RESULT_SIZE_AMD
+    = GL2.GL_PERFMON_RESULT_SIZE_AMD;
 
-  public static final int GL_INT_VEC4_ARB
-    = GL2.GL_INT_VEC4_ARB;
+  public static final int GL_PERFMON_RESULT_AMD
+    = GL2.GL_PERFMON_RESULT_AMD;
 
-  public static final int GL_BOOL_ARB
-    = GL2.GL_BOOL_ARB;
+  public static final int GL_QUERY_BUFFER_AMD
+    = GL2.GL_QUERY_BUFFER_AMD;
 
-  public static final int GL_BOOL_VEC2_ARB
-    = GL2.GL_BOOL_VEC2_ARB;
+  public static final int GL_QUERY_BUFFER_BINDING_AMD
+    = GL2.GL_QUERY_BUFFER_BINDING_AMD;
 
-  public static final int GL_BOOL_VEC3_ARB
-    = GL2.GL_BOOL_VEC3_ARB;
+  public static final int GL_QUERY_RESULT_NO_WAIT_AMD
+    = GL2.GL_QUERY_RESULT_NO_WAIT_AMD;
 
-  public static final int GL_BOOL_VEC4_ARB
-    = GL2.GL_BOOL_VEC4_ARB;
+  public static final int GL_VIRTUAL_PAGE_SIZE_X_AMD
+    = GL2.GL_VIRTUAL_PAGE_SIZE_X_AMD;
 
-  public static final int GL_FLOAT_MAT2_ARB
-    = GL2.GL_FLOAT_MAT2_ARB;
+  public static final int GL_VIRTUAL_PAGE_SIZE_Y_AMD
+    = GL2.GL_VIRTUAL_PAGE_SIZE_Y_AMD;
 
-  public static final int GL_FLOAT_MAT3_ARB
-    = GL2.GL_FLOAT_MAT3_ARB;
+  public static final int GL_VIRTUAL_PAGE_SIZE_Z_AMD
+    = GL2.GL_VIRTUAL_PAGE_SIZE_Z_AMD;
 
-  public static final int GL_FLOAT_MAT4_ARB
-    = GL2.GL_FLOAT_MAT4_ARB;
+  public static final int GL_MAX_SPARSE_TEXTURE_SIZE_AMD
+    = GL2.GL_MAX_SPARSE_TEXTURE_SIZE_AMD;
 
-  public static final int GL_SAMPLER_1D_ARB
-    = GL2.GL_SAMPLER_1D_ARB;
+  public static final int GL_MAX_SPARSE_3D_TEXTURE_SIZE_AMD
+    = GL2.GL_MAX_SPARSE_3D_TEXTURE_SIZE_AMD;
 
-  public static final int GL_SAMPLER_2D_ARB
-    = GL2.GL_SAMPLER_2D_ARB;
+  public static final int GL_MAX_SPARSE_ARRAY_TEXTURE_LAYERS
+    = GL2.GL_MAX_SPARSE_ARRAY_TEXTURE_LAYERS;
 
-  public static final int GL_SAMPLER_3D_ARB
-    = GL2.GL_SAMPLER_3D_ARB;
+  public static final int GL_MIN_SPARSE_LEVEL_AMD
+    = GL2.GL_MIN_SPARSE_LEVEL_AMD;
 
-  public static final int GL_SAMPLER_CUBE_ARB
-    = GL2.GL_SAMPLER_CUBE_ARB;
+  public static final int GL_MIN_LOD_WARNING_AMD
+    = GL2.GL_MIN_LOD_WARNING_AMD;
 
-  public static final int GL_SAMPLER_1D_SHADOW_ARB
-    = GL2.GL_SAMPLER_1D_SHADOW_ARB;
+  public static final int GL_TEXTURE_STORAGE_SPARSE_BIT_AMD
+    = GL2.GL_TEXTURE_STORAGE_SPARSE_BIT_AMD;
 
-  public static final int GL_SAMPLER_2D_SHADOW_ARB
-    = GL2.GL_SAMPLER_2D_SHADOW_ARB;
+  public static final int GL_AUX_DEPTH_STENCIL_APPLE
+    = GL2.GL_AUX_DEPTH_STENCIL_APPLE;
 
-  public static final int GL_OBJECT_DELETE_STATUS_ARB
-    = GL2.GL_OBJECT_DELETE_STATUS_ARB;
+  public static final int GL_UNPACK_CLIENT_STORAGE_APPLE
+    = GL2.GL_UNPACK_CLIENT_STORAGE_APPLE;
 
-  public static final int GL_OBJECT_COMPILE_STATUS_ARB
-    = GL2.GL_OBJECT_COMPILE_STATUS_ARB;
+  public static final int GL_DRAW_PIXELS_APPLE
+    = GL2.GL_DRAW_PIXELS_APPLE;
 
-  public static final int GL_OBJECT_LINK_STATUS_ARB
-    = GL2.GL_OBJECT_LINK_STATUS_ARB;
+  public static final int GL_FENCE_APPLE
+    = GL2.GL_FENCE_APPLE;
 
-  public static final int GL_OBJECT_VALIDATE_STATUS_ARB
-    = GL2.GL_OBJECT_VALIDATE_STATUS_ARB;
+  public static final int GL_HALF_APPLE
+    = GL2.GL_HALF_APPLE;
 
-  public static final int GL_OBJECT_INFO_LOG_LENGTH_ARB
-    = GL2.GL_OBJECT_INFO_LOG_LENGTH_ARB;
+  public static final int GL_RGBA_FLOAT32_APPLE
+    = GL2.GL_RGBA_FLOAT32_APPLE;
 
-  public static final int GL_OBJECT_ATTACHED_OBJECTS_ARB
-    = GL2.GL_OBJECT_ATTACHED_OBJECTS_ARB;
+  public static final int GL_RGB_FLOAT32_APPLE
+    = GL2.GL_RGB_FLOAT32_APPLE;
 
-  public static final int GL_OBJECT_ACTIVE_UNIFORMS_ARB
-    = GL2.GL_OBJECT_ACTIVE_UNIFORMS_ARB;
+  public static final int GL_ALPHA_FLOAT32_APPLE
+    = GL2.GL_ALPHA_FLOAT32_APPLE;
 
-  public static final int GL_OBJECT_ACTIVE_UNIFORM_MAX_LENGTH_ARB
-    = GL2.GL_OBJECT_ACTIVE_UNIFORM_MAX_LENGTH_ARB;
+  public static final int GL_INTENSITY_FLOAT32_APPLE
+    = GL2.GL_INTENSITY_FLOAT32_APPLE;
 
-  public static final int GL_OBJECT_SHADER_SOURCE_LENGTH_ARB
-    = GL2.GL_OBJECT_SHADER_SOURCE_LENGTH_ARB;
+  public static final int GL_LUMINANCE_FLOAT32_APPLE
+    = GL2.GL_LUMINANCE_FLOAT32_APPLE;
 
-  public static final int GL_SHADING_LANGUAGE_VERSION_ARB
-    = GL2.GL_SHADING_LANGUAGE_VERSION_ARB;
+  public static final int GL_LUMINANCE_ALPHA_FLOAT32_APPLE
+    = GL2.GL_LUMINANCE_ALPHA_FLOAT32_APPLE;
 
-  public static final int GL_RGBA_FLOAT_MODE
-    = GL2.GL_RGBA_FLOAT_MODE;
+  public static final int GL_RGBA_FLOAT16_APPLE
+    = GL2.GL_RGBA_FLOAT16_APPLE;
 
-  public static final int GL_TEXTURE_LUMINANCE_TYPE
-    = GL2.GL_TEXTURE_LUMINANCE_TYPE;
+  public static final int GL_RGB_FLOAT16_APPLE
+    = GL2.GL_RGB_FLOAT16_APPLE;
 
-  public static final int GL_TEXTURE_INTENSITY_TYPE
-    = GL2.GL_TEXTURE_INTENSITY_TYPE;
+  public static final int GL_ALPHA_FLOAT16_APPLE
+    = GL2.GL_ALPHA_FLOAT16_APPLE;
 
-  public static final int GL_ALPHA32F
-    = GL2.GL_ALPHA32F;
+  public static final int GL_INTENSITY_FLOAT16_APPLE
+    = GL2.GL_INTENSITY_FLOAT16_APPLE;
 
-  public static final int GL_INTENSITY32F
-    = GL2.GL_INTENSITY32F;
+  public static final int GL_LUMINANCE_FLOAT16_APPLE
+    = GL2.GL_LUMINANCE_FLOAT16_APPLE;
 
-  public static final int GL_LUMINANCE32F
-    = GL2.GL_LUMINANCE32F;
+  public static final int GL_LUMINANCE_ALPHA_FLOAT16_APPLE
+    = GL2.GL_LUMINANCE_ALPHA_FLOAT16_APPLE;
 
-  public static final int GL_LUMINANCE_ALPHA32F
-    = GL2.GL_LUMINANCE_ALPHA32F;
+  public static final int GL_COLOR_FLOAT_APPLE
+    = GL2.GL_COLOR_FLOAT_APPLE;
 
-  public static final int GL_ALPHA16F
-    = GL2.GL_ALPHA16F;
+  public static final int GL_BUFFER_SERIALIZED_MODIFY
+    = GL2.GL_BUFFER_SERIALIZED_MODIFY;
 
-  public static final int GL_INTENSITY16F
-    = GL2.GL_INTENSITY16F;
+  public static final int GL_BUFFER_FLUSHING_UNMAP
+    = GL2.GL_BUFFER_FLUSHING_UNMAP;
 
-  public static final int GL_LUMINANCE16F
-    = GL2.GL_LUMINANCE16F;
+  public static final int GL_BUFFER_OBJECT_APPLE
+    = GL2.GL_BUFFER_OBJECT_APPLE;
 
-  public static final int GL_LUMINANCE_ALPHA16F
-    = GL2.GL_LUMINANCE_ALPHA16F;
+  public static final int GL_RELEASED_APPLE
+    = GL2.GL_RELEASED_APPLE;
 
-  public static final int GL_INDEX
-    = GL2.GL_INDEX;
+  public static final int GL_VOLATILE_APPLE
+    = GL2.GL_VOLATILE_APPLE;
+
+  public static final int GL_RETAINED_APPLE
+    = GL2.GL_RETAINED_APPLE;
+
+  public static final int GL_UNDEFINED_APPLE
+    = GL2.GL_UNDEFINED_APPLE;
+
+  public static final int GL_PURGEABLE_APPLE
+    = GL2.GL_PURGEABLE_APPLE;
+
+  public static final int GL_RGB_422_APPLE
+    = GL2.GL_RGB_422_APPLE;
+
+  public static final int GL_UNSIGNED_SHORT_8_8_APPLE
+    = GL2.GL_UNSIGNED_SHORT_8_8_APPLE;
+
+  public static final int GL_UNSIGNED_SHORT_8_8_REV_APPLE
+    = GL2.GL_UNSIGNED_SHORT_8_8_REV_APPLE;
+
+  public static final int GL_PACK_ROW_BYTES_APPLE
+    = GL2.GL_PACK_ROW_BYTES_APPLE;
+
+  public static final int GL_UNPACK_ROW_BYTES_APPLE
+    = GL2.GL_UNPACK_ROW_BYTES_APPLE;
+
+  public static final int GL_LIGHT_MODEL_SPECULAR_VECTOR_APPLE
+    = GL2.GL_LIGHT_MODEL_SPECULAR_VECTOR_APPLE;
+
+  public static final int GL_TEXTURE_RANGE_LENGTH_APPLE
+    = GL2.GL_TEXTURE_RANGE_LENGTH_APPLE;
+
+  public static final int GL_TEXTURE_RANGE_POINTER_APPLE
+    = GL2.GL_TEXTURE_RANGE_POINTER_APPLE;
+
+  public static final int GL_TEXTURE_STORAGE_HINT_APPLE
+    = GL2.GL_TEXTURE_STORAGE_HINT_APPLE;
+
+  public static final int GL_STORAGE_PRIVATE_APPLE
+    = GL2.GL_STORAGE_PRIVATE_APPLE;
+
+  public static final int GL_STORAGE_CACHED_APPLE
+    = GL2.GL_STORAGE_CACHED_APPLE;
+
+  public static final int GL_STORAGE_SHARED_APPLE
+    = GL2.GL_STORAGE_SHARED_APPLE;
+
+  public static final int GL_TRANSFORM_HINT_APPLE
+    = GL2.GL_TRANSFORM_HINT_APPLE;
+
+  public static final int GL_VERTEX_ARRAY_RANGE_APPLE
+    = GL2.GL_VERTEX_ARRAY_RANGE_APPLE;
+
+  public static final int GL_VERTEX_ARRAY_RANGE_LENGTH_APPLE
+    = GL2.GL_VERTEX_ARRAY_RANGE_LENGTH_APPLE;
+
+  public static final int GL_VERTEX_ARRAY_STORAGE_HINT_APPLE
+    = GL2.GL_VERTEX_ARRAY_STORAGE_HINT_APPLE;
+
+  public static final int GL_VERTEX_ARRAY_RANGE_POINTER_APPLE
+    = GL2.GL_VERTEX_ARRAY_RANGE_POINTER_APPLE;
+
+  public static final int GL_STORAGE_CLIENT_APPLE
+    = GL2.GL_STORAGE_CLIENT_APPLE;
+
+  public static final int GL_VERTEX_ATTRIB_MAP1_APPLE
+    = GL2.GL_VERTEX_ATTRIB_MAP1_APPLE;
+
+  public static final int GL_VERTEX_ATTRIB_MAP2_APPLE
+    = GL2.GL_VERTEX_ATTRIB_MAP2_APPLE;
+
+  public static final int GL_VERTEX_ATTRIB_MAP1_SIZE_APPLE
+    = GL2.GL_VERTEX_ATTRIB_MAP1_SIZE_APPLE;
+
+  public static final int GL_VERTEX_ATTRIB_MAP1_COEFF_APPLE
+    = GL2.GL_VERTEX_ATTRIB_MAP1_COEFF_APPLE;
+
+  public static final int GL_VERTEX_ATTRIB_MAP1_ORDER_APPLE
+    = GL2.GL_VERTEX_ATTRIB_MAP1_ORDER_APPLE;
+
+  public static final int GL_VERTEX_ATTRIB_MAP1_DOMAIN_APPLE
+    = GL2.GL_VERTEX_ATTRIB_MAP1_DOMAIN_APPLE;
+
+  public static final int GL_VERTEX_ATTRIB_MAP2_SIZE_APPLE
+    = GL2.GL_VERTEX_ATTRIB_MAP2_SIZE_APPLE;
+
+  public static final int GL_VERTEX_ATTRIB_MAP2_COEFF_APPLE
+    = GL2.GL_VERTEX_ATTRIB_MAP2_COEFF_APPLE;
+
+  public static final int GL_VERTEX_ATTRIB_MAP2_ORDER_APPLE
+    = GL2.GL_VERTEX_ATTRIB_MAP2_ORDER_APPLE;
+
+  public static final int GL_VERTEX_ATTRIB_MAP2_DOMAIN_APPLE
+    = GL2.GL_VERTEX_ATTRIB_MAP2_DOMAIN_APPLE;
+
+  public static final int GL_YCBCR_422_APPLE
+    = GL2.GL_YCBCR_422_APPLE;
+
+  public static final int GL_MAX_DRAW_BUFFERS_ATI
+    = GL2.GL_MAX_DRAW_BUFFERS_ATI;
+
+  public static final int GL_DRAW_BUFFER0_ATI
+    = GL2.GL_DRAW_BUFFER0_ATI;
+
+  public static final int GL_DRAW_BUFFER1_ATI
+    = GL2.GL_DRAW_BUFFER1_ATI;
+
+  public static final int GL_DRAW_BUFFER2_ATI
+    = GL2.GL_DRAW_BUFFER2_ATI;
+
+  public static final int GL_DRAW_BUFFER3_ATI
+    = GL2.GL_DRAW_BUFFER3_ATI;
+
+  public static final int GL_DRAW_BUFFER4_ATI
+    = GL2.GL_DRAW_BUFFER4_ATI;
+
+  public static final int GL_DRAW_BUFFER5_ATI
+    = GL2.GL_DRAW_BUFFER5_ATI;
+
+  public static final int GL_DRAW_BUFFER6_ATI
+    = GL2.GL_DRAW_BUFFER6_ATI;
+
+  public static final int GL_DRAW_BUFFER7_ATI
+    = GL2.GL_DRAW_BUFFER7_ATI;
+
+  public static final int GL_DRAW_BUFFER8_ATI
+    = GL2.GL_DRAW_BUFFER8_ATI;
+
+  public static final int GL_DRAW_BUFFER9_ATI
+    = GL2.GL_DRAW_BUFFER9_ATI;
+
+  public static final int GL_DRAW_BUFFER10_ATI
+    = GL2.GL_DRAW_BUFFER10_ATI;
+
+  public static final int GL_DRAW_BUFFER11_ATI
+    = GL2.GL_DRAW_BUFFER11_ATI;
+
+  public static final int GL_DRAW_BUFFER12_ATI
+    = GL2.GL_DRAW_BUFFER12_ATI;
+
+  public static final int GL_DRAW_BUFFER13_ATI
+    = GL2.GL_DRAW_BUFFER13_ATI;
+
+  public static final int GL_DRAW_BUFFER14_ATI
+    = GL2.GL_DRAW_BUFFER14_ATI;
+
+  public static final int GL_DRAW_BUFFER15_ATI
+    = GL2.GL_DRAW_BUFFER15_ATI;
+
+  public static final int GL_VBO_FREE_MEMORY_ATI
+    = GL2.GL_VBO_FREE_MEMORY_ATI;
+
+  public static final int GL_TEXTURE_FREE_MEMORY_ATI
+    = GL2.GL_TEXTURE_FREE_MEMORY_ATI;
+
+  public static final int GL_RENDERBUFFER_FREE_MEMORY_ATI
+    = GL2.GL_RENDERBUFFER_FREE_MEMORY_ATI;
+
+  public static final int GL_RGBA_FLOAT_MODE_ATI
+    = GL2.GL_RGBA_FLOAT_MODE_ATI;
+
+  public static final int GL_COLOR_CLEAR_UNCLAMPED_VALUE_ATI
+    = GL2.GL_COLOR_CLEAR_UNCLAMPED_VALUE_ATI;
+
+  public static final int GL_PN_TRIANGLES_ATI
+    = GL2.GL_PN_TRIANGLES_ATI;
+
+  public static final int GL_MAX_PN_TRIANGLES_TESSELATION_LEVEL_ATI
+    = GL2.GL_MAX_PN_TRIANGLES_TESSELATION_LEVEL_ATI;
+
+  public static final int GL_PN_TRIANGLES_POINT_MODE_ATI
+    = GL2.GL_PN_TRIANGLES_POINT_MODE_ATI;
+
+  public static final int GL_PN_TRIANGLES_NORMAL_MODE_ATI
+    = GL2.GL_PN_TRIANGLES_NORMAL_MODE_ATI;
+
+  public static final int GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI
+    = GL2.GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI;
+
+  public static final int GL_PN_TRIANGLES_POINT_MODE_LINEAR_ATI
+    = GL2.GL_PN_TRIANGLES_POINT_MODE_LINEAR_ATI;
+
+  public static final int GL_PN_TRIANGLES_POINT_MODE_CUBIC_ATI
+    = GL2.GL_PN_TRIANGLES_POINT_MODE_CUBIC_ATI;
+
+  public static final int GL_PN_TRIANGLES_NORMAL_MODE_LINEAR_ATI
+    = GL2.GL_PN_TRIANGLES_NORMAL_MODE_LINEAR_ATI;
+
+  public static final int GL_PN_TRIANGLES_NORMAL_MODE_QUADRATIC_ATI
+    = GL2.GL_PN_TRIANGLES_NORMAL_MODE_QUADRATIC_ATI;
+
+  public static final int GL_RGBA_FLOAT32_ATI
+    = GL2.GL_RGBA_FLOAT32_ATI;
+
+  public static final int GL_RGB_FLOAT32_ATI
+    = GL2.GL_RGB_FLOAT32_ATI;
+
+  public static final int GL_ALPHA_FLOAT32_ATI
+    = GL2.GL_ALPHA_FLOAT32_ATI;
+
+  public static final int GL_INTENSITY_FLOAT32_ATI
+    = GL2.GL_INTENSITY_FLOAT32_ATI;
+
+  public static final int GL_LUMINANCE_FLOAT32_ATI
+    = GL2.GL_LUMINANCE_FLOAT32_ATI;
+
+  public static final int GL_LUMINANCE_ALPHA_FLOAT32_ATI
+    = GL2.GL_LUMINANCE_ALPHA_FLOAT32_ATI;
+
+  public static final int GL_RGBA_FLOAT16_ATI
+    = GL2.GL_RGBA_FLOAT16_ATI;
+
+  public static final int GL_RGB_FLOAT16_ATI
+    = GL2.GL_RGB_FLOAT16_ATI;
+
+  public static final int GL_ALPHA_FLOAT16_ATI
+    = GL2.GL_ALPHA_FLOAT16_ATI;
+
+  public static final int GL_INTENSITY_FLOAT16_ATI
+    = GL2.GL_INTENSITY_FLOAT16_ATI;
+
+  public static final int GL_LUMINANCE_FLOAT16_ATI
+    = GL2.GL_LUMINANCE_FLOAT16_ATI;
+
+  public static final int GL_LUMINANCE_ALPHA_FLOAT16_ATI
+    = GL2.GL_LUMINANCE_ALPHA_FLOAT16_ATI;
+
+  public static final int GL_422_EXT
+    = GL2.GL_422_EXT;
+
+  public static final int GL_422_REV_EXT
+    = GL2.GL_422_REV_EXT;
+
+  public static final int GL_422_AVERAGE_EXT
+    = GL2.GL_422_AVERAGE_EXT;
+
+  public static final int GL_422_REV_AVERAGE_EXT
+    = GL2.GL_422_REV_AVERAGE_EXT;
 
   public static final int GL_ABGR_EXT
     = GL2.GL_ABGR_EXT;
+
+  public static final int GL_MAX_VERTEX_BINDABLE_UNIFORMS_EXT
+    = GL2.GL_MAX_VERTEX_BINDABLE_UNIFORMS_EXT;
+
+  public static final int GL_MAX_FRAGMENT_BINDABLE_UNIFORMS_EXT
+    = GL2.GL_MAX_FRAGMENT_BINDABLE_UNIFORMS_EXT;
+
+  public static final int GL_MAX_GEOMETRY_BINDABLE_UNIFORMS_EXT
+    = GL2.GL_MAX_GEOMETRY_BINDABLE_UNIFORMS_EXT;
+
+  public static final int GL_MAX_BINDABLE_UNIFORM_SIZE_EXT
+    = GL2.GL_MAX_BINDABLE_UNIFORM_SIZE_EXT;
+
+  public static final int GL_UNIFORM_BUFFER_EXT
+    = GL2.GL_UNIFORM_BUFFER_EXT;
+
+  public static final int GL_UNIFORM_BUFFER_BINDING_EXT
+    = GL2.GL_UNIFORM_BUFFER_BINDING_EXT;
+
+  public static final int GL_CLIP_VOLUME_CLIPPING_HINT_EXT
+    = GL2.GL_CLIP_VOLUME_CLIPPING_HINT_EXT;
 
   public static final int GL_CMYK_EXT
     = GL2.GL_CMYK_EXT;
@@ -4225,149 +4835,35 @@ public class Gl {
   public static final int GL_UNPACK_CMYK_HINT_EXT
     = GL2.GL_UNPACK_CMYK_HINT_EXT;
 
-  public static final int GL_VERTEX_DATA_HINT_PGI
-    = GL2.GL_VERTEX_DATA_HINT_PGI;
+  public static final int GL_ARRAY_ELEMENT_LOCK_FIRST_EXT
+    = GL2.GL_ARRAY_ELEMENT_LOCK_FIRST_EXT;
 
-  public static final int GL_VERTEX_CONSISTENT_HINT_PGI
-    = GL2.GL_VERTEX_CONSISTENT_HINT_PGI;
+  public static final int GL_ARRAY_ELEMENT_LOCK_COUNT_EXT
+    = GL2.GL_ARRAY_ELEMENT_LOCK_COUNT_EXT;
 
-  public static final int GL_MATERIAL_SIDE_HINT_PGI
-    = GL2.GL_MATERIAL_SIDE_HINT_PGI;
+  public static final int GL_CULL_VERTEX_EXT
+    = GL2.GL_CULL_VERTEX_EXT;
 
-  public static final int GL_MAX_VERTEX_HINT_PGI
-    = GL2.GL_MAX_VERTEX_HINT_PGI;
+  public static final int GL_CULL_VERTEX_EYE_POSITION_EXT
+    = GL2.GL_CULL_VERTEX_EYE_POSITION_EXT;
 
-  public static final int GL_COLOR3_BIT_PGI
-    = GL2.GL_COLOR3_BIT_PGI;
+  public static final int GL_CULL_VERTEX_OBJECT_POSITION_EXT
+    = GL2.GL_CULL_VERTEX_OBJECT_POSITION_EXT;
 
-  public static final int GL_COLOR4_BIT_PGI
-    = GL2.GL_COLOR4_BIT_PGI;
+  public static final int GL_DEPTH_BOUNDS_TEST_EXT
+    = GL2.GL_DEPTH_BOUNDS_TEST_EXT;
 
-  public static final int GL_EDGEFLAG_BIT_PGI
-    = GL2.GL_EDGEFLAG_BIT_PGI;
+  public static final int GL_DEPTH_BOUNDS_EXT
+    = GL2.GL_DEPTH_BOUNDS_EXT;
 
-  public static final int GL_INDEX_BIT_PGI
-    = GL2.GL_INDEX_BIT_PGI;
+  public static final int GL_PROGRAM_MATRIX_EXT
+    = GL2.GL_PROGRAM_MATRIX_EXT;
 
-  public static final int GL_MAT_AMBIENT_BIT_PGI
-    = GL2.GL_MAT_AMBIENT_BIT_PGI;
+  public static final int GL_TRANSPOSE_PROGRAM_MATRIX_EXT
+    = GL2.GL_TRANSPOSE_PROGRAM_MATRIX_EXT;
 
-  public static final int GL_MAT_AMBIENT_AND_DIFFUSE_BIT_PGI
-    = GL2.GL_MAT_AMBIENT_AND_DIFFUSE_BIT_PGI;
-
-  public static final int GL_MAT_DIFFUSE_BIT_PGI
-    = GL2.GL_MAT_DIFFUSE_BIT_PGI;
-
-  public static final int GL_MAT_EMISSION_BIT_PGI
-    = GL2.GL_MAT_EMISSION_BIT_PGI;
-
-  public static final int GL_MAT_COLOR_INDEXES_BIT_PGI
-    = GL2.GL_MAT_COLOR_INDEXES_BIT_PGI;
-
-  public static final int GL_MAT_SHININESS_BIT_PGI
-    = GL2.GL_MAT_SHININESS_BIT_PGI;
-
-  public static final int GL_MAT_SPECULAR_BIT_PGI
-    = GL2.GL_MAT_SPECULAR_BIT_PGI;
-
-  public static final int GL_NORMAL_BIT_PGI
-    = GL2.GL_NORMAL_BIT_PGI;
-
-  public static final int GL_TEXCOORD1_BIT_PGI
-    = GL2.GL_TEXCOORD1_BIT_PGI;
-
-  public static final int GL_TEXCOORD2_BIT_PGI
-    = GL2.GL_TEXCOORD2_BIT_PGI;
-
-  public static final int GL_TEXCOORD3_BIT_PGI
-    = GL2.GL_TEXCOORD3_BIT_PGI;
-
-  public static final int GL_VERTEX23_BIT_PGI
-    = GL2.GL_VERTEX23_BIT_PGI;
-
-  public static final int GL_VERTEX4_BIT_PGI
-    = GL2.GL_VERTEX4_BIT_PGI;
-
-  public static final int GL_PREFER_DOUBLEBUFFER_HINT_PGI
-    = GL2.GL_PREFER_DOUBLEBUFFER_HINT_PGI;
-
-  public static final int GL_CONSERVE_MEMORY_HINT_PGI
-    = GL2.GL_CONSERVE_MEMORY_HINT_PGI;
-
-  public static final int GL_RECLAIM_MEMORY_HINT_PGI
-    = GL2.GL_RECLAIM_MEMORY_HINT_PGI;
-
-  public static final int GL_NATIVE_GRAPHICS_HANDLE_PGI
-    = GL2.GL_NATIVE_GRAPHICS_HANDLE_PGI;
-
-  public static final int GL_NATIVE_GRAPHICS_BEGIN_HINT_PGI
-    = GL2.GL_NATIVE_GRAPHICS_BEGIN_HINT_PGI;
-
-  public static final int GL_NATIVE_GRAPHICS_END_HINT_PGI
-    = GL2.GL_NATIVE_GRAPHICS_END_HINT_PGI;
-
-  public static final int GL_ALWAYS_FAST_HINT_PGI
-    = GL2.GL_ALWAYS_FAST_HINT_PGI;
-
-  public static final int GL_ALWAYS_SOFT_HINT_PGI
-    = GL2.GL_ALWAYS_SOFT_HINT_PGI;
-
-  public static final int GL_ALLOW_DRAW_OBJ_HINT_PGI
-    = GL2.GL_ALLOW_DRAW_OBJ_HINT_PGI;
-
-  public static final int GL_ALLOW_DRAW_WIN_HINT_PGI
-    = GL2.GL_ALLOW_DRAW_WIN_HINT_PGI;
-
-  public static final int GL_ALLOW_DRAW_FRG_HINT_PGI
-    = GL2.GL_ALLOW_DRAW_FRG_HINT_PGI;
-
-  public static final int GL_ALLOW_DRAW_MEM_HINT_PGI
-    = GL2.GL_ALLOW_DRAW_MEM_HINT_PGI;
-
-  public static final int GL_STRICT_DEPTHFUNC_HINT_PGI
-    = GL2.GL_STRICT_DEPTHFUNC_HINT_PGI;
-
-  public static final int GL_STRICT_LIGHTING_HINT_PGI
-    = GL2.GL_STRICT_LIGHTING_HINT_PGI;
-
-  public static final int GL_STRICT_SCISSOR_HINT_PGI
-    = GL2.GL_STRICT_SCISSOR_HINT_PGI;
-
-  public static final int GL_FULL_STIPPLE_HINT_PGI
-    = GL2.GL_FULL_STIPPLE_HINT_PGI;
-
-  public static final int GL_CLIP_NEAR_HINT_PGI
-    = GL2.GL_CLIP_NEAR_HINT_PGI;
-
-  public static final int GL_CLIP_FAR_HINT_PGI
-    = GL2.GL_CLIP_FAR_HINT_PGI;
-
-  public static final int GL_WIDE_LINE_HINT_PGI
-    = GL2.GL_WIDE_LINE_HINT_PGI;
-
-  public static final int GL_BACK_NORMALS_HINT_PGI
-    = GL2.GL_BACK_NORMALS_HINT_PGI;
-
-  public static final int GL_CLIP_VOLUME_CLIPPING_HINT_EXT
-    = GL2.GL_CLIP_VOLUME_CLIPPING_HINT_EXT;
-
-  public static final int GL_INDEX_MATERIAL_EXT
-    = GL2.GL_INDEX_MATERIAL_EXT;
-
-  public static final int GL_INDEX_MATERIAL_PARAMETER_EXT
-    = GL2.GL_INDEX_MATERIAL_PARAMETER_EXT;
-
-  public static final int GL_INDEX_MATERIAL_FACE_EXT
-    = GL2.GL_INDEX_MATERIAL_FACE_EXT;
-
-  public static final int GL_INDEX_TEST_EXT
-    = GL2.GL_INDEX_TEST_EXT;
-
-  public static final int GL_INDEX_TEST_FUNC_EXT
-    = GL2.GL_INDEX_TEST_FUNC_EXT;
-
-  public static final int GL_INDEX_TEST_REF_EXT
-    = GL2.GL_INDEX_TEST_REF_EXT;
+  public static final int GL_PROGRAM_MATRIX_STACK_DEPTH_EXT
+    = GL2.GL_PROGRAM_MATRIX_STACK_DEPTH_EXT;
 
   public static final int GL_IUI_V2F_EXT
     = GL2.GL_IUI_V2F_EXT;
@@ -4393,20 +4889,23 @@ public class Gl {
   public static final int GL_T2F_IUI_N3F_V3F_EXT
     = GL2.GL_T2F_IUI_N3F_V3F_EXT;
 
-  public static final int GL_ARRAY_ELEMENT_LOCK_FIRST_EXT
-    = GL2.GL_ARRAY_ELEMENT_LOCK_FIRST_EXT;
+  public static final int GL_INDEX_TEST_EXT
+    = GL2.GL_INDEX_TEST_EXT;
 
-  public static final int GL_ARRAY_ELEMENT_LOCK_COUNT_EXT
-    = GL2.GL_ARRAY_ELEMENT_LOCK_COUNT_EXT;
+  public static final int GL_INDEX_TEST_FUNC_EXT
+    = GL2.GL_INDEX_TEST_FUNC_EXT;
 
-  public static final int GL_CULL_VERTEX_EXT
-    = GL2.GL_CULL_VERTEX_EXT;
+  public static final int GL_INDEX_TEST_REF_EXT
+    = GL2.GL_INDEX_TEST_REF_EXT;
 
-  public static final int GL_CULL_VERTEX_EYE_POSITION_EXT
-    = GL2.GL_CULL_VERTEX_EYE_POSITION_EXT;
+  public static final int GL_INDEX_MATERIAL_EXT
+    = GL2.GL_INDEX_MATERIAL_EXT;
 
-  public static final int GL_CULL_VERTEX_OBJECT_POSITION_EXT
-    = GL2.GL_CULL_VERTEX_OBJECT_POSITION_EXT;
+  public static final int GL_INDEX_MATERIAL_PARAMETER_EXT
+    = GL2.GL_INDEX_MATERIAL_PARAMETER_EXT;
+
+  public static final int GL_INDEX_MATERIAL_FACE_EXT
+    = GL2.GL_INDEX_MATERIAL_FACE_EXT;
 
   public static final int GL_FRAGMENT_MATERIAL_EXT
     = GL2.GL_FRAGMENT_MATERIAL_EXT;
@@ -4435,6 +4934,18 @@ public class Gl {
   public static final int GL_TEXTURE_MATERIAL_PARAMETER_EXT
     = GL2.GL_TEXTURE_MATERIAL_PARAMETER_EXT;
 
+  public static final int GL_PIXEL_PACK_BUFFER_EXT
+    = GL2.GL_PIXEL_PACK_BUFFER_EXT;
+
+  public static final int GL_PIXEL_UNPACK_BUFFER_EXT
+    = GL2.GL_PIXEL_UNPACK_BUFFER_EXT;
+
+  public static final int GL_PIXEL_PACK_BUFFER_BINDING_EXT
+    = GL2.GL_PIXEL_PACK_BUFFER_BINDING_EXT;
+
+  public static final int GL_PIXEL_UNPACK_BUFFER_BINDING_EXT
+    = GL2.GL_PIXEL_UNPACK_BUFFER_BINDING_EXT;
+
   public static final int GL_PIXEL_TRANSFORM_2D_EXT
     = GL2.GL_PIXEL_TRANSFORM_2D_EXT;
 
@@ -4462,8 +4973,137 @@ public class Gl {
   public static final int GL_PIXEL_TRANSFORM_2D_MATRIX_EXT
     = GL2.GL_PIXEL_TRANSFORM_2D_MATRIX_EXT;
 
+  public static final int GL_QUADS_FOLLOW_PROVOKING_VERTEX_CONVENTION_EXT
+    = GL2.GL_QUADS_FOLLOW_PROVOKING_VERTEX_CONVENTION_EXT;
+
+  public static final int GL_FIRST_VERTEX_CONVENTION_EXT
+    = GL2.GL_FIRST_VERTEX_CONVENTION_EXT;
+
+  public static final int GL_LAST_VERTEX_CONVENTION_EXT
+    = GL2.GL_LAST_VERTEX_CONVENTION_EXT;
+
+  public static final int GL_PROVOKING_VERTEX_EXT
+    = GL2.GL_PROVOKING_VERTEX_EXT;
+
   public static final int GL_SHARED_TEXTURE_PALETTE_EXT
     = GL2.GL_SHARED_TEXTURE_PALETTE_EXT;
+
+  public static final int GL_STENCIL_TAG_BITS_EXT
+    = GL2.GL_STENCIL_TAG_BITS_EXT;
+
+  public static final int GL_STENCIL_CLEAR_TAG_VALUE_EXT
+    = GL2.GL_STENCIL_CLEAR_TAG_VALUE_EXT;
+
+  public static final int GL_STENCIL_TEST_TWO_SIDE_EXT
+    = GL2.GL_STENCIL_TEST_TWO_SIDE_EXT;
+
+  public static final int GL_ACTIVE_STENCIL_FACE_EXT
+    = GL2.GL_ACTIVE_STENCIL_FACE_EXT;
+
+  public static final int GL_COMPARE_REF_DEPTH_TO_TEXTURE
+    = GL2.GL_COMPARE_REF_DEPTH_TO_TEXTURE;
+
+  public static final int GL_COMPRESSED_LUMINANCE_LATC1_EXT
+    = GL2.GL_COMPRESSED_LUMINANCE_LATC1_EXT;
+
+  public static final int GL_COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT
+    = GL2.GL_COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT;
+
+  public static final int GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT
+    = GL2.GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT;
+
+  public static final int GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT
+    = GL2.GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT;
+
+  public static final int GL_ALPHA32UI
+    = GL2.GL_ALPHA32UI;
+
+  public static final int GL_INTENSITY32UI
+    = GL2.GL_INTENSITY32UI;
+
+  public static final int GL_LUMINANCE32UI
+    = GL2.GL_LUMINANCE32UI;
+
+  public static final int GL_LUMINANCE_ALPHA32UI
+    = GL2.GL_LUMINANCE_ALPHA32UI;
+
+  public static final int GL_ALPHA16UI
+    = GL2.GL_ALPHA16UI;
+
+  public static final int GL_INTENSITY16UI
+    = GL2.GL_INTENSITY16UI;
+
+  public static final int GL_LUMINANCE16UI
+    = GL2.GL_LUMINANCE16UI;
+
+  public static final int GL_LUMINANCE_ALPHA16UI
+    = GL2.GL_LUMINANCE_ALPHA16UI;
+
+  public static final int GL_ALPHA8UI
+    = GL2.GL_ALPHA8UI;
+
+  public static final int GL_INTENSITY8UI
+    = GL2.GL_INTENSITY8UI;
+
+  public static final int GL_LUMINANCE8UI
+    = GL2.GL_LUMINANCE8UI;
+
+  public static final int GL_LUMINANCE_ALPHA8UI
+    = GL2.GL_LUMINANCE_ALPHA8UI;
+
+  public static final int GL_ALPHA32I
+    = GL2.GL_ALPHA32I;
+
+  public static final int GL_INTENSITY32I
+    = GL2.GL_INTENSITY32I;
+
+  public static final int GL_LUMINANCE32I
+    = GL2.GL_LUMINANCE32I;
+
+  public static final int GL_LUMINANCE_ALPHA32I
+    = GL2.GL_LUMINANCE_ALPHA32I;
+
+  public static final int GL_ALPHA16I
+    = GL2.GL_ALPHA16I;
+
+  public static final int GL_INTENSITY16I
+    = GL2.GL_INTENSITY16I;
+
+  public static final int GL_LUMINANCE16I
+    = GL2.GL_LUMINANCE16I;
+
+  public static final int GL_LUMINANCE_ALPHA16I
+    = GL2.GL_LUMINANCE_ALPHA16I;
+
+  public static final int GL_ALPHA8I
+    = GL2.GL_ALPHA8I;
+
+  public static final int GL_INTENSITY8I
+    = GL2.GL_INTENSITY8I;
+
+  public static final int GL_LUMINANCE8I
+    = GL2.GL_LUMINANCE8I;
+
+  public static final int GL_LUMINANCE_ALPHA8I
+    = GL2.GL_LUMINANCE_ALPHA8I;
+
+  public static final int GL_LUMINANCE_INTEGER
+    = GL2.GL_LUMINANCE_INTEGER;
+
+  public static final int GL_LUMINANCE_ALPHA_INTEGER
+    = GL2.GL_LUMINANCE_ALPHA_INTEGER;
+
+  public static final int GL_RGBA_INTEGER_MODE
+    = GL2.GL_RGBA_INTEGER_MODE;
+
+  public static final int GL_MIRROR_CLAMP_EXT
+    = GL2.GL_MIRROR_CLAMP_EXT;
+
+  public static final int GL_MIRROR_CLAMP_TO_EDGE_EXT
+    = GL2.GL_MIRROR_CLAMP_TO_EDGE_EXT;
+
+  public static final int GL_MIRROR_CLAMP_TO_BORDER_EXT
+    = GL2.GL_MIRROR_CLAMP_TO_BORDER_EXT;
 
   public static final int GL_PERTURB_EXT
     = GL2.GL_PERTURB_EXT;
@@ -4471,509 +5111,59 @@ public class Gl {
   public static final int GL_TEXTURE_NORMAL_EXT
     = GL2.GL_TEXTURE_NORMAL_EXT;
 
-  public static final int GL_SCREEN_COORDINATES_REND
-    = GL2.GL_SCREEN_COORDINATES_REND;
+  public static final int GL_ALPHA_SNORM
+    = GL2.GL_ALPHA_SNORM;
 
-  public static final int GL_INVERTED_SCREEN_W_REND
-    = GL2.GL_INVERTED_SCREEN_W_REND;
+  public static final int GL_LUMINANCE_SNORM
+    = GL2.GL_LUMINANCE_SNORM;
 
-  public static final int GL_LIGHT_MODEL_SPECULAR_VECTOR_APPLE
-    = GL2.GL_LIGHT_MODEL_SPECULAR_VECTOR_APPLE;
+  public static final int GL_LUMINANCE_ALPHA_SNORM
+    = GL2.GL_LUMINANCE_ALPHA_SNORM;
 
-  public static final int GL_TRANSFORM_HINT_APPLE
-    = GL2.GL_TRANSFORM_HINT_APPLE;
+  public static final int GL_INTENSITY_SNORM
+    = GL2.GL_INTENSITY_SNORM;
 
-  public static final int GL_UNPACK_CONSTANT_DATA_SUNX
-    = GL2.GL_UNPACK_CONSTANT_DATA_SUNX;
+  public static final int GL_ALPHA8_SNORM
+    = GL2.GL_ALPHA8_SNORM;
 
-  public static final int GL_TEXTURE_CONSTANT_DATA_SUNX
-    = GL2.GL_TEXTURE_CONSTANT_DATA_SUNX;
+  public static final int GL_LUMINANCE8_SNORM
+    = GL2.GL_LUMINANCE8_SNORM;
 
-  public static final int GL_RED_MIN_CLAMP_INGR
-    = GL2.GL_RED_MIN_CLAMP_INGR;
+  public static final int GL_LUMINANCE8_ALPHA8_SNORM
+    = GL2.GL_LUMINANCE8_ALPHA8_SNORM;
 
-  public static final int GL_GREEN_MIN_CLAMP_INGR
-    = GL2.GL_GREEN_MIN_CLAMP_INGR;
+  public static final int GL_INTENSITY8_SNORM
+    = GL2.GL_INTENSITY8_SNORM;
 
-  public static final int GL_BLUE_MIN_CLAMP_INGR
-    = GL2.GL_BLUE_MIN_CLAMP_INGR;
+  public static final int GL_ALPHA16_SNORM
+    = GL2.GL_ALPHA16_SNORM;
 
-  public static final int GL_ALPHA_MIN_CLAMP_INGR
-    = GL2.GL_ALPHA_MIN_CLAMP_INGR;
+  public static final int GL_LUMINANCE16_SNORM
+    = GL2.GL_LUMINANCE16_SNORM;
 
-  public static final int GL_RED_MAX_CLAMP_INGR
-    = GL2.GL_RED_MAX_CLAMP_INGR;
+  public static final int GL_LUMINANCE16_ALPHA16_SNORM
+    = GL2.GL_LUMINANCE16_ALPHA16_SNORM;
 
-  public static final int GL_GREEN_MAX_CLAMP_INGR
-    = GL2.GL_GREEN_MAX_CLAMP_INGR;
+  public static final int GL_INTENSITY16_SNORM
+    = GL2.GL_INTENSITY16_SNORM;
 
-  public static final int GL_BLUE_MAX_CLAMP_INGR
-    = GL2.GL_BLUE_MAX_CLAMP_INGR;
+  public static final int GL_TEXTURE_SWIZZLE_R_EXT
+    = GL2.GL_TEXTURE_SWIZZLE_R_EXT;
 
-  public static final int GL_ALPHA_MAX_CLAMP_INGR
-    = GL2.GL_ALPHA_MAX_CLAMP_INGR;
+  public static final int GL_TEXTURE_SWIZZLE_G_EXT
+    = GL2.GL_TEXTURE_SWIZZLE_G_EXT;
 
-  public static final int GL_INTERLACE_READ_INGR
-    = GL2.GL_INTERLACE_READ_INGR;
+  public static final int GL_TEXTURE_SWIZZLE_B_EXT
+    = GL2.GL_TEXTURE_SWIZZLE_B_EXT;
 
-  public static final int GL_422_EXT
-    = GL2.GL_422_EXT;
+  public static final int GL_TEXTURE_SWIZZLE_A_EXT
+    = GL2.GL_TEXTURE_SWIZZLE_A_EXT;
 
-  public static final int GL_422_REV_EXT
-    = GL2.GL_422_REV_EXT;
+  public static final int GL_TEXTURE_SWIZZLE_RGBA_EXT
+    = GL2.GL_TEXTURE_SWIZZLE_RGBA_EXT;
 
-  public static final int GL_422_AVERAGE_EXT
-    = GL2.GL_422_AVERAGE_EXT;
-
-  public static final int GL_422_REV_AVERAGE_EXT
-    = GL2.GL_422_REV_AVERAGE_EXT;
-
-  public static final int GL_MODELVIEW0_STACK_DEPTH_EXT
-    = GL2.GL_MODELVIEW0_STACK_DEPTH_EXT;
-
-  public static final int GL_MODELVIEW1_STACK_DEPTH_EXT
-    = GL2.GL_MODELVIEW1_STACK_DEPTH_EXT;
-
-  public static final int GL_MODELVIEW0_MATRIX_EXT
-    = GL2.GL_MODELVIEW0_MATRIX_EXT;
-
-  public static final int GL_MODELVIEW1_MATRIX_EXT
-    = GL2.GL_MODELVIEW1_MATRIX_EXT;
-
-  public static final int GL_VERTEX_WEIGHTING_EXT
-    = GL2.GL_VERTEX_WEIGHTING_EXT;
-
-  public static final int GL_MODELVIEW0_EXT
-    = GL2.GL_MODELVIEW0_EXT;
-
-  public static final int GL_MODELVIEW1_EXT
-    = GL2.GL_MODELVIEW1_EXT;
-
-  public static final int GL_CURRENT_VERTEX_WEIGHT_EXT
-    = GL2.GL_CURRENT_VERTEX_WEIGHT_EXT;
-
-  public static final int GL_VERTEX_WEIGHT_ARRAY_EXT
-    = GL2.GL_VERTEX_WEIGHT_ARRAY_EXT;
-
-  public static final int GL_VERTEX_WEIGHT_ARRAY_SIZE_EXT
-    = GL2.GL_VERTEX_WEIGHT_ARRAY_SIZE_EXT;
-
-  public static final int GL_VERTEX_WEIGHT_ARRAY_TYPE_EXT
-    = GL2.GL_VERTEX_WEIGHT_ARRAY_TYPE_EXT;
-
-  public static final int GL_VERTEX_WEIGHT_ARRAY_STRIDE_EXT
-    = GL2.GL_VERTEX_WEIGHT_ARRAY_STRIDE_EXT;
-
-  public static final int GL_VERTEX_WEIGHT_ARRAY_POINTER_EXT
-    = GL2.GL_VERTEX_WEIGHT_ARRAY_POINTER_EXT;
-
-  public static final int GL_MAX_SHININESS_NV
-    = GL2.GL_MAX_SHININESS_NV;
-
-  public static final int GL_MAX_SPOT_EXPONENT_NV
-    = GL2.GL_MAX_SPOT_EXPONENT_NV;
-
-  public static final int GL_VERTEX_ARRAY_RANGE_NV
-    = GL2.GL_VERTEX_ARRAY_RANGE_NV;
-
-  public static final int GL_VERTEX_ARRAY_RANGE_LENGTH_NV
-    = GL2.GL_VERTEX_ARRAY_RANGE_LENGTH_NV;
-
-  public static final int GL_VERTEX_ARRAY_RANGE_VALID_NV
-    = GL2.GL_VERTEX_ARRAY_RANGE_VALID_NV;
-
-  public static final int GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_NV
-    = GL2.GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_NV;
-
-  public static final int GL_VERTEX_ARRAY_RANGE_POINTER_NV
-    = GL2.GL_VERTEX_ARRAY_RANGE_POINTER_NV;
-
-  public static final int GL_FOG_DISTANCE_MODE_NV
-    = GL2.GL_FOG_DISTANCE_MODE_NV;
-
-  public static final int GL_EYE_RADIAL_NV
-    = GL2.GL_EYE_RADIAL_NV;
-
-  public static final int GL_EYE_PLANE_ABSOLUTE_NV
-    = GL2.GL_EYE_PLANE_ABSOLUTE_NV;
-
-  public static final int GL_EMBOSS_LIGHT_NV
-    = GL2.GL_EMBOSS_LIGHT_NV;
-
-  public static final int GL_EMBOSS_CONSTANT_NV
-    = GL2.GL_EMBOSS_CONSTANT_NV;
-
-  public static final int GL_EMBOSS_MAP_NV
-    = GL2.GL_EMBOSS_MAP_NV;
-
-  public static final int GL_ALL_COMPLETED_NV
-    = GL2.GL_ALL_COMPLETED_NV;
-
-  public static final int GL_FENCE_STATUS_NV
-    = GL2.GL_FENCE_STATUS_NV;
-
-  public static final int GL_FENCE_CONDITION_NV
-    = GL2.GL_FENCE_CONDITION_NV;
-
-  public static final int GL_EVAL_2D_NV
-    = GL2.GL_EVAL_2D_NV;
-
-  public static final int GL_EVAL_TRIANGULAR_2D_NV
-    = GL2.GL_EVAL_TRIANGULAR_2D_NV;
-
-  public static final int GL_MAP_TESSELLATION_NV
-    = GL2.GL_MAP_TESSELLATION_NV;
-
-  public static final int GL_MAP_ATTRIB_U_ORDER_NV
-    = GL2.GL_MAP_ATTRIB_U_ORDER_NV;
-
-  public static final int GL_MAP_ATTRIB_V_ORDER_NV
-    = GL2.GL_MAP_ATTRIB_V_ORDER_NV;
-
-  public static final int GL_EVAL_FRACTIONAL_TESSELLATION_NV
-    = GL2.GL_EVAL_FRACTIONAL_TESSELLATION_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB0_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB0_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB1_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB1_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB2_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB2_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB3_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB3_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB4_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB4_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB5_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB5_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB6_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB6_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB7_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB7_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB8_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB8_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB9_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB9_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB10_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB10_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB11_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB11_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB12_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB12_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB13_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB13_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB14_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB14_NV;
-
-  public static final int GL_EVAL_VERTEX_ATTRIB15_NV
-    = GL2.GL_EVAL_VERTEX_ATTRIB15_NV;
-
-  public static final int GL_MAX_MAP_TESSELLATION_NV
-    = GL2.GL_MAX_MAP_TESSELLATION_NV;
-
-  public static final int GL_MAX_RATIONAL_EVAL_ORDER_NV
-    = GL2.GL_MAX_RATIONAL_EVAL_ORDER_NV;
-
-  public static final int GL_OFFSET_TEXTURE_RECTANGLE_NV
-    = GL2.GL_OFFSET_TEXTURE_RECTANGLE_NV;
-
-  public static final int GL_OFFSET_TEXTURE_RECTANGLE_SCALE_NV
-    = GL2.GL_OFFSET_TEXTURE_RECTANGLE_SCALE_NV;
-
-  public static final int GL_DOT_PRODUCT_TEXTURE_RECTANGLE_NV
-    = GL2.GL_DOT_PRODUCT_TEXTURE_RECTANGLE_NV;
-
-  public static final int GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV
-    = GL2.GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV;
-
-  public static final int GL_UNSIGNED_INT_S8_S8_8_8_NV
-    = GL2.GL_UNSIGNED_INT_S8_S8_8_8_NV;
-
-  public static final int GL_UNSIGNED_INT_8_8_S8_S8_REV_NV
-    = GL2.GL_UNSIGNED_INT_8_8_S8_S8_REV_NV;
-
-  public static final int GL_DSDT_MAG_INTENSITY_NV
-    = GL2.GL_DSDT_MAG_INTENSITY_NV;
-
-  public static final int GL_SHADER_CONSISTENT_NV
-    = GL2.GL_SHADER_CONSISTENT_NV;
-
-  public static final int GL_TEXTURE_SHADER_NV
-    = GL2.GL_TEXTURE_SHADER_NV;
-
-  public static final int GL_SHADER_OPERATION_NV
-    = GL2.GL_SHADER_OPERATION_NV;
-
-  public static final int GL_CULL_MODES_NV
-    = GL2.GL_CULL_MODES_NV;
-
-  public static final int GL_OFFSET_TEXTURE_MATRIX_NV
-    = GL2.GL_OFFSET_TEXTURE_MATRIX_NV;
-
-  public static final int GL_OFFSET_TEXTURE_SCALE_NV
-    = GL2.GL_OFFSET_TEXTURE_SCALE_NV;
-
-  public static final int GL_OFFSET_TEXTURE_BIAS_NV
-    = GL2.GL_OFFSET_TEXTURE_BIAS_NV;
-
-  public static final int GL_OFFSET_TEXTURE_2D_MATRIX_NV
-    = GL2.GL_OFFSET_TEXTURE_2D_MATRIX_NV;
-
-  public static final int GL_OFFSET_TEXTURE_2D_SCALE_NV
-    = GL2.GL_OFFSET_TEXTURE_2D_SCALE_NV;
-
-  public static final int GL_OFFSET_TEXTURE_2D_BIAS_NV
-    = GL2.GL_OFFSET_TEXTURE_2D_BIAS_NV;
-
-  public static final int GL_PREVIOUS_TEXTURE_INPUT_NV
-    = GL2.GL_PREVIOUS_TEXTURE_INPUT_NV;
-
-  public static final int GL_CONST_EYE_NV
-    = GL2.GL_CONST_EYE_NV;
-
-  public static final int GL_PASS_THROUGH_NV
-    = GL2.GL_PASS_THROUGH_NV;
-
-  public static final int GL_CULL_FRAGMENT_NV
-    = GL2.GL_CULL_FRAGMENT_NV;
-
-  public static final int GL_OFFSET_TEXTURE_2D_NV
-    = GL2.GL_OFFSET_TEXTURE_2D_NV;
-
-  public static final int GL_DEPENDENT_AR_TEXTURE_2D_NV
-    = GL2.GL_DEPENDENT_AR_TEXTURE_2D_NV;
-
-  public static final int GL_DEPENDENT_GB_TEXTURE_2D_NV
-    = GL2.GL_DEPENDENT_GB_TEXTURE_2D_NV;
-
-  public static final int GL_DOT_PRODUCT_NV
-    = GL2.GL_DOT_PRODUCT_NV;
-
-  public static final int GL_DOT_PRODUCT_DEPTH_REPLACE_NV
-    = GL2.GL_DOT_PRODUCT_DEPTH_REPLACE_NV;
-
-  public static final int GL_DOT_PRODUCT_TEXTURE_2D_NV
-    = GL2.GL_DOT_PRODUCT_TEXTURE_2D_NV;
-
-  public static final int GL_DOT_PRODUCT_TEXTURE_CUBE_MAP_NV
-    = GL2.GL_DOT_PRODUCT_TEXTURE_CUBE_MAP_NV;
-
-  public static final int GL_DOT_PRODUCT_DIFFUSE_CUBE_MAP_NV
-    = GL2.GL_DOT_PRODUCT_DIFFUSE_CUBE_MAP_NV;
-
-  public static final int GL_DOT_PRODUCT_REFLECT_CUBE_MAP_NV
-    = GL2.GL_DOT_PRODUCT_REFLECT_CUBE_MAP_NV;
-
-  public static final int GL_DOT_PRODUCT_CONST_EYE_REFLECT_CUBE_MAP_NV
-    = GL2.GL_DOT_PRODUCT_CONST_EYE_REFLECT_CUBE_MAP_NV;
-
-  public static final int GL_HILO_NV
-    = GL2.GL_HILO_NV;
-
-  public static final int GL_DSDT_NV
-    = GL2.GL_DSDT_NV;
-
-  public static final int GL_DSDT_MAG_NV
-    = GL2.GL_DSDT_MAG_NV;
-
-  public static final int GL_DSDT_MAG_VIB_NV
-    = GL2.GL_DSDT_MAG_VIB_NV;
-
-  public static final int GL_HILO16_NV
-    = GL2.GL_HILO16_NV;
-
-  public static final int GL_SIGNED_HILO_NV
-    = GL2.GL_SIGNED_HILO_NV;
-
-  public static final int GL_SIGNED_HILO16_NV
-    = GL2.GL_SIGNED_HILO16_NV;
-
-  public static final int GL_SIGNED_RGBA_NV
-    = GL2.GL_SIGNED_RGBA_NV;
-
-  public static final int GL_SIGNED_RGBA8_NV
-    = GL2.GL_SIGNED_RGBA8_NV;
-
-  public static final int GL_SIGNED_RGB_NV
-    = GL2.GL_SIGNED_RGB_NV;
-
-  public static final int GL_SIGNED_RGB8_NV
-    = GL2.GL_SIGNED_RGB8_NV;
-
-  public static final int GL_SIGNED_LUMINANCE_NV
-    = GL2.GL_SIGNED_LUMINANCE_NV;
-
-  public static final int GL_SIGNED_LUMINANCE8_NV
-    = GL2.GL_SIGNED_LUMINANCE8_NV;
-
-  public static final int GL_SIGNED_LUMINANCE_ALPHA_NV
-    = GL2.GL_SIGNED_LUMINANCE_ALPHA_NV;
-
-  public static final int GL_SIGNED_LUMINANCE8_ALPHA8_NV
-    = GL2.GL_SIGNED_LUMINANCE8_ALPHA8_NV;
-
-  public static final int GL_SIGNED_ALPHA_NV
-    = GL2.GL_SIGNED_ALPHA_NV;
-
-  public static final int GL_SIGNED_ALPHA8_NV
-    = GL2.GL_SIGNED_ALPHA8_NV;
-
-  public static final int GL_SIGNED_INTENSITY_NV
-    = GL2.GL_SIGNED_INTENSITY_NV;
-
-  public static final int GL_SIGNED_INTENSITY8_NV
-    = GL2.GL_SIGNED_INTENSITY8_NV;
-
-  public static final int GL_DSDT8_NV
-    = GL2.GL_DSDT8_NV;
-
-  public static final int GL_DSDT8_MAG8_NV
-    = GL2.GL_DSDT8_MAG8_NV;
-
-  public static final int GL_DSDT8_MAG8_INTENSITY8_NV
-    = GL2.GL_DSDT8_MAG8_INTENSITY8_NV;
-
-  public static final int GL_SIGNED_RGB_UNSIGNED_ALPHA_NV
-    = GL2.GL_SIGNED_RGB_UNSIGNED_ALPHA_NV;
-
-  public static final int GL_SIGNED_RGB8_UNSIGNED_ALPHA8_NV
-    = GL2.GL_SIGNED_RGB8_UNSIGNED_ALPHA8_NV;
-
-  public static final int GL_HI_SCALE_NV
-    = GL2.GL_HI_SCALE_NV;
-
-  public static final int GL_LO_SCALE_NV
-    = GL2.GL_LO_SCALE_NV;
-
-  public static final int GL_DS_SCALE_NV
-    = GL2.GL_DS_SCALE_NV;
-
-  public static final int GL_DT_SCALE_NV
-    = GL2.GL_DT_SCALE_NV;
-
-  public static final int GL_MAGNITUDE_SCALE_NV
-    = GL2.GL_MAGNITUDE_SCALE_NV;
-
-  public static final int GL_VIBRANCE_SCALE_NV
-    = GL2.GL_VIBRANCE_SCALE_NV;
-
-  public static final int GL_HI_BIAS_NV
-    = GL2.GL_HI_BIAS_NV;
-
-  public static final int GL_LO_BIAS_NV
-    = GL2.GL_LO_BIAS_NV;
-
-  public static final int GL_DS_BIAS_NV
-    = GL2.GL_DS_BIAS_NV;
-
-  public static final int GL_DT_BIAS_NV
-    = GL2.GL_DT_BIAS_NV;
-
-  public static final int GL_MAGNITUDE_BIAS_NV
-    = GL2.GL_MAGNITUDE_BIAS_NV;
-
-  public static final int GL_VIBRANCE_BIAS_NV
-    = GL2.GL_VIBRANCE_BIAS_NV;
-
-  public static final int GL_TEXTURE_BORDER_VALUES_NV
-    = GL2.GL_TEXTURE_BORDER_VALUES_NV;
-
-  public static final int GL_TEXTURE_HI_SIZE_NV
-    = GL2.GL_TEXTURE_HI_SIZE_NV;
-
-  public static final int GL_TEXTURE_LO_SIZE_NV
-    = GL2.GL_TEXTURE_LO_SIZE_NV;
-
-  public static final int GL_TEXTURE_DS_SIZE_NV
-    = GL2.GL_TEXTURE_DS_SIZE_NV;
-
-  public static final int GL_TEXTURE_DT_SIZE_NV
-    = GL2.GL_TEXTURE_DT_SIZE_NV;
-
-  public static final int GL_TEXTURE_MAG_SIZE_NV
-    = GL2.GL_TEXTURE_MAG_SIZE_NV;
-
-  public static final int GL_DOT_PRODUCT_TEXTURE_3D_NV
-    = GL2.GL_DOT_PRODUCT_TEXTURE_3D_NV;
-
-  public static final int GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV
-    = GL2.GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV;
-
-  public static final int GL_INTERLACE_OML
-    = GL2.GL_INTERLACE_OML;
-
-  public static final int GL_INTERLACE_READ_OML
-    = GL2.GL_INTERLACE_READ_OML;
-
-  public static final int GL_FORMAT_SUBSAMPLE_24_24_OML
-    = GL2.GL_FORMAT_SUBSAMPLE_24_24_OML;
-
-  public static final int GL_FORMAT_SUBSAMPLE_244_244_OML
-    = GL2.GL_FORMAT_SUBSAMPLE_244_244_OML;
-
-  public static final int GL_PACK_RESAMPLE_OML
-    = GL2.GL_PACK_RESAMPLE_OML;
-
-  public static final int GL_UNPACK_RESAMPLE_OML
-    = GL2.GL_UNPACK_RESAMPLE_OML;
-
-  public static final int GL_RESAMPLE_REPLICATE_OML
-    = GL2.GL_RESAMPLE_REPLICATE_OML;
-
-  public static final int GL_RESAMPLE_ZERO_FILL_OML
-    = GL2.GL_RESAMPLE_ZERO_FILL_OML;
-
-  public static final int GL_RESAMPLE_AVERAGE_OML
-    = GL2.GL_RESAMPLE_AVERAGE_OML;
-
-  public static final int GL_RESAMPLE_DECIMATE_OML
-    = GL2.GL_RESAMPLE_DECIMATE_OML;
-
-  public static final int GL_DEPTH_STENCIL_TO_RGBA_NV
-    = GL2.GL_DEPTH_STENCIL_TO_RGBA_NV;
-
-  public static final int GL_DEPTH_STENCIL_TO_BGRA_NV
-    = GL2.GL_DEPTH_STENCIL_TO_BGRA_NV;
-
-  public static final int GL_PN_TRIANGLES_ATI
-    = GL2.GL_PN_TRIANGLES_ATI;
-
-  public static final int GL_MAX_PN_TRIANGLES_TESSELATION_LEVEL_ATI
-    = GL2.GL_MAX_PN_TRIANGLES_TESSELATION_LEVEL_ATI;
-
-  public static final int GL_PN_TRIANGLES_POINT_MODE_ATI
-    = GL2.GL_PN_TRIANGLES_POINT_MODE_ATI;
-
-  public static final int GL_PN_TRIANGLES_NORMAL_MODE_ATI
-    = GL2.GL_PN_TRIANGLES_NORMAL_MODE_ATI;
-
-  public static final int GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI
-    = GL2.GL_PN_TRIANGLES_TESSELATION_LEVEL_ATI;
-
-  public static final int GL_PN_TRIANGLES_POINT_MODE_LINEAR_ATI
-    = GL2.GL_PN_TRIANGLES_POINT_MODE_LINEAR_ATI;
-
-  public static final int GL_PN_TRIANGLES_POINT_MODE_CUBIC_ATI
-    = GL2.GL_PN_TRIANGLES_POINT_MODE_CUBIC_ATI;
-
-  public static final int GL_PN_TRIANGLES_NORMAL_MODE_LINEAR_ATI
-    = GL2.GL_PN_TRIANGLES_NORMAL_MODE_LINEAR_ATI;
-
-  public static final int GL_PN_TRIANGLES_NORMAL_MODE_QUADRATIC_ATI
-    = GL2.GL_PN_TRIANGLES_NORMAL_MODE_QUADRATIC_ATI;
+  public static final int GL_TIME_ELAPSED_EXT
+    = GL2.GL_TIME_ELAPSED_EXT;
 
   public static final int GL_VERTEX_SHADER_EXT
     = GL2.GL_VERTEX_SHADER_EXT;
@@ -5305,11 +5495,350 @@ public class Gl {
   public static final int GL_LOCAL_CONSTANT_DATATYPE_EXT
     = GL2.GL_LOCAL_CONSTANT_DATATYPE_EXT;
 
-  public static final int GL_MULTISAMPLE_FILTER_HINT_NV
-    = GL2.GL_MULTISAMPLE_FILTER_HINT_NV;
+  public static final int GL_MODELVIEW0_STACK_DEPTH_EXT
+    = GL2.GL_MODELVIEW0_STACK_DEPTH_EXT;
+
+  public static final int GL_MODELVIEW1_STACK_DEPTH_EXT
+    = GL2.GL_MODELVIEW1_STACK_DEPTH_EXT;
+
+  public static final int GL_MODELVIEW0_MATRIX_EXT
+    = GL2.GL_MODELVIEW0_MATRIX_EXT;
+
+  public static final int GL_MODELVIEW1_MATRIX_EXT
+    = GL2.GL_MODELVIEW1_MATRIX_EXT;
+
+  public static final int GL_VERTEX_WEIGHTING_EXT
+    = GL2.GL_VERTEX_WEIGHTING_EXT;
+
+  public static final int GL_MODELVIEW0_EXT
+    = GL2.GL_MODELVIEW0_EXT;
+
+  public static final int GL_MODELVIEW1_EXT
+    = GL2.GL_MODELVIEW1_EXT;
+
+  public static final int GL_CURRENT_VERTEX_WEIGHT_EXT
+    = GL2.GL_CURRENT_VERTEX_WEIGHT_EXT;
+
+  public static final int GL_VERTEX_WEIGHT_ARRAY_EXT
+    = GL2.GL_VERTEX_WEIGHT_ARRAY_EXT;
+
+  public static final int GL_VERTEX_WEIGHT_ARRAY_SIZE_EXT
+    = GL2.GL_VERTEX_WEIGHT_ARRAY_SIZE_EXT;
+
+  public static final int GL_VERTEX_WEIGHT_ARRAY_TYPE_EXT
+    = GL2.GL_VERTEX_WEIGHT_ARRAY_TYPE_EXT;
+
+  public static final int GL_VERTEX_WEIGHT_ARRAY_STRIDE_EXT
+    = GL2.GL_VERTEX_WEIGHT_ARRAY_STRIDE_EXT;
+
+  public static final int GL_VERTEX_WEIGHT_ARRAY_POINTER_EXT
+    = GL2.GL_VERTEX_WEIGHT_ARRAY_POINTER_EXT;
+
+  public static final int GL_RED_MIN_CLAMP_INGR
+    = GL2.GL_RED_MIN_CLAMP_INGR;
+
+  public static final int GL_GREEN_MIN_CLAMP_INGR
+    = GL2.GL_GREEN_MIN_CLAMP_INGR;
+
+  public static final int GL_BLUE_MIN_CLAMP_INGR
+    = GL2.GL_BLUE_MIN_CLAMP_INGR;
+
+  public static final int GL_ALPHA_MIN_CLAMP_INGR
+    = GL2.GL_ALPHA_MIN_CLAMP_INGR;
+
+  public static final int GL_RED_MAX_CLAMP_INGR
+    = GL2.GL_RED_MAX_CLAMP_INGR;
+
+  public static final int GL_GREEN_MAX_CLAMP_INGR
+    = GL2.GL_GREEN_MAX_CLAMP_INGR;
+
+  public static final int GL_BLUE_MAX_CLAMP_INGR
+    = GL2.GL_BLUE_MAX_CLAMP_INGR;
+
+  public static final int GL_ALPHA_MAX_CLAMP_INGR
+    = GL2.GL_ALPHA_MAX_CLAMP_INGR;
+
+  public static final int GL_INTERLACE_READ_INGR
+    = GL2.GL_INTERLACE_READ_INGR;
+
+  public static final int GL_TEXTURE_MEMORY_LAYOUT_INTEL
+    = GL2.GL_TEXTURE_MEMORY_LAYOUT_INTEL;
+
+  public static final int GL_LAYOUT_DEFAULT_INTEL
+    = GL2.GL_LAYOUT_DEFAULT_INTEL;
+
+  public static final int GL_LAYOUT_LINEAR_INTEL
+    = GL2.GL_LAYOUT_LINEAR_INTEL;
+
+  public static final int GL_LAYOUT_LINEAR_CPU_CACHED_INTEL
+    = GL2.GL_LAYOUT_LINEAR_CPU_CACHED_INTEL;
+
+  public static final int GL_COMPUTE_PROGRAM_NV
+    = GL2.GL_COMPUTE_PROGRAM_NV;
+
+  public static final int GL_COMPUTE_PROGRAM_PARAMETER_BUFFER_NV
+    = GL2.GL_COMPUTE_PROGRAM_PARAMETER_BUFFER_NV;
+
+  public static final int GL_DEPTH_STENCIL_TO_RGBA_NV
+    = GL2.GL_DEPTH_STENCIL_TO_RGBA_NV;
+
+  public static final int GL_DEPTH_STENCIL_TO_BGRA_NV
+    = GL2.GL_DEPTH_STENCIL_TO_BGRA_NV;
+
+  public static final int GL_MAX_DEEP_3D_TEXTURE_WIDTH_HEIGHT_NV
+    = GL2.GL_MAX_DEEP_3D_TEXTURE_WIDTH_HEIGHT_NV;
+
+  public static final int GL_MAX_DEEP_3D_TEXTURE_DEPTH_NV
+    = GL2.GL_MAX_DEEP_3D_TEXTURE_DEPTH_NV;
 
   public static final int GL_DEPTH_CLAMP_NV
     = GL2.GL_DEPTH_CLAMP_NV;
+
+  public static final int GL_EVAL_2D_NV
+    = GL2.GL_EVAL_2D_NV;
+
+  public static final int GL_EVAL_TRIANGULAR_2D_NV
+    = GL2.GL_EVAL_TRIANGULAR_2D_NV;
+
+  public static final int GL_MAP_TESSELLATION_NV
+    = GL2.GL_MAP_TESSELLATION_NV;
+
+  public static final int GL_MAP_ATTRIB_U_ORDER_NV
+    = GL2.GL_MAP_ATTRIB_U_ORDER_NV;
+
+  public static final int GL_MAP_ATTRIB_V_ORDER_NV
+    = GL2.GL_MAP_ATTRIB_V_ORDER_NV;
+
+  public static final int GL_EVAL_FRACTIONAL_TESSELLATION_NV
+    = GL2.GL_EVAL_FRACTIONAL_TESSELLATION_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB0_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB0_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB1_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB1_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB2_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB2_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB3_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB3_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB4_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB4_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB5_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB5_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB6_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB6_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB7_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB7_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB8_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB8_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB9_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB9_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB10_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB10_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB11_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB11_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB12_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB12_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB13_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB13_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB14_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB14_NV;
+
+  public static final int GL_EVAL_VERTEX_ATTRIB15_NV
+    = GL2.GL_EVAL_VERTEX_ATTRIB15_NV;
+
+  public static final int GL_MAX_MAP_TESSELLATION_NV
+    = GL2.GL_MAX_MAP_TESSELLATION_NV;
+
+  public static final int GL_MAX_RATIONAL_EVAL_ORDER_NV
+    = GL2.GL_MAX_RATIONAL_EVAL_ORDER_NV;
+
+  public static final int GL_SAMPLE_POSITION_NV
+    = GL2.GL_SAMPLE_POSITION_NV;
+
+  public static final int GL_SAMPLE_MASK_NV
+    = GL2.GL_SAMPLE_MASK_NV;
+
+  public static final int GL_SAMPLE_MASK_VALUE_NV
+    = GL2.GL_SAMPLE_MASK_VALUE_NV;
+
+  public static final int GL_TEXTURE_BINDING_RENDERBUFFER_NV
+    = GL2.GL_TEXTURE_BINDING_RENDERBUFFER_NV;
+
+  public static final int GL_TEXTURE_RENDERBUFFER_DATA_STORE_BINDING_NV
+    = GL2.GL_TEXTURE_RENDERBUFFER_DATA_STORE_BINDING_NV;
+
+  public static final int GL_TEXTURE_RENDERBUFFER_NV
+    = GL2.GL_TEXTURE_RENDERBUFFER_NV;
+
+  public static final int GL_SAMPLER_RENDERBUFFER_NV
+    = GL2.GL_SAMPLER_RENDERBUFFER_NV;
+
+  public static final int GL_INT_SAMPLER_RENDERBUFFER_NV
+    = GL2.GL_INT_SAMPLER_RENDERBUFFER_NV;
+
+  public static final int GL_UNSIGNED_INT_SAMPLER_RENDERBUFFER_NV
+    = GL2.GL_UNSIGNED_INT_SAMPLER_RENDERBUFFER_NV;
+
+  public static final int GL_MAX_SAMPLE_MASK_WORDS_NV
+    = GL2.GL_MAX_SAMPLE_MASK_WORDS_NV;
+
+  public static final int GL_ALL_COMPLETED_NV
+    = GL2.GL_ALL_COMPLETED_NV;
+
+  public static final int GL_FENCE_STATUS_NV
+    = GL2.GL_FENCE_STATUS_NV;
+
+  public static final int GL_FENCE_CONDITION_NV
+    = GL2.GL_FENCE_CONDITION_NV;
+
+  public static final int GL_FLOAT_R_NV
+    = GL2.GL_FLOAT_R_NV;
+
+  public static final int GL_FLOAT_RG_NV
+    = GL2.GL_FLOAT_RG_NV;
+
+  public static final int GL_FLOAT_RGB_NV
+    = GL2.GL_FLOAT_RGB_NV;
+
+  public static final int GL_FLOAT_RGBA_NV
+    = GL2.GL_FLOAT_RGBA_NV;
+
+  public static final int GL_FLOAT_R16_NV
+    = GL2.GL_FLOAT_R16_NV;
+
+  public static final int GL_FLOAT_R32_NV
+    = GL2.GL_FLOAT_R32_NV;
+
+  public static final int GL_FLOAT_RG16_NV
+    = GL2.GL_FLOAT_RG16_NV;
+
+  public static final int GL_FLOAT_RG32_NV
+    = GL2.GL_FLOAT_RG32_NV;
+
+  public static final int GL_FLOAT_RGB16_NV
+    = GL2.GL_FLOAT_RGB16_NV;
+
+  public static final int GL_FLOAT_RGB32_NV
+    = GL2.GL_FLOAT_RGB32_NV;
+
+  public static final int GL_FLOAT_RGBA16_NV
+    = GL2.GL_FLOAT_RGBA16_NV;
+
+  public static final int GL_FLOAT_RGBA32_NV
+    = GL2.GL_FLOAT_RGBA32_NV;
+
+  public static final int GL_TEXTURE_FLOAT_COMPONENTS_NV
+    = GL2.GL_TEXTURE_FLOAT_COMPONENTS_NV;
+
+  public static final int GL_FLOAT_CLEAR_COLOR_VALUE_NV
+    = GL2.GL_FLOAT_CLEAR_COLOR_VALUE_NV;
+
+  public static final int GL_FLOAT_RGBA_MODE_NV
+    = GL2.GL_FLOAT_RGBA_MODE_NV;
+
+  public static final int GL_FOG_DISTANCE_MODE_NV
+    = GL2.GL_FOG_DISTANCE_MODE_NV;
+
+  public static final int GL_EYE_RADIAL_NV
+    = GL2.GL_EYE_RADIAL_NV;
+
+  public static final int GL_EYE_PLANE_ABSOLUTE_NV
+    = GL2.GL_EYE_PLANE_ABSOLUTE_NV;
+
+  public static final int GL_RENDERBUFFER_COVERAGE_SAMPLES_NV
+    = GL2.GL_RENDERBUFFER_COVERAGE_SAMPLES_NV;
+
+  public static final int GL_RENDERBUFFER_COLOR_SAMPLES_NV
+    = GL2.GL_RENDERBUFFER_COLOR_SAMPLES_NV;
+
+  public static final int GL_MAX_MULTISAMPLE_COVERAGE_MODES_NV
+    = GL2.GL_MAX_MULTISAMPLE_COVERAGE_MODES_NV;
+
+  public static final int GL_MULTISAMPLE_COVERAGE_MODES_NV
+    = GL2.GL_MULTISAMPLE_COVERAGE_MODES_NV;
+
+  public static final int GL_GEOMETRY_PROGRAM_NV
+    = GL2.GL_GEOMETRY_PROGRAM_NV;
+
+  public static final int GL_MAX_PROGRAM_OUTPUT_VERTICES_NV
+    = GL2.GL_MAX_PROGRAM_OUTPUT_VERTICES_NV;
+
+  public static final int GL_MAX_PROGRAM_TOTAL_OUTPUT_COMPONENTS_NV
+    = GL2.GL_MAX_PROGRAM_TOTAL_OUTPUT_COMPONENTS_NV;
+
+  public static final int GL_MIN_PROGRAM_TEXEL_OFFSET_NV
+    = GL2.GL_MIN_PROGRAM_TEXEL_OFFSET_NV;
+
+  public static final int GL_MAX_PROGRAM_TEXEL_OFFSET_NV
+    = GL2.GL_MAX_PROGRAM_TEXEL_OFFSET_NV;
+
+  public static final int GL_PROGRAM_ATTRIB_COMPONENTS_NV
+    = GL2.GL_PROGRAM_ATTRIB_COMPONENTS_NV;
+
+  public static final int GL_PROGRAM_RESULT_COMPONENTS_NV
+    = GL2.GL_PROGRAM_RESULT_COMPONENTS_NV;
+
+  public static final int GL_MAX_PROGRAM_ATTRIB_COMPONENTS_NV
+    = GL2.GL_MAX_PROGRAM_ATTRIB_COMPONENTS_NV;
+
+  public static final int GL_MAX_PROGRAM_RESULT_COMPONENTS_NV
+    = GL2.GL_MAX_PROGRAM_RESULT_COMPONENTS_NV;
+
+  public static final int GL_MAX_PROGRAM_GENERIC_ATTRIBS_NV
+    = GL2.GL_MAX_PROGRAM_GENERIC_ATTRIBS_NV;
+
+  public static final int GL_MAX_PROGRAM_GENERIC_RESULTS_NV
+    = GL2.GL_MAX_PROGRAM_GENERIC_RESULTS_NV;
+
+  public static final int GL_MAX_GEOMETRY_PROGRAM_INVOCATIONS_NV
+    = GL2.GL_MAX_GEOMETRY_PROGRAM_INVOCATIONS_NV;
+
+  public static final int GL_MIN_FRAGMENT_INTERPOLATION_OFFSET_NV
+    = GL2.GL_MIN_FRAGMENT_INTERPOLATION_OFFSET_NV;
+
+  public static final int GL_MAX_FRAGMENT_INTERPOLATION_OFFSET_NV
+    = GL2.GL_MAX_FRAGMENT_INTERPOLATION_OFFSET_NV;
+
+  public static final int GL_FRAGMENT_PROGRAM_INTERPOLATION_OFFSET_BITS_NV
+    = GL2.GL_FRAGMENT_PROGRAM_INTERPOLATION_OFFSET_BITS_NV;
+
+  public static final int GL_MIN_PROGRAM_TEXTURE_GATHER_OFFSET_NV
+    = GL2.GL_MIN_PROGRAM_TEXTURE_GATHER_OFFSET_NV;
+
+  public static final int GL_MAX_PROGRAM_TEXTURE_GATHER_OFFSET_NV
+    = GL2.GL_MAX_PROGRAM_TEXTURE_GATHER_OFFSET_NV;
+
+  public static final int GL_MAX_PROGRAM_SUBROUTINE_PARAMETERS_NV
+    = GL2.GL_MAX_PROGRAM_SUBROUTINE_PARAMETERS_NV;
+
+  public static final int GL_MAX_PROGRAM_SUBROUTINE_NUM_NV
+    = GL2.GL_MAX_PROGRAM_SUBROUTINE_NUM_NV;
+
+  public static final int GL_MAX_SHININESS_NV
+    = GL2.GL_MAX_SHININESS_NV;
+
+  public static final int GL_MAX_SPOT_EXPONENT_NV
+    = GL2.GL_MAX_SPOT_EXPONENT_NV;
+
+  public static final int GL_COLOR_SAMPLES_NV
+    = GL2.GL_COLOR_SAMPLES_NV;
+
+  public static final int GL_MULTISAMPLE_FILTER_HINT_NV
+    = GL2.GL_MULTISAMPLE_FILTER_HINT_NV;
 
   public static final int GL_PIXEL_COUNTER_BITS_NV
     = GL2.GL_PIXEL_COUNTER_BITS_NV;
@@ -5322,6 +5851,678 @@ public class Gl {
 
   public static final int GL_PIXEL_COUNT_AVAILABLE_NV
     = GL2.GL_PIXEL_COUNT_AVAILABLE_NV;
+
+  public static final int GL_MAX_PROGRAM_PARAMETER_BUFFER_BINDINGS_NV
+    = GL2.GL_MAX_PROGRAM_PARAMETER_BUFFER_BINDINGS_NV;
+
+  public static final int GL_MAX_PROGRAM_PARAMETER_BUFFER_SIZE_NV
+    = GL2.GL_MAX_PROGRAM_PARAMETER_BUFFER_SIZE_NV;
+
+  public static final int GL_VERTEX_PROGRAM_PARAMETER_BUFFER_NV
+    = GL2.GL_VERTEX_PROGRAM_PARAMETER_BUFFER_NV;
+
+  public static final int GL_GEOMETRY_PROGRAM_PARAMETER_BUFFER_NV
+    = GL2.GL_GEOMETRY_PROGRAM_PARAMETER_BUFFER_NV;
+
+  public static final int GL_FRAGMENT_PROGRAM_PARAMETER_BUFFER_NV
+    = GL2.GL_FRAGMENT_PROGRAM_PARAMETER_BUFFER_NV;
+
+  public static final int GL_PATH_FORMAT_SVG_NV
+    = GL2.GL_PATH_FORMAT_SVG_NV;
+
+  public static final int GL_PATH_FORMAT_PS_NV
+    = GL2.GL_PATH_FORMAT_PS_NV;
+
+  public static final int GL_STANDARD_FONT_NAME_NV
+    = GL2.GL_STANDARD_FONT_NAME_NV;
+
+  public static final int GL_SYSTEM_FONT_NAME_NV
+    = GL2.GL_SYSTEM_FONT_NAME_NV;
+
+  public static final int GL_FILE_NAME_NV
+    = GL2.GL_FILE_NAME_NV;
+
+  public static final int GL_PATH_STROKE_WIDTH_NV
+    = GL2.GL_PATH_STROKE_WIDTH_NV;
+
+  public static final int GL_PATH_END_CAPS_NV
+    = GL2.GL_PATH_END_CAPS_NV;
+
+  public static final int GL_PATH_INITIAL_END_CAP_NV
+    = GL2.GL_PATH_INITIAL_END_CAP_NV;
+
+  public static final int GL_PATH_TERMINAL_END_CAP_NV
+    = GL2.GL_PATH_TERMINAL_END_CAP_NV;
+
+  public static final int GL_PATH_JOIN_STYLE_NV
+    = GL2.GL_PATH_JOIN_STYLE_NV;
+
+  public static final int GL_PATH_MITER_LIMIT_NV
+    = GL2.GL_PATH_MITER_LIMIT_NV;
+
+  public static final int GL_PATH_DASH_CAPS_NV
+    = GL2.GL_PATH_DASH_CAPS_NV;
+
+  public static final int GL_PATH_INITIAL_DASH_CAP_NV
+    = GL2.GL_PATH_INITIAL_DASH_CAP_NV;
+
+  public static final int GL_PATH_TERMINAL_DASH_CAP_NV
+    = GL2.GL_PATH_TERMINAL_DASH_CAP_NV;
+
+  public static final int GL_PATH_DASH_OFFSET_NV
+    = GL2.GL_PATH_DASH_OFFSET_NV;
+
+  public static final int GL_PATH_CLIENT_LENGTH_NV
+    = GL2.GL_PATH_CLIENT_LENGTH_NV;
+
+  public static final int GL_PATH_FILL_MODE_NV
+    = GL2.GL_PATH_FILL_MODE_NV;
+
+  public static final int GL_PATH_FILL_MASK_NV
+    = GL2.GL_PATH_FILL_MASK_NV;
+
+  public static final int GL_PATH_FILL_COVER_MODE_NV
+    = GL2.GL_PATH_FILL_COVER_MODE_NV;
+
+  public static final int GL_PATH_STROKE_COVER_MODE_NV
+    = GL2.GL_PATH_STROKE_COVER_MODE_NV;
+
+  public static final int GL_PATH_STROKE_MASK_NV
+    = GL2.GL_PATH_STROKE_MASK_NV;
+
+  public static final int GL_COUNT_UP_NV
+    = GL2.GL_COUNT_UP_NV;
+
+  public static final int GL_COUNT_DOWN_NV
+    = GL2.GL_COUNT_DOWN_NV;
+
+  public static final int GL_PATH_OBJECT_BOUNDING_BOX_NV
+    = GL2.GL_PATH_OBJECT_BOUNDING_BOX_NV;
+
+  public static final int GL_CONVEX_HULL_NV
+    = GL2.GL_CONVEX_HULL_NV;
+
+  public static final int GL_BOUNDING_BOX_NV
+    = GL2.GL_BOUNDING_BOX_NV;
+
+  public static final int GL_TRANSLATE_X_NV
+    = GL2.GL_TRANSLATE_X_NV;
+
+  public static final int GL_TRANSLATE_Y_NV
+    = GL2.GL_TRANSLATE_Y_NV;
+
+  public static final int GL_TRANSLATE_2D_NV
+    = GL2.GL_TRANSLATE_2D_NV;
+
+  public static final int GL_TRANSLATE_3D_NV
+    = GL2.GL_TRANSLATE_3D_NV;
+
+  public static final int GL_AFFINE_2D_NV
+    = GL2.GL_AFFINE_2D_NV;
+
+  public static final int GL_AFFINE_3D_NV
+    = GL2.GL_AFFINE_3D_NV;
+
+  public static final int GL_TRANSPOSE_AFFINE_2D_NV
+    = GL2.GL_TRANSPOSE_AFFINE_2D_NV;
+
+  public static final int GL_TRANSPOSE_AFFINE_3D_NV
+    = GL2.GL_TRANSPOSE_AFFINE_3D_NV;
+
+  public static final int GL_UTF8_NV
+    = GL2.GL_UTF8_NV;
+
+  public static final int GL_UTF16_NV
+    = GL2.GL_UTF16_NV;
+
+  public static final int GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV
+    = GL2.GL_BOUNDING_BOX_OF_BOUNDING_BOXES_NV;
+
+  public static final int GL_PATH_COMMAND_COUNT_NV
+    = GL2.GL_PATH_COMMAND_COUNT_NV;
+
+  public static final int GL_PATH_COORD_COUNT_NV
+    = GL2.GL_PATH_COORD_COUNT_NV;
+
+  public static final int GL_PATH_DASH_ARRAY_COUNT_NV
+    = GL2.GL_PATH_DASH_ARRAY_COUNT_NV;
+
+  public static final int GL_PATH_COMPUTED_LENGTH_NV
+    = GL2.GL_PATH_COMPUTED_LENGTH_NV;
+
+  public static final int GL_PATH_FILL_BOUNDING_BOX_NV
+    = GL2.GL_PATH_FILL_BOUNDING_BOX_NV;
+
+  public static final int GL_PATH_STROKE_BOUNDING_BOX_NV
+    = GL2.GL_PATH_STROKE_BOUNDING_BOX_NV;
+
+  public static final int GL_SQUARE_NV
+    = GL2.GL_SQUARE_NV;
+
+  public static final int GL_ROUND_NV
+    = GL2.GL_ROUND_NV;
+
+  public static final int GL_TRIANGULAR_NV
+    = GL2.GL_TRIANGULAR_NV;
+
+  public static final int GL_BEVEL_NV
+    = GL2.GL_BEVEL_NV;
+
+  public static final int GL_MITER_REVERT_NV
+    = GL2.GL_MITER_REVERT_NV;
+
+  public static final int GL_MITER_TRUNCATE_NV
+    = GL2.GL_MITER_TRUNCATE_NV;
+
+  public static final int GL_SKIP_MISSING_GLYPH_NV
+    = GL2.GL_SKIP_MISSING_GLYPH_NV;
+
+  public static final int GL_USE_MISSING_GLYPH_NV
+    = GL2.GL_USE_MISSING_GLYPH_NV;
+
+  public static final int GL_PATH_ERROR_POSITION_NV
+    = GL2.GL_PATH_ERROR_POSITION_NV;
+
+  public static final int GL_PATH_FOG_GEN_MODE_NV
+    = GL2.GL_PATH_FOG_GEN_MODE_NV;
+
+  public static final int GL_ACCUM_ADJACENT_PAIRS_NV
+    = GL2.GL_ACCUM_ADJACENT_PAIRS_NV;
+
+  public static final int GL_ADJACENT_PAIRS_NV
+    = GL2.GL_ADJACENT_PAIRS_NV;
+
+  public static final int GL_FIRST_TO_REST_NV
+    = GL2.GL_FIRST_TO_REST_NV;
+
+  public static final int GL_PATH_GEN_MODE_NV
+    = GL2.GL_PATH_GEN_MODE_NV;
+
+  public static final int GL_PATH_GEN_COEFF_NV
+    = GL2.GL_PATH_GEN_COEFF_NV;
+
+  public static final int GL_PATH_GEN_COLOR_FORMAT_NV
+    = GL2.GL_PATH_GEN_COLOR_FORMAT_NV;
+
+  public static final int GL_PATH_GEN_COMPONENTS_NV
+    = GL2.GL_PATH_GEN_COMPONENTS_NV;
+
+  public static final int GL_PATH_STENCIL_FUNC_NV
+    = GL2.GL_PATH_STENCIL_FUNC_NV;
+
+  public static final int GL_PATH_STENCIL_REF_NV
+    = GL2.GL_PATH_STENCIL_REF_NV;
+
+  public static final int GL_PATH_STENCIL_VALUE_MASK_NV
+    = GL2.GL_PATH_STENCIL_VALUE_MASK_NV;
+
+  public static final int GL_PATH_STENCIL_DEPTH_OFFSET_FACTOR_NV
+    = GL2.GL_PATH_STENCIL_DEPTH_OFFSET_FACTOR_NV;
+
+  public static final int GL_PATH_STENCIL_DEPTH_OFFSET_UNITS_NV
+    = GL2.GL_PATH_STENCIL_DEPTH_OFFSET_UNITS_NV;
+
+  public static final int GL_PATH_COVER_DEPTH_FUNC_NV
+    = GL2.GL_PATH_COVER_DEPTH_FUNC_NV;
+
+  public static final int GL_PATH_DASH_OFFSET_RESET_NV
+    = GL2.GL_PATH_DASH_OFFSET_RESET_NV;
+
+  public static final int GL_MOVE_TO_RESETS_NV
+    = GL2.GL_MOVE_TO_RESETS_NV;
+
+  public static final int GL_MOVE_TO_CONTINUES_NV
+    = GL2.GL_MOVE_TO_CONTINUES_NV;
+
+  public static final int GL_CLOSE_PATH_NV
+    = GL2.GL_CLOSE_PATH_NV;
+
+  public static final int GL_MOVE_TO_NV
+    = GL2.GL_MOVE_TO_NV;
+
+  public static final int GL_RELATIVE_MOVE_TO_NV
+    = GL2.GL_RELATIVE_MOVE_TO_NV;
+
+  public static final int GL_LINE_TO_NV
+    = GL2.GL_LINE_TO_NV;
+
+  public static final int GL_RELATIVE_LINE_TO_NV
+    = GL2.GL_RELATIVE_LINE_TO_NV;
+
+  public static final int GL_HORIZONTAL_LINE_TO_NV
+    = GL2.GL_HORIZONTAL_LINE_TO_NV;
+
+  public static final int GL_RELATIVE_HORIZONTAL_LINE_TO_NV
+    = GL2.GL_RELATIVE_HORIZONTAL_LINE_TO_NV;
+
+  public static final int GL_VERTICAL_LINE_TO_NV
+    = GL2.GL_VERTICAL_LINE_TO_NV;
+
+  public static final int GL_RELATIVE_VERTICAL_LINE_TO_NV
+    = GL2.GL_RELATIVE_VERTICAL_LINE_TO_NV;
+
+  public static final int GL_QUADRATIC_CURVE_TO_NV
+    = GL2.GL_QUADRATIC_CURVE_TO_NV;
+
+  public static final int GL_RELATIVE_QUADRATIC_CURVE_TO_NV
+    = GL2.GL_RELATIVE_QUADRATIC_CURVE_TO_NV;
+
+  public static final int GL_CUBIC_CURVE_TO_NV
+    = GL2.GL_CUBIC_CURVE_TO_NV;
+
+  public static final int GL_RELATIVE_CUBIC_CURVE_TO_NV
+    = GL2.GL_RELATIVE_CUBIC_CURVE_TO_NV;
+
+  public static final int GL_SMOOTH_QUADRATIC_CURVE_TO_NV
+    = GL2.GL_SMOOTH_QUADRATIC_CURVE_TO_NV;
+
+  public static final int GL_RELATIVE_SMOOTH_QUADRATIC_CURVE_TO_NV
+    = GL2.GL_RELATIVE_SMOOTH_QUADRATIC_CURVE_TO_NV;
+
+  public static final int GL_SMOOTH_CUBIC_CURVE_TO_NV
+    = GL2.GL_SMOOTH_CUBIC_CURVE_TO_NV;
+
+  public static final int GL_RELATIVE_SMOOTH_CUBIC_CURVE_TO_NV
+    = GL2.GL_RELATIVE_SMOOTH_CUBIC_CURVE_TO_NV;
+
+  public static final int GL_SMALL_CCW_ARC_TO_NV
+    = GL2.GL_SMALL_CCW_ARC_TO_NV;
+
+  public static final int GL_RELATIVE_SMALL_CCW_ARC_TO_NV
+    = GL2.GL_RELATIVE_SMALL_CCW_ARC_TO_NV;
+
+  public static final int GL_SMALL_CW_ARC_TO_NV
+    = GL2.GL_SMALL_CW_ARC_TO_NV;
+
+  public static final int GL_RELATIVE_SMALL_CW_ARC_TO_NV
+    = GL2.GL_RELATIVE_SMALL_CW_ARC_TO_NV;
+
+  public static final int GL_LARGE_CCW_ARC_TO_NV
+    = GL2.GL_LARGE_CCW_ARC_TO_NV;
+
+  public static final int GL_RELATIVE_LARGE_CCW_ARC_TO_NV
+    = GL2.GL_RELATIVE_LARGE_CCW_ARC_TO_NV;
+
+  public static final int GL_LARGE_CW_ARC_TO_NV
+    = GL2.GL_LARGE_CW_ARC_TO_NV;
+
+  public static final int GL_RELATIVE_LARGE_CW_ARC_TO_NV
+    = GL2.GL_RELATIVE_LARGE_CW_ARC_TO_NV;
+
+  public static final int GL_RESTART_PATH_NV
+    = GL2.GL_RESTART_PATH_NV;
+
+  public static final int GL_DUP_FIRST_CUBIC_CURVE_TO_NV
+    = GL2.GL_DUP_FIRST_CUBIC_CURVE_TO_NV;
+
+  public static final int GL_DUP_LAST_CUBIC_CURVE_TO_NV
+    = GL2.GL_DUP_LAST_CUBIC_CURVE_TO_NV;
+
+  public static final int GL_RECT_NV
+    = GL2.GL_RECT_NV;
+
+  public static final int GL_CIRCULAR_CCW_ARC_TO_NV
+    = GL2.GL_CIRCULAR_CCW_ARC_TO_NV;
+
+  public static final int GL_CIRCULAR_CW_ARC_TO_NV
+    = GL2.GL_CIRCULAR_CW_ARC_TO_NV;
+
+  public static final int GL_CIRCULAR_TANGENT_ARC_TO_NV
+    = GL2.GL_CIRCULAR_TANGENT_ARC_TO_NV;
+
+  public static final int GL_ARC_TO_NV
+    = GL2.GL_ARC_TO_NV;
+
+  public static final int GL_RELATIVE_ARC_TO_NV
+    = GL2.GL_RELATIVE_ARC_TO_NV;
+
+  public static final int GL_BOLD_BIT_NV
+    = GL2.GL_BOLD_BIT_NV;
+
+  public static final int GL_ITALIC_BIT_NV
+    = GL2.GL_ITALIC_BIT_NV;
+
+  public static final int GL_GLYPH_WIDTH_BIT_NV
+    = GL2.GL_GLYPH_WIDTH_BIT_NV;
+
+  public static final int GL_GLYPH_HEIGHT_BIT_NV
+    = GL2.GL_GLYPH_HEIGHT_BIT_NV;
+
+  public static final int GL_GLYPH_HORIZONTAL_BEARING_X_BIT_NV
+    = GL2.GL_GLYPH_HORIZONTAL_BEARING_X_BIT_NV;
+
+  public static final int GL_GLYPH_HORIZONTAL_BEARING_Y_BIT_NV
+    = GL2.GL_GLYPH_HORIZONTAL_BEARING_Y_BIT_NV;
+
+  public static final int GL_GLYPH_HORIZONTAL_BEARING_ADVANCE_BIT_NV
+    = GL2.GL_GLYPH_HORIZONTAL_BEARING_ADVANCE_BIT_NV;
+
+  public static final int GL_GLYPH_VERTICAL_BEARING_X_BIT_NV
+    = GL2.GL_GLYPH_VERTICAL_BEARING_X_BIT_NV;
+
+  public static final int GL_GLYPH_VERTICAL_BEARING_Y_BIT_NV
+    = GL2.GL_GLYPH_VERTICAL_BEARING_Y_BIT_NV;
+
+  public static final int GL_GLYPH_VERTICAL_BEARING_ADVANCE_BIT_NV
+    = GL2.GL_GLYPH_VERTICAL_BEARING_ADVANCE_BIT_NV;
+
+  public static final int GL_GLYPH_HAS_KERNING_BIT_NV
+    = GL2.GL_GLYPH_HAS_KERNING_BIT_NV;
+
+  public static final int GL_FONT_X_MIN_BOUNDS_BIT_NV
+    = GL2.GL_FONT_X_MIN_BOUNDS_BIT_NV;
+
+  public static final int GL_FONT_Y_MIN_BOUNDS_BIT_NV
+    = GL2.GL_FONT_Y_MIN_BOUNDS_BIT_NV;
+
+  public static final int GL_FONT_X_MAX_BOUNDS_BIT_NV
+    = GL2.GL_FONT_X_MAX_BOUNDS_BIT_NV;
+
+  public static final int GL_FONT_Y_MAX_BOUNDS_BIT_NV
+    = GL2.GL_FONT_Y_MAX_BOUNDS_BIT_NV;
+
+  public static final int GL_FONT_UNITS_PER_EM_BIT_NV
+    = GL2.GL_FONT_UNITS_PER_EM_BIT_NV;
+
+  public static final int GL_FONT_ASCENDER_BIT_NV
+    = GL2.GL_FONT_ASCENDER_BIT_NV;
+
+  public static final int GL_FONT_DESCENDER_BIT_NV
+    = GL2.GL_FONT_DESCENDER_BIT_NV;
+
+  public static final int GL_FONT_HEIGHT_BIT_NV
+    = GL2.GL_FONT_HEIGHT_BIT_NV;
+
+  public static final int GL_FONT_MAX_ADVANCE_WIDTH_BIT_NV
+    = GL2.GL_FONT_MAX_ADVANCE_WIDTH_BIT_NV;
+
+  public static final int GL_FONT_MAX_ADVANCE_HEIGHT_BIT_NV
+    = GL2.GL_FONT_MAX_ADVANCE_HEIGHT_BIT_NV;
+
+  public static final int GL_FONT_UNDERLINE_POSITION_BIT_NV
+    = GL2.GL_FONT_UNDERLINE_POSITION_BIT_NV;
+
+  public static final int GL_FONT_UNDERLINE_THICKNESS_BIT_NV
+    = GL2.GL_FONT_UNDERLINE_THICKNESS_BIT_NV;
+
+  public static final int GL_FONT_HAS_KERNING_BIT_NV
+    = GL2.GL_FONT_HAS_KERNING_BIT_NV;
+
+  public static final int GL_WRITE_PIXEL_DATA_RANGE_NV
+    = GL2.GL_WRITE_PIXEL_DATA_RANGE_NV;
+
+  public static final int GL_READ_PIXEL_DATA_RANGE_NV
+    = GL2.GL_READ_PIXEL_DATA_RANGE_NV;
+
+  public static final int GL_WRITE_PIXEL_DATA_RANGE_LENGTH_NV
+    = GL2.GL_WRITE_PIXEL_DATA_RANGE_LENGTH_NV;
+
+  public static final int GL_READ_PIXEL_DATA_RANGE_LENGTH_NV
+    = GL2.GL_READ_PIXEL_DATA_RANGE_LENGTH_NV;
+
+  public static final int GL_WRITE_PIXEL_DATA_RANGE_POINTER_NV
+    = GL2.GL_WRITE_PIXEL_DATA_RANGE_POINTER_NV;
+
+  public static final int GL_READ_PIXEL_DATA_RANGE_POINTER_NV
+    = GL2.GL_READ_PIXEL_DATA_RANGE_POINTER_NV;
+
+  public static final int GL_PRIMITIVE_RESTART_NV
+    = GL2.GL_PRIMITIVE_RESTART_NV;
+
+  public static final int GL_PRIMITIVE_RESTART_INDEX_NV
+    = GL2.GL_PRIMITIVE_RESTART_INDEX_NV;
+
+  public static final int GL_SHADER_GLOBAL_ACCESS_BARRIER_BIT_NV
+    = GL2.GL_SHADER_GLOBAL_ACCESS_BARRIER_BIT_NV;
+
+  public static final int GL_MAX_PROGRAM_PATCH_ATTRIBS_NV
+    = GL2.GL_MAX_PROGRAM_PATCH_ATTRIBS_NV;
+
+  public static final int GL_TESS_CONTROL_PROGRAM_NV
+    = GL2.GL_TESS_CONTROL_PROGRAM_NV;
+
+  public static final int GL_TESS_EVALUATION_PROGRAM_NV
+    = GL2.GL_TESS_EVALUATION_PROGRAM_NV;
+
+  public static final int GL_TESS_CONTROL_PROGRAM_PARAMETER_BUFFER_NV
+    = GL2.GL_TESS_CONTROL_PROGRAM_PARAMETER_BUFFER_NV;
+
+  public static final int GL_TESS_EVALUATION_PROGRAM_PARAMETER_BUFFER_NV
+    = GL2.GL_TESS_EVALUATION_PROGRAM_PARAMETER_BUFFER_NV;
+
+  public static final int GL_EMBOSS_LIGHT_NV
+    = GL2.GL_EMBOSS_LIGHT_NV;
+
+  public static final int GL_EMBOSS_CONSTANT_NV
+    = GL2.GL_EMBOSS_CONSTANT_NV;
+
+  public static final int GL_EMBOSS_MAP_NV
+    = GL2.GL_EMBOSS_MAP_NV;
+
+  public static final int GL_TEXTURE_UNSIGNED_REMAP_MODE_NV
+    = GL2.GL_TEXTURE_UNSIGNED_REMAP_MODE_NV;
+
+  public static final int GL_OFFSET_TEXTURE_RECTANGLE_NV
+    = GL2.GL_OFFSET_TEXTURE_RECTANGLE_NV;
+
+  public static final int GL_OFFSET_TEXTURE_RECTANGLE_SCALE_NV
+    = GL2.GL_OFFSET_TEXTURE_RECTANGLE_SCALE_NV;
+
+  public static final int GL_DOT_PRODUCT_TEXTURE_RECTANGLE_NV
+    = GL2.GL_DOT_PRODUCT_TEXTURE_RECTANGLE_NV;
+
+  public static final int GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV
+    = GL2.GL_RGBA_UNSIGNED_DOT_PRODUCT_MAPPING_NV;
+
+  public static final int GL_UNSIGNED_INT_S8_S8_8_8_NV
+    = GL2.GL_UNSIGNED_INT_S8_S8_8_8_NV;
+
+  public static final int GL_UNSIGNED_INT_8_8_S8_S8_REV_NV
+    = GL2.GL_UNSIGNED_INT_8_8_S8_S8_REV_NV;
+
+  public static final int GL_DSDT_MAG_INTENSITY_NV
+    = GL2.GL_DSDT_MAG_INTENSITY_NV;
+
+  public static final int GL_SHADER_CONSISTENT_NV
+    = GL2.GL_SHADER_CONSISTENT_NV;
+
+  public static final int GL_TEXTURE_SHADER_NV
+    = GL2.GL_TEXTURE_SHADER_NV;
+
+  public static final int GL_SHADER_OPERATION_NV
+    = GL2.GL_SHADER_OPERATION_NV;
+
+  public static final int GL_CULL_MODES_NV
+    = GL2.GL_CULL_MODES_NV;
+
+  public static final int GL_OFFSET_TEXTURE_MATRIX_NV
+    = GL2.GL_OFFSET_TEXTURE_MATRIX_NV;
+
+  public static final int GL_OFFSET_TEXTURE_SCALE_NV
+    = GL2.GL_OFFSET_TEXTURE_SCALE_NV;
+
+  public static final int GL_OFFSET_TEXTURE_BIAS_NV
+    = GL2.GL_OFFSET_TEXTURE_BIAS_NV;
+
+  public static final int GL_OFFSET_TEXTURE_2D_MATRIX_NV
+    = GL2.GL_OFFSET_TEXTURE_2D_MATRIX_NV;
+
+  public static final int GL_OFFSET_TEXTURE_2D_SCALE_NV
+    = GL2.GL_OFFSET_TEXTURE_2D_SCALE_NV;
+
+  public static final int GL_OFFSET_TEXTURE_2D_BIAS_NV
+    = GL2.GL_OFFSET_TEXTURE_2D_BIAS_NV;
+
+  public static final int GL_PREVIOUS_TEXTURE_INPUT_NV
+    = GL2.GL_PREVIOUS_TEXTURE_INPUT_NV;
+
+  public static final int GL_CONST_EYE_NV
+    = GL2.GL_CONST_EYE_NV;
+
+  public static final int GL_PASS_THROUGH_NV
+    = GL2.GL_PASS_THROUGH_NV;
+
+  public static final int GL_CULL_FRAGMENT_NV
+    = GL2.GL_CULL_FRAGMENT_NV;
+
+  public static final int GL_OFFSET_TEXTURE_2D_NV
+    = GL2.GL_OFFSET_TEXTURE_2D_NV;
+
+  public static final int GL_DEPENDENT_AR_TEXTURE_2D_NV
+    = GL2.GL_DEPENDENT_AR_TEXTURE_2D_NV;
+
+  public static final int GL_DEPENDENT_GB_TEXTURE_2D_NV
+    = GL2.GL_DEPENDENT_GB_TEXTURE_2D_NV;
+
+  public static final int GL_DOT_PRODUCT_NV
+    = GL2.GL_DOT_PRODUCT_NV;
+
+  public static final int GL_DOT_PRODUCT_DEPTH_REPLACE_NV
+    = GL2.GL_DOT_PRODUCT_DEPTH_REPLACE_NV;
+
+  public static final int GL_DOT_PRODUCT_TEXTURE_2D_NV
+    = GL2.GL_DOT_PRODUCT_TEXTURE_2D_NV;
+
+  public static final int GL_DOT_PRODUCT_TEXTURE_CUBE_MAP_NV
+    = GL2.GL_DOT_PRODUCT_TEXTURE_CUBE_MAP_NV;
+
+  public static final int GL_DOT_PRODUCT_DIFFUSE_CUBE_MAP_NV
+    = GL2.GL_DOT_PRODUCT_DIFFUSE_CUBE_MAP_NV;
+
+  public static final int GL_DOT_PRODUCT_REFLECT_CUBE_MAP_NV
+    = GL2.GL_DOT_PRODUCT_REFLECT_CUBE_MAP_NV;
+
+  public static final int GL_DOT_PRODUCT_CONST_EYE_REFLECT_CUBE_MAP_NV
+    = GL2.GL_DOT_PRODUCT_CONST_EYE_REFLECT_CUBE_MAP_NV;
+
+  public static final int GL_HILO_NV
+    = GL2.GL_HILO_NV;
+
+  public static final int GL_DSDT_NV
+    = GL2.GL_DSDT_NV;
+
+  public static final int GL_DSDT_MAG_NV
+    = GL2.GL_DSDT_MAG_NV;
+
+  public static final int GL_DSDT_MAG_VIB_NV
+    = GL2.GL_DSDT_MAG_VIB_NV;
+
+  public static final int GL_HILO16_NV
+    = GL2.GL_HILO16_NV;
+
+  public static final int GL_SIGNED_HILO_NV
+    = GL2.GL_SIGNED_HILO_NV;
+
+  public static final int GL_SIGNED_HILO16_NV
+    = GL2.GL_SIGNED_HILO16_NV;
+
+  public static final int GL_SIGNED_RGBA_NV
+    = GL2.GL_SIGNED_RGBA_NV;
+
+  public static final int GL_SIGNED_RGBA8_NV
+    = GL2.GL_SIGNED_RGBA8_NV;
+
+  public static final int GL_SIGNED_RGB_NV
+    = GL2.GL_SIGNED_RGB_NV;
+
+  public static final int GL_SIGNED_RGB8_NV
+    = GL2.GL_SIGNED_RGB8_NV;
+
+  public static final int GL_SIGNED_LUMINANCE_NV
+    = GL2.GL_SIGNED_LUMINANCE_NV;
+
+  public static final int GL_SIGNED_LUMINANCE8_NV
+    = GL2.GL_SIGNED_LUMINANCE8_NV;
+
+  public static final int GL_SIGNED_LUMINANCE_ALPHA_NV
+    = GL2.GL_SIGNED_LUMINANCE_ALPHA_NV;
+
+  public static final int GL_SIGNED_LUMINANCE8_ALPHA8_NV
+    = GL2.GL_SIGNED_LUMINANCE8_ALPHA8_NV;
+
+  public static final int GL_SIGNED_ALPHA_NV
+    = GL2.GL_SIGNED_ALPHA_NV;
+
+  public static final int GL_SIGNED_ALPHA8_NV
+    = GL2.GL_SIGNED_ALPHA8_NV;
+
+  public static final int GL_SIGNED_INTENSITY_NV
+    = GL2.GL_SIGNED_INTENSITY_NV;
+
+  public static final int GL_SIGNED_INTENSITY8_NV
+    = GL2.GL_SIGNED_INTENSITY8_NV;
+
+  public static final int GL_DSDT8_NV
+    = GL2.GL_DSDT8_NV;
+
+  public static final int GL_DSDT8_MAG8_NV
+    = GL2.GL_DSDT8_MAG8_NV;
+
+  public static final int GL_DSDT8_MAG8_INTENSITY8_NV
+    = GL2.GL_DSDT8_MAG8_INTENSITY8_NV;
+
+  public static final int GL_SIGNED_RGB_UNSIGNED_ALPHA_NV
+    = GL2.GL_SIGNED_RGB_UNSIGNED_ALPHA_NV;
+
+  public static final int GL_SIGNED_RGB8_UNSIGNED_ALPHA8_NV
+    = GL2.GL_SIGNED_RGB8_UNSIGNED_ALPHA8_NV;
+
+  public static final int GL_HI_SCALE_NV
+    = GL2.GL_HI_SCALE_NV;
+
+  public static final int GL_LO_SCALE_NV
+    = GL2.GL_LO_SCALE_NV;
+
+  public static final int GL_DS_SCALE_NV
+    = GL2.GL_DS_SCALE_NV;
+
+  public static final int GL_DT_SCALE_NV
+    = GL2.GL_DT_SCALE_NV;
+
+  public static final int GL_MAGNITUDE_SCALE_NV
+    = GL2.GL_MAGNITUDE_SCALE_NV;
+
+  public static final int GL_VIBRANCE_SCALE_NV
+    = GL2.GL_VIBRANCE_SCALE_NV;
+
+  public static final int GL_HI_BIAS_NV
+    = GL2.GL_HI_BIAS_NV;
+
+  public static final int GL_LO_BIAS_NV
+    = GL2.GL_LO_BIAS_NV;
+
+  public static final int GL_DS_BIAS_NV
+    = GL2.GL_DS_BIAS_NV;
+
+  public static final int GL_DT_BIAS_NV
+    = GL2.GL_DT_BIAS_NV;
+
+  public static final int GL_MAGNITUDE_BIAS_NV
+    = GL2.GL_MAGNITUDE_BIAS_NV;
+
+  public static final int GL_VIBRANCE_BIAS_NV
+    = GL2.GL_VIBRANCE_BIAS_NV;
+
+  public static final int GL_TEXTURE_BORDER_VALUES_NV
+    = GL2.GL_TEXTURE_BORDER_VALUES_NV;
+
+  public static final int GL_TEXTURE_HI_SIZE_NV
+    = GL2.GL_TEXTURE_HI_SIZE_NV;
+
+  public static final int GL_TEXTURE_LO_SIZE_NV
+    = GL2.GL_TEXTURE_LO_SIZE_NV;
+
+  public static final int GL_TEXTURE_DS_SIZE_NV
+    = GL2.GL_TEXTURE_DS_SIZE_NV;
+
+  public static final int GL_TEXTURE_DT_SIZE_NV
+    = GL2.GL_TEXTURE_DT_SIZE_NV;
+
+  public static final int GL_TEXTURE_MAG_SIZE_NV
+    = GL2.GL_TEXTURE_MAG_SIZE_NV;
+
+  public static final int GL_DOT_PRODUCT_TEXTURE_3D_NV
+    = GL2.GL_DOT_PRODUCT_TEXTURE_3D_NV;
 
   public static final int GL_OFFSET_PROJECTIVE_TEXTURE_2D_NV
     = GL2.GL_OFFSET_PROJECTIVE_TEXTURE_2D_NV;
@@ -5374,540 +6575,6 @@ public class Gl {
   public static final int GL_FORCE_BLUE_TO_ONE_NV
     = GL2.GL_FORCE_BLUE_TO_ONE_NV;
 
-  public static final int GL_STENCIL_TEST_TWO_SIDE_EXT
-    = GL2.GL_STENCIL_TEST_TWO_SIDE_EXT;
-
-  public static final int GL_ACTIVE_STENCIL_FACE_EXT
-    = GL2.GL_ACTIVE_STENCIL_FACE_EXT;
-
-  public static final int GL_UNPACK_CLIENT_STORAGE_APPLE
-    = GL2.GL_UNPACK_CLIENT_STORAGE_APPLE;
-
-  public static final int GL_DRAW_PIXELS_APPLE
-    = GL2.GL_DRAW_PIXELS_APPLE;
-
-  public static final int GL_FENCE_APPLE
-    = GL2.GL_FENCE_APPLE;
-
-  public static final int GL_VERTEX_ARRAY_RANGE_APPLE
-    = GL2.GL_VERTEX_ARRAY_RANGE_APPLE;
-
-  public static final int GL_VERTEX_ARRAY_RANGE_LENGTH_APPLE
-    = GL2.GL_VERTEX_ARRAY_RANGE_LENGTH_APPLE;
-
-  public static final int GL_VERTEX_ARRAY_STORAGE_HINT_APPLE
-    = GL2.GL_VERTEX_ARRAY_STORAGE_HINT_APPLE;
-
-  public static final int GL_VERTEX_ARRAY_RANGE_POINTER_APPLE
-    = GL2.GL_VERTEX_ARRAY_RANGE_POINTER_APPLE;
-
-  public static final int GL_STORAGE_CLIENT_APPLE
-    = GL2.GL_STORAGE_CLIENT_APPLE;
-
-  public static final int GL_STORAGE_CACHED_APPLE
-    = GL2.GL_STORAGE_CACHED_APPLE;
-
-  public static final int GL_STORAGE_SHARED_APPLE
-    = GL2.GL_STORAGE_SHARED_APPLE;
-
-  public static final int GL_YCBCR_422_APPLE
-    = GL2.GL_YCBCR_422_APPLE;
-
-  public static final int GL_UNSIGNED_SHORT_8_8_APPLE
-    = GL2.GL_UNSIGNED_SHORT_8_8_APPLE;
-
-  public static final int GL_UNSIGNED_SHORT_8_8_REV_APPLE
-    = GL2.GL_UNSIGNED_SHORT_8_8_REV_APPLE;
-
-  public static final int GL_RGB_S3TC
-    = GL2.GL_RGB_S3TC;
-
-  public static final int GL_RGB4_S3TC
-    = GL2.GL_RGB4_S3TC;
-
-  public static final int GL_RGBA_S3TC
-    = GL2.GL_RGBA_S3TC;
-
-  public static final int GL_RGBA4_S3TC
-    = GL2.GL_RGBA4_S3TC;
-
-  public static final int GL_MAX_DRAW_BUFFERS_ATI
-    = GL2.GL_MAX_DRAW_BUFFERS_ATI;
-
-  public static final int GL_DRAW_BUFFER0_ATI
-    = GL2.GL_DRAW_BUFFER0_ATI;
-
-  public static final int GL_DRAW_BUFFER1_ATI
-    = GL2.GL_DRAW_BUFFER1_ATI;
-
-  public static final int GL_DRAW_BUFFER2_ATI
-    = GL2.GL_DRAW_BUFFER2_ATI;
-
-  public static final int GL_DRAW_BUFFER3_ATI
-    = GL2.GL_DRAW_BUFFER3_ATI;
-
-  public static final int GL_DRAW_BUFFER4_ATI
-    = GL2.GL_DRAW_BUFFER4_ATI;
-
-  public static final int GL_DRAW_BUFFER5_ATI
-    = GL2.GL_DRAW_BUFFER5_ATI;
-
-  public static final int GL_DRAW_BUFFER6_ATI
-    = GL2.GL_DRAW_BUFFER6_ATI;
-
-  public static final int GL_DRAW_BUFFER7_ATI
-    = GL2.GL_DRAW_BUFFER7_ATI;
-
-  public static final int GL_DRAW_BUFFER8_ATI
-    = GL2.GL_DRAW_BUFFER8_ATI;
-
-  public static final int GL_DRAW_BUFFER9_ATI
-    = GL2.GL_DRAW_BUFFER9_ATI;
-
-  public static final int GL_DRAW_BUFFER10_ATI
-    = GL2.GL_DRAW_BUFFER10_ATI;
-
-  public static final int GL_DRAW_BUFFER11_ATI
-    = GL2.GL_DRAW_BUFFER11_ATI;
-
-  public static final int GL_DRAW_BUFFER12_ATI
-    = GL2.GL_DRAW_BUFFER12_ATI;
-
-  public static final int GL_DRAW_BUFFER13_ATI
-    = GL2.GL_DRAW_BUFFER13_ATI;
-
-  public static final int GL_DRAW_BUFFER14_ATI
-    = GL2.GL_DRAW_BUFFER14_ATI;
-
-  public static final int GL_DRAW_BUFFER15_ATI
-    = GL2.GL_DRAW_BUFFER15_ATI;
-
-  public static final int GL_TYPE_RGBA_FLOAT_ATI
-    = GL2.GL_TYPE_RGBA_FLOAT_ATI;
-
-  public static final int GL_COLOR_CLEAR_UNCLAMPED_VALUE_ATI
-    = GL2.GL_COLOR_CLEAR_UNCLAMPED_VALUE_ATI;
-
-  public static final int GL_RGBA_FLOAT32_ATI
-    = GL2.GL_RGBA_FLOAT32_ATI;
-
-  public static final int GL_RGB_FLOAT32_ATI
-    = GL2.GL_RGB_FLOAT32_ATI;
-
-  public static final int GL_ALPHA_FLOAT32_ATI
-    = GL2.GL_ALPHA_FLOAT32_ATI;
-
-  public static final int GL_INTENSITY_FLOAT32_ATI
-    = GL2.GL_INTENSITY_FLOAT32_ATI;
-
-  public static final int GL_LUMINANCE_FLOAT32_ATI
-    = GL2.GL_LUMINANCE_FLOAT32_ATI;
-
-  public static final int GL_LUMINANCE_ALPHA_FLOAT32_ATI
-    = GL2.GL_LUMINANCE_ALPHA_FLOAT32_ATI;
-
-  public static final int GL_RGBA_FLOAT16_ATI
-    = GL2.GL_RGBA_FLOAT16_ATI;
-
-  public static final int GL_RGB_FLOAT16_ATI
-    = GL2.GL_RGB_FLOAT16_ATI;
-
-  public static final int GL_ALPHA_FLOAT16_ATI
-    = GL2.GL_ALPHA_FLOAT16_ATI;
-
-  public static final int GL_INTENSITY_FLOAT16_ATI
-    = GL2.GL_INTENSITY_FLOAT16_ATI;
-
-  public static final int GL_LUMINANCE_FLOAT16_ATI
-    = GL2.GL_LUMINANCE_FLOAT16_ATI;
-
-  public static final int GL_LUMINANCE_ALPHA_FLOAT16_ATI
-    = GL2.GL_LUMINANCE_ALPHA_FLOAT16_ATI;
-
-  public static final int GL_FLOAT_R_NV
-    = GL2.GL_FLOAT_R_NV;
-
-  public static final int GL_FLOAT_RG_NV
-    = GL2.GL_FLOAT_RG_NV;
-
-  public static final int GL_FLOAT_RGB_NV
-    = GL2.GL_FLOAT_RGB_NV;
-
-  public static final int GL_FLOAT_RGBA_NV
-    = GL2.GL_FLOAT_RGBA_NV;
-
-  public static final int GL_FLOAT_R16_NV
-    = GL2.GL_FLOAT_R16_NV;
-
-  public static final int GL_FLOAT_R32_NV
-    = GL2.GL_FLOAT_R32_NV;
-
-  public static final int GL_FLOAT_RG16_NV
-    = GL2.GL_FLOAT_RG16_NV;
-
-  public static final int GL_FLOAT_RG32_NV
-    = GL2.GL_FLOAT_RG32_NV;
-
-  public static final int GL_FLOAT_RGB16_NV
-    = GL2.GL_FLOAT_RGB16_NV;
-
-  public static final int GL_FLOAT_RGB32_NV
-    = GL2.GL_FLOAT_RGB32_NV;
-
-  public static final int GL_FLOAT_RGBA16_NV
-    = GL2.GL_FLOAT_RGBA16_NV;
-
-  public static final int GL_FLOAT_RGBA32_NV
-    = GL2.GL_FLOAT_RGBA32_NV;
-
-  public static final int GL_TEXTURE_FLOAT_COMPONENTS_NV
-    = GL2.GL_TEXTURE_FLOAT_COMPONENTS_NV;
-
-  public static final int GL_FLOAT_CLEAR_COLOR_VALUE_NV
-    = GL2.GL_FLOAT_CLEAR_COLOR_VALUE_NV;
-
-  public static final int GL_FLOAT_RGBA_MODE_NV
-    = GL2.GL_FLOAT_RGBA_MODE_NV;
-
-  public static final int GL_WRITE_PIXEL_DATA_RANGE_NV
-    = GL2.GL_WRITE_PIXEL_DATA_RANGE_NV;
-
-  public static final int GL_READ_PIXEL_DATA_RANGE_NV
-    = GL2.GL_READ_PIXEL_DATA_RANGE_NV;
-
-  public static final int GL_WRITE_PIXEL_DATA_RANGE_LENGTH_NV
-    = GL2.GL_WRITE_PIXEL_DATA_RANGE_LENGTH_NV;
-
-  public static final int GL_READ_PIXEL_DATA_RANGE_LENGTH_NV
-    = GL2.GL_READ_PIXEL_DATA_RANGE_LENGTH_NV;
-
-  public static final int GL_WRITE_PIXEL_DATA_RANGE_POINTER_NV
-    = GL2.GL_WRITE_PIXEL_DATA_RANGE_POINTER_NV;
-
-  public static final int GL_READ_PIXEL_DATA_RANGE_POINTER_NV
-    = GL2.GL_READ_PIXEL_DATA_RANGE_POINTER_NV;
-
-  public static final int GL_PRIMITIVE_RESTART_NV
-    = GL2.GL_PRIMITIVE_RESTART_NV;
-
-  public static final int GL_PRIMITIVE_RESTART_INDEX_NV
-    = GL2.GL_PRIMITIVE_RESTART_INDEX_NV;
-
-  public static final int GL_TEXTURE_UNSIGNED_REMAP_MODE_NV
-    = GL2.GL_TEXTURE_UNSIGNED_REMAP_MODE_NV;
-
-  public static final int GL_DEPTH_BOUNDS_TEST_EXT
-    = GL2.GL_DEPTH_BOUNDS_TEST_EXT;
-
-  public static final int GL_DEPTH_BOUNDS_EXT
-    = GL2.GL_DEPTH_BOUNDS_EXT;
-
-  public static final int GL_MIRROR_CLAMP_EXT
-    = GL2.GL_MIRROR_CLAMP_EXT;
-
-  public static final int GL_MIRROR_CLAMP_TO_EDGE_EXT
-    = GL2.GL_MIRROR_CLAMP_TO_EDGE_EXT;
-
-  public static final int GL_MIRROR_CLAMP_TO_BORDER_EXT
-    = GL2.GL_MIRROR_CLAMP_TO_BORDER_EXT;
-
-  public static final int GL_PIXEL_PACK_BUFFER_EXT
-    = GL2.GL_PIXEL_PACK_BUFFER_EXT;
-
-  public static final int GL_PIXEL_UNPACK_BUFFER_EXT
-    = GL2.GL_PIXEL_UNPACK_BUFFER_EXT;
-
-  public static final int GL_PIXEL_PACK_BUFFER_BINDING_EXT
-    = GL2.GL_PIXEL_PACK_BUFFER_BINDING_EXT;
-
-  public static final int GL_PIXEL_UNPACK_BUFFER_BINDING_EXT
-    = GL2.GL_PIXEL_UNPACK_BUFFER_BINDING_EXT;
-
-  public static final int GL_STENCIL_TAG_BITS_EXT
-    = GL2.GL_STENCIL_TAG_BITS_EXT;
-
-  public static final int GL_STENCIL_CLEAR_TAG_VALUE_EXT
-    = GL2.GL_STENCIL_CLEAR_TAG_VALUE_EXT;
-
-  public static final int GL_TIME_ELAPSED_EXT
-    = GL2.GL_TIME_ELAPSED_EXT;
-
-  public static final int GL_BUFFER_SERIALIZED_MODIFY
-    = GL2.GL_BUFFER_SERIALIZED_MODIFY;
-
-  public static final int GL_BUFFER_FLUSHING_UNMAP
-    = GL2.GL_BUFFER_FLUSHING_UNMAP;
-
-  public static final int GL_MIN_PROGRAM_TEXEL_OFFSET_NV
-    = GL2.GL_MIN_PROGRAM_TEXEL_OFFSET_NV;
-
-  public static final int GL_MAX_PROGRAM_TEXEL_OFFSET_NV
-    = GL2.GL_MAX_PROGRAM_TEXEL_OFFSET_NV;
-
-  public static final int GL_PROGRAM_ATTRIB_COMPONENTS_NV
-    = GL2.GL_PROGRAM_ATTRIB_COMPONENTS_NV;
-
-  public static final int GL_PROGRAM_RESULT_COMPONENTS_NV
-    = GL2.GL_PROGRAM_RESULT_COMPONENTS_NV;
-
-  public static final int GL_MAX_PROGRAM_ATTRIB_COMPONENTS_NV
-    = GL2.GL_MAX_PROGRAM_ATTRIB_COMPONENTS_NV;
-
-  public static final int GL_MAX_PROGRAM_RESULT_COMPONENTS_NV
-    = GL2.GL_MAX_PROGRAM_RESULT_COMPONENTS_NV;
-
-  public static final int GL_MAX_PROGRAM_GENERIC_ATTRIBS_NV
-    = GL2.GL_MAX_PROGRAM_GENERIC_ATTRIBS_NV;
-
-  public static final int GL_MAX_PROGRAM_GENERIC_RESULTS_NV
-    = GL2.GL_MAX_PROGRAM_GENERIC_RESULTS_NV;
-
-  public static final int GL_LINES_ADJACENCY_EXT
-    = GL2.GL_LINES_ADJACENCY_EXT;
-
-  public static final int GL_LINE_STRIP_ADJACENCY_EXT
-    = GL2.GL_LINE_STRIP_ADJACENCY_EXT;
-
-  public static final int GL_TRIANGLES_ADJACENCY_EXT
-    = GL2.GL_TRIANGLES_ADJACENCY_EXT;
-
-  public static final int GL_TRIANGLE_STRIP_ADJACENCY_EXT
-    = GL2.GL_TRIANGLE_STRIP_ADJACENCY_EXT;
-
-  public static final int GL_GEOMETRY_PROGRAM_NV
-    = GL2.GL_GEOMETRY_PROGRAM_NV;
-
-  public static final int GL_MAX_PROGRAM_OUTPUT_VERTICES_NV
-    = GL2.GL_MAX_PROGRAM_OUTPUT_VERTICES_NV;
-
-  public static final int GL_MAX_PROGRAM_TOTAL_OUTPUT_COMPONENTS_NV
-    = GL2.GL_MAX_PROGRAM_TOTAL_OUTPUT_COMPONENTS_NV;
-
-  public static final int GL_GEOMETRY_VERTICES_OUT_EXT
-    = GL2.GL_GEOMETRY_VERTICES_OUT_EXT;
-
-  public static final int GL_GEOMETRY_INPUT_TYPE_EXT
-    = GL2.GL_GEOMETRY_INPUT_TYPE_EXT;
-
-  public static final int GL_GEOMETRY_OUTPUT_TYPE_EXT
-    = GL2.GL_GEOMETRY_OUTPUT_TYPE_EXT;
-
-  public static final int GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS_EXT
-    = GL2.GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS_EXT;
-
-  public static final int GL_FRAMEBUFFER_ATTACHMENT_LAYERED_EXT
-    = GL2.GL_FRAMEBUFFER_ATTACHMENT_LAYERED_EXT;
-
-  public static final int GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS_EXT
-    = GL2.GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS_EXT;
-
-  public static final int GL_FRAMEBUFFER_INCOMPLETE_LAYER_COUNT_EXT
-    = GL2.GL_FRAMEBUFFER_INCOMPLETE_LAYER_COUNT_EXT;
-
-  public static final int GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER_EXT
-    = GL2.GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LAYER_EXT;
-
-  public static final int GL_PROGRAM_POINT_SIZE_EXT
-    = GL2.GL_PROGRAM_POINT_SIZE_EXT;
-
-  public static final int GL_VERTEX_ATTRIB_ARRAY_INTEGER_NV
-    = GL2.GL_VERTEX_ATTRIB_ARRAY_INTEGER_NV;
-
-  public static final int GL_COMPARE_REF_DEPTH_TO_TEXTURE
-    = GL2.GL_COMPARE_REF_DEPTH_TO_TEXTURE;
-
-  public static final int GL_COMPRESSED_LUMINANCE_LATC1_EXT
-    = GL2.GL_COMPRESSED_LUMINANCE_LATC1_EXT;
-
-  public static final int GL_COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT
-    = GL2.GL_COMPRESSED_SIGNED_LUMINANCE_LATC1_EXT;
-
-  public static final int GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT
-    = GL2.GL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT;
-
-  public static final int GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT
-    = GL2.GL_COMPRESSED_SIGNED_LUMINANCE_ALPHA_LATC2_EXT;
-
-  public static final int GL_RENDERBUFFER_COVERAGE_SAMPLES_NV
-    = GL2.GL_RENDERBUFFER_COVERAGE_SAMPLES_NV;
-
-  public static final int GL_RENDERBUFFER_COLOR_SAMPLES_NV
-    = GL2.GL_RENDERBUFFER_COLOR_SAMPLES_NV;
-
-  public static final int GL_MAX_MULTISAMPLE_COVERAGE_MODES_NV
-    = GL2.GL_MAX_MULTISAMPLE_COVERAGE_MODES_NV;
-
-  public static final int GL_MULTISAMPLE_COVERAGE_MODES_NV
-    = GL2.GL_MULTISAMPLE_COVERAGE_MODES_NV;
-
-  public static final int GL_MAX_PROGRAM_PARAMETER_BUFFER_BINDINGS_NV
-    = GL2.GL_MAX_PROGRAM_PARAMETER_BUFFER_BINDINGS_NV;
-
-  public static final int GL_MAX_PROGRAM_PARAMETER_BUFFER_SIZE_NV
-    = GL2.GL_MAX_PROGRAM_PARAMETER_BUFFER_SIZE_NV;
-
-  public static final int GL_VERTEX_PROGRAM_PARAMETER_BUFFER_NV
-    = GL2.GL_VERTEX_PROGRAM_PARAMETER_BUFFER_NV;
-
-  public static final int GL_GEOMETRY_PROGRAM_PARAMETER_BUFFER_NV
-    = GL2.GL_GEOMETRY_PROGRAM_PARAMETER_BUFFER_NV;
-
-  public static final int GL_FRAGMENT_PROGRAM_PARAMETER_BUFFER_NV
-    = GL2.GL_FRAGMENT_PROGRAM_PARAMETER_BUFFER_NV;
-
-  public static final int GL_MAX_VERTEX_BINDABLE_UNIFORMS_EXT
-    = GL2.GL_MAX_VERTEX_BINDABLE_UNIFORMS_EXT;
-
-  public static final int GL_MAX_FRAGMENT_BINDABLE_UNIFORMS_EXT
-    = GL2.GL_MAX_FRAGMENT_BINDABLE_UNIFORMS_EXT;
-
-  public static final int GL_MAX_GEOMETRY_BINDABLE_UNIFORMS_EXT
-    = GL2.GL_MAX_GEOMETRY_BINDABLE_UNIFORMS_EXT;
-
-  public static final int GL_MAX_BINDABLE_UNIFORM_SIZE_EXT
-    = GL2.GL_MAX_BINDABLE_UNIFORM_SIZE_EXT;
-
-  public static final int GL_UNIFORM_BUFFER_EXT
-    = GL2.GL_UNIFORM_BUFFER_EXT;
-
-  public static final int GL_UNIFORM_BUFFER_BINDING_EXT
-    = GL2.GL_UNIFORM_BUFFER_BINDING_EXT;
-
-  public static final int GL_ALPHA32UI
-    = GL2.GL_ALPHA32UI;
-
-  public static final int GL_INTENSITY32UI
-    = GL2.GL_INTENSITY32UI;
-
-  public static final int GL_LUMINANCE32UI
-    = GL2.GL_LUMINANCE32UI;
-
-  public static final int GL_LUMINANCE_ALPHA32UI
-    = GL2.GL_LUMINANCE_ALPHA32UI;
-
-  public static final int GL_ALPHA16UI
-    = GL2.GL_ALPHA16UI;
-
-  public static final int GL_INTENSITY16UI
-    = GL2.GL_INTENSITY16UI;
-
-  public static final int GL_LUMINANCE16UI
-    = GL2.GL_LUMINANCE16UI;
-
-  public static final int GL_LUMINANCE_ALPHA16UI
-    = GL2.GL_LUMINANCE_ALPHA16UI;
-
-  public static final int GL_ALPHA8UI
-    = GL2.GL_ALPHA8UI;
-
-  public static final int GL_INTENSITY8UI
-    = GL2.GL_INTENSITY8UI;
-
-  public static final int GL_LUMINANCE8UI
-    = GL2.GL_LUMINANCE8UI;
-
-  public static final int GL_LUMINANCE_ALPHA8UI
-    = GL2.GL_LUMINANCE_ALPHA8UI;
-
-  public static final int GL_ALPHA32I
-    = GL2.GL_ALPHA32I;
-
-  public static final int GL_INTENSITY32I
-    = GL2.GL_INTENSITY32I;
-
-  public static final int GL_LUMINANCE32I
-    = GL2.GL_LUMINANCE32I;
-
-  public static final int GL_LUMINANCE_ALPHA32I
-    = GL2.GL_LUMINANCE_ALPHA32I;
-
-  public static final int GL_ALPHA16I
-    = GL2.GL_ALPHA16I;
-
-  public static final int GL_INTENSITY16I
-    = GL2.GL_INTENSITY16I;
-
-  public static final int GL_LUMINANCE16I
-    = GL2.GL_LUMINANCE16I;
-
-  public static final int GL_LUMINANCE_ALPHA16I
-    = GL2.GL_LUMINANCE_ALPHA16I;
-
-  public static final int GL_ALPHA8I
-    = GL2.GL_ALPHA8I;
-
-  public static final int GL_INTENSITY8I
-    = GL2.GL_INTENSITY8I;
-
-  public static final int GL_LUMINANCE8I
-    = GL2.GL_LUMINANCE8I;
-
-  public static final int GL_LUMINANCE_ALPHA8I
-    = GL2.GL_LUMINANCE_ALPHA8I;
-
-  public static final int GL_LUMINANCE_INTEGER
-    = GL2.GL_LUMINANCE_INTEGER;
-
-  public static final int GL_LUMINANCE_ALPHA_INTEGER
-    = GL2.GL_LUMINANCE_ALPHA_INTEGER;
-
-  public static final int GL_RGBA_INTEGER_MODE
-    = GL2.GL_RGBA_INTEGER_MODE;
-
-  public static final int GL_PROGRAM_MATRIX_EXT
-    = GL2.GL_PROGRAM_MATRIX_EXT;
-
-  public static final int GL_TRANSPOSE_PROGRAM_MATRIX_EXT
-    = GL2.GL_TRANSPOSE_PROGRAM_MATRIX_EXT;
-
-  public static final int GL_PROGRAM_MATRIX_STACK_DEPTH_EXT
-    = GL2.GL_PROGRAM_MATRIX_STACK_DEPTH_EXT;
-
-  public static final int GL_TEXTURE_SWIZZLE_R_EXT
-    = GL2.GL_TEXTURE_SWIZZLE_R_EXT;
-
-  public static final int GL_TEXTURE_SWIZZLE_G_EXT
-    = GL2.GL_TEXTURE_SWIZZLE_G_EXT;
-
-  public static final int GL_TEXTURE_SWIZZLE_B_EXT
-    = GL2.GL_TEXTURE_SWIZZLE_B_EXT;
-
-  public static final int GL_TEXTURE_SWIZZLE_A_EXT
-    = GL2.GL_TEXTURE_SWIZZLE_A_EXT;
-
-  public static final int GL_TEXTURE_SWIZZLE_RGBA_EXT
-    = GL2.GL_TEXTURE_SWIZZLE_RGBA_EXT;
-
-  public static final int GL_SAMPLE_POSITION_NV
-    = GL2.GL_SAMPLE_POSITION_NV;
-
-  public static final int GL_SAMPLE_MASK_NV
-    = GL2.GL_SAMPLE_MASK_NV;
-
-  public static final int GL_SAMPLE_MASK_VALUE_NV
-    = GL2.GL_SAMPLE_MASK_VALUE_NV;
-
-  public static final int GL_TEXTURE_BINDING_RENDERBUFFER_NV
-    = GL2.GL_TEXTURE_BINDING_RENDERBUFFER_NV;
-
-  public static final int GL_TEXTURE_RENDERBUFFER_DATA_STORE_BINDING_NV
-    = GL2.GL_TEXTURE_RENDERBUFFER_DATA_STORE_BINDING_NV;
-
-  public static final int GL_TEXTURE_RENDERBUFFER_NV
-    = GL2.GL_TEXTURE_RENDERBUFFER_NV;
-
-  public static final int GL_SAMPLER_RENDERBUFFER_NV
-    = GL2.GL_SAMPLER_RENDERBUFFER_NV;
-
-  public static final int GL_INT_SAMPLER_RENDERBUFFER_NV
-    = GL2.GL_INT_SAMPLER_RENDERBUFFER_NV;
-
-  public static final int GL_UNSIGNED_INT_SAMPLER_RENDERBUFFER_NV
-    = GL2.GL_UNSIGNED_INT_SAMPLER_RENDERBUFFER_NV;
-
-  public static final int GL_MAX_SAMPLE_MASK_WORDS_NV
-    = GL2.GL_MAX_SAMPLE_MASK_WORDS_NV;
-
   public static final int GL_TRANSFORM_FEEDBACK_NV
     = GL2.GL_TRANSFORM_FEEDBACK_NV;
 
@@ -5920,197 +6587,38 @@ public class Gl {
   public static final int GL_TRANSFORM_FEEDBACK_BINDING_NV
     = GL2.GL_TRANSFORM_FEEDBACK_BINDING_NV;
 
-  public static final int GL_VBO_FREE_MEMORY_ATI
-    = GL2.GL_VBO_FREE_MEMORY_ATI;
+  public static final int GL_SURFACE_STATE_NV
+    = GL2.GL_SURFACE_STATE_NV;
 
-  public static final int GL_TEXTURE_FREE_MEMORY_ATI
-    = GL2.GL_TEXTURE_FREE_MEMORY_ATI;
+  public static final int GL_SURFACE_REGISTERED_NV
+    = GL2.GL_SURFACE_REGISTERED_NV;
 
-  public static final int GL_RENDERBUFFER_FREE_MEMORY_ATI
-    = GL2.GL_RENDERBUFFER_FREE_MEMORY_ATI;
+  public static final int GL_SURFACE_MAPPED_NV
+    = GL2.GL_SURFACE_MAPPED_NV;
 
-  public static final int GL_COUNTER_TYPE_AMD
-    = GL2.GL_COUNTER_TYPE_AMD;
+  public static final int GL_WRITE_DISCARD_NV
+    = GL2.GL_WRITE_DISCARD_NV;
 
-  public static final int GL_COUNTER_RANGE_AMD
-    = GL2.GL_COUNTER_RANGE_AMD;
+  public static final int GL_VERTEX_ARRAY_RANGE_NV
+    = GL2.GL_VERTEX_ARRAY_RANGE_NV;
 
-  public static final int GL_UNSIGNED_INT64_AMD
-    = GL2.GL_UNSIGNED_INT64_AMD;
+  public static final int GL_VERTEX_ARRAY_RANGE_LENGTH_NV
+    = GL2.GL_VERTEX_ARRAY_RANGE_LENGTH_NV;
 
-  public static final int GL_PERCENTAGE_AMD
-    = GL2.GL_PERCENTAGE_AMD;
+  public static final int GL_VERTEX_ARRAY_RANGE_VALID_NV
+    = GL2.GL_VERTEX_ARRAY_RANGE_VALID_NV;
 
-  public static final int GL_PERFMON_RESULT_AVAILABLE_AMD
-    = GL2.GL_PERFMON_RESULT_AVAILABLE_AMD;
+  public static final int GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_NV
+    = GL2.GL_MAX_VERTEX_ARRAY_RANGE_ELEMENT_NV;
 
-  public static final int GL_PERFMON_RESULT_SIZE_AMD
-    = GL2.GL_PERFMON_RESULT_SIZE_AMD;
+  public static final int GL_VERTEX_ARRAY_RANGE_POINTER_NV
+    = GL2.GL_VERTEX_ARRAY_RANGE_POINTER_NV;
 
-  public static final int GL_PERFMON_RESULT_AMD
-    = GL2.GL_PERFMON_RESULT_AMD;
+  public static final int GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV
+    = GL2.GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV;
 
-  public static final int GL_QUADS_FOLLOW_PROVOKING_VERTEX_CONVENTION_EXT
-    = GL2.GL_QUADS_FOLLOW_PROVOKING_VERTEX_CONVENTION_EXT;
-
-  public static final int GL_FIRST_VERTEX_CONVENTION_EXT
-    = GL2.GL_FIRST_VERTEX_CONVENTION_EXT;
-
-  public static final int GL_LAST_VERTEX_CONVENTION_EXT
-    = GL2.GL_LAST_VERTEX_CONVENTION_EXT;
-
-  public static final int GL_PROVOKING_VERTEX_EXT
-    = GL2.GL_PROVOKING_VERTEX_EXT;
-
-  public static final int GL_ALPHA_SNORM
-    = GL2.GL_ALPHA_SNORM;
-
-  public static final int GL_LUMINANCE_SNORM
-    = GL2.GL_LUMINANCE_SNORM;
-
-  public static final int GL_LUMINANCE_ALPHA_SNORM
-    = GL2.GL_LUMINANCE_ALPHA_SNORM;
-
-  public static final int GL_INTENSITY_SNORM
-    = GL2.GL_INTENSITY_SNORM;
-
-  public static final int GL_ALPHA8_SNORM
-    = GL2.GL_ALPHA8_SNORM;
-
-  public static final int GL_LUMINANCE8_SNORM
-    = GL2.GL_LUMINANCE8_SNORM;
-
-  public static final int GL_LUMINANCE8_ALPHA8_SNORM
-    = GL2.GL_LUMINANCE8_ALPHA8_SNORM;
-
-  public static final int GL_INTENSITY8_SNORM
-    = GL2.GL_INTENSITY8_SNORM;
-
-  public static final int GL_ALPHA16_SNORM
-    = GL2.GL_ALPHA16_SNORM;
-
-  public static final int GL_LUMINANCE16_SNORM
-    = GL2.GL_LUMINANCE16_SNORM;
-
-  public static final int GL_LUMINANCE16_ALPHA16_SNORM
-    = GL2.GL_LUMINANCE16_ALPHA16_SNORM;
-
-  public static final int GL_INTENSITY16_SNORM
-    = GL2.GL_INTENSITY16_SNORM;
-
-  public static final int GL_TEXTURE_RANGE_LENGTH_APPLE
-    = GL2.GL_TEXTURE_RANGE_LENGTH_APPLE;
-
-  public static final int GL_TEXTURE_RANGE_POINTER_APPLE
-    = GL2.GL_TEXTURE_RANGE_POINTER_APPLE;
-
-  public static final int GL_TEXTURE_STORAGE_HINT_APPLE
-    = GL2.GL_TEXTURE_STORAGE_HINT_APPLE;
-
-  public static final int GL_STORAGE_PRIVATE_APPLE
-    = GL2.GL_STORAGE_PRIVATE_APPLE;
-
-  public static final int GL_HALF_APPLE
-    = GL2.GL_HALF_APPLE;
-
-  public static final int GL_RGBA_FLOAT32_APPLE
-    = GL2.GL_RGBA_FLOAT32_APPLE;
-
-  public static final int GL_RGB_FLOAT32_APPLE
-    = GL2.GL_RGB_FLOAT32_APPLE;
-
-  public static final int GL_ALPHA_FLOAT32_APPLE
-    = GL2.GL_ALPHA_FLOAT32_APPLE;
-
-  public static final int GL_INTENSITY_FLOAT32_APPLE
-    = GL2.GL_INTENSITY_FLOAT32_APPLE;
-
-  public static final int GL_LUMINANCE_FLOAT32_APPLE
-    = GL2.GL_LUMINANCE_FLOAT32_APPLE;
-
-  public static final int GL_LUMINANCE_ALPHA_FLOAT32_APPLE
-    = GL2.GL_LUMINANCE_ALPHA_FLOAT32_APPLE;
-
-  public static final int GL_RGBA_FLOAT16_APPLE
-    = GL2.GL_RGBA_FLOAT16_APPLE;
-
-  public static final int GL_RGB_FLOAT16_APPLE
-    = GL2.GL_RGB_FLOAT16_APPLE;
-
-  public static final int GL_ALPHA_FLOAT16_APPLE
-    = GL2.GL_ALPHA_FLOAT16_APPLE;
-
-  public static final int GL_INTENSITY_FLOAT16_APPLE
-    = GL2.GL_INTENSITY_FLOAT16_APPLE;
-
-  public static final int GL_LUMINANCE_FLOAT16_APPLE
-    = GL2.GL_LUMINANCE_FLOAT16_APPLE;
-
-  public static final int GL_LUMINANCE_ALPHA_FLOAT16_APPLE
-    = GL2.GL_LUMINANCE_ALPHA_FLOAT16_APPLE;
-
-  public static final int GL_COLOR_FLOAT_APPLE
-    = GL2.GL_COLOR_FLOAT_APPLE;
-
-  public static final int GL_VERTEX_ATTRIB_MAP1_APPLE
-    = GL2.GL_VERTEX_ATTRIB_MAP1_APPLE;
-
-  public static final int GL_VERTEX_ATTRIB_MAP2_APPLE
-    = GL2.GL_VERTEX_ATTRIB_MAP2_APPLE;
-
-  public static final int GL_VERTEX_ATTRIB_MAP1_SIZE_APPLE
-    = GL2.GL_VERTEX_ATTRIB_MAP1_SIZE_APPLE;
-
-  public static final int GL_VERTEX_ATTRIB_MAP1_COEFF_APPLE
-    = GL2.GL_VERTEX_ATTRIB_MAP1_COEFF_APPLE;
-
-  public static final int GL_VERTEX_ATTRIB_MAP1_ORDER_APPLE
-    = GL2.GL_VERTEX_ATTRIB_MAP1_ORDER_APPLE;
-
-  public static final int GL_VERTEX_ATTRIB_MAP1_DOMAIN_APPLE
-    = GL2.GL_VERTEX_ATTRIB_MAP1_DOMAIN_APPLE;
-
-  public static final int GL_VERTEX_ATTRIB_MAP2_SIZE_APPLE
-    = GL2.GL_VERTEX_ATTRIB_MAP2_SIZE_APPLE;
-
-  public static final int GL_VERTEX_ATTRIB_MAP2_COEFF_APPLE
-    = GL2.GL_VERTEX_ATTRIB_MAP2_COEFF_APPLE;
-
-  public static final int GL_VERTEX_ATTRIB_MAP2_ORDER_APPLE
-    = GL2.GL_VERTEX_ATTRIB_MAP2_ORDER_APPLE;
-
-  public static final int GL_VERTEX_ATTRIB_MAP2_DOMAIN_APPLE
-    = GL2.GL_VERTEX_ATTRIB_MAP2_DOMAIN_APPLE;
-
-  public static final int GL_AUX_DEPTH_STENCIL_APPLE
-    = GL2.GL_AUX_DEPTH_STENCIL_APPLE;
-
-  public static final int GL_BUFFER_OBJECT_APPLE
-    = GL2.GL_BUFFER_OBJECT_APPLE;
-
-  public static final int GL_RELEASED_APPLE
-    = GL2.GL_RELEASED_APPLE;
-
-  public static final int GL_VOLATILE_APPLE
-    = GL2.GL_VOLATILE_APPLE;
-
-  public static final int GL_RETAINED_APPLE
-    = GL2.GL_RETAINED_APPLE;
-
-  public static final int GL_UNDEFINED_APPLE
-    = GL2.GL_UNDEFINED_APPLE;
-
-  public static final int GL_PURGEABLE_APPLE
-    = GL2.GL_PURGEABLE_APPLE;
-
-  public static final int GL_PACK_ROW_BYTES_APPLE
-    = GL2.GL_PACK_ROW_BYTES_APPLE;
-
-  public static final int GL_UNPACK_ROW_BYTES_APPLE
-    = GL2.GL_UNPACK_ROW_BYTES_APPLE;
-
-  public static final int GL_RGB_422_APPLE
-    = GL2.GL_RGB_422_APPLE;
+  public static final int GL_VERTEX_ATTRIB_ARRAY_INTEGER_NV
+    = GL2.GL_VERTEX_ATTRIB_ARRAY_INTEGER_NV;
 
   public static final int GL_VIDEO_BUFFER_NV
     = GL2.GL_VIDEO_BUFFER_NV;
@@ -6199,89 +6707,188 @@ public class Gl {
   public static final int GL_VIDEO_CAPTURE_SURFACE_ORIGIN_NV
     = GL2.GL_VIDEO_CAPTURE_SURFACE_ORIGIN_NV;
 
-  public static final int GL_MAX_GEOMETRY_PROGRAM_INVOCATIONS_NV
-    = GL2.GL_MAX_GEOMETRY_PROGRAM_INVOCATIONS_NV;
+  public static final int GL_INTERLACE_OML
+    = GL2.GL_INTERLACE_OML;
 
-  public static final int GL_MIN_FRAGMENT_INTERPOLATION_OFFSET_NV
-    = GL2.GL_MIN_FRAGMENT_INTERPOLATION_OFFSET_NV;
+  public static final int GL_INTERLACE_READ_OML
+    = GL2.GL_INTERLACE_READ_OML;
 
-  public static final int GL_MAX_FRAGMENT_INTERPOLATION_OFFSET_NV
-    = GL2.GL_MAX_FRAGMENT_INTERPOLATION_OFFSET_NV;
+  public static final int GL_PACK_RESAMPLE_OML
+    = GL2.GL_PACK_RESAMPLE_OML;
 
-  public static final int GL_FRAGMENT_PROGRAM_INTERPOLATION_OFFSET_BITS_NV
-    = GL2.GL_FRAGMENT_PROGRAM_INTERPOLATION_OFFSET_BITS_NV;
+  public static final int GL_UNPACK_RESAMPLE_OML
+    = GL2.GL_UNPACK_RESAMPLE_OML;
 
-  public static final int GL_MIN_PROGRAM_TEXTURE_GATHER_OFFSET_NV
-    = GL2.GL_MIN_PROGRAM_TEXTURE_GATHER_OFFSET_NV;
+  public static final int GL_RESAMPLE_REPLICATE_OML
+    = GL2.GL_RESAMPLE_REPLICATE_OML;
 
-  public static final int GL_MAX_PROGRAM_TEXTURE_GATHER_OFFSET_NV
-    = GL2.GL_MAX_PROGRAM_TEXTURE_GATHER_OFFSET_NV;
+  public static final int GL_RESAMPLE_ZERO_FILL_OML
+    = GL2.GL_RESAMPLE_ZERO_FILL_OML;
 
-  public static final int GL_MAX_PROGRAM_SUBROUTINE_PARAMETERS_NV
-    = GL2.GL_MAX_PROGRAM_SUBROUTINE_PARAMETERS_NV;
+  public static final int GL_RESAMPLE_AVERAGE_OML
+    = GL2.GL_RESAMPLE_AVERAGE_OML;
 
-  public static final int GL_MAX_PROGRAM_SUBROUTINE_NUM_NV
-    = GL2.GL_MAX_PROGRAM_SUBROUTINE_NUM_NV;
+  public static final int GL_RESAMPLE_DECIMATE_OML
+    = GL2.GL_RESAMPLE_DECIMATE_OML;
 
-  public static final int GL_SHADER_GLOBAL_ACCESS_BARRIER_BIT_NV
-    = GL2.GL_SHADER_GLOBAL_ACCESS_BARRIER_BIT_NV;
+  public static final int GL_FORMAT_SUBSAMPLE_24_24_OML
+    = GL2.GL_FORMAT_SUBSAMPLE_24_24_OML;
 
-  public static final int GL_MAX_PROGRAM_PATCH_ATTRIBS_NV
-    = GL2.GL_MAX_PROGRAM_PATCH_ATTRIBS_NV;
+  public static final int GL_FORMAT_SUBSAMPLE_244_244_OML
+    = GL2.GL_FORMAT_SUBSAMPLE_244_244_OML;
 
-  public static final int GL_TESS_CONTROL_PROGRAM_NV
-    = GL2.GL_TESS_CONTROL_PROGRAM_NV;
+  public static final int GL_PREFER_DOUBLEBUFFER_HINT_PGI
+    = GL2.GL_PREFER_DOUBLEBUFFER_HINT_PGI;
 
-  public static final int GL_TESS_EVALUATION_PROGRAM_NV
-    = GL2.GL_TESS_EVALUATION_PROGRAM_NV;
+  public static final int GL_CONSERVE_MEMORY_HINT_PGI
+    = GL2.GL_CONSERVE_MEMORY_HINT_PGI;
 
-  public static final int GL_TESS_CONTROL_PROGRAM_PARAMETER_BUFFER_NV
-    = GL2.GL_TESS_CONTROL_PROGRAM_PARAMETER_BUFFER_NV;
+  public static final int GL_RECLAIM_MEMORY_HINT_PGI
+    = GL2.GL_RECLAIM_MEMORY_HINT_PGI;
 
-  public static final int GL_TESS_EVALUATION_PROGRAM_PARAMETER_BUFFER_NV
-    = GL2.GL_TESS_EVALUATION_PROGRAM_PARAMETER_BUFFER_NV;
+  public static final int GL_NATIVE_GRAPHICS_HANDLE_PGI
+    = GL2.GL_NATIVE_GRAPHICS_HANDLE_PGI;
 
-  public static final int GL_COVERAGE_SAMPLES_NV
-    = GL2.GL_COVERAGE_SAMPLES_NV;
+  public static final int GL_NATIVE_GRAPHICS_BEGIN_HINT_PGI
+    = GL2.GL_NATIVE_GRAPHICS_BEGIN_HINT_PGI;
 
-  public static final int GL_COLOR_SAMPLES_NV
-    = GL2.GL_COLOR_SAMPLES_NV;
+  public static final int GL_NATIVE_GRAPHICS_END_HINT_PGI
+    = GL2.GL_NATIVE_GRAPHICS_END_HINT_PGI;
 
-  public static final int GL_DATA_BUFFER_AMD
-    = GL2.GL_DATA_BUFFER_AMD;
+  public static final int GL_ALWAYS_FAST_HINT_PGI
+    = GL2.GL_ALWAYS_FAST_HINT_PGI;
 
-  public static final int GL_PERFORMANCE_MONITOR_AMD
-    = GL2.GL_PERFORMANCE_MONITOR_AMD;
+  public static final int GL_ALWAYS_SOFT_HINT_PGI
+    = GL2.GL_ALWAYS_SOFT_HINT_PGI;
 
-  public static final int GL_QUERY_OBJECT_AMD
-    = GL2.GL_QUERY_OBJECT_AMD;
+  public static final int GL_ALLOW_DRAW_OBJ_HINT_PGI
+    = GL2.GL_ALLOW_DRAW_OBJ_HINT_PGI;
 
-  public static final int GL_VERTEX_ARRAY_OBJECT_AMD
-    = GL2.GL_VERTEX_ARRAY_OBJECT_AMD;
+  public static final int GL_ALLOW_DRAW_WIN_HINT_PGI
+    = GL2.GL_ALLOW_DRAW_WIN_HINT_PGI;
 
-  public static final int GL_SAMPLER_OBJECT_AMD
-    = GL2.GL_SAMPLER_OBJECT_AMD;
+  public static final int GL_ALLOW_DRAW_FRG_HINT_PGI
+    = GL2.GL_ALLOW_DRAW_FRG_HINT_PGI;
 
-  public static final int GL_SURFACE_STATE_NV
-    = GL2.GL_SURFACE_STATE_NV;
+  public static final int GL_ALLOW_DRAW_MEM_HINT_PGI
+    = GL2.GL_ALLOW_DRAW_MEM_HINT_PGI;
 
-  public static final int GL_SURFACE_REGISTERED_NV
-    = GL2.GL_SURFACE_REGISTERED_NV;
+  public static final int GL_STRICT_DEPTHFUNC_HINT_PGI
+    = GL2.GL_STRICT_DEPTHFUNC_HINT_PGI;
 
-  public static final int GL_SURFACE_MAPPED_NV
-    = GL2.GL_SURFACE_MAPPED_NV;
+  public static final int GL_STRICT_LIGHTING_HINT_PGI
+    = GL2.GL_STRICT_LIGHTING_HINT_PGI;
 
-  public static final int GL_WRITE_DISCARD_NV
-    = GL2.GL_WRITE_DISCARD_NV;
+  public static final int GL_STRICT_SCISSOR_HINT_PGI
+    = GL2.GL_STRICT_SCISSOR_HINT_PGI;
 
-  public static final int GL_CG_VERTEX_SHADER_EXT
-    = GL2.GL_CG_VERTEX_SHADER_EXT;
+  public static final int GL_FULL_STIPPLE_HINT_PGI
+    = GL2.GL_FULL_STIPPLE_HINT_PGI;
 
-  public static final int GL_CG_FRAGMENT_SHADER_EXT
-    = GL2.GL_CG_FRAGMENT_SHADER_EXT;
+  public static final int GL_CLIP_NEAR_HINT_PGI
+    = GL2.GL_CLIP_NEAR_HINT_PGI;
 
-  public static final int GL_MIN_PBUFFER_VIEWPORT_DIMS_APPLE
-    = GL2.GL_MIN_PBUFFER_VIEWPORT_DIMS_APPLE;
+  public static final int GL_CLIP_FAR_HINT_PGI
+    = GL2.GL_CLIP_FAR_HINT_PGI;
+
+  public static final int GL_WIDE_LINE_HINT_PGI
+    = GL2.GL_WIDE_LINE_HINT_PGI;
+
+  public static final int GL_BACK_NORMALS_HINT_PGI
+    = GL2.GL_BACK_NORMALS_HINT_PGI;
+
+  public static final int GL_VERTEX_DATA_HINT_PGI
+    = GL2.GL_VERTEX_DATA_HINT_PGI;
+
+  public static final int GL_VERTEX_CONSISTENT_HINT_PGI
+    = GL2.GL_VERTEX_CONSISTENT_HINT_PGI;
+
+  public static final int GL_MATERIAL_SIDE_HINT_PGI
+    = GL2.GL_MATERIAL_SIDE_HINT_PGI;
+
+  public static final int GL_MAX_VERTEX_HINT_PGI
+    = GL2.GL_MAX_VERTEX_HINT_PGI;
+
+  public static final int GL_COLOR3_BIT_PGI
+    = GL2.GL_COLOR3_BIT_PGI;
+
+  public static final int GL_COLOR4_BIT_PGI
+    = GL2.GL_COLOR4_BIT_PGI;
+
+  public static final int GL_EDGEFLAG_BIT_PGI
+    = GL2.GL_EDGEFLAG_BIT_PGI;
+
+  public static final int GL_INDEX_BIT_PGI
+    = GL2.GL_INDEX_BIT_PGI;
+
+  public static final int GL_MAT_AMBIENT_BIT_PGI
+    = GL2.GL_MAT_AMBIENT_BIT_PGI;
+
+  public static final int GL_MAT_AMBIENT_AND_DIFFUSE_BIT_PGI
+    = GL2.GL_MAT_AMBIENT_AND_DIFFUSE_BIT_PGI;
+
+  public static final int GL_MAT_DIFFUSE_BIT_PGI
+    = GL2.GL_MAT_DIFFUSE_BIT_PGI;
+
+  public static final int GL_MAT_EMISSION_BIT_PGI
+    = GL2.GL_MAT_EMISSION_BIT_PGI;
+
+  public static final int GL_MAT_COLOR_INDEXES_BIT_PGI
+    = GL2.GL_MAT_COLOR_INDEXES_BIT_PGI;
+
+  public static final int GL_MAT_SHININESS_BIT_PGI
+    = GL2.GL_MAT_SHININESS_BIT_PGI;
+
+  public static final int GL_MAT_SPECULAR_BIT_PGI
+    = GL2.GL_MAT_SPECULAR_BIT_PGI;
+
+  public static final int GL_NORMAL_BIT_PGI
+    = GL2.GL_NORMAL_BIT_PGI;
+
+  public static final int GL_TEXCOORD1_BIT_PGI
+    = GL2.GL_TEXCOORD1_BIT_PGI;
+
+  public static final int GL_TEXCOORD2_BIT_PGI
+    = GL2.GL_TEXCOORD2_BIT_PGI;
+
+  public static final int GL_TEXCOORD3_BIT_PGI
+    = GL2.GL_TEXCOORD3_BIT_PGI;
+
+  public static final int GL_VERTEX23_BIT_PGI
+    = GL2.GL_VERTEX23_BIT_PGI;
+
+  public static final int GL_VERTEX4_BIT_PGI
+    = GL2.GL_VERTEX4_BIT_PGI;
+
+  public static final int GL_SCREEN_COORDINATES_REND
+    = GL2.GL_SCREEN_COORDINATES_REND;
+
+  public static final int GL_INVERTED_SCREEN_W_REND
+    = GL2.GL_INVERTED_SCREEN_W_REND;
+
+  public static final int GL_RGB_S3TC
+    = GL2.GL_RGB_S3TC;
+
+  public static final int GL_RGB4_S3TC
+    = GL2.GL_RGB4_S3TC;
+
+  public static final int GL_RGBA_S3TC
+    = GL2.GL_RGBA_S3TC;
+
+  public static final int GL_RGBA4_S3TC
+    = GL2.GL_RGBA4_S3TC;
+
+  public static final int GL_RGBA_DXT5_S3TC
+    = GL2.GL_RGBA_DXT5_S3TC;
+
+  public static final int GL_RGBA4_DXT5_S3TC
+    = GL2.GL_RGBA4_DXT5_S3TC;
+
+  public static final int GL_UNPACK_CONSTANT_DATA_SUNX
+    = GL2.GL_UNPACK_CONSTANT_DATA_SUNX;
+
+  public static final int GL_TEXTURE_CONSTANT_DATA_SUNX
+    = GL2.GL_TEXTURE_CONSTANT_DATA_SUNX;
 
   public static void glAccum(
     int op,
@@ -6347,6 +6954,12 @@ public class Gl {
       mode);
   }
 
+  public static void glBeginConditionalRenderNVX(
+    int id) {
+    gl().glBeginConditionalRenderNVX(
+      id);
+  }
+
   public static void glBeginOcclusionQueryNV(
     int id) {
     gl().glBeginOcclusionQueryNV(
@@ -6368,18 +6981,6 @@ public class Gl {
     int video_capture_slot) {
     gl().glBeginVideoCaptureNV(
       video_capture_slot);
-  }
-
-  public static void glBindBufferOffset(
-    int target,
-    int index,
-    int buffer,
-    long offset) {
-    gl().glBindBufferOffset(
-      target,
-      index,
-      buffer,
-      offset);
   }
 
   public static int glBindLightParameterEXT(
@@ -6685,6 +7286,24 @@ public class Gl {
     double[] equation,
     int equation_offset) {
     gl().glClipPlane(
+      plane,
+      equation,
+      equation_offset);
+  }
+
+  public static void glClipPlanef(
+    int plane,
+    FloatBuffer equation) {
+    gl().glClipPlanef(
+      plane,
+      equation);
+  }
+
+  public static void glClipPlanef(
+    int plane,
+    float[] equation,
+    int equation_offset) {
+    gl().glClipPlanef(
       plane,
       equation,
       equation_offset);
@@ -7858,6 +8477,14 @@ public class Gl {
       height);
   }
 
+  public static void glCopyPathNV(
+    int resultPath,
+    int srcPath) {
+    gl().glCopyPathNV(
+      resultPath,
+      srcPath);
+  }
+
   public static void glCopyPixels(
     int x,
     int y,
@@ -7978,6 +8605,98 @@ public class Gl {
       height);
   }
 
+  public static void glCoverFillPathInstancedNV(
+    int numPaths,
+    int pathNameType,
+    Buffer paths,
+    int pathBase,
+    int coverMode,
+    int transformType,
+    FloatBuffer transformValues) {
+    gl().glCoverFillPathInstancedNV(
+      numPaths,
+      pathNameType,
+      paths,
+      pathBase,
+      coverMode,
+      transformType,
+      transformValues);
+  }
+
+  public static void glCoverFillPathInstancedNV(
+    int numPaths,
+    int pathNameType,
+    Buffer paths,
+    int pathBase,
+    int coverMode,
+    int transformType,
+    float[] transformValues,
+    int transformValues_offset) {
+    gl().glCoverFillPathInstancedNV(
+      numPaths,
+      pathNameType,
+      paths,
+      pathBase,
+      coverMode,
+      transformType,
+      transformValues,
+      transformValues_offset);
+  }
+
+  public static void glCoverFillPathNV(
+    int path,
+    int coverMode) {
+    gl().glCoverFillPathNV(
+      path,
+      coverMode);
+  }
+
+  public static void glCoverStrokePathInstancedNV(
+    int numPaths,
+    int pathNameType,
+    Buffer paths,
+    int pathBase,
+    int coverMode,
+    int transformType,
+    FloatBuffer transformValues) {
+    gl().glCoverStrokePathInstancedNV(
+      numPaths,
+      pathNameType,
+      paths,
+      pathBase,
+      coverMode,
+      transformType,
+      transformValues);
+  }
+
+  public static void glCoverStrokePathInstancedNV(
+    int numPaths,
+    int pathNameType,
+    Buffer paths,
+    int pathBase,
+    int coverMode,
+    int transformType,
+    float[] transformValues,
+    int transformValues_offset) {
+    gl().glCoverStrokePathInstancedNV(
+      numPaths,
+      pathNameType,
+      paths,
+      pathBase,
+      coverMode,
+      transformType,
+      transformValues,
+      transformValues_offset);
+  }
+
+  public static void glCoverStrokePathNV(
+    int path,
+    int coverMode) {
+    gl().glCoverStrokePathNV(
+      path,
+      coverMode);
+  }
+
   public static int glCreateProgramObjectARB(
     ) {
     return gl().glCreateProgramObjectARB();
@@ -8023,6 +8742,12 @@ public class Gl {
       pname,
       params,
       params_offset);
+  }
+
+  public static void glCurrentPaletteMatrix(
+    int index) {
+    gl().glCurrentPaletteMatrix(
+      index);
   }
 
   public static void glDeleteFencesAPPLE(
@@ -8115,6 +8840,14 @@ public class Gl {
       ids_offset);
   }
 
+  public static void glDeletePathsNV(
+    int path,
+    int range) {
+    gl().glDeletePathsNV(
+      path,
+      range);
+  }
+
   public static void glDeletePerfMonitorsAMD(
     int n,
     IntBuffer monitors) {
@@ -8199,6 +8932,14 @@ public class Gl {
       index);
   }
 
+  public static void glDisableClientStateiEXT(
+    int array,
+    int index) {
+    gl().glDisableClientStateiEXT(
+      array,
+      index);
+  }
+
   public static void glDisableIndexed(
     int target,
     int index) {
@@ -8211,6 +8952,22 @@ public class Gl {
     int id) {
     gl().glDisableVariantClientStateEXT(
       id);
+  }
+
+  public static void glDisableVertexArrayAttribEXT(
+    int vaobj,
+    int index) {
+    gl().glDisableVertexArrayAttribEXT(
+      vaobj,
+      index);
+  }
+
+  public static void glDisableVertexArrayEXT(
+    int vaobj,
+    int array) {
+    gl().glDisableVertexArrayEXT(
+      vaobj,
+      array);
   }
 
   public static void glDisableVertexAttribAPPLE(
@@ -8273,6 +9030,32 @@ public class Gl {
       pixels_buffer_offset);
   }
 
+  public static void glDrawTextureNV(
+    int texture,
+    int sampler,
+    float x0,
+    float y0,
+    float x1,
+    float y1,
+    float z,
+    float s0,
+    float t0,
+    float s1,
+    float t1) {
+    gl().glDrawTextureNV(
+      texture,
+      sampler,
+      x0,
+      y0,
+      x1,
+      y1,
+      z,
+      s0,
+      t0,
+      s1,
+      t1);
+  }
+
   public static void glDrawTransformFeedbackNV(
     int mode,
     int id) {
@@ -8325,6 +9108,14 @@ public class Gl {
       index);
   }
 
+  public static void glEnableClientStateiEXT(
+    int array,
+    int index) {
+    gl().glEnableClientStateiEXT(
+      array,
+      index);
+  }
+
   public static void glEnableIndexed(
     int target,
     int index) {
@@ -8337,6 +9128,22 @@ public class Gl {
     int id) {
     gl().glEnableVariantClientStateEXT(
       id);
+  }
+
+  public static void glEnableVertexArrayAttribEXT(
+    int vaobj,
+    int index) {
+    gl().glEnableVertexArrayAttribEXT(
+      vaobj,
+      index);
+  }
+
+  public static void glEnableVertexArrayEXT(
+    int vaobj,
+    int array) {
+    gl().glEnableVertexArrayEXT(
+      vaobj,
+      array);
   }
 
   public static void glEnableVertexAttribAPPLE(
@@ -8356,6 +9163,11 @@ public class Gl {
   public static void glEnd(
     ) {
     gl().glEnd();
+  }
+
+  public static void glEndConditionalRenderNVX(
+    ) {
+    gl().glEndConditionalRenderNVX();
   }
 
   public static void glEndList(
@@ -8535,20 +9347,6 @@ public class Gl {
       buffer);
   }
 
-/*
-  public static void glFeedbackBuffer(
-    int size,
-    int type,
-    float[] buffer,
-    int buffer_offset) {
-    gl().glFeedbackBuffer(
-      size,
-      type,
-      buffer,
-      buffer_offset);
-  }
-*/
-
   public static void glFinishFenceAPPLE(
     int fence) {
     gl().glFinishFenceAPPLE(
@@ -8567,11 +9365,6 @@ public class Gl {
     gl().glFinishObjectAPPLE(
       object,
       name);
-  }
-
-  public static void glFinishRenderAPPLE(
-    ) {
-    gl().glFinishRenderAPPLE();
   }
 
   public static void glFinishTextureSUNX(
@@ -8593,11 +9386,6 @@ public class Gl {
     int target) {
     gl().glFlushPixelDataRangeNV(
       target);
-  }
-
-  public static void glFlushRenderAPPLE(
-    ) {
-    gl().glFlushRenderAPPLE();
   }
 
   public static void glFlushVertexArrayRangeAPPLE(
@@ -8884,6 +9672,12 @@ public class Gl {
       ids_offset);
   }
 
+  public static int glGenPathsNV(
+    int range) {
+    return gl().glGenPathsNV(
+      range);
+  }
+
   public static void glGenPerfMonitorsAMD(
     int n,
     IntBuffer monitors) {
@@ -9084,6 +9878,24 @@ public class Gl {
       equation_offset);
   }
 
+  public static void glGetClipPlanef(
+    int plane,
+    FloatBuffer equation) {
+    gl().glGetClipPlanef(
+      plane,
+      equation);
+  }
+
+  public static void glGetClipPlanef(
+    int plane,
+    float[] equation,
+    int equation_offset) {
+    gl().glGetClipPlanef(
+      plane,
+      equation,
+      equation_offset);
+  }
+
   public static void glGetColorTable(
     int target,
     int format,
@@ -9266,6 +10078,28 @@ public class Gl {
       data_offset);
   }
 
+  public static void glGetDoublei_vEXT(
+    int pname,
+    int index,
+    DoubleBuffer params) {
+    gl().glGetDoublei_vEXT(
+      pname,
+      index,
+      params);
+  }
+
+  public static void glGetDoublei_vEXT(
+    int pname,
+    int index,
+    double[] params,
+    int params_offset) {
+    gl().glGetDoublei_vEXT(
+      pname,
+      index,
+      params,
+      params_offset);
+  }
+
   public static void glGetFenceivNV(
     int fence,
     int pname,
@@ -9308,6 +10142,28 @@ public class Gl {
       index,
       data,
       data_offset);
+  }
+
+  public static void glGetFloati_vEXT(
+    int pname,
+    int index,
+    FloatBuffer params) {
+    gl().glGetFloati_vEXT(
+      pname,
+      index,
+      params);
+  }
+
+  public static void glGetFloati_vEXT(
+    int pname,
+    int index,
+    float[] params,
+    int params_offset) {
+    gl().glGetFloati_vEXT(
+      pname,
+      index,
+      params,
+      params_offset);
   }
 
   public static void glGetFramebufferParameterivEXT(
@@ -9408,6 +10264,20 @@ public class Gl {
       pname,
       params,
       params_offset);
+  }
+
+  public static long glGetImageHandleNV(
+    int texture,
+    int level,
+    boolean layered,
+    int layer,
+    int format) {
+    return gl().glGetImageHandleNV(
+      texture,
+      level,
+      layered,
+      layer,
+      format);
   }
 
   public static void glGetInfoLogARB(
@@ -10558,6 +11428,316 @@ public class Gl {
       params_offset);
   }
 
+  public static void glGetPathColorGenfvNV(
+    int color,
+    int pname,
+    FloatBuffer value) {
+    gl().glGetPathColorGenfvNV(
+      color,
+      pname,
+      value);
+  }
+
+  public static void glGetPathColorGenfvNV(
+    int color,
+    int pname,
+    float[] value,
+    int value_offset) {
+    gl().glGetPathColorGenfvNV(
+      color,
+      pname,
+      value,
+      value_offset);
+  }
+
+  public static void glGetPathColorGenivNV(
+    int color,
+    int pname,
+    IntBuffer value) {
+    gl().glGetPathColorGenivNV(
+      color,
+      pname,
+      value);
+  }
+
+  public static void glGetPathColorGenivNV(
+    int color,
+    int pname,
+    int[] value,
+    int value_offset) {
+    gl().glGetPathColorGenivNV(
+      color,
+      pname,
+      value,
+      value_offset);
+  }
+
+  public static void glGetPathCommandsNV(
+    int path,
+    ByteBuffer commands) {
+    gl().glGetPathCommandsNV(
+      path,
+      commands);
+  }
+
+  public static void glGetPathCommandsNV(
+    int path,
+    byte[] commands,
+    int commands_offset) {
+    gl().glGetPathCommandsNV(
+      path,
+      commands,
+      commands_offset);
+  }
+
+  public static void glGetPathCoordsNV(
+    int path,
+    FloatBuffer coords) {
+    gl().glGetPathCoordsNV(
+      path,
+      coords);
+  }
+
+  public static void glGetPathCoordsNV(
+    int path,
+    float[] coords,
+    int coords_offset) {
+    gl().glGetPathCoordsNV(
+      path,
+      coords,
+      coords_offset);
+  }
+
+  public static void glGetPathDashArrayNV(
+    int path,
+    FloatBuffer dashArray) {
+    gl().glGetPathDashArrayNV(
+      path,
+      dashArray);
+  }
+
+  public static void glGetPathDashArrayNV(
+    int path,
+    float[] dashArray,
+    int dashArray_offset) {
+    gl().glGetPathDashArrayNV(
+      path,
+      dashArray,
+      dashArray_offset);
+  }
+
+  public static float glGetPathLengthNV(
+    int path,
+    int startSegment,
+    int numSegments) {
+    return gl().glGetPathLengthNV(
+      path,
+      startSegment,
+      numSegments);
+  }
+
+  public static void glGetPathMetricRangeNV(
+    int metricQueryMask,
+    int firstPathName,
+    int numPaths,
+    int stride,
+    FloatBuffer metrics) {
+    gl().glGetPathMetricRangeNV(
+      metricQueryMask,
+      firstPathName,
+      numPaths,
+      stride,
+      metrics);
+  }
+
+  public static void glGetPathMetricRangeNV(
+    int metricQueryMask,
+    int firstPathName,
+    int numPaths,
+    int stride,
+    float[] metrics,
+    int metrics_offset) {
+    gl().glGetPathMetricRangeNV(
+      metricQueryMask,
+      firstPathName,
+      numPaths,
+      stride,
+      metrics,
+      metrics_offset);
+  }
+
+  public static void glGetPathMetricsNV(
+    int metricQueryMask,
+    int numPaths,
+    int pathNameType,
+    Buffer paths,
+    int pathBase,
+    int stride,
+    FloatBuffer metrics) {
+    gl().glGetPathMetricsNV(
+      metricQueryMask,
+      numPaths,
+      pathNameType,
+      paths,
+      pathBase,
+      stride,
+      metrics);
+  }
+
+  public static void glGetPathMetricsNV(
+    int metricQueryMask,
+    int numPaths,
+    int pathNameType,
+    Buffer paths,
+    int pathBase,
+    int stride,
+    float[] metrics,
+    int metrics_offset) {
+    gl().glGetPathMetricsNV(
+      metricQueryMask,
+      numPaths,
+      pathNameType,
+      paths,
+      pathBase,
+      stride,
+      metrics,
+      metrics_offset);
+  }
+
+  public static void glGetPathParameterfvNV(
+    int path,
+    int pname,
+    FloatBuffer value) {
+    gl().glGetPathParameterfvNV(
+      path,
+      pname,
+      value);
+  }
+
+  public static void glGetPathParameterfvNV(
+    int path,
+    int pname,
+    float[] value,
+    int value_offset) {
+    gl().glGetPathParameterfvNV(
+      path,
+      pname,
+      value,
+      value_offset);
+  }
+
+  public static void glGetPathParameterivNV(
+    int path,
+    int pname,
+    IntBuffer value) {
+    gl().glGetPathParameterivNV(
+      path,
+      pname,
+      value);
+  }
+
+  public static void glGetPathParameterivNV(
+    int path,
+    int pname,
+    int[] value,
+    int value_offset) {
+    gl().glGetPathParameterivNV(
+      path,
+      pname,
+      value,
+      value_offset);
+  }
+
+  public static void glGetPathSpacingNV(
+    int pathListMode,
+    int numPaths,
+    int pathNameType,
+    Buffer paths,
+    int pathBase,
+    float advanceScale,
+    float kerningScale,
+    int transformType,
+    FloatBuffer returnedSpacing) {
+    gl().glGetPathSpacingNV(
+      pathListMode,
+      numPaths,
+      pathNameType,
+      paths,
+      pathBase,
+      advanceScale,
+      kerningScale,
+      transformType,
+      returnedSpacing);
+  }
+
+  public static void glGetPathSpacingNV(
+    int pathListMode,
+    int numPaths,
+    int pathNameType,
+    Buffer paths,
+    int pathBase,
+    float advanceScale,
+    float kerningScale,
+    int transformType,
+    float[] returnedSpacing,
+    int returnedSpacing_offset) {
+    gl().glGetPathSpacingNV(
+      pathListMode,
+      numPaths,
+      pathNameType,
+      paths,
+      pathBase,
+      advanceScale,
+      kerningScale,
+      transformType,
+      returnedSpacing,
+      returnedSpacing_offset);
+  }
+
+  public static void glGetPathTexGenfvNV(
+    int texCoordSet,
+    int pname,
+    FloatBuffer value) {
+    gl().glGetPathTexGenfvNV(
+      texCoordSet,
+      pname,
+      value);
+  }
+
+  public static void glGetPathTexGenfvNV(
+    int texCoordSet,
+    int pname,
+    float[] value,
+    int value_offset) {
+    gl().glGetPathTexGenfvNV(
+      texCoordSet,
+      pname,
+      value,
+      value_offset);
+  }
+
+  public static void glGetPathTexGenivNV(
+    int texCoordSet,
+    int pname,
+    IntBuffer value) {
+    gl().glGetPathTexGenivNV(
+      texCoordSet,
+      pname,
+      value);
+  }
+
+  public static void glGetPathTexGenivNV(
+    int texCoordSet,
+    int pname,
+    int[] value,
+    int value_offset) {
+    gl().glGetPathTexGenivNV(
+      texCoordSet,
+      pname,
+      value,
+      value_offset);
+  }
+
   public static void glGetPerfMonitorCounterDataAMD(
     int monitor,
     int pname,
@@ -10798,6 +11978,60 @@ public class Gl {
       values_buffer_offset);
   }
 
+  public static void glGetPixelTransformParameterfvEXT(
+    int target,
+    int pname,
+    FloatBuffer params) {
+    gl().glGetPixelTransformParameterfvEXT(
+      target,
+      pname,
+      params);
+  }
+
+  public static void glGetPixelTransformParameterfvEXT(
+    int target,
+    int pname,
+    float[] params,
+    int params_offset) {
+    gl().glGetPixelTransformParameterfvEXT(
+      target,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetPixelTransformParameterivEXT(
+    int target,
+    int pname,
+    IntBuffer params) {
+    gl().glGetPixelTransformParameterivEXT(
+      target,
+      pname,
+      params);
+  }
+
+  public static void glGetPixelTransformParameterivEXT(
+    int target,
+    int pname,
+    int[] params,
+    int params_offset) {
+    gl().glGetPixelTransformParameterivEXT(
+      target,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetPointeri_vEXT(
+    int pname,
+    int index,
+    PointerBuffer params) {
+    gl().glGetPointeri_vEXT(
+      pname,
+      index,
+      params);
+  }
+
   public static void glGetPolygonStipple(
     ByteBuffer mask) {
     gl().glGetPolygonStipple(
@@ -10810,12 +12044,6 @@ public class Gl {
     gl().glGetPolygonStipple(
       mask,
       mask_offset);
-  }
-
-  public static void glGetPolygonStipple(
-    long mask_buffer_offset) {
-    gl().glGetPolygonStipple(
-      mask_buffer_offset);
   }
 
   public static void glGetProgramEnvParameterIivNV(
@@ -11174,6 +12402,12 @@ public class Gl {
       params_offset);
   }
 
+  public static long glGetTextureHandleNV(
+    int texture) {
+    return gl().glGetTextureHandleNV(
+      texture);
+  }
+
   public static void glGetTextureImageEXT(
     int texture,
     int target,
@@ -11354,6 +12588,14 @@ public class Gl {
       params_offset);
   }
 
+  public static long glGetTextureSamplerHandleNV(
+    int texture,
+    int sampler) {
+    return gl().glGetTextureSamplerHandleNV(
+      texture,
+      sampler);
+  }
+
   public static int glGetUniformBufferSizeEXT(
     int program,
     int location) {
@@ -11488,6 +12730,76 @@ public class Gl {
       data_offset);
   }
 
+  public static void glGetVertexArrayIntegeri_vEXT(
+    int vaobj,
+    int index,
+    int pname,
+    IntBuffer param) {
+    gl().glGetVertexArrayIntegeri_vEXT(
+      vaobj,
+      index,
+      pname,
+      param);
+  }
+
+  public static void glGetVertexArrayIntegeri_vEXT(
+    int vaobj,
+    int index,
+    int pname,
+    int[] param,
+    int param_offset) {
+    gl().glGetVertexArrayIntegeri_vEXT(
+      vaobj,
+      index,
+      pname,
+      param,
+      param_offset);
+  }
+
+  public static void glGetVertexArrayIntegervEXT(
+    int vaobj,
+    int pname,
+    IntBuffer param) {
+    gl().glGetVertexArrayIntegervEXT(
+      vaobj,
+      pname,
+      param);
+  }
+
+  public static void glGetVertexArrayIntegervEXT(
+    int vaobj,
+    int pname,
+    int[] param,
+    int param_offset) {
+    gl().glGetVertexArrayIntegervEXT(
+      vaobj,
+      pname,
+      param,
+      param_offset);
+  }
+
+  public static void glGetVertexArrayPointeri_vEXT(
+    int vaobj,
+    int index,
+    int pname,
+    PointerBuffer param) {
+    gl().glGetVertexArrayPointeri_vEXT(
+      vaobj,
+      index,
+      pname,
+      param);
+  }
+
+  public static void glGetVertexArrayPointervEXT(
+    int vaobj,
+    int pname,
+    PointerBuffer param) {
+    gl().glGetVertexArrayPointervEXT(
+      vaobj,
+      pname,
+      param);
+  }
+
   public static void glGetVertexAttribIivEXT(
     int index,
     int pname,
@@ -11740,6 +13052,248 @@ public class Gl {
       pname,
       params,
       params_offset);
+  }
+
+  public static void glGetnColorTable(
+    int target,
+    int format,
+    int type,
+    int bufSize,
+    Buffer table) {
+    gl().glGetnColorTable(
+      target,
+      format,
+      type,
+      bufSize,
+      table);
+  }
+
+  public static void glGetnConvolutionFilter(
+    int target,
+    int format,
+    int type,
+    int bufSize,
+    Buffer image) {
+    gl().glGetnConvolutionFilter(
+      target,
+      format,
+      type,
+      bufSize,
+      image);
+  }
+
+  public static void glGetnHistogram(
+    int target,
+    boolean reset,
+    int format,
+    int type,
+    int bufSize,
+    Buffer values) {
+    gl().glGetnHistogram(
+      target,
+      reset,
+      format,
+      type,
+      bufSize,
+      values);
+  }
+
+  public static void glGetnMapdv(
+    int target,
+    int query,
+    int bufSize,
+    DoubleBuffer v) {
+    gl().glGetnMapdv(
+      target,
+      query,
+      bufSize,
+      v);
+  }
+
+  public static void glGetnMapdv(
+    int target,
+    int query,
+    int bufSize,
+    double[] v,
+    int v_offset) {
+    gl().glGetnMapdv(
+      target,
+      query,
+      bufSize,
+      v,
+      v_offset);
+  }
+
+  public static void glGetnMapfv(
+    int target,
+    int query,
+    int bufSize,
+    FloatBuffer v) {
+    gl().glGetnMapfv(
+      target,
+      query,
+      bufSize,
+      v);
+  }
+
+  public static void glGetnMapfv(
+    int target,
+    int query,
+    int bufSize,
+    float[] v,
+    int v_offset) {
+    gl().glGetnMapfv(
+      target,
+      query,
+      bufSize,
+      v,
+      v_offset);
+  }
+
+  public static void glGetnMapiv(
+    int target,
+    int query,
+    int bufSize,
+    IntBuffer v) {
+    gl().glGetnMapiv(
+      target,
+      query,
+      bufSize,
+      v);
+  }
+
+  public static void glGetnMapiv(
+    int target,
+    int query,
+    int bufSize,
+    int[] v,
+    int v_offset) {
+    gl().glGetnMapiv(
+      target,
+      query,
+      bufSize,
+      v,
+      v_offset);
+  }
+
+  public static void glGetnMinmax(
+    int target,
+    boolean reset,
+    int format,
+    int type,
+    int bufSize,
+    Buffer values) {
+    gl().glGetnMinmax(
+      target,
+      reset,
+      format,
+      type,
+      bufSize,
+      values);
+  }
+
+  public static void glGetnPixelMapfv(
+    int map,
+    int bufSize,
+    FloatBuffer values) {
+    gl().glGetnPixelMapfv(
+      map,
+      bufSize,
+      values);
+  }
+
+  public static void glGetnPixelMapfv(
+    int map,
+    int bufSize,
+    float[] values,
+    int values_offset) {
+    gl().glGetnPixelMapfv(
+      map,
+      bufSize,
+      values,
+      values_offset);
+  }
+
+  public static void glGetnPixelMapuiv(
+    int map,
+    int bufSize,
+    IntBuffer values) {
+    gl().glGetnPixelMapuiv(
+      map,
+      bufSize,
+      values);
+  }
+
+  public static void glGetnPixelMapuiv(
+    int map,
+    int bufSize,
+    int[] values,
+    int values_offset) {
+    gl().glGetnPixelMapuiv(
+      map,
+      bufSize,
+      values,
+      values_offset);
+  }
+
+  public static void glGetnPixelMapusv(
+    int map,
+    int bufSize,
+    ShortBuffer values) {
+    gl().glGetnPixelMapusv(
+      map,
+      bufSize,
+      values);
+  }
+
+  public static void glGetnPixelMapusv(
+    int map,
+    int bufSize,
+    short[] values,
+    int values_offset) {
+    gl().glGetnPixelMapusv(
+      map,
+      bufSize,
+      values,
+      values_offset);
+  }
+
+  public static void glGetnPolygonStipple(
+    int bufSize,
+    ByteBuffer pattern) {
+    gl().glGetnPolygonStipple(
+      bufSize,
+      pattern);
+  }
+
+  public static void glGetnPolygonStipple(
+    int bufSize,
+    byte[] pattern,
+    int pattern_offset) {
+    gl().glGetnPolygonStipple(
+      bufSize,
+      pattern,
+      pattern_offset);
+  }
+
+  public static void glGetnSeparableFilter(
+    int target,
+    int format,
+    int type,
+    int rowBufSize,
+    Buffer row,
+    int columnBufSize,
+    Buffer column,
+    Buffer span) {
+    gl().glGetnSeparableFilter(
+      target,
+      format,
+      type,
+      rowBufSize,
+      row,
+      columnBufSize,
+      column,
+      span);
   }
 
   public static void glHintPGI(
@@ -11929,6 +13483,18 @@ public class Gl {
       pointer_buffer_offset);
   }
 
+  public static void glInterpolatePathsNV(
+    int resultPath,
+    int pathA,
+    int pathB,
+    float weight) {
+    gl().glInterpolatePathsNV(
+      resultPath,
+      pathA,
+      pathB,
+      weight);
+  }
+
   public static boolean glIsEnabledIndexed(
     int target,
     int index) {
@@ -11947,6 +13513,12 @@ public class Gl {
     int fence) {
     return gl().glIsFenceNV(
       fence);
+  }
+
+  public static boolean glIsImageHandleResidentNV(
+    long handle) {
+    return gl().glIsImageHandleResidentNV(
+      handle);
   }
 
   public static boolean glIsList(
@@ -11969,10 +13541,44 @@ public class Gl {
       id);
   }
 
+  public static boolean glIsPathNV(
+    int path) {
+    return gl().glIsPathNV(
+      path);
+  }
+
+  public static boolean glIsPointInFillPathNV(
+    int path,
+    int mask,
+    float x,
+    float y) {
+    return gl().glIsPointInFillPathNV(
+      path,
+      mask,
+      x,
+      y);
+  }
+
+  public static boolean glIsPointInStrokePathNV(
+    int path,
+    float x,
+    float y) {
+    return gl().glIsPointInStrokePathNV(
+      path,
+      x,
+      y);
+  }
+
   public static boolean glIsProgramARB(
     int program) {
     return gl().glIsProgramARB(
       program);
+  }
+
+  public static boolean glIsTextureHandleResidentNV(
+    long handle) {
+    return gl().glIsTextureHandleResidentNV(
+      handle);
   }
 
   public static boolean glIsTransformFeedbackNV(
@@ -12129,6 +13735,32 @@ public class Gl {
     gl().glLockArraysEXT(
       first,
       count);
+  }
+
+  public static void glMakeImageHandleNonResidentNV(
+    long handle) {
+    gl().glMakeImageHandleNonResidentNV(
+      handle);
+  }
+
+  public static void glMakeImageHandleResidentNV(
+    long handle,
+    int access) {
+    gl().glMakeImageHandleResidentNV(
+      handle,
+      access);
+  }
+
+  public static void glMakeTextureHandleNonResidentNV(
+    long handle) {
+    gl().glMakeTextureHandleNonResidentNV(
+      handle);
+  }
+
+  public static void glMakeTextureHandleResidentNV(
+    long handle) {
+    gl().glMakeTextureHandleResidentNV(
+      handle);
   }
 
   public static void glMap1d(
@@ -12437,6 +14069,38 @@ public class Gl {
       params_offset);
   }
 
+  public static ByteBuffer glMapTexture2DINTEL(
+    int texture,
+    int level,
+    int access,
+    IntBuffer stride,
+    IntBuffer layout) {
+    return gl().glMapTexture2DINTEL(
+      texture,
+      level,
+      access,
+      stride,
+      layout);
+  }
+
+  public static ByteBuffer glMapTexture2DINTEL(
+    int texture,
+    int level,
+    int access,
+    int[] stride,
+    int stride_offset,
+    int[] layout,
+    int layout_offset) {
+    return gl().glMapTexture2DINTEL(
+      texture,
+      level,
+      access,
+      stride,
+      stride_offset,
+      layout,
+      layout_offset);
+  }
+
   public static void glMapVertexAttrib1dAPPLE(
     int index,
     int size,
@@ -12669,6 +14333,18 @@ public class Gl {
       top,
       zNear,
       zFar);
+  }
+
+  public static void glMatrixIndexPointer(
+    int size,
+    int type,
+    int stride,
+    Buffer pointer) {
+    gl().glMatrixIndexPointer(
+      size,
+      type,
+      stride,
+      pointer);
   }
 
   public static void glMatrixIndexubvARB(
@@ -13045,6 +14721,32 @@ public class Gl {
       buffer);
   }
 
+  public static void glMultiTexCoord1bOES(
+    int texture,
+    byte s) {
+    gl().glMultiTexCoord1bOES(
+      texture,
+      s);
+  }
+
+  public static void glMultiTexCoord1bvOES(
+    int texture,
+    ByteBuffer coords) {
+    gl().glMultiTexCoord1bvOES(
+      texture,
+      coords);
+  }
+
+  public static void glMultiTexCoord1bvOES(
+    int texture,
+    byte[] coords,
+    int coords_offset) {
+    gl().glMultiTexCoord1bvOES(
+      texture,
+      coords,
+      coords_offset);
+  }
+
   public static void glMultiTexCoord1d(
     int target,
     double s) {
@@ -13173,6 +14875,34 @@ public class Gl {
       target,
       v,
       v_offset);
+  }
+
+  public static void glMultiTexCoord2bOES(
+    int texture,
+    byte s,
+    byte t) {
+    gl().glMultiTexCoord2bOES(
+      texture,
+      s,
+      t);
+  }
+
+  public static void glMultiTexCoord2bvOES(
+    int texture,
+    ByteBuffer coords) {
+    gl().glMultiTexCoord2bvOES(
+      texture,
+      coords);
+  }
+
+  public static void glMultiTexCoord2bvOES(
+    int texture,
+    byte[] coords,
+    int coords_offset) {
+    gl().glMultiTexCoord2bvOES(
+      texture,
+      coords,
+      coords_offset);
   }
 
   public static void glMultiTexCoord2d(
@@ -13313,6 +15043,36 @@ public class Gl {
       target,
       v,
       v_offset);
+  }
+
+  public static void glMultiTexCoord3bOES(
+    int texture,
+    byte s,
+    byte t,
+    byte r) {
+    gl().glMultiTexCoord3bOES(
+      texture,
+      s,
+      t,
+      r);
+  }
+
+  public static void glMultiTexCoord3bvOES(
+    int texture,
+    ByteBuffer coords) {
+    gl().glMultiTexCoord3bvOES(
+      texture,
+      coords);
+  }
+
+  public static void glMultiTexCoord3bvOES(
+    int texture,
+    byte[] coords,
+    int coords_offset) {
+    gl().glMultiTexCoord3bvOES(
+      texture,
+      coords,
+      coords_offset);
   }
 
   public static void glMultiTexCoord3d(
@@ -13463,6 +15223,38 @@ public class Gl {
       target,
       v,
       v_offset);
+  }
+
+  public static void glMultiTexCoord4bOES(
+    int texture,
+    byte s,
+    byte t,
+    byte r,
+    byte q) {
+    gl().glMultiTexCoord4bOES(
+      texture,
+      s,
+      t,
+      r,
+      q);
+  }
+
+  public static void glMultiTexCoord4bvOES(
+    int texture,
+    ByteBuffer coords) {
+    gl().glMultiTexCoord4bvOES(
+      texture,
+      coords);
+  }
+
+  public static void glMultiTexCoord4bvOES(
+    int texture,
+    byte[] coords,
+    int coords_offset) {
+    gl().glMultiTexCoord4bvOES(
+      texture,
+      coords,
+      coords_offset);
   }
 
   public static void glMultiTexCoord4d(
@@ -14737,6 +16529,334 @@ public class Gl {
       token);
   }
 
+  public static void glPathColorGenNV(
+    int color,
+    int genMode,
+    int colorFormat,
+    FloatBuffer coeffs) {
+    gl().glPathColorGenNV(
+      color,
+      genMode,
+      colorFormat,
+      coeffs);
+  }
+
+  public static void glPathColorGenNV(
+    int color,
+    int genMode,
+    int colorFormat,
+    float[] coeffs,
+    int coeffs_offset) {
+    gl().glPathColorGenNV(
+      color,
+      genMode,
+      colorFormat,
+      coeffs,
+      coeffs_offset);
+  }
+
+  public static void glPathCommandsNV(
+    int path,
+    int numCommands,
+    ByteBuffer commands,
+    int numCoords,
+    int coordType,
+    Buffer coords) {
+    gl().glPathCommandsNV(
+      path,
+      numCommands,
+      commands,
+      numCoords,
+      coordType,
+      coords);
+  }
+
+  public static void glPathCommandsNV(
+    int path,
+    int numCommands,
+    byte[] commands,
+    int commands_offset,
+    int numCoords,
+    int coordType,
+    Buffer coords) {
+    gl().glPathCommandsNV(
+      path,
+      numCommands,
+      commands,
+      commands_offset,
+      numCoords,
+      coordType,
+      coords);
+  }
+
+  public static void glPathCoordsNV(
+    int path,
+    int numCoords,
+    int coordType,
+    Buffer coords) {
+    gl().glPathCoordsNV(
+      path,
+      numCoords,
+      coordType,
+      coords);
+  }
+
+  public static void glPathCoverDepthFuncNV(
+    int func) {
+    gl().glPathCoverDepthFuncNV(
+      func);
+  }
+
+  public static void glPathDashArrayNV(
+    int path,
+    int dashCount,
+    FloatBuffer dashArray) {
+    gl().glPathDashArrayNV(
+      path,
+      dashCount,
+      dashArray);
+  }
+
+  public static void glPathDashArrayNV(
+    int path,
+    int dashCount,
+    float[] dashArray,
+    int dashArray_offset) {
+    gl().glPathDashArrayNV(
+      path,
+      dashCount,
+      dashArray,
+      dashArray_offset);
+  }
+
+  public static void glPathFogGenNV(
+    int genMode) {
+    gl().glPathFogGenNV(
+      genMode);
+  }
+
+  public static void glPathGlyphRangeNV(
+    int firstPathName,
+    int fontTarget,
+    Buffer fontName,
+    int fontStyle,
+    int firstGlyph,
+    int numGlyphs,
+    int handleMissingGlyphs,
+    int pathParameterTemplate,
+    float emScale) {
+    gl().glPathGlyphRangeNV(
+      firstPathName,
+      fontTarget,
+      fontName,
+      fontStyle,
+      firstGlyph,
+      numGlyphs,
+      handleMissingGlyphs,
+      pathParameterTemplate,
+      emScale);
+  }
+
+  public static void glPathGlyphsNV(
+    int firstPathName,
+    int fontTarget,
+    Buffer fontName,
+    int fontStyle,
+    int numGlyphs,
+    int type,
+    Buffer charcodes,
+    int handleMissingGlyphs,
+    int pathParameterTemplate,
+    float emScale) {
+    gl().glPathGlyphsNV(
+      firstPathName,
+      fontTarget,
+      fontName,
+      fontStyle,
+      numGlyphs,
+      type,
+      charcodes,
+      handleMissingGlyphs,
+      pathParameterTemplate,
+      emScale);
+  }
+
+  public static void glPathParameterfNV(
+    int path,
+    int pname,
+    float value) {
+    gl().glPathParameterfNV(
+      path,
+      pname,
+      value);
+  }
+
+  public static void glPathParameterfvNV(
+    int path,
+    int pname,
+    FloatBuffer value) {
+    gl().glPathParameterfvNV(
+      path,
+      pname,
+      value);
+  }
+
+  public static void glPathParameterfvNV(
+    int path,
+    int pname,
+    float[] value,
+    int value_offset) {
+    gl().glPathParameterfvNV(
+      path,
+      pname,
+      value,
+      value_offset);
+  }
+
+  public static void glPathParameteriNV(
+    int path,
+    int pname,
+    int value) {
+    gl().glPathParameteriNV(
+      path,
+      pname,
+      value);
+  }
+
+  public static void glPathParameterivNV(
+    int path,
+    int pname,
+    IntBuffer value) {
+    gl().glPathParameterivNV(
+      path,
+      pname,
+      value);
+  }
+
+  public static void glPathParameterivNV(
+    int path,
+    int pname,
+    int[] value,
+    int value_offset) {
+    gl().glPathParameterivNV(
+      path,
+      pname,
+      value,
+      value_offset);
+  }
+
+  public static void glPathStencilDepthOffsetNV(
+    float factor,
+    float units) {
+    gl().glPathStencilDepthOffsetNV(
+      factor,
+      units);
+  }
+
+  public static void glPathStencilFuncNV(
+    int func,
+    int ref,
+    int mask) {
+    gl().glPathStencilFuncNV(
+      func,
+      ref,
+      mask);
+  }
+
+  public static void glPathStringNV(
+    int path,
+    int format,
+    int length,
+    Buffer pathString) {
+    gl().glPathStringNV(
+      path,
+      format,
+      length,
+      pathString);
+  }
+
+  public static void glPathSubCommandsNV(
+    int path,
+    int commandStart,
+    int commandsToDelete,
+    int numCommands,
+    ByteBuffer commands,
+    int numCoords,
+    int coordType,
+    Buffer coords) {
+    gl().glPathSubCommandsNV(
+      path,
+      commandStart,
+      commandsToDelete,
+      numCommands,
+      commands,
+      numCoords,
+      coordType,
+      coords);
+  }
+
+  public static void glPathSubCommandsNV(
+    int path,
+    int commandStart,
+    int commandsToDelete,
+    int numCommands,
+    byte[] commands,
+    int commands_offset,
+    int numCoords,
+    int coordType,
+    Buffer coords) {
+    gl().glPathSubCommandsNV(
+      path,
+      commandStart,
+      commandsToDelete,
+      numCommands,
+      commands,
+      commands_offset,
+      numCoords,
+      coordType,
+      coords);
+  }
+
+  public static void glPathSubCoordsNV(
+    int path,
+    int coordStart,
+    int numCoords,
+    int coordType,
+    Buffer coords) {
+    gl().glPathSubCoordsNV(
+      path,
+      coordStart,
+      numCoords,
+      coordType,
+      coords);
+  }
+
+  public static void glPathTexGenNV(
+    int texCoordSet,
+    int genMode,
+    int components,
+    FloatBuffer coeffs) {
+    gl().glPathTexGenNV(
+      texCoordSet,
+      genMode,
+      components,
+      coeffs);
+  }
+
+  public static void glPathTexGenNV(
+    int texCoordSet,
+    int genMode,
+    int components,
+    float[] coeffs,
+    int coeffs_offset) {
+    gl().glPathTexGenNV(
+      texCoordSet,
+      genMode,
+      components,
+      coeffs,
+      coeffs_offset);
+  }
+
   public static void glPauseTransformFeedbackNV(
     ) {
     gl().glPauseTransformFeedbackNV();
@@ -14936,6 +17056,54 @@ public class Gl {
       yfactor);
   }
 
+  public static boolean glPointAlongPathNV(
+    int path,
+    int startSegment,
+    int numSegments,
+    float distance,
+    FloatBuffer x,
+    FloatBuffer y,
+    FloatBuffer tangentX,
+    FloatBuffer tangentY) {
+    return gl().glPointAlongPathNV(
+      path,
+      startSegment,
+      numSegments,
+      distance,
+      x,
+      y,
+      tangentX,
+      tangentY);
+  }
+
+  public static boolean glPointAlongPathNV(
+    int path,
+    int startSegment,
+    int numSegments,
+    float distance,
+    float[] x,
+    int x_offset,
+    float[] y,
+    int y_offset,
+    float[] tangentX,
+    int tangentX_offset,
+    float[] tangentY,
+    int tangentY_offset) {
+    return gl().glPointAlongPathNV(
+      path,
+      startSegment,
+      numSegments,
+      distance,
+      x,
+      x_offset,
+      y,
+      y_offset,
+      tangentX,
+      tangentX_offset,
+      tangentY,
+      tangentY_offset);
+  }
+
   public static void glPolygonStipple(
     ByteBuffer mask) {
     gl().glPolygonStipple(
@@ -14948,12 +17116,6 @@ public class Gl {
     gl().glPolygonStipple(
       mask,
       mask_offset);
-  }
-
-  public static void glPolygonStipple(
-    long mask_buffer_offset) {
-    gl().glPolygonStipple(
-      mask_buffer_offset);
   }
 
   public static void glPopAttrib(
@@ -15008,29 +17170,29 @@ public class Gl {
 
   public static void glProgramBufferParametersIivNV(
     int target,
-    int buffer,
-    int index,
+    int bindingIndex,
+    int wordIndex,
     int count,
     IntBuffer params) {
     gl().glProgramBufferParametersIivNV(
       target,
-      buffer,
-      index,
+      bindingIndex,
+      wordIndex,
       count,
       params);
   }
 
   public static void glProgramBufferParametersIivNV(
     int target,
-    int buffer,
-    int index,
+    int bindingIndex,
+    int wordIndex,
     int count,
     int[] params,
     int params_offset) {
     gl().glProgramBufferParametersIivNV(
       target,
-      buffer,
-      index,
+      bindingIndex,
+      wordIndex,
       count,
       params,
       params_offset);
@@ -15038,29 +17200,29 @@ public class Gl {
 
   public static void glProgramBufferParametersIuivNV(
     int target,
-    int buffer,
-    int index,
+    int bindingIndex,
+    int wordIndex,
     int count,
     IntBuffer params) {
     gl().glProgramBufferParametersIuivNV(
       target,
-      buffer,
-      index,
+      bindingIndex,
+      wordIndex,
       count,
       params);
   }
 
   public static void glProgramBufferParametersIuivNV(
     int target,
-    int buffer,
-    int index,
+    int bindingIndex,
+    int wordIndex,
     int count,
     int[] params,
     int params_offset) {
     gl().glProgramBufferParametersIuivNV(
       target,
-      buffer,
-      index,
+      bindingIndex,
+      wordIndex,
       count,
       params,
       params_offset);
@@ -15068,29 +17230,29 @@ public class Gl {
 
   public static void glProgramBufferParametersfvNV(
     int target,
-    int buffer,
-    int index,
+    int bindingIndex,
+    int wordIndex,
     int count,
     FloatBuffer params) {
     gl().glProgramBufferParametersfvNV(
       target,
-      buffer,
-      index,
+      bindingIndex,
+      wordIndex,
       count,
       params);
   }
 
   public static void glProgramBufferParametersfvNV(
     int target,
-    int buffer,
-    int index,
+    int bindingIndex,
+    int wordIndex,
     int count,
     float[] params,
     int params_offset) {
     gl().glProgramBufferParametersfvNV(
       target,
-      buffer,
-      index,
+      bindingIndex,
+      wordIndex,
       count,
       params,
       params_offset);
@@ -15590,114 +17752,6 @@ public class Gl {
       params_offset);
   }
 
-  public static void glProgramUniform1dEXT(
-    int program,
-    int location,
-    double x) {
-    gl().glProgramUniform1dEXT(
-      program,
-      location,
-      x);
-  }
-
-  public static void glProgramUniform1dvEXT(
-    int program,
-    int location,
-    int count,
-    DoubleBuffer value) {
-    gl().glProgramUniform1dvEXT(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform1dvEXT(
-    int program,
-    int location,
-    int count,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniform1dvEXT(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform1fEXT(
-    int program,
-    int location,
-    float v0) {
-    gl().glProgramUniform1fEXT(
-      program,
-      location,
-      v0);
-  }
-
-  public static void glProgramUniform1fvEXT(
-    int program,
-    int location,
-    int count,
-    FloatBuffer value) {
-    gl().glProgramUniform1fvEXT(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform1fvEXT(
-    int program,
-    int location,
-    int count,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniform1fvEXT(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform1iEXT(
-    int program,
-    int location,
-    int v0) {
-    gl().glProgramUniform1iEXT(
-      program,
-      location,
-      v0);
-  }
-
-  public static void glProgramUniform1ivEXT(
-    int program,
-    int location,
-    int count,
-    IntBuffer value) {
-    gl().glProgramUniform1ivEXT(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform1ivEXT(
-    int program,
-    int location,
-    int count,
-    int[] value,
-    int value_offset) {
-    gl().glProgramUniform1ivEXT(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
   public static void glProgramUniform1uiEXT(
     int program,
     int location,
@@ -15727,120 +17781,6 @@ public class Gl {
     int[] value,
     int value_offset) {
     gl().glProgramUniform1uivEXT(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform2dEXT(
-    int program,
-    int location,
-    double x,
-    double y) {
-    gl().glProgramUniform2dEXT(
-      program,
-      location,
-      x,
-      y);
-  }
-
-  public static void glProgramUniform2dvEXT(
-    int program,
-    int location,
-    int count,
-    DoubleBuffer value) {
-    gl().glProgramUniform2dvEXT(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform2dvEXT(
-    int program,
-    int location,
-    int count,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniform2dvEXT(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform2fEXT(
-    int program,
-    int location,
-    float v0,
-    float v1) {
-    gl().glProgramUniform2fEXT(
-      program,
-      location,
-      v0,
-      v1);
-  }
-
-  public static void glProgramUniform2fvEXT(
-    int program,
-    int location,
-    int count,
-    FloatBuffer value) {
-    gl().glProgramUniform2fvEXT(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform2fvEXT(
-    int program,
-    int location,
-    int count,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniform2fvEXT(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform2iEXT(
-    int program,
-    int location,
-    int v0,
-    int v1) {
-    gl().glProgramUniform2iEXT(
-      program,
-      location,
-      v0,
-      v1);
-  }
-
-  public static void glProgramUniform2ivEXT(
-    int program,
-    int location,
-    int count,
-    IntBuffer value) {
-    gl().glProgramUniform2ivEXT(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform2ivEXT(
-    int program,
-    int location,
-    int count,
-    int[] value,
-    int value_offset) {
-    gl().glProgramUniform2ivEXT(
       program,
       location,
       count,
@@ -15886,126 +17826,6 @@ public class Gl {
       value_offset);
   }
 
-  public static void glProgramUniform3dEXT(
-    int program,
-    int location,
-    double x,
-    double y,
-    double z) {
-    gl().glProgramUniform3dEXT(
-      program,
-      location,
-      x,
-      y,
-      z);
-  }
-
-  public static void glProgramUniform3dvEXT(
-    int program,
-    int location,
-    int count,
-    DoubleBuffer value) {
-    gl().glProgramUniform3dvEXT(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform3dvEXT(
-    int program,
-    int location,
-    int count,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniform3dvEXT(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform3fEXT(
-    int program,
-    int location,
-    float v0,
-    float v1,
-    float v2) {
-    gl().glProgramUniform3fEXT(
-      program,
-      location,
-      v0,
-      v1,
-      v2);
-  }
-
-  public static void glProgramUniform3fvEXT(
-    int program,
-    int location,
-    int count,
-    FloatBuffer value) {
-    gl().glProgramUniform3fvEXT(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform3fvEXT(
-    int program,
-    int location,
-    int count,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniform3fvEXT(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform3iEXT(
-    int program,
-    int location,
-    int v0,
-    int v1,
-    int v2) {
-    gl().glProgramUniform3iEXT(
-      program,
-      location,
-      v0,
-      v1,
-      v2);
-  }
-
-  public static void glProgramUniform3ivEXT(
-    int program,
-    int location,
-    int count,
-    IntBuffer value) {
-    gl().glProgramUniform3ivEXT(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform3ivEXT(
-    int program,
-    int location,
-    int count,
-    int[] value,
-    int value_offset) {
-    gl().glProgramUniform3ivEXT(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
   public static void glProgramUniform3uiEXT(
     int program,
     int location,
@@ -16039,132 +17859,6 @@ public class Gl {
     int[] value,
     int value_offset) {
     gl().glProgramUniform3uivEXT(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform4dEXT(
-    int program,
-    int location,
-    double x,
-    double y,
-    double z,
-    double w) {
-    gl().glProgramUniform4dEXT(
-      program,
-      location,
-      x,
-      y,
-      z,
-      w);
-  }
-
-  public static void glProgramUniform4dvEXT(
-    int program,
-    int location,
-    int count,
-    DoubleBuffer value) {
-    gl().glProgramUniform4dvEXT(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform4dvEXT(
-    int program,
-    int location,
-    int count,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniform4dvEXT(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform4fEXT(
-    int program,
-    int location,
-    float v0,
-    float v1,
-    float v2,
-    float v3) {
-    gl().glProgramUniform4fEXT(
-      program,
-      location,
-      v0,
-      v1,
-      v2,
-      v3);
-  }
-
-  public static void glProgramUniform4fvEXT(
-    int program,
-    int location,
-    int count,
-    FloatBuffer value) {
-    gl().glProgramUniform4fvEXT(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform4fvEXT(
-    int program,
-    int location,
-    int count,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniform4fvEXT(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform4iEXT(
-    int program,
-    int location,
-    int v0,
-    int v1,
-    int v2,
-    int v3) {
-    gl().glProgramUniform4iEXT(
-      program,
-      location,
-      v0,
-      v1,
-      v2,
-      v3);
-  }
-
-  public static void glProgramUniform4ivEXT(
-    int program,
-    int location,
-    int count,
-    IntBuffer value) {
-    gl().glProgramUniform4ivEXT(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform4ivEXT(
-    int program,
-    int location,
-    int count,
-    int[] value,
-    int value_offset) {
-    gl().glProgramUniform4ivEXT(
       program,
       location,
       count,
@@ -16214,94 +17908,40 @@ public class Gl {
       value_offset);
   }
 
-  public static void glProgramUniformMatrix2dvEXT(
+  public static void glProgramUniformHandleui64NV(
     int program,
     int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix2dvEXT(
+    long value) {
+    gl().glProgramUniformHandleui64NV(
       program,
       location,
-      count,
-      transpose,
       value);
   }
 
-  public static void glProgramUniformMatrix2dvEXT(
+  public static void glProgramUniformHandleui64vNV(
     int program,
     int location,
     int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix2dvEXT(
+    LongBuffer values) {
+    gl().glProgramUniformHandleui64vNV(
       program,
       location,
       count,
-      transpose,
-      value,
-      value_offset);
+      values);
   }
 
-  public static void glProgramUniformMatrix2fvEXT(
+  public static void glProgramUniformHandleui64vNV(
     int program,
     int location,
     int count,
-    boolean transpose,
-    FloatBuffer value) {
-    gl().glProgramUniformMatrix2fvEXT(
+    long[] values,
+    int values_offset) {
+    gl().glProgramUniformHandleui64vNV(
       program,
       location,
       count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix2fvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix2fvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix2x3dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix2x3dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix2x3dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix2x3dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
+      values,
+      values_offset);
   }
 
   public static void glProgramUniformMatrix2x3fvEXT(
@@ -16326,36 +17966,6 @@ public class Gl {
     float[] value,
     int value_offset) {
     gl().glProgramUniformMatrix2x3fvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix2x4dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix2x4dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix2x4dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix2x4dvEXT(
       program,
       location,
       count,
@@ -16394,96 +18004,6 @@ public class Gl {
       value_offset);
   }
 
-  public static void glProgramUniformMatrix3dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix3dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix3dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix3dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix3fvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    FloatBuffer value) {
-    gl().glProgramUniformMatrix3fvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix3fvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix3fvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix3x2dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix3x2dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix3x2dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix3x2dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
   public static void glProgramUniformMatrix3x2fvEXT(
     int program,
     int location,
@@ -16506,36 +18026,6 @@ public class Gl {
     float[] value,
     int value_offset) {
     gl().glProgramUniformMatrix3x2fvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix3x4dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix3x4dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix3x4dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix3x4dvEXT(
       program,
       location,
       count,
@@ -16574,96 +18064,6 @@ public class Gl {
       value_offset);
   }
 
-  public static void glProgramUniformMatrix4dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix4dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix4dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix4dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix4fvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    FloatBuffer value) {
-    gl().glProgramUniformMatrix4fvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix4fvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix4fvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix4x2dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix4x2dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix4x2dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix4x2dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
   public static void glProgramUniformMatrix4x2fvEXT(
     int program,
     int location,
@@ -16686,36 +18086,6 @@ public class Gl {
     float[] value,
     int value_offset) {
     gl().glProgramUniformMatrix4x2fvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix4x3dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix4x3dvEXT(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix4x3dvEXT(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix4x3dvEXT(
       program,
       location,
       count,
@@ -16790,6 +18160,26 @@ public class Gl {
     int name) {
     gl().glPushName(
       name);
+  }
+
+  public static int glQueryMatrixxOES(
+    IntBuffer mantissa,
+    IntBuffer exponent) {
+    return gl().glQueryMatrixxOES(
+      mantissa,
+      exponent);
+  }
+
+  public static int glQueryMatrixxOES(
+    int[] mantissa,
+    int mantissa_offset,
+    int[] exponent,
+    int exponent_offset) {
+    return gl().glQueryMatrixxOES(
+      mantissa,
+      mantissa_offset,
+      exponent,
+      exponent_offset);
   }
 
   public static void glRasterPos2d(
@@ -17525,18 +18915,6 @@ public class Gl {
       buffer);
   }
 
-/*
-  public static void glSelectBuffer(
-    int size,
-    int[] buffer,
-    int buffer_offset) {
-    gl().glSelectBuffer(
-      size,
-      buffer,
-      buffer_offset);
-  }
-*/
-
   public static void glSelectPerfMonitorCountersAMD(
     int monitor,
     boolean enable,
@@ -17711,17 +19089,116 @@ public class Gl {
       stencilClearTag);
   }
 
+  public static void glStencilFillPathInstancedNV(
+    int numPaths,
+    int pathNameType,
+    Buffer paths,
+    int pathBase,
+    int fillMode,
+    int mask,
+    int transformType,
+    FloatBuffer transformValues) {
+    gl().glStencilFillPathInstancedNV(
+      numPaths,
+      pathNameType,
+      paths,
+      pathBase,
+      fillMode,
+      mask,
+      transformType,
+      transformValues);
+  }
+
+  public static void glStencilFillPathInstancedNV(
+    int numPaths,
+    int pathNameType,
+    Buffer paths,
+    int pathBase,
+    int fillMode,
+    int mask,
+    int transformType,
+    float[] transformValues,
+    int transformValues_offset) {
+    gl().glStencilFillPathInstancedNV(
+      numPaths,
+      pathNameType,
+      paths,
+      pathBase,
+      fillMode,
+      mask,
+      transformType,
+      transformValues,
+      transformValues_offset);
+  }
+
+  public static void glStencilFillPathNV(
+    int path,
+    int fillMode,
+    int mask) {
+    gl().glStencilFillPathNV(
+      path,
+      fillMode,
+      mask);
+  }
+
+  public static void glStencilStrokePathInstancedNV(
+    int numPaths,
+    int pathNameType,
+    Buffer paths,
+    int pathBase,
+    int reference,
+    int mask,
+    int transformType,
+    FloatBuffer transformValues) {
+    gl().glStencilStrokePathInstancedNV(
+      numPaths,
+      pathNameType,
+      paths,
+      pathBase,
+      reference,
+      mask,
+      transformType,
+      transformValues);
+  }
+
+  public static void glStencilStrokePathInstancedNV(
+    int numPaths,
+    int pathNameType,
+    Buffer paths,
+    int pathBase,
+    int reference,
+    int mask,
+    int transformType,
+    float[] transformValues,
+    int transformValues_offset) {
+    gl().glStencilStrokePathInstancedNV(
+      numPaths,
+      pathNameType,
+      paths,
+      pathBase,
+      reference,
+      mask,
+      transformType,
+      transformValues,
+      transformValues_offset);
+  }
+
+  public static void glStencilStrokePathNV(
+    int path,
+    int reference,
+    int mask) {
+    gl().glStencilStrokePathNV(
+      path,
+      reference,
+      mask);
+  }
+
   public static void glStringMarkerGREMEDY(
     int len,
     Buffer string) {
     gl().glStringMarkerGREMEDY(
       len,
       string);
-  }
-
-  public static void glSwapAPPLE(
-    ) {
-    gl().glSwapAPPLE();
   }
 
   public static void glSwizzleEXT(
@@ -17738,6 +19215,12 @@ public class Gl {
       outY,
       outZ,
       outW);
+  }
+
+  public static void glSyncTextureINTEL(
+    int texture) {
+    gl().glSyncTextureINTEL(
+      texture);
   }
 
   public static boolean glTestFenceAPPLE(
@@ -17758,6 +19241,26 @@ public class Gl {
     return gl().glTestObjectAPPLE(
       object,
       name);
+  }
+
+  public static void glTexCoord1bOES(
+    byte s) {
+    gl().glTexCoord1bOES(
+      s);
+  }
+
+  public static void glTexCoord1bvOES(
+    ByteBuffer coords) {
+    gl().glTexCoord1bvOES(
+      coords);
+  }
+
+  public static void glTexCoord1bvOES(
+    byte[] coords,
+    int coords_offset) {
+    gl().glTexCoord1bvOES(
+      coords,
+      coords_offset);
   }
 
   public static void glTexCoord1d(
@@ -17858,6 +19361,28 @@ public class Gl {
     gl().glTexCoord1sv(
       v,
       v_offset);
+  }
+
+  public static void glTexCoord2bOES(
+    byte s,
+    byte t) {
+    gl().glTexCoord2bOES(
+      s,
+      t);
+  }
+
+  public static void glTexCoord2bvOES(
+    ByteBuffer coords) {
+    gl().glTexCoord2bvOES(
+      coords);
+  }
+
+  public static void glTexCoord2bvOES(
+    byte[] coords,
+    int coords_offset) {
+    gl().glTexCoord2bvOES(
+      coords,
+      coords_offset);
   }
 
   public static void glTexCoord2d(
@@ -17968,6 +19493,30 @@ public class Gl {
     gl().glTexCoord2sv(
       v,
       v_offset);
+  }
+
+  public static void glTexCoord3bOES(
+    byte s,
+    byte t,
+    byte r) {
+    gl().glTexCoord3bOES(
+      s,
+      t,
+      r);
+  }
+
+  public static void glTexCoord3bvOES(
+    ByteBuffer coords) {
+    gl().glTexCoord3bvOES(
+      coords);
+  }
+
+  public static void glTexCoord3bvOES(
+    byte[] coords,
+    int coords_offset) {
+    gl().glTexCoord3bvOES(
+      coords,
+      coords_offset);
   }
 
   public static void glTexCoord3d(
@@ -18088,6 +19637,32 @@ public class Gl {
     gl().glTexCoord3sv(
       v,
       v_offset);
+  }
+
+  public static void glTexCoord4bOES(
+    byte s,
+    byte t,
+    byte r,
+    byte q) {
+    gl().glTexCoord4bOES(
+      s,
+      t,
+      r,
+      q);
+  }
+
+  public static void glTexCoord4bvOES(
+    ByteBuffer coords) {
+    gl().glTexCoord4bvOES(
+      coords);
+  }
+
+  public static void glTexCoord4bvOES(
+    byte[] coords,
+    int coords_offset) {
+    gl().glTexCoord4bvOES(
+      coords,
+      coords_offset);
   }
 
   public static void glTexCoord4d(
@@ -18258,6 +19833,24 @@ public class Gl {
     gl().glTexRenderbufferNV(
       target,
       renderbuffer);
+  }
+
+  public static void glTexStorageSparseAMD(
+    int target,
+    int internalFormat,
+    int width,
+    int height,
+    int depth,
+    int layers,
+    int flags) {
+    gl().glTexStorageSparseAMD(
+      target,
+      internalFormat,
+      width,
+      height,
+      depth,
+      layers,
+      flags);
   }
 
   public static void glTextureBarrierNV(
@@ -18517,6 +20110,26 @@ public class Gl {
       renderbuffer);
   }
 
+  public static void glTextureStorageSparseAMD(
+    int texture,
+    int target,
+    int internalFormat,
+    int width,
+    int height,
+    int depth,
+    int layers,
+    int flags) {
+    gl().glTextureStorageSparseAMD(
+      texture,
+      target,
+      internalFormat,
+      width,
+      height,
+      depth,
+      layers,
+      flags);
+  }
+
   public static void glTextureSubImage1DEXT(
     int texture,
     int target,
@@ -18587,6 +20200,32 @@ public class Gl {
       format,
       type,
       pixels);
+  }
+
+  public static void glTransformPathNV(
+    int resultPath,
+    int srcPath,
+    int transformType,
+    FloatBuffer transformValues) {
+    gl().glTransformPathNV(
+      resultPath,
+      srcPath,
+      transformType,
+      transformValues);
+  }
+
+  public static void glTransformPathNV(
+    int resultPath,
+    int srcPath,
+    int transformType,
+    float[] transformValues,
+    int transformValues_offset) {
+    gl().glTransformPathNV(
+      resultPath,
+      srcPath,
+      transformType,
+      transformValues,
+      transformValues_offset);
   }
 
   public static void glTranslated(
@@ -18873,6 +20512,36 @@ public class Gl {
       buffer);
   }
 
+  public static void glUniformHandleui64NV(
+    int location,
+    long value) {
+    gl().glUniformHandleui64NV(
+      location,
+      value);
+  }
+
+  public static void glUniformHandleui64vNV(
+    int location,
+    int count,
+    LongBuffer value) {
+    gl().glUniformHandleui64vNV(
+      location,
+      count,
+      value);
+  }
+
+  public static void glUniformHandleui64vNV(
+    int location,
+    int count,
+    long[] value,
+    int value_offset) {
+    gl().glUniformHandleui64vNV(
+      location,
+      count,
+      value,
+      value_offset);
+  }
+
   public static void glUniformMatrix2fvARB(
     int location,
     int count,
@@ -18962,6 +20631,14 @@ public class Gl {
       buffer);
   }
 
+  public static void glUnmapTexture2DINTEL(
+    int texture,
+    int level) {
+    gl().glUnmapTexture2DINTEL(
+      texture,
+      level);
+  }
+
   public static void glUseProgramObjectARB(
     int programObj) {
     gl().glUseProgramObjectARB(
@@ -19021,20 +20698,10 @@ public class Gl {
 
   public static void glVDPAUMapSurfacesNV(
     int numSurfaces,
-    LongBuffer surfaces) {
+    PointerBuffer surfaces) {
     gl().glVDPAUMapSurfacesNV(
       numSurfaces,
       surfaces);
-  }
-
-  public static void glVDPAUMapSurfacesNV(
-    int numSurfaces,
-    long[] surfaces,
-    int surfaces_offset) {
-    gl().glVDPAUMapSurfacesNV(
-      numSurfaces,
-      surfaces,
-      surfaces_offset);
   }
 
   public static long glVDPAURegisterOutputSurfaceNV(
@@ -19099,20 +20766,10 @@ public class Gl {
 
   public static void glVDPAUUnmapSurfacesNV(
     int numSurface,
-    LongBuffer surfaces) {
+    PointerBuffer surfaces) {
     gl().glVDPAUUnmapSurfacesNV(
       numSurface,
       surfaces);
-  }
-
-  public static void glVDPAUUnmapSurfacesNV(
-    int numSurface,
-    long[] surfaces,
-    int surfaces_offset) {
-    gl().glVDPAUUnmapSurfacesNV(
-      numSurface,
-      surfaces,
-      surfaces_offset);
   }
 
   public static void glVDPAUUnregisterSurfaceNV(
@@ -19295,6 +20952,26 @@ public class Gl {
       addr_offset);
   }
 
+  public static void glVertex2bOES(
+    byte x) {
+    gl().glVertex2bOES(
+      x);
+  }
+
+  public static void glVertex2bvOES(
+    ByteBuffer coords) {
+    gl().glVertex2bvOES(
+      coords);
+  }
+
+  public static void glVertex2bvOES(
+    byte[] coords,
+    int coords_offset) {
+    gl().glVertex2bvOES(
+      coords,
+      coords_offset);
+  }
+
   public static void glVertex2d(
     double x,
     double y) {
@@ -19403,6 +21080,28 @@ public class Gl {
     gl().glVertex2sv(
       v,
       v_offset);
+  }
+
+  public static void glVertex3bOES(
+    byte x,
+    byte y) {
+    gl().glVertex3bOES(
+      x,
+      y);
+  }
+
+  public static void glVertex3bvOES(
+    ByteBuffer coords) {
+    gl().glVertex3bvOES(
+      coords);
+  }
+
+  public static void glVertex3bvOES(
+    byte[] coords,
+    int coords_offset) {
+    gl().glVertex3bvOES(
+      coords,
+      coords_offset);
   }
 
   public static void glVertex3d(
@@ -19523,6 +21222,30 @@ public class Gl {
     gl().glVertex3sv(
       v,
       v_offset);
+  }
+
+  public static void glVertex4bOES(
+    byte x,
+    byte y,
+    byte z) {
+    gl().glVertex4bOES(
+      x,
+      y,
+      z);
+  }
+
+  public static void glVertex4bvOES(
+    ByteBuffer coords) {
+    gl().glVertex4bvOES(
+      coords);
+  }
+
+  public static void glVertex4bvOES(
+    byte[] coords,
+    int coords_offset) {
+    gl().glVertex4bvOES(
+      coords,
+      coords_offset);
   }
 
   public static void glVertex4d(
@@ -19655,6 +21378,94 @@ public class Gl {
       v_offset);
   }
 
+  public static void glVertexArrayColorOffsetEXT(
+    int vaobj,
+    int buffer,
+    int size,
+    int type,
+    int stride,
+    long offset) {
+    gl().glVertexArrayColorOffsetEXT(
+      vaobj,
+      buffer,
+      size,
+      type,
+      stride,
+      offset);
+  }
+
+  public static void glVertexArrayEdgeFlagOffsetEXT(
+    int vaobj,
+    int buffer,
+    int stride,
+    long offset) {
+    gl().glVertexArrayEdgeFlagOffsetEXT(
+      vaobj,
+      buffer,
+      stride,
+      offset);
+  }
+
+  public static void glVertexArrayFogCoordOffsetEXT(
+    int vaobj,
+    int buffer,
+    int type,
+    int stride,
+    long offset) {
+    gl().glVertexArrayFogCoordOffsetEXT(
+      vaobj,
+      buffer,
+      type,
+      stride,
+      offset);
+  }
+
+  public static void glVertexArrayIndexOffsetEXT(
+    int vaobj,
+    int buffer,
+    int type,
+    int stride,
+    long offset) {
+    gl().glVertexArrayIndexOffsetEXT(
+      vaobj,
+      buffer,
+      type,
+      stride,
+      offset);
+  }
+
+  public static void glVertexArrayMultiTexCoordOffsetEXT(
+    int vaobj,
+    int buffer,
+    int texunit,
+    int size,
+    int type,
+    int stride,
+    long offset) {
+    gl().glVertexArrayMultiTexCoordOffsetEXT(
+      vaobj,
+      buffer,
+      texunit,
+      size,
+      type,
+      stride,
+      offset);
+  }
+
+  public static void glVertexArrayNormalOffsetEXT(
+    int vaobj,
+    int buffer,
+    int type,
+    int stride,
+    long offset) {
+    gl().glVertexArrayNormalOffsetEXT(
+      vaobj,
+      buffer,
+      type,
+      stride,
+      offset);
+  }
+
   public static void glVertexArrayParameteriAPPLE(
     int pname,
     int param) {
@@ -19677,6 +21488,92 @@ public class Gl {
     gl().glVertexArrayRangeNV(
       length,
       pointer);
+  }
+
+  public static void glVertexArraySecondaryColorOffsetEXT(
+    int vaobj,
+    int buffer,
+    int size,
+    int type,
+    int stride,
+    long offset) {
+    gl().glVertexArraySecondaryColorOffsetEXT(
+      vaobj,
+      buffer,
+      size,
+      type,
+      stride,
+      offset);
+  }
+
+  public static void glVertexArrayTexCoordOffsetEXT(
+    int vaobj,
+    int buffer,
+    int size,
+    int type,
+    int stride,
+    long offset) {
+    gl().glVertexArrayTexCoordOffsetEXT(
+      vaobj,
+      buffer,
+      size,
+      type,
+      stride,
+      offset);
+  }
+
+  public static void glVertexArrayVertexAttribIOffsetEXT(
+    int vaobj,
+    int buffer,
+    int index,
+    int size,
+    int type,
+    int stride,
+    long offset) {
+    gl().glVertexArrayVertexAttribIOffsetEXT(
+      vaobj,
+      buffer,
+      index,
+      size,
+      type,
+      stride,
+      offset);
+  }
+
+  public static void glVertexArrayVertexAttribOffsetEXT(
+    int vaobj,
+    int buffer,
+    int index,
+    int size,
+    int type,
+    boolean normalized,
+    int stride,
+    long offset) {
+    gl().glVertexArrayVertexAttribOffsetEXT(
+      vaobj,
+      buffer,
+      index,
+      size,
+      type,
+      normalized,
+      stride,
+      offset);
+  }
+
+  public static void glVertexArrayVertexOffsetEXT(
+    int vaobj,
+    int buffer,
+    int size,
+    int type,
+    int stride,
+    long offset) {
+    gl().glVertexArrayVertexOffsetEXT(
+      vaobj,
+      buffer,
+      size,
+      type,
+      stride,
+      offset);
   }
 
   public static void glVertexAttrib1dARB(
@@ -20917,6 +22814,16 @@ public class Gl {
       stride);
   }
 
+  public static void glVertexAttribParameteriAMD(
+    int index,
+    int pname,
+    int param) {
+    gl().glVertexAttribParameteriAMD(
+      index,
+      pname,
+      param);
+  }
+
   public static void glVertexAttribPointerARB(
     int index,
     int size,
@@ -21207,6 +23114,46 @@ public class Gl {
       pname,
       params,
       params_offset);
+  }
+
+  public static void glWeightPathsNV(
+    int resultPath,
+    int numPaths,
+    IntBuffer paths,
+    FloatBuffer weights) {
+    gl().glWeightPathsNV(
+      resultPath,
+      numPaths,
+      paths,
+      weights);
+  }
+
+  public static void glWeightPathsNV(
+    int resultPath,
+    int numPaths,
+    int[] paths,
+    int paths_offset,
+    float[] weights,
+    int weights_offset) {
+    gl().glWeightPathsNV(
+      resultPath,
+      numPaths,
+      paths,
+      paths_offset,
+      weights,
+      weights_offset);
+  }
+
+  public static void glWeightPointer(
+    int size,
+    int type,
+    int stride,
+    Buffer pointer) {
+    gl().glWeightPointer(
+      size,
+      type,
+      stride,
+      pointer);
   }
 
   public static void glWeightbvARB(
@@ -21553,14 +23500,82 @@ public class Gl {
       outW);
   }
 
-  public static boolean glIsPBOPackEnabled(
-    ) {
-    return gl().glIsPBOPackEnabled();
+  public static ByteBuffer glAllocateMemoryNV(
+    int size,
+    float readFrequency,
+    float writeFrequency,
+    float priority) {
+    return gl().glAllocateMemoryNV(
+      size,
+      readFrequency,
+      writeFrequency,
+      priority);
   }
 
-  public static boolean glIsPBOUnpackEnabled(
-    ) {
-    return gl().glIsPBOUnpackEnabled();
+  public static void glFreeMemoryNV(
+    ByteBuffer pointer) {
+    gl().glFreeMemoryNV(
+      pointer);
+  }
+
+  public static void glVertexAttribPointer(
+    int indx,
+    int size,
+    int type,
+    boolean normalized,
+    int stride,
+    Buffer ptr) {
+    gl().glVertexAttribPointer(
+      indx,
+      size,
+      type,
+      normalized,
+      stride,
+      ptr);
+  }
+
+  public static void glDrawElementsInstanced(
+    int mode,
+    int count,
+    int type,
+    Buffer indices,
+    int instancecount) {
+    gl().glDrawElementsInstanced(
+      mode,
+      count,
+      type,
+      indices,
+      instancecount);
+  }
+
+  public static void glDrawRangeElements(
+    int mode,
+    int start,
+    int end,
+    int count,
+    int type,
+    Buffer indices) {
+    gl().glDrawRangeElements(
+      mode,
+      start,
+      end,
+      count,
+      type,
+      indices);
+  }
+
+  public static void glVertexAttribIPointer(
+    int index,
+    int size,
+    int type,
+    int stride,
+    Buffer pointer) {
+    gl().glVertexAttribIPointer(
+      index,
+      size,
+      type,
+      stride,
+      pointer);
   }
 
 
@@ -21597,10 +23612,10 @@ public class Gl {
     = GL2.GL_RESCALE_NORMAL;
 
   public static final int GL_STACK_OVERFLOW
-    = GL2.GL_STACK_OVERFLOW;
+    = GL2ES2.GL_STACK_OVERFLOW;
 
   public static final int GL_STACK_UNDERFLOW
-    = GL2.GL_STACK_UNDERFLOW;
+    = GL2ES2.GL_STACK_UNDERFLOW;
 
   public static final int GL_EXP
     = GL2.GL_EXP;
@@ -21837,7 +23852,7 @@ public class Gl {
     = GL2.GL_SRC0_ALPHA;
 
   public static final int GL_SRC1_ALPHA
-    = GL2.GL_SRC1_ALPHA;
+    = GL2GL3.GL_SRC1_ALPHA;
 
   public static final int GL_SRC2_ALPHA
     = GL2.GL_SRC2_ALPHA;
@@ -21912,16 +23927,10 @@ public class Gl {
     = GL2.GL_TEXTURE_GEN_STR;
 
   public static final int GL_CONTEXT_ROBUST_ACCESS
-    = GL2ES1.GL_CONTEXT_ROBUST_ACCESS;
+    = GL2ES2.GL_CONTEXT_ROBUST_ACCESS;
 
   public static final int GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING
-    = GL2ES1.GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING;
-
-  public static final int GL_RGB16F
-    = GL2ES1.GL_RGB16F;
-
-  public static final int GL_BGRA8_EXT
-    = GL2ES1.GL_BGRA8_EXT;
+    = GL2ES2.GL_FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING;
 
   public static void glAlphaFunc(
     int func,
@@ -21947,12 +23956,6 @@ public class Gl {
       green,
       blue,
       alpha);
-  }
-
-  public static void glCurrentPaletteMatrix(
-    int matrixpaletteindex) {
-    gl().glCurrentPaletteMatrix(
-      matrixpaletteindex);
   }
 
   public static void glFogf(
@@ -22155,18 +24158,6 @@ public class Gl {
       opcode);
   }
 
-  public static void glMatrixIndexPointer(
-    int size,
-    int type,
-    int stride,
-    Buffer pointer) {
-    gl().glMatrixIndexPointer(
-      size,
-      type,
-      stride,
-      pointer);
-  }
-
   public static void glMultiTexCoord4f(
     int target,
     float s,
@@ -22351,18 +24342,6 @@ public class Gl {
       params_offset);
   }
 
-  public static void glWeightPointer(
-    int size,
-    int type,
-    int stride,
-    Buffer pointer) {
-    gl().glWeightPointer(
-      size,
-      type,
-      stride,
-      pointer);
-  }
-
   public static void glOrtho(
     double left,
     double right,
@@ -22393,6 +24372,18 @@ public class Gl {
       top,
       zNear,
       zFar);
+  }
+
+  public static void glDrawElements(
+    int mode,
+    int count,
+    int type,
+    Buffer indices) {
+    gl().glDrawElements(
+      mode,
+      count,
+      type,
+      indices);
   }
 
 
@@ -22442,9 +24433,6 @@ public class Gl {
 
   public static final int GL_INT
     = GL2.GL_INT;
-
-  public static final int GL_DEPTH_COMPONENT
-    = GL2.GL_DEPTH_COMPONENT;
 
   public static final int GL_FRAGMENT_SHADER
     = GL2.GL_FRAGMENT_SHADER;
@@ -22644,8 +24632,113 @@ public class Gl {
   public static final int GL_INT_10_10_10_2
     = GL2.GL_INT_10_10_10_2;
 
-  public static final int GL_RGBA16F
-    = GL2.GL_RGBA16F;
+  public static final int GL_DEBUG_OUTPUT_SYNCHRONOUS
+    = GL2.GL_DEBUG_OUTPUT_SYNCHRONOUS;
+
+  public static final int GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH
+    = GL2.GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH;
+
+  public static final int GL_DEBUG_CALLBACK_FUNCTION
+    = GL2.GL_DEBUG_CALLBACK_FUNCTION;
+
+  public static final int GL_DEBUG_CALLBACK_USER_PARAM
+    = GL2.GL_DEBUG_CALLBACK_USER_PARAM;
+
+  public static final int GL_DEBUG_SOURCE_API
+    = GL2.GL_DEBUG_SOURCE_API;
+
+  public static final int GL_DEBUG_SOURCE_WINDOW_SYSTEM
+    = GL2.GL_DEBUG_SOURCE_WINDOW_SYSTEM;
+
+  public static final int GL_DEBUG_SOURCE_SHADER_COMPILER
+    = GL2.GL_DEBUG_SOURCE_SHADER_COMPILER;
+
+  public static final int GL_DEBUG_SOURCE_THIRD_PARTY
+    = GL2.GL_DEBUG_SOURCE_THIRD_PARTY;
+
+  public static final int GL_DEBUG_SOURCE_APPLICATION
+    = GL2.GL_DEBUG_SOURCE_APPLICATION;
+
+  public static final int GL_DEBUG_SOURCE_OTHER
+    = GL2.GL_DEBUG_SOURCE_OTHER;
+
+  public static final int GL_DEBUG_TYPE_ERROR
+    = GL2.GL_DEBUG_TYPE_ERROR;
+
+  public static final int GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR
+    = GL2.GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR;
+
+  public static final int GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR
+    = GL2.GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR;
+
+  public static final int GL_DEBUG_TYPE_PORTABILITY
+    = GL2.GL_DEBUG_TYPE_PORTABILITY;
+
+  public static final int GL_DEBUG_TYPE_PERFORMANCE
+    = GL2.GL_DEBUG_TYPE_PERFORMANCE;
+
+  public static final int GL_DEBUG_TYPE_OTHER
+    = GL2.GL_DEBUG_TYPE_OTHER;
+
+  public static final int GL_DEBUG_TYPE_MARKER
+    = GL2.GL_DEBUG_TYPE_MARKER;
+
+  public static final int GL_DEBUG_TYPE_PUSH_GROUP
+    = GL2.GL_DEBUG_TYPE_PUSH_GROUP;
+
+  public static final int GL_DEBUG_TYPE_POP_GROUP
+    = GL2.GL_DEBUG_TYPE_POP_GROUP;
+
+  public static final int GL_DEBUG_SEVERITY_NOTIFICATION
+    = GL2.GL_DEBUG_SEVERITY_NOTIFICATION;
+
+  public static final int GL_MAX_DEBUG_GROUP_STACK_DEPTH
+    = GL2.GL_MAX_DEBUG_GROUP_STACK_DEPTH;
+
+  public static final int GL_DEBUG_GROUP_STACK_DEPTH
+    = GL2.GL_DEBUG_GROUP_STACK_DEPTH;
+
+  public static final int GL_BUFFER
+    = GL2.GL_BUFFER;
+
+  public static final int GL_SHADER
+    = GL2.GL_SHADER;
+
+  public static final int GL_PROGRAM
+    = GL2.GL_PROGRAM;
+
+  public static final int GL_QUERY
+    = GL2.GL_QUERY;
+
+  public static final int GL_SAMPLER
+    = GL2.GL_SAMPLER;
+
+  public static final int GL_MAX_LABEL_LENGTH
+    = GL2.GL_MAX_LABEL_LENGTH;
+
+  public static final int GL_MAX_DEBUG_MESSAGE_LENGTH
+    = GL2.GL_MAX_DEBUG_MESSAGE_LENGTH;
+
+  public static final int GL_MAX_DEBUG_LOGGED_MESSAGES
+    = GL2.GL_MAX_DEBUG_LOGGED_MESSAGES;
+
+  public static final int GL_DEBUG_LOGGED_MESSAGES
+    = GL2.GL_DEBUG_LOGGED_MESSAGES;
+
+  public static final int GL_DEBUG_SEVERITY_HIGH
+    = GL2.GL_DEBUG_SEVERITY_HIGH;
+
+  public static final int GL_DEBUG_SEVERITY_MEDIUM
+    = GL2.GL_DEBUG_SEVERITY_MEDIUM;
+
+  public static final int GL_DEBUG_SEVERITY_LOW
+    = GL2.GL_DEBUG_SEVERITY_LOW;
+
+  public static final int GL_DEBUG_OUTPUT
+    = GL2.GL_DEBUG_OUTPUT;
+
+  public static final int GL_CONTEXT_FLAG_DEBUG_BIT
+    = GL2.GL_CONTEXT_FLAG_DEBUG_BIT;
 
   public static final int GL_RG16F
     = GL2.GL_RG16F;
@@ -22659,12 +24752,6 @@ public class Gl {
   public static final int GL_UNSIGNED_NORMALIZED
     = GL2.GL_UNSIGNED_NORMALIZED;
 
-  public static final int GL_ANY_SAMPLES_PASSED
-    = GL2.GL_ANY_SAMPLES_PASSED;
-
-  public static final int GL_ANY_SAMPLES_PASSED_CONSERVATIVE
-    = GL2.GL_ANY_SAMPLES_PASSED_CONSERVATIVE;
-
   public static final int GL_CURRENT_QUERY
     = GL2.GL_CURRENT_QUERY;
 
@@ -22674,59 +24761,8 @@ public class Gl {
   public static final int GL_QUERY_RESULT_AVAILABLE
     = GL2.GL_QUERY_RESULT_AVAILABLE;
 
-  public static final int GL_VERTEX_SHADER_BIT
-    = GL2.GL_VERTEX_SHADER_BIT;
-
-  public static final int GL_FRAGMENT_SHADER_BIT
-    = GL2.GL_FRAGMENT_SHADER_BIT;
-
-  public static final int GL_PROGRAM_SEPARABLE
-    = GL2.GL_PROGRAM_SEPARABLE;
-
-  public static final int GL_ACTIVE_PROGRAM
-    = GL2.GL_ACTIVE_PROGRAM;
-
-  public static final int GL_PROGRAM_PIPELINE_BINDING
-    = GL2.GL_PROGRAM_PIPELINE_BINDING;
-
-  public static final int GL_TEXTURE_COMPARE_MODE
-    = GL2.GL_TEXTURE_COMPARE_MODE;
-
-  public static final int GL_TEXTURE_COMPARE_FUNC
-    = GL2.GL_TEXTURE_COMPARE_FUNC;
-
-  public static final int GL_COMPARE_REF_TO_TEXTURE
-    = GL2.GL_COMPARE_REF_TO_TEXTURE;
-
-  public static final int GL_SAMPLER_2D_SHADOW
-    = GL2.GL_SAMPLER_2D_SHADOW;
-
-  public static final int GL_RED
-    = GL2.GL_RED;
-
-  public static final int GL_RG
-    = GL2.GL_RG;
-
-  public static final int GL_R8
-    = GL2.GL_R8;
-
-  public static final int GL_RG8
-    = GL2.GL_RG8;
-
-  public static final int GL_UNSIGNED_INT_2_10_10_10_REV
-    = GL2.GL_UNSIGNED_INT_2_10_10_10_REV;
-
-  public static final int GL_UNPACK_ROW_LENGTH
-    = GL2.GL_UNPACK_ROW_LENGTH;
-
-  public static final int GL_UNPACK_SKIP_ROWS
-    = GL2.GL_UNPACK_SKIP_ROWS;
-
-  public static final int GL_UNPACK_SKIP_PIXELS
-    = GL2.GL_UNPACK_SKIP_PIXELS;
-
-  public static final int GL_SHADER_BINARY_DMP
-    = GL2.GL_SHADER_BINARY_DMP;
+  public static final int GL_MAX_COLOR_ATTACHMENTS
+    = GL2.GL_MAX_COLOR_ATTACHMENTS;
 
   public static final int GL_MAX_DRAW_BUFFERS
     = GL2.GL_MAX_DRAW_BUFFERS;
@@ -22824,11 +24860,77 @@ public class Gl {
   public static final int GL_COLOR_ATTACHMENT15
     = GL2.GL_COLOR_ATTACHMENT15;
 
-  public static final int GL_MAX_COLOR_ATTACHMENTS
-    = GL2.GL_MAX_COLOR_ATTACHMENTS;
+  public static final int GL_ANY_SAMPLES_PASSED
+    = GL2.GL_ANY_SAMPLES_PASSED;
+
+  public static final int GL_ANY_SAMPLES_PASSED_CONSERVATIVE
+    = GL2.GL_ANY_SAMPLES_PASSED_CONSERVATIVE;
+
+  public static final int GL_VERTEX_SHADER_BIT
+    = GL2.GL_VERTEX_SHADER_BIT;
+
+  public static final int GL_FRAGMENT_SHADER_BIT
+    = GL2.GL_FRAGMENT_SHADER_BIT;
+
+  public static final int GL_PROGRAM_SEPARABLE
+    = GL2.GL_PROGRAM_SEPARABLE;
+
+  public static final int GL_ACTIVE_PROGRAM
+    = GL2.GL_ACTIVE_PROGRAM;
+
+  public static final int GL_PROGRAM_PIPELINE_BINDING
+    = GL2.GL_PROGRAM_PIPELINE_BINDING;
+
+  public static final int GL_TEXTURE_COMPARE_MODE
+    = GL2.GL_TEXTURE_COMPARE_MODE;
+
+  public static final int GL_TEXTURE_COMPARE_FUNC
+    = GL2.GL_TEXTURE_COMPARE_FUNC;
+
+  public static final int GL_COMPARE_REF_TO_TEXTURE
+    = GL2.GL_COMPARE_REF_TO_TEXTURE;
+
+  public static final int GL_SAMPLER_2D_SHADOW
+    = GL2.GL_SAMPLER_2D_SHADOW;
+
+  public static final int GL_RED
+    = GL2.GL_RED;
+
+  public static final int GL_RG
+    = GL2.GL_RG;
+
+  public static final int GL_R8
+    = GL2.GL_R8;
+
+  public static final int GL_RG8
+    = GL2.GL_RG8;
+
+  public static final int GL_R32F
+    = GL2.GL_R32F;
+
+  public static final int GL_RG32F
+    = GL2.GL_RG32F;
+
+  public static final int GL_UNSIGNED_INT_2_10_10_10_REV
+    = GL2.GL_UNSIGNED_INT_2_10_10_10_REV;
+
+  public static final int GL_UNPACK_ROW_LENGTH
+    = GL2.GL_UNPACK_ROW_LENGTH;
+
+  public static final int GL_UNPACK_SKIP_ROWS
+    = GL2.GL_UNPACK_SKIP_ROWS;
+
+  public static final int GL_UNPACK_SKIP_PIXELS
+    = GL2.GL_UNPACK_SKIP_PIXELS;
+
+  public static final int GL_SHADER_BINARY_DMP
+    = GL2.GL_SHADER_BINARY_DMP;
 
   public static final int GL_ALL_SHADER_BITS
     = GL2.GL_ALL_SHADER_BITS;
+
+  public static final int GL_DEPTH_COMPONENT
+    = GL2.GL_DEPTH_COMPONENT;
 
   public static void glAttachShader(
     int program,
@@ -23001,6 +25103,56 @@ public class Gl {
     int type) {
     return gl().glCreateShader(
       type);
+  }
+
+  public static void glDebugMessageControl(
+    int source,
+    int type,
+    int severity,
+    int count,
+    IntBuffer ids,
+    boolean enabled) {
+    gl().glDebugMessageControl(
+      source,
+      type,
+      severity,
+      count,
+      ids,
+      enabled);
+  }
+
+  public static void glDebugMessageControl(
+    int source,
+    int type,
+    int severity,
+    int count,
+    int[] ids,
+    int ids_offset,
+    boolean enabled) {
+    gl().glDebugMessageControl(
+      source,
+      type,
+      severity,
+      count,
+      ids,
+      ids_offset,
+      enabled);
+  }
+
+  public static void glDebugMessageInsert(
+    int source,
+    int type,
+    int id,
+    int severity,
+    int length,
+    String buf) {
+    gl().glDebugMessageInsert(
+      source,
+      type,
+      id,
+      severity,
+      length,
+      buf);
   }
 
   public static void glDeleteProgram(
@@ -23215,6 +25367,118 @@ public class Gl {
     return gl().glGetAttribLocation(
       program,
       name);
+  }
+
+  public static int glGetDebugMessageLog(
+    int count,
+    int bufsize,
+    IntBuffer sources,
+    IntBuffer types,
+    IntBuffer ids,
+    IntBuffer severities,
+    IntBuffer lengths,
+    ByteBuffer messageLog) {
+    return gl().glGetDebugMessageLog(
+      count,
+      bufsize,
+      sources,
+      types,
+      ids,
+      severities,
+      lengths,
+      messageLog);
+  }
+
+  public static int glGetDebugMessageLog(
+    int count,
+    int bufsize,
+    int[] sources,
+    int sources_offset,
+    int[] types,
+    int types_offset,
+    int[] ids,
+    int ids_offset,
+    int[] severities,
+    int severities_offset,
+    int[] lengths,
+    int lengths_offset,
+    byte[] messageLog,
+    int messageLog_offset) {
+    return gl().glGetDebugMessageLog(
+      count,
+      bufsize,
+      sources,
+      sources_offset,
+      types,
+      types_offset,
+      ids,
+      ids_offset,
+      severities,
+      severities_offset,
+      lengths,
+      lengths_offset,
+      messageLog,
+      messageLog_offset);
+  }
+
+  public static void glGetObjectLabel(
+    int identifier,
+    int name,
+    int bufSize,
+    IntBuffer length,
+    ByteBuffer label) {
+    gl().glGetObjectLabel(
+      identifier,
+      name,
+      bufSize,
+      length,
+      label);
+  }
+
+  public static void glGetObjectLabel(
+    int identifier,
+    int name,
+    int bufSize,
+    int[] length,
+    int length_offset,
+    byte[] label,
+    int label_offset) {
+    gl().glGetObjectLabel(
+      identifier,
+      name,
+      bufSize,
+      length,
+      length_offset,
+      label,
+      label_offset);
+  }
+
+  public static void glGetObjectPtrLabel(
+    Buffer ptr,
+    int bufSize,
+    IntBuffer length,
+    ByteBuffer label) {
+    gl().glGetObjectPtrLabel(
+      ptr,
+      bufSize,
+      length,
+      label);
+  }
+
+  public static void glGetObjectPtrLabel(
+    Buffer ptr,
+    int bufSize,
+    int[] length,
+    int length_offset,
+    byte[] label,
+    int label_offset) {
+    gl().glGetObjectPtrLabel(
+      ptr,
+      bufSize,
+      length,
+      length_offset,
+      label,
+      label_offset);
   }
 
   public static void glGetProgramBinary(
@@ -23541,6 +25805,59 @@ public class Gl {
       program);
   }
 
+  public static void glObjectLabel(
+    int identifier,
+    int name,
+    int length,
+    ByteBuffer label) {
+    gl().glObjectLabel(
+      identifier,
+      name,
+      length,
+      label);
+  }
+
+  public static void glObjectLabel(
+    int identifier,
+    int name,
+    int length,
+    byte[] label,
+    int label_offset) {
+    gl().glObjectLabel(
+      identifier,
+      name,
+      length,
+      label,
+      label_offset);
+  }
+
+  public static void glObjectPtrLabel(
+    Buffer ptr,
+    int length,
+    ByteBuffer label) {
+    gl().glObjectPtrLabel(
+      ptr,
+      length,
+      label);
+  }
+
+  public static void glObjectPtrLabel(
+    Buffer ptr,
+    int length,
+    byte[] label,
+    int label_offset) {
+    gl().glObjectPtrLabel(
+      ptr,
+      length,
+      label,
+      label_offset);
+  }
+
+  public static void glPopDebugGroup(
+    ) {
+    gl().glPopDebugGroup();
+  }
+
   public static void glProgramBinary(
     int program,
     int binaryFormat,
@@ -23551,6 +25868,32 @@ public class Gl {
       binaryFormat,
       binary,
       length);
+  }
+
+  public static void glPushDebugGroup(
+    int source,
+    int id,
+    int length,
+    ByteBuffer message) {
+    gl().glPushDebugGroup(
+      source,
+      id,
+      length,
+      message);
+  }
+
+  public static void glPushDebugGroup(
+    int source,
+    int id,
+    int length,
+    byte[] message,
+    int message_offset) {
+    gl().glPushDebugGroup(
+      source,
+      id,
+      length,
+      message,
+      message_offset);
   }
 
   public static void glShaderSource(
@@ -24187,22 +26530,6 @@ public class Gl {
     int type,
     boolean normalized,
     int stride,
-    Buffer ptr) {
-    gl().glVertexAttribPointer(
-      indx,
-      size,
-      type,
-      normalized,
-      stride,
-      ptr);
-  }
-
-  public static void glVertexAttribPointer(
-    int indx,
-    int size,
-    int type,
-    boolean normalized,
-    int stride,
     long ptr_buffer_offset) {
     gl().glVertexAttribPointer(
       indx,
@@ -24289,58 +26616,7 @@ public class Gl {
   }
 
 
-  // Generated from GL2GL3.html
-
-  public static final int GL_DOUBLE
-    = GL2.GL_DOUBLE;
-
-  public static final int GL_POINT_SIZE_GRANULARITY
-    = GL2.GL_POINT_SIZE_GRANULARITY;
-
-  public static final int GL_POINT_SIZE_RANGE
-    = GL2.GL_POINT_SIZE_RANGE;
-
-  public static final int GL_LINE_WIDTH_GRANULARITY
-    = GL2.GL_LINE_WIDTH_GRANULARITY;
-
-  public static final int GL_LINE_WIDTH_RANGE
-    = GL2.GL_LINE_WIDTH_RANGE;
-
-  public static final int GL_POINT
-    = GL2.GL_POINT;
-
-  public static final int GL_LINE
-    = GL2.GL_LINE;
-
-  public static final int GL_FILL
-    = GL2.GL_FILL;
-
-  public static final int GL_POLYGON_SMOOTH
-    = GL2.GL_POLYGON_SMOOTH;
-
-  public static final int GL_POLYGON_OFFSET_POINT
-    = GL2.GL_POLYGON_OFFSET_POINT;
-
-  public static final int GL_POLYGON_OFFSET_LINE
-    = GL2.GL_POLYGON_OFFSET_LINE;
-
-  public static final int GL_LEFT
-    = GL2.GL_LEFT;
-
-  public static final int GL_RIGHT
-    = GL2.GL_RIGHT;
-
-  public static final int GL_FRONT_LEFT
-    = GL2.GL_FRONT_LEFT;
-
-  public static final int GL_FRONT_RIGHT
-    = GL2.GL_FRONT_RIGHT;
-
-  public static final int GL_BACK_LEFT
-    = GL2.GL_BACK_LEFT;
-
-  public static final int GL_BACK_RIGHT
-    = GL2.GL_BACK_RIGHT;
+  // Generated from GL2ES3.html
 
   public static final int GL_GREEN
     = GL2.GL_GREEN;
@@ -24351,15 +26627,6 @@ public class Gl {
   public static final int GL_READ_BUFFER
     = GL2.GL_READ_BUFFER;
 
-  public static final int GL_DRAW_BUFFER
-    = GL2.GL_DRAW_BUFFER;
-
-  public static final int GL_DOUBLEBUFFER
-    = GL2.GL_DOUBLEBUFFER;
-
-  public static final int GL_STEREO
-    = GL2.GL_STEREO;
-
   public static final int GL_COLOR
     = GL2.GL_COLOR;
 
@@ -24368,12 +26635,6 @@ public class Gl {
 
   public static final int GL_STENCIL
     = GL2.GL_STENCIL;
-
-  public static final int GL_POLYGON_SMOOTH_HINT
-    = GL2.GL_POLYGON_SMOOTH_HINT;
-
-  public static final int GL_PACK_LSB_FIRST
-    = GL2.GL_PACK_LSB_FIRST;
 
   public static final int GL_PACK_ROW_LENGTH
     = GL2.GL_PACK_ROW_LENGTH;
@@ -24384,116 +26645,17 @@ public class Gl {
   public static final int GL_PACK_SKIP_ROWS
     = GL2.GL_PACK_SKIP_ROWS;
 
-  public static final int GL_PACK_SWAP_BYTES
-    = GL2.GL_PACK_SWAP_BYTES;
+  public static final int GL_MIN
+    = GL2.GL_MIN;
 
-  public static final int GL_UNPACK_LSB_FIRST
-    = GL2.GL_UNPACK_LSB_FIRST;
-
-  public static final int GL_UNPACK_SWAP_BYTES
-    = GL2.GL_UNPACK_SWAP_BYTES;
-
-  public static final int GL_TEXTURE_1D
-    = GL2.GL_TEXTURE_1D;
-
-  public static final int GL_TEXTURE_BORDER_COLOR
-    = GL2.GL_TEXTURE_BORDER_COLOR;
-
-  public static final int GL_TEXTURE_WIDTH
-    = GL2.GL_TEXTURE_WIDTH;
-
-  public static final int GL_TEXTURE_HEIGHT
-    = GL2.GL_TEXTURE_HEIGHT;
-
-  public static final int GL_TEXTURE_RED_SIZE
-    = GL2.GL_TEXTURE_RED_SIZE;
-
-  public static final int GL_TEXTURE_GREEN_SIZE
-    = GL2.GL_TEXTURE_GREEN_SIZE;
-
-  public static final int GL_TEXTURE_BLUE_SIZE
-    = GL2.GL_TEXTURE_BLUE_SIZE;
-
-  public static final int GL_TEXTURE_ALPHA_SIZE
-    = GL2.GL_TEXTURE_ALPHA_SIZE;
-
-  public static final int GL_PROXY_TEXTURE_1D
-    = GL2.GL_PROXY_TEXTURE_1D;
-
-  public static final int GL_PROXY_TEXTURE_2D
-    = GL2.GL_PROXY_TEXTURE_2D;
-
-  public static final int GL_TEXTURE_BINDING_1D
-    = GL2.GL_TEXTURE_BINDING_1D;
-
-  public static final int GL_TEXTURE_INTERNAL_FORMAT
-    = GL2.GL_TEXTURE_INTERNAL_FORMAT;
-
-  public static final int GL_R3_G3_B2
-    = GL2.GL_R3_G3_B2;
-
-  public static final int GL_RGB4
-    = GL2.GL_RGB4;
-
-  public static final int GL_RGB5
-    = GL2.GL_RGB5;
-
-  public static final int GL_RGB12
-    = GL2.GL_RGB12;
-
-  public static final int GL_RGB16
-    = GL2.GL_RGB16;
-
-  public static final int GL_RGBA2
-    = GL2.GL_RGBA2;
-
-  public static final int GL_RGBA12
-    = GL2.GL_RGBA12;
-
-  public static final int GL_RGBA16
-    = GL2.GL_RGBA16;
-
-  public static final int GL_UNSIGNED_BYTE_3_3_2
-    = GL2.GL_UNSIGNED_BYTE_3_3_2;
-
-  public static final int GL_UNSIGNED_INT_8_8_8_8
-    = GL2.GL_UNSIGNED_INT_8_8_8_8;
-
-  public static final int GL_PACK_SKIP_IMAGES
-    = GL2.GL_PACK_SKIP_IMAGES;
-
-  public static final int GL_PACK_IMAGE_HEIGHT
-    = GL2.GL_PACK_IMAGE_HEIGHT;
+  public static final int GL_MAX
+    = GL2.GL_MAX;
 
   public static final int GL_UNPACK_SKIP_IMAGES
     = GL2.GL_UNPACK_SKIP_IMAGES;
 
   public static final int GL_UNPACK_IMAGE_HEIGHT
     = GL2.GL_UNPACK_IMAGE_HEIGHT;
-
-  public static final int GL_PROXY_TEXTURE_3D
-    = GL2.GL_PROXY_TEXTURE_3D;
-
-  public static final int GL_TEXTURE_DEPTH
-    = GL2.GL_TEXTURE_DEPTH;
-
-  public static final int GL_UNSIGNED_BYTE_2_3_3_REV
-    = GL2.GL_UNSIGNED_BYTE_2_3_3_REV;
-
-  public static final int GL_UNSIGNED_SHORT_5_6_5_REV
-    = GL2.GL_UNSIGNED_SHORT_5_6_5_REV;
-
-  public static final int GL_UNSIGNED_SHORT_4_4_4_4_REV
-    = GL2.GL_UNSIGNED_SHORT_4_4_4_4_REV;
-
-  public static final int GL_UNSIGNED_SHORT_1_5_5_5_REV
-    = GL2.GL_UNSIGNED_SHORT_1_5_5_5_REV;
-
-  public static final int GL_UNSIGNED_INT_8_8_8_8_REV
-    = GL2.GL_UNSIGNED_INT_8_8_8_8_REV;
-
-  public static final int GL_BGR
-    = GL2.GL_BGR;
 
   public static final int GL_MAX_ELEMENTS_VERTICES
     = GL2.GL_MAX_ELEMENTS_VERTICES;
@@ -24513,56 +26675,8 @@ public class Gl {
   public static final int GL_TEXTURE_MAX_LEVEL
     = GL2.GL_TEXTURE_MAX_LEVEL;
 
-  public static final int GL_SMOOTH_POINT_SIZE_GRANULARITY
-    = GL2.GL_SMOOTH_POINT_SIZE_GRANULARITY;
-
-  public static final int GL_SMOOTH_LINE_WIDTH_GRANULARITY
-    = GL2.GL_SMOOTH_LINE_WIDTH_GRANULARITY;
-
-  public static final int GL_MIN
-    = GL2.GL_MIN;
-
-  public static final int GL_MAX
-    = GL2.GL_MAX;
-
-  public static final int GL_PROXY_TEXTURE_CUBE_MAP
-    = GL2.GL_PROXY_TEXTURE_CUBE_MAP;
-
-  public static final int GL_COMPRESSED_RGB
-    = GL2.GL_COMPRESSED_RGB;
-
-  public static final int GL_COMPRESSED_RGBA
-    = GL2.GL_COMPRESSED_RGBA;
-
-  public static final int GL_TEXTURE_COMPRESSION_HINT
-    = GL2.GL_TEXTURE_COMPRESSION_HINT;
-
-  public static final int GL_TEXTURE_COMPRESSED_IMAGE_SIZE
-    = GL2.GL_TEXTURE_COMPRESSED_IMAGE_SIZE;
-
-  public static final int GL_TEXTURE_COMPRESSED
-    = GL2.GL_TEXTURE_COMPRESSED;
-
-  public static final int GL_CLAMP_TO_BORDER
-    = GL2.GL_CLAMP_TO_BORDER;
-
   public static final int GL_MAX_TEXTURE_LOD_BIAS
     = GL2.GL_MAX_TEXTURE_LOD_BIAS;
-
-  public static final int GL_TEXTURE_LOD_BIAS
-    = GL2.GL_TEXTURE_LOD_BIAS;
-
-  public static final int GL_TEXTURE_DEPTH_SIZE
-    = GL2.GL_TEXTURE_DEPTH_SIZE;
-
-  public static final int GL_QUERY_COUNTER_BITS
-    = GL2.GL_QUERY_COUNTER_BITS;
-
-  public static final int GL_READ_ONLY
-    = GL2.GL_READ_ONLY;
-
-  public static final int GL_READ_WRITE
-    = GL2.GL_READ_WRITE;
 
   public static final int GL_STREAM_READ
     = GL2.GL_STREAM_READ;
@@ -24582,35 +26696,11 @@ public class Gl {
   public static final int GL_DYNAMIC_COPY
     = GL2.GL_DYNAMIC_COPY;
 
-  public static final int GL_SAMPLES_PASSED
-    = GL2.GL_SAMPLES_PASSED;
-
-  public static final int GL_VERTEX_PROGRAM_POINT_SIZE
-    = GL2.GL_VERTEX_PROGRAM_POINT_SIZE;
-
   public static final int GL_MAX_FRAGMENT_UNIFORM_COMPONENTS
     = GL2.GL_MAX_FRAGMENT_UNIFORM_COMPONENTS;
 
   public static final int GL_MAX_VERTEX_UNIFORM_COMPONENTS
     = GL2.GL_MAX_VERTEX_UNIFORM_COMPONENTS;
-
-  public static final int GL_MAX_VARYING_FLOATS
-    = GL2.GL_MAX_VARYING_FLOATS;
-
-  public static final int GL_SAMPLER_1D
-    = GL2.GL_SAMPLER_1D;
-
-  public static final int GL_SAMPLER_1D_SHADOW
-    = GL2.GL_SAMPLER_1D_SHADOW;
-
-  public static final int GL_POINT_SPRITE_COORD_ORIGIN
-    = GL2.GL_POINT_SPRITE_COORD_ORIGIN;
-
-  public static final int GL_LOWER_LEFT
-    = GL2.GL_LOWER_LEFT;
-
-  public static final int GL_UPPER_LEFT
-    = GL2.GL_UPPER_LEFT;
 
   public static final int GL_PIXEL_PACK_BUFFER
     = GL2.GL_PIXEL_PACK_BUFFER;
@@ -24645,39 +26735,6 @@ public class Gl {
   public static final int GL_SRGB8
     = GL2.GL_SRGB8;
 
-  public static final int GL_COMPRESSED_SRGB
-    = GL2.GL_COMPRESSED_SRGB;
-
-  public static final int GL_COMPRESSED_SRGB_ALPHA
-    = GL2.GL_COMPRESSED_SRGB_ALPHA;
-
-  public static final int GL_CLIP_DISTANCE0
-    = GL2.GL_CLIP_DISTANCE0;
-
-  public static final int GL_CLIP_DISTANCE1
-    = GL2.GL_CLIP_DISTANCE1;
-
-  public static final int GL_CLIP_DISTANCE2
-    = GL2.GL_CLIP_DISTANCE2;
-
-  public static final int GL_CLIP_DISTANCE3
-    = GL2.GL_CLIP_DISTANCE3;
-
-  public static final int GL_CLIP_DISTANCE4
-    = GL2.GL_CLIP_DISTANCE4;
-
-  public static final int GL_CLIP_DISTANCE5
-    = GL2.GL_CLIP_DISTANCE5;
-
-  public static final int GL_CLIP_DISTANCE6
-    = GL2.GL_CLIP_DISTANCE6;
-
-  public static final int GL_CLIP_DISTANCE7
-    = GL2.GL_CLIP_DISTANCE7;
-
-  public static final int GL_MAX_CLIP_DISTANCES
-    = GL2.GL_MAX_CLIP_DISTANCES;
-
   public static final int GL_MAJOR_VERSION
     = GL2.GL_MAJOR_VERSION;
 
@@ -24686,24 +26743,6 @@ public class Gl {
 
   public static final int GL_NUM_EXTENSIONS
     = GL2.GL_NUM_EXTENSIONS;
-
-  public static final int GL_CONTEXT_FLAGS
-    = GL2.GL_CONTEXT_FLAGS;
-
-  public static final int GL_DEPTH_BUFFER
-    = GL2.GL_DEPTH_BUFFER;
-
-  public static final int GL_STENCIL_BUFFER
-    = GL2.GL_STENCIL_BUFFER;
-
-  public static final int GL_COMPRESSED_RED
-    = GL2.GL_COMPRESSED_RED;
-
-  public static final int GL_COMPRESSED_RG
-    = GL2.GL_COMPRESSED_RG;
-
-  public static final int GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT
-    = GL2.GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT;
 
   public static final int GL_VERTEX_ATTRIB_ARRAY_INTEGER
     = GL2.GL_VERTEX_ATTRIB_ARRAY_INTEGER;
@@ -24714,35 +26753,14 @@ public class Gl {
   public static final int GL_MAX_PROGRAM_TEXEL_OFFSET
     = GL2.GL_MAX_PROGRAM_TEXEL_OFFSET;
 
-  public static final int GL_CLAMP_READ_COLOR
-    = GL2.GL_CLAMP_READ_COLOR;
-
-  public static final int GL_FIXED_ONLY
-    = GL2.GL_FIXED_ONLY;
-
   public static final int GL_MAX_VARYING_COMPONENTS
     = GL2.GL_MAX_VARYING_COMPONENTS;
-
-  public static final int GL_TEXTURE_1D_ARRAY
-    = GL2.GL_TEXTURE_1D_ARRAY;
-
-  public static final int GL_PROXY_TEXTURE_1D_ARRAY
-    = GL2.GL_PROXY_TEXTURE_1D_ARRAY;
-
-  public static final int GL_PROXY_TEXTURE_2D_ARRAY
-    = GL2.GL_PROXY_TEXTURE_2D_ARRAY;
-
-  public static final int GL_TEXTURE_BINDING_1D_ARRAY
-    = GL2.GL_TEXTURE_BINDING_1D_ARRAY;
 
   public static final int GL_RGB9_E5
     = GL2.GL_RGB9_E5;
 
   public static final int GL_UNSIGNED_INT_5_9_9_9_REV
     = GL2.GL_UNSIGNED_INT_5_9_9_9_REV;
-
-  public static final int GL_TEXTURE_SHARED_SIZE
-    = GL2.GL_TEXTURE_SHARED_SIZE;
 
   public static final int GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH
     = GL2.GL_TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH;
@@ -24761,9 +26779,6 @@ public class Gl {
 
   public static final int GL_TRANSFORM_FEEDBACK_BUFFER_SIZE
     = GL2.GL_TRANSFORM_FEEDBACK_BUFFER_SIZE;
-
-  public static final int GL_PRIMITIVES_GENERATED
-    = GL2.GL_PRIMITIVES_GENERATED;
 
   public static final int GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN
     = GL2.GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN;
@@ -24828,29 +26843,11 @@ public class Gl {
   public static final int GL_RED_INTEGER
     = GL2.GL_RED_INTEGER;
 
-  public static final int GL_GREEN_INTEGER
-    = GL2.GL_GREEN_INTEGER;
-
-  public static final int GL_BLUE_INTEGER
-    = GL2.GL_BLUE_INTEGER;
-
   public static final int GL_RGB_INTEGER
     = GL2.GL_RGB_INTEGER;
 
   public static final int GL_RGBA_INTEGER
     = GL2.GL_RGBA_INTEGER;
-
-  public static final int GL_BGR_INTEGER
-    = GL2.GL_BGR_INTEGER;
-
-  public static final int GL_BGRA_INTEGER
-    = GL2.GL_BGRA_INTEGER;
-
-  public static final int GL_SAMPLER_1D_ARRAY
-    = GL2.GL_SAMPLER_1D_ARRAY;
-
-  public static final int GL_SAMPLER_1D_ARRAY_SHADOW
-    = GL2.GL_SAMPLER_1D_ARRAY_SHADOW;
 
   public static final int GL_SAMPLER_2D_ARRAY_SHADOW
     = GL2.GL_SAMPLER_2D_ARRAY_SHADOW;
@@ -24867,9 +26864,6 @@ public class Gl {
   public static final int GL_UNSIGNED_INT_VEC4
     = GL2.GL_UNSIGNED_INT_VEC4;
 
-  public static final int GL_INT_SAMPLER_1D
-    = GL2.GL_INT_SAMPLER_1D;
-
   public static final int GL_INT_SAMPLER_2D
     = GL2.GL_INT_SAMPLER_2D;
 
@@ -24879,14 +26873,8 @@ public class Gl {
   public static final int GL_INT_SAMPLER_CUBE
     = GL2.GL_INT_SAMPLER_CUBE;
 
-  public static final int GL_INT_SAMPLER_1D_ARRAY
-    = GL2.GL_INT_SAMPLER_1D_ARRAY;
-
   public static final int GL_INT_SAMPLER_2D_ARRAY
     = GL2.GL_INT_SAMPLER_2D_ARRAY;
-
-  public static final int GL_UNSIGNED_INT_SAMPLER_1D
-    = GL2.GL_UNSIGNED_INT_SAMPLER_1D;
 
   public static final int GL_UNSIGNED_INT_SAMPLER_2D
     = GL2.GL_UNSIGNED_INT_SAMPLER_2D;
@@ -24897,23 +26885,8 @@ public class Gl {
   public static final int GL_UNSIGNED_INT_SAMPLER_CUBE
     = GL2.GL_UNSIGNED_INT_SAMPLER_CUBE;
 
-  public static final int GL_UNSIGNED_INT_SAMPLER_1D_ARRAY
-    = GL2.GL_UNSIGNED_INT_SAMPLER_1D_ARRAY;
-
   public static final int GL_UNSIGNED_INT_SAMPLER_2D_ARRAY
     = GL2.GL_UNSIGNED_INT_SAMPLER_2D_ARRAY;
-
-  public static final int GL_QUERY_WAIT
-    = GL2.GL_QUERY_WAIT;
-
-  public static final int GL_QUERY_NO_WAIT
-    = GL2.GL_QUERY_NO_WAIT;
-
-  public static final int GL_QUERY_BY_REGION_WAIT
-    = GL2.GL_QUERY_BY_REGION_WAIT;
-
-  public static final int GL_QUERY_BY_REGION_NO_WAIT
-    = GL2.GL_QUERY_BY_REGION_NO_WAIT;
 
   public static final int GL_BUFFER_ACCESS_FLAGS
     = GL2.GL_BUFFER_ACCESS_FLAGS;
@@ -24923,60 +26896,6 @@ public class Gl {
 
   public static final int GL_BUFFER_MAP_OFFSET
     = GL2.GL_BUFFER_MAP_OFFSET;
-
-  public static final int GL_SAMPLER_BUFFER
-    = GL2.GL_SAMPLER_BUFFER;
-
-  public static final int GL_INT_SAMPLER_2D_RECT
-    = GL2.GL_INT_SAMPLER_2D_RECT;
-
-  public static final int GL_INT_SAMPLER_BUFFER
-    = GL2.GL_INT_SAMPLER_BUFFER;
-
-  public static final int GL_UNSIGNED_INT_SAMPLER_2D_RECT
-    = GL2.GL_UNSIGNED_INT_SAMPLER_2D_RECT;
-
-  public static final int GL_UNSIGNED_INT_SAMPLER_BUFFER
-    = GL2.GL_UNSIGNED_INT_SAMPLER_BUFFER;
-
-  public static final int GL_PRIMITIVE_RESTART
-    = GL2.GL_PRIMITIVE_RESTART;
-
-  public static final int GL_PRIMITIVE_RESTART_INDEX
-    = GL2.GL_PRIMITIVE_RESTART_INDEX;
-
-  public static final int GL_SAMPLER_2D_RECT_ARB
-    = GL2.GL_SAMPLER_2D_RECT_ARB;
-
-  public static final int GL_SAMPLER_2D_RECT_SHADOW_ARB
-    = GL2.GL_SAMPLER_2D_RECT_SHADOW_ARB;
-
-  public static final int GL_TEXTURE_RECTANGLE_ARB
-    = GL2.GL_TEXTURE_RECTANGLE_ARB;
-
-  public static final int GL_TEXTURE_BINDING_RECTANGLE_ARB
-    = GL2.GL_TEXTURE_BINDING_RECTANGLE_ARB;
-
-  public static final int GL_PROXY_TEXTURE_RECTANGLE_ARB
-    = GL2.GL_PROXY_TEXTURE_RECTANGLE_ARB;
-
-  public static final int GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB
-    = GL2.GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB;
-
-  public static final int GL_TEXTURE_RED_TYPE
-    = GL2.GL_TEXTURE_RED_TYPE;
-
-  public static final int GL_TEXTURE_GREEN_TYPE
-    = GL2.GL_TEXTURE_GREEN_TYPE;
-
-  public static final int GL_TEXTURE_BLUE_TYPE
-    = GL2.GL_TEXTURE_BLUE_TYPE;
-
-  public static final int GL_TEXTURE_ALPHA_TYPE
-    = GL2.GL_TEXTURE_ALPHA_TYPE;
-
-  public static final int GL_TEXTURE_DEPTH_TYPE
-    = GL2.GL_TEXTURE_DEPTH_TYPE;
 
   public static final int GL_DEPTH_COMPONENT32F
     = GL2.GL_DEPTH_COMPONENT32F;
@@ -25014,9 +26933,6 @@ public class Gl {
   public static final int GL_DEPTH_STENCIL_ATTACHMENT
     = GL2.GL_DEPTH_STENCIL_ATTACHMENT;
 
-  public static final int GL_TEXTURE_STENCIL_SIZE
-    = GL2.GL_TEXTURE_STENCIL_SIZE;
-
   public static final int GL_DRAW_FRAMEBUFFER_BINDING
     = GL2.GL_DRAW_FRAMEBUFFER_BINDING;
 
@@ -25032,137 +26948,14 @@ public class Gl {
   public static final int GL_RENDERBUFFER_SAMPLES
     = GL2.GL_RENDERBUFFER_SAMPLES;
 
-  public static final int GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER
-    = GL2.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER;
-
-  public static final int GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER
-    = GL2.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER;
-
-  public static final int GL_STENCIL_INDEX16
-    = GL2.GL_STENCIL_INDEX16;
-
   public static final int GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE
     = GL2.GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE;
 
   public static final int GL_MAX_SAMPLES
     = GL2.GL_MAX_SAMPLES;
 
-  public static final int GL_FRAMEBUFFER_SRGB
-    = GL2.GL_FRAMEBUFFER_SRGB;
-
-  public static final int GL_LINES_ADJACENCY_ARB
-    = GL2.GL_LINES_ADJACENCY_ARB;
-
-  public static final int GL_LINE_STRIP_ADJACENCY_ARB
-    = GL2.GL_LINE_STRIP_ADJACENCY_ARB;
-
-  public static final int GL_TRIANGLES_ADJACENCY_ARB
-    = GL2.GL_TRIANGLES_ADJACENCY_ARB;
-
-  public static final int GL_TRIANGLE_STRIP_ADJACENCY_ARB
-    = GL2.GL_TRIANGLE_STRIP_ADJACENCY_ARB;
-
-  public static final int GL_PROGRAM_POINT_SIZE_ARB
-    = GL2.GL_PROGRAM_POINT_SIZE_ARB;
-
-  public static final int GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS_ARB
-    = GL2.GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS_ARB;
-
-  public static final int GL_FRAMEBUFFER_ATTACHMENT_LAYERED_ARB
-    = GL2.GL_FRAMEBUFFER_ATTACHMENT_LAYERED_ARB;
-
-  public static final int GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS_ARB
-    = GL2.GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS_ARB;
-
-  public static final int GL_FRAMEBUFFER_INCOMPLETE_LAYER_COUNT_ARB
-    = GL2.GL_FRAMEBUFFER_INCOMPLETE_LAYER_COUNT_ARB;
-
-  public static final int GL_GEOMETRY_SHADER_ARB
-    = GL2.GL_GEOMETRY_SHADER_ARB;
-
-  public static final int GL_GEOMETRY_VERTICES_OUT_ARB
-    = GL2.GL_GEOMETRY_VERTICES_OUT_ARB;
-
-  public static final int GL_GEOMETRY_INPUT_TYPE_ARB
-    = GL2.GL_GEOMETRY_INPUT_TYPE_ARB;
-
-  public static final int GL_GEOMETRY_OUTPUT_TYPE_ARB
-    = GL2.GL_GEOMETRY_OUTPUT_TYPE_ARB;
-
-  public static final int GL_MAX_GEOMETRY_VARYING_COMPONENTS_ARB
-    = GL2.GL_MAX_GEOMETRY_VARYING_COMPONENTS_ARB;
-
-  public static final int GL_MAX_VERTEX_VARYING_COMPONENTS_ARB
-    = GL2.GL_MAX_VERTEX_VARYING_COMPONENTS_ARB;
-
-  public static final int GL_MAX_GEOMETRY_UNIFORM_COMPONENTS_ARB
-    = GL2.GL_MAX_GEOMETRY_UNIFORM_COMPONENTS_ARB;
-
-  public static final int GL_MAX_GEOMETRY_OUTPUT_VERTICES_ARB
-    = GL2.GL_MAX_GEOMETRY_OUTPUT_VERTICES_ARB;
-
-  public static final int GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS_ARB
-    = GL2.GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS_ARB;
-
-  public static final int GL_MAP_READ_BIT
-    = GL2.GL_MAP_READ_BIT;
-
-  public static final int GL_MAP_WRITE_BIT
-    = GL2.GL_MAP_WRITE_BIT;
-
-  public static final int GL_MAP_INVALIDATE_RANGE_BIT
-    = GL2.GL_MAP_INVALIDATE_RANGE_BIT;
-
-  public static final int GL_MAP_INVALIDATE_BUFFER_BIT
-    = GL2.GL_MAP_INVALIDATE_BUFFER_BIT;
-
-  public static final int GL_MAP_FLUSH_EXPLICIT_BIT
-    = GL2.GL_MAP_FLUSH_EXPLICIT_BIT;
-
-  public static final int GL_MAP_UNSYNCHRONIZED_BIT
-    = GL2.GL_MAP_UNSYNCHRONIZED_BIT;
-
-  public static final int GL_TEXTURE_BUFFER
-    = GL2.GL_TEXTURE_BUFFER;
-
-  public static final int GL_MAX_TEXTURE_BUFFER_SIZE
-    = GL2.GL_MAX_TEXTURE_BUFFER_SIZE;
-
-  public static final int GL_TEXTURE_BINDING_BUFFER
-    = GL2.GL_TEXTURE_BINDING_BUFFER;
-
-  public static final int GL_TEXTURE_BUFFER_DATA_STORE_BINDING
-    = GL2.GL_TEXTURE_BUFFER_DATA_STORE_BINDING;
-
-  public static final int GL_TEXTURE_BUFFER_FORMAT
-    = GL2.GL_TEXTURE_BUFFER_FORMAT;
-
-  public static final int GL_COMPRESSED_RED_RGTC1
-    = GL2.GL_COMPRESSED_RED_RGTC1;
-
-  public static final int GL_COMPRESSED_SIGNED_RED_RGTC1
-    = GL2.GL_COMPRESSED_SIGNED_RED_RGTC1;
-
-  public static final int GL_COMPRESSED_RG_RGTC2
-    = GL2.GL_COMPRESSED_RG_RGTC2;
-
-  public static final int GL_COMPRESSED_SIGNED_RG_RGTC2
-    = GL2.GL_COMPRESSED_SIGNED_RG_RGTC2;
-
   public static final int GL_RG_INTEGER
     = GL2.GL_RG_INTEGER;
-
-  public static final int GL_R16
-    = GL2.GL_R16;
-
-  public static final int GL_RG16
-    = GL2.GL_RG16;
-
-  public static final int GL_R32F
-    = GL2.GL_R32F;
-
-  public static final int GL_RG32F
-    = GL2.GL_RG32F;
 
   public static final int GL_R8I
     = GL2.GL_R8I;
@@ -25203,6 +26996,27 @@ public class Gl {
   public static final int GL_VERTEX_ARRAY_BINDING
     = GL2.GL_VERTEX_ARRAY_BINDING;
 
+  public static final int GL_R8_SNORM
+    = GL2.GL_R8_SNORM;
+
+  public static final int GL_RG8_SNORM
+    = GL2.GL_RG8_SNORM;
+
+  public static final int GL_RGB8_SNORM
+    = GL2.GL_RGB8_SNORM;
+
+  public static final int GL_RGBA8_SNORM
+    = GL2.GL_RGBA8_SNORM;
+
+  public static final int GL_SIGNED_NORMALIZED
+    = GL2.GL_SIGNED_NORMALIZED;
+
+  public static final int GL_COPY_READ_BUFFER
+    = GL2.GL_COPY_READ_BUFFER;
+
+  public static final int GL_COPY_WRITE_BUFFER
+    = GL2.GL_COPY_WRITE_BUFFER;
+
   public static final int GL_UNIFORM_BUFFER
     = GL2.GL_UNIFORM_BUFFER;
 
@@ -25218,9 +27032,6 @@ public class Gl {
   public static final int GL_MAX_VERTEX_UNIFORM_BLOCKS
     = GL2.GL_MAX_VERTEX_UNIFORM_BLOCKS;
 
-  public static final int GL_MAX_GEOMETRY_UNIFORM_BLOCKS
-    = GL2.GL_MAX_GEOMETRY_UNIFORM_BLOCKS;
-
   public static final int GL_MAX_FRAGMENT_UNIFORM_BLOCKS
     = GL2.GL_MAX_FRAGMENT_UNIFORM_BLOCKS;
 
@@ -25235,9 +27046,6 @@ public class Gl {
 
   public static final int GL_MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS
     = GL2.GL_MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS;
-
-  public static final int GL_MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS
-    = GL2.GL_MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS;
 
   public static final int GL_MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS
     = GL2.GL_MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS;
@@ -25293,925 +27101,110 @@ public class Gl {
   public static final int GL_UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER
     = GL2.GL_UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER;
 
-  public static final int GL_UNIFORM_BLOCK_REFERENCED_BY_GEOMETRY_SHADER
-    = GL2.GL_UNIFORM_BLOCK_REFERENCED_BY_GEOMETRY_SHADER;
-
   public static final int GL_UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER
     = GL2.GL_UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER;
 
-  public static final int GL_COPY_READ_BUFFER
-    = GL2.GL_COPY_READ_BUFFER;
+  public static final int GL_COPY_READ_BUFFER_BINDING
+    = GL2.GL_COPY_READ_BUFFER_BINDING;
 
-  public static final int GL_COPY_WRITE_BUFFER
-    = GL2.GL_COPY_WRITE_BUFFER;
+  public static final int GL_COPY_WRITE_BUFFER_BINDING
+    = GL2.GL_COPY_WRITE_BUFFER_BINDING;
 
-  public static final int GL_DEPTH_CLAMP
-    = GL2.GL_DEPTH_CLAMP;
+  public static final int GL_TRANSFORM_FEEDBACK_PAUSED
+    = GL2.GL_TRANSFORM_FEEDBACK_PAUSED;
 
-  public static final int GL_QUADS_FOLLOW_PROVOKING_VERTEX_CONVENTION
-    = GL2.GL_QUADS_FOLLOW_PROVOKING_VERTEX_CONVENTION;
+  public static final int GL_TRANSFORM_FEEDBACK_ACTIVE
+    = GL2.GL_TRANSFORM_FEEDBACK_ACTIVE;
 
-  public static final int GL_FIRST_VERTEX_CONVENTION
-    = GL2.GL_FIRST_VERTEX_CONVENTION;
+  public static final int GL_COMPRESSED_RGBA_ASTC_4x4_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_4x4_KHR;
 
-  public static final int GL_LAST_VERTEX_CONVENTION
-    = GL2.GL_LAST_VERTEX_CONVENTION;
+  public static final int GL_COMPRESSED_RGBA_ASTC_5x4_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_5x4_KHR;
 
-  public static final int GL_PROVOKING_VERTEX
-    = GL2.GL_PROVOKING_VERTEX;
+  public static final int GL_COMPRESSED_RGBA_ASTC_5x5_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_5x5_KHR;
 
-  public static final int GL_TEXTURE_CUBE_MAP_SEAMLESS
-    = GL2.GL_TEXTURE_CUBE_MAP_SEAMLESS;
+  public static final int GL_COMPRESSED_RGBA_ASTC_6x5_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_6x5_KHR;
 
-  public static final int GL_SAMPLE_POSITION
-    = GL2.GL_SAMPLE_POSITION;
+  public static final int GL_COMPRESSED_RGBA_ASTC_6x6_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_6x6_KHR;
 
-  public static final int GL_SAMPLE_MASK
-    = GL2.GL_SAMPLE_MASK;
+  public static final int GL_COMPRESSED_RGBA_ASTC_8x5_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_8x5_KHR;
 
-  public static final int GL_SAMPLE_MASK_VALUE
-    = GL2.GL_SAMPLE_MASK_VALUE;
+  public static final int GL_COMPRESSED_RGBA_ASTC_8x6_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_8x6_KHR;
 
-  public static final int GL_MAX_SAMPLE_MASK_WORDS
-    = GL2.GL_MAX_SAMPLE_MASK_WORDS;
+  public static final int GL_COMPRESSED_RGBA_ASTC_8x8_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_8x8_KHR;
 
-  public static final int GL_TEXTURE_2D_MULTISAMPLE
-    = GL2.GL_TEXTURE_2D_MULTISAMPLE;
+  public static final int GL_COMPRESSED_RGBA_ASTC_10x5_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_10x5_KHR;
 
-  public static final int GL_PROXY_TEXTURE_2D_MULTISAMPLE
-    = GL2.GL_PROXY_TEXTURE_2D_MULTISAMPLE;
+  public static final int GL_COMPRESSED_RGBA_ASTC_10x6_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_10x6_KHR;
 
-  public static final int GL_TEXTURE_2D_MULTISAMPLE_ARRAY
-    = GL2.GL_TEXTURE_2D_MULTISAMPLE_ARRAY;
+  public static final int GL_COMPRESSED_RGBA_ASTC_10x8_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_10x8_KHR;
 
-  public static final int GL_PROXY_TEXTURE_2D_MULTISAMPLE_ARRAY
-    = GL2.GL_PROXY_TEXTURE_2D_MULTISAMPLE_ARRAY;
+  public static final int GL_COMPRESSED_RGBA_ASTC_10x10_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_10x10_KHR;
 
-  public static final int GL_TEXTURE_BINDING_2D_MULTISAMPLE
-    = GL2.GL_TEXTURE_BINDING_2D_MULTISAMPLE;
+  public static final int GL_COMPRESSED_RGBA_ASTC_12x10_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_12x10_KHR;
 
-  public static final int GL_TEXTURE_BINDING_2D_MULTISAMPLE_ARRAY
-    = GL2.GL_TEXTURE_BINDING_2D_MULTISAMPLE_ARRAY;
+  public static final int GL_COMPRESSED_RGBA_ASTC_12x12_KHR
+    = GL2.GL_COMPRESSED_RGBA_ASTC_12x12_KHR;
 
-  public static final int GL_TEXTURE_SAMPLES
-    = GL2.GL_TEXTURE_SAMPLES;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR;
 
-  public static final int GL_TEXTURE_FIXED_SAMPLE_LOCATIONS
-    = GL2.GL_TEXTURE_FIXED_SAMPLE_LOCATIONS;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR;
 
-  public static final int GL_SAMPLER_2D_MULTISAMPLE
-    = GL2.GL_SAMPLER_2D_MULTISAMPLE;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR;
 
-  public static final int GL_INT_SAMPLER_2D_MULTISAMPLE
-    = GL2.GL_INT_SAMPLER_2D_MULTISAMPLE;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR;
 
-  public static final int GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE
-    = GL2.GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR;
 
-  public static final int GL_SAMPLER_2D_MULTISAMPLE_ARRAY
-    = GL2.GL_SAMPLER_2D_MULTISAMPLE_ARRAY;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR;
 
-  public static final int GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY
-    = GL2.GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR;
 
-  public static final int GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY
-    = GL2.GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR;
 
-  public static final int GL_MAX_COLOR_TEXTURE_SAMPLES
-    = GL2.GL_MAX_COLOR_TEXTURE_SAMPLES;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR;
 
-  public static final int GL_MAX_DEPTH_TEXTURE_SAMPLES
-    = GL2.GL_MAX_DEPTH_TEXTURE_SAMPLES;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR;
 
-  public static final int GL_MAX_INTEGER_SAMPLES
-    = GL2.GL_MAX_INTEGER_SAMPLES;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR;
 
-  public static final int GL_SAMPLE_SHADING
-    = GL2.GL_SAMPLE_SHADING;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR;
 
-  public static final int GL_MIN_SAMPLE_SHADING_VALUE
-    = GL2.GL_MIN_SAMPLE_SHADING_VALUE;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR;
 
-  public static final int GL_TEXTURE_CUBE_MAP_ARRAY
-    = GL2.GL_TEXTURE_CUBE_MAP_ARRAY;
-
-  public static final int GL_TEXTURE_BINDING_CUBE_MAP_ARRAY
-    = GL2.GL_TEXTURE_BINDING_CUBE_MAP_ARRAY;
-
-  public static final int GL_PROXY_TEXTURE_CUBE_MAP_ARRAY
-    = GL2.GL_PROXY_TEXTURE_CUBE_MAP_ARRAY;
-
-  public static final int GL_SAMPLER_CUBE_MAP_ARRAY
-    = GL2.GL_SAMPLER_CUBE_MAP_ARRAY;
-
-  public static final int GL_SAMPLER_CUBE_MAP_ARRAY_SHADOW
-    = GL2.GL_SAMPLER_CUBE_MAP_ARRAY_SHADOW;
-
-  public static final int GL_INT_SAMPLER_CUBE_MAP_ARRAY
-    = GL2.GL_INT_SAMPLER_CUBE_MAP_ARRAY;
-
-  public static final int GL_UNSIGNED_INT_SAMPLER_CUBE_MAP_ARRAY
-    = GL2.GL_UNSIGNED_INT_SAMPLER_CUBE_MAP_ARRAY;
-
-  public static final int GL_MIN_PROGRAM_TEXTURE_GATHER_OFFSET
-    = GL2.GL_MIN_PROGRAM_TEXTURE_GATHER_OFFSET;
-
-  public static final int GL_MAX_PROGRAM_TEXTURE_GATHER_OFFSET
-    = GL2.GL_MAX_PROGRAM_TEXTURE_GATHER_OFFSET;
-
-  public static final int GL_SHADER_INCLUDE_ARB
-    = GL2.GL_SHADER_INCLUDE_ARB;
-
-  public static final int GL_NAMED_STRING_LENGTH_ARB
-    = GL2.GL_NAMED_STRING_LENGTH_ARB;
-
-  public static final int GL_NAMED_STRING_TYPE_ARB
-    = GL2.GL_NAMED_STRING_TYPE_ARB;
-
-  public static final int GL_SRC1_COLOR
-    = GL2.GL_SRC1_COLOR;
-
-  public static final int GL_ONE_MINUS_SRC1_COLOR
-    = GL2.GL_ONE_MINUS_SRC1_COLOR;
-
-  public static final int GL_ONE_MINUS_SRC1_ALPHA
-    = GL2.GL_ONE_MINUS_SRC1_ALPHA;
-
-  public static final int GL_MAX_DUAL_SOURCE_DRAW_BUFFERS
-    = GL2.GL_MAX_DUAL_SOURCE_DRAW_BUFFERS;
-
-  public static final int GL_SAMPLER_BINDING
-    = GL2.GL_SAMPLER_BINDING;
-
-  public static final int GL_RGB10_A2UI
-    = GL2.GL_RGB10_A2UI;
-
-  public static final int GL_TEXTURE_SWIZZLE_R
-    = GL2.GL_TEXTURE_SWIZZLE_R;
-
-  public static final int GL_TEXTURE_SWIZZLE_G
-    = GL2.GL_TEXTURE_SWIZZLE_G;
-
-  public static final int GL_TEXTURE_SWIZZLE_B
-    = GL2.GL_TEXTURE_SWIZZLE_B;
-
-  public static final int GL_TEXTURE_SWIZZLE_A
-    = GL2.GL_TEXTURE_SWIZZLE_A;
-
-  public static final int GL_TEXTURE_SWIZZLE_RGBA
-    = GL2.GL_TEXTURE_SWIZZLE_RGBA;
-
-  public static final int GL_TIME_ELAPSED
-    = GL2.GL_TIME_ELAPSED;
-
-  public static final int GL_TIMESTAMP
-    = GL2.GL_TIMESTAMP;
-
-  public static final int GL_INT_2_10_10_10_REV
-    = GL2.GL_INT_2_10_10_10_REV;
-
-  public static final int GL_ACTIVE_SUBROUTINES
-    = GL2.GL_ACTIVE_SUBROUTINES;
-
-  public static final int GL_ACTIVE_SUBROUTINE_UNIFORMS
-    = GL2.GL_ACTIVE_SUBROUTINE_UNIFORMS;
-
-  public static final int GL_ACTIVE_SUBROUTINE_UNIFORM_LOCATIONS
-    = GL2.GL_ACTIVE_SUBROUTINE_UNIFORM_LOCATIONS;
-
-  public static final int GL_ACTIVE_SUBROUTINE_MAX_LENGTH
-    = GL2.GL_ACTIVE_SUBROUTINE_MAX_LENGTH;
-
-  public static final int GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH
-    = GL2.GL_ACTIVE_SUBROUTINE_UNIFORM_MAX_LENGTH;
-
-  public static final int GL_MAX_SUBROUTINES
-    = GL2.GL_MAX_SUBROUTINES;
-
-  public static final int GL_MAX_SUBROUTINE_UNIFORM_LOCATIONS
-    = GL2.GL_MAX_SUBROUTINE_UNIFORM_LOCATIONS;
-
-  public static final int GL_NUM_COMPATIBLE_SUBROUTINES
-    = GL2.GL_NUM_COMPATIBLE_SUBROUTINES;
-
-  public static final int GL_COMPATIBLE_SUBROUTINES
-    = GL2.GL_COMPATIBLE_SUBROUTINES;
-
-  public static final int GL_TRANSFORM_FEEDBACK
-    = GL2.GL_TRANSFORM_FEEDBACK;
-
-  public static final int GL_TRANSFORM_FEEDBACK_BUFFER_PAUSED
-    = GL2.GL_TRANSFORM_FEEDBACK_BUFFER_PAUSED;
-
-  public static final int GL_TRANSFORM_FEEDBACK_BUFFER_ACTIVE
-    = GL2.GL_TRANSFORM_FEEDBACK_BUFFER_ACTIVE;
-
-  public static final int GL_TRANSFORM_FEEDBACK_BINDING
-    = GL2.GL_TRANSFORM_FEEDBACK_BINDING;
-
-  public static final int GL_MAX_TRANSFORM_FEEDBACK_BUFFERS
-    = GL2.GL_MAX_TRANSFORM_FEEDBACK_BUFFERS;
-
-  public static final int GL_MAX_VERTEX_STREAMS
-    = GL2.GL_MAX_VERTEX_STREAMS;
-
-  public static final int GL_PROGRAM_BINARY_RETRIEVABLE_HINT
-    = GL2.GL_PROGRAM_BINARY_RETRIEVABLE_HINT;
-
-  public static final int GL_GEOMETRY_SHADER_BIT
-    = GL2.GL_GEOMETRY_SHADER_BIT;
-
-  public static final int GL_TESS_CONTROL_SHADER_BIT
-    = GL2.GL_TESS_CONTROL_SHADER_BIT;
-
-  public static final int GL_TESS_EVALUATION_SHADER_BIT
-    = GL2.GL_TESS_EVALUATION_SHADER_BIT;
-
-  public static final int GL_MAX_VIEWPORTS
-    = GL2.GL_MAX_VIEWPORTS;
-
-  public static final int GL_VIEWPORT_SUBPIXEL_BITS
-    = GL2.GL_VIEWPORT_SUBPIXEL_BITS;
-
-  public static final int GL_VIEWPORT_BOUNDS_RANGE
-    = GL2.GL_VIEWPORT_BOUNDS_RANGE;
-
-  public static final int GL_LAYER_PROVOKING_VERTEX
-    = GL2.GL_LAYER_PROVOKING_VERTEX;
-
-  public static final int GL_VIEWPORT_INDEX_PROVOKING_VERTEX
-    = GL2.GL_VIEWPORT_INDEX_PROVOKING_VERTEX;
-
-  public static final int GL_UNDEFINED_VERTEX
-    = GL2.GL_UNDEFINED_VERTEX;
-
-  public static final int GL_SYNC_CL_EVENT_ARB
-    = GL2.GL_SYNC_CL_EVENT_ARB;
-
-  public static final int GL_SYNC_CL_EVENT_COMPLETE_ARB
-    = GL2.GL_SYNC_CL_EVENT_COMPLETE_ARB;
-
-  public static final int GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB
-    = GL2.GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB;
-
-  public static final int GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH_ARB
-    = GL2.GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH_ARB;
-
-  public static final int GL_DEBUG_CALLBACK_FUNCTION_ARB
-    = GL2.GL_DEBUG_CALLBACK_FUNCTION_ARB;
-
-  public static final int GL_DEBUG_CALLBACK_USER_PARAM_ARB
-    = GL2.GL_DEBUG_CALLBACK_USER_PARAM_ARB;
-
-  public static final int GL_DEBUG_SOURCE_API_ARB
-    = GL2.GL_DEBUG_SOURCE_API_ARB;
-
-  public static final int GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB
-    = GL2.GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB;
-
-  public static final int GL_DEBUG_SOURCE_SHADER_COMPILER_ARB
-    = GL2.GL_DEBUG_SOURCE_SHADER_COMPILER_ARB;
-
-  public static final int GL_DEBUG_SOURCE_THIRD_PARTY_ARB
-    = GL2.GL_DEBUG_SOURCE_THIRD_PARTY_ARB;
-
-  public static final int GL_DEBUG_SOURCE_APPLICATION_ARB
-    = GL2.GL_DEBUG_SOURCE_APPLICATION_ARB;
-
-  public static final int GL_DEBUG_SOURCE_OTHER_ARB
-    = GL2.GL_DEBUG_SOURCE_OTHER_ARB;
-
-  public static final int GL_DEBUG_TYPE_ERROR_ARB
-    = GL2.GL_DEBUG_TYPE_ERROR_ARB;
-
-  public static final int GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB
-    = GL2.GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB;
-
-  public static final int GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB
-    = GL2.GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB;
-
-  public static final int GL_DEBUG_TYPE_PORTABILITY_ARB
-    = GL2.GL_DEBUG_TYPE_PORTABILITY_ARB;
-
-  public static final int GL_DEBUG_TYPE_PERFORMANCE_ARB
-    = GL2.GL_DEBUG_TYPE_PERFORMANCE_ARB;
-
-  public static final int GL_DEBUG_TYPE_OTHER_ARB
-    = GL2.GL_DEBUG_TYPE_OTHER_ARB;
-
-  public static final int GL_MAX_DEBUG_MESSAGE_LENGTH_ARB
-    = GL2.GL_MAX_DEBUG_MESSAGE_LENGTH_ARB;
-
-  public static final int GL_MAX_DEBUG_LOGGED_MESSAGES_ARB
-    = GL2.GL_MAX_DEBUG_LOGGED_MESSAGES_ARB;
-
-  public static final int GL_DEBUG_LOGGED_MESSAGES_ARB
-    = GL2.GL_DEBUG_LOGGED_MESSAGES_ARB;
-
-  public static final int GL_DEBUG_SEVERITY_HIGH_ARB
-    = GL2.GL_DEBUG_SEVERITY_HIGH_ARB;
-
-  public static final int GL_DEBUG_SEVERITY_MEDIUM_ARB
-    = GL2.GL_DEBUG_SEVERITY_MEDIUM_ARB;
-
-  public static final int GL_DEBUG_SEVERITY_LOW_ARB
-    = GL2.GL_DEBUG_SEVERITY_LOW_ARB;
-
-  public static final int GL_CONTEXT_FLAG_ROBUST_ACCESS_BIT
-    = GL2.GL_CONTEXT_FLAG_ROBUST_ACCESS_BIT;
-
-  public static final int GL_UNPACK_COMPRESSED_BLOCK_WIDTH
-    = GL2.GL_UNPACK_COMPRESSED_BLOCK_WIDTH;
-
-  public static final int GL_UNPACK_COMPRESSED_BLOCK_HEIGHT
-    = GL2.GL_UNPACK_COMPRESSED_BLOCK_HEIGHT;
-
-  public static final int GL_UNPACK_COMPRESSED_BLOCK_DEPTH
-    = GL2.GL_UNPACK_COMPRESSED_BLOCK_DEPTH;
-
-  public static final int GL_UNPACK_COMPRESSED_BLOCK_SIZE
-    = GL2.GL_UNPACK_COMPRESSED_BLOCK_SIZE;
-
-  public static final int GL_PACK_COMPRESSED_BLOCK_WIDTH
-    = GL2.GL_PACK_COMPRESSED_BLOCK_WIDTH;
-
-  public static final int GL_PACK_COMPRESSED_BLOCK_HEIGHT
-    = GL2.GL_PACK_COMPRESSED_BLOCK_HEIGHT;
-
-  public static final int GL_PACK_COMPRESSED_BLOCK_DEPTH
-    = GL2.GL_PACK_COMPRESSED_BLOCK_DEPTH;
-
-  public static final int GL_PACK_COMPRESSED_BLOCK_SIZE
-    = GL2.GL_PACK_COMPRESSED_BLOCK_SIZE;
-
-  public static final int GL_NUM_SAMPLE_COUNTS
-    = GL2.GL_NUM_SAMPLE_COUNTS;
-
-  public static final int GL_MIN_MAP_BUFFER_ALIGNMENT
-    = GL2.GL_MIN_MAP_BUFFER_ALIGNMENT;
-
-  public static final int GL_ATOMIC_COUNTER_BUFFER
-    = GL2.GL_ATOMIC_COUNTER_BUFFER;
-
-  public static final int GL_ATOMIC_COUNTER_BUFFER_BINDING
-    = GL2.GL_ATOMIC_COUNTER_BUFFER_BINDING;
-
-  public static final int GL_ATOMIC_COUNTER_BUFFER_START
-    = GL2.GL_ATOMIC_COUNTER_BUFFER_START;
-
-  public static final int GL_ATOMIC_COUNTER_BUFFER_SIZE
-    = GL2.GL_ATOMIC_COUNTER_BUFFER_SIZE;
-
-  public static final int GL_ATOMIC_COUNTER_BUFFER_DATA_SIZE
-    = GL2.GL_ATOMIC_COUNTER_BUFFER_DATA_SIZE;
-
-  public static final int GL_ATOMIC_COUNTER_BUFFER_ACTIVE_ATOMIC_COUNTERS
-    = GL2.GL_ATOMIC_COUNTER_BUFFER_ACTIVE_ATOMIC_COUNTERS;
-
-  public static final int GL_ATOMIC_COUNTER_BUFFER_ACTIVE_ATOMIC_COUNTER_INDICES
-    = GL2.GL_ATOMIC_COUNTER_BUFFER_ACTIVE_ATOMIC_COUNTER_INDICES;
-
-  public static final int GL_ATOMIC_COUNTER_BUFFER_REFERENCED_BY_VERTEX_SHADER
-    = GL2.GL_ATOMIC_COUNTER_BUFFER_REFERENCED_BY_VERTEX_SHADER;
-
-  public static final int GL_ATOMIC_COUNTER_BUFFER_REFERENCED_BY_TESS_CONTROL_SHADER
-    = GL2.GL_ATOMIC_COUNTER_BUFFER_REFERENCED_BY_TESS_CONTROL_SHADER;
-
-  public static final int GL_ATOMIC_COUNTER_BUFFER_REFERENCED_BY_TESS_EVALUATION_SHADER
-    = GL2.GL_ATOMIC_COUNTER_BUFFER_REFERENCED_BY_TESS_EVALUATION_SHADER;
-
-  public static final int GL_ATOMIC_COUNTER_BUFFER_REFERENCED_BY_GEOMETRY_SHADER
-    = GL2.GL_ATOMIC_COUNTER_BUFFER_REFERENCED_BY_GEOMETRY_SHADER;
-
-  public static final int GL_ATOMIC_COUNTER_BUFFER_REFERENCED_BY_FRAGMENT_SHADER
-    = GL2.GL_ATOMIC_COUNTER_BUFFER_REFERENCED_BY_FRAGMENT_SHADER;
-
-  public static final int GL_MAX_VERTEX_ATOMIC_COUNTER_BUFFERS
-    = GL2.GL_MAX_VERTEX_ATOMIC_COUNTER_BUFFERS;
-
-  public static final int GL_MAX_TESS_CONTROL_ATOMIC_COUNTER_BUFFERS
-    = GL2.GL_MAX_TESS_CONTROL_ATOMIC_COUNTER_BUFFERS;
-
-  public static final int GL_MAX_TESS_EVALUATION_ATOMIC_COUNTER_BUFFERS
-    = GL2.GL_MAX_TESS_EVALUATION_ATOMIC_COUNTER_BUFFERS;
-
-  public static final int GL_MAX_GEOMETRY_ATOMIC_COUNTER_BUFFERS
-    = GL2.GL_MAX_GEOMETRY_ATOMIC_COUNTER_BUFFERS;
-
-  public static final int GL_MAX_FRAGMENT_ATOMIC_COUNTER_BUFFERS
-    = GL2.GL_MAX_FRAGMENT_ATOMIC_COUNTER_BUFFERS;
-
-  public static final int GL_MAX_COMBINED_ATOMIC_COUNTER_BUFFERS
-    = GL2.GL_MAX_COMBINED_ATOMIC_COUNTER_BUFFERS;
-
-  public static final int GL_MAX_VERTEX_ATOMIC_COUNTERS
-    = GL2.GL_MAX_VERTEX_ATOMIC_COUNTERS;
-
-  public static final int GL_MAX_TESS_CONTROL_ATOMIC_COUNTERS
-    = GL2.GL_MAX_TESS_CONTROL_ATOMIC_COUNTERS;
-
-  public static final int GL_MAX_TESS_EVALUATION_ATOMIC_COUNTERS
-    = GL2.GL_MAX_TESS_EVALUATION_ATOMIC_COUNTERS;
-
-  public static final int GL_MAX_GEOMETRY_ATOMIC_COUNTERS
-    = GL2.GL_MAX_GEOMETRY_ATOMIC_COUNTERS;
-
-  public static final int GL_MAX_FRAGMENT_ATOMIC_COUNTERS
-    = GL2.GL_MAX_FRAGMENT_ATOMIC_COUNTERS;
-
-  public static final int GL_MAX_COMBINED_ATOMIC_COUNTERS
-    = GL2.GL_MAX_COMBINED_ATOMIC_COUNTERS;
-
-  public static final int GL_MAX_ATOMIC_COUNTER_BUFFER_SIZE
-    = GL2.GL_MAX_ATOMIC_COUNTER_BUFFER_SIZE;
-
-  public static final int GL_MAX_ATOMIC_COUNTER_BUFFER_BINDINGS
-    = GL2.GL_MAX_ATOMIC_COUNTER_BUFFER_BINDINGS;
-
-  public static final int GL_ACTIVE_ATOMIC_COUNTER_BUFFERS
-    = GL2.GL_ACTIVE_ATOMIC_COUNTER_BUFFERS;
-
-  public static final int GL_UNIFORM_ATOMIC_COUNTER_BUFFER_INDEX
-    = GL2.GL_UNIFORM_ATOMIC_COUNTER_BUFFER_INDEX;
-
-  public static final int GL_UNSIGNED_INT_ATOMIC_COUNTER
-    = GL2.GL_UNSIGNED_INT_ATOMIC_COUNTER;
-
-  public static final int GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT
-    = GL2.GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT;
-
-  public static final int GL_ELEMENT_ARRAY_BARRIER_BIT
-    = GL2.GL_ELEMENT_ARRAY_BARRIER_BIT;
-
-  public static final int GL_UNIFORM_BARRIER_BIT
-    = GL2.GL_UNIFORM_BARRIER_BIT;
-
-  public static final int GL_TEXTURE_FETCH_BARRIER_BIT
-    = GL2.GL_TEXTURE_FETCH_BARRIER_BIT;
-
-  public static final int GL_SHADER_IMAGE_ACCESS_BARRIER_BIT
-    = GL2.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT;
-
-  public static final int GL_COMMAND_BARRIER_BIT
-    = GL2.GL_COMMAND_BARRIER_BIT;
-
-  public static final int GL_PIXEL_BUFFER_BARRIER_BIT
-    = GL2.GL_PIXEL_BUFFER_BARRIER_BIT;
-
-  public static final int GL_TEXTURE_UPDATE_BARRIER_BIT
-    = GL2.GL_TEXTURE_UPDATE_BARRIER_BIT;
-
-  public static final int GL_BUFFER_UPDATE_BARRIER_BIT
-    = GL2.GL_BUFFER_UPDATE_BARRIER_BIT;
-
-  public static final int GL_FRAMEBUFFER_BARRIER_BIT
-    = GL2.GL_FRAMEBUFFER_BARRIER_BIT;
-
-  public static final int GL_TRANSFORM_FEEDBACK_BARRIER_BIT
-    = GL2.GL_TRANSFORM_FEEDBACK_BARRIER_BIT;
-
-  public static final int GL_ATOMIC_COUNTER_BARRIER_BIT
-    = GL2.GL_ATOMIC_COUNTER_BARRIER_BIT;
-
-  public static final int GL_MAX_IMAGE_UNITS
-    = GL2.GL_MAX_IMAGE_UNITS;
-
-  public static final int GL_MAX_COMBINED_IMAGE_UNITS_AND_FRAGMENT_OUTPUTS
-    = GL2.GL_MAX_COMBINED_IMAGE_UNITS_AND_FRAGMENT_OUTPUTS;
-
-  public static final int GL_IMAGE_BINDING_NAME
-    = GL2.GL_IMAGE_BINDING_NAME;
-
-  public static final int GL_IMAGE_BINDING_LEVEL
-    = GL2.GL_IMAGE_BINDING_LEVEL;
-
-  public static final int GL_IMAGE_BINDING_LAYERED
-    = GL2.GL_IMAGE_BINDING_LAYERED;
-
-  public static final int GL_IMAGE_BINDING_LAYER
-    = GL2.GL_IMAGE_BINDING_LAYER;
-
-  public static final int GL_IMAGE_BINDING_ACCESS
-    = GL2.GL_IMAGE_BINDING_ACCESS;
-
-  public static final int GL_IMAGE_1D
-    = GL2.GL_IMAGE_1D;
-
-  public static final int GL_IMAGE_2D
-    = GL2.GL_IMAGE_2D;
-
-  public static final int GL_IMAGE_3D
-    = GL2.GL_IMAGE_3D;
-
-  public static final int GL_IMAGE_2D_RECT
-    = GL2.GL_IMAGE_2D_RECT;
-
-  public static final int GL_IMAGE_CUBE
-    = GL2.GL_IMAGE_CUBE;
-
-  public static final int GL_IMAGE_BUFFER
-    = GL2.GL_IMAGE_BUFFER;
-
-  public static final int GL_IMAGE_1D_ARRAY
-    = GL2.GL_IMAGE_1D_ARRAY;
-
-  public static final int GL_IMAGE_2D_ARRAY
-    = GL2.GL_IMAGE_2D_ARRAY;
-
-  public static final int GL_IMAGE_CUBE_MAP_ARRAY
-    = GL2.GL_IMAGE_CUBE_MAP_ARRAY;
-
-  public static final int GL_IMAGE_2D_MULTISAMPLE
-    = GL2.GL_IMAGE_2D_MULTISAMPLE;
-
-  public static final int GL_IMAGE_2D_MULTISAMPLE_ARRAY
-    = GL2.GL_IMAGE_2D_MULTISAMPLE_ARRAY;
-
-  public static final int GL_INT_IMAGE_1D
-    = GL2.GL_INT_IMAGE_1D;
-
-  public static final int GL_INT_IMAGE_2D
-    = GL2.GL_INT_IMAGE_2D;
-
-  public static final int GL_INT_IMAGE_3D
-    = GL2.GL_INT_IMAGE_3D;
-
-  public static final int GL_INT_IMAGE_2D_RECT
-    = GL2.GL_INT_IMAGE_2D_RECT;
-
-  public static final int GL_INT_IMAGE_CUBE
-    = GL2.GL_INT_IMAGE_CUBE;
-
-  public static final int GL_INT_IMAGE_BUFFER
-    = GL2.GL_INT_IMAGE_BUFFER;
-
-  public static final int GL_INT_IMAGE_1D_ARRAY
-    = GL2.GL_INT_IMAGE_1D_ARRAY;
-
-  public static final int GL_INT_IMAGE_2D_ARRAY
-    = GL2.GL_INT_IMAGE_2D_ARRAY;
-
-  public static final int GL_INT_IMAGE_CUBE_MAP_ARRAY
-    = GL2.GL_INT_IMAGE_CUBE_MAP_ARRAY;
-
-  public static final int GL_INT_IMAGE_2D_MULTISAMPLE
-    = GL2.GL_INT_IMAGE_2D_MULTISAMPLE;
-
-  public static final int GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY
-    = GL2.GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY;
-
-  public static final int GL_UNSIGNED_INT_IMAGE_1D
-    = GL2.GL_UNSIGNED_INT_IMAGE_1D;
-
-  public static final int GL_UNSIGNED_INT_IMAGE_2D
-    = GL2.GL_UNSIGNED_INT_IMAGE_2D;
-
-  public static final int GL_UNSIGNED_INT_IMAGE_3D
-    = GL2.GL_UNSIGNED_INT_IMAGE_3D;
-
-  public static final int GL_UNSIGNED_INT_IMAGE_2D_RECT
-    = GL2.GL_UNSIGNED_INT_IMAGE_2D_RECT;
-
-  public static final int GL_UNSIGNED_INT_IMAGE_CUBE
-    = GL2.GL_UNSIGNED_INT_IMAGE_CUBE;
-
-  public static final int GL_UNSIGNED_INT_IMAGE_BUFFER
-    = GL2.GL_UNSIGNED_INT_IMAGE_BUFFER;
-
-  public static final int GL_UNSIGNED_INT_IMAGE_1D_ARRAY
-    = GL2.GL_UNSIGNED_INT_IMAGE_1D_ARRAY;
-
-  public static final int GL_UNSIGNED_INT_IMAGE_2D_ARRAY
-    = GL2.GL_UNSIGNED_INT_IMAGE_2D_ARRAY;
-
-  public static final int GL_UNSIGNED_INT_IMAGE_CUBE_MAP_ARRAY
-    = GL2.GL_UNSIGNED_INT_IMAGE_CUBE_MAP_ARRAY;
-
-  public static final int GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE
-    = GL2.GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE;
-
-  public static final int GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY
-    = GL2.GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY;
-
-  public static final int GL_MAX_IMAGE_SAMPLES
-    = GL2.GL_MAX_IMAGE_SAMPLES;
-
-  public static final int GL_IMAGE_BINDING_FORMAT
-    = GL2.GL_IMAGE_BINDING_FORMAT;
-
-  public static final int GL_IMAGE_FORMAT_COMPATIBILITY_TYPE
-    = GL2.GL_IMAGE_FORMAT_COMPATIBILITY_TYPE;
-
-  public static final int GL_IMAGE_FORMAT_COMPATIBILITY_BY_SIZE
-    = GL2.GL_IMAGE_FORMAT_COMPATIBILITY_BY_SIZE;
-
-  public static final int GL_IMAGE_FORMAT_COMPATIBILITY_BY_CLASS
-    = GL2.GL_IMAGE_FORMAT_COMPATIBILITY_BY_CLASS;
-
-  public static final int GL_MAX_VERTEX_IMAGE_UNIFORMS
-    = GL2.GL_MAX_VERTEX_IMAGE_UNIFORMS;
-
-  public static final int GL_MAX_TESS_CONTROL_IMAGE_UNIFORMS
-    = GL2.GL_MAX_TESS_CONTROL_IMAGE_UNIFORMS;
-
-  public static final int GL_MAX_TESS_EVALUATION_IMAGE_UNIFORMS
-    = GL2.GL_MAX_TESS_EVALUATION_IMAGE_UNIFORMS;
-
-  public static final int GL_MAX_GEOMETRY_IMAGE_UNIFORMS
-    = GL2.GL_MAX_GEOMETRY_IMAGE_UNIFORMS;
-
-  public static final int GL_MAX_FRAGMENT_IMAGE_UNIFORMS
-    = GL2.GL_MAX_FRAGMENT_IMAGE_UNIFORMS;
-
-  public static final int GL_MAX_COMBINED_IMAGE_UNIFORMS
-    = GL2.GL_MAX_COMBINED_IMAGE_UNIFORMS;
-
-  public static final int GL_SAMPLER_BUFFER_AMD
-    = GL2.GL_SAMPLER_BUFFER_AMD;
-
-  public static final int GL_INT_SAMPLER_BUFFER_AMD
-    = GL2.GL_INT_SAMPLER_BUFFER_AMD;
-
-  public static final int GL_UNSIGNED_INT_SAMPLER_BUFFER_AMD
-    = GL2.GL_UNSIGNED_INT_SAMPLER_BUFFER_AMD;
-
-  public static final int GL_TESSELLATION_MODE_AMD
-    = GL2.GL_TESSELLATION_MODE_AMD;
-
-  public static final int GL_TESSELLATION_FACTOR_AMD
-    = GL2.GL_TESSELLATION_FACTOR_AMD;
-
-  public static final int GL_DISCRETE_AMD
-    = GL2.GL_DISCRETE_AMD;
-
-  public static final int GL_CONTINUOUS_AMD
-    = GL2.GL_CONTINUOUS_AMD;
-
-  public static final int GL_RED_SNORM
-    = GL2.GL_RED_SNORM;
-
-  public static final int GL_RG_SNORM
-    = GL2.GL_RG_SNORM;
-
-  public static final int GL_RGB_SNORM
-    = GL2.GL_RGB_SNORM;
-
-  public static final int GL_RGBA_SNORM
-    = GL2.GL_RGBA_SNORM;
-
-  public static final int GL_R8_SNORM
-    = GL2.GL_R8_SNORM;
-
-  public static final int GL_RG8_SNORM
-    = GL2.GL_RG8_SNORM;
-
-  public static final int GL_RGB8_SNORM
-    = GL2.GL_RGB8_SNORM;
-
-  public static final int GL_RGBA8_SNORM
-    = GL2.GL_RGBA8_SNORM;
-
-  public static final int GL_R16_SNORM
-    = GL2.GL_R16_SNORM;
-
-  public static final int GL_RG16_SNORM
-    = GL2.GL_RG16_SNORM;
-
-  public static final int GL_RGB16_SNORM
-    = GL2.GL_RGB16_SNORM;
-
-  public static final int GL_RGBA16_SNORM
-    = GL2.GL_RGBA16_SNORM;
-
-  public static final int GL_SIGNED_NORMALIZED
-    = GL2.GL_SIGNED_NORMALIZED;
-
-  public static final int GL_BUFFER_GPU_ADDRESS_NV
-    = GL2.GL_BUFFER_GPU_ADDRESS_NV;
-
-  public static final int GL_GPU_ADDRESS_NV
-    = GL2.GL_GPU_ADDRESS_NV;
-
-  public static final int GL_MAX_SHADER_BUFFER_ADDRESS_NV
-    = GL2.GL_MAX_SHADER_BUFFER_ADDRESS_NV;
-
-  public static final int GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV
-    = GL2.GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV;
-
-  public static final int GL_ELEMENT_ARRAY_UNIFIED_NV
-    = GL2.GL_ELEMENT_ARRAY_UNIFIED_NV;
-
-  public static final int GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV
-    = GL2.GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV;
-
-  public static final int GL_VERTEX_ARRAY_ADDRESS_NV
-    = GL2.GL_VERTEX_ARRAY_ADDRESS_NV;
-
-  public static final int GL_NORMAL_ARRAY_ADDRESS_NV
-    = GL2.GL_NORMAL_ARRAY_ADDRESS_NV;
-
-  public static final int GL_COLOR_ARRAY_ADDRESS_NV
-    = GL2.GL_COLOR_ARRAY_ADDRESS_NV;
-
-  public static final int GL_INDEX_ARRAY_ADDRESS_NV
-    = GL2.GL_INDEX_ARRAY_ADDRESS_NV;
-
-  public static final int GL_TEXTURE_COORD_ARRAY_ADDRESS_NV
-    = GL2.GL_TEXTURE_COORD_ARRAY_ADDRESS_NV;
-
-  public static final int GL_EDGE_FLAG_ARRAY_ADDRESS_NV
-    = GL2.GL_EDGE_FLAG_ARRAY_ADDRESS_NV;
-
-  public static final int GL_SECONDARY_COLOR_ARRAY_ADDRESS_NV
-    = GL2.GL_SECONDARY_COLOR_ARRAY_ADDRESS_NV;
-
-  public static final int GL_FOG_COORD_ARRAY_ADDRESS_NV
-    = GL2.GL_FOG_COORD_ARRAY_ADDRESS_NV;
-
-  public static final int GL_ELEMENT_ARRAY_ADDRESS_NV
-    = GL2.GL_ELEMENT_ARRAY_ADDRESS_NV;
-
-  public static final int GL_VERTEX_ATTRIB_ARRAY_LENGTH_NV
-    = GL2.GL_VERTEX_ATTRIB_ARRAY_LENGTH_NV;
-
-  public static final int GL_VERTEX_ARRAY_LENGTH_NV
-    = GL2.GL_VERTEX_ARRAY_LENGTH_NV;
-
-  public static final int GL_NORMAL_ARRAY_LENGTH_NV
-    = GL2.GL_NORMAL_ARRAY_LENGTH_NV;
-
-  public static final int GL_COLOR_ARRAY_LENGTH_NV
-    = GL2.GL_COLOR_ARRAY_LENGTH_NV;
-
-  public static final int GL_INDEX_ARRAY_LENGTH_NV
-    = GL2.GL_INDEX_ARRAY_LENGTH_NV;
-
-  public static final int GL_TEXTURE_COORD_ARRAY_LENGTH_NV
-    = GL2.GL_TEXTURE_COORD_ARRAY_LENGTH_NV;
-
-  public static final int GL_EDGE_FLAG_ARRAY_LENGTH_NV
-    = GL2.GL_EDGE_FLAG_ARRAY_LENGTH_NV;
-
-  public static final int GL_SECONDARY_COLOR_ARRAY_LENGTH_NV
-    = GL2.GL_SECONDARY_COLOR_ARRAY_LENGTH_NV;
-
-  public static final int GL_FOG_COORD_ARRAY_LENGTH_NV
-    = GL2.GL_FOG_COORD_ARRAY_LENGTH_NV;
-
-  public static final int GL_ELEMENT_ARRAY_LENGTH_NV
-    = GL2.GL_ELEMENT_ARRAY_LENGTH_NV;
-
-  public static final int GL_DRAW_INDIRECT_UNIFIED_NV
-    = GL2.GL_DRAW_INDIRECT_UNIFIED_NV;
-
-  public static final int GL_DRAW_INDIRECT_ADDRESS_NV
-    = GL2.GL_DRAW_INDIRECT_ADDRESS_NV;
-
-  public static final int GL_DRAW_INDIRECT_LENGTH_NV
-    = GL2.GL_DRAW_INDIRECT_LENGTH_NV;
-
-  public static final int GL_MAX_DEBUG_LOGGED_MESSAGES_AMD
-    = GL2.GL_MAX_DEBUG_LOGGED_MESSAGES_AMD;
-
-  public static final int GL_DEBUG_LOGGED_MESSAGES_AMD
-    = GL2.GL_DEBUG_LOGGED_MESSAGES_AMD;
-
-  public static final int GL_DEBUG_SEVERITY_HIGH_AMD
-    = GL2.GL_DEBUG_SEVERITY_HIGH_AMD;
-
-  public static final int GL_DEBUG_SEVERITY_MEDIUM_AMD
-    = GL2.GL_DEBUG_SEVERITY_MEDIUM_AMD;
-
-  public static final int GL_DEBUG_SEVERITY_LOW_AMD
-    = GL2.GL_DEBUG_SEVERITY_LOW_AMD;
-
-  public static final int GL_DEBUG_CATEGORY_API_ERROR_AMD
-    = GL2.GL_DEBUG_CATEGORY_API_ERROR_AMD;
-
-  public static final int GL_DEBUG_CATEGORY_WINDOW_SYSTEM_AMD
-    = GL2.GL_DEBUG_CATEGORY_WINDOW_SYSTEM_AMD;
-
-  public static final int GL_DEBUG_CATEGORY_DEPRECATION_AMD
-    = GL2.GL_DEBUG_CATEGORY_DEPRECATION_AMD;
-
-  public static final int GL_DEBUG_CATEGORY_UNDEFINED_BEHAVIOR_AMD
-    = GL2.GL_DEBUG_CATEGORY_UNDEFINED_BEHAVIOR_AMD;
-
-  public static final int GL_DEBUG_CATEGORY_PERFORMANCE_AMD
-    = GL2.GL_DEBUG_CATEGORY_PERFORMANCE_AMD;
-
-  public static final int GL_DEBUG_CATEGORY_SHADER_COMPILER_AMD
-    = GL2.GL_DEBUG_CATEGORY_SHADER_COMPILER_AMD;
-
-  public static final int GL_DEBUG_CATEGORY_APPLICATION_AMD
-    = GL2.GL_DEBUG_CATEGORY_APPLICATION_AMD;
-
-  public static final int GL_DEBUG_CATEGORY_OTHER_AMD
-    = GL2.GL_DEBUG_CATEGORY_OTHER_AMD;
-
-  public static final int GL_DEPTH_CLAMP_NEAR_AMD
-    = GL2.GL_DEPTH_CLAMP_NEAR_AMD;
-
-  public static final int GL_DEPTH_CLAMP_FAR_AMD
-    = GL2.GL_DEPTH_CLAMP_FAR_AMD;
-
-  public static final int GL_TEXTURE_SRGB_DECODE_EXT
-    = GL2.GL_TEXTURE_SRGB_DECODE_EXT;
-
-  public static final int GL_DECODE_EXT
-    = GL2.GL_DECODE_EXT;
-
-  public static final int GL_SKIP_DECODE_EXT
-    = GL2.GL_SKIP_DECODE_EXT;
-
-  public static final int GL_TEXTURE_COVERAGE_SAMPLES_NV
-    = GL2.GL_TEXTURE_COVERAGE_SAMPLES_NV;
-
-  public static final int GL_TEXTURE_COLOR_SAMPLES_NV
-    = GL2.GL_TEXTURE_COLOR_SAMPLES_NV;
-
-  public static final int GL_FACTOR_MIN_AMD
-    = GL2.GL_FACTOR_MIN_AMD;
-
-  public static final int GL_FACTOR_MAX_AMD
-    = GL2.GL_FACTOR_MAX_AMD;
-
-  public static final int GL_SUBSAMPLE_DISTANCE_AMD
-    = GL2.GL_SUBSAMPLE_DISTANCE_AMD;
-
-  public static final int GL_SYNC_X11_FENCE_EXT
-    = GL2.GL_SYNC_X11_FENCE_EXT;
-
-  public static final int GL_SCALED_RESOLVE_FASTEST_EXT
-    = GL2.GL_SCALED_RESOLVE_FASTEST_EXT;
-
-  public static final int GL_SCALED_RESOLVE_NICEST_EXT
-    = GL2.GL_SCALED_RESOLVE_NICEST_EXT;
-
-  public static final int GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD
-    = GL2.GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD;
-
-  public static final int GL_SET_AMD
-    = GL2.GL_SET_AMD;
-
-  public static final int GL_REPLACE_VALUE_AMD
-    = GL2.GL_REPLACE_VALUE_AMD;
-
-  public static final int GL_STENCIL_OP_VALUE_AMD
-    = GL2.GL_STENCIL_OP_VALUE_AMD;
-
-  public static final int GL_STENCIL_BACK_OP_VALUE_AMD
-    = GL2.GL_STENCIL_BACK_OP_VALUE_AMD;
-
-  public static final int GL_TEXTURE_RECTANGLE
-    = GL2.GL_TEXTURE_RECTANGLE;
-
-  public static final int GL_TEXTURE_BINDING_RECTANGLE
-    = GL2.GL_TEXTURE_BINDING_RECTANGLE;
-
-  public static final int GL_PROXY_TEXTURE_RECTANGLE
-    = GL2.GL_PROXY_TEXTURE_RECTANGLE;
-
-  public static final int GL_MAX_RECTANGLE_TEXTURE_SIZE
-    = GL2.GL_MAX_RECTANGLE_TEXTURE_SIZE;
-
-  public static final int GL_SAMPLER_2D_RECT
-    = GL2.GL_SAMPLER_2D_RECT;
-
-  public static final int GL_SAMPLER_2D_RECT_SHADOW
-    = GL2.GL_SAMPLER_2D_RECT_SHADOW;
+  public static final int GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR
+    = GL2.GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR;
 
   public static final int GL_INVALID_INDEX
     = GL2.GL_INVALID_INDEX;
 
   public static final int GL_ALL_BARRIER_BITS
     = GL2.GL_ALL_BARRIER_BITS;
-
-  public static void glActiveShaderProgram(
-    int pipeline,
-    int program) {
-    gl().glActiveShaderProgram(
-      pipeline,
-      program);
-  }
-
-  public static void glBeginConditionalRender(
-    int id,
-    int mode) {
-    gl().glBeginConditionalRender(
-      id,
-      mode);
-  }
-
-  public static void glBeginQueryIndexed(
-    int target,
-    int index,
-    int id) {
-    gl().glBeginQueryIndexed(
-      target,
-      index,
-      id);
-  }
 
   public static void glBeginTransformFeedback(
     int primitiveMode) {
@@ -26243,114 +27236,10 @@ public class Gl {
       size);
   }
 
-  public static void glBindFragDataLocation(
-    int program,
-    int color,
-    String name) {
-    gl().glBindFragDataLocation(
-      program,
-      color,
-      name);
-  }
-
-  public static void glBindFragDataLocationIndexed(
-    int program,
-    int colorNumber,
-    int index,
-    String name) {
-    gl().glBindFragDataLocationIndexed(
-      program,
-      colorNumber,
-      index,
-      name);
-  }
-
-  public static void glBindImageTexture(
-    int unit,
-    int texture,
-    int level,
-    boolean layered,
-    int layer,
-    int access,
-    int format) {
-    gl().glBindImageTexture(
-      unit,
-      texture,
-      level,
-      layered,
-      layer,
-      access,
-      format);
-  }
-
-  public static void glBindProgramPipeline(
-    int pipeline) {
-    gl().glBindProgramPipeline(
-      pipeline);
-  }
-
-  public static void glBindSampler(
-    int unit,
-    int sampler) {
-    gl().glBindSampler(
-      unit,
-      sampler);
-  }
-
-  public static void glBindTransformFeedback(
-    int target,
-    int id) {
-    gl().glBindTransformFeedback(
-      target,
-      id);
-  }
-
   public static void glBindVertexArray(
     int array) {
     gl().glBindVertexArray(
       array);
-  }
-
-  public static void glBlendEquationSeparatei(
-    int buf,
-    int modeRGB,
-    int modeAlpha) {
-    gl().glBlendEquationSeparatei(
-      buf,
-      modeRGB,
-      modeAlpha);
-  }
-
-  public static void glBlendEquationi(
-    int buf,
-    int mode) {
-    gl().glBlendEquationi(
-      buf,
-      mode);
-  }
-
-  public static void glBlendFuncSeparatei(
-    int buf,
-    int srcRGB,
-    int dstRGB,
-    int srcAlpha,
-    int dstAlpha) {
-    gl().glBlendFuncSeparatei(
-      buf,
-      srcRGB,
-      dstRGB,
-      srcAlpha,
-      dstAlpha);
-  }
-
-  public static void glBlendFunci(
-    int buf,
-    int src,
-    int dst) {
-    gl().glBlendFunci(
-      buf,
-      src,
-      dst);
   }
 
   public static void glBlitFramebuffer(
@@ -26375,26 +27264,6 @@ public class Gl {
       dstY1,
       mask,
       filter);
-  }
-
-  public static void glBufferAddressRangeNV(
-    int pname,
-    int index,
-    long address,
-    long length) {
-    gl().glBufferAddressRangeNV(
-      pname,
-      index,
-      address,
-      length);
-  }
-
-  public static void glClampColor(
-    int target,
-    int clamp) {
-    gl().glClampColor(
-      target,
-      clamp);
   }
 
   public static void glClearBufferfi(
@@ -26475,180 +27344,6 @@ public class Gl {
       value_offset);
   }
 
-  public static void glColorFormatNV(
-    int size,
-    int type,
-    int stride) {
-    gl().glColorFormatNV(
-      size,
-      type,
-      stride);
-  }
-
-  public static void glColorMaski(
-    int index,
-    boolean r,
-    boolean g,
-    boolean b,
-    boolean a) {
-    gl().glColorMaski(
-      index,
-      r,
-      g,
-      b,
-      a);
-  }
-
-  public static void glColorP3ui(
-    int type,
-    int color) {
-    gl().glColorP3ui(
-      type,
-      color);
-  }
-
-  public static void glColorP3uiv(
-    int type,
-    IntBuffer color) {
-    gl().glColorP3uiv(
-      type,
-      color);
-  }
-
-  public static void glColorP3uiv(
-    int type,
-    int[] color,
-    int color_offset) {
-    gl().glColorP3uiv(
-      type,
-      color,
-      color_offset);
-  }
-
-  public static void glColorP4ui(
-    int type,
-    int color) {
-    gl().glColorP4ui(
-      type,
-      color);
-  }
-
-  public static void glColorP4uiv(
-    int type,
-    IntBuffer color) {
-    gl().glColorP4uiv(
-      type,
-      color);
-  }
-
-  public static void glColorP4uiv(
-    int type,
-    int[] color,
-    int color_offset) {
-    gl().glColorP4uiv(
-      type,
-      color,
-      color_offset);
-  }
-
-  public static void glCompileShaderIncludeARB(
-    int shader,
-    int count,
-    String[] path,
-    IntBuffer length) {
-    gl().glCompileShaderIncludeARB(
-      shader,
-      count,
-      path,
-      length);
-  }
-
-  public static void glCompileShaderIncludeARB(
-    int shader,
-    int count,
-    String[] path,
-    int[] length,
-    int length_offset) {
-    gl().glCompileShaderIncludeARB(
-      shader,
-      count,
-      path,
-      length,
-      length_offset);
-  }
-
-  public static void glCompressedTexImage1D(
-    int target,
-    int level,
-    int internalformat,
-    int width,
-    int border,
-    int imageSize,
-    Buffer data) {
-    gl().glCompressedTexImage1D(
-      target,
-      level,
-      internalformat,
-      width,
-      border,
-      imageSize,
-      data);
-  }
-
-  public static void glCompressedTexImage1D(
-    int target,
-    int level,
-    int internalformat,
-    int width,
-    int border,
-    int imageSize,
-    long data_buffer_offset) {
-    gl().glCompressedTexImage1D(
-      target,
-      level,
-      internalformat,
-      width,
-      border,
-      imageSize,
-      data_buffer_offset);
-  }
-
-  public static void glCompressedTexSubImage1D(
-    int target,
-    int level,
-    int xoffset,
-    int width,
-    int format,
-    int imageSize,
-    Buffer data) {
-    gl().glCompressedTexSubImage1D(
-      target,
-      level,
-      xoffset,
-      width,
-      format,
-      imageSize,
-      data);
-  }
-
-  public static void glCompressedTexSubImage1D(
-    int target,
-    int level,
-    int xoffset,
-    int width,
-    int format,
-    int imageSize,
-    long data_buffer_offset) {
-    gl().glCompressedTexSubImage1D(
-      target,
-      level,
-      xoffset,
-      width,
-      format,
-      imageSize,
-      data_buffer_offset);
-  }
-
   public static void glCopyBufferSubData(
     int readTarget,
     int writeTarget,
@@ -26661,216 +27356,6 @@ public class Gl {
       readOffset,
       writeOffset,
       size);
-  }
-
-  public static void glCopyTexImage1D(
-    int target,
-    int level,
-    int internalformat,
-    int x,
-    int y,
-    int width,
-    int border) {
-    gl().glCopyTexImage1D(
-      target,
-      level,
-      internalformat,
-      x,
-      y,
-      width,
-      border);
-  }
-
-  public static void glCopyTexSubImage1D(
-    int target,
-    int level,
-    int xoffset,
-    int x,
-    int y,
-    int width) {
-    gl().glCopyTexSubImage1D(
-      target,
-      level,
-      xoffset,
-      x,
-      y,
-      width);
-  }
-
-  public static int glCreateShaderProgramv(
-    int type,
-    int count,
-    PointerBuffer strings) {
-    return gl().glCreateShaderProgramv(
-      type,
-      count,
-      strings);
-  }
-
-  public static long glCreateSyncFromCLeventARB(
-    Buffer context,
-    Buffer event,
-    int flags) {
-    return gl().glCreateSyncFromCLeventARB(
-      context,
-      event,
-      flags);
-  }
-
-  public static void glDebugMessageControlARB(
-    int source,
-    int type,
-    int severity,
-    int count,
-    IntBuffer ids,
-    boolean enabled) {
-    gl().glDebugMessageControlARB(
-      source,
-      type,
-      severity,
-      count,
-      ids,
-      enabled);
-  }
-
-  public static void glDebugMessageControlARB(
-    int source,
-    int type,
-    int severity,
-    int count,
-    int[] ids,
-    int ids_offset,
-    boolean enabled) {
-    gl().glDebugMessageControlARB(
-      source,
-      type,
-      severity,
-      count,
-      ids,
-      ids_offset,
-      enabled);
-  }
-
-  public static void glDebugMessageEnableAMD(
-    int category,
-    int severity,
-    int count,
-    IntBuffer ids,
-    boolean enabled) {
-    gl().glDebugMessageEnableAMD(
-      category,
-      severity,
-      count,
-      ids,
-      enabled);
-  }
-
-  public static void glDebugMessageEnableAMD(
-    int category,
-    int severity,
-    int count,
-    int[] ids,
-    int ids_offset,
-    boolean enabled) {
-    gl().glDebugMessageEnableAMD(
-      category,
-      severity,
-      count,
-      ids,
-      ids_offset,
-      enabled);
-  }
-
-  public static void glDebugMessageInsertAMD(
-    int category,
-    int severity,
-    int id,
-    int length,
-    String buf) {
-    gl().glDebugMessageInsertAMD(
-      category,
-      severity,
-      id,
-      length,
-      buf);
-  }
-
-  public static void glDebugMessageInsertARB(
-    int source,
-    int type,
-    int id,
-    int severity,
-    int length,
-    String buf) {
-    gl().glDebugMessageInsertARB(
-      source,
-      type,
-      id,
-      severity,
-      length,
-      buf);
-  }
-
-  public static void glDeleteNamedStringARB(
-    int namelen,
-    String name) {
-    gl().glDeleteNamedStringARB(
-      namelen,
-      name);
-  }
-
-  public static void glDeleteProgramPipelines(
-    int n,
-    IntBuffer pipelines) {
-    gl().glDeleteProgramPipelines(
-      n,
-      pipelines);
-  }
-
-  public static void glDeleteProgramPipelines(
-    int n,
-    int[] pipelines,
-    int pipelines_offset) {
-    gl().glDeleteProgramPipelines(
-      n,
-      pipelines,
-      pipelines_offset);
-  }
-
-  public static void glDeleteSamplers(
-    int count,
-    IntBuffer samplers) {
-    gl().glDeleteSamplers(
-      count,
-      samplers);
-  }
-
-  public static void glDeleteSamplers(
-    int count,
-    int[] samplers,
-    int samplers_offset) {
-    gl().glDeleteSamplers(
-      count,
-      samplers,
-      samplers_offset);
-  }
-
-  public static void glDeleteTransformFeedbacks(
-    int n,
-    IntBuffer ids) {
-    gl().glDeleteTransformFeedbacks(
-      n,
-      ids);
-  }
-
-  public static void glDeleteTransformFeedbacks(
-    int n,
-    int[] ids,
-    int ids_offset) {
-    gl().glDeleteTransformFeedbacks(
-      n,
-      ids,
-      ids_offset);
   }
 
   public static void glDeleteVertexArrays(
@@ -26891,76 +27376,16 @@ public class Gl {
       arrays_offset);
   }
 
-  public static void glDepthRangeArrayv(
-    int first,
-    int count,
-    DoubleBuffer v) {
-    gl().glDepthRangeArrayv(
-      first,
-      count,
-      v);
-  }
-
-  public static void glDepthRangeArrayv(
-    int first,
-    int count,
-    double[] v,
-    int v_offset) {
-    gl().glDepthRangeArrayv(
-      first,
-      count,
-      v,
-      v_offset);
-  }
-
-  public static void glDepthRangeIndexed(
-    int index,
-    double n,
-    double f) {
-    gl().glDepthRangeIndexed(
-      index,
-      n,
-      f);
-  }
-
-  public static void glDisablei(
-    int target,
-    int index) {
-    gl().glDisablei(
-      target,
-      index);
-  }
-
   public static void glDrawArraysInstanced(
     int mode,
     int first,
     int count,
-    int primcount) {
+    int instancecount) {
     gl().glDrawArraysInstanced(
       mode,
       first,
       count,
-      primcount);
-  }
-
-  public static void glDrawArraysInstancedBaseInstance(
-    int mode,
-    int first,
-    int count,
-    int primcount,
-    int baseinstance) {
-    gl().glDrawArraysInstancedBaseInstance(
-      mode,
-      first,
-      count,
-      primcount,
-      baseinstance);
-  }
-
-  public static void glDrawBuffer(
-    int mode) {
-    gl().glDrawBuffer(
-      mode);
+      instancecount);
   }
 
   public static void glDrawBuffers(
@@ -26981,98 +27406,18 @@ public class Gl {
       bufs_offset);
   }
 
-  public static void glDrawElementsBaseVertex(
-    int mode,
-    int count,
-    int type,
-    Buffer indices,
-    int basevertex) {
-    gl().glDrawElementsBaseVertex(
-      mode,
-      count,
-      type,
-      indices,
-      basevertex);
-  }
-
   public static void glDrawElementsInstanced(
     int mode,
     int count,
     int type,
-    Buffer indices,
-    int primcount) {
+    long indices_buffer_offset,
+    int instancecount) {
     gl().glDrawElementsInstanced(
       mode,
       count,
       type,
-      indices,
-      primcount);
-  }
-
-  public static void glDrawElementsInstancedBaseInstance(
-    int mode,
-    int count,
-    int type,
-    Buffer indices,
-    int primcount,
-    int baseinstance) {
-    gl().glDrawElementsInstancedBaseInstance(
-      mode,
-      count,
-      type,
-      indices,
-      primcount,
-      baseinstance);
-  }
-
-  public static void glDrawElementsInstancedBaseVertex(
-    int mode,
-    int count,
-    int type,
-    Buffer indices,
-    int primcount,
-    int basevertex) {
-    gl().glDrawElementsInstancedBaseVertex(
-      mode,
-      count,
-      type,
-      indices,
-      primcount,
-      basevertex);
-  }
-
-  public static void glDrawElementsInstancedBaseVertexBaseInstance(
-    int mode,
-    int count,
-    int type,
-    Buffer indices,
-    int primcount,
-    int basevertex,
-    int baseinstance) {
-    gl().glDrawElementsInstancedBaseVertexBaseInstance(
-      mode,
-      count,
-      type,
-      indices,
-      primcount,
-      basevertex,
-      baseinstance);
-  }
-
-  public static void glDrawRangeElements(
-    int mode,
-    int start,
-    int end,
-    int count,
-    int type,
-    Buffer indices) {
-    gl().glDrawRangeElements(
-      mode,
-      start,
-      end,
-      count,
-      type,
-      indices);
+      indices_buffer_offset,
+      instancecount);
   }
 
   public static void glDrawRangeElements(
@@ -27091,152 +27436,9 @@ public class Gl {
       indices_buffer_offset);
   }
 
-  public static void glDrawRangeElementsBaseVertex(
-    int mode,
-    int start,
-    int end,
-    int count,
-    int type,
-    Buffer indices,
-    int basevertex) {
-    gl().glDrawRangeElementsBaseVertex(
-      mode,
-      start,
-      end,
-      count,
-      type,
-      indices,
-      basevertex);
-  }
-
-  public static void glDrawTransformFeedback(
-    int mode,
-    int id) {
-    gl().glDrawTransformFeedback(
-      mode,
-      id);
-  }
-
-  public static void glDrawTransformFeedbackInstanced(
-    int mode,
-    int id,
-    int primcount) {
-    gl().glDrawTransformFeedbackInstanced(
-      mode,
-      id,
-      primcount);
-  }
-
-  public static void glDrawTransformFeedbackStream(
-    int mode,
-    int id,
-    int stream) {
-    gl().glDrawTransformFeedbackStream(
-      mode,
-      id,
-      stream);
-  }
-
-  public static void glDrawTransformFeedbackStreamInstanced(
-    int mode,
-    int id,
-    int stream,
-    int primcount) {
-    gl().glDrawTransformFeedbackStreamInstanced(
-      mode,
-      id,
-      stream,
-      primcount);
-  }
-
-  public static void glEdgeFlagFormatNV(
-    int stride) {
-    gl().glEdgeFlagFormatNV(
-      stride);
-  }
-
-  public static void glEnablei(
-    int target,
-    int index) {
-    gl().glEnablei(
-      target,
-      index);
-  }
-
-  public static void glEndConditionalRender(
-    ) {
-    gl().glEndConditionalRender();
-  }
-
-  public static void glEndQueryIndexed(
-    int target,
-    int index) {
-    gl().glEndQueryIndexed(
-      target,
-      index);
-  }
-
   public static void glEndTransformFeedback(
     ) {
     gl().glEndTransformFeedback();
-  }
-
-  public static void glFlushMappedBufferRange(
-    int target,
-    long offset,
-    long length) {
-    gl().glFlushMappedBufferRange(
-      target,
-      offset,
-      length);
-  }
-
-  public static void glFogCoordFormatNV(
-    int type,
-    int stride) {
-    gl().glFogCoordFormatNV(
-      type,
-      stride);
-  }
-
-  public static void glFramebufferTexture1D(
-    int target,
-    int attachment,
-    int textarget,
-    int texture,
-    int level) {
-    gl().glFramebufferTexture1D(
-      target,
-      attachment,
-      textarget,
-      texture,
-      level);
-  }
-
-  public static void glFramebufferTextureARB(
-    int target,
-    int attachment,
-    int texture,
-    int level) {
-    gl().glFramebufferTextureARB(
-      target,
-      attachment,
-      texture,
-      level);
-  }
-
-  public static void glFramebufferTextureFaceARB(
-    int target,
-    int attachment,
-    int texture,
-    int level,
-    int face) {
-    gl().glFramebufferTextureFaceARB(
-      target,
-      attachment,
-      texture,
-      level,
-      face);
   }
 
   public static void glFramebufferTextureLayer(
@@ -27251,74 +27453,6 @@ public class Gl {
       texture,
       level,
       layer);
-  }
-
-  public static void glFramebufferTextureLayerARB(
-    int target,
-    int attachment,
-    int texture,
-    int level,
-    int layer) {
-    gl().glFramebufferTextureLayerARB(
-      target,
-      attachment,
-      texture,
-      level,
-      layer);
-  }
-
-  public static void glGenProgramPipelines(
-    int n,
-    IntBuffer pipelines) {
-    gl().glGenProgramPipelines(
-      n,
-      pipelines);
-  }
-
-  public static void glGenProgramPipelines(
-    int n,
-    int[] pipelines,
-    int pipelines_offset) {
-    gl().glGenProgramPipelines(
-      n,
-      pipelines,
-      pipelines_offset);
-  }
-
-  public static void glGenSamplers(
-    int count,
-    IntBuffer samplers) {
-    gl().glGenSamplers(
-      count,
-      samplers);
-  }
-
-  public static void glGenSamplers(
-    int count,
-    int[] samplers,
-    int samplers_offset) {
-    gl().glGenSamplers(
-      count,
-      samplers,
-      samplers_offset);
-  }
-
-  public static void glGenTransformFeedbacks(
-    int n,
-    IntBuffer ids) {
-    gl().glGenTransformFeedbacks(
-      n,
-      ids);
-  }
-
-  public static void glGenTransformFeedbacks(
-    int n,
-    int[] ids,
-    int ids_offset) {
-    gl().glGenTransformFeedbacks(
-      n,
-      ids,
-      ids_offset);
   }
 
   public static void glGenVertexArrays(
@@ -27337,134 +27471,6 @@ public class Gl {
       n,
       arrays,
       arrays_offset);
-  }
-
-  public static void glGetActiveAtomicCounterBufferiv(
-    int program,
-    int bufferIndex,
-    int pname,
-    IntBuffer params) {
-    gl().glGetActiveAtomicCounterBufferiv(
-      program,
-      bufferIndex,
-      pname,
-      params);
-  }
-
-  public static void glGetActiveAtomicCounterBufferiv(
-    int program,
-    int bufferIndex,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glGetActiveAtomicCounterBufferiv(
-      program,
-      bufferIndex,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetActiveSubroutineName(
-    int program,
-    int shadertype,
-    int index,
-    int bufsize,
-    IntBuffer length,
-    ByteBuffer name) {
-    gl().glGetActiveSubroutineName(
-      program,
-      shadertype,
-      index,
-      bufsize,
-      length,
-      name);
-  }
-
-  public static void glGetActiveSubroutineName(
-    int program,
-    int shadertype,
-    int index,
-    int bufsize,
-    int[] length,
-    int length_offset,
-    byte[] name,
-    int name_offset) {
-    gl().glGetActiveSubroutineName(
-      program,
-      shadertype,
-      index,
-      bufsize,
-      length,
-      length_offset,
-      name,
-      name_offset);
-  }
-
-  public static void glGetActiveSubroutineUniformName(
-    int program,
-    int shadertype,
-    int index,
-    int bufsize,
-    IntBuffer length,
-    ByteBuffer name) {
-    gl().glGetActiveSubroutineUniformName(
-      program,
-      shadertype,
-      index,
-      bufsize,
-      length,
-      name);
-  }
-
-  public static void glGetActiveSubroutineUniformName(
-    int program,
-    int shadertype,
-    int index,
-    int bufsize,
-    int[] length,
-    int length_offset,
-    byte[] name,
-    int name_offset) {
-    gl().glGetActiveSubroutineUniformName(
-      program,
-      shadertype,
-      index,
-      bufsize,
-      length,
-      length_offset,
-      name,
-      name_offset);
-  }
-
-  public static void glGetActiveSubroutineUniformiv(
-    int program,
-    int shadertype,
-    int index,
-    int pname,
-    IntBuffer values) {
-    gl().glGetActiveSubroutineUniformiv(
-      program,
-      shadertype,
-      index,
-      pname,
-      values);
-  }
-
-  public static void glGetActiveSubroutineUniformiv(
-    int program,
-    int shadertype,
-    int index,
-    int pname,
-    int[] values,
-    int values_offset) {
-    gl().glGetActiveSubroutineUniformiv(
-      program,
-      shadertype,
-      index,
-      pname,
-      values,
-      values_offset);
   }
 
   public static void glGetActiveUniformBlockName(
@@ -27525,38 +27531,6 @@ public class Gl {
       params_offset);
   }
 
-  public static void glGetActiveUniformName(
-    int program,
-    int uniformIndex,
-    int bufSize,
-    IntBuffer length,
-    ByteBuffer uniformName) {
-    gl().glGetActiveUniformName(
-      program,
-      uniformIndex,
-      bufSize,
-      length,
-      uniformName);
-  }
-
-  public static void glGetActiveUniformName(
-    int program,
-    int uniformIndex,
-    int bufSize,
-    int[] length,
-    int length_offset,
-    byte[] uniformName,
-    int uniformName_offset) {
-    gl().glGetActiveUniformName(
-      program,
-      uniformIndex,
-      bufSize,
-      length,
-      length_offset,
-      uniformName,
-      uniformName_offset);
-  }
-
   public static void glGetActiveUniformsiv(
     int program,
     int uniformCount,
@@ -27589,250 +27563,6 @@ public class Gl {
       params_offset);
   }
 
-  public static void glGetBooleani_v(
-    int target,
-    int index,
-    ByteBuffer data) {
-    gl().glGetBooleani_v(
-      target,
-      index,
-      data);
-  }
-
-  public static void glGetBooleani_v(
-    int target,
-    int index,
-    byte[] data,
-    int data_offset) {
-    gl().glGetBooleani_v(
-      target,
-      index,
-      data,
-      data_offset);
-  }
-
-  public static void glGetBufferParameterui64vNV(
-    int target,
-    int pname,
-    LongBuffer params) {
-    gl().glGetBufferParameterui64vNV(
-      target,
-      pname,
-      params);
-  }
-
-  public static void glGetBufferParameterui64vNV(
-    int target,
-    int pname,
-    long[] params,
-    int params_offset) {
-    gl().glGetBufferParameterui64vNV(
-      target,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetBufferSubData(
-    int target,
-    long offset,
-    long size,
-    Buffer data) {
-    gl().glGetBufferSubData(
-      target,
-      offset,
-      size,
-      data);
-  }
-
-  public static void glGetCompressedTexImage(
-    int target,
-    int level,
-    Buffer img) {
-    gl().glGetCompressedTexImage(
-      target,
-      level,
-      img);
-  }
-
-  public static void glGetCompressedTexImage(
-    int target,
-    int level,
-    long img_buffer_offset) {
-    gl().glGetCompressedTexImage(
-      target,
-      level,
-      img_buffer_offset);
-  }
-
-  public static int glGetDebugMessageLogAMD(
-    int count,
-    int bufsize,
-    IntBuffer categories,
-    IntBuffer severities,
-    IntBuffer ids,
-    IntBuffer lengths,
-    ByteBuffer message) {
-    return gl().glGetDebugMessageLogAMD(
-      count,
-      bufsize,
-      categories,
-      severities,
-      ids,
-      lengths,
-      message);
-  }
-
-  public static int glGetDebugMessageLogAMD(
-    int count,
-    int bufsize,
-    int[] categories,
-    int categories_offset,
-    int[] severities,
-    int severities_offset,
-    int[] ids,
-    int ids_offset,
-    int[] lengths,
-    int lengths_offset,
-    byte[] message,
-    int message_offset) {
-    return gl().glGetDebugMessageLogAMD(
-      count,
-      bufsize,
-      categories,
-      categories_offset,
-      severities,
-      severities_offset,
-      ids,
-      ids_offset,
-      lengths,
-      lengths_offset,
-      message,
-      message_offset);
-  }
-
-  public static int glGetDebugMessageLogARB(
-    int count,
-    int bufsize,
-    IntBuffer sources,
-    IntBuffer types,
-    IntBuffer ids,
-    IntBuffer severities,
-    IntBuffer lengths,
-    ByteBuffer messageLog) {
-    return gl().glGetDebugMessageLogARB(
-      count,
-      bufsize,
-      sources,
-      types,
-      ids,
-      severities,
-      lengths,
-      messageLog);
-  }
-
-  public static int glGetDebugMessageLogARB(
-    int count,
-    int bufsize,
-    int[] sources,
-    int sources_offset,
-    int[] types,
-    int types_offset,
-    int[] ids,
-    int ids_offset,
-    int[] severities,
-    int severities_offset,
-    int[] lengths,
-    int lengths_offset,
-    byte[] messageLog,
-    int messageLog_offset) {
-    return gl().glGetDebugMessageLogARB(
-      count,
-      bufsize,
-      sources,
-      sources_offset,
-      types,
-      types_offset,
-      ids,
-      ids_offset,
-      severities,
-      severities_offset,
-      lengths,
-      lengths_offset,
-      messageLog,
-      messageLog_offset);
-  }
-
-  public static void glGetDoublei_v(
-    int target,
-    int index,
-    DoubleBuffer data) {
-    gl().glGetDoublei_v(
-      target,
-      index,
-      data);
-  }
-
-  public static void glGetDoublei_v(
-    int target,
-    int index,
-    double[] data,
-    int data_offset) {
-    gl().glGetDoublei_v(
-      target,
-      index,
-      data,
-      data_offset);
-  }
-
-  public static void glGetDoublev(
-    int pname,
-    DoubleBuffer params) {
-    gl().glGetDoublev(
-      pname,
-      params);
-  }
-
-  public static void glGetDoublev(
-    int pname,
-    double[] params,
-    int params_offset) {
-    gl().glGetDoublev(
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetFloati_v(
-    int target,
-    int index,
-    FloatBuffer data) {
-    gl().glGetFloati_v(
-      target,
-      index,
-      data);
-  }
-
-  public static void glGetFloati_v(
-    int target,
-    int index,
-    float[] data,
-    int data_offset) {
-    gl().glGetFloati_v(
-      target,
-      index,
-      data,
-      data_offset);
-  }
-
-  public static int glGetFragDataIndex(
-    int program,
-    String name) {
-    return gl().glGetFragDataIndex(
-      program,
-      name);
-  }
-
   public static int glGetFragDataLocation(
     int program,
     String name) {
@@ -27863,46 +27593,6 @@ public class Gl {
       data_offset);
   }
 
-  public static void glGetIntegerui64i_vNV(
-    int value,
-    int index,
-    LongBuffer result) {
-    gl().glGetIntegerui64i_vNV(
-      value,
-      index,
-      result);
-  }
-
-  public static void glGetIntegerui64i_vNV(
-    int value,
-    int index,
-    long[] result,
-    int result_offset) {
-    gl().glGetIntegerui64i_vNV(
-      value,
-      index,
-      result,
-      result_offset);
-  }
-
-  public static void glGetIntegerui64vNV(
-    int value,
-    LongBuffer result) {
-    gl().glGetIntegerui64vNV(
-      value,
-      result);
-  }
-
-  public static void glGetIntegerui64vNV(
-    int value,
-    long[] result,
-    int result_offset) {
-    gl().glGetIntegerui64vNV(
-      value,
-      result,
-      result_offset);
-  }
-
   public static void glGetInternalformativ(
     int target,
     int internalformat,
@@ -27929,364 +27619,6 @@ public class Gl {
       internalformat,
       pname,
       bufSize,
-      params,
-      params_offset);
-  }
-
-  public static void glGetMultisamplefv(
-    int pname,
-    int index,
-    FloatBuffer val) {
-    gl().glGetMultisamplefv(
-      pname,
-      index,
-      val);
-  }
-
-  public static void glGetMultisamplefv(
-    int pname,
-    int index,
-    float[] val,
-    int val_offset) {
-    gl().glGetMultisamplefv(
-      pname,
-      index,
-      val,
-      val_offset);
-  }
-
-  public static void glGetNamedBufferParameterui64vNV(
-    int buffer,
-    int pname,
-    LongBuffer params) {
-    gl().glGetNamedBufferParameterui64vNV(
-      buffer,
-      pname,
-      params);
-  }
-
-  public static void glGetNamedBufferParameterui64vNV(
-    int buffer,
-    int pname,
-    long[] params,
-    int params_offset) {
-    gl().glGetNamedBufferParameterui64vNV(
-      buffer,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetNamedStringARB(
-    int namelen,
-    String name,
-    int bufSize,
-    IntBuffer stringlen,
-    ByteBuffer string) {
-    gl().glGetNamedStringARB(
-      namelen,
-      name,
-      bufSize,
-      stringlen,
-      string);
-  }
-
-  public static void glGetNamedStringARB(
-    int namelen,
-    String name,
-    int bufSize,
-    int[] stringlen,
-    int stringlen_offset,
-    byte[] string,
-    int string_offset) {
-    gl().glGetNamedStringARB(
-      namelen,
-      name,
-      bufSize,
-      stringlen,
-      stringlen_offset,
-      string,
-      string_offset);
-  }
-
-  public static void glGetNamedStringivARB(
-    int namelen,
-    String name,
-    int pname,
-    IntBuffer params) {
-    gl().glGetNamedStringivARB(
-      namelen,
-      name,
-      pname,
-      params);
-  }
-
-  public static void glGetNamedStringivARB(
-    int namelen,
-    String name,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glGetNamedStringivARB(
-      namelen,
-      name,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetProgramPipelineInfoLog(
-    int pipeline,
-    int bufSize,
-    IntBuffer length,
-    ByteBuffer infoLog) {
-    gl().glGetProgramPipelineInfoLog(
-      pipeline,
-      bufSize,
-      length,
-      infoLog);
-  }
-
-  public static void glGetProgramPipelineInfoLog(
-    int pipeline,
-    int bufSize,
-    int[] length,
-    int length_offset,
-    byte[] infoLog,
-    int infoLog_offset) {
-    gl().glGetProgramPipelineInfoLog(
-      pipeline,
-      bufSize,
-      length,
-      length_offset,
-      infoLog,
-      infoLog_offset);
-  }
-
-  public static void glGetProgramPipelineiv(
-    int pipeline,
-    int pname,
-    IntBuffer params) {
-    gl().glGetProgramPipelineiv(
-      pipeline,
-      pname,
-      params);
-  }
-
-  public static void glGetProgramPipelineiv(
-    int pipeline,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glGetProgramPipelineiv(
-      pipeline,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetProgramStageiv(
-    int program,
-    int shadertype,
-    int pname,
-    IntBuffer values) {
-    gl().glGetProgramStageiv(
-      program,
-      shadertype,
-      pname,
-      values);
-  }
-
-  public static void glGetProgramStageiv(
-    int program,
-    int shadertype,
-    int pname,
-    int[] values,
-    int values_offset) {
-    gl().glGetProgramStageiv(
-      program,
-      shadertype,
-      pname,
-      values,
-      values_offset);
-  }
-
-  public static void glGetQueryIndexediv(
-    int target,
-    int index,
-    int pname,
-    IntBuffer params) {
-    gl().glGetQueryIndexediv(
-      target,
-      index,
-      pname,
-      params);
-  }
-
-  public static void glGetQueryIndexediv(
-    int target,
-    int index,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glGetQueryIndexediv(
-      target,
-      index,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetQueryObjecti64v(
-    int id,
-    int pname,
-    LongBuffer params) {
-    gl().glGetQueryObjecti64v(
-      id,
-      pname,
-      params);
-  }
-
-  public static void glGetQueryObjecti64v(
-    int id,
-    int pname,
-    long[] params,
-    int params_offset) {
-    gl().glGetQueryObjecti64v(
-      id,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetQueryObjectiv(
-    int id,
-    int pname,
-    IntBuffer params) {
-    gl().glGetQueryObjectiv(
-      id,
-      pname,
-      params);
-  }
-
-  public static void glGetQueryObjectiv(
-    int id,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glGetQueryObjectiv(
-      id,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetQueryObjectui64v(
-    int id,
-    int pname,
-    LongBuffer params) {
-    gl().glGetQueryObjectui64v(
-      id,
-      pname,
-      params);
-  }
-
-  public static void glGetQueryObjectui64v(
-    int id,
-    int pname,
-    long[] params,
-    int params_offset) {
-    gl().glGetQueryObjectui64v(
-      id,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetSamplerParameterIiv(
-    int sampler,
-    int pname,
-    IntBuffer params) {
-    gl().glGetSamplerParameterIiv(
-      sampler,
-      pname,
-      params);
-  }
-
-  public static void glGetSamplerParameterIiv(
-    int sampler,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glGetSamplerParameterIiv(
-      sampler,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetSamplerParameterIuiv(
-    int sampler,
-    int pname,
-    IntBuffer params) {
-    gl().glGetSamplerParameterIuiv(
-      sampler,
-      pname,
-      params);
-  }
-
-  public static void glGetSamplerParameterIuiv(
-    int sampler,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glGetSamplerParameterIuiv(
-      sampler,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetSamplerParameterfv(
-    int sampler,
-    int pname,
-    FloatBuffer params) {
-    gl().glGetSamplerParameterfv(
-      sampler,
-      pname,
-      params);
-  }
-
-  public static void glGetSamplerParameterfv(
-    int sampler,
-    int pname,
-    float[] params,
-    int params_offset) {
-    gl().glGetSamplerParameterfv(
-      sampler,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetSamplerParameteriv(
-    int sampler,
-    int pname,
-    IntBuffer params) {
-    gl().glGetSamplerParameteriv(
-      sampler,
-      pname,
-      params);
-  }
-
-  public static void glGetSamplerParameteriv(
-    int sampler,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glGetSamplerParameteriv(
-      sampler,
-      pname,
       params,
       params_offset);
   }
@@ -28297,150 +27629,6 @@ public class Gl {
     return gl().glGetStringi(
       name,
       index);
-  }
-
-  public static int glGetSubroutineIndex(
-    int program,
-    int shadertype,
-    String name) {
-    return gl().glGetSubroutineIndex(
-      program,
-      shadertype,
-      name);
-  }
-
-  public static int glGetSubroutineUniformLocation(
-    int program,
-    int shadertype,
-    String name) {
-    return gl().glGetSubroutineUniformLocation(
-      program,
-      shadertype,
-      name);
-  }
-
-  public static void glGetTexImage(
-    int target,
-    int level,
-    int format,
-    int type,
-    Buffer pixels) {
-    gl().glGetTexImage(
-      target,
-      level,
-      format,
-      type,
-      pixels);
-  }
-
-  public static void glGetTexImage(
-    int target,
-    int level,
-    int format,
-    int type,
-    long pixels_buffer_offset) {
-    gl().glGetTexImage(
-      target,
-      level,
-      format,
-      type,
-      pixels_buffer_offset);
-  }
-
-  public static void glGetTexLevelParameterfv(
-    int target,
-    int level,
-    int pname,
-    FloatBuffer params) {
-    gl().glGetTexLevelParameterfv(
-      target,
-      level,
-      pname,
-      params);
-  }
-
-  public static void glGetTexLevelParameterfv(
-    int target,
-    int level,
-    int pname,
-    float[] params,
-    int params_offset) {
-    gl().glGetTexLevelParameterfv(
-      target,
-      level,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetTexLevelParameteriv(
-    int target,
-    int level,
-    int pname,
-    IntBuffer params) {
-    gl().glGetTexLevelParameteriv(
-      target,
-      level,
-      pname,
-      params);
-  }
-
-  public static void glGetTexLevelParameteriv(
-    int target,
-    int level,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glGetTexLevelParameteriv(
-      target,
-      level,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetTexParameterIiv(
-    int target,
-    int pname,
-    IntBuffer params) {
-    gl().glGetTexParameterIiv(
-      target,
-      pname,
-      params);
-  }
-
-  public static void glGetTexParameterIiv(
-    int target,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glGetTexParameterIiv(
-      target,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetTexParameterIuiv(
-    int target,
-    int pname,
-    IntBuffer params) {
-    gl().glGetTexParameterIuiv(
-      target,
-      pname,
-      params);
-  }
-
-  public static void glGetTexParameterIuiv(
-    int target,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glGetTexParameterIuiv(
-      target,
-      pname,
-      params,
-      params_offset);
   }
 
   public static void glGetTransformFeedbackVarying(
@@ -28521,50 +27709,6 @@ public class Gl {
       uniformIndices_offset);
   }
 
-  public static void glGetUniformSubroutineuiv(
-    int shadertype,
-    int location,
-    IntBuffer params) {
-    gl().glGetUniformSubroutineuiv(
-      shadertype,
-      location,
-      params);
-  }
-
-  public static void glGetUniformSubroutineuiv(
-    int shadertype,
-    int location,
-    int[] params,
-    int params_offset) {
-    gl().glGetUniformSubroutineuiv(
-      shadertype,
-      location,
-      params,
-      params_offset);
-  }
-
-  public static void glGetUniformui64vNV(
-    int program,
-    int location,
-    LongBuffer params) {
-    gl().glGetUniformui64vNV(
-      program,
-      location,
-      params);
-  }
-
-  public static void glGetUniformui64vNV(
-    int program,
-    int location,
-    long[] params,
-    int params_offset) {
-    gl().glGetUniformui64vNV(
-      program,
-      location,
-      params,
-      params_offset);
-  }
-
   public static void glGetUniformuiv(
     int program,
     int location,
@@ -28629,2041 +27773,12 @@ public class Gl {
       pname,
       params,
       params_offset);
-  }
-
-  public static void glGetVertexAttribLdv(
-    int index,
-    int pname,
-    DoubleBuffer params) {
-    gl().glGetVertexAttribLdv(
-      index,
-      pname,
-      params);
-  }
-
-  public static void glGetVertexAttribLdv(
-    int index,
-    int pname,
-    double[] params,
-    int params_offset) {
-    gl().glGetVertexAttribLdv(
-      index,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetVertexAttribdv(
-    int index,
-    int pname,
-    DoubleBuffer params) {
-    gl().glGetVertexAttribdv(
-      index,
-      pname,
-      params);
-  }
-
-  public static void glGetVertexAttribdv(
-    int index,
-    int pname,
-    double[] params,
-    int params_offset) {
-    gl().glGetVertexAttribdv(
-      index,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glGetnColorTable(
-    int target,
-    int format,
-    int type,
-    int bufSize,
-    Buffer table) {
-    gl().glGetnColorTable(
-      target,
-      format,
-      type,
-      bufSize,
-      table);
-  }
-
-  public static void glGetnCompressedTexImage(
-    int target,
-    int lod,
-    int bufSize,
-    Buffer img) {
-    gl().glGetnCompressedTexImage(
-      target,
-      lod,
-      bufSize,
-      img);
-  }
-
-  public static void glGetnConvolutionFilter(
-    int target,
-    int format,
-    int type,
-    int bufSize,
-    Buffer image) {
-    gl().glGetnConvolutionFilter(
-      target,
-      format,
-      type,
-      bufSize,
-      image);
-  }
-
-  public static void glGetnHistogram(
-    int target,
-    boolean reset,
-    int format,
-    int type,
-    int bufSize,
-    Buffer values) {
-    gl().glGetnHistogram(
-      target,
-      reset,
-      format,
-      type,
-      bufSize,
-      values);
-  }
-
-  public static void glGetnMapdv(
-    int target,
-    int query,
-    int bufSize,
-    DoubleBuffer v) {
-    gl().glGetnMapdv(
-      target,
-      query,
-      bufSize,
-      v);
-  }
-
-  public static void glGetnMapdv(
-    int target,
-    int query,
-    int bufSize,
-    double[] v,
-    int v_offset) {
-    gl().glGetnMapdv(
-      target,
-      query,
-      bufSize,
-      v,
-      v_offset);
-  }
-
-  public static void glGetnMapfv(
-    int target,
-    int query,
-    int bufSize,
-    FloatBuffer v) {
-    gl().glGetnMapfv(
-      target,
-      query,
-      bufSize,
-      v);
-  }
-
-  public static void glGetnMapfv(
-    int target,
-    int query,
-    int bufSize,
-    float[] v,
-    int v_offset) {
-    gl().glGetnMapfv(
-      target,
-      query,
-      bufSize,
-      v,
-      v_offset);
-  }
-
-  public static void glGetnMapiv(
-    int target,
-    int query,
-    int bufSize,
-    IntBuffer v) {
-    gl().glGetnMapiv(
-      target,
-      query,
-      bufSize,
-      v);
-  }
-
-  public static void glGetnMapiv(
-    int target,
-    int query,
-    int bufSize,
-    int[] v,
-    int v_offset) {
-    gl().glGetnMapiv(
-      target,
-      query,
-      bufSize,
-      v,
-      v_offset);
-  }
-
-  public static void glGetnMinmax(
-    int target,
-    boolean reset,
-    int format,
-    int type,
-    int bufSize,
-    Buffer values) {
-    gl().glGetnMinmax(
-      target,
-      reset,
-      format,
-      type,
-      bufSize,
-      values);
-  }
-
-  public static void glGetnPixelMapfv(
-    int map,
-    int bufSize,
-    FloatBuffer values) {
-    gl().glGetnPixelMapfv(
-      map,
-      bufSize,
-      values);
-  }
-
-  public static void glGetnPixelMapfv(
-    int map,
-    int bufSize,
-    float[] values,
-    int values_offset) {
-    gl().glGetnPixelMapfv(
-      map,
-      bufSize,
-      values,
-      values_offset);
-  }
-
-  public static void glGetnPixelMapuiv(
-    int map,
-    int bufSize,
-    IntBuffer values) {
-    gl().glGetnPixelMapuiv(
-      map,
-      bufSize,
-      values);
-  }
-
-  public static void glGetnPixelMapuiv(
-    int map,
-    int bufSize,
-    int[] values,
-    int values_offset) {
-    gl().glGetnPixelMapuiv(
-      map,
-      bufSize,
-      values,
-      values_offset);
-  }
-
-  public static void glGetnPixelMapusv(
-    int map,
-    int bufSize,
-    ShortBuffer values) {
-    gl().glGetnPixelMapusv(
-      map,
-      bufSize,
-      values);
-  }
-
-  public static void glGetnPixelMapusv(
-    int map,
-    int bufSize,
-    short[] values,
-    int values_offset) {
-    gl().glGetnPixelMapusv(
-      map,
-      bufSize,
-      values,
-      values_offset);
-  }
-
-  public static void glGetnPolygonStipple(
-    int bufSize,
-    ByteBuffer pattern) {
-    gl().glGetnPolygonStipple(
-      bufSize,
-      pattern);
-  }
-
-  public static void glGetnPolygonStipple(
-    int bufSize,
-    byte[] pattern,
-    int pattern_offset) {
-    gl().glGetnPolygonStipple(
-      bufSize,
-      pattern,
-      pattern_offset);
-  }
-
-  public static void glGetnSeparableFilter(
-    int target,
-    int format,
-    int type,
-    int rowBufSize,
-    Buffer row,
-    int columnBufSize,
-    Buffer column,
-    Buffer span) {
-    gl().glGetnSeparableFilter(
-      target,
-      format,
-      type,
-      rowBufSize,
-      row,
-      columnBufSize,
-      column,
-      span);
-  }
-
-  public static void glGetnTexImage(
-    int target,
-    int level,
-    int format,
-    int type,
-    int bufSize,
-    Buffer img) {
-    gl().glGetnTexImage(
-      target,
-      level,
-      format,
-      type,
-      bufSize,
-      img);
-  }
-
-  public static void glGetnUniformdv(
-    int program,
-    int location,
-    int bufSize,
-    DoubleBuffer params) {
-    gl().glGetnUniformdv(
-      program,
-      location,
-      bufSize,
-      params);
-  }
-
-  public static void glGetnUniformdv(
-    int program,
-    int location,
-    int bufSize,
-    double[] params,
-    int params_offset) {
-    gl().glGetnUniformdv(
-      program,
-      location,
-      bufSize,
-      params,
-      params_offset);
-  }
-
-  public static void glGetnUniformuiv(
-    int program,
-    int location,
-    int bufSize,
-    IntBuffer params) {
-    gl().glGetnUniformuiv(
-      program,
-      location,
-      bufSize,
-      params);
-  }
-
-  public static void glGetnUniformuiv(
-    int program,
-    int location,
-    int bufSize,
-    int[] params,
-    int params_offset) {
-    gl().glGetnUniformuiv(
-      program,
-      location,
-      bufSize,
-      params,
-      params_offset);
-  }
-
-  public static long glImportSyncEXT(
-    int external_sync_type,
-    long external_sync,
-    int flags) {
-    return gl().glImportSyncEXT(
-      external_sync_type,
-      external_sync,
-      flags);
-  }
-
-  public static void glIndexFormatNV(
-    int type,
-    int stride) {
-    gl().glIndexFormatNV(
-      type,
-      stride);
-  }
-
-  public static boolean glIsBufferResidentNV(
-    int target) {
-    return gl().glIsBufferResidentNV(
-      target);
-  }
-
-  public static boolean glIsEnabledi(
-    int target,
-    int index) {
-    return gl().glIsEnabledi(
-      target,
-      index);
-  }
-
-  public static boolean glIsNamedBufferResidentNV(
-    int buffer) {
-    return gl().glIsNamedBufferResidentNV(
-      buffer);
-  }
-
-  public static boolean glIsNamedStringARB(
-    int namelen,
-    String name) {
-    return gl().glIsNamedStringARB(
-      namelen,
-      name);
-  }
-
-  public static boolean glIsProgramPipeline(
-    int pipeline) {
-    return gl().glIsProgramPipeline(
-      pipeline);
-  }
-
-  public static boolean glIsSampler(
-    int sampler) {
-    return gl().glIsSampler(
-      sampler);
-  }
-
-  public static boolean glIsTransformFeedback(
-    int id) {
-    return gl().glIsTransformFeedback(
-      id);
   }
 
   public static boolean glIsVertexArray(
     int array) {
     return gl().glIsVertexArray(
       array);
-  }
-
-  public static void glMakeBufferNonResidentNV(
-    int target) {
-    gl().glMakeBufferNonResidentNV(
-      target);
-  }
-
-  public static void glMakeBufferResidentNV(
-    int target,
-    int access) {
-    gl().glMakeBufferResidentNV(
-      target,
-      access);
-  }
-
-  public static void glMakeNamedBufferNonResidentNV(
-    int buffer) {
-    gl().glMakeNamedBufferNonResidentNV(
-      buffer);
-  }
-
-  public static void glMakeNamedBufferResidentNV(
-    int buffer,
-    int access) {
-    gl().glMakeNamedBufferResidentNV(
-      buffer,
-      access);
-  }
-
-  public static ByteBuffer glMapBufferRange(
-    int target,
-    long offset,
-    long length,
-    int access) {
-    return gl().glMapBufferRange(
-      target,
-      offset,
-      length,
-      access);
-  }
-
-  public static void glMemoryBarrier(
-    int barriers) {
-    gl().glMemoryBarrier(
-      barriers);
-  }
-
-  public static void glMinSampleShading(
-    float value) {
-    gl().glMinSampleShading(
-      value);
-  }
-
-  public static void glMultiDrawArrays(
-    int mode,
-    IntBuffer first,
-    IntBuffer count,
-    int primcount) {
-    gl().glMultiDrawArrays(
-      mode,
-      first,
-      count,
-      primcount);
-  }
-
-  public static void glMultiDrawArrays(
-    int mode,
-    int[] first,
-    int first_offset,
-    int[] count,
-    int count_offset,
-    int primcount) {
-    gl().glMultiDrawArrays(
-      mode,
-      first,
-      first_offset,
-      count,
-      count_offset,
-      primcount);
-  }
-
-  public static void glMultiDrawArraysIndirectAMD(
-    int mode,
-    Buffer indirect,
-    int primcount,
-    int stride) {
-    gl().glMultiDrawArraysIndirectAMD(
-      mode,
-      indirect,
-      primcount,
-      stride);
-  }
-
-  public static void glMultiDrawElements(
-    int mode,
-    IntBuffer count,
-    int type,
-    PointerBuffer indices,
-    int primcount) {
-    gl().glMultiDrawElements(
-      mode,
-      count,
-      type,
-      indices,
-      primcount);
-  }
-
-  public static void glMultiDrawElements(
-    int mode,
-    int[] count,
-    int count_offset,
-    int type,
-    PointerBuffer indices,
-    int primcount) {
-    gl().glMultiDrawElements(
-      mode,
-      count,
-      count_offset,
-      type,
-      indices,
-      primcount);
-  }
-
-  public static void glMultiDrawElementsIndirectAMD(
-    int mode,
-    int type,
-    Buffer indirect,
-    int primcount,
-    int stride) {
-    gl().glMultiDrawElementsIndirectAMD(
-      mode,
-      type,
-      indirect,
-      primcount,
-      stride);
-  }
-
-  public static void glMultiTexCoordP1ui(
-    int texture,
-    int type,
-    int coords) {
-    gl().glMultiTexCoordP1ui(
-      texture,
-      type,
-      coords);
-  }
-
-  public static void glMultiTexCoordP1uiv(
-    int texture,
-    int type,
-    IntBuffer coords) {
-    gl().glMultiTexCoordP1uiv(
-      texture,
-      type,
-      coords);
-  }
-
-  public static void glMultiTexCoordP1uiv(
-    int texture,
-    int type,
-    int[] coords,
-    int coords_offset) {
-    gl().glMultiTexCoordP1uiv(
-      texture,
-      type,
-      coords,
-      coords_offset);
-  }
-
-  public static void glMultiTexCoordP2ui(
-    int texture,
-    int type,
-    int coords) {
-    gl().glMultiTexCoordP2ui(
-      texture,
-      type,
-      coords);
-  }
-
-  public static void glMultiTexCoordP2uiv(
-    int texture,
-    int type,
-    IntBuffer coords) {
-    gl().glMultiTexCoordP2uiv(
-      texture,
-      type,
-      coords);
-  }
-
-  public static void glMultiTexCoordP2uiv(
-    int texture,
-    int type,
-    int[] coords,
-    int coords_offset) {
-    gl().glMultiTexCoordP2uiv(
-      texture,
-      type,
-      coords,
-      coords_offset);
-  }
-
-  public static void glMultiTexCoordP3ui(
-    int texture,
-    int type,
-    int coords) {
-    gl().glMultiTexCoordP3ui(
-      texture,
-      type,
-      coords);
-  }
-
-  public static void glMultiTexCoordP3uiv(
-    int texture,
-    int type,
-    IntBuffer coords) {
-    gl().glMultiTexCoordP3uiv(
-      texture,
-      type,
-      coords);
-  }
-
-  public static void glMultiTexCoordP3uiv(
-    int texture,
-    int type,
-    int[] coords,
-    int coords_offset) {
-    gl().glMultiTexCoordP3uiv(
-      texture,
-      type,
-      coords,
-      coords_offset);
-  }
-
-  public static void glMultiTexCoordP4ui(
-    int texture,
-    int type,
-    int coords) {
-    gl().glMultiTexCoordP4ui(
-      texture,
-      type,
-      coords);
-  }
-
-  public static void glMultiTexCoordP4uiv(
-    int texture,
-    int type,
-    IntBuffer coords) {
-    gl().glMultiTexCoordP4uiv(
-      texture,
-      type,
-      coords);
-  }
-
-  public static void glMultiTexCoordP4uiv(
-    int texture,
-    int type,
-    int[] coords,
-    int coords_offset) {
-    gl().glMultiTexCoordP4uiv(
-      texture,
-      type,
-      coords,
-      coords_offset);
-  }
-
-  public static void glNamedStringARB(
-    int type,
-    int namelen,
-    String name,
-    int stringlen,
-    String string) {
-    gl().glNamedStringARB(
-      type,
-      namelen,
-      name,
-      stringlen,
-      string);
-  }
-
-  public static void glNormalFormatNV(
-    int type,
-    int stride) {
-    gl().glNormalFormatNV(
-      type,
-      stride);
-  }
-
-  public static void glNormalP3ui(
-    int type,
-    int coords) {
-    gl().glNormalP3ui(
-      type,
-      coords);
-  }
-
-  public static void glNormalP3uiv(
-    int type,
-    IntBuffer coords) {
-    gl().glNormalP3uiv(
-      type,
-      coords);
-  }
-
-  public static void glNormalP3uiv(
-    int type,
-    int[] coords,
-    int coords_offset) {
-    gl().glNormalP3uiv(
-      type,
-      coords,
-      coords_offset);
-  }
-
-  public static void glPauseTransformFeedback(
-    ) {
-    gl().glPauseTransformFeedback();
-  }
-
-  public static void glPixelStoref(
-    int pname,
-    float param) {
-    gl().glPixelStoref(
-      pname,
-      param);
-  }
-
-  public static void glPointParameteri(
-    int pname,
-    int param) {
-    gl().glPointParameteri(
-      pname,
-      param);
-  }
-
-  public static void glPointParameteriv(
-    int pname,
-    IntBuffer params) {
-    gl().glPointParameteriv(
-      pname,
-      params);
-  }
-
-  public static void glPointParameteriv(
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glPointParameteriv(
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glPolygonMode(
-    int face,
-    int mode) {
-    gl().glPolygonMode(
-      face,
-      mode);
-  }
-
-  public static void glPrimitiveRestartIndex(
-    int index) {
-    gl().glPrimitiveRestartIndex(
-      index);
-  }
-
-  public static void glProgramParameteri(
-    int program,
-    int pname,
-    int value) {
-    gl().glProgramParameteri(
-      program,
-      pname,
-      value);
-  }
-
-  public static void glProgramParameteriARB(
-    int program,
-    int pname,
-    int value) {
-    gl().glProgramParameteriARB(
-      program,
-      pname,
-      value);
-  }
-
-  public static void glProgramUniform1d(
-    int program,
-    int location,
-    double v0) {
-    gl().glProgramUniform1d(
-      program,
-      location,
-      v0);
-  }
-
-  public static void glProgramUniform1dv(
-    int program,
-    int location,
-    int count,
-    DoubleBuffer value) {
-    gl().glProgramUniform1dv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform1dv(
-    int program,
-    int location,
-    int count,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniform1dv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform1f(
-    int program,
-    int location,
-    float v0) {
-    gl().glProgramUniform1f(
-      program,
-      location,
-      v0);
-  }
-
-  public static void glProgramUniform1fv(
-    int program,
-    int location,
-    int count,
-    FloatBuffer value) {
-    gl().glProgramUniform1fv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform1fv(
-    int program,
-    int location,
-    int count,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniform1fv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform1i(
-    int program,
-    int location,
-    int v0) {
-    gl().glProgramUniform1i(
-      program,
-      location,
-      v0);
-  }
-
-  public static void glProgramUniform1iv(
-    int program,
-    int location,
-    int count,
-    IntBuffer value) {
-    gl().glProgramUniform1iv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform1iv(
-    int program,
-    int location,
-    int count,
-    int[] value,
-    int value_offset) {
-    gl().glProgramUniform1iv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform1ui(
-    int program,
-    int location,
-    int v0) {
-    gl().glProgramUniform1ui(
-      program,
-      location,
-      v0);
-  }
-
-  public static void glProgramUniform1uiv(
-    int program,
-    int location,
-    int count,
-    IntBuffer value) {
-    gl().glProgramUniform1uiv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform1uiv(
-    int program,
-    int location,
-    int count,
-    int[] value,
-    int value_offset) {
-    gl().glProgramUniform1uiv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform2d(
-    int program,
-    int location,
-    double v0,
-    double v1) {
-    gl().glProgramUniform2d(
-      program,
-      location,
-      v0,
-      v1);
-  }
-
-  public static void glProgramUniform2dv(
-    int program,
-    int location,
-    int count,
-    DoubleBuffer value) {
-    gl().glProgramUniform2dv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform2dv(
-    int program,
-    int location,
-    int count,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniform2dv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform2f(
-    int program,
-    int location,
-    float v0,
-    float v1) {
-    gl().glProgramUniform2f(
-      program,
-      location,
-      v0,
-      v1);
-  }
-
-  public static void glProgramUniform2fv(
-    int program,
-    int location,
-    int count,
-    FloatBuffer value) {
-    gl().glProgramUniform2fv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform2fv(
-    int program,
-    int location,
-    int count,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniform2fv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform2i(
-    int program,
-    int location,
-    int v0,
-    int v1) {
-    gl().glProgramUniform2i(
-      program,
-      location,
-      v0,
-      v1);
-  }
-
-  public static void glProgramUniform2iv(
-    int program,
-    int location,
-    int count,
-    IntBuffer value) {
-    gl().glProgramUniform2iv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform2iv(
-    int program,
-    int location,
-    int count,
-    int[] value,
-    int value_offset) {
-    gl().glProgramUniform2iv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform2ui(
-    int program,
-    int location,
-    int v0,
-    int v1) {
-    gl().glProgramUniform2ui(
-      program,
-      location,
-      v0,
-      v1);
-  }
-
-  public static void glProgramUniform2uiv(
-    int program,
-    int location,
-    int count,
-    IntBuffer value) {
-    gl().glProgramUniform2uiv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform2uiv(
-    int program,
-    int location,
-    int count,
-    int[] value,
-    int value_offset) {
-    gl().glProgramUniform2uiv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform3d(
-    int program,
-    int location,
-    double v0,
-    double v1,
-    double v2) {
-    gl().glProgramUniform3d(
-      program,
-      location,
-      v0,
-      v1,
-      v2);
-  }
-
-  public static void glProgramUniform3dv(
-    int program,
-    int location,
-    int count,
-    DoubleBuffer value) {
-    gl().glProgramUniform3dv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform3dv(
-    int program,
-    int location,
-    int count,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniform3dv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform3f(
-    int program,
-    int location,
-    float v0,
-    float v1,
-    float v2) {
-    gl().glProgramUniform3f(
-      program,
-      location,
-      v0,
-      v1,
-      v2);
-  }
-
-  public static void glProgramUniform3fv(
-    int program,
-    int location,
-    int count,
-    FloatBuffer value) {
-    gl().glProgramUniform3fv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform3fv(
-    int program,
-    int location,
-    int count,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniform3fv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform3i(
-    int program,
-    int location,
-    int v0,
-    int v1,
-    int v2) {
-    gl().glProgramUniform3i(
-      program,
-      location,
-      v0,
-      v1,
-      v2);
-  }
-
-  public static void glProgramUniform3iv(
-    int program,
-    int location,
-    int count,
-    IntBuffer value) {
-    gl().glProgramUniform3iv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform3iv(
-    int program,
-    int location,
-    int count,
-    int[] value,
-    int value_offset) {
-    gl().glProgramUniform3iv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform3ui(
-    int program,
-    int location,
-    int v0,
-    int v1,
-    int v2) {
-    gl().glProgramUniform3ui(
-      program,
-      location,
-      v0,
-      v1,
-      v2);
-  }
-
-  public static void glProgramUniform3uiv(
-    int program,
-    int location,
-    int count,
-    IntBuffer value) {
-    gl().glProgramUniform3uiv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform3uiv(
-    int program,
-    int location,
-    int count,
-    int[] value,
-    int value_offset) {
-    gl().glProgramUniform3uiv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform4d(
-    int program,
-    int location,
-    double v0,
-    double v1,
-    double v2,
-    double v3) {
-    gl().glProgramUniform4d(
-      program,
-      location,
-      v0,
-      v1,
-      v2,
-      v3);
-  }
-
-  public static void glProgramUniform4dv(
-    int program,
-    int location,
-    int count,
-    DoubleBuffer value) {
-    gl().glProgramUniform4dv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform4dv(
-    int program,
-    int location,
-    int count,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniform4dv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform4f(
-    int program,
-    int location,
-    float v0,
-    float v1,
-    float v2,
-    float v3) {
-    gl().glProgramUniform4f(
-      program,
-      location,
-      v0,
-      v1,
-      v2,
-      v3);
-  }
-
-  public static void glProgramUniform4fv(
-    int program,
-    int location,
-    int count,
-    FloatBuffer value) {
-    gl().glProgramUniform4fv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform4fv(
-    int program,
-    int location,
-    int count,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniform4fv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform4i(
-    int program,
-    int location,
-    int v0,
-    int v1,
-    int v2,
-    int v3) {
-    gl().glProgramUniform4i(
-      program,
-      location,
-      v0,
-      v1,
-      v2,
-      v3);
-  }
-
-  public static void glProgramUniform4iv(
-    int program,
-    int location,
-    int count,
-    IntBuffer value) {
-    gl().glProgramUniform4iv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform4iv(
-    int program,
-    int location,
-    int count,
-    int[] value,
-    int value_offset) {
-    gl().glProgramUniform4iv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniform4ui(
-    int program,
-    int location,
-    int v0,
-    int v1,
-    int v2,
-    int v3) {
-    gl().glProgramUniform4ui(
-      program,
-      location,
-      v0,
-      v1,
-      v2,
-      v3);
-  }
-
-  public static void glProgramUniform4uiv(
-    int program,
-    int location,
-    int count,
-    IntBuffer value) {
-    gl().glProgramUniform4uiv(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniform4uiv(
-    int program,
-    int location,
-    int count,
-    int[] value,
-    int value_offset) {
-    gl().glProgramUniform4uiv(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix2dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix2dv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix2dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix2dv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix2fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    FloatBuffer value) {
-    gl().glProgramUniformMatrix2fv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix2fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix2fv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix2x3dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix2x3dv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix2x3dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix2x3dv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix2x3fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    FloatBuffer value) {
-    gl().glProgramUniformMatrix2x3fv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix2x3fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix2x3fv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix2x4dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix2x4dv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix2x4dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix2x4dv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix2x4fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    FloatBuffer value) {
-    gl().glProgramUniformMatrix2x4fv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix2x4fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix2x4fv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix3dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix3dv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix3dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix3dv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix3fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    FloatBuffer value) {
-    gl().glProgramUniformMatrix3fv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix3fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix3fv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix3x2dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix3x2dv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix3x2dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix3x2dv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix3x2fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    FloatBuffer value) {
-    gl().glProgramUniformMatrix3x2fv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix3x2fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix3x2fv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix3x4dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix3x4dv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix3x4dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix3x4dv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix3x4fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    FloatBuffer value) {
-    gl().glProgramUniformMatrix3x4fv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix3x4fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix3x4fv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix4dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix4dv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix4dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix4dv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix4fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    FloatBuffer value) {
-    gl().glProgramUniformMatrix4fv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix4fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix4fv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix4x2dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix4x2dv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix4x2dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix4x2dv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix4x2fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    FloatBuffer value) {
-    gl().glProgramUniformMatrix4x2fv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix4x2fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix4x2fv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix4x3dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    DoubleBuffer value) {
-    gl().glProgramUniformMatrix4x3dv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix4x3dv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    double[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix4x3dv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformMatrix4x3fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    FloatBuffer value) {
-    gl().glProgramUniformMatrix4x3fv(
-      program,
-      location,
-      count,
-      transpose,
-      value);
-  }
-
-  public static void glProgramUniformMatrix4x3fv(
-    int program,
-    int location,
-    int count,
-    boolean transpose,
-    float[] value,
-    int value_offset) {
-    gl().glProgramUniformMatrix4x3fv(
-      program,
-      location,
-      count,
-      transpose,
-      value,
-      value_offset);
-  }
-
-  public static void glProgramUniformui64NV(
-    int program,
-    int location,
-    long value) {
-    gl().glProgramUniformui64NV(
-      program,
-      location,
-      value);
-  }
-
-  public static void glProgramUniformui64vNV(
-    int program,
-    int location,
-    int count,
-    LongBuffer value) {
-    gl().glProgramUniformui64vNV(
-      program,
-      location,
-      count,
-      value);
-  }
-
-  public static void glProgramUniformui64vNV(
-    int program,
-    int location,
-    int count,
-    long[] value,
-    int value_offset) {
-    gl().glProgramUniformui64vNV(
-      program,
-      location,
-      count,
-      value,
-      value_offset);
-  }
-
-  public static void glProvokingVertex(
-    int mode) {
-    gl().glProvokingVertex(
-      mode);
-  }
-
-  public static void glQueryCounter(
-    int id,
-    int target) {
-    gl().glQueryCounter(
-      id,
-      target);
   }
 
   public static void glReadBuffer(
@@ -30684,655 +27799,6 @@ public class Gl {
       internalformat,
       width,
       height);
-  }
-
-  public static void glResumeTransformFeedback(
-    ) {
-    gl().glResumeTransformFeedback();
-  }
-
-  public static void glSampleMaski(
-    int index,
-    int mask) {
-    gl().glSampleMaski(
-      index,
-      mask);
-  }
-
-  public static void glSamplerParameterIiv(
-    int sampler,
-    int pname,
-    IntBuffer param) {
-    gl().glSamplerParameterIiv(
-      sampler,
-      pname,
-      param);
-  }
-
-  public static void glSamplerParameterIiv(
-    int sampler,
-    int pname,
-    int[] param,
-    int param_offset) {
-    gl().glSamplerParameterIiv(
-      sampler,
-      pname,
-      param,
-      param_offset);
-  }
-
-  public static void glSamplerParameterIuiv(
-    int sampler,
-    int pname,
-    IntBuffer param) {
-    gl().glSamplerParameterIuiv(
-      sampler,
-      pname,
-      param);
-  }
-
-  public static void glSamplerParameterIuiv(
-    int sampler,
-    int pname,
-    int[] param,
-    int param_offset) {
-    gl().glSamplerParameterIuiv(
-      sampler,
-      pname,
-      param,
-      param_offset);
-  }
-
-  public static void glSamplerParameterf(
-    int sampler,
-    int pname,
-    float param) {
-    gl().glSamplerParameterf(
-      sampler,
-      pname,
-      param);
-  }
-
-  public static void glSamplerParameterfv(
-    int sampler,
-    int pname,
-    FloatBuffer param) {
-    gl().glSamplerParameterfv(
-      sampler,
-      pname,
-      param);
-  }
-
-  public static void glSamplerParameterfv(
-    int sampler,
-    int pname,
-    float[] param,
-    int param_offset) {
-    gl().glSamplerParameterfv(
-      sampler,
-      pname,
-      param,
-      param_offset);
-  }
-
-  public static void glSamplerParameteri(
-    int sampler,
-    int pname,
-    int param) {
-    gl().glSamplerParameteri(
-      sampler,
-      pname,
-      param);
-  }
-
-  public static void glSamplerParameteriv(
-    int sampler,
-    int pname,
-    IntBuffer param) {
-    gl().glSamplerParameteriv(
-      sampler,
-      pname,
-      param);
-  }
-
-  public static void glSamplerParameteriv(
-    int sampler,
-    int pname,
-    int[] param,
-    int param_offset) {
-    gl().glSamplerParameteriv(
-      sampler,
-      pname,
-      param,
-      param_offset);
-  }
-
-  public static void glScissorArrayv(
-    int first,
-    int count,
-    IntBuffer v) {
-    gl().glScissorArrayv(
-      first,
-      count,
-      v);
-  }
-
-  public static void glScissorArrayv(
-    int first,
-    int count,
-    int[] v,
-    int v_offset) {
-    gl().glScissorArrayv(
-      first,
-      count,
-      v,
-      v_offset);
-  }
-
-  public static void glScissorIndexed(
-    int index,
-    int left,
-    int bottom,
-    int width,
-    int height) {
-    gl().glScissorIndexed(
-      index,
-      left,
-      bottom,
-      width,
-      height);
-  }
-
-  public static void glScissorIndexedv(
-    int index,
-    IntBuffer v) {
-    gl().glScissorIndexedv(
-      index,
-      v);
-  }
-
-  public static void glScissorIndexedv(
-    int index,
-    int[] v,
-    int v_offset) {
-    gl().glScissorIndexedv(
-      index,
-      v,
-      v_offset);
-  }
-
-  public static void glSecondaryColorFormatNV(
-    int size,
-    int type,
-    int stride) {
-    gl().glSecondaryColorFormatNV(
-      size,
-      type,
-      stride);
-  }
-
-  public static void glSecondaryColorP3ui(
-    int type,
-    int color) {
-    gl().glSecondaryColorP3ui(
-      type,
-      color);
-  }
-
-  public static void glSecondaryColorP3uiv(
-    int type,
-    IntBuffer color) {
-    gl().glSecondaryColorP3uiv(
-      type,
-      color);
-  }
-
-  public static void glSecondaryColorP3uiv(
-    int type,
-    int[] color,
-    int color_offset) {
-    gl().glSecondaryColorP3uiv(
-      type,
-      color,
-      color_offset);
-  }
-
-  public static void glSetMultisamplefvAMD(
-    int pname,
-    int index,
-    FloatBuffer val) {
-    gl().glSetMultisamplefvAMD(
-      pname,
-      index,
-      val);
-  }
-
-  public static void glSetMultisamplefvAMD(
-    int pname,
-    int index,
-    float[] val,
-    int val_offset) {
-    gl().glSetMultisamplefvAMD(
-      pname,
-      index,
-      val,
-      val_offset);
-  }
-
-  public static void glStencilOpValueAMD(
-    int face,
-    int value) {
-    gl().glStencilOpValueAMD(
-      face,
-      value);
-  }
-
-  public static void glTessellationFactorAMD(
-    float factor) {
-    gl().glTessellationFactorAMD(
-      factor);
-  }
-
-  public static void glTessellationModeAMD(
-    int mode) {
-    gl().glTessellationModeAMD(
-      mode);
-  }
-
-  public static void glTexBuffer(
-    int target,
-    int internalformat,
-    int buffer) {
-    gl().glTexBuffer(
-      target,
-      internalformat,
-      buffer);
-  }
-
-  public static void glTexCoordFormatNV(
-    int size,
-    int type,
-    int stride) {
-    gl().glTexCoordFormatNV(
-      size,
-      type,
-      stride);
-  }
-
-  public static void glTexCoordP1ui(
-    int type,
-    int coords) {
-    gl().glTexCoordP1ui(
-      type,
-      coords);
-  }
-
-  public static void glTexCoordP1uiv(
-    int type,
-    IntBuffer coords) {
-    gl().glTexCoordP1uiv(
-      type,
-      coords);
-  }
-
-  public static void glTexCoordP1uiv(
-    int type,
-    int[] coords,
-    int coords_offset) {
-    gl().glTexCoordP1uiv(
-      type,
-      coords,
-      coords_offset);
-  }
-
-  public static void glTexCoordP2ui(
-    int type,
-    int coords) {
-    gl().glTexCoordP2ui(
-      type,
-      coords);
-  }
-
-  public static void glTexCoordP2uiv(
-    int type,
-    IntBuffer coords) {
-    gl().glTexCoordP2uiv(
-      type,
-      coords);
-  }
-
-  public static void glTexCoordP2uiv(
-    int type,
-    int[] coords,
-    int coords_offset) {
-    gl().glTexCoordP2uiv(
-      type,
-      coords,
-      coords_offset);
-  }
-
-  public static void glTexCoordP3ui(
-    int type,
-    int coords) {
-    gl().glTexCoordP3ui(
-      type,
-      coords);
-  }
-
-  public static void glTexCoordP3uiv(
-    int type,
-    IntBuffer coords) {
-    gl().glTexCoordP3uiv(
-      type,
-      coords);
-  }
-
-  public static void glTexCoordP3uiv(
-    int type,
-    int[] coords,
-    int coords_offset) {
-    gl().glTexCoordP3uiv(
-      type,
-      coords,
-      coords_offset);
-  }
-
-  public static void glTexCoordP4ui(
-    int type,
-    int coords) {
-    gl().glTexCoordP4ui(
-      type,
-      coords);
-  }
-
-  public static void glTexCoordP4uiv(
-    int type,
-    IntBuffer coords) {
-    gl().glTexCoordP4uiv(
-      type,
-      coords);
-  }
-
-  public static void glTexCoordP4uiv(
-    int type,
-    int[] coords,
-    int coords_offset) {
-    gl().glTexCoordP4uiv(
-      type,
-      coords,
-      coords_offset);
-  }
-
-  public static void glTexImage1D(
-    int target,
-    int level,
-    int internalFormat,
-    int width,
-    int border,
-    int format,
-    int type,
-    Buffer pixels) {
-    gl().glTexImage1D(
-      target,
-      level,
-      internalFormat,
-      width,
-      border,
-      format,
-      type,
-      pixels);
-  }
-
-  public static void glTexImage1D(
-    int target,
-    int level,
-    int internalFormat,
-    int width,
-    int border,
-    int format,
-    int type,
-    long pixels_buffer_offset) {
-    gl().glTexImage1D(
-      target,
-      level,
-      internalFormat,
-      width,
-      border,
-      format,
-      type,
-      pixels_buffer_offset);
-  }
-
-  public static void glTexImage2DMultisample(
-    int target,
-    int samples,
-    int internalformat,
-    int width,
-    int height,
-    boolean fixedsamplelocations) {
-    gl().glTexImage2DMultisample(
-      target,
-      samples,
-      internalformat,
-      width,
-      height,
-      fixedsamplelocations);
-  }
-
-  public static void glTexImage2DMultisampleCoverageNV(
-    int target,
-    int coverageSamples,
-    int colorSamples,
-    int internalFormat,
-    int width,
-    int height,
-    boolean fixedSampleLocations) {
-    gl().glTexImage2DMultisampleCoverageNV(
-      target,
-      coverageSamples,
-      colorSamples,
-      internalFormat,
-      width,
-      height,
-      fixedSampleLocations);
-  }
-
-  public static void glTexImage3DMultisample(
-    int target,
-    int samples,
-    int internalformat,
-    int width,
-    int height,
-    int depth,
-    boolean fixedsamplelocations) {
-    gl().glTexImage3DMultisample(
-      target,
-      samples,
-      internalformat,
-      width,
-      height,
-      depth,
-      fixedsamplelocations);
-  }
-
-  public static void glTexImage3DMultisampleCoverageNV(
-    int target,
-    int coverageSamples,
-    int colorSamples,
-    int internalFormat,
-    int width,
-    int height,
-    int depth,
-    boolean fixedSampleLocations) {
-    gl().glTexImage3DMultisampleCoverageNV(
-      target,
-      coverageSamples,
-      colorSamples,
-      internalFormat,
-      width,
-      height,
-      depth,
-      fixedSampleLocations);
-  }
-
-  public static void glTexParameterIiv(
-    int target,
-    int pname,
-    IntBuffer params) {
-    gl().glTexParameterIiv(
-      target,
-      pname,
-      params);
-  }
-
-  public static void glTexParameterIiv(
-    int target,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glTexParameterIiv(
-      target,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glTexParameterIuiv(
-    int target,
-    int pname,
-    IntBuffer params) {
-    gl().glTexParameterIuiv(
-      target,
-      pname,
-      params);
-  }
-
-  public static void glTexParameterIuiv(
-    int target,
-    int pname,
-    int[] params,
-    int params_offset) {
-    gl().glTexParameterIuiv(
-      target,
-      pname,
-      params,
-      params_offset);
-  }
-
-  public static void glTexSubImage1D(
-    int target,
-    int level,
-    int xoffset,
-    int width,
-    int format,
-    int type,
-    Buffer pixels) {
-    gl().glTexSubImage1D(
-      target,
-      level,
-      xoffset,
-      width,
-      format,
-      type,
-      pixels);
-  }
-
-  public static void glTexSubImage1D(
-    int target,
-    int level,
-    int xoffset,
-    int width,
-    int format,
-    int type,
-    long pixels_buffer_offset) {
-    gl().glTexSubImage1D(
-      target,
-      level,
-      xoffset,
-      width,
-      format,
-      type,
-      pixels_buffer_offset);
-  }
-
-  public static void glTextureImage2DMultisampleCoverageNV(
-    int texture,
-    int target,
-    int coverageSamples,
-    int colorSamples,
-    int internalFormat,
-    int width,
-    int height,
-    boolean fixedSampleLocations) {
-    gl().glTextureImage2DMultisampleCoverageNV(
-      texture,
-      target,
-      coverageSamples,
-      colorSamples,
-      internalFormat,
-      width,
-      height,
-      fixedSampleLocations);
-  }
-
-  public static void glTextureImage2DMultisampleNV(
-    int texture,
-    int target,
-    int samples,
-    int internalFormat,
-    int width,
-    int height,
-    boolean fixedSampleLocations) {
-    gl().glTextureImage2DMultisampleNV(
-      texture,
-      target,
-      samples,
-      internalFormat,
-      width,
-      height,
-      fixedSampleLocations);
-  }
-
-  public static void glTextureImage3DMultisampleCoverageNV(
-    int texture,
-    int target,
-    int coverageSamples,
-    int colorSamples,
-    int internalFormat,
-    int width,
-    int height,
-    int depth,
-    boolean fixedSampleLocations) {
-    gl().glTextureImage3DMultisampleCoverageNV(
-      texture,
-      target,
-      coverageSamples,
-      colorSamples,
-      internalFormat,
-      width,
-      height,
-      depth,
-      fixedSampleLocations);
-  }
-
-  public static void glTextureImage3DMultisampleNV(
-    int texture,
-    int target,
-    int samples,
-    int internalFormat,
-    int width,
-    int height,
-    int depth,
-    boolean fixedSampleLocations) {
-    gl().glTextureImage3DMultisampleNV(
-      texture,
-      target,
-      samples,
-      internalFormat,
-      width,
-      height,
-      depth,
-      fixedSampleLocations);
   }
 
   public static void glTransformFeedbackVaryings(
@@ -31645,26 +28111,2431 @@ public class Gl {
       value_offset);
   }
 
-  public static void glUniformSubroutinesuiv(
-    int shadertype,
-    int count,
-    IntBuffer indices) {
-    gl().glUniformSubroutinesuiv(
-      shadertype,
-      count,
-      indices);
+  public static void glVertexAttribI4i(
+    int index,
+    int x,
+    int y,
+    int z,
+    int w) {
+    gl().glVertexAttribI4i(
+      index,
+      x,
+      y,
+      z,
+      w);
   }
 
-  public static void glUniformSubroutinesuiv(
-    int shadertype,
+  public static void glVertexAttribI4iv(
+    int index,
+    IntBuffer v) {
+    gl().glVertexAttribI4iv(
+      index,
+      v);
+  }
+
+  public static void glVertexAttribI4iv(
+    int index,
+    int[] v,
+    int v_offset) {
+    gl().glVertexAttribI4iv(
+      index,
+      v,
+      v_offset);
+  }
+
+  public static void glVertexAttribI4ui(
+    int index,
+    int x,
+    int y,
+    int z,
+    int w) {
+    gl().glVertexAttribI4ui(
+      index,
+      x,
+      y,
+      z,
+      w);
+  }
+
+  public static void glVertexAttribI4uiv(
+    int index,
+    IntBuffer v) {
+    gl().glVertexAttribI4uiv(
+      index,
+      v);
+  }
+
+  public static void glVertexAttribI4uiv(
+    int index,
+    int[] v,
+    int v_offset) {
+    gl().glVertexAttribI4uiv(
+      index,
+      v,
+      v_offset);
+  }
+
+  public static void glVertexAttribIPointer(
+    int index,
+    int size,
+    int type,
+    int stride,
+    long pointer_buffer_offset) {
+    gl().glVertexAttribIPointer(
+      index,
+      size,
+      type,
+      stride,
+      pointer_buffer_offset);
+  }
+
+  public static boolean glIsPBOPackBound(
+    ) {
+    return gl().glIsPBOPackBound();
+  }
+
+  public static boolean isPBOPackBound(
+    ) {
+    return gl().isPBOPackBound();
+  }
+
+  public static boolean glIsPBOUnpackBound(
+    ) {
+    return gl().glIsPBOUnpackBound();
+  }
+
+  public static boolean isPBOUnpackBound(
+    ) {
+    return gl().isPBOUnpackBound();
+  }
+
+
+  // Generated from GL2GL3.html
+
+  public static final int GL_DOUBLE
+    = GL2.GL_DOUBLE;
+
+  public static final int GL_QUADS
+    = GL2.GL_QUADS;
+
+  public static final int GL_POINT_SIZE_GRANULARITY
+    = GL2.GL_POINT_SIZE_GRANULARITY;
+
+  public static final int GL_POINT_SIZE_RANGE
+    = GL2.GL_POINT_SIZE_RANGE;
+
+  public static final int GL_LINE_WIDTH_GRANULARITY
+    = GL2.GL_LINE_WIDTH_GRANULARITY;
+
+  public static final int GL_LINE_WIDTH_RANGE
+    = GL2.GL_LINE_WIDTH_RANGE;
+
+  public static final int GL_POINT
+    = GL2.GL_POINT;
+
+  public static final int GL_LINE
+    = GL2.GL_LINE;
+
+  public static final int GL_FILL
+    = GL2.GL_FILL;
+
+  public static final int GL_POLYGON_MODE
+    = GL2.GL_POLYGON_MODE;
+
+  public static final int GL_POLYGON_SMOOTH
+    = GL2.GL_POLYGON_SMOOTH;
+
+  public static final int GL_POLYGON_OFFSET_POINT
+    = GL2.GL_POLYGON_OFFSET_POINT;
+
+  public static final int GL_POLYGON_OFFSET_LINE
+    = GL2.GL_POLYGON_OFFSET_LINE;
+
+  public static final int GL_LEFT
+    = GL2.GL_LEFT;
+
+  public static final int GL_RIGHT
+    = GL2.GL_RIGHT;
+
+  public static final int GL_FRONT_LEFT
+    = GL2.GL_FRONT_LEFT;
+
+  public static final int GL_FRONT_RIGHT
+    = GL2.GL_FRONT_RIGHT;
+
+  public static final int GL_BACK_LEFT
+    = GL2.GL_BACK_LEFT;
+
+  public static final int GL_BACK_RIGHT
+    = GL2.GL_BACK_RIGHT;
+
+  public static final int GL_DRAW_BUFFER
+    = GL2.GL_DRAW_BUFFER;
+
+  public static final int GL_DOUBLEBUFFER
+    = GL2.GL_DOUBLEBUFFER;
+
+  public static final int GL_STEREO
+    = GL2.GL_STEREO;
+
+  public static final int GL_POLYGON_SMOOTH_HINT
+    = GL2.GL_POLYGON_SMOOTH_HINT;
+
+  public static final int GL_PACK_LSB_FIRST
+    = GL2.GL_PACK_LSB_FIRST;
+
+  public static final int GL_PACK_SWAP_BYTES
+    = GL2.GL_PACK_SWAP_BYTES;
+
+  public static final int GL_UNPACK_LSB_FIRST
+    = GL2.GL_UNPACK_LSB_FIRST;
+
+  public static final int GL_UNPACK_SWAP_BYTES
+    = GL2.GL_UNPACK_SWAP_BYTES;
+
+  public static final int GL_TEXTURE_1D
+    = GL2.GL_TEXTURE_1D;
+
+  public static final int GL_TEXTURE_BORDER_COLOR
+    = GL2.GL_TEXTURE_BORDER_COLOR;
+
+  public static final int GL_TEXTURE_WIDTH
+    = GL2.GL_TEXTURE_WIDTH;
+
+  public static final int GL_TEXTURE_HEIGHT
+    = GL2.GL_TEXTURE_HEIGHT;
+
+  public static final int GL_TEXTURE_RED_SIZE
+    = GL2.GL_TEXTURE_RED_SIZE;
+
+  public static final int GL_TEXTURE_GREEN_SIZE
+    = GL2.GL_TEXTURE_GREEN_SIZE;
+
+  public static final int GL_TEXTURE_BLUE_SIZE
+    = GL2.GL_TEXTURE_BLUE_SIZE;
+
+  public static final int GL_TEXTURE_ALPHA_SIZE
+    = GL2.GL_TEXTURE_ALPHA_SIZE;
+
+  public static final int GL_PROXY_TEXTURE_1D
+    = GL2.GL_PROXY_TEXTURE_1D;
+
+  public static final int GL_PROXY_TEXTURE_2D
+    = GL2.GL_PROXY_TEXTURE_2D;
+
+  public static final int GL_TEXTURE_BINDING_1D
+    = GL2.GL_TEXTURE_BINDING_1D;
+
+  public static final int GL_TEXTURE_INTERNAL_FORMAT
+    = GL2.GL_TEXTURE_INTERNAL_FORMAT;
+
+  public static final int GL_R3_G3_B2
+    = GL2.GL_R3_G3_B2;
+
+  public static final int GL_RGB4
+    = GL2.GL_RGB4;
+
+  public static final int GL_RGB5
+    = GL2.GL_RGB5;
+
+  public static final int GL_RGB12
+    = GL2.GL_RGB12;
+
+  public static final int GL_RGB16
+    = GL2.GL_RGB16;
+
+  public static final int GL_RGBA2
+    = GL2.GL_RGBA2;
+
+  public static final int GL_RGBA12
+    = GL2.GL_RGBA12;
+
+  public static final int GL_RGBA16
+    = GL2.GL_RGBA16;
+
+  public static final int GL_UNSIGNED_BYTE_3_3_2
+    = GL2.GL_UNSIGNED_BYTE_3_3_2;
+
+  public static final int GL_UNSIGNED_INT_8_8_8_8
+    = GL2.GL_UNSIGNED_INT_8_8_8_8;
+
+  public static final int GL_PACK_SKIP_IMAGES
+    = GL2.GL_PACK_SKIP_IMAGES;
+
+  public static final int GL_PACK_IMAGE_HEIGHT
+    = GL2.GL_PACK_IMAGE_HEIGHT;
+
+  public static final int GL_PROXY_TEXTURE_3D
+    = GL2.GL_PROXY_TEXTURE_3D;
+
+  public static final int GL_TEXTURE_DEPTH
+    = GL2.GL_TEXTURE_DEPTH;
+
+  public static final int GL_UNSIGNED_BYTE_2_3_3_REV
+    = GL2.GL_UNSIGNED_BYTE_2_3_3_REV;
+
+  public static final int GL_UNSIGNED_SHORT_5_6_5_REV
+    = GL2.GL_UNSIGNED_SHORT_5_6_5_REV;
+
+  public static final int GL_UNSIGNED_SHORT_4_4_4_4_REV
+    = GL2.GL_UNSIGNED_SHORT_4_4_4_4_REV;
+
+  public static final int GL_UNSIGNED_SHORT_1_5_5_5_REV
+    = GL2.GL_UNSIGNED_SHORT_1_5_5_5_REV;
+
+  public static final int GL_UNSIGNED_INT_8_8_8_8_REV
+    = GL2.GL_UNSIGNED_INT_8_8_8_8_REV;
+
+  public static final int GL_BGR
+    = GL2.GL_BGR;
+
+  public static final int GL_SMOOTH_POINT_SIZE_GRANULARITY
+    = GL2.GL_SMOOTH_POINT_SIZE_GRANULARITY;
+
+  public static final int GL_SMOOTH_LINE_WIDTH_GRANULARITY
+    = GL2.GL_SMOOTH_LINE_WIDTH_GRANULARITY;
+
+  public static final int GL_PROXY_TEXTURE_CUBE_MAP
+    = GL2.GL_PROXY_TEXTURE_CUBE_MAP;
+
+  public static final int GL_COMPRESSED_RGB
+    = GL2.GL_COMPRESSED_RGB;
+
+  public static final int GL_COMPRESSED_RGBA
+    = GL2.GL_COMPRESSED_RGBA;
+
+  public static final int GL_TEXTURE_COMPRESSION_HINT
+    = GL2.GL_TEXTURE_COMPRESSION_HINT;
+
+  public static final int GL_TEXTURE_COMPRESSED_IMAGE_SIZE
+    = GL2.GL_TEXTURE_COMPRESSED_IMAGE_SIZE;
+
+  public static final int GL_TEXTURE_COMPRESSED
+    = GL2.GL_TEXTURE_COMPRESSED;
+
+  public static final int GL_CLAMP_TO_BORDER
+    = GL2.GL_CLAMP_TO_BORDER;
+
+  public static final int GL_TEXTURE_LOD_BIAS
+    = GL2.GL_TEXTURE_LOD_BIAS;
+
+  public static final int GL_TEXTURE_DEPTH_SIZE
+    = GL2.GL_TEXTURE_DEPTH_SIZE;
+
+  public static final int GL_QUERY_COUNTER_BITS
+    = GL2.GL_QUERY_COUNTER_BITS;
+
+  public static final int GL_READ_ONLY
+    = GL2.GL_READ_ONLY;
+
+  public static final int GL_READ_WRITE
+    = GL2.GL_READ_WRITE;
+
+  public static final int GL_SAMPLES_PASSED
+    = GL2.GL_SAMPLES_PASSED;
+
+  public static final int GL_VERTEX_PROGRAM_POINT_SIZE
+    = GL2.GL_VERTEX_PROGRAM_POINT_SIZE;
+
+  public static final int GL_MAX_VARYING_FLOATS
+    = GL2.GL_MAX_VARYING_FLOATS;
+
+  public static final int GL_SAMPLER_1D
+    = GL2.GL_SAMPLER_1D;
+
+  public static final int GL_SAMPLER_1D_SHADOW
+    = GL2.GL_SAMPLER_1D_SHADOW;
+
+  public static final int GL_POINT_SPRITE_COORD_ORIGIN
+    = GL2.GL_POINT_SPRITE_COORD_ORIGIN;
+
+  public static final int GL_LOWER_LEFT
+    = GL2.GL_LOWER_LEFT;
+
+  public static final int GL_UPPER_LEFT
+    = GL2.GL_UPPER_LEFT;
+
+  public static final int GL_COMPRESSED_SRGB
+    = GL2.GL_COMPRESSED_SRGB;
+
+  public static final int GL_COMPRESSED_SRGB_ALPHA
+    = GL2.GL_COMPRESSED_SRGB_ALPHA;
+
+  public static final int GL_CLIP_DISTANCE0
+    = GL2.GL_CLIP_DISTANCE0;
+
+  public static final int GL_CLIP_DISTANCE1
+    = GL2.GL_CLIP_DISTANCE1;
+
+  public static final int GL_CLIP_DISTANCE2
+    = GL2.GL_CLIP_DISTANCE2;
+
+  public static final int GL_CLIP_DISTANCE3
+    = GL2.GL_CLIP_DISTANCE3;
+
+  public static final int GL_CLIP_DISTANCE4
+    = GL2.GL_CLIP_DISTANCE4;
+
+  public static final int GL_CLIP_DISTANCE5
+    = GL2.GL_CLIP_DISTANCE5;
+
+  public static final int GL_CLIP_DISTANCE6
+    = GL2.GL_CLIP_DISTANCE6;
+
+  public static final int GL_CLIP_DISTANCE7
+    = GL2.GL_CLIP_DISTANCE7;
+
+  public static final int GL_MAX_CLIP_DISTANCES
+    = GL2.GL_MAX_CLIP_DISTANCES;
+
+  public static final int GL_CONTEXT_FLAGS
+    = GL2.GL_CONTEXT_FLAGS;
+
+  public static final int GL_COMPRESSED_RED
+    = GL2.GL_COMPRESSED_RED;
+
+  public static final int GL_COMPRESSED_RG
+    = GL2.GL_COMPRESSED_RG;
+
+  public static final int GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT
+    = GL2.GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT;
+
+  public static final int GL_CLAMP_READ_COLOR
+    = GL2.GL_CLAMP_READ_COLOR;
+
+  public static final int GL_FIXED_ONLY
+    = GL2.GL_FIXED_ONLY;
+
+  public static final int GL_TEXTURE_1D_ARRAY
+    = GL2.GL_TEXTURE_1D_ARRAY;
+
+  public static final int GL_PROXY_TEXTURE_1D_ARRAY
+    = GL2.GL_PROXY_TEXTURE_1D_ARRAY;
+
+  public static final int GL_PROXY_TEXTURE_2D_ARRAY
+    = GL2.GL_PROXY_TEXTURE_2D_ARRAY;
+
+  public static final int GL_TEXTURE_BINDING_1D_ARRAY
+    = GL2.GL_TEXTURE_BINDING_1D_ARRAY;
+
+  public static final int GL_TEXTURE_SHARED_SIZE
+    = GL2.GL_TEXTURE_SHARED_SIZE;
+
+  public static final int GL_PRIMITIVES_GENERATED
+    = GL2.GL_PRIMITIVES_GENERATED;
+
+  public static final int GL_GREEN_INTEGER
+    = GL2.GL_GREEN_INTEGER;
+
+  public static final int GL_BLUE_INTEGER
+    = GL2.GL_BLUE_INTEGER;
+
+  public static final int GL_BGR_INTEGER
+    = GL2.GL_BGR_INTEGER;
+
+  public static final int GL_BGRA_INTEGER
+    = GL2.GL_BGRA_INTEGER;
+
+  public static final int GL_SAMPLER_1D_ARRAY
+    = GL2.GL_SAMPLER_1D_ARRAY;
+
+  public static final int GL_SAMPLER_1D_ARRAY_SHADOW
+    = GL2.GL_SAMPLER_1D_ARRAY_SHADOW;
+
+  public static final int GL_INT_SAMPLER_1D
+    = GL2.GL_INT_SAMPLER_1D;
+
+  public static final int GL_INT_SAMPLER_1D_ARRAY
+    = GL2.GL_INT_SAMPLER_1D_ARRAY;
+
+  public static final int GL_UNSIGNED_INT_SAMPLER_1D
+    = GL2.GL_UNSIGNED_INT_SAMPLER_1D;
+
+  public static final int GL_UNSIGNED_INT_SAMPLER_1D_ARRAY
+    = GL2.GL_UNSIGNED_INT_SAMPLER_1D_ARRAY;
+
+  public static final int GL_QUERY_WAIT
+    = GL2.GL_QUERY_WAIT;
+
+  public static final int GL_QUERY_NO_WAIT
+    = GL2.GL_QUERY_NO_WAIT;
+
+  public static final int GL_QUERY_BY_REGION_WAIT
+    = GL2.GL_QUERY_BY_REGION_WAIT;
+
+  public static final int GL_QUERY_BY_REGION_NO_WAIT
+    = GL2.GL_QUERY_BY_REGION_NO_WAIT;
+
+  public static final int GL_TEXTURE_STENCIL_SIZE
+    = GL2.GL_TEXTURE_STENCIL_SIZE;
+
+  public static final int GL_TEXTURE_RED_TYPE
+    = GL2.GL_TEXTURE_RED_TYPE;
+
+  public static final int GL_TEXTURE_GREEN_TYPE
+    = GL2.GL_TEXTURE_GREEN_TYPE;
+
+  public static final int GL_TEXTURE_BLUE_TYPE
+    = GL2.GL_TEXTURE_BLUE_TYPE;
+
+  public static final int GL_TEXTURE_ALPHA_TYPE
+    = GL2.GL_TEXTURE_ALPHA_TYPE;
+
+  public static final int GL_TEXTURE_DEPTH_TYPE
+    = GL2.GL_TEXTURE_DEPTH_TYPE;
+
+  public static final int GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER
+    = GL2.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER;
+
+  public static final int GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER
+    = GL2.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER;
+
+  public static final int GL_STENCIL_INDEX16
+    = GL2.GL_STENCIL_INDEX16;
+
+  public static final int GL_FRAMEBUFFER_SRGB
+    = GL2.GL_FRAMEBUFFER_SRGB;
+
+  public static final int GL_COMPRESSED_RED_RGTC1
+    = GL2.GL_COMPRESSED_RED_RGTC1;
+
+  public static final int GL_COMPRESSED_SIGNED_RED_RGTC1
+    = GL2.GL_COMPRESSED_SIGNED_RED_RGTC1;
+
+  public static final int GL_COMPRESSED_RG_RGTC2
+    = GL2.GL_COMPRESSED_RG_RGTC2;
+
+  public static final int GL_COMPRESSED_SIGNED_RG_RGTC2
+    = GL2.GL_COMPRESSED_SIGNED_RG_RGTC2;
+
+  public static final int GL_R16
+    = GL2.GL_R16;
+
+  public static final int GL_RG16
+    = GL2.GL_RG16;
+
+  public static final int GL_SAMPLER_2D_RECT
+    = GL2.GL_SAMPLER_2D_RECT;
+
+  public static final int GL_SAMPLER_2D_RECT_SHADOW
+    = GL2.GL_SAMPLER_2D_RECT_SHADOW;
+
+  public static final int GL_SAMPLER_BUFFER
+    = GL2.GL_SAMPLER_BUFFER;
+
+  public static final int GL_INT_SAMPLER_2D_RECT
+    = GL2.GL_INT_SAMPLER_2D_RECT;
+
+  public static final int GL_INT_SAMPLER_BUFFER
+    = GL2.GL_INT_SAMPLER_BUFFER;
+
+  public static final int GL_UNSIGNED_INT_SAMPLER_2D_RECT
+    = GL2.GL_UNSIGNED_INT_SAMPLER_2D_RECT;
+
+  public static final int GL_UNSIGNED_INT_SAMPLER_BUFFER
+    = GL2.GL_UNSIGNED_INT_SAMPLER_BUFFER;
+
+  public static final int GL_TEXTURE_BUFFER
+    = GL2.GL_TEXTURE_BUFFER;
+
+  public static final int GL_MAX_TEXTURE_BUFFER_SIZE
+    = GL2.GL_MAX_TEXTURE_BUFFER_SIZE;
+
+  public static final int GL_TEXTURE_BINDING_BUFFER
+    = GL2.GL_TEXTURE_BINDING_BUFFER;
+
+  public static final int GL_TEXTURE_BUFFER_DATA_STORE_BINDING
+    = GL2.GL_TEXTURE_BUFFER_DATA_STORE_BINDING;
+
+  public static final int GL_TEXTURE_RECTANGLE
+    = GL2.GL_TEXTURE_RECTANGLE;
+
+  public static final int GL_TEXTURE_BINDING_RECTANGLE
+    = GL2.GL_TEXTURE_BINDING_RECTANGLE;
+
+  public static final int GL_PROXY_TEXTURE_RECTANGLE
+    = GL2.GL_PROXY_TEXTURE_RECTANGLE;
+
+  public static final int GL_MAX_RECTANGLE_TEXTURE_SIZE
+    = GL2.GL_MAX_RECTANGLE_TEXTURE_SIZE;
+
+  public static final int GL_RED_SNORM
+    = GL2.GL_RED_SNORM;
+
+  public static final int GL_RG_SNORM
+    = GL2.GL_RG_SNORM;
+
+  public static final int GL_RGB_SNORM
+    = GL2.GL_RGB_SNORM;
+
+  public static final int GL_RGBA_SNORM
+    = GL2.GL_RGBA_SNORM;
+
+  public static final int GL_R16_SNORM
+    = GL2.GL_R16_SNORM;
+
+  public static final int GL_RG16_SNORM
+    = GL2.GL_RG16_SNORM;
+
+  public static final int GL_RGB16_SNORM
+    = GL2.GL_RGB16_SNORM;
+
+  public static final int GL_RGBA16_SNORM
+    = GL2.GL_RGBA16_SNORM;
+
+  public static final int GL_PRIMITIVE_RESTART
+    = GL2.GL_PRIMITIVE_RESTART;
+
+  public static final int GL_PRIMITIVE_RESTART_INDEX
+    = GL2.GL_PRIMITIVE_RESTART_INDEX;
+
+  public static final int GL_SYNC_CL_EVENT_ARB
+    = GL2.GL_SYNC_CL_EVENT_ARB;
+
+  public static final int GL_SYNC_CL_EVENT_COMPLETE_ARB
+    = GL2.GL_SYNC_CL_EVENT_COMPLETE_ARB;
+
+  public static final int GL_COMPUTE_SHADER_BIT
+    = GL2.GL_COMPUTE_SHADER_BIT;
+
+  public static final int GL_LINES_ADJACENCY_ARB
+    = GL2.GL_LINES_ADJACENCY_ARB;
+
+  public static final int GL_LINE_STRIP_ADJACENCY_ARB
+    = GL2.GL_LINE_STRIP_ADJACENCY_ARB;
+
+  public static final int GL_TRIANGLES_ADJACENCY_ARB
+    = GL2.GL_TRIANGLES_ADJACENCY_ARB;
+
+  public static final int GL_TRIANGLE_STRIP_ADJACENCY_ARB
+    = GL2.GL_TRIANGLE_STRIP_ADJACENCY_ARB;
+
+  public static final int GL_PROGRAM_POINT_SIZE_ARB
+    = GL2.GL_PROGRAM_POINT_SIZE_ARB;
+
+  public static final int GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS_ARB
+    = GL2.GL_MAX_GEOMETRY_TEXTURE_IMAGE_UNITS_ARB;
+
+  public static final int GL_FRAMEBUFFER_ATTACHMENT_LAYERED_ARB
+    = GL2.GL_FRAMEBUFFER_ATTACHMENT_LAYERED_ARB;
+
+  public static final int GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS_ARB
+    = GL2.GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS_ARB;
+
+  public static final int GL_FRAMEBUFFER_INCOMPLETE_LAYER_COUNT_ARB
+    = GL2.GL_FRAMEBUFFER_INCOMPLETE_LAYER_COUNT_ARB;
+
+  public static final int GL_GEOMETRY_SHADER_ARB
+    = GL2.GL_GEOMETRY_SHADER_ARB;
+
+  public static final int GL_GEOMETRY_VERTICES_OUT_ARB
+    = GL2.GL_GEOMETRY_VERTICES_OUT_ARB;
+
+  public static final int GL_GEOMETRY_INPUT_TYPE_ARB
+    = GL2.GL_GEOMETRY_INPUT_TYPE_ARB;
+
+  public static final int GL_GEOMETRY_OUTPUT_TYPE_ARB
+    = GL2.GL_GEOMETRY_OUTPUT_TYPE_ARB;
+
+  public static final int GL_MAX_GEOMETRY_VARYING_COMPONENTS_ARB
+    = GL2.GL_MAX_GEOMETRY_VARYING_COMPONENTS_ARB;
+
+  public static final int GL_MAX_VERTEX_VARYING_COMPONENTS_ARB
+    = GL2.GL_MAX_VERTEX_VARYING_COMPONENTS_ARB;
+
+  public static final int GL_MAX_GEOMETRY_UNIFORM_COMPONENTS_ARB
+    = GL2.GL_MAX_GEOMETRY_UNIFORM_COMPONENTS_ARB;
+
+  public static final int GL_MAX_GEOMETRY_OUTPUT_VERTICES_ARB
+    = GL2.GL_MAX_GEOMETRY_OUTPUT_VERTICES_ARB;
+
+  public static final int GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS_ARB
+    = GL2.GL_MAX_GEOMETRY_TOTAL_OUTPUT_COMPONENTS_ARB;
+
+  public static final int GL_SRGB_DECODE_ARB
+    = GL2.GL_SRGB_DECODE_ARB;
+
+  public static final int GL_CONTEXT_FLAG_ROBUST_ACCESS_BIT
+    = GL2.GL_CONTEXT_FLAG_ROBUST_ACCESS_BIT;
+
+  public static final int GL_SHADER_INCLUDE_ARB
+    = GL2.GL_SHADER_INCLUDE_ARB;
+
+  public static final int GL_NAMED_STRING_LENGTH_ARB
+    = GL2.GL_NAMED_STRING_LENGTH_ARB;
+
+  public static final int GL_NAMED_STRING_TYPE_ARB
+    = GL2.GL_NAMED_STRING_TYPE_ARB;
+
+  public static final int GL_MAX_PROGRAM_TEXTURE_GATHER_COMPONENTS
+    = GL2.GL_MAX_PROGRAM_TEXTURE_GATHER_COMPONENTS;
+
+  public static final int GL_MAX_GEOMETRY_UNIFORM_BLOCKS
+    = GL2.GL_MAX_GEOMETRY_UNIFORM_BLOCKS;
+
+  public static final int GL_MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS
+    = GL2.GL_MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS;
+
+  public static final int GL_UNIFORM_BLOCK_REFERENCED_BY_GEOMETRY_SHADER
+    = GL2.GL_UNIFORM_BLOCK_REFERENCED_BY_GEOMETRY_SHADER;
+
+  public static final int GL_FACTOR_MIN_AMD
+    = GL2.GL_FACTOR_MIN_AMD;
+
+  public static final int GL_FACTOR_MAX_AMD
+    = GL2.GL_FACTOR_MAX_AMD;
+
+  public static final int GL_MAX_DEBUG_LOGGED_MESSAGES_AMD
+    = GL2.GL_MAX_DEBUG_LOGGED_MESSAGES_AMD;
+
+  public static final int GL_DEBUG_LOGGED_MESSAGES_AMD
+    = GL2.GL_DEBUG_LOGGED_MESSAGES_AMD;
+
+  public static final int GL_DEBUG_SEVERITY_HIGH_AMD
+    = GL2.GL_DEBUG_SEVERITY_HIGH_AMD;
+
+  public static final int GL_DEBUG_SEVERITY_MEDIUM_AMD
+    = GL2.GL_DEBUG_SEVERITY_MEDIUM_AMD;
+
+  public static final int GL_DEBUG_SEVERITY_LOW_AMD
+    = GL2.GL_DEBUG_SEVERITY_LOW_AMD;
+
+  public static final int GL_DEBUG_CATEGORY_API_ERROR_AMD
+    = GL2.GL_DEBUG_CATEGORY_API_ERROR_AMD;
+
+  public static final int GL_DEBUG_CATEGORY_WINDOW_SYSTEM_AMD
+    = GL2.GL_DEBUG_CATEGORY_WINDOW_SYSTEM_AMD;
+
+  public static final int GL_DEBUG_CATEGORY_DEPRECATION_AMD
+    = GL2.GL_DEBUG_CATEGORY_DEPRECATION_AMD;
+
+  public static final int GL_DEBUG_CATEGORY_UNDEFINED_BEHAVIOR_AMD
+    = GL2.GL_DEBUG_CATEGORY_UNDEFINED_BEHAVIOR_AMD;
+
+  public static final int GL_DEBUG_CATEGORY_PERFORMANCE_AMD
+    = GL2.GL_DEBUG_CATEGORY_PERFORMANCE_AMD;
+
+  public static final int GL_DEBUG_CATEGORY_SHADER_COMPILER_AMD
+    = GL2.GL_DEBUG_CATEGORY_SHADER_COMPILER_AMD;
+
+  public static final int GL_DEBUG_CATEGORY_APPLICATION_AMD
+    = GL2.GL_DEBUG_CATEGORY_APPLICATION_AMD;
+
+  public static final int GL_DEBUG_CATEGORY_OTHER_AMD
+    = GL2.GL_DEBUG_CATEGORY_OTHER_AMD;
+
+  public static final int GL_DEPTH_CLAMP_NEAR_AMD
+    = GL2.GL_DEPTH_CLAMP_NEAR_AMD;
+
+  public static final int GL_DEPTH_CLAMP_FAR_AMD
+    = GL2.GL_DEPTH_CLAMP_FAR_AMD;
+
+  public static final int GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD
+    = GL2.GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD;
+
+  public static final int GL_SUBSAMPLE_DISTANCE_AMD
+    = GL2.GL_SUBSAMPLE_DISTANCE_AMD;
+
+  public static final int GL_SET_AMD
+    = GL2.GL_SET_AMD;
+
+  public static final int GL_REPLACE_VALUE_AMD
+    = GL2.GL_REPLACE_VALUE_AMD;
+
+  public static final int GL_STENCIL_OP_VALUE_AMD
+    = GL2.GL_STENCIL_OP_VALUE_AMD;
+
+  public static final int GL_STENCIL_BACK_OP_VALUE_AMD
+    = GL2.GL_STENCIL_BACK_OP_VALUE_AMD;
+
+  public static final int GL_SAMPLER_BUFFER_AMD
+    = GL2.GL_SAMPLER_BUFFER_AMD;
+
+  public static final int GL_INT_SAMPLER_BUFFER_AMD
+    = GL2.GL_INT_SAMPLER_BUFFER_AMD;
+
+  public static final int GL_UNSIGNED_INT_SAMPLER_BUFFER_AMD
+    = GL2.GL_UNSIGNED_INT_SAMPLER_BUFFER_AMD;
+
+  public static final int GL_TESSELLATION_MODE_AMD
+    = GL2.GL_TESSELLATION_MODE_AMD;
+
+  public static final int GL_TESSELLATION_FACTOR_AMD
+    = GL2.GL_TESSELLATION_FACTOR_AMD;
+
+  public static final int GL_DISCRETE_AMD
+    = GL2.GL_DISCRETE_AMD;
+
+  public static final int GL_CONTINUOUS_AMD
+    = GL2.GL_CONTINUOUS_AMD;
+
+  public static final int GL_SCALED_RESOLVE_FASTEST_EXT
+    = GL2.GL_SCALED_RESOLVE_FASTEST_EXT;
+
+  public static final int GL_SCALED_RESOLVE_NICEST_EXT
+    = GL2.GL_SCALED_RESOLVE_NICEST_EXT;
+
+  public static final int GL_TEXTURE_SRGB_DECODE_EXT
+    = GL2.GL_TEXTURE_SRGB_DECODE_EXT;
+
+  public static final int GL_DECODE_EXT
+    = GL2.GL_DECODE_EXT;
+
+  public static final int GL_SKIP_DECODE_EXT
+    = GL2.GL_SKIP_DECODE_EXT;
+
+  public static final int GL_SYNC_X11_FENCE_EXT
+    = GL2.GL_SYNC_X11_FENCE_EXT;
+
+  public static final int GL_BUFFER_GPU_ADDRESS_NV
+    = GL2.GL_BUFFER_GPU_ADDRESS_NV;
+
+  public static final int GL_GPU_ADDRESS_NV
+    = GL2.GL_GPU_ADDRESS_NV;
+
+  public static final int GL_MAX_SHADER_BUFFER_ADDRESS_NV
+    = GL2.GL_MAX_SHADER_BUFFER_ADDRESS_NV;
+
+  public static final int GL_TEXTURE_COVERAGE_SAMPLES_NV
+    = GL2.GL_TEXTURE_COVERAGE_SAMPLES_NV;
+
+  public static final int GL_TEXTURE_COLOR_SAMPLES_NV
+    = GL2.GL_TEXTURE_COLOR_SAMPLES_NV;
+
+  public static final int GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV
+    = GL2.GL_VERTEX_ATTRIB_ARRAY_UNIFIED_NV;
+
+  public static final int GL_ELEMENT_ARRAY_UNIFIED_NV
+    = GL2.GL_ELEMENT_ARRAY_UNIFIED_NV;
+
+  public static final int GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV
+    = GL2.GL_VERTEX_ATTRIB_ARRAY_ADDRESS_NV;
+
+  public static final int GL_VERTEX_ARRAY_ADDRESS_NV
+    = GL2.GL_VERTEX_ARRAY_ADDRESS_NV;
+
+  public static final int GL_NORMAL_ARRAY_ADDRESS_NV
+    = GL2.GL_NORMAL_ARRAY_ADDRESS_NV;
+
+  public static final int GL_COLOR_ARRAY_ADDRESS_NV
+    = GL2.GL_COLOR_ARRAY_ADDRESS_NV;
+
+  public static final int GL_INDEX_ARRAY_ADDRESS_NV
+    = GL2.GL_INDEX_ARRAY_ADDRESS_NV;
+
+  public static final int GL_TEXTURE_COORD_ARRAY_ADDRESS_NV
+    = GL2.GL_TEXTURE_COORD_ARRAY_ADDRESS_NV;
+
+  public static final int GL_EDGE_FLAG_ARRAY_ADDRESS_NV
+    = GL2.GL_EDGE_FLAG_ARRAY_ADDRESS_NV;
+
+  public static final int GL_SECONDARY_COLOR_ARRAY_ADDRESS_NV
+    = GL2.GL_SECONDARY_COLOR_ARRAY_ADDRESS_NV;
+
+  public static final int GL_FOG_COORD_ARRAY_ADDRESS_NV
+    = GL2.GL_FOG_COORD_ARRAY_ADDRESS_NV;
+
+  public static final int GL_ELEMENT_ARRAY_ADDRESS_NV
+    = GL2.GL_ELEMENT_ARRAY_ADDRESS_NV;
+
+  public static final int GL_VERTEX_ATTRIB_ARRAY_LENGTH_NV
+    = GL2.GL_VERTEX_ATTRIB_ARRAY_LENGTH_NV;
+
+  public static final int GL_VERTEX_ARRAY_LENGTH_NV
+    = GL2.GL_VERTEX_ARRAY_LENGTH_NV;
+
+  public static final int GL_NORMAL_ARRAY_LENGTH_NV
+    = GL2.GL_NORMAL_ARRAY_LENGTH_NV;
+
+  public static final int GL_COLOR_ARRAY_LENGTH_NV
+    = GL2.GL_COLOR_ARRAY_LENGTH_NV;
+
+  public static final int GL_INDEX_ARRAY_LENGTH_NV
+    = GL2.GL_INDEX_ARRAY_LENGTH_NV;
+
+  public static final int GL_TEXTURE_COORD_ARRAY_LENGTH_NV
+    = GL2.GL_TEXTURE_COORD_ARRAY_LENGTH_NV;
+
+  public static final int GL_EDGE_FLAG_ARRAY_LENGTH_NV
+    = GL2.GL_EDGE_FLAG_ARRAY_LENGTH_NV;
+
+  public static final int GL_SECONDARY_COLOR_ARRAY_LENGTH_NV
+    = GL2.GL_SECONDARY_COLOR_ARRAY_LENGTH_NV;
+
+  public static final int GL_FOG_COORD_ARRAY_LENGTH_NV
+    = GL2.GL_FOG_COORD_ARRAY_LENGTH_NV;
+
+  public static final int GL_ELEMENT_ARRAY_LENGTH_NV
+    = GL2.GL_ELEMENT_ARRAY_LENGTH_NV;
+
+  public static final int GL_DRAW_INDIRECT_UNIFIED_NV
+    = GL2.GL_DRAW_INDIRECT_UNIFIED_NV;
+
+  public static final int GL_DRAW_INDIRECT_ADDRESS_NV
+    = GL2.GL_DRAW_INDIRECT_ADDRESS_NV;
+
+  public static final int GL_DRAW_INDIRECT_LENGTH_NV
+    = GL2.GL_DRAW_INDIRECT_LENGTH_NV;
+
+  public static void glBeginConditionalRender(
+    int id,
+    int mode) {
+    gl().glBeginConditionalRender(
+      id,
+      mode);
+  }
+
+  public static void glBindFragDataLocation(
+    int program,
+    int color,
+    String name) {
+    gl().glBindFragDataLocation(
+      program,
+      color,
+      name);
+  }
+
+  public static void glBufferAddressRangeNV(
+    int pname,
+    int index,
+    long address,
+    long length) {
+    gl().glBufferAddressRangeNV(
+      pname,
+      index,
+      address,
+      length);
+  }
+
+  public static void glClampColor(
+    int target,
+    int clamp) {
+    gl().glClampColor(
+      target,
+      clamp);
+  }
+
+  public static void glClearNamedBufferDataEXT(
+    int buffer,
+    int internalformat,
+    int format,
+    int type,
+    Buffer data) {
+    gl().glClearNamedBufferDataEXT(
+      buffer,
+      internalformat,
+      format,
+      type,
+      data);
+  }
+
+  public static void glClearNamedBufferSubDataEXT(
+    int buffer,
+    int internalformat,
+    int format,
+    int type,
+    long offset,
+    long size,
+    Buffer data) {
+    gl().glClearNamedBufferSubDataEXT(
+      buffer,
+      internalformat,
+      format,
+      type,
+      offset,
+      size,
+      data);
+  }
+
+  public static void glColorFormatNV(
+    int size,
+    int type,
+    int stride) {
+    gl().glColorFormatNV(
+      size,
+      type,
+      stride);
+  }
+
+  public static void glColorMaski(
+    int index,
+    boolean r,
+    boolean g,
+    boolean b,
+    boolean a) {
+    gl().glColorMaski(
+      index,
+      r,
+      g,
+      b,
+      a);
+  }
+
+  public static void glCompileShaderIncludeARB(
+    int shader,
     int count,
-    int[] indices,
-    int indices_offset) {
-    gl().glUniformSubroutinesuiv(
-      shadertype,
+    String[] path,
+    IntBuffer length) {
+    gl().glCompileShaderIncludeARB(
+      shader,
       count,
+      path,
+      length);
+  }
+
+  public static void glCompileShaderIncludeARB(
+    int shader,
+    int count,
+    String[] path,
+    int[] length,
+    int length_offset) {
+    gl().glCompileShaderIncludeARB(
+      shader,
+      count,
+      path,
+      length,
+      length_offset);
+  }
+
+  public static void glCompressedTexImage1D(
+    int target,
+    int level,
+    int internalformat,
+    int width,
+    int border,
+    int imageSize,
+    Buffer data) {
+    gl().glCompressedTexImage1D(
+      target,
+      level,
+      internalformat,
+      width,
+      border,
+      imageSize,
+      data);
+  }
+
+  public static void glCompressedTexImage1D(
+    int target,
+    int level,
+    int internalformat,
+    int width,
+    int border,
+    int imageSize,
+    long data_buffer_offset) {
+    gl().glCompressedTexImage1D(
+      target,
+      level,
+      internalformat,
+      width,
+      border,
+      imageSize,
+      data_buffer_offset);
+  }
+
+  public static void glCompressedTexSubImage1D(
+    int target,
+    int level,
+    int xoffset,
+    int width,
+    int format,
+    int imageSize,
+    Buffer data) {
+    gl().glCompressedTexSubImage1D(
+      target,
+      level,
+      xoffset,
+      width,
+      format,
+      imageSize,
+      data);
+  }
+
+  public static void glCompressedTexSubImage1D(
+    int target,
+    int level,
+    int xoffset,
+    int width,
+    int format,
+    int imageSize,
+    long data_buffer_offset) {
+    gl().glCompressedTexSubImage1D(
+      target,
+      level,
+      xoffset,
+      width,
+      format,
+      imageSize,
+      data_buffer_offset);
+  }
+
+  public static void glCopyTexImage1D(
+    int target,
+    int level,
+    int internalformat,
+    int x,
+    int y,
+    int width,
+    int border) {
+    gl().glCopyTexImage1D(
+      target,
+      level,
+      internalformat,
+      x,
+      y,
+      width,
+      border);
+  }
+
+  public static void glCopyTexSubImage1D(
+    int target,
+    int level,
+    int xoffset,
+    int x,
+    int y,
+    int width) {
+    gl().glCopyTexSubImage1D(
+      target,
+      level,
+      xoffset,
+      x,
+      y,
+      width);
+  }
+
+  public static long glCreateSyncFromCLeventARB(
+    long context,
+    long event,
+    int flags) {
+    return gl().glCreateSyncFromCLeventARB(
+      context,
+      event,
+      flags);
+  }
+
+  public static void glDebugMessageEnableAMD(
+    int category,
+    int severity,
+    int count,
+    IntBuffer ids,
+    boolean enabled) {
+    gl().glDebugMessageEnableAMD(
+      category,
+      severity,
+      count,
+      ids,
+      enabled);
+  }
+
+  public static void glDebugMessageEnableAMD(
+    int category,
+    int severity,
+    int count,
+    int[] ids,
+    int ids_offset,
+    boolean enabled) {
+    gl().glDebugMessageEnableAMD(
+      category,
+      severity,
+      count,
+      ids,
+      ids_offset,
+      enabled);
+  }
+
+  public static void glDebugMessageInsertAMD(
+    int category,
+    int severity,
+    int id,
+    int length,
+    String buf) {
+    gl().glDebugMessageInsertAMD(
+      category,
+      severity,
+      id,
+      length,
+      buf);
+  }
+
+  public static void glDeleteNamedStringARB(
+    int namelen,
+    String name) {
+    gl().glDeleteNamedStringARB(
+      namelen,
+      name);
+  }
+
+  public static void glDisablei(
+    int target,
+    int index) {
+    gl().glDisablei(
+      target,
+      index);
+  }
+
+  public static void glDrawBuffer(
+    int mode) {
+    gl().glDrawBuffer(
+      mode);
+  }
+
+  public static void glEdgeFlagFormatNV(
+    int stride) {
+    gl().glEdgeFlagFormatNV(
+      stride);
+  }
+
+  public static void glEnablei(
+    int target,
+    int index) {
+    gl().glEnablei(
+      target,
+      index);
+  }
+
+  public static void glEndConditionalRender(
+    ) {
+    gl().glEndConditionalRender();
+  }
+
+  public static void glFogCoordFormatNV(
+    int type,
+    int stride) {
+    gl().glFogCoordFormatNV(
+      type,
+      stride);
+  }
+
+  public static void glFramebufferTexture1D(
+    int target,
+    int attachment,
+    int textarget,
+    int texture,
+    int level) {
+    gl().glFramebufferTexture1D(
+      target,
+      attachment,
+      textarget,
+      texture,
+      level);
+  }
+
+  public static void glFramebufferTextureARB(
+    int target,
+    int attachment,
+    int texture,
+    int level) {
+    gl().glFramebufferTextureARB(
+      target,
+      attachment,
+      texture,
+      level);
+  }
+
+  public static void glFramebufferTextureFaceARB(
+    int target,
+    int attachment,
+    int texture,
+    int level,
+    int face) {
+    gl().glFramebufferTextureFaceARB(
+      target,
+      attachment,
+      texture,
+      level,
+      face);
+  }
+
+  public static void glFramebufferTextureLayerARB(
+    int target,
+    int attachment,
+    int texture,
+    int level,
+    int layer) {
+    gl().glFramebufferTextureLayerARB(
+      target,
+      attachment,
+      texture,
+      level,
+      layer);
+  }
+
+  public static void glGetActiveUniformName(
+    int program,
+    int uniformIndex,
+    int bufSize,
+    IntBuffer length,
+    ByteBuffer uniformName) {
+    gl().glGetActiveUniformName(
+      program,
+      uniformIndex,
+      bufSize,
+      length,
+      uniformName);
+  }
+
+  public static void glGetActiveUniformName(
+    int program,
+    int uniformIndex,
+    int bufSize,
+    int[] length,
+    int length_offset,
+    byte[] uniformName,
+    int uniformName_offset) {
+    gl().glGetActiveUniformName(
+      program,
+      uniformIndex,
+      bufSize,
+      length,
+      length_offset,
+      uniformName,
+      uniformName_offset);
+  }
+
+  public static void glGetBooleani_v(
+    int target,
+    int index,
+    ByteBuffer data) {
+    gl().glGetBooleani_v(
+      target,
+      index,
+      data);
+  }
+
+  public static void glGetBooleani_v(
+    int target,
+    int index,
+    byte[] data,
+    int data_offset) {
+    gl().glGetBooleani_v(
+      target,
+      index,
+      data,
+      data_offset);
+  }
+
+  public static void glGetBufferParameterui64vNV(
+    int target,
+    int pname,
+    LongBuffer params) {
+    gl().glGetBufferParameterui64vNV(
+      target,
+      pname,
+      params);
+  }
+
+  public static void glGetBufferParameterui64vNV(
+    int target,
+    int pname,
+    long[] params,
+    int params_offset) {
+    gl().glGetBufferParameterui64vNV(
+      target,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetBufferSubData(
+    int target,
+    long offset,
+    long size,
+    Buffer data) {
+    gl().glGetBufferSubData(
+      target,
+      offset,
+      size,
+      data);
+  }
+
+  public static void glGetCompressedTexImage(
+    int target,
+    int level,
+    Buffer img) {
+    gl().glGetCompressedTexImage(
+      target,
+      level,
+      img);
+  }
+
+  public static void glGetCompressedTexImage(
+    int target,
+    int level,
+    long img_buffer_offset) {
+    gl().glGetCompressedTexImage(
+      target,
+      level,
+      img_buffer_offset);
+  }
+
+  public static int glGetDebugMessageLogAMD(
+    int count,
+    int bufsize,
+    IntBuffer categories,
+    IntBuffer severities,
+    IntBuffer ids,
+    IntBuffer lengths,
+    ByteBuffer message) {
+    return gl().glGetDebugMessageLogAMD(
+      count,
+      bufsize,
+      categories,
+      severities,
+      ids,
+      lengths,
+      message);
+  }
+
+  public static int glGetDebugMessageLogAMD(
+    int count,
+    int bufsize,
+    int[] categories,
+    int categories_offset,
+    int[] severities,
+    int severities_offset,
+    int[] ids,
+    int ids_offset,
+    int[] lengths,
+    int lengths_offset,
+    byte[] message,
+    int message_offset) {
+    return gl().glGetDebugMessageLogAMD(
+      count,
+      bufsize,
+      categories,
+      categories_offset,
+      severities,
+      severities_offset,
+      ids,
+      ids_offset,
+      lengths,
+      lengths_offset,
+      message,
+      message_offset);
+  }
+
+  public static void glGetDoublev(
+    int pname,
+    DoubleBuffer params) {
+    gl().glGetDoublev(
+      pname,
+      params);
+  }
+
+  public static void glGetDoublev(
+    int pname,
+    double[] params,
+    int params_offset) {
+    gl().glGetDoublev(
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetIntegerui64i_vNV(
+    int value,
+    int index,
+    LongBuffer result) {
+    gl().glGetIntegerui64i_vNV(
+      value,
+      index,
+      result);
+  }
+
+  public static void glGetIntegerui64i_vNV(
+    int value,
+    int index,
+    long[] result,
+    int result_offset) {
+    gl().glGetIntegerui64i_vNV(
+      value,
+      index,
+      result,
+      result_offset);
+  }
+
+  public static void glGetIntegerui64vNV(
+    int value,
+    LongBuffer result) {
+    gl().glGetIntegerui64vNV(
+      value,
+      result);
+  }
+
+  public static void glGetIntegerui64vNV(
+    int value,
+    long[] result,
+    int result_offset) {
+    gl().glGetIntegerui64vNV(
+      value,
+      result,
+      result_offset);
+  }
+
+  public static void glGetNamedBufferParameterui64vNV(
+    int buffer,
+    int pname,
+    LongBuffer params) {
+    gl().glGetNamedBufferParameterui64vNV(
+      buffer,
+      pname,
+      params);
+  }
+
+  public static void glGetNamedBufferParameterui64vNV(
+    int buffer,
+    int pname,
+    long[] params,
+    int params_offset) {
+    gl().glGetNamedBufferParameterui64vNV(
+      buffer,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetNamedFramebufferParameterivEXT(
+    int framebuffer,
+    int pname,
+    IntBuffer params) {
+    gl().glGetNamedFramebufferParameterivEXT(
+      framebuffer,
+      pname,
+      params);
+  }
+
+  public static void glGetNamedFramebufferParameterivEXT(
+    int framebuffer,
+    int pname,
+    int[] params,
+    int params_offset) {
+    gl().glGetNamedFramebufferParameterivEXT(
+      framebuffer,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetNamedStringARB(
+    int namelen,
+    String name,
+    int bufSize,
+    IntBuffer stringlen,
+    ByteBuffer string) {
+    gl().glGetNamedStringARB(
+      namelen,
+      name,
+      bufSize,
+      stringlen,
+      string);
+  }
+
+  public static void glGetNamedStringARB(
+    int namelen,
+    String name,
+    int bufSize,
+    int[] stringlen,
+    int stringlen_offset,
+    byte[] string,
+    int string_offset) {
+    gl().glGetNamedStringARB(
+      namelen,
+      name,
+      bufSize,
+      stringlen,
+      stringlen_offset,
+      string,
+      string_offset);
+  }
+
+  public static void glGetNamedStringivARB(
+    int namelen,
+    String name,
+    int pname,
+    IntBuffer params) {
+    gl().glGetNamedStringivARB(
+      namelen,
+      name,
+      pname,
+      params);
+  }
+
+  public static void glGetNamedStringivARB(
+    int namelen,
+    String name,
+    int pname,
+    int[] params,
+    int params_offset) {
+    gl().glGetNamedStringivARB(
+      namelen,
+      name,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetQueryObjectiv(
+    int id,
+    int pname,
+    IntBuffer params) {
+    gl().glGetQueryObjectiv(
+      id,
+      pname,
+      params);
+  }
+
+  public static void glGetQueryObjectiv(
+    int id,
+    int pname,
+    int[] params,
+    int params_offset) {
+    gl().glGetQueryObjectiv(
+      id,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetTexImage(
+    int target,
+    int level,
+    int format,
+    int type,
+    Buffer pixels) {
+    gl().glGetTexImage(
+      target,
+      level,
+      format,
+      type,
+      pixels);
+  }
+
+  public static void glGetTexImage(
+    int target,
+    int level,
+    int format,
+    int type,
+    long pixels_buffer_offset) {
+    gl().glGetTexImage(
+      target,
+      level,
+      format,
+      type,
+      pixels_buffer_offset);
+  }
+
+  public static void glGetTexLevelParameterfv(
+    int target,
+    int level,
+    int pname,
+    FloatBuffer params) {
+    gl().glGetTexLevelParameterfv(
+      target,
+      level,
+      pname,
+      params);
+  }
+
+  public static void glGetTexLevelParameterfv(
+    int target,
+    int level,
+    int pname,
+    float[] params,
+    int params_offset) {
+    gl().glGetTexLevelParameterfv(
+      target,
+      level,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetTexLevelParameteriv(
+    int target,
+    int level,
+    int pname,
+    IntBuffer params) {
+    gl().glGetTexLevelParameteriv(
+      target,
+      level,
+      pname,
+      params);
+  }
+
+  public static void glGetTexLevelParameteriv(
+    int target,
+    int level,
+    int pname,
+    int[] params,
+    int params_offset) {
+    gl().glGetTexLevelParameteriv(
+      target,
+      level,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetTexParameterIiv(
+    int target,
+    int pname,
+    IntBuffer params) {
+    gl().glGetTexParameterIiv(
+      target,
+      pname,
+      params);
+  }
+
+  public static void glGetTexParameterIiv(
+    int target,
+    int pname,
+    int[] params,
+    int params_offset) {
+    gl().glGetTexParameterIiv(
+      target,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetTexParameterIuiv(
+    int target,
+    int pname,
+    IntBuffer params) {
+    gl().glGetTexParameterIuiv(
+      target,
+      pname,
+      params);
+  }
+
+  public static void glGetTexParameterIuiv(
+    int target,
+    int pname,
+    int[] params,
+    int params_offset) {
+    gl().glGetTexParameterIuiv(
+      target,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetUniformui64vNV(
+    int program,
+    int location,
+    LongBuffer params) {
+    gl().glGetUniformui64vNV(
+      program,
+      location,
+      params);
+  }
+
+  public static void glGetUniformui64vNV(
+    int program,
+    int location,
+    long[] params,
+    int params_offset) {
+    gl().glGetUniformui64vNV(
+      program,
+      location,
+      params,
+      params_offset);
+  }
+
+  public static void glGetVertexAttribdv(
+    int index,
+    int pname,
+    DoubleBuffer params) {
+    gl().glGetVertexAttribdv(
+      index,
+      pname,
+      params);
+  }
+
+  public static void glGetVertexAttribdv(
+    int index,
+    int pname,
+    double[] params,
+    int params_offset) {
+    gl().glGetVertexAttribdv(
+      index,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glGetnCompressedTexImage(
+    int target,
+    int lod,
+    int bufSize,
+    Buffer img) {
+    gl().glGetnCompressedTexImage(
+      target,
+      lod,
+      bufSize,
+      img);
+  }
+
+  public static void glGetnTexImage(
+    int target,
+    int level,
+    int format,
+    int type,
+    int bufSize,
+    Buffer img) {
+    gl().glGetnTexImage(
+      target,
+      level,
+      format,
+      type,
+      bufSize,
+      img);
+  }
+
+  public static void glGetnUniformdv(
+    int program,
+    int location,
+    int bufSize,
+    DoubleBuffer params) {
+    gl().glGetnUniformdv(
+      program,
+      location,
+      bufSize,
+      params);
+  }
+
+  public static void glGetnUniformdv(
+    int program,
+    int location,
+    int bufSize,
+    double[] params,
+    int params_offset) {
+    gl().glGetnUniformdv(
+      program,
+      location,
+      bufSize,
+      params,
+      params_offset);
+  }
+
+  public static void glGetnUniformuiv(
+    int program,
+    int location,
+    int bufSize,
+    IntBuffer params) {
+    gl().glGetnUniformuiv(
+      program,
+      location,
+      bufSize,
+      params);
+  }
+
+  public static void glGetnUniformuiv(
+    int program,
+    int location,
+    int bufSize,
+    int[] params,
+    int params_offset) {
+    gl().glGetnUniformuiv(
+      program,
+      location,
+      bufSize,
+      params,
+      params_offset);
+  }
+
+  public static long glImportSyncEXT(
+    int external_sync_type,
+    long external_sync,
+    int flags) {
+    return gl().glImportSyncEXT(
+      external_sync_type,
+      external_sync,
+      flags);
+  }
+
+  public static void glIndexFormatNV(
+    int type,
+    int stride) {
+    gl().glIndexFormatNV(
+      type,
+      stride);
+  }
+
+  public static boolean glIsBufferResidentNV(
+    int target) {
+    return gl().glIsBufferResidentNV(
+      target);
+  }
+
+  public static boolean glIsEnabledi(
+    int target,
+    int index) {
+    return gl().glIsEnabledi(
+      target,
+      index);
+  }
+
+  public static boolean glIsNamedBufferResidentNV(
+    int buffer) {
+    return gl().glIsNamedBufferResidentNV(
+      buffer);
+  }
+
+  public static boolean glIsNamedStringARB(
+    int namelen,
+    String name) {
+    return gl().glIsNamedStringARB(
+      namelen,
+      name);
+  }
+
+  public static void glMakeBufferNonResidentNV(
+    int target) {
+    gl().glMakeBufferNonResidentNV(
+      target);
+  }
+
+  public static void glMakeBufferResidentNV(
+    int target,
+    int access) {
+    gl().glMakeBufferResidentNV(
+      target,
+      access);
+  }
+
+  public static void glMakeNamedBufferNonResidentNV(
+    int buffer) {
+    gl().glMakeNamedBufferNonResidentNV(
+      buffer);
+  }
+
+  public static void glMakeNamedBufferResidentNV(
+    int buffer,
+    int access) {
+    gl().glMakeNamedBufferResidentNV(
+      buffer,
+      access);
+  }
+
+  public static void glMultiDrawArrays(
+    int mode,
+    IntBuffer first,
+    IntBuffer count,
+    int drawcount) {
+    gl().glMultiDrawArrays(
+      mode,
+      first,
+      count,
+      drawcount);
+  }
+
+  public static void glMultiDrawArrays(
+    int mode,
+    int[] first,
+    int first_offset,
+    int[] count,
+    int count_offset,
+    int drawcount) {
+    gl().glMultiDrawArrays(
+      mode,
+      first,
+      first_offset,
+      count,
+      count_offset,
+      drawcount);
+  }
+
+  public static void glMultiDrawArraysIndirectAMD(
+    int mode,
+    Buffer indirect,
+    int primcount,
+    int stride) {
+    gl().glMultiDrawArraysIndirectAMD(
+      mode,
+      indirect,
+      primcount,
+      stride);
+  }
+
+  public static void glMultiDrawElements(
+    int mode,
+    IntBuffer count,
+    int type,
+    PointerBuffer indices,
+    int drawcount) {
+    gl().glMultiDrawElements(
+      mode,
+      count,
+      type,
       indices,
-      indices_offset);
+      drawcount);
+  }
+
+  public static void glMultiDrawElementsIndirectAMD(
+    int mode,
+    int type,
+    Buffer indirect,
+    int primcount,
+    int stride) {
+    gl().glMultiDrawElementsIndirectAMD(
+      mode,
+      type,
+      indirect,
+      primcount,
+      stride);
+  }
+
+  public static void glNamedFramebufferParameteriEXT(
+    int framebuffer,
+    int pname,
+    int param) {
+    gl().glNamedFramebufferParameteriEXT(
+      framebuffer,
+      pname,
+      param);
+  }
+
+  public static void glNamedStringARB(
+    int type,
+    int namelen,
+    String name,
+    int stringlen,
+    String string) {
+    gl().glNamedStringARB(
+      type,
+      namelen,
+      name,
+      stringlen,
+      string);
+  }
+
+  public static void glNormalFormatNV(
+    int type,
+    int stride) {
+    gl().glNormalFormatNV(
+      type,
+      stride);
+  }
+
+  public static void glPixelStoref(
+    int pname,
+    float param) {
+    gl().glPixelStoref(
+      pname,
+      param);
+  }
+
+  public static void glPointParameteri(
+    int pname,
+    int param) {
+    gl().glPointParameteri(
+      pname,
+      param);
+  }
+
+  public static void glPointParameteriv(
+    int pname,
+    IntBuffer params) {
+    gl().glPointParameteriv(
+      pname,
+      params);
+  }
+
+  public static void glPointParameteriv(
+    int pname,
+    int[] params,
+    int params_offset) {
+    gl().glPointParameteriv(
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glPolygonMode(
+    int face,
+    int mode) {
+    gl().glPolygonMode(
+      face,
+      mode);
+  }
+
+  public static void glPrimitiveRestartIndex(
+    int index) {
+    gl().glPrimitiveRestartIndex(
+      index);
+  }
+
+  public static void glProgramParameteriARB(
+    int program,
+    int pname,
+    int value) {
+    gl().glProgramParameteriARB(
+      program,
+      pname,
+      value);
+  }
+
+  public static void glProgramUniformui64NV(
+    int program,
+    int location,
+    long value) {
+    gl().glProgramUniformui64NV(
+      program,
+      location,
+      value);
+  }
+
+  public static void glProgramUniformui64vNV(
+    int program,
+    int location,
+    int count,
+    LongBuffer value) {
+    gl().glProgramUniformui64vNV(
+      program,
+      location,
+      count,
+      value);
+  }
+
+  public static void glProgramUniformui64vNV(
+    int program,
+    int location,
+    int count,
+    long[] value,
+    int value_offset) {
+    gl().glProgramUniformui64vNV(
+      program,
+      location,
+      count,
+      value,
+      value_offset);
+  }
+
+  public static void glSecondaryColorFormatNV(
+    int size,
+    int type,
+    int stride) {
+    gl().glSecondaryColorFormatNV(
+      size,
+      type,
+      stride);
+  }
+
+  public static void glSetMultisamplefvAMD(
+    int pname,
+    int index,
+    FloatBuffer val) {
+    gl().glSetMultisamplefvAMD(
+      pname,
+      index,
+      val);
+  }
+
+  public static void glSetMultisamplefvAMD(
+    int pname,
+    int index,
+    float[] val,
+    int val_offset) {
+    gl().glSetMultisamplefvAMD(
+      pname,
+      index,
+      val,
+      val_offset);
+  }
+
+  public static void glStencilOpValueAMD(
+    int face,
+    int value) {
+    gl().glStencilOpValueAMD(
+      face,
+      value);
+  }
+
+  public static void glTessellationFactorAMD(
+    float factor) {
+    gl().glTessellationFactorAMD(
+      factor);
+  }
+
+  public static void glTessellationModeAMD(
+    int mode) {
+    gl().glTessellationModeAMD(
+      mode);
+  }
+
+  public static void glTexBuffer(
+    int target,
+    int internalformat,
+    int buffer) {
+    gl().glTexBuffer(
+      target,
+      internalformat,
+      buffer);
+  }
+
+  public static void glTexCoordFormatNV(
+    int size,
+    int type,
+    int stride) {
+    gl().glTexCoordFormatNV(
+      size,
+      type,
+      stride);
+  }
+
+  public static void glTexImage1D(
+    int target,
+    int level,
+    int internalFormat,
+    int width,
+    int border,
+    int format,
+    int type,
+    Buffer pixels) {
+    gl().glTexImage1D(
+      target,
+      level,
+      internalFormat,
+      width,
+      border,
+      format,
+      type,
+      pixels);
+  }
+
+  public static void glTexImage1D(
+    int target,
+    int level,
+    int internalFormat,
+    int width,
+    int border,
+    int format,
+    int type,
+    long pixels_buffer_offset) {
+    gl().glTexImage1D(
+      target,
+      level,
+      internalFormat,
+      width,
+      border,
+      format,
+      type,
+      pixels_buffer_offset);
+  }
+
+  public static void glTexImage2DMultisampleCoverageNV(
+    int target,
+    int coverageSamples,
+    int colorSamples,
+    int internalFormat,
+    int width,
+    int height,
+    boolean fixedSampleLocations) {
+    gl().glTexImage2DMultisampleCoverageNV(
+      target,
+      coverageSamples,
+      colorSamples,
+      internalFormat,
+      width,
+      height,
+      fixedSampleLocations);
+  }
+
+  public static void glTexImage3DMultisampleCoverageNV(
+    int target,
+    int coverageSamples,
+    int colorSamples,
+    int internalFormat,
+    int width,
+    int height,
+    int depth,
+    boolean fixedSampleLocations) {
+    gl().glTexImage3DMultisampleCoverageNV(
+      target,
+      coverageSamples,
+      colorSamples,
+      internalFormat,
+      width,
+      height,
+      depth,
+      fixedSampleLocations);
+  }
+
+  public static void glTexParameterIiv(
+    int target,
+    int pname,
+    IntBuffer params) {
+    gl().glTexParameterIiv(
+      target,
+      pname,
+      params);
+  }
+
+  public static void glTexParameterIiv(
+    int target,
+    int pname,
+    int[] params,
+    int params_offset) {
+    gl().glTexParameterIiv(
+      target,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glTexParameterIuiv(
+    int target,
+    int pname,
+    IntBuffer params) {
+    gl().glTexParameterIuiv(
+      target,
+      pname,
+      params);
+  }
+
+  public static void glTexParameterIuiv(
+    int target,
+    int pname,
+    int[] params,
+    int params_offset) {
+    gl().glTexParameterIuiv(
+      target,
+      pname,
+      params,
+      params_offset);
+  }
+
+  public static void glTexSubImage1D(
+    int target,
+    int level,
+    int xoffset,
+    int width,
+    int format,
+    int type,
+    Buffer pixels) {
+    gl().glTexSubImage1D(
+      target,
+      level,
+      xoffset,
+      width,
+      format,
+      type,
+      pixels);
+  }
+
+  public static void glTexSubImage1D(
+    int target,
+    int level,
+    int xoffset,
+    int width,
+    int format,
+    int type,
+    long pixels_buffer_offset) {
+    gl().glTexSubImage1D(
+      target,
+      level,
+      xoffset,
+      width,
+      format,
+      type,
+      pixels_buffer_offset);
+  }
+
+  public static void glTextureBufferRangeEXT(
+    int texture,
+    int target,
+    int internalformat,
+    int buffer,
+    long offset,
+    long size) {
+    gl().glTextureBufferRangeEXT(
+      texture,
+      target,
+      internalformat,
+      buffer,
+      offset,
+      size);
+  }
+
+  public static void glTextureImage2DMultisampleCoverageNV(
+    int texture,
+    int target,
+    int coverageSamples,
+    int colorSamples,
+    int internalFormat,
+    int width,
+    int height,
+    boolean fixedSampleLocations) {
+    gl().glTextureImage2DMultisampleCoverageNV(
+      texture,
+      target,
+      coverageSamples,
+      colorSamples,
+      internalFormat,
+      width,
+      height,
+      fixedSampleLocations);
+  }
+
+  public static void glTextureImage2DMultisampleNV(
+    int texture,
+    int target,
+    int samples,
+    int internalFormat,
+    int width,
+    int height,
+    boolean fixedSampleLocations) {
+    gl().glTextureImage2DMultisampleNV(
+      texture,
+      target,
+      samples,
+      internalFormat,
+      width,
+      height,
+      fixedSampleLocations);
+  }
+
+  public static void glTextureImage3DMultisampleCoverageNV(
+    int texture,
+    int target,
+    int coverageSamples,
+    int colorSamples,
+    int internalFormat,
+    int width,
+    int height,
+    int depth,
+    boolean fixedSampleLocations) {
+    gl().glTextureImage3DMultisampleCoverageNV(
+      texture,
+      target,
+      coverageSamples,
+      colorSamples,
+      internalFormat,
+      width,
+      height,
+      depth,
+      fixedSampleLocations);
+  }
+
+  public static void glTextureImage3DMultisampleNV(
+    int texture,
+    int target,
+    int samples,
+    int internalFormat,
+    int width,
+    int height,
+    int depth,
+    boolean fixedSampleLocations) {
+    gl().glTextureImage3DMultisampleNV(
+      texture,
+      target,
+      samples,
+      internalFormat,
+      width,
+      height,
+      depth,
+      fixedSampleLocations);
   }
 
   public static void glUniformui64NV(
@@ -31697,20 +30568,82 @@ public class Gl {
       value_offset);
   }
 
-  public static void glUseProgramStages(
-    int pipeline,
-    int stages,
-    int program) {
-    gl().glUseProgramStages(
-      pipeline,
-      stages,
-      program);
+  public static void glVertexArrayBindVertexBufferEXT(
+    int vaobj,
+    int bindingindex,
+    int buffer,
+    long offset,
+    int stride) {
+    gl().glVertexArrayBindVertexBufferEXT(
+      vaobj,
+      bindingindex,
+      buffer,
+      offset,
+      stride);
   }
 
-  public static void glValidateProgramPipeline(
-    int pipeline) {
-    gl().glValidateProgramPipeline(
-      pipeline);
+  public static void glVertexArrayVertexAttribBindingEXT(
+    int vaobj,
+    int attribindex,
+    int bindingindex) {
+    gl().glVertexArrayVertexAttribBindingEXT(
+      vaobj,
+      attribindex,
+      bindingindex);
+  }
+
+  public static void glVertexArrayVertexAttribFormatEXT(
+    int vaobj,
+    int attribindex,
+    int size,
+    int type,
+    boolean normalized,
+    int relativeoffset) {
+    gl().glVertexArrayVertexAttribFormatEXT(
+      vaobj,
+      attribindex,
+      size,
+      type,
+      normalized,
+      relativeoffset);
+  }
+
+  public static void glVertexArrayVertexAttribIFormatEXT(
+    int vaobj,
+    int attribindex,
+    int size,
+    int type,
+    int relativeoffset) {
+    gl().glVertexArrayVertexAttribIFormatEXT(
+      vaobj,
+      attribindex,
+      size,
+      type,
+      relativeoffset);
+  }
+
+  public static void glVertexArrayVertexAttribLFormatEXT(
+    int vaobj,
+    int attribindex,
+    int size,
+    int type,
+    int relativeoffset) {
+    gl().glVertexArrayVertexAttribLFormatEXT(
+      vaobj,
+      attribindex,
+      size,
+      type,
+      relativeoffset);
+  }
+
+  public static void glVertexArrayVertexBindingDivisorEXT(
+    int vaobj,
+    int bindingindex,
+    int divisor) {
+    gl().glVertexArrayVertexBindingDivisorEXT(
+      vaobj,
+      bindingindex,
+      divisor);
   }
 
   public static void glVertexAttrib1d(
@@ -32357,38 +31290,6 @@ public class Gl {
       v_offset);
   }
 
-  public static void glVertexAttribI4i(
-    int index,
-    int x,
-    int y,
-    int z,
-    int w) {
-    gl().glVertexAttribI4i(
-      index,
-      x,
-      y,
-      z,
-      w);
-  }
-
-  public static void glVertexAttribI4iv(
-    int index,
-    IntBuffer v) {
-    gl().glVertexAttribI4iv(
-      index,
-      v);
-  }
-
-  public static void glVertexAttribI4iv(
-    int index,
-    int[] v,
-    int v_offset) {
-    gl().glVertexAttribI4iv(
-      index,
-      v,
-      v_offset);
-  }
-
   public static void glVertexAttribI4sv(
     int index,
     ShortBuffer v) {
@@ -32425,38 +31326,6 @@ public class Gl {
       v_offset);
   }
 
-  public static void glVertexAttribI4ui(
-    int index,
-    int x,
-    int y,
-    int z,
-    int w) {
-    gl().glVertexAttribI4ui(
-      index,
-      x,
-      y,
-      z,
-      w);
-  }
-
-  public static void glVertexAttribI4uiv(
-    int index,
-    IntBuffer v) {
-    gl().glVertexAttribI4uiv(
-      index,
-      v);
-  }
-
-  public static void glVertexAttribI4uiv(
-    int index,
-    int[] v,
-    int v_offset) {
-    gl().glVertexAttribI4uiv(
-      index,
-      v,
-      v_offset);
-  }
-
   public static void glVertexAttribI4usv(
     int index,
     ShortBuffer v) {
@@ -32487,302 +31356,6 @@ public class Gl {
       stride);
   }
 
-  public static void glVertexAttribIPointer(
-    int index,
-    int size,
-    int type,
-    int stride,
-    Buffer pointer) {
-    gl().glVertexAttribIPointer(
-      index,
-      size,
-      type,
-      stride,
-      pointer);
-  }
-
-  public static void glVertexAttribL1d(
-    int index,
-    double x) {
-    gl().glVertexAttribL1d(
-      index,
-      x);
-  }
-
-  public static void glVertexAttribL1dv(
-    int index,
-    DoubleBuffer v) {
-    gl().glVertexAttribL1dv(
-      index,
-      v);
-  }
-
-  public static void glVertexAttribL1dv(
-    int index,
-    double[] v,
-    int v_offset) {
-    gl().glVertexAttribL1dv(
-      index,
-      v,
-      v_offset);
-  }
-
-  public static void glVertexAttribL2d(
-    int index,
-    double x,
-    double y) {
-    gl().glVertexAttribL2d(
-      index,
-      x,
-      y);
-  }
-
-  public static void glVertexAttribL2dv(
-    int index,
-    DoubleBuffer v) {
-    gl().glVertexAttribL2dv(
-      index,
-      v);
-  }
-
-  public static void glVertexAttribL2dv(
-    int index,
-    double[] v,
-    int v_offset) {
-    gl().glVertexAttribL2dv(
-      index,
-      v,
-      v_offset);
-  }
-
-  public static void glVertexAttribL3d(
-    int index,
-    double x,
-    double y,
-    double z) {
-    gl().glVertexAttribL3d(
-      index,
-      x,
-      y,
-      z);
-  }
-
-  public static void glVertexAttribL3dv(
-    int index,
-    DoubleBuffer v) {
-    gl().glVertexAttribL3dv(
-      index,
-      v);
-  }
-
-  public static void glVertexAttribL3dv(
-    int index,
-    double[] v,
-    int v_offset) {
-    gl().glVertexAttribL3dv(
-      index,
-      v,
-      v_offset);
-  }
-
-  public static void glVertexAttribL4d(
-    int index,
-    double x,
-    double y,
-    double z,
-    double w) {
-    gl().glVertexAttribL4d(
-      index,
-      x,
-      y,
-      z,
-      w);
-  }
-
-  public static void glVertexAttribL4dv(
-    int index,
-    DoubleBuffer v) {
-    gl().glVertexAttribL4dv(
-      index,
-      v);
-  }
-
-  public static void glVertexAttribL4dv(
-    int index,
-    double[] v,
-    int v_offset) {
-    gl().glVertexAttribL4dv(
-      index,
-      v,
-      v_offset);
-  }
-
-  public static void glVertexAttribLPointer(
-    int index,
-    int size,
-    int type,
-    int stride,
-    Buffer pointer) {
-    gl().glVertexAttribLPointer(
-      index,
-      size,
-      type,
-      stride,
-      pointer);
-  }
-
-  public static void glVertexAttribP1ui(
-    int index,
-    int type,
-    boolean normalized,
-    int value) {
-    gl().glVertexAttribP1ui(
-      index,
-      type,
-      normalized,
-      value);
-  }
-
-  public static void glVertexAttribP1uiv(
-    int index,
-    int type,
-    boolean normalized,
-    IntBuffer value) {
-    gl().glVertexAttribP1uiv(
-      index,
-      type,
-      normalized,
-      value);
-  }
-
-  public static void glVertexAttribP1uiv(
-    int index,
-    int type,
-    boolean normalized,
-    int[] value,
-    int value_offset) {
-    gl().glVertexAttribP1uiv(
-      index,
-      type,
-      normalized,
-      value,
-      value_offset);
-  }
-
-  public static void glVertexAttribP2ui(
-    int index,
-    int type,
-    boolean normalized,
-    int value) {
-    gl().glVertexAttribP2ui(
-      index,
-      type,
-      normalized,
-      value);
-  }
-
-  public static void glVertexAttribP2uiv(
-    int index,
-    int type,
-    boolean normalized,
-    IntBuffer value) {
-    gl().glVertexAttribP2uiv(
-      index,
-      type,
-      normalized,
-      value);
-  }
-
-  public static void glVertexAttribP2uiv(
-    int index,
-    int type,
-    boolean normalized,
-    int[] value,
-    int value_offset) {
-    gl().glVertexAttribP2uiv(
-      index,
-      type,
-      normalized,
-      value,
-      value_offset);
-  }
-
-  public static void glVertexAttribP3ui(
-    int index,
-    int type,
-    boolean normalized,
-    int value) {
-    gl().glVertexAttribP3ui(
-      index,
-      type,
-      normalized,
-      value);
-  }
-
-  public static void glVertexAttribP3uiv(
-    int index,
-    int type,
-    boolean normalized,
-    IntBuffer value) {
-    gl().glVertexAttribP3uiv(
-      index,
-      type,
-      normalized,
-      value);
-  }
-
-  public static void glVertexAttribP3uiv(
-    int index,
-    int type,
-    boolean normalized,
-    int[] value,
-    int value_offset) {
-    gl().glVertexAttribP3uiv(
-      index,
-      type,
-      normalized,
-      value,
-      value_offset);
-  }
-
-  public static void glVertexAttribP4ui(
-    int index,
-    int type,
-    boolean normalized,
-    int value) {
-    gl().glVertexAttribP4ui(
-      index,
-      type,
-      normalized,
-      value);
-  }
-
-  public static void glVertexAttribP4uiv(
-    int index,
-    int type,
-    boolean normalized,
-    IntBuffer value) {
-    gl().glVertexAttribP4uiv(
-      index,
-      type,
-      normalized,
-      value);
-  }
-
-  public static void glVertexAttribP4uiv(
-    int index,
-    int type,
-    boolean normalized,
-    int[] value,
-    int value_offset) {
-    gl().glVertexAttribP4uiv(
-      index,
-      type,
-      normalized,
-      value,
-      value_offset);
-  }
-
   public static void glVertexFormatNV(
     int size,
     int type,
@@ -32791,154 +31364,6 @@ public class Gl {
       size,
       type,
       stride);
-  }
-
-  public static void glVertexP2ui(
-    int type,
-    int value) {
-    gl().glVertexP2ui(
-      type,
-      value);
-  }
-
-  public static void glVertexP2uiv(
-    int type,
-    IntBuffer value) {
-    gl().glVertexP2uiv(
-      type,
-      value);
-  }
-
-  public static void glVertexP2uiv(
-    int type,
-    int[] value,
-    int value_offset) {
-    gl().glVertexP2uiv(
-      type,
-      value,
-      value_offset);
-  }
-
-  public static void glVertexP3ui(
-    int type,
-    int value) {
-    gl().glVertexP3ui(
-      type,
-      value);
-  }
-
-  public static void glVertexP3uiv(
-    int type,
-    IntBuffer value) {
-    gl().glVertexP3uiv(
-      type,
-      value);
-  }
-
-  public static void glVertexP3uiv(
-    int type,
-    int[] value,
-    int value_offset) {
-    gl().glVertexP3uiv(
-      type,
-      value,
-      value_offset);
-  }
-
-  public static void glVertexP4ui(
-    int type,
-    int value) {
-    gl().glVertexP4ui(
-      type,
-      value);
-  }
-
-  public static void glVertexP4uiv(
-    int type,
-    IntBuffer value) {
-    gl().glVertexP4uiv(
-      type,
-      value);
-  }
-
-  public static void glVertexP4uiv(
-    int type,
-    int[] value,
-    int value_offset) {
-    gl().glVertexP4uiv(
-      type,
-      value,
-      value_offset);
-  }
-
-  public static void glViewportArrayv(
-    int first,
-    int count,
-    FloatBuffer v) {
-    gl().glViewportArrayv(
-      first,
-      count,
-      v);
-  }
-
-  public static void glViewportArrayv(
-    int first,
-    int count,
-    float[] v,
-    int v_offset) {
-    gl().glViewportArrayv(
-      first,
-      count,
-      v,
-      v_offset);
-  }
-
-  public static void glViewportIndexedf(
-    int index,
-    float x,
-    float y,
-    float w,
-    float h) {
-    gl().glViewportIndexedf(
-      index,
-      x,
-      y,
-      w,
-      h);
-  }
-
-  public static void glViewportIndexedfv(
-    int index,
-    FloatBuffer v) {
-    gl().glViewportIndexedfv(
-      index,
-      v);
-  }
-
-  public static void glViewportIndexedfv(
-    int index,
-    float[] v,
-    int v_offset) {
-    gl().glViewportIndexedfv(
-      index,
-      v,
-      v_offset);
-  }
-
-  public static ByteBuffer glAllocateMemoryNV(
-    int arg0,
-    float arg1,
-    float arg2,
-    float arg3) {
-    return gl().glAllocateMemoryNV(
-      arg0,
-      arg1,
-      arg2,
-      arg3);
-  }
-
-  public static boolean isExtensionAvailable(String extensionName) {
-    return gl().isExtensionAvailable(extensionName);
   }
 
   public static void setSwapInterval(int interval) {

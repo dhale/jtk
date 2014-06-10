@@ -10,7 +10,8 @@ import java.awt.*;
 import java.io.File;
 import javax.media.opengl.*;
 import javax.media.opengl.awt.*;
-import com.jogamp.opengl.util.awt.Screenshot;
+import com.jogamp.opengl.util.GLReadBufferUtil;
+//import com.jogamp.opengl.util.awt.Screenshot; // deprecated
 
 /**
  * A canvas that paints via OpenGL. To paint a canvas using OpenGL, 
@@ -47,7 +48,7 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
    * Constructs a canvas with specified capabilities.
    */
   /* Not supported if this class extends GLJPanel,
-   * which we may need to do of GLCanvas does not work.
+   * which we may need to do if GLCanvas does not work.
   public GlCanvas(
     GLCapabilities capabilities,
     GLCapabilitiesChooser chooser,
@@ -155,7 +156,10 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
           File file = new File(_fileName);
           int w = getWidth();
           int h = getHeight();
-          Screenshot.writeToFile(file,w,h);
+          //Screenshot.writeToFile(file,w,h); // deprecated
+          GLReadBufferUtil rbu = new GLReadBufferUtil(true,false);
+          rbu.readPixels(getGL(),false);
+          rbu.write(file);
         } catch (Exception e) {
           throw new RuntimeException(e);
         }
