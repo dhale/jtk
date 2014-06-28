@@ -47,7 +47,7 @@ public class UnitSphereSampling {
    * Constructs a sampling for the specified number of bits.
    * Sample indices are signed integers with no more than this
    * number of bits, which includes the sign bit.
-   * @param nbits the number of bits; 4 &lt;= nbits &lt;= 32 required.
+   * @param nbits the number of bits; 4 &le; nbits &le; 32 required.
    */
   public UnitSphereSampling(int nbits) {
     initialize(nbits);
