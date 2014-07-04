@@ -45,6 +45,10 @@ public class SelectDragMode extends Mode {
         component.addMouseListener(_ml);
       } else {
         component.removeMouseListener(_ml);
+        _selecting = false;
+        _selectable = null;
+        _dragable = null;
+        _dragContext = null;
       }
     }
   }
@@ -56,8 +60,8 @@ public class SelectDragMode extends Mode {
   private View _view; // view when mouse pressed; null, if none
   private World _world; // world when mouse pressed; null, if none
   private PickResult _pickResult; // pick result when mouse pressed
-  private Dragable _dragable; // used iff dragging
   private Selectable _selectable; // used iff selecting
+  private Dragable _dragable; // used iff dragging
   private DragContext _dragContext; // non-null iff dragging
   private boolean _selecting; // true iff mouse moves too little for drag
 
@@ -88,7 +92,7 @@ public class SelectDragMode extends Mode {
     public void mouseReleased(MouseEvent e) {
 
       // If dragging, end the drag.
-      if (_dragContext!=null) {
+      if (_dragable!=null && _dragContext!=null) {
         _dragable.dragEnd(_dragContext);
       }
       
@@ -151,7 +155,7 @@ public class SelectDragMode extends Mode {
       }
 
       // If we are now dragging, update the drag context and drag.
-      if (_dragContext!=null) {
+      if (_dragable!=null && _dragContext!=null) {
         _dragContext.update(e);
         _dragable.drag(_dragContext);
       }

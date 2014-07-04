@@ -47,6 +47,9 @@ public class OrbitViewMode extends Mode {
       } else {
         component.removeMouseListener(_ml);
         component.removeKeyListener(_kl);
+        _rotating = false;
+        _scaling = false;
+        _translating = false;
       }
     }
   }
