@@ -12,14 +12,14 @@ import static edu.mines.jtk.ogl.Gl.*;
 import edu.mines.jtk.util.Direct;
 
 /**
- * A group of connected line segments.
+ * A group of one or more sets of connected line segments.
  * @author Dave Hale, Colorado School of Mines
  * @version 2010.01.10
  */
 public class LineGroup extends Group {
 
   /**
-   * Constructs a line group with specified coordinates.
+   * Constructs a line group with one set of connected line segments.
    * <p>
    * The (x,y,z) coordinates of points are packed into the specified 
    * array xyz. The number of points is np = xyz.length/3.
@@ -30,7 +30,7 @@ public class LineGroup extends Group {
   }
 
   /**
-   * Constructs a line group with specified coordinates and colors.
+   * Constructs a line group with one set of connected line segments.
    * <p>
    * The (x,y,z) coordinates of points are packed into the specified 
    * array xyz. The number of points is np = xyz.length/3.
@@ -42,6 +42,41 @@ public class LineGroup extends Group {
    */
   public LineGroup(float[] xyz, float[] rgb) {
     this.addChild(new LineNode(xyz,rgb));
+  }
+
+  /**
+   * Constructs a line group with multiple sets of connected line segments.
+   * <p>
+   * The number of sets is ns = xyz.length. For the set with index is, (x,y,z)
+   * coordinates of points are packed into the array xyz[is]. The number of
+   * points in that set is np = xyz[is].length/3.
+   * @param xyz array[ns][3*np] of packed point coordinates.
+   */
+  public LineGroup(float[][] xyz) {
+    this(xyz,null);
+  }
+
+  /**
+   * Constructs a line group with multiple sets of connected line segments.
+   * <p>
+   * The number of sets is ns = xyz.length. For the set with index is, (x,y,z)
+   * coordinates of points are packed into the array xyz[is]. The number of
+   * points in that set is np = xyz[is].length/3.
+   * <p>
+   * If rgb is not null, this array contains similarly packed (r,g,b)
+   * components of colors. The number of colors equals the number of points.
+   * @param xyz array[ns][3*np] of packed point coordinates.
+   * @param rgb array[ns][3*np] of packed color components.
+   */
+  public LineGroup(float[][] xyz, float[][] rgb) {
+    int ns = xyz.length;
+    for (int is=0; is<ns; ++is) {
+      if (rgb==null) {
+        this.addChild(new LineNode(xyz[is],null));
+      } else {
+        this.addChild(new LineNode(xyz[is],rgb[is]));
+      }
+    }
   }
 
   ///////////////////////////////////////////////////////////////////////////
