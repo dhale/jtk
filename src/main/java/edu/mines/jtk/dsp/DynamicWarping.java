@@ -679,6 +679,17 @@ public class DynamicWarping {
   }
 
   /**
+   * Smooths (and normalizes) alignment errors in only the 1st dimension.
+   * Input and output arrays can be the same array.
+   * @param e input array[n2][n1][nl] of alignment errors.
+   * @param es output array[n2][n1][nl] of smoothed errors.
+   */
+  public void smoothErrors1(float[][][] e, float[][][] es) {
+    smoothErrors1(_bstrain1,e,es);
+    normalizeErrors(es);
+  }
+
+  /**
    * Returns smoothed shifts.
    * @param u array of shifts to be smoothed.
    * @return array of smoothed shifts
@@ -976,12 +987,12 @@ public class DynamicWarping {
    * @param e input/output array of alignment errors.
    */
   public static void normalizeErrors(float[][][] e) {
-    final int nl = e[0][0].length;
-    final int n1 = e[0].length;
-    final int n2 = e.length;
     final float[][][] ef = e;
+    int n2 = e.length;
     MinMax mm = Parallel.reduce(n2,new Parallel.ReduceInt<MinMax>() {
     public MinMax compute(int i2) {
+      int nl = ef[i2][0].length;
+      int n1 = ef[i2].length;
       float emin =  Float.MAX_VALUE;
       float emax = -Float.MAX_VALUE;
       for (int i1=0; i1<n1; ++i1) {
@@ -1315,14 +1326,14 @@ public class DynamicWarping {
    * @param e input/output array of alignment errors.
    */
   private static void shiftAndScale(float emin, float emax, float[][][] e) {
-    final int nl = e[0][0].length;
-    final int n1 = e[0].length;
     final int n2 = e.length;
     final float eshift = emin;
     final float escale = (emax>emin)?1.0f/(emax-emin):1.0f;
     final float[][][] ef = e;
     Parallel.loop(n2,new Parallel.LoopInt() {
     public void compute(int i2) {
+      int nl = ef[i2][0].length;
+      int n1 = ef[i2].length;
       for (int i1=0; i1<n1; ++i1) {
         for (int il=0; il<nl; ++il) {
           ef[i2][i1][il] = (ef[i2][i1][il]-eshift)*escale;
