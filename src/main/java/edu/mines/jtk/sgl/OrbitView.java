@@ -232,6 +232,16 @@ public class OrbitView extends View {
     return new Matrix44(_unitSphereToView);
   }
 
+  /**
+   * Sets the eye-to-screen distance, in pixels. If zero, the default,
+   * this view will use the screen size (length of the screen diagonal).
+   * This parameter is used only for perspective views.
+   * @param esd the eye-to-screen distance, in pixels.
+   */
+  public void setEyeToScreenDistance(double esd) {
+    _esd = esd;
+  }
+
 
   ///////////////////////////////////////////////////////////////////////////
   // protected
@@ -248,10 +258,13 @@ public class OrbitView extends View {
       return;
 
     // Screen size, in pixels.
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    double xs = screenSize.width;
-    double ys = screenSize.height;
-    double ss = sqrt(xs*xs+ys*ys);
+    double ss = _esd;
+    if (ss<=0.0) {
+      Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+      double xs = screenSize.width;
+      double ys = screenSize.height;
+      ss = sqrt(xs*xs+ys*ys);
+    }
 
     // Cube to pixel.
     Matrix44 cubeToPixel = Matrix44.identity();
@@ -421,6 +434,7 @@ public class OrbitView extends View {
   private Vector3 _translate;
   private double _azimuth;
   private double _elevation;
+  private double _esd;
   private Projection _projection = Projection.PERSPECTIVE;
   private BoundingSphere _worldSphere = null;
   private Matrix44 _worldToUnitSphere;
