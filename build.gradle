@@ -1,8 +1,7 @@
 apply plugin: 'java'
-//apply plugin: 'scala'
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '1.6'
+  gradleVersion = '2.0'
 }
 
 defaultTasks 'jar'
@@ -36,8 +35,6 @@ javadoc {
   title = project.description
 }
 
-//repositories.mavenCentral() // for Scala jars
 dependencies {
   compile fileTree('libs') // contains jars provided with the Mines JTK
-//  compile 'org.scala-lang:scala-library:2.10.+' // contains Scala jars
 }
