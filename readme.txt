@@ -81,9 +81,7 @@ Linux) and gradlew.bat (for Windows). Then type the command "gradlew"
 
 Gradle will automatically be downloaded the first time that you use
 the gradlew command. So you should first execute this command only
-when you have an internet connection. Also, when first building the
-Mines JTK, JAR files for the Scala programming language (see below)
-will be downloaded automatically.
+when you have an internet connection.
 
 The layout of directories and files for the Mines JTK was designed to
 conform to that expected by common build tools such as Gradle (and
@@ -176,16 +174,3 @@ for the package names in our private projects may be much shorter than
 "edu.mines.jtk".) Only those Java packages that are both well written
 and useful to others are eventually moved to edu.mines.jtk.
 
-
-Development using Scala
------------------------
-
-Scala is a relatively new programming language that supports both
-object-oriented and functional programming and the use of existing
-Java packages. Currently, Scala is used only in demo programs, and
-these demos will be built when you build the Mines JTK. However, the
-use of Scala remains optional.
-
-If you want to use Scala, then you must install it on your system so
-that you have commands scala and scalac, which work much like java and
-javac.
