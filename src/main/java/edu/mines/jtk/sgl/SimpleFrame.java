@@ -157,7 +157,7 @@ public class SimpleFrame extends JFrame {
    * @param sy sampling of y coordinates; may be non-uniform.
    * @param z array[nx][ny] of z coordinates z = f(x,y).
    */
-  public SimpleFrame asTriangles(
+  public static SimpleFrame asTriangles(
     boolean vn, Sampling sx, Sampling sy, float[][] z)
   {
     return asTriangles(new TriangleGroup(vn,sx,sy,z));
@@ -173,7 +173,7 @@ public class SimpleFrame extends JFrame {
    * @param g array[nx][ny] of green color components.
    * @param b array[nx][ny] of blue color components.
    */
-  public SimpleFrame asTriangles(
+  public static SimpleFrame asTriangles(
     boolean vn, Sampling sx, Sampling sy, float[][] z,
     float[][] r, float[][] g, float[][] b)
   {
