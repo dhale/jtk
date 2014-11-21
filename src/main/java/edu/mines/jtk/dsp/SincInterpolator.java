@@ -544,6 +544,22 @@ public class SincInterpolator {
     return copy(_table.asinc);
   }
 
+  /**
+   * Gets the number of sampled sinc approximations in the table.
+   * @return the number of tabulated sampled sinc approximations.
+   */
+  public int getNumberInTable() {
+    return _table.asinc.length;
+  }
+
+  /**
+   * Gets the length of sampled sinc approximations in the table.
+   * @return the length of tabulated sampled sinc approximations.
+   */
+  public int getLengthInTable() {
+    return _table.asinc[0].length;
+  }
+
   ///////////////////////////////////////////////////////////////////////////
   // private
 
