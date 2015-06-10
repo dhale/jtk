@@ -334,7 +334,7 @@ public class SibsonInterpolator2 {
       return _fnull;
     double asum = computeAreas(x1,x2);
     if (asum<=0.0)
-      return _fnull;
+      return f(_mesh.findNodeNearest(x1,x2));
     if (usingGradients()) {
       return interpolate1(asum,x1,x2);
     } else {
