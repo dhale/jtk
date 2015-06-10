@@ -356,7 +356,7 @@ public class SibsonInterpolator3 {
       return _fnull;
     double vsum = computeVolumes(x1,x2,x3);
     if (vsum<=0.0)
-      return _fnull;
+      return f(_mesh.findNodeNearest(x1,x2,x3));
     if (usingGradients()) {
       return interpolate1(vsum,x1,x2,x3);
     } else {
