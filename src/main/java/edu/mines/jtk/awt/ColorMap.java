@@ -10,7 +10,7 @@ import java.awt.*;
 import java.awt.image.IndexColorModel;
 import javax.swing.event.EventListenerList;
 import static java.lang.Math.*;
-
+import edu.mines.jtk.la.DMatrix;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -229,7 +229,7 @@ public class ColorMap {
 
   /**
    * Maps an array of floats to a packed array of HSL float values in [0,1].
-   * @param v the array of float values to be mapped to colors.
+   * @param v the array of float values to be mapped to HSL values.
    * @return array[3*v.length] of packed HSL float values.
    */
   public float[] getHslFloats(float[] v) {
@@ -244,6 +244,29 @@ public class ColorMap {
       hsl[i++] = value[2];
     }
     return hslFloats;
+  }
+  
+  /**
+   * Maps color values to the CIE L*a*b (CIELab) colorspace.
+   * <p>
+   * CIE L*a*b is a non-linear color space specified by the "Commission internationale 
+   * de l'éclairage", or CIE (English: International Commission of
+   * Illumination), and describes all colors visible to the human eye. This colorspace
+   * defines color positions along three axes: one axis being lightness (L*), one 
+   * axis representing the position between magenta and green (a*), and one axis 
+   * representing the position between yellow and blue (b*). The design of 
+   * this colorspace is to control mimic logarithmic response the human eye, 
+   * and when mapped into three-dimensional space the perceptual difference can be 
+   * estimated by the Euclidean distance between points.
+   * @param v the array of floats to be mapped to CIELab values.
+   * @return array[3*v.length] of packaed CIELab values.
+   */
+  public float[] getCIELabFloats(float[] v) {
+    // CIE XYZ tristiumulus values of the reference white.
+    float Xn = 0.95047f;
+    float Yn = 1.00000f;
+    float Zn = 1.08883f;
+    // TODO
   }
   
   /**
@@ -296,6 +319,8 @@ public class ColorMap {
     float b = hueToRgb(p, q, h - 1.0f/3.0f);
     return new float[] {r,g,b};
   }
+  
+  
   
   /**
    * Sets the min-max range of values mapped to colors. Values outside this 
@@ -766,5 +791,32 @@ public class ColorMap {
     if(t<1.0f/2.0f) return q;
     if(t<2.0f/3.0f) return p + (q - p) * (2/3 - t) * 6;
     return p;
+  }
+  
+  /**
+   * Converts an RGB value to a CIE XYZ value.
+   * <p>
+   * An RGB value can map to a CIE XYZ value using the
+   * following matrix transform:
+   *  | X |   | 0.412453,  0.357580,  0.180423 |   | R |
+   *  | Y | = | 0.212671,  0.715160,  0.072169 | * | G |
+   *  | Z |   | 0.019334,  0.119193,  0.950227 |   | B |.
+   * @param r a red color value.
+   * @param g a green color value.
+   * @param b a blue color value.
+   * @return the CIE XYZ transform.
+   */
+  private static float[] rgbToXyz(float r, g, b) {
+    double[] rgb = new double[] = {r,g,b};
+    double[] trans = new double[] = 
+    {
+      { 0.412453, 0.356580, 0.180423 },
+      { 0.212671, 0.715160, 0.072169 },
+      { 0.019334, 0.119193, 0.950227 }
+    };
+    DMatrix matrgb = new DMatrix(rgb);
+    DMatrix mattrans = new DMatrix(trans);
+    DMatrix xyz = mattrans.times(matrgb);
+    return xyz.getArray[0];
   }
 }
