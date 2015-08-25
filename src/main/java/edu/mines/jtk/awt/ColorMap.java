@@ -228,6 +228,76 @@ public class ColorMap {
   }
 
   /**
+   * Maps an array of floats to a packed array of HSL float values in [0,1].
+   * @param v the array of float values to be mapped to colors.
+   * @return array[3*v.length] of packed HSL float values.
+   */
+  public float[] getHslFloats(float[] v) {
+    float[] rgb = getRgbFloats(v);
+    int nv = v.length;
+    float[] hsl = new float[nv];
+    float[] value = new float[3];
+    for (int i=0,iv=0; iv<nv; ++iv) {
+      value = rgbToHsl(rgb[i+0],rgb[i+1],rgb[i+2]);
+      hsl[i++] = value[0];
+      hsl[i++] = value[1];
+      hsl[i++] = value[2];
+    }
+    return hslFloats;
+  }
+  
+  /**
+   * Maps an RGB value into HSL colorspace.
+   * @param r the red color value.
+   * @param g the green color value.
+   * @param b the blue color value.
+   * @return an array[3] containing the HSL values.
+   */ 
+  public static float[] rgbToHsl(float r, float g, float b) {
+    float h,s,l;
+    min = min(r,g,b);
+    max = max(r,g,b);
+    l = (max+min)/2f;
+    if (max==min) 
+      h = s = 0.0f; // achromatic
+    else {
+      diff = max - min;
+      s = (l>0.5f) ? diff / (2f - max - min) : diff / (max + min);
+      switch (max) {
+        case r: 
+          h = (g-b)/d + ((g<b) ? 6.0f : 0.0f);
+          break;
+        case g:
+          h = (b-r)/d + 2.0f;
+          break;
+        case b:
+          h = (r-g)/d + 4.0f;
+          break;
+      }
+      h/=6.0f;
+    }
+    return new float[] = {h,s,l};
+  }
+  
+  /**
+   * Maps an HSL value into the RGB colorspace.
+   * @param h the hue.
+   * @param s the saturation.
+   * @param l the lightness.
+   * @return an array[3] containing mapped RGB values.
+   */
+  public static float[] hslToRgb(float h, float s, float l) {
+    float r,g,b;
+    if (s==0) r = g = b = 1;
+    float q = (l < 0.5f) ? l * (1.0f + s) : l + s - l * s;
+    float p = 2 * l - q;
+    float r = hueToRgb(p, q, h + 1.0f/3.0f);
+    float g = hueToRgb(p, q, h);
+    float b = hueToRgb(p, q, h - 1.0f/3.0f);
+    return new float[] {r,g,b};
+  }
+  
+  /**
    * Sets the min-max range of values mapped to colors. Values outside this 
    * range are clipped. The default range is [0.0,1.0].
    * @param vmin the minimum value.
@@ -687,5 +757,14 @@ public class ColorMap {
       }
     }
     return c;
+  }
+  
+  private static hueToRgb(float p, float q, float t) {
+    if(t<0.0f) t += 1;
+    if(t>1.0f) t -= 1;
+    if(t<1.0f/6.0f) return p + (q - p) * 6 * t;
+    if(t<1.0f/2.0f) return q;
+    if(t<2.0f/3.0f) return p + (q - p) * (2/3 - t) * 6;
+    return p;
   }
 }
