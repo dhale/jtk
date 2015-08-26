@@ -235,7 +235,7 @@ public class ColorMap {
   public float[] getHslFloats(float[] v) {
     float[] rgb = getRgbFloats(v);
     int nv = v.length;
-    float[] hsl = new float[nv];
+    float[] hsl = new float[3*nv];
     float[] value = new float[3];
     for (int i=0,iv=0; iv<nv; ++iv) {
       value = rgbToHsl(rgb[i+0],rgb[i+1],rgb[i+2]);
@@ -243,30 +243,57 @@ public class ColorMap {
       hsl[i++] = value[1];
       hsl[i++] = value[2];
     }
-    return hslFloats;
+    return hsl;
   }
   
   /**
-   * Maps color values to the CIE L*a*b (CIELab) colorspace.
+   * Maps color values to the CIE L*a*b* (CIELab) colorspace.
    * <p>
-   * CIE L*a*b is a non-linear color space specified by the "Commission internationale 
-   * de l'éclairage", or CIE (English: International Commission of
-   * Illumination), and describes all colors visible to the human eye. This colorspace
-   * defines color positions along three axes: one axis being lightness (L*), one 
-   * axis representing the position between magenta and green (a*), and one axis 
-   * representing the position between yellow and blue (b*). The design of 
-   * this colorspace is to control mimic logarithmic response the human eye, 
-   * and when mapped into three-dimensional space the perceptual difference can be 
-   * estimated by the Euclidean distance between points.
+   * CIE L*a*b* is a non-linear color space specified by the "Commission 
+   * internationale de l'éclairage", or CIE (English: International 
+   * Commission of Illumination), and describes all colors visible to the 
+   * human eye. This colorspace defines color positions along three axes: one 
+   * axis being lightness (L*), one axis representing the position between 
+   * magenta and green (a*), and one axis representing the position between 
+   * yellow and blue (b*). 
+   * <p>
+   * The design of this colorspace is to control mimic logarithmic response 
+   * the human eye, and when mapped into three-dimensional space the 
+   * perceptual difference can be estimated by the measuring the Euclidean 
+   * distance between points.
    * @param v the array of floats to be mapped to CIELab values.
    * @return array[3*v.length] of packaed CIELab values.
    */
   public float[] getCIELabFloats(float[] v) {
+    int nv = v.length;
+    float[] rgb = getRgbFloats(v);
+    float[] cielab = new float[3*nv];
+    float[] xyz = new float[3];
+
+    float r,g,b;
+    float Ls,as,bs;
+    float cutoff;
+    float X,Y,Z;
+    float XXn,YYn,ZZn;
+
     // CIE XYZ tristiumulus values of the reference white.
     float Xn = 0.95047f;
     float Yn = 1.00000f;
     float Zn = 1.08883f;
-    // TODO
+
+    for (int i=0,j=0,iv=0; iv<nv; ++iv) {
+      r = rgb[j++]; g = rgb[j++]; b = rgb[j++];
+      xyz = rgbToCIEXyz(r,g,b);
+      X = xyz[0]; Y = xyz[1]; Z = xyz[2];
+      XXn = X/Xn; YYn = Y/Yn; ZZn = Z/Zn;
+      Ls = 116.0f * cieLabParam(YYn) - 16.0f;           // L*
+      as = 500 * (cieLabParam(XXn) - cieLabParam(YYn)); // a*
+      bs = 200 * (cieLabParam(YYn) - cieLabParam(ZZn)); // b*
+      cielab[i++] = Ls;
+      cielab[i++] = as;
+      cielab[i++] = bs;
+    }
+    return cielab;
   }
   
   /**
@@ -278,28 +305,28 @@ public class ColorMap {
    */ 
   public static float[] rgbToHsl(float r, float g, float b) {
     float h,s,l;
-    min = min(r,g,b);
-    max = max(r,g,b);
+    float[] hsl;
+    float min = min(min(r,g),b);
+    float max = max(max(r,g),b);
     l = (max+min)/2f;
     if (max==min) 
       h = s = 0.0f; // achromatic
     else {
-      diff = max - min;
+      float diff = max - min;
       s = (l>0.5f) ? diff / (2f - max - min) : diff / (max + min);
-      switch (max) {
-        case r: 
-          h = (g-b)/d + ((g<b) ? 6.0f : 0.0f);
-          break;
-        case g:
-          h = (b-r)/d + 2.0f;
-          break;
-        case b:
-          h = (r-g)/d + 4.0f;
-          break;
-      }
+      if (max==r) 
+        h = (g-b)/diff + ((g<b) ? 6.0f : 0.0f);
+      else if (max==g)
+        h = (b-r)/diff + 2.0f;
+      else 
+        h = (r-g)/diff + 4.0f;
+
       h/=6.0f;
     }
-    return new float[] = {h,s,l};
+    hsl[0] = h;
+    hsl[1] = s;
+    hsl[2] = l;
+    return hsl;
   }
   
   /**
@@ -314,13 +341,11 @@ public class ColorMap {
     if (s==0) r = g = b = 1;
     float q = (l < 0.5f) ? l * (1.0f + s) : l + s - l * s;
     float p = 2 * l - q;
-    float r = hueToRgb(p, q, h + 1.0f/3.0f);
-    float g = hueToRgb(p, q, h);
-    float b = hueToRgb(p, q, h - 1.0f/3.0f);
+    r = hueToRgb(p, q, h + 1.0f/3.0f);
+    g = hueToRgb(p, q, h);
+    b = hueToRgb(p, q, h - 1.0f/3.0f);
     return new float[] {r,g,b};
   }
-  
-  
   
   /**
    * Sets the min-max range of values mapped to colors. Values outside this 
@@ -784,7 +809,7 @@ public class ColorMap {
     return c;
   }
   
-  private static hueToRgb(float p, float q, float t) {
+  private static float hueToRgb(float p, float q, float t) {
     if(t<0.0f) t += 1;
     if(t>1.0f) t -= 1;
     if(t<1.0f/6.0f) return p + (q - p) * 6 * t;
@@ -806,9 +831,9 @@ public class ColorMap {
    * @param b a blue color value.
    * @return the CIE XYZ transform.
    */
-  private static float[] rgbToXyz(float r, g, b) {
-    double[] rgb = new double[] = {r,g,b};
-    double[] trans = new double[] = 
+  private static float[] rgbToCIEXyz(float r, float g, float b) {
+    double[][] rgb = {{r},{g},{b}};
+    double[][] trans =  
     {
       { 0.412453, 0.356580, 0.180423 },
       { 0.212671, 0.715160, 0.072169 },
@@ -817,6 +842,15 @@ public class ColorMap {
     DMatrix matrgb = new DMatrix(rgb);
     DMatrix mattrans = new DMatrix(trans);
     DMatrix xyz = mattrans.times(matrgb);
-    return xyz.getArray[0];
+    return xyz.getArray()[0];
+  }
+
+  /**
+   * Computes condition for CIELab transform.
+   */
+  private float cieLabParam(float val) {
+    float cond = pow(6.0f/29.0f,3);
+    if (val>cond) return pow(val,1.0f/3.0f);
+    else return (1/3.0f * pow(29.0f/6.0f,2)*val + 4.0f/29.0f);
   }
 }
