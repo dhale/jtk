@@ -250,7 +250,7 @@ public class ColorMap {
    * Maps color values to the CIE L*a*b* (CIELab) colorspace.
    * <p>
    * CIE L*a*b* is a non-linear color space specified by the "Commission 
-   * internationale de l'éclairage", or CIE (English: International 
+   * internationale de l'Ã©clairage", or CIE (English: International 
    * Commission of Illumination), and describes all colors visible to the 
    * human eye. This colorspace defines color positions along three axes: one 
    * axis being lightness (L*), one axis representing the position between 
@@ -305,7 +305,7 @@ public class ColorMap {
    */ 
   public static float[] rgbToHsl(float r, float g, float b) {
     float h,s,l;
-    float[] hsl;
+    float[] hsl = new float[3];
     float min = min(min(r,g),b);
     float max = max(max(r,g),b);
     l = (max+min)/2f;
@@ -842,15 +842,17 @@ public class ColorMap {
     DMatrix matrgb = new DMatrix(rgb);
     DMatrix mattrans = new DMatrix(trans);
     DMatrix xyz = mattrans.times(matrgb);
-    return xyz.getArray()[0];
+    double[] darr = xyz.getPackedColumns();
+    float[] farr = { (float)darr[0], (float)darr[1], (float)darr[2] };
+    return farr;
   }
 
   /**
    * Computes condition for CIELab transform.
    */
   private float cieLabParam(float val) {
-    float cond = pow(6.0f/29.0f,3);
-    if (val>cond) return pow(val,1.0f/3.0f);
-    else return (1/3.0f * pow(29.0f/6.0f,2)*val + 4.0f/29.0f);
+    float cond = (float)pow(6.0f/29.0f,3);
+    if (val>cond) return (float)pow(val,1.0f/3.0f);
+    else return (1/3.0f * (float)pow(29.0f/6.0f,2)*val + 4.0f/29.0f);
   }
 }
