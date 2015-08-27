@@ -264,7 +264,7 @@ public class ColorMap {
    * @param v the array of floats to be mapped to CIELab values.
    * @return array[3*v.length] of packaed CIELab values.
    */
-  public float[] getCIELabFloats(float[] v) {
+  public float[] getCieLabFloats(float[] v) {
     int nv = v.length;
     float[] rgb = getRgbFloats(v);
     float[] cielab = new float[3*nv];
@@ -286,14 +286,45 @@ public class ColorMap {
       xyz = rgbToCIEXyz(r,g,b);
       X = xyz[0]; Y = xyz[1]; Z = xyz[2];
       XXn = X/Xn; YYn = Y/Yn; ZZn = Z/Zn;
-      Ls = 116.0f * cieLabParam(YYn) - 16.0f;           // L*
-      as = 500 * (cieLabParam(XXn) - cieLabParam(YYn)); // a*
-      bs = 200 * (cieLabParam(YYn) - cieLabParam(ZZn)); // b*
+      Ls = 116.0f * (cieLabParam(YYn) - 16.0f);
+      as = 500.0f * (cieLabParam(XXn) - cieLabParam(YYn));
+      bs = 200.0f * (cieLabParam(YYn) - cieLabParam(ZZn));
       cielab[i++] = Ls;
       cielab[i++] = as;
       cielab[i++] = bs;
     }
     return cielab;
+  }
+
+  /**
+   * Converts CIE L*a*b values to a packed array of RGB values.
+   * @param lab a packed array of L*a*b values.
+   */
+  public static float[] cieLabToRgb(float[] lab) {
+    float X,Y,Z;
+    float Ls,as,bs;
+    float Xf,Yf,Zf;
+    int nv = lab.length/3;
+    float[] vals = new float[3];
+    float[] rgb = new float[3*nv];
+
+    // CIE XYZ tristimulus values of the reference white.
+    float Xn = 0.95047f;
+    float Yn = 1.00000f;
+    float Zn = 1.08883f;
+
+    for (int i=0,iv=0; iv<nv; ++iv) {
+      Ls = lab[i+0]; as = lab[i+1]; bs = lab[i+2];
+      float lps = (Ls+16)/116.0f;
+      float aof = (as/500f);
+      float bot = (bs/200f);
+      X = Xn*cieLabParamInv(lps+aof);
+      Y = Yn*cieLabParamInv(lps);
+      Z = Zn*cieLabParamInv(lps-bot);
+      vals = cieXyzToRgb(X,Y,Z);
+      rgb[i++] = vals[0]; rgb[i++] = vals[1]; rgb[i++] = vals[2];
+    }
+    return rgb;
   }
   
   /**
@@ -835,14 +866,30 @@ public class ColorMap {
     double[][] rgb = {{r},{g},{b}};
     double[][] trans =  
     {
-      { 0.412453, 0.356580, 0.180423 },
+      { 0.412453, 0.356580, 0.180423 },  // Specifically for sRGB
       { 0.212671, 0.715160, 0.072169 },
       { 0.019334, 0.119193, 0.950227 }
     };
     DMatrix matrgb = new DMatrix(rgb);
     DMatrix mattrans = new DMatrix(trans);
-    DMatrix xyz = mattrans.times(matrgb);
-    double[] darr = xyz.getPackedColumns();
+    DMatrix matxyz = mattrans.times(matrgb);
+    double[] darr = matxyz.getPackedColumns();
+    float[] farr = { (float)darr[0], (float)darr[1], (float)darr[2] };
+    return farr;
+  }
+
+  private static float[] cieXyzToRgb(float x, float y, float z) {
+    double[][] xyz = {{x},{y},{z}};
+    double[][] trans =  
+    {
+      { 3.240454,-1.537139,-0.498531 },  // Specifically for sRGB
+      {-0.969266, 1.876012, 0.041556 },
+      { 0.055643,-0.204026, 1.057225 }
+    };
+    DMatrix matxyz = new DMatrix(xyz);
+    DMatrix mattrans = new DMatrix(trans);
+    DMatrix matrgb = mattrans.times(matxyz);
+    double[] darr = matrgb.getPackedColumns();
     float[] farr = { (float)darr[0], (float)darr[1], (float)darr[2] };
     return farr;
   }
@@ -850,9 +897,20 @@ public class ColorMap {
   /**
    * Computes condition for CIELab transform.
    */
-  private float cieLabParam(float val) {
-    float cond = (float)pow(6.0f/29.0f,3);
-    if (val>cond) return (float)pow(val,1.0f/3.0f);
-    else return (1/3.0f * (float)pow(29.0f/6.0f,2)*val + 4.0f/29.0f);
+  private static float cieLabParam(float val) {
+    float constant = 0.2068965f; // constant = 6/29
+    float cond = (float)pow(constant,3);
+    if (val>cond) return (float)pow(val,0.333f);
+    else return (1/3.0f * (float)pow(1.0f/constant,2)*val + 4.0f/29.0f);
+  }
+
+  /**
+   * Condition for CIELab inverse transform.
+   */
+  private static float cieLabParamInv(float val) {
+    float constant = 0.2068965f; // constant = 6/29
+    float cond = (float)pow(constant,3);
+    if (val>cond) return (float)pow(val,3);
+    else return (3.0f*(float)pow(constant,2)*(val-4.0f/29.0f));
   }
 }
