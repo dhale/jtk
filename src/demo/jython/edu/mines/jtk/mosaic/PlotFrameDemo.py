@@ -2,6 +2,9 @@ import sys
 from java.awt import *
 from java.lang import *
 from javax.swing import *
+
+from jarray import array
+
 from edu.mines.jtk.awt import *
 from edu.mines.jtk.dsp import *
 from edu.mines.jtk.mosaic import *

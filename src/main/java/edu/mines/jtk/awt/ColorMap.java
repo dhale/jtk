@@ -5,26 +5,26 @@ the Common Public License - v1.0, which accompanies this distribution, and is
 available at http://www.eclipse.org/legal/cpl-v10.html
 ****************************************************************************/
 package edu.mines.jtk.awt;
-
+ 
 import java.awt.*;
 import java.awt.image.IndexColorModel;
 import javax.swing.event.EventListenerList;
 import static java.lang.Math.*;
 import edu.mines.jtk.la.DMatrix;
 import edu.mines.jtk.util.Check;
-
+ 
 /**
- * A color map converts a range of double values to colors. 
+ * A color map converts a range of double values to colors.
  * For any double value, a color map
  * (1) transforms the value to an integer pixel in the range [0,255],
  * (2) maps this integer pixel to a color using an index color model.
  * <p>
- * The method {@link #getIndex(double)} performs step (1). For any 
+ * The method {@link #getIndex(double)} performs step (1). For any
  * double value, that method
  * (1a) clips to a specified min-max range of values,
  * (1b) linearly translates and scales to [0.0,255.0], and
  * (1c) rounds to the nearest integer pixel in [0,255].
- * Extensions of this class may of course override this method to 
+ * Extensions of this class may of course override this method to
  * implement alternative mappings.
  * <p>
  * A color map maintains a list of color map listeners, and notifies those
@@ -33,57 +33,57 @@ import edu.mines.jtk.util.Check;
  * @version 2009.07.06
  */
 public class ColorMap {
-
+ 
   /**
    * Color model for grays from black to white.
    */
   public static final IndexColorModel GRAY = getGray();
-
+ 
   /**
    * Color model for red to blue like Matlab's jet color map.
    */
   public static final IndexColorModel JET = getJet();
-
+ 
   /**
    * Color model for red to blue like GMT's jet color map.
    */
   public static final IndexColorModel GMT_JET = getGmtJet();
-
+ 
   /**
-   * Color model for hues from red to blue. 
+   * Color model for hues from red to blue.
    */
   public static final IndexColorModel HUE = getHue();
-
+ 
   /**
-   * Color model for hues from red to blue. 
+   * Color model for hues from red to blue.
    */
   public static final IndexColorModel HUE_RED_TO_BLUE = getHueRedToBlue();
-
+ 
   /**
-   * Color model for hues from blue to red. 
+   * Color model for hues from blue to red.
    */
   public static final IndexColorModel HUE_BLUE_TO_RED = getHueBlueToRed();
-
+ 
   /**
    * Color model for eight complete cycles of hues.
    */
   public static final IndexColorModel PRISM = getPrism();
-
+ 
   /**
    * Color model for red to white to blue.
    */
   public static final IndexColorModel RED_WHITE_BLUE = getRedWhiteBlue();
-
+ 
   /**
    * Color model for blue to white to red.
    */
   public static final IndexColorModel BLUE_WHITE_RED = getBlueWhiteRed();
-
+ 
   /**
    * Color model for gray to yellow to red.
    */
   public static final IndexColorModel GRAY_YELLOW_RED = getGrayYellowRed();
-
+ 
   /**
    * Constructs a color map for values in [0,1].
    * The integers 0 and 255 must be valid pixels for the color model.
@@ -92,7 +92,7 @@ public class ColorMap {
   public ColorMap(IndexColorModel colorModel) {
     this(0.0,1.0,colorModel);
   }
-
+ 
   /**
    * Constructs a color map for specified values.
    * The integers 0 and 255 must be valid pixels for the color model.
@@ -108,7 +108,7 @@ public class ColorMap {
     _colorModel = colorModel;
     cacheColors();
   }
-
+ 
   /**
    * Constructs a color map for specified values and colors.
    * The default value range is [0.0,1.0].
@@ -119,9 +119,9 @@ public class ColorMap {
   public ColorMap(double vmin, double vmax, Color[] c) {
     this(vmin,vmax,getReds(c),getGreens(c),getBlues(c));
   }
-
+ 
   /**
-   * Constructs a color map for specified values and colors. Red, green, 
+   * Constructs a color map for specified values and colors. Red, green,
    * and blue components are bytes in the range [0,255], inclusive.
    * @param vmin the minimum value.
    * @param vmax the maximum value.
@@ -132,9 +132,9 @@ public class ColorMap {
   public ColorMap(double vmin, double vmax, byte[] r, byte[] g, byte[] b) {
     this(vmin,vmax,new IndexColorModel(8,256,r,g,b));
   }
-
+ 
   /**
-   * Constructs a color map for specified values and colors. Red, green, 
+   * Constructs a color map for specified values and colors. Red, green,
    * and blue components are floats in the range [0,1], inclusive.
    * @param vmin the minimum value.
    * @param vmax the maximum value.
@@ -145,7 +145,7 @@ public class ColorMap {
   public ColorMap(double vmin, double vmax, float[] r, float[] g, float[] b) {
     this(vmin,vmax,getBytes(r),getBytes(g),getBytes(b));
   }
-
+ 
   /**
    * Constructs a color map for a specified solid color.
    * @param c a color.
@@ -153,7 +153,7 @@ public class ColorMap {
   public ColorMap(Color c) {
     this(0.0,1.0,c);
   }
-
+ 
   /**
    * Constructs a color map for a specified solid color within a given [0,1]
    * range.
@@ -164,7 +164,7 @@ public class ColorMap {
   public ColorMap(double vmin, double vmax, Color c) {
     this(vmin,vmax,makeSolidColors(c));
   }
-
+ 
   /**
    * Gets the minimum value in the range of mapped values.
    * @return the minimum value.
@@ -172,7 +172,7 @@ public class ColorMap {
   public double getMinValue() {
     return _vmin;
   }
-
+ 
   /**
    * Gets the maximum value in the range of mapped values.
    * @return the maximum value.
@@ -180,7 +180,7 @@ public class ColorMap {
   public double getMaxValue() {
     return _vmax;
   }
-
+ 
   /**
    * Gets the index color model used by this color map.
    * @return the index color model.
@@ -188,7 +188,7 @@ public class ColorMap {
   public IndexColorModel getColorModel() {
     return _colorModel;
   }
-
+ 
   /**
    * Gets the color corresponding to the specified value.
    * @param v the value to be mapped to a color.
@@ -197,7 +197,7 @@ public class ColorMap {
   public Color getColor(double v) {
     return _colors[getIndex(v)];
   }
-
+ 
   /**
    * Gets the index in the range [0,255] corresponding to the specified value.
    * @param v the value to be mapped to an index.
@@ -208,7 +208,7 @@ public class ColorMap {
     double s = (256.0-Math.ulp(256.0))/(_vmax-_vmin);
     return (int)((v-_vmin)*s);
   }
-
+ 
   /**
    * Maps an array of floats to a packed array of RGB float values in [0,1].
    * @param v the array of float values to be mapped to colors.
@@ -226,7 +226,7 @@ public class ColorMap {
     }
     return rgb;
   }
-
+ 
   /**
    * Maps an array of floats to a packed array of HSL float values in [0,1].
    * @param v the array of float values to be mapped to HSL values.
@@ -245,141 +245,182 @@ public class ColorMap {
     }
     return hsl;
   }
-  
+ 
   /**
    * Maps color values to the CIE L*a*b* (CIELab) colorspace.
    * <p>
-   * CIE L*a*b* is a non-linear color space specified by the "Commission 
-   * internationale de l'Ã©clairage", or CIE (English: International 
-   * Commission of Illumination), and describes all colors visible to the 
-   * human eye. This colorspace defines color positions along three axes: one 
-   * axis being lightness (L*), one axis representing the position between 
-   * magenta and green (a*), and one axis representing the position between 
-   * yellow and blue (b*). 
+   * CIE L*a*b* is a non-linear color space specified by the "Commission
+   * internationale de l'éclairage", or CIE (English: International
+   * Commission of Illumination), and describes all colors visible to the
+   * human eye. This colorspace defines color positions along three axes: one
+   * axis being lightness (L*), one axis representing the position between
+   * magenta and green (a*), and one axis representing the position between
+   * yellow and blue (b*).
    * <p>
-   * The design of this colorspace is to control mimic logarithmic response 
-   * the human eye, and when mapped into three-dimensional space the 
-   * perceptual difference can be estimated by the measuring the Euclidean 
+   * The design of this colorspace is to control mimic logarithmic response
+   * the human eye, and when mapped into three-dimensional space the
+   * perceptual difference can be estimated by the measuring the Euclidean
    * distance between points.
    * @param v the array of floats to be mapped to CIELab values.
    * @return array[3*v.length] of packaed CIELab values.
    */
-  public float[] getCieLabFloats(float[] v) {
+  public float[] getCIELabFloats(float[] v) {
     int nv = v.length;
     float[] rgb = getRgbFloats(v);
+    float[] lab = new float[3];
     float[] cielab = new float[3*nv];
-    float[] xyz = new float[3];
-
+ 
     float r,g,b;
     float Ls,as,bs;
-    float cutoff;
     float X,Y,Z;
     float XXn,YYn,ZZn;
-
+ 
     // CIE XYZ tristiumulus values of the reference white.
     float Xn = 0.95047f;
     float Yn = 1.00000f;
     float Zn = 1.08883f;
-
+ 
     for (int i=0,j=0,iv=0; iv<nv; ++iv) {
       r = rgb[j++]; g = rgb[j++]; b = rgb[j++];
-      xyz = rgbToCIEXyz(r,g,b);
-      X = xyz[0]; Y = xyz[1]; Z = xyz[2];
-      XXn = X/Xn; YYn = Y/Yn; ZZn = Z/Zn;
-      Ls = 116.0f * (cieLabParam(YYn) - 16.0f);
-      as = 500.0f * (cieLabParam(XXn) - cieLabParam(YYn));
-      bs = 200.0f * (cieLabParam(YYn) - cieLabParam(ZZn));
-      cielab[i++] = Ls;
-      cielab[i++] = as;
-      cielab[i++] = bs;
+      lab = rgbToCIELab(r,g,b);
+      cielab[i++] = lab[0];
+      cielab[i++] = lab[1];
+      cielab[i++] = lab[2];
     }
     return cielab;
   }
-
-  /**
-   * Converts CIE L*a*b values to a packed array of RGB values.
-   * @param lab a packed array of L*a*b values.
-   */
-  public static float[] cieLabToRgb(float[] lab) {
-    float X,Y,Z;
-    float Ls,as,bs;
-    float Xf,Yf,Zf;
-    int nv = lab.length/3;
-    float[] vals = new float[3];
-    float[] rgb = new float[3*nv];
-
-    // CIE XYZ tristimulus values of the reference white.
-    float Xn = 0.95047f;
-    float Yn = 1.00000f;
-    float Zn = 1.08883f;
-
-    for (int i=0,iv=0; iv<nv; ++iv) {
-      Ls = lab[i+0]; as = lab[i+1]; bs = lab[i+2];
-      float lps = (Ls+16)/116.0f;
-      float aof = (as/500f);
-      float bot = (bs/200f);
-      X = Xn*cieLabParamInv(lps+aof);
-      Y = Yn*cieLabParamInv(lps);
-      Z = Zn*cieLabParamInv(lps-bot);
-      vals = cieXyzToRgb(X,Y,Z);
-      rgb[i++] = vals[0]; rgb[i++] = vals[1]; rgb[i++] = vals[2];
-    }
-    return rgb;
-  }
-  
+ 
   /**
    * Maps an RGB value into HSL colorspace.
-   * @param r the red color value.
-   * @param g the green color value.
-   * @param b the blue color value.
+   * <p>
+   * Hue (H) is measured as an angle [0-360).
+   * Saturation (S) and Lightness (L) are computed as decimal percent [0,1].
+   * @param r the red color value in range [0,1].
+   * @param g the green color value in range [0,1].
+   * @param b the blue color value in range [0,1].
    * @return an array[3] containing the HSL values.
-   */ 
+   */
   public static float[] rgbToHsl(float r, float g, float b) {
     float h,s,l;
     float[] hsl = new float[3];
     float min = min(min(r,g),b);
     float max = max(max(r,g),b);
     l = (max+min)/2f;
-    if (max==min) 
+    if (max==min)
       h = s = 0.0f; // achromatic
     else {
       float diff = max - min;
       s = (l>0.5f) ? diff / (2f - max - min) : diff / (max + min);
-      if (max==r) 
+      if (max==r)
         h = (g-b)/diff + ((g<b) ? 6.0f : 0.0f);
       else if (max==g)
         h = (b-r)/diff + 2.0f;
-      else 
+      else
         h = (r-g)/diff + 4.0f;
-
+ 
       h/=6.0f;
     }
-    hsl[0] = h;
+    hsl[0] = h * 360;
     hsl[1] = s;
     hsl[2] = l;
     return hsl;
   }
-  
+ 
   /**
    * Maps an HSL value into the RGB colorspace.
-   * @param h the hue.
-   * @param s the saturation.
-   * @param l the lightness.
+   * @param h the hue in range [0,360).
+   * @param s the saturation in range [0,1].
+   * @param l the lightness in range [0,1].
    * @return an array[3] containing mapped RGB values.
    */
   public static float[] hslToRgb(float h, float s, float l) {
-    float r,g,b;
-    if (s==0) r = g = b = 1;
-    float q = (l < 0.5f) ? l * (1.0f + s) : l + s - l * s;
-    float p = 2 * l - q;
-    r = hueToRgb(p, q, h + 1.0f/3.0f);
-    g = hueToRgb(p, q, h);
-    b = hueToRgb(p, q, h - 1.0f/3.0f);
+    float r = 0, g = 0, b = 0;
+    float c = (1 - Math.abs(2*l-1)) * s;
+    float x = c * (1 - Math.abs((h/60.0f)%2-1));
+    float m = l - c/2.0f;
+ 
+         if (h>=  0 && h< 60) { r = c; g = x; b = 0;}
+    else if (h>= 60 && h<120) { r = x; g = c; b = 0;}
+    else if (h>=120 && h<180) { r = 0; g = c; b = x;}
+    else if (h>=180 && h<240) { r = 0; g = x; b = c;}
+    else if (h>=240 && h<300) { r = x; g = 0; b = c;}
+    else                      { r = c; g = 0; b = x;}
+ 
+    r += m;
+    g += m;
+    b += m;
+ 
+    r = min(1.0f,max(0.0f,r));
+    g = min(1.0f,max(0.0f,g));
+    b = min(1.0f,max(0.0f,b));
+
     return new float[] {r,g,b};
   }
-  
+ 
   /**
-   * Sets the min-max range of values mapped to colors. Values outside this 
+   * Converts an RGB value to the CIE L*a*b* colorspace.
+   * @param rgb an array containing an RGB value.
+   * @return an array[3] containing the CIE L*a*b* values.
+   */
+  public static float[] rgbToCIELab(float[] rgb) {
+    float[] xyz = rgbToCIEXyz(rgb);
+    // CIE XYZ tristiumulus values of the reference white D65
+    float Xn = 95.047f;
+    float Yn = 100.000f;
+    float Zn = 108.883f;
+    xyz[0]/=Xn; xyz[1]/=Yn; xyz[2]/=Zn;
+
+    return CIEXyzToCIELab(xyz);
+  }
+
+  /**
+   * Converts an RGB value to the CIE L*a*b* colorspace.
+   * @param r the red color value [0,1].
+   * @param g the green color value [0,1].
+   * @param b the blue color value [0,1].
+   * @return an array[3] of CIE L*a*b* values
+   */
+  public static float[] rgbToCIELab(float r, float g, float b) {
+    return rgbToCIELab(new float[] { r, g, b });
+  }
+
+   /**
+   * Converts a CIE L*a*b* color value to an RGB color value.
+   * @param lab an array containing the CIE L*a*b* values.
+   * @return an array[3] containing RGB values.
+   */
+  public static float[] CIELabToRgb(float[] lab) {
+    float[] xyz = CIELabToCIEXyz(lab);
+
+    // CIE XYZ tristiumulus values of the reference white D65
+    float Xn = 95.047f;
+    float Yn = 100.000f;
+    float Zn = 108.883f;
+    xyz[0]*=Xn; xyz[1]*=Yn; xyz[2]*=Zn;
+
+    float[] rgb = CIEXyzToRgb(xyz);
+
+    
+    rgb[0] = min(1.0f,max(0.0f,rgb[0]));
+    rgb[1] = min(1.0f,max(0.0f,rgb[1]));
+    rgb[2] = min(1.0f,max(0.0f,rgb[2]));
+
+    return rgb;
+  }
+
+  /**
+   * Converts a CIE L*a*b* color value to an RGB color value.
+   * @param Ls the CIE Lightness (L*) value.
+   * @param as the CIE a* value.
+   * @param bs the CIE b* value.
+   * @return an array[3] containing RGB values.
+   */
+  public static float[] CIELabToRgb(float Ls, float as, float bs) {
+    return CIELabToRgb(new float[] { Ls, as, bs });
+  }
+ 
+  /**
+   * Sets the min-max range of values mapped to colors. Values outside this
    * range are clipped. The default range is [0.0,1.0].
    * @param vmin the minimum value.
    * @param vmax the maximum value.
@@ -389,7 +430,7 @@ public class ColorMap {
     _vmax = vmax;
     fireColorMapChanged();
   }
-
+ 
   /**
    * Sets the index color model for this color map.
    * @param colorModel the index color model.
@@ -399,7 +440,7 @@ public class ColorMap {
     cacheColors();
     fireColorMapChanged();
   }
-
+ 
   /**
    * Sets the index color model for this color map to a single color.
    * @param c a color.
@@ -409,7 +450,7 @@ public class ColorMap {
     cacheColors();
     fireColorMapChanged();
   }
-
+ 
   /**
    * Adds the specified color map listener.
    * Then notifies the listener that this color map has changed.
@@ -419,7 +460,7 @@ public class ColorMap {
     _colorMapListeners.add(ColorMapListener.class,cml);
     cml.colorMapChanged(this);
   }
-
+ 
   /**
    * Removes the specified color map listener.
    * @param cml the listener.
@@ -427,7 +468,7 @@ public class ColorMap {
   public void removeListener(ColorMapListener cml) {
     _colorMapListeners.remove(ColorMapListener.class,cml);
   }
-
+ 
   /**
    * Gets a linear gray black-to-white color model.
    * @return the color model.
@@ -435,10 +476,10 @@ public class ColorMap {
   public static IndexColorModel getGray() {
     return getGray(0.0,1.0);
   }
-
+ 
   /**
    * Gets a linear gray color model for the specified gray levels. Gray
-   * levels equal to 0.0 and 1.0 correspond to colors black and white, 
+   * levels equal to 0.0 and 1.0 correspond to colors black and white,
    * respectively.
    * @param g0 the gray level corresponding to index value 0.
    * @param g255 the gray level corresponding to index value 255.
@@ -447,10 +488,10 @@ public class ColorMap {
   public static IndexColorModel getGray(double g0, double g255) {
     return getGray(g0,g255,1.0);
   }
-
+ 
   /**
    * Gets a linear gray color model for the specified gray levels. Gray
-   * levels equal to 0.0 and 1.0 correspond to colors black and white, 
+   * levels equal to 0.0 and 1.0 correspond to colors black and white,
    * respectively.
    * @param g0 the gray level corresponding to index value 0.
    * @param g255 the gray level corresponding to index value 255.
@@ -466,7 +507,7 @@ public class ColorMap {
     }
     return makeIndexColorModel(c);
   }
-
+ 
   /**
    * Gets a red-to-blue color model like Matlab's jet color map.
    * @return the color model.
@@ -474,7 +515,7 @@ public class ColorMap {
   public static IndexColorModel getJet() {
     return getJet(1.0);
   }
-
+ 
   /**
    * Gets a red-to-blue color model like Matlab's jet color map.
    * @param alpha the opacity for all colors in this color model.
@@ -483,7 +524,7 @@ public class ColorMap {
   public static IndexColorModel getJet(double alpha) {
     return makeIndexColorModel(getJetColors(alpha));
   }
-
+ 
   /**
    * Gets a red-to-blue color model like GMT's jet color map.
    * @return the color model.
@@ -491,7 +532,7 @@ public class ColorMap {
   public static IndexColorModel getGmtJet() {
     return getGmtJet(1.0);
   }
-
+ 
   /**
    * Gets a red-to-blue color model like GMT's jet color map.
    * @param alpha the opacity for all colors in this color model.
@@ -500,7 +541,7 @@ public class ColorMap {
   public static IndexColorModel getGmtJet(double alpha) {
     return makeIndexColorModel(getGmtJetColors(alpha));
   }
-
+ 
   /**
    * Gets a color model with eight complete cycles of hues.
    * @return the color model.
@@ -508,7 +549,7 @@ public class ColorMap {
   public static IndexColorModel getPrism() {
     return getHue(0.0,8.0);
   }
-
+ 
   /**
    * Gets a red-to-blue linear hue color model.
    * @return the color model.
@@ -516,7 +557,7 @@ public class ColorMap {
   public static IndexColorModel getHue() {
     return getHue(0.0,0.67);
   }
-
+ 
   /**
    * Gets a red-to-blue linear hue color model.
    * @return the color model.
@@ -524,7 +565,7 @@ public class ColorMap {
   public static IndexColorModel getHueRedToBlue() {
     return getHue(0.0,0.67);
   }
-
+ 
   /**
    * Gets a blue-to-red linear hue color model.
    * @return the color model.
@@ -532,10 +573,10 @@ public class ColorMap {
   public static IndexColorModel getHueBlueToRed() {
     return getHue(0.67,0.0);
   }
-
+ 
   /**
-   * Gets a linear hue color model for the specified hues. Hues equal to 
-   * 0.00, 0.33, and 0.67, and 1.00 correspond approximately to the colors 
+   * Gets a linear hue color model for the specified hues. Hues equal to
+   * 0.00, 0.33, and 0.67, and 1.00 correspond approximately to the colors
    * red, green, blue, and red, respectively.
    * @param h0 the hue corresponding to index value 0.
    * @param h255 the hue corresponding to index value 255.
@@ -544,10 +585,10 @@ public class ColorMap {
   public static IndexColorModel getHue(double h0, double h255) {
     return getHue(h0,h255,1.0);
   }
-
+ 
   /**
-   * Gets a linear hue color model for the specified hues and alpha. 
-   * Hues equal to 0.00, 0.33, and 0.67, and 1.00 correspond 
+   * Gets a linear hue color model for the specified hues and alpha.
+   * Hues equal to 0.00, 0.33, and 0.67, and 1.00 correspond
    * approximately to the colors red, green, blue, and red, respectively.
    * @param h0 the hue corresponding to index value 0.
    * @param h255 the hue corresponding to index value 255.
@@ -564,7 +605,7 @@ public class ColorMap {
     }
     return makeIndexColorModel(c);
   }
-
+ 
   /**
    * Gets a red-white-blue color model.
    * @return the color model.
@@ -583,7 +624,7 @@ public class ColorMap {
     }
     return makeIndexColorModel(c);
   }
-
+ 
   /**
    * Gets a blue-white-red color model.
    * @return the color model.
@@ -602,7 +643,7 @@ public class ColorMap {
     }
     return makeIndexColorModel(c);
   }
-
+ 
   /**
    * Gets the gray-yellow-red color model.
    * @return the color model.
@@ -622,7 +663,7 @@ public class ColorMap {
     }
     return makeIndexColorModel(c);
   }
-
+ 
   /**
    * Returns an index color model for the specified array of 256 colors.
    * @param c array[256] of colors.
@@ -637,7 +678,7 @@ public class ColorMap {
         getReds(c),getGreens(c),getBlues(c));
     }
   }
-
+ 
   /**
    * Returns an index color model for a single color.
    * @param c a color.
@@ -649,7 +690,7 @@ public class ColorMap {
       colors[i] = c;
     return makeIndexColorModel(colors);
   }
-
+ 
   /**
    * Returns an index color model with specified opacity (alpha).
    * @param icm an index color model from which to copy RGBs.
@@ -671,7 +712,7 @@ public class ColorMap {
       a[i] = ia;
     return new IndexColorModel(bits,size,r,g,b,a);
   }
-
+ 
   /**
    * Returns an index color model with specified opacities (alphas).
    * @param icm an index color model from which to copy RGBs.
@@ -693,16 +734,16 @@ public class ColorMap {
       a[i] = (byte)(255.0f*alpha[i]+0.5f);
     return new IndexColorModel(bits,size,r,g,b,a);
   }
-
+ 
   ///////////////////////////////////////////////////////////////////////////
   // private
-
+ 
   private double _vmin = 0.0;
   private double _vmax = 1.0;
   private IndexColorModel _colorModel;
   private Color[] _colors = new Color[256];
   private EventListenerList _colorMapListeners = new EventListenerList();
-
+ 
   private void fireColorMapChanged() {
     Object[] listeners = _colorMapListeners.getListenerList();
     for (int i=listeners.length-2; i>=0; i-=2) {
@@ -710,12 +751,12 @@ public class ColorMap {
       cml.colorMapChanged(this);
     }
   }
-
+ 
   private void cacheColors() {
     for (int index=0; index<256; ++index)
       _colors[index] = new Color(_colorModel.getRGB(index));
   }
-
+ 
   private static byte[] getReds(Color[] color) {
     int n = color.length;
     byte[] r = new byte[n];
@@ -723,7 +764,7 @@ public class ColorMap {
       r[i] = (byte)color[i].getRed();
     return r;
   }
-
+ 
   private static byte[] getGreens(Color[] color) {
     int n = color.length;
     byte[] g = new byte[n];
@@ -731,7 +772,7 @@ public class ColorMap {
       g[i] = (byte)color[i].getGreen();
     return g;
   }
-
+ 
   private static byte[] getBlues(Color[] color) {
     int n = color.length;
     byte[] b = new byte[n];
@@ -739,7 +780,7 @@ public class ColorMap {
       b[i] = (byte)color[i].getBlue();
     return b;
   }
-
+ 
   private static byte[] getAlphas(Color[] color) {
     int n = color.length;
     byte[] b = new byte[n];
@@ -747,7 +788,7 @@ public class ColorMap {
       b[i] = (byte)color[i].getAlpha();
     return b;
   }
-
+ 
   private static boolean hasAlpha(Color[] color) {
     int n = color.length;
     for (int i=0; i<n; ++i)
@@ -755,7 +796,7 @@ public class ColorMap {
         return true;
     return false;
   }
-
+ 
   private static byte[] getBytes(float[] f) {
     int n = f.length;
     byte[] b = new byte[n];
@@ -763,7 +804,7 @@ public class ColorMap {
       b[i] = (byte)(f[i]*255.0f+0.5f);
     return b;
   }
-
+ 
   private static Color[] addAlpha(Color[] color, double alpha) {
     int n = color.length;
     float a = (float)alpha;
@@ -776,7 +817,7 @@ public class ColorMap {
     }
     return c;
   }
-
+ 
   private static Color[] addAlpha(Color[] color, float[] alpha) {
     int n = color.length;
     Color[] c = new Color[n];
@@ -789,7 +830,7 @@ public class ColorMap {
     }
     return c;
   }
-
+ 
   private static Color[] getJetColors(double alpha) {
     float a = (float)alpha;
     Color[] c = new Color[256];
@@ -814,7 +855,7 @@ public class ColorMap {
     }
     return c;
   }
-
+ 
   private static Color[] getGmtJetColors(double alpha) {
     float a = (float)alpha;
     Color[] c = new Color[256];
@@ -839,78 +880,68 @@ public class ColorMap {
     }
     return c;
   }
-  
-  private static float hueToRgb(float p, float q, float t) {
-    if(t<0.0f) t += 1;
-    if(t>1.0f) t -= 1;
-    if(t<1.0f/6.0f) return p + (q - p) * 6 * t;
-    if(t<1.0f/2.0f) return q;
-    if(t<2.0f/3.0f) return p + (q - p) * (2/3 - t) * 6;
-    return p;
-  }
-  
-  /**
-   * Converts an RGB value to a CIE XYZ value.
-   * <p>
-   * An RGB value can map to a CIE XYZ value using the
-   * following matrix transform:
-   *  | X |   | 0.412453,  0.357580,  0.180423 |   | R |
-   *  | Y | = | 0.212671,  0.715160,  0.072169 | * | G |
-   *  | Z |   | 0.019334,  0.119193,  0.950227 |   | B |.
-   * @param r a red color value.
-   * @param g a green color value.
-   * @param b a blue color value.
-   * @return the CIE XYZ transform.
-   */
-  private static float[] rgbToCIEXyz(float r, float g, float b) {
-    double[][] rgb = {{r},{g},{b}};
-    double[][] trans =  
-    {
-      { 0.412453, 0.356580, 0.180423 },  // Specifically for sRGB
-      { 0.212671, 0.715160, 0.072169 },
-      { 0.019334, 0.119193, 0.950227 }
-    };
-    DMatrix matrgb = new DMatrix(rgb);
-    DMatrix mattrans = new DMatrix(trans);
-    DMatrix matxyz = mattrans.times(matrgb);
-    double[] darr = matxyz.getPackedColumns();
-    float[] farr = { (float)darr[0], (float)darr[1], (float)darr[2] };
-    return farr;
+
+  private static float[] CIEXyzToCIELab(float[] xyz) {
+    float c = 0.008856f;
+
+    for (int i=0; i<3; ++i) 
+      xyz[i] = (xyz[i] > c) ? (float)Math.pow(xyz[i],1.0f/3.0f) 
+                            : (7.787f*xyz[i])+(16.0f/116.0f);
+ 
+    float Ls = 116.0f *  xyz[1] - 16.0f;   // L*
+    float as = 500.0f * (xyz[0] - xyz[1]); // a*
+    float bs = 200.0f * (xyz[1] - xyz[2]); // b*
+ 
+    return new float[] { Ls, as, bs };
   }
 
-  private static float[] cieXyzToRgb(float x, float y, float z) {
-    double[][] xyz = {{x},{y},{z}};
-    double[][] trans =  
-    {
-      { 3.240454,-1.537139,-0.498531 },  // Specifically for sRGB
-      {-0.969266, 1.876012, 0.041556 },
-      { 0.055643,-0.204026, 1.057225 }
-    };
-    DMatrix matxyz = new DMatrix(xyz);
-    DMatrix mattrans = new DMatrix(trans);
-    DMatrix matrgb = mattrans.times(matxyz);
-    double[] darr = matrgb.getPackedColumns();
-    float[] farr = { (float)darr[0], (float)darr[1], (float)darr[2] };
-    return farr;
+  private static float[] CIELabToCIEXyz(float[] lab) {
+    float c = 0.008856f;
+
+    float y = (lab[0] + 16.0f) / 116.0f;
+    float x = (lab[1] / 500.0f) + y;
+    float z = y - (lab[2] / 200.0f);
+
+    float[] xyz = new float[] { x, y, z };
+
+    for (int i=0; i<3; ++i)
+      xyz[i] = (Math.pow(xyz[i],3) > c) ?
+        (float)Math.pow(xyz[i],3) : (xyz[i]-16.0f/116.0f)/7.787f;
+
+    return xyz;
   }
 
-  /**
-   * Computes condition for CIELab transform.
-   */
-  private static float cieLabParam(float val) {
-    float constant = 0.2068965f; // constant = 6/29
-    float cond = (float)pow(constant,3);
-    if (val>cond) return (float)pow(val,0.333f);
-    else return (1/3.0f * (float)pow(1.0f/constant,2)*val + 4.0f/29.0f);
+  private static float[] rgbToCIEXyz(float[] rgb) {
+    float[] xyz = new float[3];
+    float c = 0.04045f;
+
+    for (int i=0; i<3; ++i) {
+      rgb[i] = (rgb[i] > c) ?
+        (float)Math.pow((rgb[i]+0.055f)/1.055f,2.4f) : rgb[i] / 12.92f;
+      rgb[i]*=100;
+    }
+
+    xyz[0] = rgb[0]*0.4124f + rgb[1]*0.3576f + rgb[2]*0.1805f;
+    xyz[1] = rgb[0]*0.2126f + rgb[1]*0.7152f + rgb[2]*0.0722f;
+    xyz[2] = rgb[0]*0.0193f + rgb[1]*0.1192f + rgb[2]*0.9505f;
+
+    return xyz;
   }
 
-  /**
-   * Condition for CIELab inverse transform.
-   */
-  private static float cieLabParamInv(float val) {
-    float constant = 0.2068965f; // constant = 6/29
-    float cond = (float)pow(constant,3);
-    if (val>cond) return (float)pow(val,3);
-    else return (3.0f*(float)pow(constant,2)*(val-4.0f/29.0f));
+  private static float[] CIEXyzToRgb(float[] xyz) {
+    xyz[0]/=100.0f; xyz[1]/=100.0f; xyz[2]/=100.0f;
+    float[] rgb = new float[3];
+    float c = 0.0031308f;
+
+    rgb[0] = xyz[0]* 3.2406f + xyz[1]*-1.5372f+xyz[2]*-0.4986f;
+    rgb[1] = xyz[0]*-0.9689f + xyz[1]* 1.8758f+xyz[2]* 0.0415f;
+    rgb[2] = xyz[0]* 0.0557f + xyz[1]*-0.2040f+xyz[2]* 1.0570f;
+
+    for (int i=0; i<3; ++i) {
+      rgb[i] = (rgb[i] > c) ?
+        1.055f*((float)Math.pow(rgb[i],1.0f/2.4f))-0.055f : rgb[i]*12.92f;
+    }
+
+    return rgb;
   }
 }
