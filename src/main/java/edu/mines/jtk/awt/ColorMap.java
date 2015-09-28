@@ -264,7 +264,7 @@ public class ColorMap {
    * @param v the array of floats to be mapped to CIELab values.
    * @return array[3*v.length] of packaed CIELab values.
    */
-  public float[] getCIELabFloats(float[] v) {
+  public float[] getCieLabFloats(float[] v) {
     int nv = v.length;
     float[] rgb = getRgbFloats(v);
     float[] lab = new float[3];
@@ -282,7 +282,7 @@ public class ColorMap {
  
     for (int i=0,j=0,iv=0; iv<nv; ++iv) {
       r = rgb[j++]; g = rgb[j++]; b = rgb[j++];
-      lab = rgbToCIELab(r,g,b);
+      lab = rgbToCieLab(r,g,b);
       cielab[i++] = lab[0];
       cielab[i++] = lab[1];
       cielab[i++] = lab[2];
@@ -362,15 +362,15 @@ public class ColorMap {
    * @param rgb an array containing an RGB value.
    * @return an array[3] containing the CIE L*a*b* values.
    */
-  public static float[] rgbToCIELab(float[] rgb) {
-    float[] xyz = rgbToCIEXyz(rgb);
+  public static float[] rgbToCieLab(float[] rgb) {
+    float[] xyz = rgbToCieXyz(rgb);
     // CIE XYZ tristiumulus values of the reference white D65
     float Xn = 95.047f;
     float Yn = 100.000f;
     float Zn = 108.883f;
     xyz[0]/=Xn; xyz[1]/=Yn; xyz[2]/=Zn;
 
-    return CIEXyzToCIELab(xyz);
+    return cieXyzToCieLab(xyz);
   }
 
   /**
@@ -380,8 +380,8 @@ public class ColorMap {
    * @param b the blue color value [0,1].
    * @return an array[3] of CIE L*a*b* values
    */
-  public static float[] rgbToCIELab(float r, float g, float b) {
-    return rgbToCIELab(new float[] { r, g, b });
+  public static float[] rgbToCieLab(float r, float g, float b) {
+    return rgbToCieLab(new float[] { r, g, b });
   }
 
    /**
@@ -389,8 +389,8 @@ public class ColorMap {
    * @param lab an array containing the CIE L*a*b* values.
    * @return an array[3] containing RGB values.
    */
-  public static float[] CIELabToRgb(float[] lab) {
-    float[] xyz = CIELabToCIEXyz(lab);
+  public static float[] cieLabToRgb(float[] lab) {
+    float[] xyz = cieLabToCieXyz(lab);
 
     // CIE XYZ tristiumulus values of the reference white D65
     float Xn = 95.047f;
@@ -398,7 +398,7 @@ public class ColorMap {
     float Zn = 108.883f;
     xyz[0]*=Xn; xyz[1]*=Yn; xyz[2]*=Zn;
 
-    float[] rgb = CIEXyzToRgb(xyz);
+    float[] rgb = cieXyzToRgb(xyz);
 
     
     rgb[0] = min(1.0f,max(0.0f,rgb[0]));
@@ -415,8 +415,8 @@ public class ColorMap {
    * @param bs the CIE b* value.
    * @return an array[3] containing RGB values.
    */
-  public static float[] CIELabToRgb(float Ls, float as, float bs) {
-    return CIELabToRgb(new float[] { Ls, as, bs });
+  public static float[] cieLabToRgb(float Ls, float as, float bs) {
+    return cieLabToRgb(new float[] { Ls, as, bs });
   }
  
   /**
@@ -881,7 +881,7 @@ public class ColorMap {
     return c;
   }
 
-  private static float[] CIEXyzToCIELab(float[] xyz) {
+  private static float[] cieXyzToCieLab(float[] xyz) {
     float c = 0.008856f;
 
     for (int i=0; i<3; ++i) 
@@ -895,7 +895,7 @@ public class ColorMap {
     return new float[] { Ls, as, bs };
   }
 
-  private static float[] CIELabToCIEXyz(float[] lab) {
+  private static float[] cieLabToCieXyz(float[] lab) {
     float c = 0.008856f;
 
     float y = (lab[0] + 16.0f) / 116.0f;
@@ -911,7 +911,7 @@ public class ColorMap {
     return xyz;
   }
 
-  private static float[] rgbToCIEXyz(float[] rgb) {
+  private static float[] rgbToCieXyz(float[] rgb) {
     float[] xyz = new float[3];
     float c = 0.04045f;
 
@@ -928,7 +928,7 @@ public class ColorMap {
     return xyz;
   }
 
-  private static float[] CIEXyzToRgb(float[] xyz) {
+  private static float[] cieXyzToRgb(float[] xyz) {
     xyz[0]/=100.0f; xyz[1]/=100.0f; xyz[2]/=100.0f;
     float[] rgb = new float[3];
     float c = 0.0031308f;

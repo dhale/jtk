@@ -17,7 +17,7 @@ from edu.mines.jtk.sgl import *
 ##############################################################################
 # Perceptual Color Map Demo Using CIE L*a*b* Color Space
 #
-# Humans are terrible at differentiating different colors. We can't help it - 
+# Humans are terrible at differentiating colors. We can't help it - 
 # it's biology! The human eye has four types of receptors: the rods which are
 # sensitive only to black, white and shades of gray, and cones of which there
 # are three types, each responding to a different range of colors. In fact,
@@ -100,7 +100,7 @@ def getNewColorModel(Lab):
   col = zeros(len(x),Color)
   for i in range(len(x)):
     j = 3*i
-    rgb = ColorMap.CIELabToRgb(Lab[j+0],Lab[j+1],Lab[j+2])
+    rgb = ColorMap.cieLabToRgb(Lab[j+0],Lab[j+1],Lab[j+2])
     col[i] = Color(rgb[0],rgb[1],rgb[2]);
   cm = ColorMap(0,1,col)
   return cm.getColorModel()
@@ -111,7 +111,7 @@ def getRgbAndLab():
   rgb = zerofloat(n*3)
   color = zerofloat(3)
   for i in range(len(x)):
-    cieLab = cm.getCIELabFloats(f[i])
+    cieLab = cm.getCieLabFloats(f[i])
     color = cm.getRgbFloats(f[i])
     rgb[3*i+0] = color[0]
     rgb[3*i+1] = color[1]

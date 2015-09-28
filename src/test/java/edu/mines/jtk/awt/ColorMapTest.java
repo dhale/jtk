@@ -50,7 +50,7 @@ public class ColorMapTest extends TestCase {
     }
   }
  
-  public void testRgbToCIELab() {
+  public void testRgbToCieLab() {
     float r,g,b;
     float Ls,as,bs;
  
@@ -60,7 +60,7 @@ public class ColorMapTest extends TestCase {
       Ls = _rgbcielab[i][3]; as = _rgbcielab[i][4]; bs = _rgbcielab[i][5];
  
       float[] expected  = { Ls, as, bs };
-      float[] test = ColorMap.rgbToCIELab(r,g,b);
+      float[] test = ColorMap.rgbToCieLab(r,g,b);
  
       assertEquals(expected[0],test[0],0.01);
       assertEquals(expected[1],test[1],0.01);
@@ -68,7 +68,7 @@ public class ColorMapTest extends TestCase {
     }
   }
 
-  public void testCIELabToRgb() {
+  public void testCieLabToRgb() {
     float r,g,b;
     float Ls,as,bs;
  
@@ -78,7 +78,7 @@ public class ColorMapTest extends TestCase {
       Ls = _rgbcielab[i][3]; as = _rgbcielab[i][4]; bs = _rgbcielab[i][5];
  
       float[] expected  = { r, g, b };
-      float[] test = ColorMap.CIELabToRgb(Ls,as,bs);
+      float[] test = ColorMap.cieLabToRgb(Ls,as,bs);
  
       assertEquals(expected[0],test[0],0.01);
       assertEquals(expected[1],test[1],0.01);
