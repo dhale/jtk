@@ -1,13 +1,13 @@
-#The Colorado School of Mines Java Toolkit
+#The Mines Java Toolkit
 
-The Mines Java Toolkit (JTK) is a set of Java packages and native (non-Java) software libraries for science and engineering. Applications currently include digital signal processing, linear algebra, optimization, meshing, interpolation, and 2D and 3D graphics.
+The Mines Java Toolkit (Mines JTK) is a set of Java packages and native (non-Java) software libraries for science and engineering. Applications currently include digital signal processing, linear algebra, optimization, meshing, interpolation, and 2D and 3D graphics.
 
-Note: if you modify (or port, or translate, or ...) our source code, then you have created a "derived work", and should review carefully the terms of the license that accompanies this software.
+The Mines JTK is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
 
 ###Getting the source code
 
-To build and use the Mines JTK, you must first [download its source code from GitHub](https://github.com/dhale/jtk). If you clone this source code repository using git, then you will be able to easily update your copy as others make changes. Alternatively, you may use the Downloads link provided by GitHub to obtain a current snapshot of the code; but this copy cannot be conveniently updated with git.
+To build and use the Mines JTK, you must first [download its source code from GitHub](https://github.com/dhale/jtk). If you clone this source code repository using git, then you will be able to easily update your copy as others make changes. Alternatively, you may use the Downloads link provided by GitHub to obtain a current snapshot of the code.
 
 If you are using Linux or Mac OS X (10.7+), then you already have a git command-line client. Various git clients with graphical user interfaces are also available for Linux, Mac OS X, and Windows, and git is also available within popular integrated development environments, such as Eclipse, Netbeans, and IntelliJ IDEA. Note that git will be necessary if you wish to propose changes (submit pull requests) for the master branch of the source code repository. 
 
@@ -69,15 +69,13 @@ javarun edu.mines.jtk.util.AllTest
 ``` 
 If any of these tests fail, then you may need to edit your javarun script. Many of our Java packages contain AllTest suites like this one.
 
-The Mines JTK also comes with demo programs in [src/demo](src/demo). These demos are written in multiple languages, including Jython. Scripting in Jython is an efficient way to utilize the Java classes in the Mines JTK. With the Mines JTK we include a Jython JAR file (in [libs/](libs/)),and scripts to run Jython programs (in [bin/](bin/)), so that these demos
-can be run without any additional software.
+The Mines JTK also comes with demo programs in [src/demo](src/demo). These demos are written in multiple languages, including Jython. Scripting in Jython is an efficient way to utilize the Java classes in the Mines JTK. With the Mines JTK we include a Jython JAR file (in [libs/](libs/)),and scripts to run Jython programs (in [bin/](bin/)), so that these demos can be run without any additional software.
  
 To execute the Jython demos you should:
 
 1. copy the appropriate script ([jythonrun.sh](bin/jythonrun.sh) or [jythonrun.bat](bin/jythonrun.bat)) to some directory in your PATH, 
 2. edit the script to specify the correct directories, and 
-3. run a Jython program by typing ```jythonrun program_name.py```. Again, you may
-want to use a shorter name (such as ```jy```), for this script.
+3. run a Jython program by typing ```jythonrun program_name.py```. Again, you may want to use a shorter name (such as ```jy```), for this script.
 
 
 ###3D graphics in the Mines JTK
