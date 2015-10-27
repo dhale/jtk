@@ -56,7 +56,7 @@ distributions {
 dependencies {
   compile "org.jogamp.jogl:jogl-all-main:2.3.2",
           "org.jogamp.gluegen:gluegen-rt-main:2.3.2",
-          "org.python:jython:2.5.3",
+          "org.python:jython-standalone:2.5.3",
           "com.googlecode.netlib-java:netlib-java:0.9.3"
 
   testCompile "junit:junit:3.8.1"
