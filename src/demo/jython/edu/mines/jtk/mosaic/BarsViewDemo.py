@@ -259,8 +259,13 @@ def test3():
  
 def main(args):
   test1()
+<<<<<<< HEAD
   test2()
   test3()
+=======
+#  test2()
+#  test3()
+>>>>>>> origin/master
 
 #############################################################################
 class RunMain(Runnable):
