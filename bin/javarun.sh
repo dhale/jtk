@@ -1,21 +1,16 @@
 #!/bin/sh
 
-# Where is the Mines JTK? (Where is your build.xml?)
-export MINES_JTK_HOME=$HOME/git/jtk
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
 
 # If Mac OS X, which version of Java should we use?
 export JAVA_VERSION=1.7.0
 
-# Where will Java look for classes? 
+# Where will Java look for classes?
 # Add other jars to this list as necessary.
 export CLASSPATH=\
-$MINES_JTK_HOME/build/libs/edu_mines_jtk.jar:\
-$MINES_JTK_HOME/libs/arpack-java.jar:\
-$MINES_JTK_HOME/libs/netlib-java.jar:\
-$MINES_JTK_HOME/libs/gluegen-rt.jar:\
-$MINES_JTK_HOME/libs/jogl-all.jar:\
-$MINES_JTK_HOME/libs/junit.jar:\
-.
+"$SCRIPTPATH/*":\
+"$SCRIPTPATH/lib/*"
 
 # Run a server 64-bit VM with assertions enabled and a 1GB max Java heap.
 # Modify these flags and properties as necessary for your system.
