@@ -634,6 +634,96 @@ public class PlotPanel extends IPanel {
   }
 
   /**
+   * Adds a bars view of the array x2.
+   * @param x2 array of x2 values.
+   * @return the bars view.
+   */
+  public BarsView addBars(float[] x2) {
+    return addBars(0,0,x2);
+  }
+
+  /**
+   * Adds a view of bars (x1,x2) for a sampled function x2(x1).
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param x2 array of x2 coordinates.
+   * @return the bars view.
+   */
+  public BarsView addBars(Sampling s1, float[] x2) {
+    return addBars(0,0,s1,x2);
+  }
+
+  /**
+   * Adds a view of bars of the array x2 containing x2.length plot segments.
+   * @param x2 array of array of x2 values.
+   * @return the bars view.
+   */
+  public BarsView addBars(float[][] x2) {
+    return addBars(0,0,x2);
+  }
+
+  /**
+   * Adds a view of bars (x1,x2) for a sampled function x2(x1) and x2.length
+   * plot segments.
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param x2 array of array of x2 values.
+   */
+  public BarsView addBars(Sampling s1, float[][] x2) {
+    return addBars(0,0,s1,x2);
+  }
+
+  /**
+   * Adds a view of bars x2 for a sampled function x2(x1).
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param x2 array of x2 values.
+   * @return the bars view.
+   */
+  public BarsView addBars(int irow, int icol, Sampling s1, float[] x2) {
+    BarsView bv = new BarsView(s1,x2);
+    return addBarsView(irow,icol,bv);
+  }
+
+  /**
+   * Adds a bars view of the array x2 of bar values.
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param x2 array of x2 values.
+   * @return the bars view.
+   */
+  public BarsView addBars(int irow, int icol, float[] x2) {
+    BarsView bv = new BarsView(x2);
+    return addBarsView(irow,icol,bv);
+  }
+
+  /**
+   * Adds a bars view of the array of arrays x2 of bar values and x2.length
+   * plot segments.
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param x2 array of arrays of x2 values.
+   * @return the bars view.
+   */
+  public BarsView addBars(int irow, int icol, float[][] x2) {
+    BarsView bv = new BarsView(x2);
+    return addBarsView(irow,icol,bv);
+  }
+
+  /**
+   * Adds a bars view of the array of arrays x2 of bar values and x2.length
+   * plot segments for a sample function x2(x1).
+   * @param irow the tile row index.
+   * @param icol the tile column index.
+   * @param s1 the sampling of the variable x1; must be uniform.
+   * @param x2 array of array of x2 values.
+   * @return the bars view.
+   */
+  public BarsView addBars(int irow, int icol, Sampling s1, float[][] x2) {
+    BarsView bv = new BarsView(s1,x2);
+    return addBarsView(irow,icol,bv);
+  }
+
+  /**
    * Adds a pixels view of the specified sampled function f(x1,x2).
    * Assumes zero first sample values and unit sampling intervals.
    * @param f array[n2][n1] of sampled function values f(x1,x2), where 
@@ -1133,6 +1223,16 @@ public class PlotPanel extends IPanel {
   private GridView addGridView(int irow, int icol, GridView gv) {
     addTiledView(irow,icol,gv);
     return gv;
+  }
+
+  private BarsView addBarsView(int irow, int icol, BarsView bv) {
+    if (_orientation==Orientation.X1RIGHT_X2UP) {
+      bv.setOrientation(BarsView.Orientation.X1RIGHT_X2UP);
+    } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
+      bv.setOrientation(BarsView.Orientation.X1DOWN_X2RIGHT);
+    }
+    addTiledView(irow,icol,bv);
+    return bv;
   }
 
   private PixelsView addPixelsView(int irow, int icol, PixelsView pv) {
