@@ -25,20 +25,20 @@ import static edu.mines.jtk.util.ArrayMath.*;
  
 /**
  * A view of bars.
- * Points (x1,x2) may be specified as arrays x1 and x2 of coordinates. Each
- * pair of arrays x1 and x2 corresponds to one plot segment. Multiple plot
- * segments may be specified by arrays of arrays of x1 and x2 coordinates.
+ * Bars may be specified as arrays of x2 values. Each array of x2 corresponds 
+ * to one plot segment. Multiple plot segments may be specified by arrays of 
+ * arrays of x1 and x2 coordinates.
  * <p>
- * For example, to view sampled functions x2 = sin(x1) and x2 = cos(x1),
+ * For example, to view sampled functions x2 = f(x1) and x2 = g(x1),
  * one might construct two plot segments by specifying an array of two
  * arrays of x1 coordinates and a corresponding array of two arrays of
  * x2 coordinates.
  * <p>
- * Note that mark and line attributes are constant for each points view.
- * These attributes do not vary among plot segments. To paint marks and
- * lines with different attributes, construct multiple views.
- * @author Chris Engelsma, Colorado School of Mines
- * @version 2015.10.26
+ * Note that some attributes remain constant across all plot segments,
+ * including: bar width, bar stacking, line style, bar alignment, and 
+ * axis orientation.
+ * @author Chris Engelsma
+ * @version 2015.10.27
  */
 public class BarsView extends TiledView {
  
@@ -560,7 +560,7 @@ public class BarsView extends TiledView {
   ArrayList<Integer> _nx = new ArrayList<Integer>(); // numbers of (x1,x2)
   ArrayList<float[]> _x1 = new ArrayList<float[]>(); // arrays of x1
   ArrayList<float[]> _x2 = new ArrayList<float[]>(); // arrays of x2
-  int _nxmax; // maximum number of points in a segment
+  int _nxmax; // maximum number of bars in a segment
 
   // View orientation
   private Orientation _orientation = Orientation.X1RIGHT_X2UP;
