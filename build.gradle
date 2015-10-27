@@ -52,9 +52,10 @@ distributions {
   }
 }
 
+
 dependencies {
-  compile "org.jogamp.jogl:jogl-all-main:2.1.4",
-          "org.jogamp.gluegen:gluegen-rt-main:2.1.4",
+  compile "org.jogamp.jogl:jogl-all-main:2.3.2",
+          "org.jogamp.gluegen:gluegen-rt-main:2.3.2",
           "org.python:jython:2.5.3",
           "com.googlecode.netlib-java:netlib-java:0.9.3"
 

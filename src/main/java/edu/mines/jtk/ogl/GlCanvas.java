@@ -16,9 +16,11 @@ package edu.mines.jtk.ogl;
 
 import java.awt.*;
 import java.io.File;
-import javax.media.opengl.*;
-import javax.media.opengl.awt.*;
+
+
+import com.jogamp.opengl.awt.*;
 import com.jogamp.opengl.util.GLReadBufferUtil;
+import com.jogamp.opengl.*;
 //import com.jogamp.opengl.util.awt.Screenshot; // deprecated
 
 /**
