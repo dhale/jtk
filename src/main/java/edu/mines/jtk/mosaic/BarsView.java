@@ -15,8 +15,10 @@ limitations under the License.
 package edu.mines.jtk.mosaic;
  
 import java.awt.*;
+import java.awt.image.*;
 import java.util.*;
  
+import edu.mines.jtk.awt.*;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.Check;
 import static edu.mines.jtk.util.ArrayMath.*;
@@ -164,7 +166,9 @@ public class BarsView extends TiledView {
     _nx.add(x1.length);
     _x1.add(copy(x1));
     _x2.add(copy(x2));
-    _barColor = new Color[_ns];
+    _colorMaps = new ColorMap[_ns];
+    for (int i=0; i<_ns; ++i) 
+      _colorMaps[i] = new ColorMap(Color.CYAN);
     _lineColor = new Color[_ns];
     updateBestProjectors();
     repaint();
@@ -191,7 +195,9 @@ public class BarsView extends TiledView {
       _x1.add(copy(x1[is]));
       _x2.add(copy(x2[is]));
     }
-    _barColor = new Color[_ns];
+    _colorMaps = new ColorMap[_ns];
+    for (int i=0; i<_ns; ++i) 
+      _colorMaps[i] = new ColorMap(Color.CYAN);
     _lineColor = new Color[_ns];
     updateBestProjectors();
     repaint();
@@ -298,14 +304,51 @@ public class BarsView extends TiledView {
   }
 
   /**
+   * Sets a color model for all bar sets.
+   * @param colorModel a color model.
+   */
+  public void setColorModel(IndexColorModel colorModel) {
+    for (int is=0; is<_ns; ++is) 
+      setColorModel(is,colorModel);
+  }
+
+  /**
+   * Sets a color model for a specific bar set.
+   * @param i index of a bar set.
+   * @param colorModel a color model.
+   */
+  public void setColorModel(int i, IndexColorModel colorModel) {
+    _colorMaps[i].setColorModel(colorModel);
+    repaint();
+  }
+
+  /**
+   * Sets a color map for all bar sets.
+   * @param colorMap a color map.
+   */
+  public void setColorMap(ColorMap colorMap) {
+    for (int is=0; is<_ns; ++is)
+      setColorMap(is,colorMap);
+  }
+
+  /**
+   * Sets a color map for a specific bar set.
+   * @param i index of a bar set.
+   * @param colorModel a color model.
+   */
+  public void setColorMap(int i, ColorMap colorMap) {
+    _colorMaps[i] = colorMap;
+    repaint();
+  }
+
+  /**
    * Sets the fill color for a set of bars.
    * The default fill color is the tile background color.
-   * @param ibar the index of a bar set.
+   * @param i the index of a bar set.
    * @param color the bar color.
    */
-  public void setFillColor(int ibar, Color color) {
-    if (!equalColors(_barColor[ibar],color))
-      _barColor[ibar] = color;
+  public void setFillColor(int i, Color color) {
+    _colorMaps[i] = new ColorMap(color);
     repaint();
   }
  
@@ -375,10 +418,8 @@ public class BarsView extends TiledView {
    * @param color the line color; null, for tile foreground color.
    */
   public void setLineColor(int ibar, Color color) {
-    if (!equalColors(_lineColor[ibar],color)) {
-      _lineColor[ibar] = color;
-      repaint();
-    }
+    _lineColor[ibar] = color;
+    repaint();
   }
   /**
    * Sets the format used for text labels.
@@ -454,8 +495,18 @@ public class BarsView extends TiledView {
     float[] o2 = new float[] { 0.0f, 1.0f };
     int[] ox = new int[2];
     int[] oy = new int[2];
+
+    // Convert color map to color arrays
+    Color[][] colors = new Color[_ns][_nxmax];
+    for (int is=0; is<_ns; ++is) {
+      float[] x2 = _x2.get(is);
+      for (int ix=0; ix<_nxmax; ++ix) 
+        colors[is][ix] = _colorMaps[is].getColor(x2[ix]);
+    }
  
+    // Get origin in pixels
     computeXY(hp,vp,ts,1,o1,o2,ox,oy);
+
     float[] bottom = new float[_nxmax];
     int[] prevTop = new int[_nxmax];
     for (int i=0; i<_nxmax; ++i) 
@@ -482,13 +533,13 @@ public class BarsView extends TiledView {
       computeXY(hp,vp,ts,n,x1,x2,x,y);
 
       // First draw the filled bar, then the outline
-      if (_barColor!=null) {
-        gbar.setColor(_barColor[is]);
-        paintBars(gbar,_barWidth,prevTop,n,x,y,shift,is,true);
-      }
-      if (_lineColor!=null)
+      if (_colorMaps[is]!=null) 
+        paintBars(gbar,_barWidth,prevTop,n,x,y,shift,is,true,colors[is]);
+      if (_lineColor[is]!=null) 
         gbar.setColor(_lineColor[is]);
-      paintBars(gbar,_barWidth,prevTop,n,x,y,shift,is,false);
+      else 
+        gbar.setColor(Color.BLACK);
+      paintBars(gbar,_barWidth,prevTop,n,x,y,shift,is,false,null);
 
       if (_stackingBars) {
         if (_orientation==BarsView.Orientation.X1RIGHT_X2UP) {
@@ -510,15 +561,25 @@ public class BarsView extends TiledView {
   ArrayList<float[]> _x1 = new ArrayList<float[]>(); // arrays of x1
   ArrayList<float[]> _x2 = new ArrayList<float[]>(); // arrays of x2
   int _nxmax; // maximum number of points in a segment
+
+  // View orientation
   private Orientation _orientation = Orientation.X1RIGHT_X2UP;
+
+  // View alignment
   private Alignment _alignment = Alignment.ALIGN_CENTER;
+
+  // Flag for bar arrangement
   private boolean _stackingBars = false;
+
+  // Visual stuff
   private Line _lineStyle = Line.SOLID;
   private float _lineWidth = 0.0f;
   private Color[] _lineColor = null;
-  private Color[] _barColor = null;
   private float _barWidth = 1.0f;
   private String _textFormat = "%1.4G";
+
+  // Color lists with default null
+  private ColorMap[] _colorMaps = null;
  
   /**
    * Called when we might new realignment.
@@ -627,17 +688,17 @@ public class BarsView extends TiledView {
  
   private void paintBars(
     Graphics2D g2d, float wb, int[] bottoms, int n,
-    int[] x, int[] y, int s, int adj, boolean fill) 
+    int[] x, int[] y, int s, int adj, boolean fill, Color[] colors) 
   {
     if (_orientation==BarsView.Orientation.X1RIGHT_X2UP)
-      paintBarsVertical(g2d,wb,bottoms,n,x,y,s,adj,fill);
+      paintBarsVertical(g2d,wb,bottoms,n,x,y,s,adj,fill,colors);
     else 
-      paintBarsHorizontal(g2d,wb,bottoms,n,x,y,s,adj,fill);
+      paintBarsHorizontal(g2d,wb,bottoms,n,x,y,s,adj,fill,colors);
   }
 
   private void paintBarsHorizontal(
     Graphics2D g2d, float wb, int[] bottoms, int n,
-    int[] x, int[] y, int s, int adj, boolean fill)
+    int[] x, int[] y, int s, int adj, boolean fill, Color[] colors)
   {
     int pw,py;
     float frac = adj/(float)_ns;
@@ -650,7 +711,7 @@ public class BarsView extends TiledView {
       hw = w/2;
       int ypos = max(yim1,y[i]-hw);
       int xpos = min(zero,x[i]);
-      int h = abs(x[i]);
+      int h = abs(zero-x[i]);
       if (!_stackingBars) {
         py = ypos + (int)(w*frac);
         pw = w/_ns;
@@ -658,14 +719,18 @@ public class BarsView extends TiledView {
         py = ypos;
         pw = w;
       }
-      if (fill) g2d.fillRect(xpos,py,h,pw);
-      else      g2d.drawRect(xpos,py,h,pw);
+      if (fill) {
+        g2d.setColor(colors[i]);
+        g2d.fillRect(xpos,py,h,pw);
+      }
+      else
+        g2d.drawRect(xpos,py,h,pw);
       yim1 = ypos+w;
     }
   }
   private void paintBarsVertical(
     Graphics2D g2d, float wb, int[] bottoms, int n,
-    int[] x, int[] y, int s, int adj, boolean fill)
+    int[] x, int[] y, int s, int adj, boolean fill, Color[] colors)
   {
     int pw,px;
     float frac = adj/(float)_ns;
@@ -687,8 +752,12 @@ public class BarsView extends TiledView {
         px = xpos;
         pw = w;
       }
-      if (fill) g2d.fillRect(px,ypos,pw,h);
-      else      g2d.drawRect(px,ypos,pw,h);
+      if (fill) {
+        g2d.setColor(colors[i]);
+        g2d.fillRect(px,ypos,pw,h);
+      }
+      else 
+        g2d.drawRect(px,ypos,pw,h);
       xim1 = xpos+w;
     }
   }
