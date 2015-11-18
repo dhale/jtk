@@ -1,7 +1,6 @@
 #!/bin/sh
 
-SCRIPT=$(readlink -f "$0")
-SCRIPTPATH=$(dirname "$SCRIPT")
+SCRIPTPATH=$(dirname "$0")
 
 # If Mac OS X, which version of Java should we use?
 export JAVA_VERSION=1.7.0
