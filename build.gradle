@@ -29,6 +29,7 @@ jar {
   }
   from sourceSets.demo.output // include demos
   from sourceSets.test.output // include tests
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 javadoc {
