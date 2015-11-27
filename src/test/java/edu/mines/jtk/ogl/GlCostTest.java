@@ -14,8 +14,8 @@ limitations under the License.
 ****************************************************************************/
 package edu.mines.jtk.ogl;
 
-import javax.media.opengl.*;
-import javax.media.opengl.awt.*;
+import com.jogamp.opengl.*;
+import com.jogamp.opengl.awt.*;
 import javax.swing.*;
 
 import static edu.mines.jtk.ogl.Gl.*;
@@ -106,7 +106,7 @@ public class GlCostTest extends JFrame implements GLEventListener {
       public void run() {
         GlCostTest frame = new GlCostTest();
         frame.setSize(512,512);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
       }
     });

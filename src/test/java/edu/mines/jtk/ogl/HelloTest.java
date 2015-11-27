@@ -27,7 +27,7 @@ public class HelloTest {
     public void glInit() {
       glClearColor(0.0f,0.0f,0.0f,0.0f);
       System.out.println("JOGL version: "+ 
-          Package.getPackage("javax.media.opengl").
+          Package.getPackage("com.jogamp.opengl").
           getImplementationVersion());
       System.out.println("OpenGL version="+glGetString(GL_VERSION));
       System.out.println("OpenGL vendor="+glGetString(GL_VENDOR));

@@ -1,13 +1,21 @@
 apply plugin: 'java'
 
-task wrapper(type: Wrapper) {
-  gradleVersion = '2.0'
+apply plugin: 'java-library-distribution'
+
+sourceCompatibility = JavaVersion.VERSION_1_7
+targetCompatibility = JavaVersion.VERSION_1_7
+
+repositories {
+  mavenCentral()
 }
 
-defaultTasks 'jar'
+task wrapper(type: Wrapper) {
+  gradleVersion = '2.8'
+}
+
+defaultTasks 'distZip'
 
 description = 'Mines Java Toolkit'
-sourceCompatibility = 1.7
 
 sourceSets {
   main {
@@ -36,6 +44,21 @@ javadoc {
   title = project.description
 }
 
+distributions {
+  main {
+    baseName = 'edu_mines_jtk_all'
+    contents {
+      from 'bin/'
+    }
+  }
+}
+
+
 dependencies {
-  compile fileTree('libs') // contains jars provided with the Mines JTK
+  compile "org.jogamp.jogl:jogl-all-main:2.3.2",
+          "org.jogamp.gluegen:gluegen-rt-main:2.3.2",
+          "org.python:jython-standalone:2.5.3",
+          "com.googlecode.netlib-java:netlib-java:0.9.3"
+
+  testCompile "junit:junit:3.8.1"
 }

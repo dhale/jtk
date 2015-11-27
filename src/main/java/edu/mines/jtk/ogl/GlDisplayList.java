@@ -14,7 +14,7 @@ limitations under the License.
 ****************************************************************************/
 package edu.mines.jtk.ogl;
 
-import javax.media.opengl.GLContext;
+import com.jogamp.opengl.GLContext;
 
 import static edu.mines.jtk.ogl.Gl.glDeleteLists;
 import static edu.mines.jtk.ogl.Gl.glGenLists;
