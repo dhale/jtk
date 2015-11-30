@@ -1,0 +1,15 @@
+description = 'Mines Java Toolkit'
+sourceCompatibility = 1.7
+
+defaultTasks 'jar'
+
+jar {
+  baseName 'edu_mines_jtk'
+  manifest {
+    attributes 'Implementation-Title': project.description
+  }
+}
+
+javadoc {
+  title = project.description
+}

@@ -1,41 +1,25 @@
-apply plugin: 'java'
+allprojects {
+  // TODO
+}
+
+subprojects {
+  apply plugin: 'java'
+
+  description = 'Mines Java Toolkit'
+  sourceCompatibility = 1.7
+
+  dependencies {
+    compile fileTree('../libs') // contains jars provided with the Mines JTK
+  }
+
+  jar {
+    baseName 'edu_mines_jtk'
+    manifest {
+      attributes 'Implementation-Title': project.description
+    }
+  }
+}
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.0'
-}
-
-defaultTasks 'jar'
-
-description = 'Mines Java Toolkit'
-sourceCompatibility = 1.7
-
-sourceSets {
-  main {
-    output.resourcesDir = output.classesDir
-  }
-  test {
-    output.resourcesDir = output.classesDir
-  }
-  demo {
-    output.resourcesDir = output.classesDir
-    compileClasspath += sourceSets.main.runtimeClasspath
-  }
-}
-
-jar {
-  baseName 'edu_mines_jtk'
-  manifest {
-    attributes 'Implementation-Title': project.description
-  }
-  from sourceSets.demo.output // include demos
-  from sourceSets.test.output // include tests
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-javadoc {
-  title = project.description
-}
-
-dependencies {
-  compile fileTree('libs') // contains jars provided with the Mines JTK
+  gradleVersion = '2.9'
 }

@@ -7,7 +7,6 @@
 
 build/
 *.iml
-*.png
 *.zip
 *.swp
 *.class
