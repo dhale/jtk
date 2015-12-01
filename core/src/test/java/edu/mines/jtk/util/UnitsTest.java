@@ -29,14 +29,19 @@ public class UnitsTest extends TestCase {
   }
 
   public void testDefine() {
-    boolean defined;
+    boolean isValid, defined;
     try {
-      defined = Units.define("degrees F",false,"degF");
+      isValid = Units.isValidDefinition("degrees F");
+      assertTrue(isValid);
+      Units.define("degrees F",false,"degF");
+      defined = Units.isDefined("degrees F");
       assertTrue(defined);
-      defined = Units.define("degrees C",false,"degC");
+      isValid = Units.isValidDefinition("degrees C");
+      assertTrue(isValid);
+      Units.define("degrees C",false,"degC");
+      defined = Units.isDefined("degrees C");
       assertTrue(defined);
-      defined = Units.define("cubic_inches",false,"in^3");
-      assertTrue(defined);
+      Units.define("cubic_inches",false,"in^3");
       defined = Units.isDefined("m");
       assertTrue(defined);
       defined = Units.define("m",false,"meters");
