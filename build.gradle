@@ -1,25 +1,18 @@
+// for root project, as well as subprojects
 allprojects {
-  // TODO
+  defaultTasks 'jar'
 }
 
+// for subprojects only
 subprojects {
   apply plugin: 'java'
 
-  description = 'Mines Java Toolkit'
-  sourceCompatibility = 1.7
-
-  dependencies {
-    compile fileTree('../libs') // contains jars provided with the Mines JTK
-  }
-
-  jar {
-    baseName 'edu_mines_jtk'
-    manifest {
-      attributes 'Implementation-Title': project.description
-    }
+  repositories {
+    mavenCentral()
   }
 }
 
+// for the Gradle wrapper
 task wrapper(type: Wrapper) {
   gradleVersion = '2.9'
 }

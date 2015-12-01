@@ -1,12 +1,22 @@
 description = 'Mines Java Toolkit'
-sourceCompatibility = 1.7
 
-defaultTasks 'jar'
+apply plugin: 'java-library-distribution'
 
 jar {
-  baseName 'edu_mines_jtk'
+  baseName = 'edu_mines_jtk'
   manifest {
     attributes 'Implementation-Title': project.description
+  }
+}
+
+dependencies {
+  compile fileTree('../libs') // jars provided with the Mines JTK
+  testCompile 'junit:junit:4+'
+}
+
+distributions {
+  main {
+    baseName = 'edu_mines_jtk_all'
   }
 }
 
