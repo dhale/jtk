@@ -1,6 +1,8 @@
+apply plugin: 'java-library-distribution'
+
 description = 'Mines Java Toolkit'
 
-apply plugin: 'java-library-distribution'
+defaultTasks 'jar'
 
 jar {
   baseName = 'edu_mines_jtk'
@@ -10,7 +12,7 @@ jar {
 }
 
 dependencies {
-  compile fileTree('../libs') // jars provided with the Mines JTK
+  compile fileTree("$rootDir/libs")
   testCompile 'junit:junit:4+'
 }
 
@@ -22,4 +24,9 @@ distributions {
 
 javadoc {
   title = project.description
+}
+
+task deps(type: Sync) {
+  from configurations.runtime
+  into "$buildDir/deps"
 }

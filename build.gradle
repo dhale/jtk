@@ -1,6 +1,8 @@
+defaultTasks ':core:jar'
+
 // for root project, as well as subprojects
 allprojects {
-  defaultTasks 'jar'
+  // nothing here, yet
 }
 
 // for subprojects only
