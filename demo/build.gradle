@@ -1,0 +1,24 @@
+description = 'Mines Java Toolkit Demo'
+
+dependencies {
+  compile project(':core')
+  compile fileTree("$rootDir/libs") // jars provided with the Mines JTK
+}
+
+task run(type: JavaExec) {
+  enableAssertions = true
+  classpath = sourceSets.main.runtimeClasspath
+  main = (
+    project.hasProperty("mainClass") ?
+    mainClass :
+    'edu.mines.jtkdemo.mosaic.PolesAndZerosDemo'
+  )
+}
+
+task runJython(type: JavaExec) {
+  enableAssertions = true
+  classpath = sourceSets.main.runtimeClasspath
+  classpath.each { println it }
+  main = 'org.python.util.jython'
+  args "src/main/jython/edu/mines/jtk/mosaic/PlotFrameDemo.py"
+}
