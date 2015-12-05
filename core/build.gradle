@@ -1,6 +1,7 @@
+description = 'Mines Java Toolkit'
+
 apply plugin: 'java-library-distribution'
 
-description = 'Mines Java Toolkit'
 archivesBaseName = 'edu_mines_jtk'
 
 dependencies {
