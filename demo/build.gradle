@@ -1,5 +1,6 @@
 description = 'Mines Java Toolkit Demos'
 
+// Demos require the Mines JTK core and Jython.
 dependencies {
   compile project(':core')
   compile 'org.python:jython-standalone:2.7.0'
