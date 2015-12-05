@@ -16,12 +16,18 @@ task run(type: JavaExec) {
     println "demo = "+demo 
     println "classpath = "; classpath.each { println it }
     if (demo.endsWith('.py')) {
+      def pref = 'jtkdemo/'
+      if (!demo.contains(pref))
+        demo = pref + demo
       demo = 'src/main/jython/' + demo
       main = 'org.python.util.jython'
       args '-Dpython.cachedir.skip=false',
            '-Dpython.cachedir=/tmp/cachedir',
            demo
     } else {
+      def pref = 'jtkdemo.'
+      if (!demo.contains(pref))
+        demo = pref + demo
       main = demo
     }
   }
