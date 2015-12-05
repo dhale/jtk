@@ -7,8 +7,6 @@ allprojects {
 
 // for subprojects only
 subprojects {
-  apply plugin: 'java'
-
   repositories {
     mavenCentral()
   }

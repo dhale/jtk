@@ -1,5 +1,7 @@
 description = 'Mines Java Toolkit Demos'
 
+apply plugin: 'java'
+
 // Demos require the Mines JTK core and Jython.
 dependencies {
   compile project(':core')
