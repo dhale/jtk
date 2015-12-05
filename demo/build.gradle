@@ -1,14 +1,14 @@
 description = 'Mines Java Toolkit Demos'
 
 dependencies {
-
   compile project(':core')
-
   compile 'org.python:jython-standalone:2.7.0'
-
   compile fileTree("$rootDir/libs") // get rid of this!
 }
 
+// Runs demo Java main or Jython script. For example,
+//   gradle run -P demo=jtkdemo.mosaic.PlotFrameDemo
+//   gradle run -P demo=jtkdemo/mosaic/PlotFrameDemo.py
 task run(type: JavaExec) {
   if (project.hasProperty('demo')) {
     enableAssertions = true
@@ -17,7 +17,7 @@ task run(type: JavaExec) {
     println "classpath = "; classpath.each { println it }
     if (demo.endsWith('.py')) {
       demo = 'src/main/jython/' + demo
-      main = org.python.util.jython
+      main = 'org.python.util.jython'
       args '-Dpython.cachedir.skip=false',
            '-Dpython.cachedir=/tmp/cachedir',
            demo
