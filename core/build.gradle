@@ -1,15 +1,7 @@
 apply plugin: 'java-library-distribution'
 
 description = 'Mines Java Toolkit'
-
-defaultTasks 'jar'
-
-jar {
-  baseName = 'edu_mines_jtk'
-  manifest {
-    attributes 'Implementation-Title': project.description
-  }
-}
+archivesBaseName = 'edu_mines_jtk'
 
 dependencies {
   compile fileTree("$rootDir/libs")

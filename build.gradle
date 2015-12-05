@@ -2,7 +2,7 @@ defaultTasks ':core:jar'
 
 // for root project, as well as subprojects
 allprojects {
-  // nothing here, yet
+  version = 1.0
 }
 
 // for subprojects only
