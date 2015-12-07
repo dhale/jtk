@@ -18,11 +18,11 @@ import java.util.regex.Pattern;
  * functions in the various GL* interfaces provided by JOGL. Therefore,
  * some editing of the generated Gl.java is required.
  * <p>
- * This program will require modification if the format of JOGL's 
+ * This program will require modification if the format of JOGL's
  * javadoc-generated html files changes.
  * <p>
  * An alternative to this program would be to use reflection on the JOGL
- * class file javax.media.opengl.GL.class, but this alternative would not
+ * class file com.jogamp.opengl.GL.class, but this alternative would not
  * preserve the names of method parameters. A better alternative would be
  * for JOGL to provide these bindings.
  * @author Dave Hale, Colorado School of Mines
@@ -44,8 +44,8 @@ class MakeGl {
       "GL2GL3.html",
     };
     String outputFileName = "Gl.java";
-    HashSet<String> cs = new HashSet<String>();
-    HashSet<String> fs = new HashSet<String>();
+    HashSet<String> cs = new HashSet<>();
+    HashSet<String> fs = new HashSet<>();
     try {
       trace("MakeGl begin ...");
       BufferedWriter bw = new BufferedWriter(new FileWriter(outputFileName));
@@ -87,7 +87,7 @@ class MakeGl {
 "package edu.mines.jtk.ogl;",
 "",
 "import java.nio.*;",
-"import javax.media.opengl.*;",
+"import com.jogamp.opengl.*;",
 "import com.jogamp.common.nio.PointerBuffer;",
 "",
 "/**",
@@ -168,7 +168,7 @@ class MakeGl {
       BufferedReader br, BufferedWriter bw)
     throws IOException 
   {
-    ArrayList<String> parList = new ArrayList<String>();
+    ArrayList<String> parList = new ArrayList<>();
     for (String input=br.readLine(); input!=null; input=br.readLine()) {
       if (hasConstant(input)) {
         String conName = getConName(input);
@@ -210,7 +210,7 @@ class MakeGl {
           continue;
         }
         bw.write(output);
-        if (funType.equals("void")) {
+        if ("void".equals(funType)) {
           output = "    gl()."+funName+"(";
         } else {
           output = "    return gl()."+funName+"(";

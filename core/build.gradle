@@ -5,7 +5,9 @@ apply plugin: 'java-library-distribution'
 archivesBaseName = 'edu_mines_jtk'
 
 dependencies {
-  compile fileTree("$rootDir/libs")
+  compile 'org.jogamp.jogl:jogl-all-main:2.3.2',
+          'org.jogamp.gluegen:gluegen-rt-main:2.3.2',
+          'com.googlecode.netlib-java:netlib-java:0.9.3'
   testCompile 'junit:junit:4+'
 }
 

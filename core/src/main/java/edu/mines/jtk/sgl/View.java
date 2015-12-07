@@ -20,29 +20,29 @@ import java.util.Iterator;
 /**
  * An abstract view of a world.
  * <p>
- * A view draws its world on one or more view canvases. The simplest 
+ * A view draws its world on one or more view canvases. The simplest
  * and typical scenario is that a view draws on only one canvas.
  * <p>
- * A view manages a world-to-view transform, which is that part of the 
- * OpenGL modelview transform that depends on the view. A view also 
- * manages the view-to-cube and cube-to-pixel transforms of each of its 
+ * A view manages a world-to-view transform, which is that part of the
+ * OpenGL modelview transform that depends on the view. A view also
+ * manages the view-to-cube and cube-to-pixel transforms of each of its
  * view canvases, as necessary.
  * <p>
  * All three transforms - world-to-view, view-to-cube, and cube-to-pixel -
  * are view-dependent. Because the latter two transforms may vary among
- * the multiple view canvases on which a view draws, those transforms 
+ * the multiple view canvases on which a view draws, those transforms
  * are stored with each view canvas. Nevertheless, the view updates the
- * view-to-cube and cube-to-pixel transforms for each view canvas on which 
+ * view-to-cube and cube-to-pixel transforms for each view canvas on which
  * it draws.
  * <p>
  * Some aspects of the world-to-view transform are common to all classes of
- * views. These include an initial translation, scaling, and rotation of the 
- * world coordinate system. Typically, these initial transforms are followed 
- * by other view-specific transforms, but all classes of views provide at 
+ * views. These include an initial translation, scaling, and rotation of the
+ * world coordinate system. Typically, these initial transforms are followed
+ * by other view-specific transforms, but all classes of views provide at
  * least these aspects.
  * <p>
- * Classes that extend this abstract base class must implement two methods: 
- * {@link #updateTransforms(ViewCanvas)} and {@link #draw(ViewCanvas)}. The 
+ * Classes that extend this abstract base class must implement two methods:
+ * {@link #updateTransforms(ViewCanvas)} and {@link #draw(ViewCanvas)}. The
  * method {@link #updateTransforms(ViewCanvas)} is called to update the
  * three view-dependent transforms for a specified view canvas. The method
  * {@link #draw(ViewCanvas)} is called to draw the view on a specified view
@@ -148,7 +148,7 @@ public abstract class View {
 
   /**
    * Updates transforms for this view and all canvases on which it draws.
-   * This method should be called when the world drawn by this view changes, 
+   * This method should be called when the world drawn by this view changes,
    * when the view parameters change, and when any canvas on which this view
    * draws changes.
    */
@@ -158,8 +158,8 @@ public abstract class View {
   }
 
   /**
-   * Repaints all canvases on which this view draws. This method should be 
-   * called when this view must redraw its world, for example, when that 
+   * Repaints all canvases on which this view draws. This method should be
+   * called when this view must redraw its world, for example, when that
    * world changes, or when a canvas on which this view draws changes.
    */
   public void repaint() {
@@ -172,7 +172,7 @@ public abstract class View {
   // protected
 
   /**
-   * Updates the transforms for a canvas on which this view draws. 
+   * Updates the transforms for a canvas on which this view draws.
    * The view-to-cube and cube-to-pixel transforms are canvas-specific.
    * @param canvas the view canvas.
    */

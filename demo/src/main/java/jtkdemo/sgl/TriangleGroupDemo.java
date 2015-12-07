@@ -15,6 +15,7 @@ limitations under the License.
 package jtkdemo.sgl;
 
 import java.awt.*;
+import javax.swing.*;
 
 import edu.mines.jtk.sgl.*;
 import static edu.mines.jtk.ogl.Gl.*;
@@ -27,6 +28,14 @@ import static edu.mines.jtk.ogl.Gl.*;
 public class TriangleGroupDemo {
 
   public static void main(String[] args) {
+    SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          go(args);
+        }
+      });
+  }
+
+  public static void go(String[] args) {
     float[] xyz = makeSineWave();
     xyz = addBulge(xyz);
     xyz = addTear(xyz);
@@ -113,15 +122,15 @@ public class TriangleGroupDemo {
     float[] t = new float[n];
     int nt = n/9;
     for (int it=0,i=0,j=0; it<nt; ++it) {
-      float xa = xyz[i++];  
-      float ya = xyz[i++];  
-      float za = xyz[i++];  
-      float xb = xyz[i++];  
-      float yb = xyz[i++];  
-      float zb = xyz[i++];  
-      float xc = xyz[i++];  
-      float yc = xyz[i++];  
-      float zc = xyz[i++];  
+      float xa = xyz[i++];
+      float ya = xyz[i++];
+      float za = xyz[i++];
+      float xb = xyz[i++];
+      float yb = xyz[i++];
+      float zb = xyz[i++];
+      float xc = xyz[i++];
+      float yc = xyz[i++];
+      float zc = xyz[i++];
       float x = 0.333333f*(xa+xb+xc);
       if (x>5.0f) {
         za += exp(xa,ya);

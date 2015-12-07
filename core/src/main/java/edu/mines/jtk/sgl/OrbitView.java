@@ -22,42 +22,42 @@ import edu.mines.jtk.util.Stopwatch;
 
 /**
  * A view of a world, as if in orbit around that world.
- * By default, the view camera is aimed towards the world, from a point 
- * outside the world's sphere. The camera's up axis is always aligned 
+ * By default, the view camera is aimed towards the world, from a point
+ * outside the world's sphere. The camera's up axis is always aligned
  * with lines of constant longitude. An orbit view is designed to draw
  * on a single view canvas.
  * <p>
- * All views maintain a world-to-view transform. In an orbit view, that 
- * world-to-view transform is comprised of a world-to-unit-sphere 
+ * All views maintain a world-to-view transform. In an orbit view, that
+ * world-to-view transform is comprised of a world-to-unit-sphere
  * transform and a unit-sphere-to-view transform.
  * <p>
- * The world-to-unit-sphere transform centers and normalizes the world. 
- * A world drawn by an orbit view has a world sphere that, by default, is 
+ * The world-to-unit-sphere transform centers and normalizes the world.
+ * A world drawn by an orbit view has a world sphere that, by default, is
  * the bounding sphere of the world when first viewed. The world-to-unit-
- * sphere transform first translates the world sphere's center to the origin, 
- * and then scales the world sphere to have unit radius. The purpose of this 
- * first transform is to make other orbit view parameters independent 
- * of world coordinates. To modify the world-to-unit-sphere transform, 
+ * sphere transform first translates the world sphere's center to the origin,
+ * and then scales the world sphere to have unit radius. The purpose of this
+ * first transform is to make other orbit view parameters independent
+ * of world coordinates. To modify the world-to-unit-sphere transform,
  * set the world sphere.
  * <p>
- * The second unit-sphere-to-view transform applies a translate, scale, 
- * and rotate to the unit sphere, and then applies a final translate 
+ * The second unit-sphere-to-view transform applies a translate, scale,
+ * and rotate to the unit sphere, and then applies a final translate
  * down the z-axis to push the transformed sphere into the view frustum.
  * The orbit view applies the first translate, scale, and rotate in that
  * order, so that the scale and rotate occurs about the center of
  * the view.
  * <p>
  * The rotate part of the unit-sphere-to-view transform is comprised of
- * two rotations, because an orbit view camera has both azimuth and 
- * elevation angles. Imagine a line from the center of the unit sphere 
- * to the camera. The point where that line intersects the sphere has a 
- * latitude and longitude. The azimuth angle is the longitude, positive 
- * for degrees East, negative for degrees West. The elevation angle is 
+ * two rotations, because an orbit view camera has both azimuth and
+ * elevation angles. Imagine a line from the center of the unit sphere
+ * to the camera. The point where that line intersects the sphere has a
+ * latitude and longitude. The azimuth angle is the longitude, positive
+ * for degrees East, negative for degrees West. The elevation angle is
  * the latitude, positive for degrees North, negative for degrees South.
  * <p>
  * An orbit view supports both perspective and orthographic projections.
- * For perspective projections, the field of view is computed by assuming 
- * that the distance from the eye to the default screen is approximately 
+ * For perspective projections, the field of view is computed by assuming
+ * that the distance from the eye to the default screen is approximately
  * equal to the size of that screen.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.29

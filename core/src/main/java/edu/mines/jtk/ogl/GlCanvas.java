@@ -16,9 +16,11 @@ package edu.mines.jtk.ogl;
 
 import java.awt.*;
 import java.io.File;
-import javax.media.opengl.*;
-import javax.media.opengl.awt.*;
+
+
+import com.jogamp.opengl.awt.*;
 import com.jogamp.opengl.util.GLReadBufferUtil;
+import com.jogamp.opengl.*;
 //import com.jogamp.opengl.util.awt.Screenshot; // deprecated
 
 /**
@@ -30,13 +32,13 @@ import com.jogamp.opengl.util.GLReadBufferUtil;
  * @version 2006.07.08
  */
 public class GlCanvas extends GLCanvas implements GLEventListener {
-//public class GlCanvas extends GLJPanel implements GLEventListener {
+ //public class GlCanvas extends GLJPanel implements GLEventListener {
 // If GLCanvas does not work (e.g., in JOGL2 RC9 on Mac OS X 10.8),
 // we may have more luck extending GLJPanel instead of GLCanvas.
 // GLJPanel now does not work correctly with ImagePanelGroup.
 
   private static final long serialVersionUID = 1L;
-    
+
   /**
    * Constructs a canvas with default capabilities.
    */

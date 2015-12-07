@@ -15,8 +15,8 @@ limitations under the License.
 package jtkdemo.ogl;
 
 import java.awt.*;
-import javax.media.opengl.*;
-import javax.media.opengl.awt.*;
+import com.jogamp.opengl.*;
+import com.jogamp.opengl.awt.*;
 import javax.swing.*;
 
 /**
@@ -70,7 +70,7 @@ public class JoglDemo {
     frame.setSize(500,500);
     frame.setLocationRelativeTo(null);
     frame.getContentPane().add(component,BorderLayout.CENTER);
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     frame.setVisible(true);
   }
   public static void main(String[] args) {

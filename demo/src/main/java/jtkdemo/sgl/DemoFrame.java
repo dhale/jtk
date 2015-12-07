@@ -75,10 +75,10 @@ class DemoFrame extends JFrame {
     ovm.setActive(true);
 
     this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    this.setSize(new Dimension(SIZE,SIZE));
     this.add(_canvas,BorderLayout.CENTER);
     this.add(toolBar,BorderLayout.WEST);
     this.setJMenuBar(menuBar);
+    this.setSize(new Dimension(SIZE,SIZE));
 
     _view = view;
   }
