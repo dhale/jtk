@@ -98,15 +98,15 @@ public class SimpleFrameDemo {
     float[] t = new float[n];
     int nt = n/9;
     for (int it=0,i=0,j=0; it<nt; ++it) {
-      float xa = xyz[i++];  
-      float ya = xyz[i++];  
-      float za = xyz[i++];  
-      float xb = xyz[i++];  
-      float yb = xyz[i++];  
-      float zb = xyz[i++];  
-      float xc = xyz[i++];  
-      float yc = xyz[i++];  
-      float zc = xyz[i++];  
+      float xa = xyz[i++];
+      float ya = xyz[i++];
+      float za = xyz[i++];
+      float xb = xyz[i++];
+      float yb = xyz[i++];
+      float zb = xyz[i++];
+      float xc = xyz[i++];
+      float yc = xyz[i++];
+      float zc = xyz[i++];
       float x = 0.333333f*(xa+xb+xc);
       if (x>5.0f) {
         za += exp(xa,ya);

@@ -12,7 +12,6 @@ testClasses.enabled = false
 dependencies {
   compile project(':core')
   compile 'org.python:jython-standalone:2.7.0'
-  //compile fileTree("$rootDir/libs") // get rid of this!
 }
 
 // Runs a demo Java main or Jython script. For example,
@@ -22,8 +21,8 @@ task run(type: JavaExec) {
   if (project.hasProperty('demo')) {
     enableAssertions = true
     classpath = sourceSets.main.runtimeClasspath
-    println "demo = "+demo 
-    println "classpath = "; classpath.each { println it }
+    //println "demo = "+demo // useful only for debugging
+    //println "classpath = "; classpath.each { println it }
     if (demo.endsWith('.py')) {
       def pref = 'jtkdemo/'
       if (!demo.contains(pref))
