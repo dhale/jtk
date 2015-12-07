@@ -12,18 +12,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.sgl;
+package jtkdemo.sgl;
 
 import java.awt.*;
 
+import edu.mines.jtk.sgl.*;
 import static edu.mines.jtk.ogl.Gl.*;
 
 /**
- * Tests {@link edu.mines.jtk.sgl.QuadGroup}.
+ * Demos {@link edu.mines.jtk.sgl.QuadGroup}.
  * @author Dave Hale
  * @version 2011.12.05
  */
-public class QuadGroupTest {
+public class QuadGroupDemo {
 
   public static void main(String[] args) {
     float[] xyz = makeSineWave();
@@ -53,7 +54,7 @@ public class QuadGroupTest {
     World world = new World();
     world.addChild(tg);
 
-    TestFrame frame = new TestFrame(world);
+    DemoFrame frame = new DemoFrame(world);
     OrbitView view = frame.getOrbitView();
     view.setWorldSphere(new BoundingSphere(5,5,5,5));
     frame.setSize(new Dimension(800,600));

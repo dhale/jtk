@@ -12,23 +12,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.mosaic;
+package jtkdemo.mosaic;
 
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
 import edu.mines.jtk.awt.ColorMap;
+import edu.mines.jtk.mosaic.*;
 
 /**
- * Tests {@link edu.mines.jtk.mosaic.ContoursView}
+ * Demos {@link edu.mines.jtk.mosaic.ContoursView}
  * @author Chris Engelsma, Colorado School of Mines
  * @version 2009.07.17
  */
 @SuppressWarnings({"rawtypes","unchecked"}) 
 // Use of JComboBox below is OK in Java 6, 
 // but must be JComboBox<E> in Java 7
-public class ContoursViewTest {
+public class ContoursViewDemo {
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {

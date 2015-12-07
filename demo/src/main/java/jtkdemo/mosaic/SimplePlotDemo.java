@@ -12,19 +12,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  ****************************************************************************/
-package edu.mines.jtk.mosaic;
+package jtkdemo.mosaic;
 
 import javax.swing.*;
 
 import edu.mines.jtk.dsp.Sampling;
+import edu.mines.jtk.mosaic.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * Tests {@link edu.mines.jtk.mosaic.SimplePlot}
+ * Demos {@link edu.mines.jtk.mosaic.SimplePlot}
  * @author Dave Hale, Colorado School of Mines
  * @version 2006.12.26
  */
-public class SimplePlotTest {
+public class SimplePlotDemo {
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {

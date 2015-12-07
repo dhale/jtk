@@ -12,20 +12,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.sgl;
+package jtkdemo.sgl;
 
 import edu.mines.jtk.dsp.Sampling;
-import edu.mines.jtk.util.Float3;
-import static edu.mines.jtk.util.MathPlus.FLT_PI;
-import static edu.mines.jtk.util.MathPlus.sin;
-import edu.mines.jtk.util.SimpleFloat3;
+import edu.mines.jtk.util.*;
+import edu.mines.jtk.sgl.*;
+import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * Tests {@link edu.mines.jtk.sgl.AxisAlignedQuad}.
+ * Demos {@link edu.mines.jtk.sgl.AxisAlignedQuad}.
  * @author Dave Hale
  * @version 2006.06.29
  */
-public class AxisAlignedQuadTest {
+public class AxisAlignedQuadDemo {
 
   public static void main(String[] args) {
     int nx = 101;
@@ -68,7 +67,7 @@ public class AxisAlignedQuadTest {
     World world = new World();
     world.addChild(aaq);
 
-    TestFrame frame = new TestFrame(world);
+    DemoFrame frame = new DemoFrame(world);
     frame.setVisible(true);
   }
 }

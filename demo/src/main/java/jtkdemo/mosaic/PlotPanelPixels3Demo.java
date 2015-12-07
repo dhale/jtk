@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.mosaic;
+package jtkdemo.mosaic;
 
 import java.awt.*;
 import static java.lang.Math.max;
@@ -20,25 +20,26 @@ import javax.swing.*;
 
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.dsp.Sampling;
+import edu.mines.jtk.mosaic.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * Tests {@link edu.mines.jtk.mosaic.PlotPanelPixels3}
+ * Demos {@link edu.mines.jtk.mosaic.PlotPanelPixels3}
  * @author Dave Hale, Colorado School of Mines
  * @version 2007.08.11
  */
-public class PlotPanelPixels3Test {
+public class PlotPanelPixels3Demo {
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        test1();
-        test2();
+        demo1();
+        demo2();
       }
     });
   }
 
-  private static void test1() {
+  private static void demo1() {
     int n1 = 11;
     int n2 = 17;
     int n3 = 13;
@@ -77,7 +78,7 @@ public class PlotPanelPixels3Test {
     //frame.paintToPng(300,6,"junk.png");
   }
 
-  private static void test2() {
+  private static void demo2() {
     int n1 = 11;
     int n2 = 17;
     int n3 = 13;

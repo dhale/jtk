@@ -12,20 +12,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.mosaic;
+package jtkdemo.mosaic;
 
 import javax.swing.*;
 
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.dsp.Sampling;
+import edu.mines.jtk.mosaic.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * Tests {@link edu.mines.jtk.mosaic.PlotFrame}
+ * Demos {@link edu.mines.jtk.mosaic.PlotFrame}
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.12.25
  */
-public class PlotFrameTest {
+public class PlotFrameDemo2 {
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {

@@ -12,36 +12,37 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.sgl;
+package jtkdemo.sgl;
 
 import java.awt.*;
 
 import edu.mines.jtk.la.*;
+import edu.mines.jtk.sgl.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * Tests {@link edu.mines.jtk.sgl.EllipsoidGlyph}.
+ * Demos {@link edu.mines.jtk.sgl.EllipsoidGlyph}.
  * @author Dave Hale
  * @version 2009.08.10
  */
-public class EllipsoidGlyphTest {
+public class EllipsoidGlyphDemo {
 
   public static void main(String[] args) {
-    test0();
-    test1();
-    test2();
+    demo0();
+    demo1();
+    demo2();
   }
 
-  public static void test0() {
+  public static void demo0() {
     show(new OneEllipsoid(1.0f));
     show(new OneEllipsoid(0.3f));
     show(new OneEllipsoid(0.1f));
   }
-  public static void test1() {
+  public static void demo1() {
     show(new EightEllipsoidsInCube());
   }
 
-  public static void test2() {
+  public static void demo2() {
     show(new RandomEllipsoidsOnGrid());
   }
 

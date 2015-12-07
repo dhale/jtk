@@ -12,19 +12,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.mosaic;
+package jtkdemo.mosaic;
 
 import java.awt.*;
 import java.io.IOException;
 import static java.lang.Math.*;
 import javax.swing.*;
 
+import edu.mines.jtk.mosaic.*;
+
 /**
- * Test {@link edu.mines.jtk.mosaic.IPanel}.
+ * Demo {@link edu.mines.jtk.mosaic.IPanel}.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.12.20
  */
-public class IPanelTest {
+public class IPanelDemo {
 
   static class Title extends IPanel {
     private static final long serialVersionUID = 1L;

@@ -12,27 +12,28 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.sgl;
+package jtkdemo.sgl;
 
 import java.awt.*;
 
 import edu.mines.jtk.dsp.*;
+import edu.mines.jtk.sgl.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * Tests {@link edu.mines.jtk.sgl.TensorsPanel}.
+ * Demos {@link edu.mines.jtk.sgl.TensorsPanel}.
  * @author Dave Hale
  * @version 2013.11.20
  */
-public class TensorsPanelTest {
+public class TensorsPanelDemo {
 
   public static void main(String[] args) {
-    test1();
-    test2();
-    test3();
+    demo1();
+    demo2();
+    demo3();
   }
 
-  public static void test1() {
+  public static void demo1() {
     int n1 = 1;
     int n2 = 111;
     int n3 = 111;
@@ -59,7 +60,7 @@ public class TensorsPanelTest {
     show(aaq);
   }
 
-  public static void test2() {
+  public static void demo2() {
     int n1 = 111;
     int n2 = 1;
     int n3 = 111;
@@ -86,7 +87,7 @@ public class TensorsPanelTest {
     show(aaq);
   }
 
-  public static void test3() {
+  public static void demo3() {
     int n1 = 111;
     int n2 = 111;
     int n3 = 1;

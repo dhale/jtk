@@ -12,32 +12,33 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.mosaic;
+package jtkdemo.mosaic;
 
 import static java.lang.Math.max;
 import javax.swing.*;
 
 import edu.mines.jtk.awt.ColorMap;
 import edu.mines.jtk.dsp.Sampling;
+import edu.mines.jtk.mosaic.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * Tests {@link edu.mines.jtk.mosaic.PixelsView}
+ * Demos {@link edu.mines.jtk.mosaic.PixelsView}
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.10.04
  */
-public class PixelsViewTest {
+public class PixelsViewDemo {
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        test1();
-        test2();
+        demo1();
+        demo2();
       }
     });
   }
 
-  private static void test1() {
+  private static void demo1() {
     int n1 = 11;
     int n2 = 11;
     float d1 = 1.0f/(float)max(1,n1-1);
@@ -78,7 +79,7 @@ public class PixelsViewTest {
     //frame.paintToPng(300,6,"junk.png");
   }
 
-  private static void test2() {
+  private static void demo2() {
     int n1 = 11;
     int n2 = 11;
     float d1 = 1.0f/(float)max(1,n1-1);

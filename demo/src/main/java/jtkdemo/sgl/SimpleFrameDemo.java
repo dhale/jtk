@@ -12,17 +12,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.sgl;
+package jtkdemo.sgl;
 
 import java.awt.Color;
 import javax.swing.SwingUtilities;
 
+import edu.mines.jtk.sgl.*;
+
 /**
- * Tests {@link edu.mines.jtk.sgl.SimpleFrame}.
+ * Demos {@link edu.mines.jtk.sgl.SimpleFrame}.
  * @author Chris Engelsma, Colorado School of Mines.
  * @version 2009.07.20
  */
-public class SimpleFrameTest {
+public class SimpleFrameDemo {
 
   public static void main(final String[] args) {
     SwingUtilities.invokeLater(new Runnable() {

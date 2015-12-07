@@ -12,23 +12,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.sgl;
+package jtkdemo.sgl;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import javax.swing.*;
 
 import edu.mines.jtk.awt.*;
+import edu.mines.jtk.sgl.*;
 
 /**
- * A frame for testing the package {@link edu.mines.jtk.sgl}.
+ * A frame for demoing the package {@link edu.mines.jtk.sgl}.
  * @author Dave Hale
  * @version 2006.06.28
  */
-class TestFrame extends JFrame {
+class DemoFrame extends JFrame {
   private static final long serialVersionUID = 1L;
 
-  public TestFrame(World world) {
+  public DemoFrame(World world) {
     OrbitView view = (world!=null)?new OrbitView(world):new OrbitView();
     view.setAxesOrientation(AxesOrientation.XRIGHT_YOUT_ZDOWN);
     _canvas = new ViewCanvas(view);
@@ -91,7 +92,7 @@ class TestFrame extends JFrame {
   }
 
   public static void main(String[] args) {
-    TestFrame frame = new TestFrame(null);
+    DemoFrame frame = new DemoFrame(null);
     frame.setVisible(true);
   }
 

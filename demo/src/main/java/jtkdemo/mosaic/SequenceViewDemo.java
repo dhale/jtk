@@ -1,5 +1,5 @@
 /****************************************************************************
-Copyright 2009, Colorado School of Mines and others.
+Copyright 2004, Colorado School of Mines and others.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -12,43 +12,49 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.mosaic;
+package jtkdemo.mosaic;
 
-import javax.swing.*;
+import java.awt.*;
+import javax.swing.SwingUtilities;
 
+import edu.mines.jtk.dsp.Sampling;
+import edu.mines.jtk.mosaic.*;
 import static edu.mines.jtk.util.ArrayMath.*;
 
 /**
- * Tests {@link edu.mines.jtk.mosaic.PointsView}
+ * Demo {@link edu.mines.jtk.mosaic.SequenceView} and associates.
  * @author Dave Hale, Colorado School of Mines
- * @version 2009.01.19
+ * @version 2005.01.01
  */
-public class PointsViewTest {
+public class SequenceViewDemo {
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        test1();
+        go();
       }
     });
   }
+  private static void go() {
+    int nx = 101;
+    float dx = 0.1f;
+    float fx = -0.5f*dx*(float)(nx-1);
+    Sampling sx = new Sampling(nx,dx,fx);
+    float[] f1 = rampfloat(fx,dx,nx);
+    float[] f2 = add(0.5f,sin(f1));
 
-  private static void test1() {
-    int n = 50;
-    float[] x1 = randfloat(n);
-    float[] x2 = randfloat(n);
-    float[] x3 = randfloat(n);
+    PlotPanel panel = new PlotPanel(2,1);
 
-    PlotPanel panel = new PlotPanel(1,1);
-    panel.setLimits(-0.1,-0.1,1.1,1.1);
-    PointsView pv = panel.addPoints(x1,x2,x3);
-    pv.setLineStyle(PointsView.Line.NONE);
-    pv.setMarkStyle(PointsView.Mark.FILLED_CIRCLE);
-    pv.setTextFormat("%4.2f");
+    SequenceView sv1 = panel.addSequence(0,0,sx,f1);
+    sv1.setColor(Color.RED);
+
+    SequenceView sv2 = panel.addSequence(1,0,sx,f2);
+    sv2.setZero(SequenceView.Zero.MIDDLE);
+    
     PlotFrame frame = new PlotFrame(panel);
-    frame.setSize(800,800);
     frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
+    frame.setSize(950,500);
     frame.setVisible(true);
-    //frame.paintToPng(300,6,"junk.png");
+    frame.paintToPng(300,6,"junk.png");
   }
 }

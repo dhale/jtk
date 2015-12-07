@@ -12,19 +12,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.mosaic;
+package jtkdemo.mosaic;
 
 import java.awt.*;
 import java.util.EnumSet;
 import java.util.Set;
 import javax.swing.*;
 
+import edu.mines.jtk.mosaic.*;
+
 /**
- * Test {@link edu.mines.jtk.mosaic.Mosaic} and associates.
+ * Demo {@link edu.mines.jtk.mosaic.Mosaic} and associates.
  * @author Dave Hale, Colorado School of Mines
  * @version 2004.12.27
  */
-public class MosaicTest {
+public class MosaicDemo {
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {

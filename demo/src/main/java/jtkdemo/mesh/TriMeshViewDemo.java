@@ -12,30 +12,31 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.mesh;
+package jtkdemo.mesh;
 
 import java.awt.*;
 import javax.swing.*;
 
+import edu.mines.jtk.mesh.*;
 import edu.mines.jtk.mosaic.*;
 
 
 /**
- * Tests {@link edu.mines.jtk.mesh.TriMeshView}.
+ * Demos {@link edu.mines.jtk.mesh.TriMeshView}.
  * @author Dave Hale, Colorado School of Mines
  * @version 2008.09.11
  */
-public class TriMeshViewTest {
+public class TriMeshViewDemo {
 
   public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        testSquare();
+        demoSquare();
       }
     });
   }
 
-  public static void testSquare() {
+  public static void demoSquare() {
     TriMesh tm = new TriMesh();
     TriMesh.Node n0 = new TriMesh.Node(0.0f,0.0f);
     TriMesh.Node n1 = new TriMesh.Node(1.0f,0.0f);

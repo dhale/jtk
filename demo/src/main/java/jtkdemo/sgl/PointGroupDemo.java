@@ -12,19 +12,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.sgl;
+package jtkdemo.sgl;
 
 import java.awt.*;
 
-import static edu.mines.jtk.ogl.Gl.GL_AMBIENT_AND_DIFFUSE;
-//import edu.mines.jtk.util.Stopwatch;
+import edu.mines.jtk.sgl.*;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
- * Tests {@link edu.mines.jtk.sgl.PointGroup}.
+ * Demos {@link edu.mines.jtk.sgl.PointGroup}.
  * @author Dave Hale
  * @version 2009.01.13
  */
-public class PointGroupTest {
+public class PointGroupDemo {
 
   public static void main(String[] args) {
     float[] xyz = makeSineWave();
@@ -64,7 +64,7 @@ public class PointGroupTest {
     World world = new World();
     world.addChild(pg);
 
-    TestFrame frame = new TestFrame(world);
+    DemoFrame frame = new DemoFrame(world);
     OrbitView view = frame.getOrbitView();
     view.setWorldSphere(new BoundingSphere(5,5,5,5));
     frame.setSize(new Dimension(800,600));

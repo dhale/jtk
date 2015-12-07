@@ -9,9 +9,9 @@ dependencies {
   compile fileTree("$rootDir/libs") // get rid of this!
 }
 
-// Runs demo Java main or Jython script. For example,
-//   gradle run -P demo=jtkdemo.mosaic.PlotFrameDemo
-//   gradle run -P demo=jtkdemo/mosaic/PlotFrameDemo.py
+// Runs a demo Java main or Jython script. For example,
+//   gradle run -P demo=mosaic.PlotFrameDemo
+//   gradle run -P demo=mosaic/PlotFrameDemo.py
 task run(type: JavaExec) {
   if (project.hasProperty('demo')) {
     enableAssertions = true

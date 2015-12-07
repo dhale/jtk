@@ -12,20 +12,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ****************************************************************************/
-package edu.mines.jtk.sgl;
+package jtkdemo.sgl;
 
 import java.awt.*;
 import java.nio.FloatBuffer;
 
-import static edu.mines.jtk.ogl.Gl.*;
+import edu.mines.jtk.sgl.*;
 import edu.mines.jtk.util.Direct;
+import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * A simple cube with colored sides.
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.05.27
  */
-public class ColorCubeTest extends Node implements Selectable {
+public class ColorCubeDemo extends Node implements Selectable {
 
   public void pick(PickContext pc) {
     Segment ps = pc.getPickSegment();
@@ -55,7 +56,7 @@ public class ColorCubeTest extends Node implements Selectable {
   // protected
 
   protected void selectedChanged() {
-    System.out.println("ColorCubeTest: "+this+" selected="+isSelected());
+    System.out.println("ColorCubeDemo: "+this+" selected="+isSelected());
     dirtyDraw();
   }
 
@@ -121,7 +122,7 @@ public class ColorCubeTest extends Node implements Selectable {
   private static FloatBuffer _cb = Direct.newFloatBuffer(_ca);
 
   ///////////////////////////////////////////////////////////////////////////
-  // testing
+  // demoing
 
   public static void main(String[] args) {
     StateSet states = new StateSet();
@@ -131,8 +132,8 @@ public class ColorCubeTest extends Node implements Selectable {
     ms.setShininessFront(100.0f);
     states.add(ms);
 
-    ColorCubeTest cc1 = new ColorCubeTest();
-    ColorCubeTest cc2 = new ColorCubeTest();
+    ColorCubeDemo cc1 = new ColorCubeDemo();
+    ColorCubeDemo cc2 = new ColorCubeDemo();
     cc1.setStates(states);
     cc2.setStates(states);
 
@@ -145,7 +146,7 @@ public class ColorCubeTest extends Node implements Selectable {
     world.addChild(tg1);
     world.addChild(tg2);
 
-    TestFrame frame = new TestFrame(world);
+    DemoFrame frame = new DemoFrame(world);
     frame.setVisible(true);
   }
 }
