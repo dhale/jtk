@@ -395,9 +395,10 @@ public class OrbitView extends View {
     if (world==null)
       return;
 
-    // Viewport (cube-to-pixel) transform.
-    int w = canvas.getWidth();
-    int h = canvas.getHeight();
+    // Viewport (cube-to-pixel) transform. Here we must use the native surface
+    // width and height, consistent with handling of HI-DPI displays in Java 8.
+    int w = canvas.getSurfaceWidth(); // not getWidth()!
+    int h = canvas.getSurfaceHeight(); // not getHeight()!
     glViewport(0,0,w,h);
 
     // Projection (view-to-cube) transform.
