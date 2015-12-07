@@ -140,9 +140,7 @@ public class ViewCanvas extends GlCanvas {
       _view.draw(this);
   }
 
-  public void glResize(
-    int width, int height, int widthBefore, int heightBefore)
-  {
+  public void glResize(int x, int y, int width, int height) {
     if (_view!=null)
       _view.updateTransforms(this);
   }
