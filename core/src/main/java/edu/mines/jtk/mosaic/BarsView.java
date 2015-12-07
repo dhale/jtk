@@ -286,7 +286,7 @@ public class BarsView extends TiledView {
   /**
    * Sets the bar width.
    * The default width will be 1, or fully expanded bars.
-   * @param style the bar width in range [0.0 - 1.0]
+   * @param width the bar width in range [0.0 - 1.0]
    */ 
   public void setBarWidth(float width) {
     _barWidth = width;
@@ -334,7 +334,7 @@ public class BarsView extends TiledView {
   /**
    * Sets a color map for a specific bar set.
    * @param i index of a bar set.
-   * @param colorModel a color model.
+   * @param colorMap a color map.
    */
   public void setColorMap(int i, ColorMap colorMap) {
     _colorMaps[i] = colorMap;

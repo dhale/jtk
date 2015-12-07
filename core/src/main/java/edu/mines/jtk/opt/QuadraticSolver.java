@@ -48,7 +48,7 @@ import java.util.logging.Logger;
  * beta = p'H A g / p'H p = p'q/p'u
  * }
  * </pre>
- * <p/>
+ * <p></p>
  * Also contains a solver for a least-squares inverse of a linear
  * transform, using QuadraticTransform as a wrapper.
  *

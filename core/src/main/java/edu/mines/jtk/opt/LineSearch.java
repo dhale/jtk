@@ -25,12 +25,12 @@ import static edu.mines.jtk.util.MathPlus.*;
  * vector and the function's gradient) to find a step s that minimizes the
  * function along the line constraining the search. The search assumes that
  * f'(0) &lt; 0, and searches for a positive s that minimizes f(s).
- * <p/>
+ *
  * This implementation uses Mor'e and Thuente's algorithm with guaranteed
  * sufficient decrease. It iteratively searches for a step s that at each
  * iteration satisfies both a sufficient-decrease condition and a curvature
  * condition.
- * <p/>
+ *
  * The sufficient decrease condition (1) is
  * <pre>
  *   f(s) &lt;= f(0) + ftol*f'(0)*s,
@@ -40,7 +40,7 @@ import static edu.mines.jtk.util.MathPlus.*;
  *   abs(f'(s)) &lt;= gtol*abs(f'(0)),
  * </pre>
  * for specified non-negative tolerances ftol and gtol.
- * <p/>
+ *
  * Condition (1) ensures a sufficient decrease in the function f(s),
  * provided that s is not too small. Condition (2) ensures that s is not
  * too small, and usually guarantees that s is near a local minimizer of
@@ -49,14 +49,14 @@ import static edu.mines.jtk.util.MathPlus.*;
  *   f'(s) - f'(0) &gt; (1-gtol)*abs(f'(0)),
  * </pre>
  * so that the average curvature of f on the interval (0,s) is positive.
- * <p/>
+ *
  * The curvature condition (2) is especially important in a quasi-Newton
  * method for function minimization, because it guarantees that a
  * positive-definite quasi-Newton update is possible. If ftol is less than
  * gtol and the function f(s) is bounded below, then there exists a step s
  * that satisfies both conditions. If such a step cannot be found, then
  * only the first sufficient-decrease condition (1) is satisfied.
- * <p/>
+ *
  * Mor'e and Thuente's algorithm initially choses an interval [sa,sb] that
  * contains a minimizer of a modified function
  * <pre>
@@ -64,11 +64,11 @@ import static edu.mines.jtk.util.MathPlus.*;
  * </pre>
  * If h(s) &lt;= 0 and f'(s) &gt;= 0 for some step s, then the interval
  * [a,b] is chosen so that it contains a minimizer of f.
- * <p/>
+ * 
  * If no step can be found that satisfies both conditions, then the
  * algorithm ends unconverged. In this case the step s satisifies only
  * the sufficient-decrease condition.
- * <p/>
+ * 
  * References:
  * <ul><li>
  * Mor'e, J.J., and Thuente, D.J., 1992, Line search algorithms with

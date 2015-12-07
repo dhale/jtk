@@ -46,6 +46,12 @@ public final class Geometry {
    * Determines if a point c is left of the line defined by the
    * points a and b. This is equivalent to determining whether the
    * points a, b, and c are in counter-clockwise (CCW) order.
+   * @param xa x coordinate of point a.
+   * @param ya y coordinate of point a.
+   * @param xb x coordinate of point b.
+   * @param yb y coordinate of point b.
+   * @param xc x coordinate of point c.
+   * @param yc y coordinate of point c.
    * @return positive, if left of line; 
    *         negative, if right of line;
    *         zero, otherwise.
@@ -85,6 +91,9 @@ public final class Geometry {
    * Determines if a point c is left of the line defined by the
    * points a and b. This is equivalent to determining whether the
    * points a, b, and c are in counter-clockwise (CCW) order.
+   * @param pa {x,y} coordinates of point a.
+   * @param pb {x,y} coordinates of point b.
+   * @param pc {x,y} coordinates of point c.
    * @return positive, if left of line; 
    *         negative, if right of line;
    *         zero, otherwise.
@@ -102,6 +111,9 @@ public final class Geometry {
    * Determines if a point c is left of the line defined by the
    * points a and b. This is equivalent to determining whether the
    * points a, b, and c are in counter-clockwise (CCW) order.
+   * @param pa {x,y} coordinates of point a.
+   * @param pb {x,y} coordinates of point b.
+   * @param pc {x,y} coordinates of point c.
    * @return positive, if left of line; 
    *         negative, if right of line;
    *         zero, otherwise.
@@ -121,6 +133,12 @@ public final class Geometry {
    * points a, b, and c are in counter-clockwise (CCW) order.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param xa x coordinate of point a.
+   * @param ya y coordinate of point a.
+   * @param xb x coordinate of point b.
+   * @param yb y coordinate of point b.
+   * @param xc x coordinate of point c.
+   * @param yc y coordinate of point c.
    * @return positive, if left of line; 
    *         negative, if right of line;
    *         zero, otherwise.
@@ -143,6 +161,9 @@ public final class Geometry {
    * points a, b, and c are in counter-clockwise (CCW) order.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param pa {x,y} coordinates of point a.
+   * @param pb {x,y} coordinates of point b.
+   * @param pc {x,y} coordinates of point c.
    * @return positive, if left of line; 
    *         negative, if right of line;
    *         zero, otherwise.
@@ -162,6 +183,9 @@ public final class Geometry {
    * points a, b, and c are in counter-clockwise (CCW) order.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param pa {x,y} coordinates of point a.
+   * @param pb {x,y} coordinates of point b.
+   * @param pc {x,y} coordinates of point c.
    * @return positive, if left of line; 
    *         negative, if right of line;
    *         zero, otherwise.
@@ -179,6 +203,18 @@ public final class Geometry {
    * Determines if a point d is left of the plane defined by the
    * points a, b, and c. The latter are assumed to be in CCW order,
    * as viewed from the right side of the plane.
+   * @param xa x coordinate of point a.
+   * @param ya y coordinate of point a.
+   * @param za z coordinate of point a.
+   * @param xb x coordinate of point b.
+   * @param yb y coordinate of point b.
+   * @param zb z coordinate of point b.
+   * @param xc x coordinate of point c.
+   * @param yc y coordinate of point c.
+   * @param zc z coordinate of point c.
+   * @param xd x coordinate of point d.
+   * @param yd y coordinate of point d.
+   * @param zd z coordinate of point d.
    * @return positive, if left of plane; 
    *         negative, if right of plane;
    *         zero, otherwise.
@@ -236,6 +272,10 @@ public final class Geometry {
    * Determines if a point d is left of the plane defined by the
    * points a, b, and c. The latter are assumed to be in CCW order,
    * as viewed from the right side of the plane.
+   * @param pa {x,y,z} coordinates of point a.
+   * @param pb {x,y,z} coordinates of point b.
+   * @param pc {x,y,z} coordinates of point c.
+   * @param pd {x,y,z} coordinates of point d.
    * @return positive, if left of plane; 
    *         negative, if right of plane;
    *         zero, otherwise.
@@ -254,6 +294,10 @@ public final class Geometry {
    * Determines if a point d is left of the plane defined by the
    * points a, b, and c. The latter are assumed to be in CCW order,
    * as viewed from the right side of the plane.
+   * @param pa {x,y,z} coordinates of point a.
+   * @param pb {x,y,z} coordinates of point b.
+   * @param pc {x,y,z} coordinates of point c.
+   * @param pd {x,y,z} coordinates of point d.
    * @return positive, if left of plane; 
    *         negative, if right of plane;
    *         zero, otherwise.
@@ -274,6 +318,18 @@ public final class Geometry {
    * as viewed from the right side of the plane.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param xa x coordinate of point a.
+   * @param ya y coordinate of point a.
+   * @param za z coordinate of point a.
+   * @param xb x coordinate of point b.
+   * @param yb y coordinate of point b.
+   * @param zb z coordinate of point b.
+   * @param xc x coordinate of point c.
+   * @param yc y coordinate of point c.
+   * @param zc z coordinate of point c.
+   * @param xd x coordinate of point d.
+   * @param yd y coordinate of point d.
+   * @param zd z coordinate of point d.
    * @return positive, if left of plane; 
    *         negative, if right of plane;
    *         zero, otherwise.
@@ -305,6 +361,10 @@ public final class Geometry {
    * as viewed from the right side of the plane.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param pa {x,y,z} coordinates of point a.
+   * @param pb {x,y,z} coordinates of point b.
+   * @param pc {x,y,z} coordinates of point c.
+   * @param pd {x,y,z} coordinates of point d.
    * @return positive, if left of plane; 
    *         negative, if right of plane;
    *         zero, otherwise.
@@ -325,6 +385,10 @@ public final class Geometry {
    * as viewed from the right side of the plane.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param pa {x,y,z} coordinates of point a.
+   * @param pb {x,y,z} coordinates of point b.
+   * @param pc {x,y,z} coordinates of point c.
+   * @param pd {x,y,z} coordinates of point d.
    * @return positive, if left of plane; 
    *         negative, if right of plane;
    *         zero, otherwise.
@@ -343,6 +407,14 @@ public final class Geometry {
    * Determines if a point d is inside the circle defined by the points 
    * a, b, and c. The latter are assumed to be in CCW order, such that
    * the method {@link #leftOfLine} would return a positive number.
+   * @param xa x coordinate of point a.
+   * @param ya y coordinate of point a.
+   * @param xb x coordinate of point b.
+   * @param yb y coordinate of point b.
+   * @param xc x coordinate of point c.
+   * @param yc y coordinate of point c.
+   * @param xd x coordinate of point d.
+   * @param yd y coordinate of point d.
    * @return positive, if inside the circle;
    *         negative, if outside the circle;
    *         zero, otherwise.
@@ -397,6 +469,10 @@ public final class Geometry {
    * Determines if a point d is inside the circle defined by the points 
    * a, b, and c. The latter are assumed to be in CCW order, such that
    * the method {@link #leftOfLine} would return a positive number.
+   * @param pa {x,y} coordinates of point a.
+   * @param pb {x,y} coordinates of point b.
+   * @param pc {x,y} coordinates of point c.
+   * @param pd {x,y} coordinates of point d.
    * @return positive, if inside the circle;
    *         negative, if outside the circle;
    *         zero, otherwise.
@@ -415,6 +491,10 @@ public final class Geometry {
    * Determines if a point d is inside the circle defined by the points 
    * a, b, and c. The latter are assumed to be in CCW order, such that
    * the method {@link #leftOfLine} would return a positive number.
+   * @param pa {x,y} coordinates of point a.
+   * @param pb {x,y} coordinates of point b.
+   * @param pc {x,y} coordinates of point c.
+   * @param pd {x,y} coordinates of point d.
    * @return positive, if inside the circle;
    *         negative, if outside the circle;
    *         zero, otherwise.
@@ -435,6 +515,14 @@ public final class Geometry {
    * the method {@link #leftOfLine} would return a positive number.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param xa x coordinate of point a.
+   * @param ya y coordinate of point a.
+   * @param xb x coordinate of point b.
+   * @param yb y coordinate of point b.
+   * @param xc x coordinate of point c.
+   * @param yc y coordinate of point c.
+   * @param xd x coordinate of point d.
+   * @param yd y coordinate of point d.
    * @return positive, if inside the circle;
    *         negative, if outside the circle;
    *         zero, otherwise.
@@ -468,6 +556,10 @@ public final class Geometry {
    * the method {@link #leftOfLine} would return a positive number.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param pa {x,y} coordinates of point a.
+   * @param pb {x,y} coordinates of point b.
+   * @param pc {x,y} coordinates of point c.
+   * @param pd {x,y} coordinates of point d.
    * @return positive, if inside the circle;
    *         negative, if outside the circle;
    *         zero, otherwise.
@@ -488,6 +580,10 @@ public final class Geometry {
    * the method {@link #leftOfLine} would return a positive number.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param pa {x,y} coordinates of point a.
+   * @param pb {x,y} coordinates of point b.
+   * @param pc {x,y} coordinates of point c.
+   * @param pd {x,y} coordinates of point d.
    * @return positive, if inside the circle;
    *         negative, if outside the circle;
    *         zero, otherwise.
@@ -506,6 +602,21 @@ public final class Geometry {
    * Determines if a point e is inside the sphere defined by the points 
    * a, b, c, and d. The latter are assumed to be in CCW order, such that
    * the method {@link #leftOfPlane} would return a positive number.
+   * @param xa x coordinate of point a.
+   * @param ya y coordinate of point a.
+   * @param za z coordinate of point a.
+   * @param xb x coordinate of point b.
+   * @param yb y coordinate of point b.
+   * @param zb z coordinate of point b.
+   * @param xc x coordinate of point c.
+   * @param yc y coordinate of point c.
+   * @param zc z coordinate of point c.
+   * @param xd x coordinate of point d.
+   * @param yd y coordinate of point d.
+   * @param zd z coordinate of point d.
+   * @param xe x coordinate of point e.
+   * @param ye y coordinate of point e.
+   * @param ze z coordinate of point e.
    * @return positive, if inside the sphere;
    *         negative, if outside the sphere;
    *         zero, otherwise.
@@ -606,6 +717,11 @@ public final class Geometry {
    * Determines if a point e is inside the sphere defined by the points 
    * a, b, c, and d. The latter are assumed to be in CCW order, such that
    * the method {@link #leftOfPlane} would return a positive number.
+   * @param pa {x,y,z} coordinates of point a.
+   * @param pb {x,y,z} coordinates of point b.
+   * @param pc {x,y,z} coordinates of point c.
+   * @param pd {x,y,z} coordinates of point d.
+   * @param pe {x,y,z} coordinates of point e.
    * @return positive, if inside the sphere;
    *         negative, if outside the sphere;
    *         zero, otherwise.
@@ -625,6 +741,11 @@ public final class Geometry {
    * Determines if a point e is inside the sphere defined by the points 
    * a, b, c, and d. The latter are assumed to be in CCW order, such that
    * the method {@link #leftOfPlane} would return a positive number.
+   * @param pa {x,y,z} coordinates of point a.
+   * @param pb {x,y,z} coordinates of point b.
+   * @param pc {x,y,z} coordinates of point c.
+   * @param pd {x,y,z} coordinates of point d.
+   * @param pe {x,y,z} coordinates of point e.
    * @return positive, if inside the sphere;
    *         negative, if outside the sphere;
    *         zero, otherwise.
@@ -646,6 +767,21 @@ public final class Geometry {
    * the method {@link #leftOfPlane} would return a positive number.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param xa x coordinate of point a.
+   * @param ya y coordinate of point a.
+   * @param za z coordinate of point a.
+   * @param xb x coordinate of point b.
+   * @param yb y coordinate of point b.
+   * @param zb z coordinate of point b.
+   * @param xc x coordinate of point c.
+   * @param yc y coordinate of point c.
+   * @param zc z coordinate of point c.
+   * @param xd x coordinate of point d.
+   * @param yd y coordinate of point d.
+   * @param zd z coordinate of point d.
+   * @param xe x coordinate of point e.
+   * @param ye y coordinate of point e.
+   * @param ze z coordinate of point e.
    * @return positive, if inside the sphere;
    *         negative, if outside the sphere;
    *         zero, otherwise.
@@ -697,6 +833,11 @@ public final class Geometry {
    * the method {@link #leftOfPlane} would return a positive number.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param pa {x,y,z} coordinates of point a.
+   * @param pb {x,y,z} coordinates of point b.
+   * @param pc {x,y,z} coordinates of point c.
+   * @param pd {x,y,z} coordinates of point d.
+   * @param pe {x,y,z} coordinates of point e.
    * @return positive, if inside the sphere;
    *         negative, if outside the sphere;
    *         zero, otherwise.
@@ -718,6 +859,11 @@ public final class Geometry {
    * the method {@link #leftOfPlane} would return a positive number.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param pa {x,y,z} coordinates of point a.
+   * @param pb {x,y,z} coordinates of point b.
+   * @param pc {x,y,z} coordinates of point c.
+   * @param pd {x,y,z} coordinates of point d.
+   * @param pe {x,y,z} coordinates of point e.
    * @return positive, if inside the sphere;
    *         negative, if outside the sphere;
    *         zero, otherwise.

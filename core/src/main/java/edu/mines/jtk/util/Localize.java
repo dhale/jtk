@@ -19,31 +19,31 @@ import java.util.logging.Logger;
 import java.util.regex.*;
 
 /**
- * Localize messages for end users, using a Formatter pattern and a localized resource bundle.
- * <p/>
- * 
- * <pre>
+ * Localize messages for end users, using a Formatter pattern and a
+ * localized resource bundle.
+ *
  * In a class like MyPanel.java you might have lines like this:
- * 
+ * <pre>
  * double value = 3.14;
  * String msg = "The value "+value+" is too large";
- * 
+ * </pre>
  * Instead, in the same package as MyPanel.java, create a file
  * MyPanel.properties, with this line:
- * 
+ * <pre>
  * too_large = The value %g is too large.
- * 
+ * </pre>
  * Then you can replace the original lines by this.
- * 
+ * <pre>
  * private static Localize local = new Localize(MyPanel.class);
  * ...
- * 
+ *
  * double value = 3.14;
  * String msg = local.format("too_large", value);
- * 
+ * </pre>
+ *
  * If you create an additional file called MyPanel_es.properties, then
  * that file will be used automatically in Spanish-speaking locales.
- * 
+ *
  * @author W.S. Harlan, Landmark Graphics
  */
 public class Localize {
@@ -59,9 +59,10 @@ public class Localize {
 
     /**
      * Construct for localized messages.
-     * 
-     * @param clazz Name of client class that requires localization Class<Foo> is assumed to have property files
-     *        Foo.properties, Foo_es.properties, etc. Uses default Locale.
+     *
+     * @param clazz Name of client class that requires localization
+     * Class&lt;Foo&gt; is assumed to have property files Foo.properties,
+     * Foo_es.properties, etc. Uses default Locale.
      */
     public Localize(final Class<?> clazz) {
         this(clazz, null);
@@ -69,10 +70,12 @@ public class Localize {
 
     /**
      * Construct for localized messages.
-     * 
+     *
      * @param clazz Name of client class that requires localization
-     * @param resourceBundleName Name of ResourceBundle to be used for localizing messages. If null, then Class<Foo> is
-     *        assumed to have property files Foo.properties, Foo_es.properties, etc. Uses default Locale.
+     * @param resourceBundleName Name of ResourceBundle to be used for
+     * localizing messages. If null, then Class&lt;Foo&gt; is assumed to have
+     * property files Foo.properties, Foo_es.properties, etc. Uses default
+     * Locale.
      */
     public Localize(final Class<?> clazz, final String resourceBundleName) {
         this(clazz, resourceBundleName, null);
@@ -82,9 +85,11 @@ public class Localize {
      * Construct for localized messages.
      * 
      * @param clazz Name of client class that requires localization
-     * @param resourceBundleName Name of ResourceBundle to be used for localizing messages. If null, then Class<Foo> is
-     *        assumed to have property files Foo.properties, Foo_es.properties, etc.
-     * @param locale Locale to use for localization. If null, then will use default Locale.
+     * @param resourceBundleName Name of ResourceBundle to be used for
+     * localizing messages. If null, then Class&lt;Foo&gt; is assumed to have
+     * property files Foo.properties, Foo_es.properties, etc.
+     * @param locale Locale to use for localization. If null, then will use
+     * default Locale.
      */
     public Localize(final Class<?> clazz, final String resourceBundleName, final Locale locale) {
         this.clazz = clazz;
@@ -94,9 +99,11 @@ public class Localize {
     }
 
     /**
-     * Format a localized message, with java.util.Formatter and the appropriate resource.
+     * Format a localized message, with java.util.Formatter and the appropriate
+     * resource.
      * 
-     * @param key used to specify format string in properties file. If not found, then will be used as the format.
+     * @param key used to specify format string in properties file. If not
+     * found, then will be used as the format.
      * @param args Optional arguments to be passed to Formatter.format method.
      * @return formatted localized String
      */
@@ -124,10 +131,12 @@ public class Localize {
      * Get a resource bundle associated with a class.
      * 
      * @param clazz Name of client class that requires resource bundle.
-     * @param resourceBundleName Name of ResourceBundle to be used for localizing messages. If null, then Class<Foo> is
-     *        assumed to have property files Foo.properties, Foo_es.properties, etc.
-     * @param locale Locale to use for localization. If null, then will use default Locale.
-     * @return Get ResourceBundle for this locale.
+     * @param resourceBundleName Name of ResourceBundle to be used for
+     * localizing messages. If null, then Class&lt;Foo&gt; is assumed to have
+     * property files Foo.properties, Foo_es.properties, etc.
+     * @param locale Locale to use for localization. If null, then will use
+     * default Locale.
+     * @return ResourceBundle for this locale.
      */
     public static ResourceBundle getResourceBundle(final Class<?> clazz, String resourceBundleName, Locale locale) {
 

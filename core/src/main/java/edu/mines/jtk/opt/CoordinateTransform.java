@@ -29,8 +29,8 @@ import java.util.logging.Logger;
  * out_o are output coordinates,<br>
  * i is the index of each input dimension,<br>
  * and o is the index of each output dimension.<br>
- * <p/>
- * <p> The optimum coefficients minimize this least
+ * <p></p>
+ * The optimum coefficients minimize this least
  * squares error:
  * <pre>
  * sum_oj [ sum_i ( a_io * in_ij ) - out_oj ]^2
@@ -39,18 +39,18 @@ import java.util.logging.Logger;
  * out_oj is an output array of corresponding coordinates,<br>
  * and j is the index of pairs of coordinates to be fit
  * in a least-squares sense.
- * <p/>
- * <p> Normal equations (indexed by k) are solved independently for each o:
+ * <p></p>
+ * Normal equations (indexed by k) are solved independently for each o:
  * <pre>
  * sum_ij ( in_kj * in_ij * a_io ) = sum_j ( in_kj * out_oj )
  * </pre>
  * The Hessian is <code> H = sum_j ( in_kj * in_ij ) </code>
  * and the gradient <code> b = - sum_j ( in_kj * out_oj ) </code>
- * <p/>
- * <p> The solution is undamped and may not behave as you
+ * <p></p>
+ * The solution is undamped and may not behave as you
  * want for degenerate solutions.
- * <p/>
- * <p> If the linear transform needs a translation shift,
+ * <p></p>
+ * If the linear transform needs a translation shift,
  * then include a constant as one of the input coordinates.
  *
  * @author W.S. Harlan

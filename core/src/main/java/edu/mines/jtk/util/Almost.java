@@ -257,7 +257,7 @@ public class Almost implements Serializable, Comparator<Number> {
      *
      * @param r1 First number to check
      * @param r2 Second number to check
-     * @return 1 if r1>r2; -1 if r1 &lt; r2; 0 if r1==r2, within precision.
+     * @return 1 if r1 &gt; r2; -1 if r1 &lt; r2; 0 if r1==r2, within precision.
      */
     public int cmp(final double r1, final double r2) {
         if (r1 == r2) {

@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
  * consistent (SI) units.
  * <p>
  * Here is a simple example:
- * <code><pre>
+ * <pre><code>
  *  // Ensure frequency units have dimensions of inverse time.
  *  if (!freqUnits.haveDimensionsOf(Units.inv(timeUnits))) {
  *    // handle error
@@ -40,20 +40,20 @@ import java.util.StringTokenizer;
  * 
  *  // Use frequency and time, without worrying about units.
  *  ...
- * </pre></code>
+ * </code></pre>
  * <p>
  * When converting many values from some units to some other units
  * (with the same dimensions) it is more efficient to compute a shift
  * and scale factor and then use these instead of calling conversion 
  * methods. For example,
- * <code><pre>
+ * <pre><code>
  *  // Determine shift and scale.
  *  double shift = toUnits.doubleShiftFrom(fromUnits);
  *  double scale = toUnits.doubleScaleFrom(fromUnits);
  * 
  *  // Use shift and scale to convert lots of values.
  *  for (int i=0; i&lt;n; ++i) to[i] = shift+scale*from[i];
- * </pre></code>
+ * </code></pre>
  *
  * @author Dave Hale, Colorado School of Mines
  * @version 2000.02.17, 2006.07.19

@@ -45,11 +45,11 @@ public class GaussNewtonSolver {
      * [f(m+x)-data]'N[f(m+x)-data] + (x)'M(x)
      * </pre>
      * if dampOnlyPerturbation is false.
-     * <p/>
+     * <p></p>
      * m is the reference model and x is the perturbation of that model,
      * Returns full solution m+x.
-     * <p/>
-     * <p/>
+     * <p></p>
+     * <p></p>
      * Iterative linearization of f(m+x) ~= f(m) + Fx makes the objective
      * function quadratic in x: [f(m)+Fx-data]'N[f(m)+Fx-data] + (m+x)'M(m+x)
      * x is solved with the specified number of conjugate gradient iterations.
@@ -63,7 +63,7 @@ public class GaussNewtonSolver {
      * </pre>
      * Hard constraints, if any, will be applied during line searches, and
      * to the final result.
-     * <p/>
+     * <p></p>
      * "Line search error" is an acceptable fraction of imprecision
      * in the scale factor for the line search.  A very small value
      * will cause the maximum number of line seach iterations to be used.
