@@ -47,7 +47,7 @@ The layout of directories and files for the Mines JTK was designed to conform to
 
 ###Testing the Mines JTK
 
-The full name of the default Gradle task performed when you type ```gradlew``` is ```:core:jar```. You can perform other tasks, such as
+The full name of the default Gradle task performed by the command ```gradlew``` is ```:core:jar```. We can perform other tasks, such as
 
 ```gradlew test```
 
@@ -59,13 +59,13 @@ to copy all external dependencies (JAR files used by some packages in the Mines 
 
 ```gradlew distZip```
 
-to make a ZIP archive containing JAR files for the Mines JTK and all dependencies. To learn what tasks are available, use
+to make a ZIP archive containing JAR files for the Mines JTK and all dependencies. To learn what tasks are available, we can use
 
 ```gradlew tasks```
 
 ###Running demonstration programs
 
-The Mines Java Toolkit is a set of classes intended for use in other programs. The demo subproject provides examples, Java classes with a method ```main```, and Jython scripts. You can learn a lot about classes in the Mines JTK by running the demos and studying their source code. Try this:
+The Mines Java Toolkit is a set of classes intended for use in other programs. The demo subproject provides examples, Java classes with a method ```main```, and Jython scripts. We can learn a lot about classes in the Mines JTK by running the demos and studying their source code. Try this:
 
 ```gradlew run -P demo=mosaic.PlotFrameDemo```
 
@@ -79,7 +79,7 @@ Currently, the best way to learn about what demos are available is to browse the
 
 ###3D graphics in the Mines JTK
 
-Our packages for 3D graphics are built on JOGL, a Java binding for the OpenGL API. JAR files for JOGL on 64-bit operating systems are provided with the Mines JTK. As a first demo of 3D graphics, type ```gradlew ogl.HelloDemo``` You should see a white square, painted via OpenGL. This program also prints the OpenGL vendor and version number. That number should not be less than 1.2.
+Our packages for 3D graphics are built on JOGL, a Java binding for the OpenGL API. As a first demo of 3D graphics, type the command ```gradlew ogl.HelloDemo``` You should see a white square, painted via OpenGL. This program also prints the OpenGL vendor and version number. That number should not be less than 1.2.
 
 ###Development using the Mines JTK
 
