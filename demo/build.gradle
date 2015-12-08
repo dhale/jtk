@@ -14,14 +14,15 @@ dependencies {
   compile 'org.python:jython-standalone:2.7.0'
 }
 
-// Runs a demo Java main or Jython script. For example,
-//   gradle run -P demo=mosaic.PlotFrameDemo
-//   gradle run -P demo=mosaic/PlotFrameDemo.py
+// A task to run a demo Java main class or Jython script.
 task run(type: JavaExec) {
+  description = 'Runs a demo Java main or Jython script. For example,\n' +
+                '      $ gradle run -P demo=mosaic.PlotFrameDemo\n' +
+                '      $ gradle run -P demo=mosaic/PlotFrameDemo.py'
   if (project.hasProperty('demo')) {
     enableAssertions = true
     classpath = sourceSets.main.runtimeClasspath
-    //println "demo = "+demo // useful only for debugging
+    //println "demo = "+demo // classpath may be useful for debugging
     //println "classpath = "; classpath.each { println it }
     if (demo.endsWith('.py')) {
       def pref = 'jtkdemo/'
@@ -30,7 +31,7 @@ task run(type: JavaExec) {
       demo = 'src/main/jython/' + demo
       main = 'org.python.util.jython'
       jvmArgs '-Dpython.cachedir.skip=false',
-              '-Dpython.cachedir=/tmp/cachedir'
+              "-Dpython.cachedir=${buildDir}/jython-cache/"
       args demo
     } else {
       def pref = 'jtkdemo.'
