@@ -79,7 +79,11 @@ Currently, the best way to learn about what demos are available is to browse the
 
 ###3D graphics in the Mines JTK
 
-Our packages for 3D graphics are built on JOGL, a Java binding for the OpenGL API. As a first demo of 3D graphics, type the command ```gradlew ogl.HelloDemo``` You should see a white square, painted via OpenGL. This program also prints the OpenGL vendor and version number. That number should not be less than 1.2.
+Our packages for 3D graphics are built on JOGL, a Java binding for the OpenGL API. As a first demo that 3D graphics is working, type the command
+
+```gradlew run -P demo=ogl.HelloDemo```
+
+You should see a white square, painted via OpenGL. This demo program also prints the OpenGL vendor and version number. That number should not be less than 1.2.
 
 ###Development using the Mines JTK
 
