@@ -2,7 +2,7 @@ description = 'Mines Java Toolkit'
 
 apply plugin: 'java-library-distribution'
 
-archivesBaseName = 'edu_mines_jtk'
+archivesBaseName = 'edu-mines-jtk'
 
 dependencies {
   compile 'org.jogamp.jogl:jogl-all-main:2.3.2',
@@ -13,7 +13,7 @@ dependencies {
 
 distributions {
   main {
-    baseName = 'edu_mines_jtk_all'
+    baseName = 'edu-mines-jtk-all'
   }
 }
 
@@ -22,6 +22,7 @@ javadoc {
 }
 
 task deps(type: Sync) {
+  description = "Copies all dependencies into core/build/deps/."
   from configurations.runtime
-  into "$buildDir/deps"
+  into "${buildDir}/deps"
 }
