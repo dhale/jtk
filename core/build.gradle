@@ -1,6 +1,8 @@
 description = 'Mines Java Toolkit'
 
 apply plugin: 'java-library-distribution'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 archivesBaseName = 'edu-mines-jtk'
 
@@ -25,4 +27,64 @@ task deps(type: Sync) {
   description = "Copies all dependencies into core/build/deps/."
   from configurations.runtime
   into "${buildDir}/deps"
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from tasks.javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar) {
+  from sourceSets.main.allSource
+  classifier = 'sources'
+}
+
+artifacts {
+  archives jar
+  archives javadocJar
+  archives sourcesJar
+}
+
+signing {
+  sign configurations.archives
+}
+
+uploadArchives {
+  repositories {
+    mavenDeployer {
+      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+        authentication(userName: sonatypeUsername, password: sonatypePassword)
+      }
+
+      pom.project {
+        name 'Mines Java Toolkit'
+        packaging 'jar'
+        description 'Java packages for science and engineering'
+        url 'https://github.com/dhale/jtk/'
+
+        scm {
+          url 'scm:git@github.com/dhale/jtk.git'
+          connection 'scm:git@github.com/dhale/jtk.git'
+          developerConnection 'scm:git@github.com/dhale/jtk.git'
+        }
+
+        licenses {
+          license {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+          }
+        }
+
+        developers {
+          developer {
+            id 'dhale'
+            name 'Dave Hale'
+          }
+        }
+      }
+    }
+  }
 }

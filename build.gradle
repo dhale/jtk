@@ -2,6 +2,7 @@ defaultTasks ':core:jar'
 
 // for root project, as well as subprojects
 allprojects {
+  group = 'edu.mines.jtk'
   version = '1.0.0'
 }
 
