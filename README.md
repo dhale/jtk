@@ -10,7 +10,7 @@ To use the Mines JTK, simply include its JAR (Java archive) among any other exte
 
 ###Getting the source code
 
-If you want to build the Mines JTK yourself, you must first [download its source code from GitHub](https://github.com/dhale/jtk). If you clone this source code repository using git, then you will be able to easily update your copy as others make changes. Alternatively, you may use the Downloads link provided by GitHub to obtain a current snapshot of the code.
+If you want to build the Mines JTK yourself, you should first [download its source code from GitHub](https://github.com/dhale/jtk). If you clone this source code repository using git, then you will be able to easily update your copy as others make changes. Alternatively, you may use the Downloads link provided by GitHub to obtain a current snapshot of the code.
 
 If you are using Linux or Mac OS X (10.7+), then you already have a git command-line client. Various git clients with graphical user interfaces are also available for Linux, Mac OS X, and Windows, and git is also available within popular integrated development environments. Note that git will be necessary if you wish to propose changes (submit pull requests) for the master branch of the source code repository. 
 
