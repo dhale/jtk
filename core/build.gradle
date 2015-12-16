@@ -49,39 +49,41 @@ signing {
   sign configurations.archives
 }
 
-uploadArchives {
-  repositories {
-    mavenDeployer {
-      beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+if (project.hasProperty('sonatypeUsername')) {
+  uploadArchives {
+    repositories {
+      mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: sonatypeUsername, password: sonatypePassword)
-      }
-
-      pom.project {
-        name 'Mines Java Toolkit'
-        packaging 'jar'
-        description 'Java packages for science and engineering'
-        url 'https://github.com/dhale/jtk/'
-
-        scm {
-          url 'scm:git@github.com/dhale/jtk.git'
-          connection 'scm:git@github.com/dhale/jtk.git'
-          developerConnection 'scm:git@github.com/dhale/jtk.git'
+        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+          authentication(userName: sonatypeUsername, password: sonatypePassword)
         }
 
-        licenses {
-          license {
-            name 'The Apache Software License, Version 2.0'
-            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-            distribution 'repo'
+        pom.project {
+          name 'Mines Java Toolkit'
+          packaging 'jar'
+          description 'Java packages for science and engineering'
+          url 'https://github.com/dhale/jtk/'
+
+          scm {
+            url 'scm:git@github.com/dhale/jtk.git'
+            connection 'scm:git@github.com/dhale/jtk.git'
+            developerConnection 'scm:git@github.com/dhale/jtk.git'
           }
-        }
 
-        developers {
-          developer {
-            id 'dhale'
-            name 'Dave Hale'
+          licenses {
+            license {
+              name 'The Apache Software License, Version 2.0'
+              url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+              distribution 'repo'
+            }
+          }
+
+          developers {
+            developer {
+              id 'dhale'
+              name 'Dave Hale'
+            }
           }
         }
       }
