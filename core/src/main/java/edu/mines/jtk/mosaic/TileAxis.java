@@ -225,6 +225,23 @@ public class TileAxis extends IPanel {
     return _axisTics;
   }
 
+  /**
+   * Check whether axis is set to display log scale
+   * @return boolean
+   */
+  public boolean isLogScale() {
+    return _logScale;
+  }
+
+  /**
+   * Set whether axis displays log scale
+   * @return this TileAxis
+   */
+  public TileAxis setLogScale(boolean logScale) {
+    _logScale = logScale;
+    return this;
+  }
+
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
 
     // If no axis tics, paint nothing.
@@ -735,6 +752,7 @@ public class TileAxis extends IPanel {
   private int _ticLabelHeight;
   private AxisTics _axisTics;
   private boolean _revalidatePending;
+  private boolean _logScale;
 
   /**
    * Called by this axis when it needs to be revalidated because a 
