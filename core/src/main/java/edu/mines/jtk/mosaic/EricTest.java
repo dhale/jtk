@@ -7,6 +7,7 @@ public class EricTest {
 		System.out.println("Hello?");
 		
 		// can I make a simplePlot?
+		// use this simple plot to observe changes to TileAxis
 		int n = 100;
 		float[] x = new float[n];
 		float[] f = new float[n];
@@ -16,6 +17,7 @@ public class EricTest {
 		}
 		SimplePlot plot = new SimplePlot();
 		plot.addPoints(x, f);
+		
 		
 		
 	}

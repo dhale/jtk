@@ -251,6 +251,36 @@ public class TileAxis extends IPanel {
       tile.getVerticalProjector();
     Transcaler t = tile.getTranscaler(w,h);
 
+    // TEST TEST
+    // look for min and max values
+    if(isHorizontal()){
+    	System.out.println("I go from " + p.v0() + " to " + p.v1());
+    	System.out.println("My min exponent would be " + Math.log10(p.v0()));
+    	System.out.println("My max exponent would be " + Math.log10(p.v1()));
+    	System.out.println("So let's say I need to specify a min value, like -1\n");
+    	
+    	// try to draw some points on log major ticks, assuming start at 10^-1
+    	// I think the starting value should be a user input, and assume the incoming
+    	// data matches
+    	int myW = 10;
+    	float expMin = -1.5f;
+    	float expMax = (float)Math.log10(p.v1());
+    	float range = expMax - expMin;
+    	
+    	// draw major ticks
+    	for(int i=(int)(ceil(expMin)); i<expMax; ++i){
+    		float x1 = (i-expMin)/range;
+    		g2d.fillOval(t.x(x1)-myW/2, 0-myW/2, myW, myW);
+    	}
+    	
+    	// draw minor ticks
+    	
+    	
+    	
+    	
+    }
+    
+    
     // Font dimensions.
     Font font = g2d.getFont();
     FontMetrics fm = g2d.getFontMetrics();
@@ -279,31 +309,6 @@ public class TileAxis extends IPanel {
     double fticMinor = _axisTics.getFirstMinor();
     int mtic = _axisTics.getMultiple();
 
-    // Minor tics. Skip major tics, which may not coincide, due to rounding.
-    int ktic = (int)round((fticMajor-fticMinor)/dticMinor);
-    for (int itic=0; itic<nticMinor; ++itic) {
-      if (itic==ktic) {
-        ktic += mtic;
-      } else {
-        double vtic = fticMinor+itic*dticMinor;
-        double utic = p.u(vtic);
-        if (isHorizontal) {
-          x = t.x(utic);
-          if (isTop) {
-            g2d.drawLine(x,h-1,x,h-1-tl/2);
-          } else {
-            g2d.drawLine(x,0,x,tl/2);
-          }
-        } else {
-          y = t.y(utic);
-          if (isLeft) {
-            g2d.drawLine(w-1,y,w-1-tl/2,y);
-          } else {
-            g2d.drawLine(0,y,tl/2,y);
-          }
-        }
-      }
-    }
 
     // Major tics.
     int wsmax = 0;
@@ -367,7 +372,34 @@ public class TileAxis extends IPanel {
         int ys = max(fa,min(h-1,y+(int)round(0.3*fa)));
         g2d.drawString(stic,xs,ys);
       }
+    } 
+    
+    // Minor tics. Skip major tics, which may not coincide, due to rounding.
+    int ktic = (int)round((fticMajor-fticMinor)/dticMinor);
+    for (int itic=0; itic<nticMinor; ++itic) {
+      if (itic==ktic) {
+        ktic += mtic;
+      } else {
+        double vtic = fticMinor+itic*dticMinor;
+        double utic = p.u(vtic);
+        if (isHorizontal) {
+          x = t.x(utic);
+          if (isTop) {
+            g2d.drawLine(x,h-1,x,h-1-tl/2);
+          } else {
+            g2d.drawLine(x,0,x,tl/2);
+          }
+        } else {
+          y = t.y(utic);
+          if (isLeft) {
+            g2d.drawLine(w-1,y,w-1-tl/2,y);
+          } else {
+            g2d.drawLine(0,y,tl/2,y);
+          }
+        }
+      }
     }
+
 
     // Axis label.
     if (_label!=null) {
