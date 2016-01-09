@@ -289,291 +289,134 @@ public class TileAxis extends IPanel {
     boolean isHorizontal = isHorizontal();
     boolean isTop = isTop();
     boolean isLeft = isLeft();
-	boolean isVerticalRotated = isVerticalRotated();
+    boolean isVerticalRotated = isVerticalRotated();
     
-	if(!isLogScale()){			// Added for log tic testing
-	    // Axis tic sampling.
-	    int nticMajor = _axisTics.getCountMajor();
-	    double dticMajor = _axisTics.getDeltaMajor();
-	    double fticMajor = _axisTics.getFirstMajor();
-	    int nticMinor = _axisTics.getCountMinor();
-	    double dticMinor = _axisTics.getDeltaMinor();
-	    double fticMinor = _axisTics.getFirstMinor();
-	    int mtic = _axisTics.getMultiple();
-	
-	    // Minor tics. Skip major tics, which may not coincide, due to rounding.
-	    int ktic = (int)round((fticMajor-fticMinor)/dticMinor);
-	    for (int itic=0; itic<nticMinor; ++itic) {
-	      if (itic==ktic) {
-	        ktic += mtic;
-	      } else {
-	        double vtic = fticMinor+itic*dticMinor;
-	        double utic = p.u(vtic);
-	        if (isHorizontal) {
-	          x = t.x(utic);
-	          if (isTop) {
-	            g2d.drawLine(x,h-1,x,h-1-tl/2);
-	          } else {
-	            g2d.drawLine(x,0,x,tl/2);
-	          }
-	        } else {
-	          y = t.y(utic);
-	          if (isLeft) {
-	            g2d.drawLine(w-1,y,w-1-tl/2,y);
-	          } else {
-	            g2d.drawLine(0,y,tl/2,y);
-	          }
-	        }
-	      }
-	    }
-	
-	    // Major tics.
-	    int wsmax = 0;
-	    double tiny = 1.0e-6*abs(dticMajor);
-	    for (int itic=0; itic<nticMajor; ++itic) {
-	      double vtic = fticMajor+itic*dticMajor;
-	      double utic = p.u(vtic);
-	      if (abs(vtic)<tiny)
-	        vtic = 0.0;
-	      String stic = formatTic(vtic);
-	      if (isHorizontal) {
-	        x = t.x(utic);
-	        if (isTop) {
-	          y = h-1;
-	          g2d.drawLine(x,y,x,y-tl);
-	          y -= tl+fd;
-	        } else {
-	          y = 0;
-	          g2d.drawLine(x,y,x,y+tl);
-	          y += tl+fa;
-	        }
-	        int ws = fm.stringWidth(stic);
-	        int xs = max(0,min(w-ws,x-ws/2));
-	        int ys = y;
-	        g2d.drawString(stic,xs,ys);
-	
-	      } else if (isVerticalRotated) {
-	        y = t.y(utic);
-	        if (isLeft) {
-	          x = w-1;
-	          g2d.drawLine(x,y,x-tl,y);
-	          x -= tl+fd;
-	        } else {
-	          x = 0;
-	          g2d.drawLine(x,y,x+tl,y);
-	          x += tl+fd;
-	        }
-	        int ws = fm.stringWidth(stic);
-	        int xs = x;
-	        int ys = max(ws,min(h,y+ws/2));
-	        g2d.translate(xs,ys);
-	        g2d.rotate(-PI/2.0);
-	        g2d.drawString(stic,0,0);
-	        g2d.rotate(PI/2.0);
-	        g2d.translate(-xs,-ys);
-	      } else {
-	        y = t.y(utic);
-	        if (isLeft) {
-	          x = w-1;
-	          g2d.drawLine(x,y,x-tl,y);
-	          x -= tl+fd;
-	        } else {
-	          x = 0;
-	          g2d.drawLine(x,y,x+tl,y);
-	          x += tl+fd;
-	        }
-	        int ws = fm.stringWidth(stic);
-	        if (ws>wsmax)
-	          wsmax = ws;
-	        int xs = (isLeft)?x-ws:x;
-	        int ys = max(fa,min(h-1,y+(int)round(0.3*fa)));
-	        g2d.drawString(stic,xs,ys);
-	      }
-	    } 
-    } else {	        // TEST TEST ERIC LOGSCALE
-		
-    	// assume log scale, going from 10^a - 10^b, has linear spacing from a -> b
-    	// My plan is to either: (a) assume that the current range of values are a .. b, 
-    	//                           e.g. a = HorzProjector.v0() and b = HorzProjector.v1()
-    	//                       (b) convert the current range of values to log values
-    	//                           e.g. a = log10(HorzProjector.v0()) and b = log10(HorzProjector.v1())
-    	//                           This would require some checking for values, e.g no negatives, can't start at 0, etc
-    	// Following code assumes option (a)
-    	double expMin = Math.min(p.v0(),p.v1());
-		double expMax = Math.max(p.v0(),p.v1());//p.v1();
-		double range = expMax - expMin;
-		int fticMajor = (int)(ceil(expMin));       // the first major tic
-		int lticMajor = (int)(floor(expMax));      // the last major tic
-		int nticMajor = lticMajor - fticMajor + 1; // number of major tics to draw
-		double utic, vtic;
-		
-		System.out.println("p.v0() = " + p.v0());
-		System.out.println("p.v1() = " + p.v1());
-		System.out.println("expMin = " + expMin);
-		System.out.println("expMax = " + expMax);
-		System.out.println("fticMajor = " + fticMajor);
-		System.out.println("lticMajor = " + lticMajor);
-		System.out.println("nticMajor = " + nticMajor);
-		System.out.println("range = " + range);
-        System.out.println("******\n\n");
-        
-		
-        // draw minor tics
-        for(int itic=-1; itic<nticMajor; ++itic){
-          double vticMajor = fticMajor + itic;
-          for(int jtic=2; jtic<10; ++jtic){
-            vtic = vticMajor + Math.log10(jtic);
-            utic = p.u(vtic);
-            if(isHorizontal){
-              x = t.x(utic);
-  	          if (isTop) {
-  	            g2d.drawLine(x,h-1,x,h-1-tl/2);
-  	          } else {
-  	            g2d.drawLine(x,0,x,tl/2);
-  	          }
-            } else {
-              y = t.y(utic);
-	          if (isLeft) {
-	            g2d.drawLine(w-1,y,w-1-tl/2,y);
-	          } else {
-	            g2d.drawLine(0,y,tl/2,y);
-	          }
-            }
-  		  }
-        }
-       
-		// draw major tics
-	    int wsmax = 0;
-	    double tiny = 1.0e-6;
-        for(int itic=0; itic<nticMajor; ++itic){
-           vtic = fticMajor + itic;
-           utic = p.u(vtic);
- 	      if (abs(vtic)<tiny)
- 		        vtic = 0.0;
- 	     String stic = formatTic(vtic);
-           if(isHorizontal){
-             x = t.x(utic);
-	             if (isTop) {
-	   	          y = h-1;
-	   	          g2d.drawLine(x,y,x,y-tl);
-	   	          y -= tl+fd;
-	   	        } else {
-	   	          y = 0;
-	   	          g2d.drawLine(x,y,x,y+tl);
-	   	          y += tl+fa;
-	   	        }
-	 	        int ws = fm.stringWidth(stic);
-		        int xs = max(0,min(w-ws,x-ws/2));
-		        int ys = y;
-		        g2d.drawString(stic,xs,ys);
-           } else if (isVerticalRotated) {
-   	        y = t.y(utic);
-   	        if (isLeft) {
-   	          x = w-1;
-   	          g2d.drawLine(x,y,x-tl,y);
-   	          x -= tl+fd;
-   	        } else {
-   	          x = 0;
-   	          g2d.drawLine(x,y,x+tl,y);
-   	          x += tl+fd;
-   	        }
-   	        int ws = fm.stringWidth(stic);
-   	        int xs = x;
-   	        int ys = max(ws,min(h,y+ws/2));
-   	        g2d.translate(xs,ys);
-   	        g2d.rotate(-PI/2.0);
-   	        g2d.drawString(stic,0,0);
-   	        g2d.rotate(PI/2.0);
-   	        g2d.translate(-xs,-ys);
- 	      } else {
- 		        y = t.y(utic);
- 		        if (isLeft) {
- 		          x = w-1;
- 		          g2d.drawLine(x,y,x-tl,y);
- 		          x -= tl+fd;
- 		        } else {
- 		          x = 0;
- 		          g2d.drawLine(x,y,x+tl,y);
- 		          x += tl+fd;
- 		        }
- 		        int ws = fm.stringWidth(stic);
- 		        if (ws>wsmax)
- 		          wsmax = ws;
- 		        int xs = (isLeft)?x-ws:x;
- 		        int ys = max(fa,min(h-1,y+(int)round(0.3*fa)));
- 		        g2d.drawString(stic,xs,ys);
- 	      }
-		}
- 
-   /*     
-	    // Major tics.
-	    int wsmax = 0;
-	    double tiny = 1.0e-6*abs(dticMajor);
-	    for (int itic=0; itic<nticMajor; ++itic) {
-	      double vtic = fticMajor+itic*dticMajor;
-	      double utic = p.u(vtic);
-	      if (abs(vtic)<tiny)
-	        vtic = 0.0;
-	      String stic = formatTic(vtic);
-	      if (isHorizontal) {
-	        x = t.x(utic);
-	        if (isTop) {
-	          y = h-1;
-	          g2d.drawLine(x,y,x,y-tl);
-	          y -= tl+fd;
-	        } else {
-	          y = 0;
-	          g2d.drawLine(x,y,x,y+tl);
-	          y += tl+fa;
-	        }
-	        int ws = fm.stringWidth(stic);
-	        int xs = max(0,min(w-ws,x-ws/2));
-	        int ys = y;
-	        g2d.drawString(stic,xs,ys);
-	
-	      } else if (isVerticalRotated) {
-	        y = t.y(utic);
-	        if (isLeft) {
-	          x = w-1;
-	          g2d.drawLine(x,y,x-tl,y);
-	          x -= tl+fd;
-	        } else {
-	          x = 0;
-	          g2d.drawLine(x,y,x+tl,y);
-	          x += tl+fd;
-	        }
-	        int ws = fm.stringWidth(stic);
-	        int xs = x;
-	        int ys = max(ws,min(h,y+ws/2));
-	        g2d.translate(xs,ys);
-	        g2d.rotate(-PI/2.0);
-	        g2d.drawString(stic,0,0);
-	        g2d.rotate(PI/2.0);
-	        g2d.translate(-xs,-ys);
-	      } else {
-	        y = t.y(utic);
-	        if (isLeft) {
-	          x = w-1;
-	          g2d.drawLine(x,y,x-tl,y);
-	          x -= tl+fd;
-	        } else {
-	          x = 0;
-	          g2d.drawLine(x,y,x+tl,y);
-	          x += tl+fd;
-	        }
-	        int ws = fm.stringWidth(stic);
-	        if (ws>wsmax)
-	          wsmax = ws;
-	        int xs = (isLeft)?x-ws:x;
-	        int ys = max(fa,min(h-1,y+(int)round(0.3*fa)));
-	        g2d.drawString(stic,xs,ys);
-	      }
-	    }
-*/
+    int nticMajor = 0, nticMinor = 0, mtic = 0, ktic= 0;
+    double dticMajor = 0, fticMajor = 0, dticMinor = 0, fticMinor = 0;
 
+    // Axis tic sampling.
+    if(!isLogScale()){
+        nticMajor = _axisTics.getCountMajor();
+        dticMajor = _axisTics.getDeltaMajor();
+        fticMajor = _axisTics.getFirstMajor();
+        nticMinor = _axisTics.getCountMinor();
+        dticMinor = _axisTics.getDeltaMinor();
+        fticMinor = _axisTics.getFirstMinor();
+        mtic = _axisTics.getMultiple();
+        ktic = (int)round((fticMajor-fticMinor)/dticMinor);
+    } else {
+        double expMin = Math.min(p.v0(),p.v1());
+        double expMax = Math.max(p.v0(),p.v1());//p.v1();
+        double c = Math.pow(10, (expMin - ceil(expMin) + 1));
+        int c2 = 10 - (int)ceil(c);
+        double d = Math.pow(10, (expMax-floor(expMax)));
+        int d2 = (int)floor(d) - 1;
+        
+        nticMajor = (int)(floor(expMax) - ceil(expMin) + 1);
+        dticMajor = 1;
+        fticMajor = ceil(expMin);
+        nticMinor = 10*(nticMajor-1) + c2 + d2;
+        fticMinor = ceil(c); 
+        mtic = 9;
+        ktic = c2;
     }
 
-	// Axis label.
+    // Minor tics. Skip major tics, which may not coincide, due to rounding.
+    for (int itic=0; itic<nticMinor; ++itic) {
+      if (itic==ktic) {
+        ktic += mtic;
+      } else {
+        double vtic = 0;
+        if(isLogScale()){
+          int vticMajor = (((int)fticMinor + itic - 1)/9+(int)fticMajor) - 1;
+          int jtic = ((int)fticMinor + itic-1)%9+1;
+          vtic = vticMajor + Math.log10(jtic);
+        } else 
+          vtic = fticMinor+itic*dticMinor;
+        double utic = p.u(vtic);
+        if (isHorizontal) {
+          x = t.x(utic);
+          if (isTop) {
+            g2d.drawLine(x,h-1,x,h-1-tl/2);
+          } else {
+            g2d.drawLine(x,0,x,tl/2);
+          }
+        } else {
+          y = t.y(utic);
+          if (isLeft) {
+            g2d.drawLine(w-1,y,w-1-tl/2,y);
+          } else {
+            g2d.drawLine(0,y,tl/2,y);
+          }
+        }
+      }
+    }
+
+    // Major tics.
+    int wsmax = 0;
+    double tiny = 1.0e-6*abs(dticMajor);
+    for (int itic=0; itic<nticMajor; ++itic) {
+      double vtic = fticMajor+itic*dticMajor;
+      double utic = p.u(vtic);
+      if (abs(vtic)<tiny)
+        vtic = 0.0;
+      String stic = formatTic(vtic);
+      if (isHorizontal) {
+        x = t.x(utic);
+        if (isTop) {
+          y = h-1;
+          g2d.drawLine(x,y,x,y-tl);
+          y -= tl+fd;
+        } else {
+          y = 0;
+          g2d.drawLine(x,y,x,y+tl);
+          y += tl+fa;
+        }
+        int ws = fm.stringWidth(stic);
+        int xs = max(0,min(w-ws,x-ws/2));
+        int ys = y;
+        g2d.drawString(stic,xs,ys);
+
+      } else if (isVerticalRotated) {
+        y = t.y(utic);
+        if (isLeft) {
+          x = w-1;
+          g2d.drawLine(x,y,x-tl,y);
+          x -= tl+fd;
+        } else {
+          x = 0;
+          g2d.drawLine(x,y,x+tl,y);
+          x += tl+fd;
+        }
+        int ws = fm.stringWidth(stic);
+        int xs = x;
+        int ys = max(ws,min(h,y+ws/2));
+        g2d.translate(xs,ys);
+        g2d.rotate(-PI/2.0);
+        g2d.drawString(stic,0,0);
+        g2d.rotate(PI/2.0);
+        g2d.translate(-xs,-ys);
+      } else {
+        y = t.y(utic);
+        if (isLeft) {
+          x = w-1;
+          g2d.drawLine(x,y,x-tl,y);
+          x -= tl+fd;
+        } else {
+          x = 0;
+          g2d.drawLine(x,y,x+tl,y);
+          x += tl+fd;
+        }
+        int ws = fm.stringWidth(stic);
+        if (ws>wsmax)
+          wsmax = ws;
+        int xs = (isLeft)?x-ws:x;
+        int ys = max(fa,min(h-1,y+(int)round(0.3*fa)));
+        g2d.drawString(stic,xs,ys);
+      }
+    } 
+    
+    // Axis label.
     if (_label!=null) {
       if (isHorizontal) {
         int wl = fm.stringWidth(_label);
@@ -616,7 +459,7 @@ public class TileAxis extends IPanel {
     _mosaic = mosaic;
     _placement = placement;
     _index = index;
-    _logScale = false;	// ERIC
+    _logScale = false;// ERIC
     //setBackground(Color.CYAN); // for debugging only
     mosaic.add(this);
   }
@@ -902,7 +745,7 @@ public class TileAxis extends IPanel {
   private int _ticLabelHeight;
   private AxisTics _axisTics;
   private boolean _revalidatePending;
-  private boolean _logScale;		// ERIC
+  private boolean _logScale;// ERIC
 
   /**
    * Called by this axis when it needs to be revalidated because a 
@@ -936,8 +779,8 @@ public class TileAxis extends IPanel {
 
   // Formats tic value, removing any trailing zeros after a decimal point.
   private String formatTic(double v) {
-	  if(_logScale)
-		  v = Math.pow(10,v);
+  if(_logScale)
+  v = Math.pow(10,v);
     String s = String.format(_format,v);
     s = StringUtil.removeTrailingZeros(s);
     return s;
