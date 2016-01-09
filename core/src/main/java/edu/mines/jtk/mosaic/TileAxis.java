@@ -304,7 +304,8 @@ public class TileAxis extends IPanel {
         fticMinor = _axisTics.getFirstMinor();
         mtic = _axisTics.getMultiple();
         ktic = (int)round((fticMajor-fticMinor)/dticMinor);
-    } else {
+        
+    } else {	// setup for log scale tics -- should this be part of AxisTics? 
         double expMin = Math.min(p.v0(),p.v1());
         double expMax = Math.max(p.v0(),p.v1());//p.v1();
         double c = Math.pow(10, (expMin - ceil(expMin) + 1));
