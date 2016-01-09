@@ -443,35 +443,78 @@ public class TileAxis extends IPanel {
         }
        
 		// draw major tics
+	    int wsmax = 0;
+	    double tiny = 1.0e-6;
         for(int itic=0; itic<nticMajor; ++itic){
            vtic = fticMajor + itic;
            utic = p.u(vtic);
+ 	      if (abs(vtic)<tiny)
+ 		        vtic = 0.0;
+ 	     String stic = formatTic(vtic);
            if(isHorizontal){
              x = t.x(utic);
-    	       if (isTop) {
-    	         g2d.drawLine(x,h-1,x,h-1-tl);
-    	       } else {
-    	         g2d.drawLine(x,0,x,tl);
-    	       }
-           } else {
-             y = t.y(utic);
-  	         if (isLeft) {
-  	           g2d.drawLine(w-1,y,w-1-tl,y);
-  	         } else {
-  	           g2d.drawLine(0,y,tl,y);
-  	         }
-           }
+	             if (isTop) {
+	   	          y = h-1;
+	   	          g2d.drawLine(x,y,x,y-tl);
+	   	          y -= tl+fd;
+	   	        } else {
+	   	          y = 0;
+	   	          g2d.drawLine(x,y,x,y+tl);
+	   	          y += tl+fa;
+	   	        }
+	 	        int ws = fm.stringWidth(stic);
+		        int xs = max(0,min(w-ws,x-ws/2));
+		        int ys = y;
+		        g2d.drawString(stic,xs,ys);
+           } else if (isVerticalRotated) {
+   	        y = t.y(utic);
+   	        if (isLeft) {
+   	          x = w-1;
+   	          g2d.drawLine(x,y,x-tl,y);
+   	          x -= tl+fd;
+   	        } else {
+   	          x = 0;
+   	          g2d.drawLine(x,y,x+tl,y);
+   	          x += tl+fd;
+   	        }
+   	        int ws = fm.stringWidth(stic);
+   	        int xs = x;
+   	        int ys = max(ws,min(h,y+ws/2));
+   	        g2d.translate(xs,ys);
+   	        g2d.rotate(-PI/2.0);
+   	        g2d.drawString(stic,0,0);
+   	        g2d.rotate(PI/2.0);
+   	        g2d.translate(-xs,-ys);
+ 	      } else {
+ 		        y = t.y(utic);
+ 		        if (isLeft) {
+ 		          x = w-1;
+ 		          g2d.drawLine(x,y,x-tl,y);
+ 		          x -= tl+fd;
+ 		        } else {
+ 		          x = 0;
+ 		          g2d.drawLine(x,y,x+tl,y);
+ 		          x += tl+fd;
+ 		        }
+ 		        int ws = fm.stringWidth(stic);
+ 		        if (ws>wsmax)
+ 		          wsmax = ws;
+ 		        int xs = (isLeft)?x-ws:x;
+ 		        int ys = max(fa,min(h-1,y+(int)round(0.3*fa)));
+ 		        g2d.drawString(stic,xs,ys);
+ 	      }
 		}
  
    /*     
 	    // Major tics.
 	    int wsmax = 0;
-	    double tiny = 1.0e-6*abs(dticMajorU);
+	    double tiny = 1.0e-6*abs(dticMajor);
 	    for (int itic=0; itic<nticMajor; ++itic) {
-	      utic = fticMajorU + itic*dticMajorU;
-	      if (abs(utic)<tiny)
-	        utic = 0.0;
-	      String stic = formatTic(utic);
+	      double vtic = fticMajor+itic*dticMajor;
+	      double utic = p.u(vtic);
+	      if (abs(vtic)<tiny)
+	        vtic = 0.0;
+	      String stic = formatTic(vtic);
 	      if (isHorizontal) {
 	        x = t.x(utic);
 	        if (isTop) {
@@ -789,7 +832,7 @@ public class TileAxis extends IPanel {
       return false;
     }
   }
-
+  
   // Tracking methods called by MouseTrackMode.
   void beginTracking(int x, int y) {
     if (!_tracking) {
@@ -893,6 +936,8 @@ public class TileAxis extends IPanel {
 
   // Formats tic value, removing any trailing zeros after a decimal point.
   private String formatTic(double v) {
+	  if(_logScale)
+		  v = Math.pow(10,v);
     String s = String.format(_format,v);
     s = StringUtil.removeTrailingZeros(s);
     return s;
