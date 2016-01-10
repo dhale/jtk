@@ -11,4 +11,3 @@ build/
 *.swp
 *.class
 *.DS_Store
-/bin/

@@ -224,27 +224,6 @@ public class TileAxis extends IPanel {
   public AxisTics getAxisTics() {
     return _axisTics;
   }
-  
-  
-  //ERIC
-  /**
-   * Check whether axis is set to display log scale
-   * @return boolean
-   */
-  public boolean isLogScale() {
-    return _logScale;
-  }
-  
-  //ERIC
-  /**
-   * Set whether axis displays log scale
-   * @return this TileAxis
-   */
-  public TileAxis setLogScale(boolean logScale) {
-    _logScale = logScale;
-    return this;
-  }
-  
 
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
 
@@ -290,50 +269,23 @@ public class TileAxis extends IPanel {
     boolean isTop = isTop();
     boolean isLeft = isLeft();
     boolean isVerticalRotated = isVerticalRotated();
-    
-    int nticMajor = 0, nticMinor = 0, mtic = 0, ktic= 0;
-    double dticMajor = 0, fticMajor = 0, dticMinor = 0, fticMinor = 0;
 
     // Axis tic sampling.
-    if(!isLogScale()){
-        nticMajor = _axisTics.getCountMajor();
-        dticMajor = _axisTics.getDeltaMajor();
-        fticMajor = _axisTics.getFirstMajor();
-        nticMinor = _axisTics.getCountMinor();
-        dticMinor = _axisTics.getDeltaMinor();
-        fticMinor = _axisTics.getFirstMinor();
-        mtic = _axisTics.getMultiple();
-        ktic = (int)round((fticMajor-fticMinor)/dticMinor);
-        
-    } else {	// setup for log scale tics -- should this be part of AxisTics? 
-        double expMin = Math.min(p.v0(),p.v1());
-        double expMax = Math.max(p.v0(),p.v1());//p.v1();
-        double c = Math.pow(10, (expMin - ceil(expMin) + 1));
-        int c2 = 10 - (int)ceil(c);
-        double d = Math.pow(10, (expMax-floor(expMax)));
-        int d2 = (int)floor(d) - 1;
-        
-        nticMajor = (int)(floor(expMax) - ceil(expMin) + 1);
-        dticMajor = 1;
-        fticMajor = ceil(expMin);
-        nticMinor = 10*(nticMajor-1) + c2 + d2;
-        fticMinor = ceil(c); 
-        mtic = 9;
-        ktic = c2;
-    }
+    int nticMajor = _axisTics.getCountMajor();
+    double dticMajor = _axisTics.getDeltaMajor();
+    double fticMajor = _axisTics.getFirstMajor();
+    int nticMinor = _axisTics.getCountMinor();
+    double dticMinor = _axisTics.getDeltaMinor();
+    double fticMinor = _axisTics.getFirstMinor();
+    int mtic = _axisTics.getMultiple();
 
     // Minor tics. Skip major tics, which may not coincide, due to rounding.
+    int ktic = (int)round((fticMajor-fticMinor)/dticMinor);
     for (int itic=0; itic<nticMinor; ++itic) {
       if (itic==ktic) {
         ktic += mtic;
       } else {
-        double vtic = 0;
-        if(isLogScale()){
-          int vticMajor = (((int)fticMinor + itic - 1)/9+(int)fticMajor) - 1;
-          int jtic = ((int)fticMinor + itic-1)%9+1;
-          vtic = vticMajor + Math.log10(jtic);
-        } else 
-          vtic = fticMinor+itic*dticMinor;
+        double vtic = fticMinor+itic*dticMinor;
         double utic = p.u(vtic);
         if (isHorizontal) {
           x = t.x(utic);
@@ -415,8 +367,8 @@ public class TileAxis extends IPanel {
         int ys = max(fa,min(h-1,y+(int)round(0.3*fa)));
         g2d.drawString(stic,xs,ys);
       }
-    } 
-    
+    }
+
     // Axis label.
     if (_label!=null) {
       if (isHorizontal) {
@@ -460,7 +412,6 @@ public class TileAxis extends IPanel {
     _mosaic = mosaic;
     _placement = placement;
     _index = index;
-    _logScale = false;// ERIC
     //setBackground(Color.CYAN); // for debugging only
     mosaic.add(this);
   }
@@ -676,7 +627,7 @@ public class TileAxis extends IPanel {
       return false;
     }
   }
-  
+
   // Tracking methods called by MouseTrackMode.
   void beginTracking(int x, int y) {
     if (!_tracking) {
@@ -746,7 +697,6 @@ public class TileAxis extends IPanel {
   private int _ticLabelHeight;
   private AxisTics _axisTics;
   private boolean _revalidatePending;
-  private boolean _logScale;// ERIC
 
   /**
    * Called by this axis when it needs to be revalidated because a 
@@ -780,8 +730,6 @@ public class TileAxis extends IPanel {
 
   // Formats tic value, removing any trailing zeros after a decimal point.
   private String formatTic(double v) {
-  if(_logScale)
-  v = Math.pow(10,v);
     String s = String.format(_format,v);
     s = StringUtil.removeTrailingZeros(s);
     return s;
