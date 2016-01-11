@@ -73,8 +73,24 @@ public class Projector {
    *  v0 != v1 is required.
    */
   public Projector(double v0, double v1) {
-    this(v0,v1,0.0,1.0);
+    this(v0,v1,0.0,1.0,Scale.LINEAR);
   }
+  
+  /**
+   * Constructs a projector with specified v and u values. The
+   * parameters u0 and u1 determine the margins of the projector.
+   * @param v0 the v coordinate that corresponds to u coordinate 0;
+   *  v0 != v1 is required.
+   * @param v1 the v coordinate that corresponds to u coordinate 1;
+   *  v0 != v1 is required.
+   *  @param u0 the u coordinate closest to normalized coordinate 0;
+   *  0.0 &lt;= u0 &lt; u1 is required.
+   * @param u1 the u coordinate closest to normalized coordinate 1;
+   *  u0 &lt; u1 &lt;= 1.0 is required.
+   */
+  public Projector(double v0, double v1, double u0, double u1) {
+    this(v0,v1,u0,u1,Scale.LINEAR);
+  }  
 
   /**
    * Constructs a projector with specified v and u values. The
@@ -89,8 +105,9 @@ public class Projector {
    *  0.0 &lt;= u0 &lt; u1 is required.
    * @param u1 the u coordinate closest to normalized coordinate 1;
    *  u0 &lt; u1 &lt;= 1.0 is required.
+   *  @param s the scale type
    */
-  public Projector(double v0, double v1, double u0, double u1) {
+  public Projector(double v0, double v1, double u0, double u1, Scale s) {
     Check.argument(0.0<=u0,"0.0 <= u0");
     Check.argument(u0<u1,"u0 < u1");
     Check.argument(u1<=1.0,"u1 <= 1.0");
@@ -99,6 +116,7 @@ public class Projector {
     _u1 = u1;
     _v0 = v0;
     _v1 = v1;
+    _scaleType = s;
     computeShiftsAndScales();
   }
 
@@ -257,7 +275,8 @@ public class Projector {
     return this._u0==that._u0 && 
            this._u1==that._u1 &&
            this._v0==that._v0 &&
-           this._v1==that._v1;
+           this._v1==that._v1 &&
+           this._scaleType == that._scaleType;
   }
 
   @Override
@@ -274,7 +293,7 @@ public class Projector {
 
   @Override
   public String toString() {
-    return "Projector("+_v0+", "+_v1+", "+_u0+", "+_u1+")";
+    return "Projector("+_v0+", "+_v1+", "+_u0+", "+_u1+", " + _scaleType +")";
   }
 
   
@@ -285,6 +304,7 @@ public class Projector {
   private double _v0,_v1;
   private double _ushift,_uscale;
   private double _vshift,_vscale;
+  private Scale _scaleType;
 
   private void computeShiftsAndScales() {
     _uscale = (_v1-_v0)/(_u1-_u0);

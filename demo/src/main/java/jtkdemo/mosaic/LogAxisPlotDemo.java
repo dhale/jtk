@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import edu.mines.jtk.mosaic.PlotFrame;
 import edu.mines.jtk.mosaic.PlotPanel;
+import edu.mines.jtk.mosaic.PointsView;
 import edu.mines.jtk.mosaic.Scale;
 import edu.mines.jtk.util.ArrayMath;
 
@@ -17,13 +18,16 @@ public class LogAxisPlotDemo {
 		// a good old linear function
 		float[] x = new float[n];
 		x = ArrayMath.rampfloat(0, X/n, n);
-		float[] f = new float[n];
+		float[] f1 = new float[n];
+		float[] f2 = new float[n];
 		for(int i=0; i<n; ++i){
-			f[i] = ArrayMath.pow(x[i],2);
+			f1[i] = ArrayMath.pow(x[i],2);
+			f2[i] = ArrayMath.pow(0.5f*x[i],2);
 		}
 
 		PlotPanel plot = new PlotPanel();
-		plot.addPoints(x, f);	
+		PointsView pv1 = plot.addPoints(x, f1);
+		PointsView pv2 = plot.addPoints(x, f2);
 		plot.setVisible(true);
 	    PlotFrame frame = new PlotFrame(plot);
 	    frame.setSize(800,800);
