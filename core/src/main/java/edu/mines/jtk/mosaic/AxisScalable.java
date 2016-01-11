@@ -5,10 +5,12 @@ package edu.mines.jtk.mosaic;
  */
 public interface AxisScalable {
 
-	public TiledView setHScale(Scale s);
+	public void setHScale(Scale s);
 	
-	public TiledView setVScale(Scale s);
+	public void setVScale(Scale s);
 	
-	public Scale getScale();
+	public Scale getHScale();
+	
+	public Scale getVScale();
 	
 }

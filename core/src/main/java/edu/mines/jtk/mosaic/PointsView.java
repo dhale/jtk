@@ -434,6 +434,39 @@ public class PointsView extends TiledView {
     repaint();
   }
 
+  /**
+   * Sets the horizontal axis scaling.
+   * @param axis scaling enum value
+   */
+  public PointsView setHScale(Scale scaleType) {
+	  _axisScalable.setHScale(scaleType);
+	  return this;
+  } 
+  
+  /**
+   * Sets the vertical axis scaling.
+   * @param axis scaling enum value
+   */
+  public void setVScale(Scale scaleType) {
+	  _axisScalable.setVScale(scaleType);
+  } 
+  
+  /**
+   * Gets the horizontal axis scaling.
+   * @return the horizontal scaling
+   */
+  public Scale getHScale() {
+	  return _axisScalable.getHScale();
+  }
+  
+  /**
+   * Gets the vertical axis scaling.
+   * @return the vertical scaling
+   */
+  public Scale getVScale() {
+	  return _axisScalable.getVScale();
+  }
+  
   public void paint(Graphics2D g2d) {
     g2d.setRenderingHint(
       RenderingHints.KEY_ANTIALIASING,
@@ -569,6 +602,7 @@ public class PointsView extends TiledView {
   private float _markSize = -1.0f;
   private Color _markColor = null;
   private String _textFormat = "%1.4G";
+  private AxisScalable _axisScalable = new AxisScalable1D();
 
   /**
    * Called when we might new realignment.
