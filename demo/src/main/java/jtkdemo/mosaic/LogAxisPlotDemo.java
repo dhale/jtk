@@ -5,6 +5,7 @@ import java.awt.Color;
 import edu.mines.jtk.mosaic.PlotFrame;
 import edu.mines.jtk.mosaic.PlotPanel;
 import edu.mines.jtk.mosaic.PointsView;
+import edu.mines.jtk.mosaic.Projector;
 import edu.mines.jtk.mosaic.Scale;
 import edu.mines.jtk.util.ArrayMath;
 
@@ -24,7 +25,7 @@ public class LogAxisPlotDemo {
 			f1[i] = ArrayMath.pow(x[i],2);
 			f2[i] = ArrayMath.pow(0.5f*x[i],2);
 		}
-
+/*
 		PlotPanel plot = new PlotPanel();
 		PointsView pv1 = plot.addPoints(x, f1);
 		PointsView pv2 = plot.addPoints(x, f2);
@@ -33,7 +34,23 @@ public class LogAxisPlotDemo {
 	    frame.setSize(800,800);
 	    frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
 	    frame.setVisible(true);
-		
+	*/	
+	    
+	    // Projector log scale test
+		// assuming safe input for now
+	    Projector p = new Projector(0.1, 100, 0.0, 1.0);
+	    p.setScale(Scale.LINEAR);
+	    System.out.println("p.u(0) = " + p.u(0.3));
+	    System.out.println("p.u(50) = " + p.u(50));
+	    System.out.println("p.u(100) = " + p.u(100));
+	    p.setScale(Scale.LOG);
+	    System.out.println("p.u(0.3) = " + p.u(0.3));
+	    System.out.println("p.u(10) = " + p.u(10));
+	    System.out.println("p.u(100) = " + p.u(100));
+	    System.out.println("p.v(p.u(0.3)) = " + p.v(p.u(0.3)));
+	    System.out.println("p.v(p.u(10)) = " + p.v(p.u(10)));
+	    System.out.println("p.v(p.u(100)) = " + p.v(p.u(100)));
+	    
 	}
 	
 	public static float f1(double x){

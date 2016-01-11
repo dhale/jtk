@@ -17,6 +17,8 @@ package edu.mines.jtk.mosaic;
 import static edu.mines.jtk.util.MathPlus.max;
 import static edu.mines.jtk.util.MathPlus.min;
 import static edu.mines.jtk.util.MathPlus.signum;
+
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -125,7 +127,7 @@ public class Projector {
    * @param p the projector.
    */
   public Projector(Projector p) {
-    this(p._v0,p._v1,p._u0,p._u1);
+    this(p._v0,p._v1,p._u0,p._u1,p._scaleType);
   }
 
   /**
@@ -134,7 +136,11 @@ public class Projector {
    * @return normalized coordinate u.
    */
   public double u(double v) {
-    return _vshift+_vscale*v;
+	if(_scaleType == Scale.LINEAR)
+      return _vshift+_vscale*v;
+	else if(_scaleType == Scale.LOG)
+	  return _vshift+_vscale*ArrayMath.log10(v);
+	return 0.0;
   }
 
   /**
@@ -143,7 +149,11 @@ public class Projector {
    * @return world coordinate v.
    */
   public double v(double u) {
-    return _ushift+_uscale*u;
+	if(_scaleType == Scale.LINEAR)
+	  return _ushift+_uscale*u;
+	else if(_scaleType == Scale.LOG)
+	  return ArrayMath.pow(10,_ushift+_uscale*u);
+	return 0.0;
   }
 
   /**
@@ -178,6 +188,23 @@ public class Projector {
     return _v1;
   }
 
+  /**
+   * Returns the scale type
+   * @return the value of _scaleType
+   */
+  public Scale getScale() {
+    return _scaleType;
+  }  
+
+  /**
+   * Sets the scale type
+   * @param new scale type
+   */
+  public void setScale(Scale s) {
+    _scaleType = s;
+    computeShiftsAndScales();
+  }  
+  
   /**
    * Merges the specified projector into this projector. 
    * @param p the projector.
@@ -307,9 +334,17 @@ public class Projector {
   private Scale _scaleType;
 
   private void computeShiftsAndScales() {
-    _uscale = (_v1-_v0)/(_u1-_u0);
-    _ushift = _v0-_uscale*_u0;
-    _vscale = (_u1-_u0)/(_v1-_v0);
-    _vshift = _u0-_vscale*_v0;
+	if(_scaleType == Scale.LINEAR){
+      _uscale = (_v1-_v0)/(_u1-_u0);
+      _ushift = _v0-_uscale*_u0;
+      _vscale = (_u1-_u0)/(_v1-_v0);
+      _vshift = _u0-_vscale*_v0;
+	} else if(_scaleType == Scale.LOG){
+		_vscale = (_u1-_u0)/(ArrayMath.log10(_v1)-ArrayMath.log10(_v0));
+		_uscale = (ArrayMath.log10(_v1)-ArrayMath.log10(_v0))/(_u1-_u0);
+		_ushift = ArrayMath.log10(_v0)-_uscale*_u0;
+		_vshift = _u0-_vscale*ArrayMath.log10(_v0);
+	}
+    System.out.println("\n" + _uscale + ", " + _ushift + ", " + _vscale + ", " + _vshift);
   }
 }
