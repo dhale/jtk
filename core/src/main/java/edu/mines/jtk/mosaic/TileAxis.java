@@ -21,7 +21,9 @@ import java.awt.geom.Rectangle2D;
 import static java.lang.Math.*;
 import javax.swing.*;
 
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.AxisTics;
+import edu.mines.jtk.util.LogAxisTics;
 import edu.mines.jtk.util.StringUtil;
 
 /**
@@ -568,7 +570,11 @@ public class TileAxis extends IPanel {
       // coordinates visible, not the actual coordinate values. In this way,
       // we maintain a constant tic interval as this axis is scrolled.
       AxisTics at;
-      if (_interval==0.0) {
+      if (p.getScale() == Scale.LOG) {
+    	  double expRange = ArrayMath.log10(vmax) - (ArrayMath.log10(vmin)); 
+    	  at = new LogAxisTics(vmin, vmax, (int)(expRange + 1e-6));
+      }
+      else if (_interval==0.0) {
         at= new AxisTics(vmin,vmin+dv,nmax);
       } else {
         at= new AxisTics(vmin,vmin+dv,_interval);
@@ -615,7 +621,8 @@ public class TileAxis extends IPanel {
     // Compute new axis tics constructed with the best-fit tic interval 
     // computed above, but now for the currently visible range [v0,v1] 
     // of world coordinates. These axis tics are painted by this axis.
-    _axisTics = new AxisTics(v0,v1,dtic);
+    if(p.getScale() == Scale.LINEAR)
+      _axisTics = new AxisTics(v0,v1,dtic);
 
     // If either the tic label max width or height has changed,
     // then the preferred size of this axis may have changed as well.
