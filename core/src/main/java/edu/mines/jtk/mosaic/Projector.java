@@ -340,11 +340,10 @@ public class Projector {
       _vscale = (_u1-_u0)/(_v1-_v0);
       _vshift = _u0-_vscale*_v0;
 	} else if(_scaleType == Scale.LOG){
-		_vscale = (_u1-_u0)/(ArrayMath.log10(_v1)-ArrayMath.log10(_v0));
-		_uscale = (ArrayMath.log10(_v1)-ArrayMath.log10(_v0))/(_u1-_u0);
-		_ushift = ArrayMath.log10(_v0)-_uscale*_u0;
-		_vshift = _u0-_vscale*ArrayMath.log10(_v0);
+	  _vscale = (_u1-_u0)/(ArrayMath.log10(_v1)-ArrayMath.log10(_v0));
+	  _uscale = (ArrayMath.log10(_v1)-ArrayMath.log10(_v0))/(_u1-_u0);
+	  _ushift = ArrayMath.log10(_v0)-_uscale*_u0;
+	  _vshift = _u0-_vscale*ArrayMath.log10(_v0);
 	}
-    System.out.println("\n" + _uscale + ", " + _ushift + ", " + _vscale + ", " + _vshift);
   }
 }
