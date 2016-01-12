@@ -210,7 +210,7 @@ public class Projector {
    * @param p the projector.
    */
   public void merge(Projector p) {
-
+	  
     // Ignore null projectors.
     if (p==null)
       return;

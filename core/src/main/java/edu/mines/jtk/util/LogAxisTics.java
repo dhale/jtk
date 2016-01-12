@@ -89,6 +89,15 @@ public class LogAxisTics extends AxisTics {
 	  public int getMultiple() {
 	    return _mtic;
 	  }
+	  
+	  /**
+	   * Gets the minor tic skip value, the first minor tic at which to 
+	   * skip because it coincides with a major tic.
+	   * @return the first minor tic to skip 
+	   */
+	  public int getFirstMinorSkip() {
+		  return _ktic;
+	  }
 
 	  ///////////////////////////////////////////////////////////////////////////
 	  // private
@@ -96,6 +105,7 @@ public class LogAxisTics extends AxisTics {
 	  private double _xmin;
 	  private double _xmax;
 	  private int _mtic;
+	  private int _ktic;
 	  private int _ntic;
 	  private double _dtic;
 	  private double _ftic;
@@ -117,7 +127,8 @@ public class LogAxisTics extends AxisTics {
 	    
 	    _nticMinor = 10*(_ntic) + c2 + d2;
 	    _dticMinor = 1;
-	    _fticMinor = ceil(c);
+	    _fticMinor = pow(10,ceil(_expMin)-1)*(int)(c);
+	    _ktic = c2+1;
 	  }
 
 	  private static boolean almostEqual(double x1, double x2) {

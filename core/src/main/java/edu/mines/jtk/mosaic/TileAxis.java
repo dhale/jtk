@@ -24,6 +24,7 @@ import javax.swing.*;
 import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.AxisTics;
 import edu.mines.jtk.util.LogAxisTics;
+import edu.mines.jtk.util.MathPlus;
 import edu.mines.jtk.util.StringUtil;
 
 /**
@@ -230,8 +231,10 @@ public class TileAxis extends IPanel {
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
 
     // If no axis tics, paint nothing.
-    if (_axisTics==null)
+    if (_axisTics==null){
+    	System.out.println("null?");
       return;
+    }
 
     // Adjacent tile; if none, do nothing.
     Tile tile = getTile();
@@ -271,6 +274,7 @@ public class TileAxis extends IPanel {
     boolean isTop = isTop();
     boolean isLeft = isLeft();
     boolean isVerticalRotated = isVerticalRotated();
+    boolean isLogScale = (p.getScale() == Scale.LOG);
 
     // Axis tic sampling.
     int nticMajor = _axisTics.getCountMajor();
@@ -282,12 +286,23 @@ public class TileAxis extends IPanel {
     int mtic = _axisTics.getMultiple();
 
     // Minor tics. Skip major tics, which may not coincide, due to rounding.
-    int ktic = (int)round((fticMajor-fticMinor)/dticMinor);
+    int ktic = isLogScale ? ((LogAxisTics)_axisTics).getFirstMinorSkip()
+                          : (int)round((fticMajor-fticMinor)/dticMinor);
+    int ktic0 = ktic;
+    System.out.println("ktic = " + ktic);
     for (int itic=0; itic<nticMinor; ++itic) {
+    	
       if (itic==ktic) {
         ktic += mtic;
+        if(isLogScale) {System.out.println("ktic test = " + ktic/mtic);}
       } else {
-        double vtic = fticMinor+itic*dticMinor;
+    	  double vtic = 0.0;
+    	  if(isLogScale){
+    		  vtic = fticMinor+itic*dticMinor*MathPlus.pow(10.0, ktic/mtic + floor(MathPlus.log10(fticMinor)));
+    		  System.out.println("vtic = " + vtic);
+    	  }
+    	  else
+    		  vtic = fticMinor+itic*dticMinor;
         double utic = p.u(vtic);
         if (isHorizontal) {
           x = t.x(utic);
@@ -311,7 +326,8 @@ public class TileAxis extends IPanel {
     int wsmax = 0;
     double tiny = 1.0e-6*abs(dticMajor);
     for (int itic=0; itic<nticMajor; ++itic) {
-      double vtic = fticMajor+itic*dticMajor;
+      double vtic = isLogScale ? fticMajor*Math.pow(10, itic) 
+    		      : fticMajor+itic*dticMajor;
       double utic = p.u(vtic);
       if (abs(vtic)<tiny)
         vtic = 0.0;
@@ -570,11 +586,7 @@ public class TileAxis extends IPanel {
       // coordinates visible, not the actual coordinate values. In this way,
       // we maintain a constant tic interval as this axis is scrolled.
       AxisTics at;
-      if (p.getScale() == Scale.LOG) {
-    	  double expRange = ArrayMath.log10(vmax) - (ArrayMath.log10(vmin)); 
-    	  at = new LogAxisTics(vmin, vmax, (int)(expRange + 1e-6));
-      }
-      else if (_interval==0.0) {
+      if (_interval==0.0) {
         at= new AxisTics(vmin,vmin+dv,nmax);
       } else {
         at= new AxisTics(vmin,vmin+dv,_interval);
@@ -623,6 +635,10 @@ public class TileAxis extends IPanel {
     // of world coordinates. These axis tics are painted by this axis.
     if(p.getScale() == Scale.LINEAR)
       _axisTics = new AxisTics(v0,v1,dtic);
+    else if (p.getScale() == Scale.LOG) {
+  	  int expRange = (int)(floor(ArrayMath.log10(vmax)) - ceil(ArrayMath.log10(vmin))) + 1; 
+  	  _axisTics = new LogAxisTics(vmin, vmax, expRange);
+    }
 
     // If either the tic label max width or height has changed,
     // then the preferred size of this axis may have changed as well.
