@@ -14,11 +14,11 @@ public class LogAxisPlotDemo {
 		
 		// use this simple plot to observe changes to TileAxis
 		int n = 1000;
-		float X = 200;
+		float X = 300;
 
 		// a good old linear function
 		float[] x = new float[n];
-		x = ArrayMath.rampfloat(0.07f, X/n, n);
+		x = ArrayMath.rampfloat(0.04f, X/n, n);
 		float[] f1 = new float[n];
 		float[] f2 = new float[n];
 		for(int i=0; i<n; ++i){

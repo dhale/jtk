@@ -131,7 +131,4 @@ public class LogAxisTics extends AxisTics {
 	    _ktic = c2+1;
 	  }
 
-	  private static boolean almostEqual(double x1, double x2) {
-	    return abs(x1-x2)<=max(abs(x1),abs(x2))*100.0*DBL_EPSILON;
-	  }
 }

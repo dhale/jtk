@@ -289,17 +289,15 @@ public class TileAxis extends IPanel {
     int ktic = isLogScale ? ((LogAxisTics)_axisTics).getFirstMinorSkip()
                           : (int)round((fticMajor-fticMinor)/dticMinor);
     int ktic0 = ktic;
-    System.out.println("ktic = " + ktic);
     for (int itic=0; itic<nticMinor; ++itic) {
     	
       if (itic==ktic) {
         ktic += mtic;
-        if(isLogScale) {System.out.println("ktic test = " + ktic/mtic);}
       } else {
     	  double vtic = 0.0;
-    	  if(isLogScale){
-    		  vtic = fticMinor+itic*dticMinor*MathPlus.pow(10.0, ktic/mtic + floor(MathPlus.log10(fticMinor)));
-    		  System.out.println("vtic = " + vtic);
+    	  if(isLogScale){	// drawing log spaced minor tics ... always draws all 8 of them
+    		  vtic = (itic + fticMinor*MathPlus.pow(10.0,-floor(MathPlus.log10(fticMinor)))-1)%9+1;
+    		  vtic *= MathPlus.pow(10.0,(ktic-1)/mtic + floor(MathPlus.log10(fticMinor)));
     	  }
     	  else
     		  vtic = fticMinor+itic*dticMinor;
