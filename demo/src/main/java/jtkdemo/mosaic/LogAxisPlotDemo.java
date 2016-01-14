@@ -12,6 +12,9 @@ import edu.mines.jtk.util.ArrayMath;
 public class LogAxisPlotDemo {
 	public static void main(String args[]){
 		
+		// CURRENT ISSUES
+		// when zoomed plot does not pan correctly (maybe will be better when data is transformed?)
+		
 		// use this simple plot to observe changes to TileAxis
 		int n = 1000;
 		float X = 300;
@@ -22,7 +25,7 @@ public class LogAxisPlotDemo {
 		float[] f1 = new float[n];
 		float[] f2 = new float[n];
 		for(int i=0; i<n; ++i){
-			f1[i] = ArrayMath.pow(x[i],1);
+			f1[i] = ArrayMath.pow(1.5f*x[i],1);
 			f2[i] = ArrayMath.pow(0.5f*x[i],1);
 		}
 
@@ -36,8 +39,7 @@ public class LogAxisPlotDemo {
 	    frame.setSize(800,800);
 	    frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
 	    frame.setVisible(true);
-		
-	    
+/*	    
 	    // Projector log scale test
 		// assuming safe input for now
 	    Projector p = new Projector(0.1, 100, 0.0, 1.0);
@@ -52,7 +54,7 @@ public class LogAxisPlotDemo {
 	    System.out.println("p.v(p.u(0.3)) = " + p.v(p.u(0.3)));
 	    System.out.println("p.v(p.u(10)) = " + p.v(p.u(10)));
 	    System.out.println("p.v(p.u(100)) = " + p.v(p.u(100)));
-	    
+	    */
 	}
 	
 	public static float f1(double x){

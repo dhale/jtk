@@ -20,6 +20,7 @@ public class LogAxisTics extends AxisTics {
 		computeMultiple();
 		computeMinorTics();
 		
+		/*
 		System.out.println("Making a log ticer!");
 		System.out.println(_expMin);
 		System.out.println(_expMax);
@@ -30,6 +31,7 @@ public class LogAxisTics extends AxisTics {
 		System.out.println(getDeltaMinor());
 		System.out.println(getFirstMinor());
 		System.out.println(getMultiple());
+		*/
 	  }
 
 	  /**
@@ -102,8 +104,8 @@ public class LogAxisTics extends AxisTics {
 	  ///////////////////////////////////////////////////////////////////////////
 	  // private
 
-	  private double _xmin;
-	  private double _xmax;
+	  //private double _xmin;
+	  //private double _xmax;
 	  private int _mtic;
 	  private int _ktic;
 	  private int _ntic;
@@ -120,9 +122,13 @@ public class LogAxisTics extends AxisTics {
 	  }
 
 	  private void computeMinorTics() {
+		// the number of log-spaced tics that the first value is behind the first major tic
 	    double c = pow(10.0, (_expMin - ceil(_expMin) + 1));
+	    // the number of log-spaced tics that the last value is ahead of the previous-to-first major tic
 	    int c2 = 10 - (int)ceil(c);
+	    // the number of log-spaced tics that the last value is behind the next-after-last major tic
 	    double d = pow(10.0, (_expMax-floor(_expMax)));
+	    // the number of log-spaced tics that the last value is ahead of the last major tic
 	    int d2 = (int)floor(d) - 1;
 	    
 	    _nticMinor = 10*(_ntic) + c2 + d2;
