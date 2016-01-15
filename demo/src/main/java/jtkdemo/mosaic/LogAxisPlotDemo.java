@@ -45,30 +45,26 @@ public class LogAxisPlotDemo {
 		
 		// log-x plots
 		PointsView pv3 = plot.addPoints(0,0,x1, f1);
-//		System.out.println("pv3: " + pv3.getVScale() + ", " + pv3.getHScale());
 		PointsView pv4 = plot.addPoints(0,0,x2, f2);
-		pv3.setHScale(Scale.LOG);
-//		System.out.println("pv3: " + pv3.getVScale() + ", " + pv3.getHScale());
-//		System.out.println("pv4: " + pv4.getVScale() + ", " + pv4.getHScale());
-//		pv4.setHScale(Scale.LOG);
-//		System.out.println("pv3: " + pv3.getVScale() + ", " + pv3.getHScale());
-//		System.out.println("pv4: " + pv4.getVScale() + ", " + pv4.getHScale());
 		pv3.setLineColor(Color.BLUE);
 		pv4.setLineColor(Color.RED);
 
 		// log-y plots
 		PointsView pv5 = plot.addPoints(1,1,x1, f1);
 		PointsView pv6 = plot.addPoints(1,1,x2, f2);
-		pv5.setVScale(Scale.LOG);
 		pv5.setLineColor(Color.BLUE);
 		pv6.setLineColor(Color.RED);
-/*		
+		
+		
+		// need to update the PlotPanel 
 		// log-log plots
 		PointsView pv7 = plot.addPoints(1,0,x1, f1);
 		PointsView pv8 = plot.addPoints(1,0,x2, f2);
+		pv8.setVScale(Scale.LOG);
+		pv8.setHScale(Scale.LOG);
 		pv7.setLineColor(Color.BLUE);
 		pv8.setLineColor(Color.RED);		
-*/		
+		
 		System.out.println("pv1: " + pv1.getVScale() + ", " + pv1.getHScale());
 		plot.setVisible(true);
 	    PlotFrame frame = new PlotFrame(plot);

@@ -706,6 +706,10 @@ public class Mosaic extends IPanel {
   private TileAxis[] _axesLeft; // array[nrow] of left axes; null, if none
   private TileAxis[] _axesBottom; // array[ncol] of bottom axes; null, if none
   private TileAxis[] _axesRight; // array[nrow] of right axes; null, if none
+  private Scale[] _scaleTop; // array[ncol] of top axis scaling (LOG / LINEAR)
+  private Scale[] _scaleLeft; // array[nrow] of left axis scaling (LOG / LINEAR)
+  private Scale[] _scaleBottom; // array[ncol] of bottom axis scaling (LOG / LINEAR)
+  private Scale[] _scaleRight; // array[nrow] of right axis scaling (LOG / LINEAR)
   private ArrayList<Tile> _tileList; // simple list of all tiles
   private ArrayList<TileAxis> _axisList; // simple list of all axes
   private HScrollBar[] _hsb; // horizontal scroll bars
