@@ -19,6 +19,8 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.image.IndexColorModel;
 import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Set;
 import static java.lang.Math.*;
 
@@ -1252,6 +1254,28 @@ public class PlotPanel extends IPanel {
     } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
       pv.setOrientation(PointsView.Orientation.X1DOWN_X2RIGHT);
     }
+    /*
+    // if incoming PointsView has set scale = Scale.AUTO, it should match previous views
+    if(getTile(irow,icol).countTiledViews() == 0){
+    	pv.setHScale(Scale.LINEAR);
+    	pv.setVScale(Scale.LINEAR);
+    } else {
+	    Iterator<TiledView> itr = getTile(irow,icol).getTiledViews();
+	    while(itr.hasNext()){
+	    	TiledView tv = itr.next();
+	    	if(tv instanceof PointsView){
+	    		PointsView pv1 = (PointsView)tv;
+	    		if(pv.getHScale() == Scale.AUTO)
+	    			pv.setHScale(pv1.getHScale());
+	    		else
+	    			pv1.setHScale(pv.getHScale());
+	    		if(pv.getVScale() == Scale.AUTO)
+	    			pv.setVScale(pv1.getVScale());
+	    		else
+	    			pv1.setVScale(pv.getVScale());
+	    	}
+	    }
+    }*/
     addTiledView(irow,icol,pv);
     return pv;
   }

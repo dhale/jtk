@@ -34,20 +34,22 @@ public class LogAxisPlotDemo {
 		}
 
 		PlotPanel plot = new PlotPanel(2,2);
-		
+/*		
 		// plain old linear plots
 		PointsView pv1 = plot.addPoints(0,1,x, f1);
 		PointsView pv2 = plot.addPoints(0,1,x, f2);
 		pv1.setLineColor(Color.BLUE);
 		pv2.setLineColor(Color.RED);
-		
+*/		
 		// log-x plots
 		PointsView pv3 = plot.addPoints(0,0,x, f1);
+		pv3.setVScale(Scale.LOG);
+		pv3.setHScale(Scale.LOG);
 		PointsView pv4 = plot.addPoints(0,0,x, f2);
-		pv3.getHorizontalProjector().setScale(Scale.LOG);
+		//pv3.getHorizontalProjector().setScale(Scale.LOG);
 		pv3.setLineColor(Color.BLUE);
 		pv4.setLineColor(Color.RED);
-
+/*
 		// log-y plots
 		PointsView pv5 = plot.addPoints(1,1,x, f1);
 		PointsView pv6 = plot.addPoints(1,1,x, f2);
@@ -64,7 +66,7 @@ public class LogAxisPlotDemo {
 		pv8.setLineColor(Color.RED);		
 		
 		System.out.println(pv1.getHorizontalProjector().getScale());
-		
+		*/
 		plot.setVisible(true);
 	    PlotFrame frame = new PlotFrame(plot);
 	    frame.setSize(800,800);

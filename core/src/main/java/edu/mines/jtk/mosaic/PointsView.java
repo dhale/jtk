@@ -457,7 +457,8 @@ public class PointsView extends TiledView {
    * @return the horizontal scaling
    */
   public Scale getHScale() {
-	  return getHorizontalProjector().getScale();
+	  Projector hp = getHorizontalProjector();
+	  return (hp == null) ? Scale.AUTO : hp.getScale();
   }
   
   /**
@@ -465,7 +466,8 @@ public class PointsView extends TiledView {
    * @return the vertical scaling
    */
   public Scale getVScale() {
-	  return getVerticalProjector().getScale();
+	  Projector vp = getVerticalProjector();
+	  return (vp == null) ? Scale.AUTO : vp.getScale();
   }
   
   public void paint(Graphics2D g2d) {
@@ -654,12 +656,14 @@ public class PointsView extends TiledView {
     // Best projectors.
     Projector bhp = null;
     Projector bvp = null;
+    Scale hscale = getHScale();
+    Scale vscale = getVScale();
     if (_orientation==Orientation.X1RIGHT_X2UP) {
-      bhp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1):null;
-      bvp = (x2min<x2max)?new Projector(x2max,x2min,u0,u1):null;
+      bhp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1,hscale):null;
+      bvp = (x2min<x2max)?new Projector(x2max,x2min,u0,u1,vscale):null;
     } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      bhp = (x2min<x2max)?new Projector(x2min,x2max,u0,u1):null;
-      bvp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1):null;
+      bhp = (x2min<x2max)?new Projector(x2min,x2max,u0,u1,hscale):null;
+      bvp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1,vscale):null;
     }
     setBestProjectors(bhp,bvp);
   }

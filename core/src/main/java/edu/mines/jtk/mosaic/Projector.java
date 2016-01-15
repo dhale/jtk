@@ -136,7 +136,7 @@ public class Projector {
    * @return normalized coordinate u.
    */
   public double u(double v) {
-	if(_scaleType == Scale.LINEAR)
+	if(_scaleType == Scale.LINEAR || _scaleType == Scale.AUTO)
       return _vshift+_vscale*v;
 	else if(_scaleType == Scale.LOG)
 	  return _vshift+_vscale*ArrayMath.log10(v);
@@ -149,7 +149,7 @@ public class Projector {
    * @return world coordinate v.
    */
   public double v(double u) {
-	if(_scaleType == Scale.LINEAR)
+	if(_scaleType == Scale.LINEAR || _scaleType == Scale.AUTO)
 	  return _ushift+_uscale*u;
 	else if(_scaleType == Scale.LOG)
 	  return ArrayMath.pow(10,_ushift+_uscale*u);
@@ -334,7 +334,7 @@ public class Projector {
   private Scale _scaleType;
 
   private void computeShiftsAndScales() {
-	if(_scaleType == Scale.LINEAR){
+	if(_scaleType == Scale.LINEAR || _scaleType == Scale.AUTO){
       _uscale = (_v1-_v0)/(_u1-_u0);
       _ushift = _v0-_uscale*_u0;
       _vscale = (_u1-_u0)/(_v1-_v0);
