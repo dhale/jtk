@@ -683,8 +683,8 @@ public class PointsView extends TiledView {
       yv = x1;
     }
     for (int i=0; i<n; ++i) {
-      x[i] = ts.x(xv[i]);
-      y[i] = ts.y(yv[i]);
+      x[i] = (hp.getScale() == Scale.LOG) ? ts.x(log10(xv[i])) : ts.x(xv[i]);
+      y[i] = (vp.getScale() == Scale.LOG) ? ts.y(log10(yv[i])) : ts.y(yv[i]);
     }
   }
 

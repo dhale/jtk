@@ -276,8 +276,6 @@ public class TileAxis extends IPanel {
     boolean isVerticalRotated = isVerticalRotated();
     boolean isLogScale = (p.getScale() == Scale.LOG);
 
-    //System.out.println( (isHorizontal ? "HOR: " : "VER: ") + p);
-    
     // Axis tic sampling.
     int nticMajor = _axisTics.getCountMajor();
     double dticMajor = _axisTics.getDeltaMajor();
@@ -634,8 +632,10 @@ public class TileAxis extends IPanel {
     if(p.getScale() == Scale.LINEAR)
       _axisTics = new AxisTics(v0,v1,dtic);
     else if (p.getScale() == Scale.LOG) {
-  	  int expRange = (int)(floor(ArrayMath.log10(v1)) - ceil(ArrayMath.log10(v0))) + 1; 
-  	  _axisTics = new LogAxisTics(v0, v1, expRange);
+      double v0a = min(v0, v1);
+      double v1a = max(v0, v1);
+  	  ntic = (int)(floor(ArrayMath.log10(v1a)) - ceil(ArrayMath.log10(v0a))) + 1; 
+  	  _axisTics = new LogAxisTics(v0a, v1a, ntic);
     }
 
     // If either the tic label max width or height has changed,

@@ -8,12 +8,16 @@ import edu.mines.jtk.mosaic.PointsView;
 import edu.mines.jtk.mosaic.Projector;
 import edu.mines.jtk.mosaic.Scale;
 import edu.mines.jtk.util.ArrayMath;
+import static edu.mines.jtk.util.MathPlus.*;
 
 public class LogAxisPlotDemo {
 	public static void main(String args[]){
 		
 		// CURRENT ISSUES
 		// when zoomed plot does not pan correctly (maybe will be better when data is transformed?)
+		// still need to transform data (view dependent? Start with 1d interface for PointsView)
+		//			- This might be done in the computeXY method in PointsView?
+		//			- Which leads to Transcaler.combineWith()...
 		
 		// use this simple plot to observe changes to TileAxis
 		int n = 1000;
@@ -25,15 +29,42 @@ public class LogAxisPlotDemo {
 		float[] f1 = new float[n];
 		float[] f2 = new float[n];
 		for(int i=0; i<n; ++i){
-			f1[i] = ArrayMath.pow(1.5f*x[i],1);
-			f2[i] = ArrayMath.pow(0.5f*x[i],1);
+			f1[i] = pow(1.5f*x[i],1);
+			f2[i] = (float)exp(0.02*x[i]);
 		}
 
-		PlotPanel plot = new PlotPanel();
-		PointsView pv1 = plot.addPoints(x, f1);
-		PointsView pv2 = plot.addPoints(x, f2);
-		pv1.getHorizontalProjector().setScale(Scale.LOG);
+		PlotPanel plot = new PlotPanel(2,2);
+		
+		// plain old linear plots
+		PointsView pv1 = plot.addPoints(0,1,x, f1);
+		PointsView pv2 = plot.addPoints(0,1,x, f2);
+		pv1.setLineColor(Color.BLUE);
+		pv2.setLineColor(Color.RED);
+		
+		// log-x plots
+		PointsView pv3 = plot.addPoints(0,0,x, f1);
+		PointsView pv4 = plot.addPoints(0,0,x, f2);
+		pv3.getHorizontalProjector().setScale(Scale.LOG);
+		pv3.setLineColor(Color.BLUE);
+		pv4.setLineColor(Color.RED);
+
+		// log-y plots
+		PointsView pv5 = plot.addPoints(1,1,x, f1);
+		PointsView pv6 = plot.addPoints(1,1,x, f2);
+		pv5.getVerticalProjector().setScale(Scale.LOG);
+		pv5.setLineColor(Color.BLUE);
+		pv6.setLineColor(Color.RED);
+		
+		// log-log plots
+		PointsView pv7 = plot.addPoints(1,0,x, f1);
+		PointsView pv8 = plot.addPoints(1,0,x, f2);
+		pv8.getVerticalProjector().setScale(Scale.LOG);
+		pv8.getHorizontalProjector().setScale(Scale.LOG);
+		pv7.setLineColor(Color.BLUE);
+		pv8.setLineColor(Color.RED);		
+		
 		System.out.println(pv1.getHorizontalProjector().getScale());
+		
 		plot.setVisible(true);
 	    PlotFrame frame = new PlotFrame(plot);
 	    frame.setSize(800,800);

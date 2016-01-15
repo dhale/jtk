@@ -15,6 +15,7 @@ limitations under the License.
 package edu.mines.jtk.mosaic;
 
 import edu.mines.jtk.util.Check;
+import static edu.mines.jtk.util.MathPlus.log10;
 
 /**
  * Translates and scales (maps) user coordinates to/from device coordinates.
@@ -147,10 +148,12 @@ public class Transcaler {
    * @return the new transcaler.
    */
   public Transcaler combineWith(Projector xp, Projector yp) {
-    double x1v = xp.v(_x1u);
-    double y1v = yp.v(_y1u);
-    double x2v = xp.v(_x2u);
-    double y2v = yp.v(_y2u);
+	Scale xsc = xp.getScale();
+	Scale ysc = yp.getScale();
+	double x1v = (xsc == Scale.LOG) ? log10(xp.v(_x1u)) : xp.v(_x1u); 
+	double x2v = (xsc == Scale.LOG) ? log10(xp.v(_x2u)) : xp.v(_x2u);
+	double y1v = (ysc == Scale.LOG) ? log10(yp.v(_y1u)) : yp.v(_y1u); 
+	double y2v = (ysc == Scale.LOG) ? log10(yp.v(_y2u)) : yp.v(_y2u);
     return new Transcaler(x1v,y1v,x2v,y2v,_x1d,_y1d,_x2d,_y2d);
   }
 

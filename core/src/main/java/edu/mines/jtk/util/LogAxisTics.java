@@ -1,6 +1,10 @@
 package edu.mines.jtk.util;
 
 import static edu.mines.jtk.util.MathPlus.*;
+import static java.lang.Math.ceil;
+import static java.lang.Math.floor;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class LogAxisTics extends AxisTics {
 
@@ -12,28 +16,17 @@ public class LogAxisTics extends AxisTics {
 	   */
 	  public LogAxisTics(double x1, double x2, int ntic) {
 		super(x1,x2,ntic);
-		_expMin = min(log10(x1),log10(x2));
-	    _expMax = max(log10(x1),log10(x2));
+	    double xmin = min(x1, x2);
+	    double xmax = max(x1, x2);
+		_expMin = log10(xmin);
+	    _expMax = log10(xmax);
 		_dtic = 1;
 		_ftic = pow(10, ceil(_expMin));
 		_ntic = ntic;
 		computeMultiple();
 		computeMinorTics();
-		
-		/*
-		System.out.println("Making a log ticer!");
-		System.out.println(_expMin);
-		System.out.println(_expMax);
-		System.out.println(getCountMajor());
-		System.out.println(getDeltaMajor());
-		System.out.println(getFirstMajor());
-		System.out.println(getCountMinor());
-		System.out.println(getDeltaMinor());
-		System.out.println(getFirstMinor());
-		System.out.println(getMultiple());
-		*/
 	  }
-
+	  
 	  /**
 	   * Gets the number of major tics.
 	   * @return the number of major tics.
