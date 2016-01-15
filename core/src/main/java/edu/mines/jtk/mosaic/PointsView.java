@@ -439,10 +439,14 @@ public class PointsView extends TiledView {
    * @param axis scaling enum value
    */
   public PointsView setHScale(Scale scaleType) {
-	  Projector hp = getHorizontalProjector();
-	  if(hp != null)
-		  hp.setScale(scaleType);
-	  _hscale = scaleType;
+	  if(scaleType != _hscale){
+		  _hscale = scaleType;
+		  Projector hp = getHorizontalProjector();
+		  if(hp != null)
+			  hp.setScale(scaleType);
+		  if(getTile() != null)
+			  getTile().setHScale(_hscale);
+  	  }
 	  return this;
   } 
   
@@ -451,10 +455,14 @@ public class PointsView extends TiledView {
    * @param axis scaling enum value
    */
   public PointsView setVScale(Scale scaleType) {
-	  Projector vp = getVerticalProjector();
-	  if(vp != null)
-		  vp.setScale(scaleType);
-	  _vscale = scaleType;
+	  if(scaleType != _vscale){
+		  _vscale = scaleType;
+		  Projector vp = getVerticalProjector();
+		  if(vp != null)
+			  vp.setScale(scaleType);
+		  if(getTile() != null)
+			  getTile().setVScale(_vscale);
+	  }
 	  return this;
   } 
   

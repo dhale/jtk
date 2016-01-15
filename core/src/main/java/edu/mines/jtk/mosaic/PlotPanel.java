@@ -1254,35 +1254,55 @@ public class PlotPanel extends IPanel {
     } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
       pv.setOrientation(PointsView.Orientation.X1DOWN_X2RIGHT);
     }
+
+    // if the incoming pv is NOT 
     
-    // if incoming PointsView has set scale = Scale.AUTO, it should match previous views
-    if(getTile(irow,icol).countTiledViews() == 0){
-    	Scale hscale = pv.getHScale();
-    	Scale vscale = pv.getVScale();
-    	pv.setHScale( (hscale==Scale.AUTO) ? Scale.LINEAR : hscale );
-    	pv.setVScale( (vscale==Scale.AUTO) ? Scale.LINEAR : vscale );
-    } else {
-	    Iterator<TiledView> itr = getTile(irow,icol).getTiledViews();
-	    while(itr.hasNext()){
-	    	TiledView tv = itr.next();
-	    	if(tv instanceof PointsView){
-	    		PointsView pv1 = (PointsView)tv;
-	    		if(pv.getHScale() == Scale.AUTO)
-	    			pv.setHScale(pv1.getHScale());
-	    		else
-	    			pv1.setHScale(pv.getHScale());
-	    		if(pv.getVScale() == Scale.AUTO)
-	    			pv.setVScale(pv1.getVScale());
-	    		else
-	    			pv1.setVScale(pv.getVScale());
-	    	}
-	    }
+    Scale hscale = pv.getHScale();
+    Scale vscale = pv.getVScale();
+    int nRowViews = 0;
+    int nColViews = 0;
+    Scale otherHscale = Scale.AUTO;
+    Scale otherVscale = Scale.AUTO;
+    
+    // find how many other views in this column
+    for(int jrow = 0; jrow < getMosaic().countRows(); ++jrow){
+    	int nviews = getTile(jrow, icol).countTiledViews();
+    	if(  nviews > 0 ){
+    		nColViews += nviews;
+    		otherHscale = getTile(jrow, icol).getHScale();
+    	}
     }
-	Scale hscale = pv.getHScale();
-	Scale vscale = pv.getVScale();
+    // find how many other views in this row
+    for(int jcol = 0; jcol < getMosaic().countColumns(); ++jcol){
+    	int nviews = getTile(irow, jcol).countTiledViews();
+    	if(  nviews > 0 ){
+    		nRowViews += nviews;
+    		otherVscale = getTile(irow, jcol).getVScale();
+    	}
+    }
+    
+    // if there were no other views in this row
+    if(nRowViews == 0){
+    	pv.setVScale( (vscale == Scale.AUTO) ? Scale.LINEAR : vscale );
+    	getTile(irow, icol).setVScale(pv.getVScale());
+    // if there were other views in this row
+    } else {
+    	pv.setVScale( otherVscale );
+		getTile(irow, icol).setVScale( otherVscale );
+    }
+    
+    // if there were no other views in this column
+    if(nColViews == 0){
+    	pv.setHScale( (hscale == Scale.AUTO) ? Scale.LINEAR : hscale );
+    	getTile(irow, icol).setHScale(pv.getHScale());
+    	
+    // if there were other views in this column
+    } else {
+    	pv.setHScale( otherHscale );
+		getTile(irow, icol).setHScale( otherHscale );
+    }
+ 
     addTiledView(irow,icol,pv);
-    pv.setHScale(hscale);
-    pv.setVScale(vscale);
     return pv;
   }
 

@@ -1,12 +1,19 @@
 package jtkdemo.mosaic;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
 import edu.mines.jtk.mosaic.PlotFrame;
 import edu.mines.jtk.mosaic.PlotPanel;
 import edu.mines.jtk.mosaic.PointsView;
 import edu.mines.jtk.mosaic.Projector;
 import edu.mines.jtk.mosaic.Scale;
+import edu.mines.jtk.mosaic.Tile;
 import edu.mines.jtk.util.ArrayMath;
 import static edu.mines.jtk.util.MathPlus.*;
 
@@ -46,31 +53,45 @@ public class LogAxisPlotDemo {
 		// log-x plots
 		PointsView pv3 = plot.addPoints(0,0,x1, f1);
 		PointsView pv4 = plot.addPoints(0,0,x2, f2);
+		pv3.setHScale(Scale.LOG);
 		pv3.setLineColor(Color.BLUE);
 		pv4.setLineColor(Color.RED);
 
 		// log-y plots
 		PointsView pv5 = plot.addPoints(1,1,x1, f1);
 		PointsView pv6 = plot.addPoints(1,1,x2, f2);
+		pv5.setVScale(Scale.LOG);
 		pv5.setLineColor(Color.BLUE);
 		pv6.setLineColor(Color.RED);
 		
-		
+
 		// need to update the PlotPanel 
 		// log-log plots
 		PointsView pv7 = plot.addPoints(1,0,x1, f1);
 		PointsView pv8 = plot.addPoints(1,0,x2, f2);
-		pv8.setVScale(Scale.LOG);
-		pv8.setHScale(Scale.LOG);
 		pv7.setLineColor(Color.BLUE);
 		pv8.setLineColor(Color.RED);		
 		
-		System.out.println("pv1: " + pv1.getVScale() + ", " + pv1.getHScale());
+		
+		
+		// make some buttons
+		JPanel buttPanel = new JPanel();
+		buttPanel.add( changeHAxisButton(plot.getTile(0, 0)));
+		buttPanel.add( changeVAxisButton(plot.getTile(0, 1)));
+		buttPanel.add( changeHAxisButton(plot.getTile(1, 0)));
+		buttPanel.add( changeVAxisButton(plot.getTile(1, 1)));
+		
+		
+		
 		plot.setVisible(true);
 	    PlotFrame frame = new PlotFrame(plot);
+	    frame.add(buttPanel,BorderLayout.SOUTH);
 	    frame.setSize(800,800);
 	    frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
 	    frame.setVisible(true);
+	    
+	    
+	    
 /*	    
 	    // Projector log scale test
 		// assuming safe input for now
@@ -88,6 +109,38 @@ public class LogAxisPlotDemo {
 	    System.out.println("p.v(p.u(100)) = " + p.v(p.u(100)));
 	    */
 	}
+	
+	
+	public static JButton changeHAxisButton(Tile tile){
+		JButton b = new JButton("Tile " + tile.getRowIndex() + ", " + tile.getColumnIndex()+ " H");
+		b.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(tile.getHScale() == Scale.LOG)
+					tile.setHScale(Scale.LINEAR);
+				else
+					tile.setHScale(Scale.LOG);
+			}
+		});
+		return b;
+	}
+	
+	public static JButton changeVAxisButton(Tile tile){
+		JButton b = new JButton("Tile " + tile.getRowIndex() + ", " + tile.getColumnIndex()+ " V");
+		b.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(tile.getVScale() == Scale.LOG)
+					tile.setVScale(Scale.LINEAR);
+				else
+					tile.setVScale(Scale.LOG);
+				tile.repaint();
+			}
+		});
+		return b;
+	}	
 	
 	public static float f1(double x){
 		return (float) (4*x*Math.sin(10/x)) + 10.0f;

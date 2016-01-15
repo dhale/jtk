@@ -260,6 +260,88 @@ public class Tile extends IPanel {
     return _mosaic.getTileAxisRight(_irow);
   }
 
+  /**
+   * Gets the Horizontal axis scaling.
+   * @return the Scale; null, if none.
+   */
+  public Scale getHScale() {
+    return _hscale;
+  }
+
+  /**
+   * Gets the Vertical axis scaling.
+   * @return the Scale; null, if none.
+   */
+  public Scale getVScale() {
+    return _vscale;
+  }
+  
+  /**
+   * Sets the Horizontal axis scaling.
+   * @param the new scale
+   * @return This tile
+   */
+  public Tile setHScale(Scale scale) {
+	  if(_hscale != scale){
+	    
+		_hscale = scale;
+	    
+	    for(TiledView tv : _tvs)
+	    	if(tv instanceof PointsView)
+    			((PointsView)tv).setHScale(_hscale);
+	    
+	    for(int jrow = 0; jrow < getMosaic().countRows(); ++jrow){
+	    	Tile t = getMosaic().getTile(jrow, _icol);
+	    	t.setHScale(_hscale);
+	    }
+	  }
+
+	  if(getTileAxisBottom() != null){
+      	getTileAxisBottom().updateAxisTics();
+      	getTileAxisBottom().repaint();
+	  }
+      if(getTileAxisTop() != null){
+      	getTileAxisTop().updateAxisTics();
+      	getTileAxisTop().repaint();
+      }
+	  repaint();
+    return this;
+  }
+
+  /**
+   * Sets the Vertical axis scaling.
+   * @param the new scale
+   * @return This tile
+   */
+  public Tile setVScale(Scale scale) {
+	  if(_vscale != scale){
+		    
+		_vscale = scale;
+	    
+	    for(TiledView tv : _tvs)
+	    	if(tv instanceof PointsView)
+    			((PointsView)tv).setVScale(_vscale);
+	    
+	    for(int jcol = 0; jcol < getMosaic().countColumns(); ++jcol){
+	    	Tile t = getMosaic().getTile(_irow, jcol);
+	    	t.setVScale(_vscale);
+	    }
+	  }
+
+	  if(getTileAxisLeft() != null){
+      	getTileAxisLeft().updateAxisTics();
+      	getTileAxisLeft().repaint();
+	  }
+      if(getTileAxisRight() != null){
+      	getTileAxisRight().updateAxisTics();
+      	getTileAxisRight().repaint();
+      }
+	  repaint();
+    return this;
+  }
+  
+  
+  
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
     g2d = createGraphics(g2d,x,y,w,h);
 
@@ -395,6 +477,8 @@ public class Tile extends IPanel {
   private Projector _svp; // specified best vertical projector; or null
   private Transcaler _ts = new Transcaler();
   private DRectangle _vr = new DRectangle(0.0,0.0,1.0,1.0);
+  private Scale _hscale = Scale.AUTO;
+  private Scale _vscale = Scale.AUTO;
 
   private void updateBestProjectors() {
     Projector bhp = null;
@@ -424,5 +508,8 @@ public class Tile extends IPanel {
     }
     _bhp = (_shp!=null)?_shp:bhp;
     _bvp = (_svp!=null)?_svp:bvp;
+    
+    _bhp.setScale(_hscale);
+    _bvp.setScale(_vscale);
   }
 }
