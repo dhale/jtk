@@ -83,38 +83,46 @@ public class Mosaic extends IPanel {
     _axisList = new ArrayList<TileAxis>();
     if (axesPlacement.contains(AxesPlacement.TOP)) {
       _axesTop = new TileAxis[ncol];
+      _scaleTop = new Scale[ncol];
       for (int icol=0; icol<ncol; ++icol) {
         TileAxis axis = _axesTop[icol] = 
           new TileAxis(this,TileAxis.Placement.TOP,icol);
         _axisList.add(axis);
         add(axis);
+        _scaleTop[icol] = Scale.LINEAR;		// all linear by default
       }
     }
     if (axesPlacement.contains(AxesPlacement.LEFT)) {
       _axesLeft = new TileAxis[nrow];
+      _scaleLeft = new Scale[nrow];
       for (int irow=0; irow<nrow; ++irow) {
         TileAxis axis = _axesLeft[irow] = 
           new TileAxis(this,TileAxis.Placement.LEFT,irow);
         _axisList.add(axis);
         add(axis);
+        _scaleLeft[irow] = Scale.LINEAR;		// all linear by default
       }
     }
     if (axesPlacement.contains(AxesPlacement.BOTTOM)) {
       _axesBottom = new TileAxis[ncol];
+      _scaleBottom = new Scale[ncol];
       for (int icol=0; icol<ncol; ++icol) {
         TileAxis axis = _axesBottom[icol] = 
           new TileAxis(this,TileAxis.Placement.BOTTOM,icol);
         _axisList.add(axis);
         add(axis);
+        _scaleBottom[icol] = Scale.LINEAR;		// all linear by default
       }
     }
     if (axesPlacement.contains(AxesPlacement.RIGHT)) {
       _axesRight = new TileAxis[nrow];
+      _scaleRight = new Scale[nrow];
       for (int irow=0; irow<nrow; ++irow) {
         TileAxis axis = _axesRight[irow] = 
           new TileAxis(this,TileAxis.Placement.RIGHT,irow);
         _axisList.add(axis);
         add(axis);
+        _scaleRight[irow] = Scale.LINEAR;		// all linear by default
       }
     }
 
@@ -230,6 +238,86 @@ public class Mosaic extends IPanel {
   }
 
   /**
+   * Gets the top axis Scale with specified column index.
+   * @param icol the column index.
+   * @return the axis scale; null, if none.
+   */
+  public Scale getScaleTop(int icol) {
+    return (_scaleTop!=null)?_scaleTop[icol]:null;
+  }
+
+  /**
+   * Gets the left axis Scale with specified row index.
+   * @param irow the row index.
+   * @return the axis scale; null, if none.
+   */
+  public Scale getScaleLeft(int irow) {
+    return (_scaleLeft!=null)?_scaleLeft[irow]:null;
+  }
+
+  /**
+   * Gets the bottom axis Scale with specified column index.
+   * @param icol the column index.
+   * @return the axis scale; null, if none.
+   */
+  public Scale getScaleBottom(int icol) {
+    return (_scaleBottom!=null)?_scaleBottom[icol]:null;
+  }
+
+  /**
+   * Gets the right axis Scale with specified row index.
+   * @param irow the row index.
+   * @return the axis scale; null, if none.
+   */
+  public Scale getScaleRight(int irow) {
+    return (_scaleRight!=null)?_scaleRight[irow]:null;
+  }
+  
+  /**
+   * Gets the top axis Scale with specified column index.
+   * @param icol the column index.
+   * @return the axis scale; null, if none.
+   */
+  public Mosaic setScaleTop(int icol, Scale scale) {
+	  if (_scaleTop!=null)
+		  _scaleTop[icol] = scale;
+	  return this;
+  }
+
+  /**
+   * Gets the left axis Scale with specified row index.
+   * @param irow the row index.
+   * @return the axis scale; null, if none.
+   */
+  public Mosaic setScaleLeft(int irow, Scale scale) {
+	  if (_scaleLeft!=null)
+		  _scaleLeft[irow] = scale;
+	  return this;
+  }
+
+  /**
+   * Gets the bottom axis Scale with specified column index.
+   * @param icol the column index.
+   * @return the axis scale; null, if none.
+   */
+  public Mosaic setScaleBottom(int icol, Scale scale) {
+	  if (_scaleBottom!=null)
+		  _scaleBottom[icol] = scale;
+	  return this;
+  }
+
+  /**
+   * Gets the right axis Scale with specified row index.
+   * @param irow the row index.
+   * @return the axis scale; null, if none.
+   */
+  public Mosaic setScaleRight(int irow, Scale scale) {
+	  if (_scaleRight!=null)
+		  _scaleRight[irow] = scale;
+	  return this;
+  } 
+
+  /**
    * Gets the top tile axis with specified column index.
    * @param icol the column index.
    * @return the axis; null, if none.
@@ -263,8 +351,8 @@ public class Mosaic extends IPanel {
    */
   public TileAxis getTileAxisRight(int irow) {
     return (_axesRight!=null)?_axesRight[irow]:null;
-  }
-
+  } 
+  
   /**
    * Sets the width minimum for the specified column. All tiles in the 
    * specified column will have width not less than the specified minimum. 
