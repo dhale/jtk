@@ -439,7 +439,10 @@ public class PointsView extends TiledView {
    * @param axis scaling enum value
    */
   public PointsView setHScale(Scale scaleType) {
-	  getHorizontalProjector().setScale(scaleType);
+	  Projector hp = getHorizontalProjector();
+	  if(hp != null)
+		  hp.setScale(scaleType);
+	  _hscale = scaleType;
 	  return this;
   } 
   
@@ -448,7 +451,10 @@ public class PointsView extends TiledView {
    * @param axis scaling enum value
    */
   public PointsView setVScale(Scale scaleType) {
-	  getVerticalProjector().setScale(scaleType);
+	  Projector vp = getVerticalProjector();
+	  if(vp != null)
+		  vp.setScale(scaleType);
+	  _vscale = scaleType;
 	  return this;
   } 
   
@@ -458,7 +464,7 @@ public class PointsView extends TiledView {
    */
   public Scale getHScale() {
 	  Projector hp = getHorizontalProjector();
-	  return (hp == null) ? Scale.AUTO : hp.getScale();
+	  return (hp == null) ? _hscale : hp.getScale();
   }
   
   /**
@@ -467,7 +473,7 @@ public class PointsView extends TiledView {
    */
   public Scale getVScale() {
 	  Projector vp = getVerticalProjector();
-	  return (vp == null) ? Scale.AUTO : vp.getScale();
+	  return (vp == null) ? _vscale : vp.getScale();
   }
   
   public void paint(Graphics2D g2d) {
@@ -605,6 +611,8 @@ public class PointsView extends TiledView {
   private float _markSize = -1.0f;
   private Color _markColor = null;
   private String _textFormat = "%1.4G";
+  private Scale _hscale = Scale.AUTO;
+  private Scale _vscale = Scale.AUTO;
 
   /**
    * Called when we might new realignment.

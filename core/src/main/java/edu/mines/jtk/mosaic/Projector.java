@@ -197,15 +197,6 @@ public class Projector {
   }  
 
   /**
-   * Sets the scale type
-   * @param new scale type
-   */
-  public void setScale(Scale s) {
-    _scaleType = s;
-    computeShiftsAndScales();
-  }  
-  
-  /**
    * Merges the specified projector into this projector. 
    * @param p the projector.
    */
@@ -323,6 +314,17 @@ public class Projector {
     return "Projector("+_v0+", "+_v1+", "+_u0+", "+_u1+", " + _scaleType +")";
   }
 
+  /////////////////////////////////////////////////////////////////////////
+  // protected
+  
+  /**
+   * Sets the scale type
+   * @param new scale type
+   */
+  protected void setScale(Scale s) {
+    _scaleType = s;
+    computeShiftsAndScales();
+  } 
   
   ///////////////////////////////////////////////////////////////////////////
   // private

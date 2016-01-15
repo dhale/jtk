@@ -24,49 +24,52 @@ public class LogAxisPlotDemo {
 		float X = 300;
 
 		// a good old linear function
-		float[] x = new float[n];
-		x = ArrayMath.rampfloat(0.04f, X/n, n);
+		float[] x1 = new float[n];
+		float[] x2 = new float[n];
+		x1 = ArrayMath.rampfloat(0.1f, X/n, n);
+		x2 = ArrayMath.rampfloat(0.04f, 1.2f*X/n, n);
 		float[] f1 = new float[n];
 		float[] f2 = new float[n];
 		for(int i=0; i<n; ++i){
-			f1[i] = pow(1.5f*x[i],1);
-			f2[i] = (float)exp(0.02*x[i]);
+			f1[i] = pow(1.5f*x1[i],1);
+			f2[i] = (float)exp(0.02*x2[i]);
 		}
 
 		PlotPanel plot = new PlotPanel(2,2);
-/*		
+		
 		// plain old linear plots
-		PointsView pv1 = plot.addPoints(0,1,x, f1);
-		PointsView pv2 = plot.addPoints(0,1,x, f2);
+		PointsView pv1 = plot.addPoints(0,1,x1, f1);
+		PointsView pv2 = plot.addPoints(0,1,x2, f2);
 		pv1.setLineColor(Color.BLUE);
 		pv2.setLineColor(Color.RED);
-*/		
+		
 		// log-x plots
-		PointsView pv3 = plot.addPoints(0,0,x, f1);
-		pv3.setVScale(Scale.LOG);
+		PointsView pv3 = plot.addPoints(0,0,x1, f1);
+//		System.out.println("pv3: " + pv3.getVScale() + ", " + pv3.getHScale());
+		PointsView pv4 = plot.addPoints(0,0,x2, f2);
 		pv3.setHScale(Scale.LOG);
-		PointsView pv4 = plot.addPoints(0,0,x, f2);
-		//pv3.getHorizontalProjector().setScale(Scale.LOG);
+//		System.out.println("pv3: " + pv3.getVScale() + ", " + pv3.getHScale());
+//		System.out.println("pv4: " + pv4.getVScale() + ", " + pv4.getHScale());
+//		pv4.setHScale(Scale.LOG);
+//		System.out.println("pv3: " + pv3.getVScale() + ", " + pv3.getHScale());
+//		System.out.println("pv4: " + pv4.getVScale() + ", " + pv4.getHScale());
 		pv3.setLineColor(Color.BLUE);
 		pv4.setLineColor(Color.RED);
-/*
+
 		// log-y plots
-		PointsView pv5 = plot.addPoints(1,1,x, f1);
-		PointsView pv6 = plot.addPoints(1,1,x, f2);
-		pv5.getVerticalProjector().setScale(Scale.LOG);
+		PointsView pv5 = plot.addPoints(1,1,x1, f1);
+		PointsView pv6 = plot.addPoints(1,1,x2, f2);
+		pv5.setVScale(Scale.LOG);
 		pv5.setLineColor(Color.BLUE);
 		pv6.setLineColor(Color.RED);
-		
+/*		
 		// log-log plots
-		PointsView pv7 = plot.addPoints(1,0,x, f1);
-		PointsView pv8 = plot.addPoints(1,0,x, f2);
-		pv8.getVerticalProjector().setScale(Scale.LOG);
-		pv8.getHorizontalProjector().setScale(Scale.LOG);
+		PointsView pv7 = plot.addPoints(1,0,x1, f1);
+		PointsView pv8 = plot.addPoints(1,0,x2, f2);
 		pv7.setLineColor(Color.BLUE);
 		pv8.setLineColor(Color.RED);		
-		
-		System.out.println(pv1.getHorizontalProjector().getScale());
-		*/
+*/		
+		System.out.println("pv1: " + pv1.getVScale() + ", " + pv1.getHScale());
 		plot.setVisible(true);
 	    PlotFrame frame = new PlotFrame(plot);
 	    frame.setSize(800,800);

@@ -1254,11 +1254,13 @@ public class PlotPanel extends IPanel {
     } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
       pv.setOrientation(PointsView.Orientation.X1DOWN_X2RIGHT);
     }
-    /*
+    
     // if incoming PointsView has set scale = Scale.AUTO, it should match previous views
     if(getTile(irow,icol).countTiledViews() == 0){
-    	pv.setHScale(Scale.LINEAR);
-    	pv.setVScale(Scale.LINEAR);
+    	Scale hscale = pv.getHScale();
+    	Scale vscale = pv.getVScale();
+    	pv.setHScale( (hscale==Scale.AUTO) ? Scale.LINEAR : hscale );
+    	pv.setVScale( (vscale==Scale.AUTO) ? Scale.LINEAR : vscale );
     } else {
 	    Iterator<TiledView> itr = getTile(irow,icol).getTiledViews();
 	    while(itr.hasNext()){
@@ -1275,8 +1277,12 @@ public class PlotPanel extends IPanel {
 	    			pv1.setVScale(pv.getVScale());
 	    	}
 	    }
-    }*/
+    }
+	Scale hscale = pv.getHScale();
+	Scale vscale = pv.getVScale();
     addTiledView(irow,icol,pv);
+    pv.setHScale(hscale);
+    pv.setVScale(vscale);
     return pv;
   }
 
