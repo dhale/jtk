@@ -20,36 +20,33 @@ import static edu.mines.jtk.util.MathPlus.*;
 public class LogAxisPlotDemo {
 	public static void main(String args[]){
 		
-		// CURRENT ISSUES
-		// when zoomed plot does not pan correctly (maybe will be better when data is transformed?)
-		// still need to transform data (view dependent? Start with 1d interface for PointsView)
-		//			- This might be done in the computeXY method in PointsView?
-		//			- Which leads to Transcaler.combineWith()...
-		
 		// use this simple plot to observe changes to TileAxis
 		int n = 1000;
 		float X = 300;
 
-		// a good old linear function
 		float[] x1 = new float[n];
 		float[] x2 = new float[n];
-		x1 = ArrayMath.rampfloat(0.1f, X/n, n);
-		x2 = ArrayMath.rampfloat(0.04f, 1.2f*X/n, n);
+		x1 = ArrayMath.rampfloat(0.0f, X/n, n);
+		x2 = ArrayMath.rampfloat(-X,2*X/n,n);
+		
 		float[] f1 = new float[n];
 		float[] f2 = new float[n];
+		float[] f3 = new float[n];
 		for(int i=0; i<n; ++i){
 			f1[i] = pow(1.5f*x1[i],1);
 			f2[i] = (float)exp(0.02*x2[i]);
+			f2[i] = f3[i] = 100*(float)sin(0.1*x2[i]);
 		}
 
-		PlotPanel plot = new PlotPanel(2,2);
+		// new plot
+		PlotPanel plot = new PlotPanel();
 		
 		// plain old linear plots
-		PointsView pv1 = plot.addPoints(0,1,x1, f1);
-		PointsView pv2 = plot.addPoints(0,1,x2, f2);
-		pv1.setLineColor(Color.BLUE);
+		//PointsView pv1 = plot.addPoints(0,1,x1, f1);
+		PointsView pv2 = plot.addPoints(x2, f2);
+		//pv1.setLineColor(Color.BLUE);
 		pv2.setLineColor(Color.RED);
-		
+/*		
 		// log-x plots
 		PointsView pv3 = plot.addPoints(0,0,x1, f1);
 		PointsView pv4 = plot.addPoints(0,0,x2, f2);
@@ -69,24 +66,24 @@ public class LogAxisPlotDemo {
 		// log-log plots
 		PointsView pv7 = plot.addPoints(1,0,x1, f1);
 		PointsView pv8 = plot.addPoints(1,0,x2, f2);
+		PointsView pv9 = plot.addPoints(1,0,x2, f3);
 		pv7.setLineColor(Color.BLUE);
 		pv8.setLineColor(Color.RED);		
-		
+	*/	
 		
 		
 		// make some buttons
 		JPanel buttPanel = new JPanel();
+		//buttPanel.add( changeHAxisButton(plot.getTile(0, 0)));
+		buttPanel.add( changeVAxisButton(plot.getTile(0, 0)));
 		buttPanel.add( changeHAxisButton(plot.getTile(0, 0)));
-		buttPanel.add( changeVAxisButton(plot.getTile(0, 1)));
-		buttPanel.add( changeHAxisButton(plot.getTile(1, 0)));
-		buttPanel.add( changeVAxisButton(plot.getTile(1, 1)));
+		//buttPanel.add( changeVAxisButton(plot.getTile(1, 1)));
 		
-		
-		
+		// frame setup
 		plot.setVisible(true);
 	    PlotFrame frame = new PlotFrame(plot);
 	    frame.add(buttPanel,BorderLayout.SOUTH);
-	    frame.setSize(800,800);
+	    frame.setSize(500,500);
 	    frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
 	    frame.setVisible(true);
 	    

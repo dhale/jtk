@@ -1255,8 +1255,6 @@ public class PlotPanel extends IPanel {
       pv.setOrientation(PointsView.Orientation.X1DOWN_X2RIGHT);
     }
 
-    // if the incoming pv is NOT 
-    
     Scale hscale = pv.getHScale();
     Scale vscale = pv.getVScale();
     int nRowViews = 0;
@@ -1285,6 +1283,7 @@ public class PlotPanel extends IPanel {
     if(nRowViews == 0){
     	pv.setVScale( (vscale == Scale.AUTO) ? Scale.LINEAR : vscale );
     	getTile(irow, icol).setVScale(pv.getVScale());
+    	
     // if there were other views in this row
     } else {
     	pv.setVScale( otherVscale );

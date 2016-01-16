@@ -114,6 +114,7 @@ public class Projector {
     Check.argument(u0<u1,"u0 < u1");
     Check.argument(u1<=1.0,"u1 <= 1.0");
     Check.argument(v0!=v1,"v0 != v1");
+    setScale(s);
     _u0 = u0;
     _u1 = u1;
     _v0 = v0;
@@ -322,7 +323,9 @@ public class Projector {
    * @param new scale type
    */
   protected void setScale(Scale s) {
-    _scaleType = s;
+	  _scaleType = s;
+	  if(_v0 <= 0 || _v1 <= 0)
+		  _scaleType = Scale.LINEAR;
     computeShiftsAndScales();
   } 
   

@@ -447,6 +447,7 @@ public class PointsView extends TiledView {
 		  if(getTile() != null)
 			  getTile().setHScale(_hscale);
   	  }
+	  updateBestProjectors();
 	  return this;
   } 
   
@@ -463,6 +464,7 @@ public class PointsView extends TiledView {
 		  if(getTile() != null)
 			  getTile().setVScale(_vscale);
 	  }
+	  updateBestProjectors();
 	  return this;
   } 
   
@@ -644,8 +646,25 @@ public class PointsView extends TiledView {
         x1max = max(x1max,x1i);
         x2max = max(x2max,x2i);
       }
+      
+      if(_hscale == Scale.LOG){
+    	  int ind = getFirstPositiveInd(x1);
+    	  if(ind > -1)
+    		  x1min = max(x1min,x1[ind]);
+    	  else
+    		  setHScale(Scale.LINEAR);
+      }
+      
+      if(_vscale == Scale.LOG){
+    	  int ind = getSmallestPositiveInd(x2);
+    	  if(ind > -1)
+    		  x2min = max(x2min,x2[ind]);
+    	  else
+    		  setVScale(Scale.LINEAR);
+      }
+      
     }
-
+    System.out.println(x2min + ", " + x2max);
     // Ensure x1min<x1max and x2min<x2max.
     if (x1min==x1max) {
       x1min -= ulp(x1min);
@@ -656,6 +675,7 @@ public class PointsView extends TiledView {
       x2max += ulp(x2max);
     }
 
+    
     // Assume mark sizes and line widths less than 2% of plot dimensions.
     // The goal is to avoid clipping big marks and wide lines. The problem
     // is that mark sizes and line widths are specified in screen pixels
@@ -681,9 +701,35 @@ public class PointsView extends TiledView {
       bhp = (x2min<x2max)?new Projector(x2min,x2max,u0,u1,hscale):null;
       bvp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1,vscale):null;
     }
+
+   	//System.out.println(bvp);
     setBestProjectors(bhp,bvp);
   }
 
+  private int getFirstPositiveInd(float[] x){
+	  int ind = -1;
+	  for(int i=0; i<x.length; i++){
+		  if(x[i] > 0){
+			  ind = i;
+			  break;
+		  }
+	  }
+	  return ind;
+  }
+  
+  private int getSmallestPositiveInd(float[] x){
+	  int ind = -1;
+	  float smallest = Float.MAX_VALUE;
+	  for(int i=0; i<x.length; i++){
+		  if(x[i] > 0 && x[i] < smallest){
+			  ind = i;
+			  smallest = x[i];
+		  }
+	  }
+	  return ind;
+  }
+
+  
   private boolean equalColors(Color ca, Color cb) {
     return (ca==null)?cb==null:ca.equals(cb);
   }
@@ -703,8 +749,11 @@ public class PointsView extends TiledView {
       yv = x1;
     }
     for (int i=0; i<n; ++i) {
+      if(yv[i] <= 0 && vp.getScale() == Scale.LOG)
+        yv[i] = (float)vp.v1();
       x[i] = (hp.getScale() == Scale.LOG) ? ts.x(log10(xv[i])) : ts.x(xv[i]);
       y[i] = (vp.getScale() == Scale.LOG) ? ts.y(log10(yv[i])) : ts.y(yv[i]);
+
     }
   }
 

@@ -506,10 +506,13 @@ public class Tile extends IPanel {
         bvp.merge(tv.getBestVerticalProjector());
       }
     }
+    
     _bhp = (_shp!=null)?_shp:bhp;
     _bvp = (_svp!=null)?_svp:bvp;
-    
-    _bhp.setScale(_hscale);
-    _bvp.setScale(_vscale);
+
+    if(_bhp!=null)
+    	_bhp.setScale(_hscale);
+    if(_bvp!=null)
+    	_bvp.setScale(_vscale);
   }
 }
