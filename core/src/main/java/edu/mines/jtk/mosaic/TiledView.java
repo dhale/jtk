@@ -96,7 +96,8 @@ public abstract class TiledView {
       if (_tile!=null)
         _tile.alignProjectors();
     }
-    System.out.println("Now _bvp = " + _bvp);
+    //System.out.println("Now _bvp = " + _bvp);
+    
   }
   
   /**

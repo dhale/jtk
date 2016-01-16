@@ -39,14 +39,14 @@ public class LogAxisPlotDemo {
 		}
 
 		// new plot
-		PlotPanel plot = new PlotPanel();
+		PlotPanel plot = new PlotPanel(2,2);
 		
 		// plain old linear plots
-		//PointsView pv1 = plot.addPoints(0,1,x1, f1);
-		PointsView pv2 = plot.addPoints(x2, f2);
-		//pv1.setLineColor(Color.BLUE);
+		PointsView pv1 = plot.addPoints(0,1,x1, f1);
+		PointsView pv2 = plot.addPoints(0,1,x2, f2);
+		pv1.setLineColor(Color.BLUE);
 		pv2.setLineColor(Color.RED);
-/*		
+		
 		// log-x plots
 		PointsView pv3 = plot.addPoints(0,0,x1, f1);
 		PointsView pv4 = plot.addPoints(0,0,x2, f2);
@@ -69,15 +69,15 @@ public class LogAxisPlotDemo {
 		PointsView pv9 = plot.addPoints(1,0,x2, f3);
 		pv7.setLineColor(Color.BLUE);
 		pv8.setLineColor(Color.RED);		
-	*/	
+		
 		
 		
 		// make some buttons
 		JPanel buttPanel = new JPanel();
-		//buttPanel.add( changeHAxisButton(plot.getTile(0, 0)));
-		buttPanel.add( changeVAxisButton(plot.getTile(0, 0)));
 		buttPanel.add( changeHAxisButton(plot.getTile(0, 0)));
-		//buttPanel.add( changeVAxisButton(plot.getTile(1, 1)));
+		buttPanel.add( changeVAxisButton(plot.getTile(0, 1)));
+		buttPanel.add( changeHAxisButton(plot.getTile(0, 1)));
+		buttPanel.add( changeVAxisButton(plot.getTile(1, 1)));
 		
 		// frame setup
 		plot.setVisible(true);
@@ -108,7 +108,7 @@ public class LogAxisPlotDemo {
 	}
 	
 	
-	public static JButton changeHAxisButton(Tile tile){
+	public static JButton changeHAxisButton(final Tile tile){
 		JButton b = new JButton("Tile " + tile.getRowIndex() + ", " + tile.getColumnIndex()+ " H");
 		b.addActionListener(new ActionListener() {
 			
@@ -123,7 +123,7 @@ public class LogAxisPlotDemo {
 		return b;
 	}
 	
-	public static JButton changeVAxisButton(Tile tile){
+	public static JButton changeVAxisButton(final Tile tile){
 		JButton b = new JButton("Tile " + tile.getRowIndex() + ", " + tile.getColumnIndex()+ " V");
 		b.addActionListener(new ActionListener() {
 			

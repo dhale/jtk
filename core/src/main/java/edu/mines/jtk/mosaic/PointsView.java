@@ -628,7 +628,6 @@ public class PointsView extends TiledView {
    * Called when we might new realignment.
    */
   private void updateBestProjectors() {
-
     // Min and max (x1,x2) values.
     float x1min =  FLT_MAX;
     float x2min =  FLT_MAX;
@@ -664,7 +663,6 @@ public class PointsView extends TiledView {
       }
       
     }
-    System.out.println(x2min + ", " + x2max);
     // Ensure x1min<x1max and x2min<x2max.
     if (x1min==x1max) {
       x1min -= ulp(x1min);
@@ -702,7 +700,6 @@ public class PointsView extends TiledView {
       bvp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1,vscale):null;
     }
 
-   	//System.out.println(bvp);
     setBestProjectors(bhp,bvp);
   }
 
@@ -716,6 +713,25 @@ public class PointsView extends TiledView {
 	  }
 	  return ind;
   }
+
+  private float getSmallest(float[] x){
+	  float smallest = Float.MAX_VALUE;
+	  for(int i=0; i<x.length; i++){
+		  if(x[i] < smallest)
+			  smallest = x[i];
+	  }
+	  return smallest;
+  } 
+
+  public float getSmallestX2(){
+	  float smallest = Float.MAX_VALUE;
+	  float[] x = _x2.get(0);
+	  for(int i=0; i<x.length; i++){
+		  if(x[i] < smallest)
+			  smallest = x[i];
+	  }
+	  return smallest;
+  }  
   
   private int getSmallestPositiveInd(float[] x){
 	  int ind = -1;
@@ -749,11 +765,14 @@ public class PointsView extends TiledView {
       yv = x1;
     }
     for (int i=0; i<n; ++i) {
+      float tempYV = yv[i];
+      float tempXV = xv[i];
       if(yv[i] <= 0 && vp.getScale() == Scale.LOG)
-        yv[i] = (float)vp.v1();
-      x[i] = (hp.getScale() == Scale.LOG) ? ts.x(log10(xv[i])) : ts.x(xv[i]);
-      y[i] = (vp.getScale() == Scale.LOG) ? ts.y(log10(yv[i])) : ts.y(yv[i]);
-
+    	tempYV = (float)vp.v1();
+      if(xv[i] <= 0 && hp.getScale() == Scale.LOG)
+      	tempXV = (float)hp.v0();
+      x[i] = (hp.getScale() == Scale.LOG) ? ts.x(log10(tempXV)) : ts.x(xv[i]);
+      y[i] = (vp.getScale() == Scale.LOG) ? ts.y(log10(tempYV)) : ts.y(yv[i]);
     }
   }
 

@@ -317,7 +317,6 @@ public class Tile extends IPanel {
 	  if(_vscale != scale){
 		    
 		_vscale = scale;
-	    
 	    for(TiledView tv : _tvs)
 	    	if(tv instanceof PointsView)
     			((PointsView)tv).setVScale(_vscale);
@@ -326,6 +325,7 @@ public class Tile extends IPanel {
 	    	Tile t = getMosaic().getTile(_irow, jcol);
 	    	t.setVScale(_vscale);
 	    }
+	    
 	  }
 
 	  if(getTileAxisLeft() != null){
