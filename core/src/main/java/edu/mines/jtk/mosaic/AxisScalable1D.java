@@ -13,15 +13,17 @@ public class AxisScalable1D implements AxisScalable {
 	}	
 	
 	@Override
-	public void setHScale(Scale s) {
+	public TiledView setHScale(Scale s) {
 		// TODO Auto-generated method stub
 		System.out.println("AxisScalable1D.setHScale()");
+		return null;
 	}
 
 	@Override
-	public void setVScale(Scale s) {
+	public TiledView setVScale(Scale s) {
 		// TODO Auto-generated method stub
 		System.out.println("AxisScalable1D.setVScale()");
+		return null;
 	}
 
 	@Override

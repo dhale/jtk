@@ -43,7 +43,7 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.12.28
  */
-public class PointsView extends TiledView {
+public class PointsView extends TiledView implements AxisScalable{
 
   /**
    * Orientation of axes x1 and x2. For example, the default orientation 
