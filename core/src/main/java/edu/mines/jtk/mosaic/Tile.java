@@ -49,7 +49,7 @@ import edu.mines.jtk.util.Check;
  * @version 2004.12.27
  * @version 2005.12.23
  */
-public class Tile extends IPanel {
+public class Tile extends IPanel implements AxisScalable{
   private static final long serialVersionUID = 1L;
 
   /**
@@ -265,7 +265,7 @@ public class Tile extends IPanel {
    * @return the Scale; null, if none.
    */
   public Scale getHScale() {
-    return _hscale;
+    return _axisScalable.getHScale();
   }
 
   /**
@@ -273,7 +273,7 @@ public class Tile extends IPanel {
    * @return the Scale; null, if none.
    */
   public Scale getVScale() {
-    return _vscale;
+    return _axisScalable.getVScale();
   }
   
   /**
@@ -282,29 +282,7 @@ public class Tile extends IPanel {
    * @return This tile
    */
   public Tile setHScale(Scale scale) {
-	  if(_hscale != scale){
-	    
-		_hscale = scale;
-	    
-	    for(TiledView tv : _tvs)
-	    	if(tv instanceof PointsView)
-    			((PointsView)tv).setHScale(_hscale);
-	    
-	    for(int jrow = 0; jrow < getMosaic().countRows(); ++jrow){
-	    	Tile t = getMosaic().getTile(jrow, _icol);
-	    	t.setHScale(_hscale);
-	    }
-	  }
-
-	  if(getTileAxisBottom() != null){
-      	getTileAxisBottom().updateAxisTics();
-      	getTileAxisBottom().repaint();
-	  }
-      if(getTileAxisTop() != null){
-      	getTileAxisTop().updateAxisTics();
-      	getTileAxisTop().repaint();
-      }
-	  repaint();
+	_axisScalable.setHScale(scale);
     return this;
   }
 
@@ -314,29 +292,7 @@ public class Tile extends IPanel {
    * @return This tile
    */
   public Tile setVScale(Scale scale) {
-	  if(_vscale != scale){
-		    
-		_vscale = scale;
-	    for(TiledView tv : _tvs)
-	    	if(tv instanceof PointsView)
-    			((PointsView)tv).setVScale(_vscale);
-	    
-	    for(int jcol = 0; jcol < getMosaic().countColumns(); ++jcol){
-	    	Tile t = getMosaic().getTile(_irow, jcol);
-	    	t.setVScale(_vscale);
-	    }
-	    
-	  }
-
-	  if(getTileAxisLeft() != null){
-      	getTileAxisLeft().updateAxisTics();
-      	getTileAxisLeft().repaint();
-	  }
-      if(getTileAxisRight() != null){
-      	getTileAxisRight().updateAxisTics();
-      	getTileAxisRight().repaint();
-      }
-	  repaint();
+	_axisScalable.setVScale(scale);
     return this;
   }
   
@@ -379,6 +335,7 @@ public class Tile extends IPanel {
     _mosaic = mosaic;
     _irow = irow;
     _icol = icol;
+    _axisScalable = new AxisScalableTile(this,Scale.AUTO, Scale.AUTO);
     mosaic.add(this);
   }
   
@@ -477,8 +434,7 @@ public class Tile extends IPanel {
   private Projector _svp; // specified best vertical projector; or null
   private Transcaler _ts = new Transcaler();
   private DRectangle _vr = new DRectangle(0.0,0.0,1.0,1.0);
-  private Scale _hscale = Scale.AUTO;
-  private Scale _vscale = Scale.AUTO;
+  private AxisScalable _axisScalable;
 
   private void updateBestProjectors() {
     Projector bhp = null;
@@ -511,8 +467,8 @@ public class Tile extends IPanel {
     _bvp = (_svp!=null)?_svp:bvp;
 
     if(_bhp!=null)
-    	_bhp.setScale(_hscale);
+    	_bhp.setScale(getHScale());
     if(_bvp!=null)
-    	_bvp.setScale(_vscale);
+    	_bvp.setScale(getVScale());
   }
 }

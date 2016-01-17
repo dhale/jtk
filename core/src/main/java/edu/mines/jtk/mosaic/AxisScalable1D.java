@@ -12,7 +12,7 @@ public class AxisScalable1D implements AxisScalable {
 	}
 	
 	@Override
-	public TiledView setHScale(Scale s) {
+	public AxisScalable setHScale(Scale s) {
 		  if(s != _hscale){
 			  Projector hp = ((TiledView)_as).getHorizontalProjector();
 			  Tile tile = ((TiledView)_as).getTile();
@@ -22,12 +22,11 @@ public class AxisScalable1D implements AxisScalable {
 				  tile.setHScale(s);
 	  	  }
 		_hscale = s;  
-		System.out.println("AxisScalable1D.setHScale()");
-		return (TiledView)_as;
+		return _as;
 	}
 
 	@Override
-	public TiledView setVScale(Scale s) {
+	public AxisScalable setVScale(Scale s) {
 		  if(s != _vscale){
 			  Projector vp = ((TiledView)_as).getVerticalProjector();
 			  Tile tile = ((TiledView)_as).getTile();
@@ -37,8 +36,7 @@ public class AxisScalable1D implements AxisScalable {
 				  tile.setVScale(s);
 	  	  }
 		  _vscale = s; 
-		System.out.println("AxisScalable1D.setVScale()");
-		return (TiledView)_as;
+		return _as;
 	}
 
 	@Override

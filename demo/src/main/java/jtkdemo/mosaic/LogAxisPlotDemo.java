@@ -27,7 +27,7 @@ public class LogAxisPlotDemo {
 		float[] x1 = new float[n];
 		float[] x2 = new float[n];
 		x1 = ArrayMath.rampfloat(0.0f, X/n, n);
-		x2 = ArrayMath.rampfloat(-X,2*X/n,n);
+		x2 = ArrayMath.rampfloat(0.0f,X/n,n);
 		
 		float[] f1 = new float[n];
 		float[] f2 = new float[n];
@@ -66,7 +66,6 @@ public class LogAxisPlotDemo {
 		// log-log plots
 		PointsView pv7 = plot.addPoints(1,0,x1, f1);
 		PointsView pv8 = plot.addPoints(1,0,x2, f2);
-		PointsView pv9 = plot.addPoints(1,0,x2, f3);
 		pv7.setLineColor(Color.BLUE);
 		pv8.setLineColor(Color.RED);		
 		
