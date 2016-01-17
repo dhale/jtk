@@ -708,15 +708,6 @@ public class PointsView extends TiledView implements AxisScalable{
 	  }
 	  return ind;
   }
-
-  private float getSmallest(float[] x){
-	  float smallest = Float.MAX_VALUE;
-	  for(int i=0; i<x.length; i++){
-		  if(x[i] < smallest)
-			  smallest = x[i];
-	  }
-	  return smallest;
-  } 
   
   private int getSmallestPositiveInd(float[] x){
 	  int ind = -1;

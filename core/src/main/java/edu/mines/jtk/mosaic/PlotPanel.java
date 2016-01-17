@@ -19,8 +19,6 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.image.IndexColorModel;
 import java.util.EnumSet;
-import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.Set;
 import static java.lang.Math.*;
 
