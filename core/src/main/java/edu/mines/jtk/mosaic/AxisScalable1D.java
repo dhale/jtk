@@ -23,7 +23,7 @@ public class AxisScalable1D implements AxisScalable {
 	  	  }
 		_hscale = s;  
 		System.out.println("AxisScalable1D.setHScale()");
-		return null;
+		return (TiledView)_as;
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class AxisScalable1D implements AxisScalable {
 	  	  }
 		  _vscale = s; 
 		System.out.println("AxisScalable1D.setVScale()");
-		return null;
+		return (TiledView)_as;
 	}
 
 	@Override
