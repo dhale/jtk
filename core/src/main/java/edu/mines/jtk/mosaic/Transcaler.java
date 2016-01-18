@@ -148,12 +148,12 @@ public class Transcaler {
    * @return the new transcaler.
    */
   public Transcaler combineWith(Projector xp, Projector yp) {
-	Scale xsc = xp.getScale();
-	Scale ysc = yp.getScale();
-	double x1v = (xsc == Scale.LOG) ? log10(xp.v(_x1u)) : xp.v(_x1u); 
-	double x2v = (xsc == Scale.LOG) ? log10(xp.v(_x2u)) : xp.v(_x2u);
-	double y1v = (ysc == Scale.LOG) ? log10(yp.v(_y1u)) : yp.v(_y1u); 
-	double y2v = (ysc == Scale.LOG) ? log10(yp.v(_y2u)) : yp.v(_y2u);
+    Scale xsc = xp.getScale();
+    Scale ysc = yp.getScale();
+    double x1v = (xsc == Scale.LOG) ? log10(xp.v(_x1u)) : xp.v(_x1u); 
+    double x2v = (xsc == Scale.LOG) ? log10(xp.v(_x2u)) : xp.v(_x2u);
+    double y1v = (ysc == Scale.LOG) ? log10(yp.v(_y1u)) : yp.v(_y1u); 
+    double y2v = (ysc == Scale.LOG) ? log10(yp.v(_y2u)) : yp.v(_y2u);
     return new Transcaler(x1v,y1v,x2v,y2v,_x1d,_y1d,_x2d,_y2d);
   }
 

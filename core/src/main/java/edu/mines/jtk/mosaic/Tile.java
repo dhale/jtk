@@ -275,14 +275,14 @@ public class Tile extends IPanel implements AxisScalable{
   public Scale getVScale() {
     return _axisScalable.getVScale();
   }
-  
+
   /**
    * Sets the Horizontal axis scaling.
    * @param the new scale
    * @return This tile
    */
   public Tile setHScale(Scale scale) {
-	_axisScalable.setHScale(scale);
+    _axisScalable.setHScale(scale);
     return this;
   }
 
@@ -292,10 +292,9 @@ public class Tile extends IPanel implements AxisScalable{
    * @return This tile
    */
   public Tile setVScale(Scale scale) {
-	_axisScalable.setVScale(scale);
+    _axisScalable.setVScale(scale);
     return this;
-  }
-  
+  } 
   
   
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
@@ -467,8 +466,8 @@ public class Tile extends IPanel implements AxisScalable{
     _bvp = (_svp!=null)?_svp:bvp;
 
     if(_bhp!=null)
-    	_bhp.setScale(getHScale());
+      _bhp.setScale(getHScale());
     if(_bvp!=null)
-    	_bvp.setScale(getVScale());
+      _bvp.setScale(getVScale());
   }
 }

@@ -290,13 +290,13 @@ public class TileAxis extends IPanel {
       if (itic==ktic) {
         ktic += mtic;
       } else {
-    	  double vtic = 0.0;
-    	  if(isLogScale){	// drawing log spaced minor tics ... always draws all 8 of them
-    		  vtic = (itic + fticMinor*MathPlus.pow(10.0,-floor(MathPlus.log10(fticMinor)))-1)%9+1;
-    		  vtic *= MathPlus.pow(10.0,(ktic-1)/mtic + floor(MathPlus.log10(fticMinor)));
-    	  }
-    	  else
-    		  vtic = fticMinor+itic*dticMinor;
+        double vtic = 0.0;
+        if(isLogScale){  // drawing log spaced minor tics ... always draws all 8 of them
+          vtic = (itic + fticMinor*MathPlus.pow(10.0,-floor(MathPlus.log10(fticMinor)))-1)%9+1;
+          vtic *= MathPlus.pow(10.0,(ktic-1)/mtic + floor(MathPlus.log10(fticMinor)));
+        }
+        else
+          vtic = fticMinor+itic*dticMinor;
         double utic = p.u(vtic);
         if (isHorizontal) {
           x = t.x(utic);
@@ -321,7 +321,7 @@ public class TileAxis extends IPanel {
     double tiny = 1.0e-6*abs(dticMajor);
     for (int itic=0; itic<nticMajor; ++itic) {
       double vtic = isLogScale ? fticMajor*Math.pow(10, itic) 
-    		      : fticMajor+itic*dticMajor;
+              : fticMajor+itic*dticMajor;
       double utic = p.u(vtic);
       if (abs(vtic)<tiny)
         vtic = 0.0;
@@ -632,8 +632,8 @@ public class TileAxis extends IPanel {
     else if (p.getScale() == Scale.LOG) {
       double v0a = min(v0, v1);
       double v1a = max(v0, v1);
-  	  ntic = (int)(floor(ArrayMath.log10(v1a)) - ceil(ArrayMath.log10(v0a))) + 1; 
-  	  _axisTics = new LogAxisTics(v0a, v1a, ntic);
+      ntic = (int)(floor(ArrayMath.log10(v1a)) - ceil(ArrayMath.log10(v0a))) + 1; 
+      _axisTics = new LogAxisTics(v0a, v1a, ntic);
     }
 
     // If either the tic label max width or height has changed,

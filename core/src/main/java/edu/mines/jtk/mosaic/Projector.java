@@ -137,11 +137,11 @@ public class Projector {
    * @return normalized coordinate u.
    */
   public double u(double v) {
-	if(_scaleType == Scale.LINEAR || _scaleType == Scale.AUTO)
+  if(_scaleType == Scale.LINEAR || _scaleType == Scale.AUTO)
       return _vshift+_vscale*v;
-	else if(_scaleType == Scale.LOG)
-	  return _vshift+_vscale*ArrayMath.log10(v);
-	return 0.0;
+  else if(_scaleType == Scale.LOG)
+    return _vshift+_vscale*ArrayMath.log10(v);
+  return 0.0;
   }
 
   /**
@@ -150,11 +150,11 @@ public class Projector {
    * @return world coordinate v.
    */
   public double v(double u) {
-	if(_scaleType == Scale.LINEAR || _scaleType == Scale.AUTO)
-	  return _ushift+_uscale*u;
-	else if(_scaleType == Scale.LOG)
-	  return ArrayMath.pow(10,_ushift+_uscale*u);
-	return 0.0;
+  if(_scaleType == Scale.LINEAR || _scaleType == Scale.AUTO)
+    return _ushift+_uscale*u;
+  else if(_scaleType == Scale.LOG)
+    return ArrayMath.pow(10,_ushift+_uscale*u);
+  return 0.0;
   }
 
   /**
@@ -202,7 +202,7 @@ public class Projector {
    * @param p the projector.
    */
   public void merge(Projector p) {
-	  
+    
     // Ignore null projectors.
     if (p==null)
       return;
@@ -323,9 +323,9 @@ public class Projector {
    * @param new scale type
    */
   protected void setScale(Scale s) {
-	  _scaleType = s;
-	  if(_v0 <= 0 || _v1 <= 0)
-		  _scaleType = Scale.LINEAR;
+    _scaleType = s;
+    if(_v0 <= 0 || _v1 <= 0)
+      _scaleType = Scale.LINEAR;
     computeShiftsAndScales();
   } 
   
@@ -339,16 +339,16 @@ public class Projector {
   private Scale _scaleType;
 
   private void computeShiftsAndScales() {
-	if(_scaleType == Scale.LINEAR || _scaleType == Scale.AUTO){
+    if (_scaleType == Scale.LINEAR || _scaleType == Scale.AUTO) {
       _uscale = (_v1-_v0)/(_u1-_u0);
       _ushift = _v0-_uscale*_u0;
       _vscale = (_u1-_u0)/(_v1-_v0);
       _vshift = _u0-_vscale*_v0;
-	} else if(_scaleType == Scale.LOG){
-	  _vscale = (_u1-_u0)/(ArrayMath.log10(_v1)-ArrayMath.log10(_v0));
-	  _uscale = (ArrayMath.log10(_v1)-ArrayMath.log10(_v0))/(_u1-_u0);
-	  _ushift = ArrayMath.log10(_v0)-_uscale*_u0;
-	  _vshift = _u0-_vscale*ArrayMath.log10(_v0);
-	}
+    } else if (_scaleType == Scale.LOG) {
+      _vscale = (_u1 - _u0) / (ArrayMath.log10(_v1) - ArrayMath.log10(_v0));
+      _uscale = (ArrayMath.log10(_v1) - ArrayMath.log10(_v0)) / (_u1 - _u0);
+      _ushift = ArrayMath.log10(_v0) - _uscale * _u0;
+      _vshift = _u0 - _vscale * ArrayMath.log10(_v0);
+    }
   }
 }

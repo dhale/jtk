@@ -441,42 +441,38 @@ public class PointsView extends TiledView implements AxisScalable{
    */
   @Override
   public PointsView setHScale(Scale scaleType) {
-	  _axisScalable.setHScale(scaleType);
-	  updateBestProjectors();
-	  return this;
-  } 
-  
+    _axisScalable.setHScale(scaleType);
+    updateBestProjectors();
+    return this;
+  }
+
   /**
    * Sets the vertical axis scaling.
    * @param axis scaling enum value
    */
   @Override
   public PointsView setVScale(Scale scaleType) {
-	  _axisScalable.setVScale(scaleType);
-	  updateBestProjectors();
-	  return this;
-  } 
-  
+    _axisScalable.setVScale(scaleType);
+    updateBestProjectors();
+    return this;
+  }
+
   /**
    * Gets the horizontal axis scaling.
    * @return the horizontal scaling
    */
   @Override
   public Scale getHScale() {
-	  //Projector hp = getHorizontalProjector();
-	  //return (hp == null) ? _hscale : hp.getScale();
-	  return _axisScalable.getHScale();
+    return _axisScalable.getHScale();
   }
-  
+
   /**
    * Gets the vertical axis scaling.
    * @return the vertical scaling
    */
   @Override
   public Scale getVScale() {
-	  //Projector vp = getVerticalProjector();
-	  //return (vp == null) ? _vscale : vp.getScale();
-	  return _axisScalable.getVScale();
+    return _axisScalable.getVScale();
   }
   
   public void paint(Graphics2D g2d) {
@@ -637,26 +633,27 @@ public class PointsView extends TiledView implements AxisScalable{
         x1max = max(x1max,x1i);
         x2max = max(x2max,x2i);
       }
-      
+
       Scale hscale = getHScale();
       Scale vscale = getVScale();
-      
-      if(hscale == Scale.LOG){
-    	  int ind = getFirstPositiveInd(x1);
-    	  if(ind > -1)
-    		  x1min = max(x1min,x1[ind]);
-    	  else
-    		  setHScale(Scale.LINEAR);
+
+      if (hscale == Scale.LOG) {
+        int ind = getFirstPositiveInd(x1);
+        if (ind > -1)
+          x1min = max(x1min, x1[ind]);
+        else
+          setHScale(Scale.LINEAR);
       }
-      
-      if(vscale == Scale.LOG){
-    	  int ind = getSmallestPositiveInd(x2);
-    	  if(ind > -1)
-    		  x2min = max(x2min,x2[ind]);
-    	  else
-    		  setVScale(Scale.LINEAR);
+
+      if (vscale == Scale.LOG) {
+        int ind = getSmallestPositiveInd(x2);
+        if (ind > -1)
+          x2min = max(x2min, x2[ind]);
+        else
+          setVScale(Scale.LINEAR);
       }
     }
+    
     // Ensure x1min<x1max and x2min<x2max.
     if (x1min==x1max) {
       x1min -= ulp(x1min);
@@ -697,29 +694,28 @@ public class PointsView extends TiledView implements AxisScalable{
     setBestProjectors(bhp,bvp);
   }
 
-  private int getFirstPositiveInd(float[] x){
-	  int ind = -1;
-	  for(int i=0; i<x.length; i++){
-		  if(x[i] > 0){
-			  ind = i;
-			  break;
-		  }
-	  }
-	  return ind;
-  }
-  
-  private int getSmallestPositiveInd(float[] x){
-	  int ind = -1;
-	  float smallest = Float.MAX_VALUE;
-	  for(int i=0; i<x.length; i++){
-		  if(x[i] > 0 && x[i] < smallest){
-			  ind = i;
-			  smallest = x[i];
-		  }
-	  }
-	  return ind;
+  private int getFirstPositiveInd(float[] x) {
+    int ind = -1;
+    for (int i = 0; i < x.length; i++) {
+      if (x[i] > 0) {
+        ind = i;
+        break;
+      }
+    }
+    return ind;
   }
 
+  private int getSmallestPositiveInd(float[] x) {
+    int ind = -1;
+    float smallest = Float.MAX_VALUE;
+    for (int i = 0; i < x.length; i++) {
+      if (x[i] > 0 && x[i] < smallest) {
+        ind = i;
+        smallest = x[i];
+      }
+    }
+    return ind;
+  }
   
   private boolean equalColors(Color ca, Color cb) {
     return (ca==null)?cb==null:ca.equals(cb);
@@ -739,13 +735,13 @@ public class PointsView extends TiledView implements AxisScalable{
       xv = x2;
       yv = x1;
     }
-    for (int i=0; i<n; ++i) {
+    for (int i = 0; i < n; ++i) {
       float tempYV = yv[i];
       float tempXV = xv[i];
-      if(yv[i] <= 0 && vp.getScale() == Scale.LOG)
-    	tempYV = (float)vp.v1();
-      if(xv[i] <= 0 && hp.getScale() == Scale.LOG)
-      	tempXV = (float)hp.v0();
+      if (yv[i] <= 0 && vp.getScale() == Scale.LOG)
+        tempYV = (float) vp.v1();
+      if (xv[i] <= 0 && hp.getScale() == Scale.LOG)
+        tempXV = (float) hp.v0();
       x[i] = (hp.getScale() == Scale.LOG) ? ts.x(log10(tempXV)) : ts.x(xv[i]);
       y[i] = (vp.getScale() == Scale.LOG) ? ts.y(log10(tempYV)) : ts.y(yv[i]);
     }
