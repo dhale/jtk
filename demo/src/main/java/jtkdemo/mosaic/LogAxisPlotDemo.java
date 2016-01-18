@@ -20,6 +20,7 @@ import static edu.mines.jtk.util.MathPlus.*;
 public class LogAxisPlotDemo {
 	public static void main(String args[]){
 		
+		System.out.println("LogAxisPlotDemo");
 		// use this simple plot to observe changes to TileAxis
 		int n = 1000;
 		float X = 300;
@@ -27,6 +28,7 @@ public class LogAxisPlotDemo {
 		float[] x1 = new float[n];
 		float[] x2 = new float[n];
 		x1 = ArrayMath.rampfloat(0.0f, X/n, n);
+		//x2 = ArrayMath.rampfloat(-X-1,X/n,n);
 		x2 = ArrayMath.rampfloat(0.0f,X/n,n);
 		
 		float[] f1 = new float[n];
@@ -37,7 +39,13 @@ public class LogAxisPlotDemo {
 			f2[i] = (float)exp(0.02*x2[i]);
 			f2[i] = f3[i] = 100*(float)sin(0.1*x2[i]);
 		}
-
+/*
+		PlotPanel plot = new PlotPanel();
+		PointsView pv5 = plot.addPoints(x1, f1);
+		PointsView pv6 = plot.addPoints(x2, f2);
+		pv5.setVScale(Scale.LOG);
+	*/	
+		
 		// new plot
 		PlotPanel plot = new PlotPanel(2,2);
 		

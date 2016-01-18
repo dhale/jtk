@@ -656,7 +656,6 @@ public class PointsView extends TiledView implements AxisScalable{
     	  else
     		  setVScale(Scale.LINEAR);
       }
-      
     }
     // Ensure x1min<x1max and x2min<x2max.
     if (x1min==x1max) {

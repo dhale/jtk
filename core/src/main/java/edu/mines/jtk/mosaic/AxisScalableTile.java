@@ -23,14 +23,14 @@ public class AxisScalableTile implements AxisScalable{
 		while(itr.hasNext()){
 		  TiledView tv = itr.next();
 		  if(tv instanceof AxisScalable)
-	    	((AxisScalable)tv).setHScale(s);
+	    	((AxisScalable)tv).setHScale(_hscale);
 		}
 		  
 		// set other tiles in this row to new scale
 		Mosaic mos = _tile.getMosaic();
 		for(int jrow = 0; jrow < mos.countRows(); ++jrow){
 		  Tile t = mos.getTile(jrow, _tile.getColumnIndex());
-		  t.setHScale(s);
+		  t.setHScale(_hscale);
 		}
 		    
 	  }
@@ -52,20 +52,19 @@ public class AxisScalableTile implements AxisScalable{
 	public AxisScalable setVScale(Scale s) {
 	  if(_vscale != s){
 		_vscale = s;
-		
 		// set all TiledViews in this tile to new scale
 		Iterator<TiledView> itr = _tile.getTiledViews();
 		while(itr.hasNext()){
 		  TiledView tv = itr.next();
 		  if(tv instanceof AxisScalable)
-	    	((AxisScalable)tv).setVScale(s);
+	    	((AxisScalable)tv).setVScale(_vscale);
 		}
 		  
 		// set other tiles in this row to new scale
 		Mosaic mos = _tile.getMosaic();
 		for(int jcol = 0; jcol < mos.countColumns(); ++jcol){
 		  Tile t = mos.getTile(_tile.getRowIndex(), jcol);
-		  t.setVScale(s);
+		  t.setVScale(_vscale);
 		}
 		    
 	  }
