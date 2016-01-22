@@ -28,7 +28,7 @@ import java.awt.Color;
 
 /**
  * Demos {@link edu.mines.jtk.mosaic.PointsView}
- * @author Eric Addison, Chevron Energy Technology Company
+ * @author Eric Addison
  * @version 2016.1.22
  */
 public class GridViewDemo {
