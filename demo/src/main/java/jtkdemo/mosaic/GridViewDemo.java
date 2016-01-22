@@ -18,6 +18,7 @@ import javax.swing.*;
 
 import edu.mines.jtk.mosaic.*;
 import edu.mines.jtk.mosaic.GridView.Horizontal;
+import edu.mines.jtk.mosaic.GridView.Style;
 import edu.mines.jtk.mosaic.GridView.Vertical;
 import edu.mines.jtk.util.ArrayMath;
 
@@ -61,6 +62,7 @@ public class GridViewDemo {
 	  gv.setVertical(Vertical.USER);
 	  gv.setVLineLocations(vLines);
 	  gv.setHLineLocations(hLines);
+	  gv.setStyle(Style.DASH);
 	  
 	  // mke a plot frame
 	  PlotFrame frame = new PlotFrame(plot);
