@@ -735,15 +735,11 @@ public class PointsView extends TiledView implements AxisScalable{
       xv = x2;
       yv = x1;
     }
+    double hLeft = Math.min(hp.v0(), hp.v1());
+    double vBot = Math.min(vp.v0(), vp.v1());
     for (int i = 0; i < n; ++i) {
-      float tempYV = yv[i];
-      float tempXV = xv[i];
-      if (yv[i] <= 0 && vp.getScale() == Scale.LOG)
-        tempYV = (float) vp.v1();
-      if (xv[i] <= 0 && hp.getScale() == Scale.LOG)
-        tempXV = (float) hp.v0();
-      x[i] = (hp.getScale() == Scale.LOG) ? ts.x(log10(tempXV)) : ts.x(xv[i]);
-      y[i] = (vp.getScale() == Scale.LOG) ? ts.y(log10(tempYV)) : ts.y(yv[i]);
+      x[i] = ts.x((xv[i] <= 0 && hp.getScale() == Scale.LOG) ? hLeft : xv[i]);
+      y[i] = ts.y((yv[i] <= 0 && vp.getScale() == Scale.LOG) ? vBot : yv[i]);
     }
   }
 

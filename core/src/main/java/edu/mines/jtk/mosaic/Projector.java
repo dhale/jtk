@@ -351,6 +351,8 @@ public class Projector {
   private Scale _scaleType;
 
   private void computeShiftsAndScales() {
+	  if(_v0 <= 0.0 || _v1 <= 0.0)
+  		_scaleType = Scale.LINEAR;
     if (_scaleType == Scale.LINEAR || _scaleType == Scale.AUTO) {
       _uscale = (_v1-_v0)/(_u1-_u0);
       _ushift = _v0-_uscale*_u0;
