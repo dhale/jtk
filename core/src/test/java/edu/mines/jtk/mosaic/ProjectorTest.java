@@ -159,25 +159,31 @@ public class ProjectorTest extends TestCase {
       fail("Expected: <"+expected+"> but was:<"+actual+">");
   }
   
-  private static void assertVeryClose (double expected, double actual) {
-	    boolean success = true;
-	    success &= Math.abs(expected-actual) <= eps;
-	    if (!success)
-	      fail("Expected: <"+expected+"> but was:<"+actual+">");
-	  }
+  public static void assertVeryClose (double expected, double actual) {
+      boolean success = true;
+      success &= Math.abs(expected-actual) <= eps;
+      if (!success)
+        fail("Expected: <"+expected+"> but was:<"+actual+">");
+    }
   
   
   // The same set of tests as above, except this time for a LOG scale projector
   // with the addition of a functional test of log projection
   
   public void testProjectionLog () {
-	  Projector p = new Projector(0.1, 100, 0.0, 1.0, Scale.LOG);
-	  assertVeryClose(0.1, p.v(p.u(0.1)));
-	  assertVeryClose(2, p.v(p.u(2)));
-	  assertVeryClose(56.7785, p.v(p.u(56.7785)));
-	  assertVeryClose(0.0, p.u(p.v(0.0)));
-	  assertVeryClose(0.25, p.u(p.v(0.25)));
-	  assertVeryClose(0.6173, p.u(p.v(0.6173)));
+    Projector p = new Projector(0.1, 100, 0.0, 1.0, Scale.LOG);
+    assertVeryClose(0.1, p.v(p.u(0.1)));
+    assertVeryClose(2, p.v(p.u(2)));
+    assertVeryClose(56.7785, p.v(p.u(56.7785)));
+    assertVeryClose(0.0, p.u(p.v(0.0)));
+    assertVeryClose(0.25, p.u(p.v(0.25)));
+    assertVeryClose(0.6173, p.u(p.v(0.6173)));
+  }
+  
+
+  public void testAutoLinear() {
+    Projector p = new Projector(0.0, 100, 0.0, 1.0, Scale.LOG);
+    assert(p.getScale() == Scale.LINEAR);
   }
   
   public void testMergeALog () {

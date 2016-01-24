@@ -98,19 +98,6 @@ public class LogAxisPlotDemo {
     frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
     frame.setVisible(true);
 
-    /*
-     * // Projector log scale test // assuming safe input for now Projector p =
-     * new Projector(0.1, 100, 0.0, 1.0); p.setScale(Scale.LINEAR);
-     * System.out.println("p.u(0) = " + p.u(0.3));
-     * System.out.println("p.u(50) = " + p.u(50));
-     * System.out.println("p.u(100) = " + p.u(100)); p.setScale(Scale.LOG);
-     * System.out.println("p.u(0.3) = " + p.u(0.3));
-     * System.out.println("p.u(10) = " + p.u(10));
-     * System.out.println("p.u(100) = " + p.u(100));
-     * System.out.println("p.v(p.u(0.3)) = " + p.v(p.u(0.3)));
-     * System.out.println("p.v(p.u(10)) = " + p.v(p.u(10)));
-     * System.out.println("p.v(p.u(100)) = " + p.v(p.u(100)));
-     */
   }
 
   public static JButton changeHAxisButton(final Tile tile) {

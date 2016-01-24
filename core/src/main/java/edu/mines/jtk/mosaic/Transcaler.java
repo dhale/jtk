@@ -106,8 +106,8 @@ public class Transcaler {
     int    x1d, int    y1d, int    x2d, int    y2d,
     Scale hscale, Scale vscale)
   {
-	_xpScale = hscale;
-	_ypScale = vscale;
+  _xpScale = hscale;
+  _ypScale = vscale;
     setMapping(x1u,y1u,x2u,y2u,x1d,y1d,x2d,y2d);
   }
 
@@ -190,16 +190,16 @@ public class Transcaler {
    * @return the device x-coordinate.
    */
   public int x(double xu) {
-	if(_xpScale == Scale.LOG)
-		xu = Math.log10(xu);
-	  
+  if(_xpScale == Scale.LOG)
+    xu = log10(xu);
+    
     double xd = _xushift+_xuscale*xu;
     if (xd<DMIN) {
       xd = DMIN;
     } else if (xd>DMAX) {
       xd = DMAX;
     }
-    	return (int)(xd);
+      return (int)(xd);
   }
 
   /**
@@ -208,9 +208,9 @@ public class Transcaler {
    * @return the device y-coordinate.
    */
   public int y(double yu) {
-	if(_ypScale == Scale.LOG)
-		yu = Math.log10(yu);
-	
+  if(_ypScale == Scale.LOG)
+    yu = log10(yu);
+  
     double yd = _yushift+_yuscale*yu;
     if (yd<DMIN) {
       yd = DMIN;
