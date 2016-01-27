@@ -15,16 +15,43 @@ limitations under the License.
 package edu.mines.jtk.mosaic;
 
 /**
- * Interface used to define methods required for changing axis scaling of TiledViews.
+ * The interface used to define methods required for changing 
+ * axis scaling of TiledViews.
+ * <p>
+ * An object that implements the AxisScalable interface allows
+ * its plot axes to be set to either a linear or logarithmic
+ * scale. The only methods defined in this interface are the 
+ * getters and setters for the horizontal and vertical scales.
+ * 
+ * @author Eric Addison
+ * @version 2016.1.25
  */
 public interface AxisScalable {
 
-  public AxisScalable setHScale(Scale s);
+  /**
+   * Sets the horizontal axis scaling.
+   * @param s the new scale
+   * @return an AxisScalable object
+   */
+  public AxisScalable setHScale(AxisScale s);
   
-  public AxisScalable setVScale(Scale s);
+  /**
+   * Sets the vertical axis scaling.
+   * @param s the new scale
+   * @return an AxisScalable object
+   */
+  public AxisScalable setVScale(AxisScale s);
+ 
+  /**
+   * Gets the current horizontal axis scaling.
+   * @return the horizontal scale
+   */
+  public AxisScale getHScale();
   
-  public Scale getHScale();
-  
-  public Scale getVScale();
+  /**
+   * Gets the current vertical axis scaling.
+   * @return the vertical scale
+   */
+  public AxisScale getVScale();
   
 }

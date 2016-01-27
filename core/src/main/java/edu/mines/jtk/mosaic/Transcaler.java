@@ -104,7 +104,7 @@ public class Transcaler {
   private Transcaler(
     double x1u, double y1u, double x2u, double y2u,
     int    x1d, int    y1d, int    x2d, int    y2d,
-    Scale hscale, Scale vscale)
+    AxisScale hscale, AxisScale vscale)
   {
   _xpScale = hscale;
   _ypScale = vscale;
@@ -175,12 +175,12 @@ public class Transcaler {
    * @return the new transcaler.
    */
   public Transcaler combineWith(Projector xp, Projector yp) {
-    Scale xsc = xp.getScale();
-    Scale ysc = yp.getScale();
-    double x1v = (xsc == Scale.LOG) ? log10(xp.v(_x1u)) : xp.v(_x1u); 
-    double x2v = (xsc == Scale.LOG) ? log10(xp.v(_x2u)) : xp.v(_x2u);
-    double y1v = (ysc == Scale.LOG) ? log10(yp.v(_y1u)) : yp.v(_y1u); 
-    double y2v = (ysc == Scale.LOG) ? log10(yp.v(_y2u)) : yp.v(_y2u);
+    AxisScale xsc = xp.getScale();
+    AxisScale ysc = yp.getScale();
+    double x1v = (xsc == AxisScale.LOG) ? log10(xp.v(_x1u)) : xp.v(_x1u); 
+    double x2v = (xsc == AxisScale.LOG) ? log10(xp.v(_x2u)) : xp.v(_x2u);
+    double y1v = (ysc == AxisScale.LOG) ? log10(yp.v(_y1u)) : yp.v(_y1u); 
+    double y2v = (ysc == AxisScale.LOG) ? log10(yp.v(_y2u)) : yp.v(_y2u);
     return new Transcaler(x1v,y1v,x2v,y2v,_x1d,_y1d,_x2d,_y2d, xsc, ysc);
   }
 
@@ -190,7 +190,7 @@ public class Transcaler {
    * @return the device x-coordinate.
    */
   public int x(double xu) {
-  if(_xpScale == Scale.LOG)
+  if(_xpScale == AxisScale.LOG)
     xu = log10(xu);
     
     double xd = _xushift+_xuscale*xu;
@@ -208,7 +208,7 @@ public class Transcaler {
    * @return the device y-coordinate.
    */
   public int y(double yu) {
-  if(_ypScale == Scale.LOG)
+  if(_ypScale == AxisScale.LOG)
     yu = log10(yu);
   
     double yd = _yushift+_yuscale*yu;
@@ -298,8 +298,8 @@ public class Transcaler {
   private int    _x1d,_y1d,_x2d,_y2d;
   private double _xushift,_xuscale,_yushift,_yuscale;
   private double _xdshift,_xdscale,_ydshift,_ydscale;
-  private Scale _xpScale = Scale.LINEAR; // Scale of hor. projector received from combineWith
-  private Scale _ypScale = Scale.LINEAR; // Scale of ver. projector received from combineWith
+  private AxisScale _xpScale = AxisScale.LINEAR; // Scale of hor. projector received from combineWith
+  private AxisScale _ypScale = AxisScale.LINEAR; // Scale of ver. projector received from combineWith
 
   private void computeShiftAndScale() {
     if (_x1u!=_x2u) {

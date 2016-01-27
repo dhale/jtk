@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 import edu.mines.jtk.mosaic.PlotFrame;
 import edu.mines.jtk.mosaic.PlotPanel;
 import edu.mines.jtk.mosaic.PointsView;
-import edu.mines.jtk.mosaic.Scale;
+import edu.mines.jtk.mosaic.AxisScale;
 import edu.mines.jtk.mosaic.Tile;
 import edu.mines.jtk.util.ArrayMath;
 import static edu.mines.jtk.util.MathPlus.*;
@@ -65,14 +65,14 @@ public class LogAxisPlotDemo {
     // log-x plots
     PointsView pv3 = plot.addPoints(0,0,x1,f1);
     PointsView pv4 = plot.addPoints(0,0,x2,f2);
-    pv3.setHScale(Scale.LOG);
+    pv3.setHScale(AxisScale.LOG);
     pv3.setLineColor(Color.BLUE);
     pv4.setLineColor(Color.RED);
 
     // log-y plots
     PointsView pv5 = plot.addPoints(1,1,x1,f1);
     PointsView pv6 = plot.addPoints(1,1,x2,f2);
-    pv5.setVScale(Scale.LOG);
+    pv5.setVScale(AxisScale.LOG);
     pv5.setLineColor(Color.BLUE);
     pv6.setLineColor(Color.RED);
 
@@ -107,10 +107,10 @@ public class LogAxisPlotDemo {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (tile.getHScale() == Scale.LOG)
-          tile.setHScale(Scale.LINEAR);
+        if (tile.getHScale() == AxisScale.LOG)
+          tile.setHScale(AxisScale.LINEAR);
         else
-          tile.setHScale(Scale.LOG);
+          tile.setHScale(AxisScale.LOG);
       }
     });
     return b;
@@ -123,10 +123,10 @@ public class LogAxisPlotDemo {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (tile.getVScale() == Scale.LOG)
-          tile.setVScale(Scale.LINEAR);
+        if (tile.getVScale() == AxisScale.LOG)
+          tile.setVScale(AxisScale.LINEAR);
         else
-          tile.setVScale(Scale.LOG);
+          tile.setVScale(AxisScale.LOG);
         tile.repaint();
       }
     });

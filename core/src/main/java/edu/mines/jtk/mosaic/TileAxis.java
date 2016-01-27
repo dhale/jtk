@@ -272,7 +272,7 @@ public class TileAxis extends IPanel {
     boolean isTop = isTop();
     boolean isLeft = isLeft();
     boolean isVerticalRotated = isVerticalRotated();
-    boolean isLogScale = (p.getScale() == Scale.LOG);
+    boolean isLogScale = (p.getScale() == AxisScale.LOG);
 
     // Axis tic sampling.
     int nticMajor = _axisTics.getCountMajor();
@@ -627,9 +627,9 @@ public class TileAxis extends IPanel {
     // Compute new axis tics constructed with the best-fit tic interval 
     // computed above, but now for the currently visible range [v0,v1] 
     // of world coordinates. These axis tics are painted by this axis.
-    if(p.getScale() == Scale.LINEAR || p.getScale() == Scale.AUTO)
+    if(p.getScale() == AxisScale.LINEAR || p.getScale() == AxisScale.AUTO)
       _axisTics = new AxisTics(v0,v1,dtic);
-    else if (p.getScale() == Scale.LOG) {
+    else if (p.getScale() == AxisScale.LOG) {
       double v0a = min(v0, v1);
       double v1a = max(v0, v1);
       ntic = (int)(floor(ArrayMath.log10(v1a)) - ceil(ArrayMath.log10(v0a))) + 1; 

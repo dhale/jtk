@@ -16,19 +16,41 @@ package edu.mines.jtk.mosaic;
 
 import java.util.Iterator;
 
+/**
+ * An implementation of the AxisScalable interface for use
+ * with the Tile class.
+ * <p>
+ * This implementation stores a reference to its Tile object,
+ * and when setting an axis scale with a definite value of
+ * Scale (not Scale.AUTO), will also set the Scale of the other
+ * Tiles in the corresponding Mosaic row or column, if applicable.
+ * <p>
+ * AxisScalableTile also stores the axis scale state information
+ * associated with the Tile object stored in _tile. 
+ * @author Eric Addison
+ * @version 2016.1.25
+ */
 public class AxisScalableTile implements AxisScalable {
 
-  private Tile _tile;
-  private Scale _hscale, _vscale;
-
-  public AxisScalableTile(Tile tile, Scale hscale, Scale vscale) {
+  /**
+   * Constructs an AxisScalableTile with a reference to the Tile
+   * tile, with initial scales hscale and vscale.
+   * @param tile the Tile to work on
+   * @param hscale the initial horizontal axis scale
+   * @param vscale the initial vertical axis scale
+   */
+  public AxisScalableTile(Tile tile, AxisScale hscale, AxisScale vscale) {
     _tile = tile;
     _hscale = hscale;
     _vscale = vscale;
   }
 
-  @Override
-  public AxisScalable setHScale(Scale s) {
+  /**
+   * Sets the horizontal axis scaling.
+   * @param s the new scale
+   * @return the stored AxisScalable object (Tile)
+   */
+  public AxisScalable setHScale(AxisScale s) {
     if (_hscale != s) {
       _hscale = s;
 
@@ -62,8 +84,12 @@ public class AxisScalableTile implements AxisScalable {
     return _tile;
   }
 
-  @Override
-  public AxisScalable setVScale(Scale s) {
+  /**
+   * Sets the vertical axis scaling.
+   * @param s the new scale
+   * @return the stored AxisScalable object (Tile)
+   */
+  public AxisScalable setVScale(AxisScale s) {
     if (_vscale != s) {
       _vscale = s;
       // set all TiledViews in this tile to new scale
@@ -96,14 +122,26 @@ public class AxisScalableTile implements AxisScalable {
     return _tile;
   }
 
-  @Override
-  public Scale getHScale() {
+  /**
+   * Gets the current horizontal axis scaling.
+   * @return the horizontal scale
+   */
+  public AxisScale getHScale() {
     return _hscale;
   }
-
-  @Override
-  public Scale getVScale() {
+  
+  /**
+   * Gets the current vertical axis scaling.
+   * @return the vertical scale
+   */
+  public AxisScale getVScale() {
     return _vscale;
   }
 
+  ///////////////////////////////////////////////////////////////////////////
+  // private
+
+  private Tile _tile;
+  private AxisScale _hscale, _vscale;
+  
 }

@@ -264,7 +264,7 @@ public class Tile extends IPanel implements AxisScalable{
    * Gets the Horizontal axis scaling.
    * @return the Scale; null, if none.
    */
-  public Scale getHScale() {
+  public AxisScale getHScale() {
     return _axisScalable.getHScale();
   }
 
@@ -272,26 +272,26 @@ public class Tile extends IPanel implements AxisScalable{
    * Gets the Vertical axis scaling.
    * @return the Scale; null, if none.
    */
-  public Scale getVScale() {
+  public AxisScale getVScale() {
     return _axisScalable.getVScale();
   }
 
   /**
    * Sets the Horizontal axis scaling.
-   * @param the new scale
+   * @param scale the new scale
    * @return This tile
    */
-  public Tile setHScale(Scale scale) {
+  public Tile setHScale(AxisScale scale) {
     _axisScalable.setHScale(scale);
     return this;
   }
 
   /**
    * Sets the Vertical axis scaling.
-   * @param the new scale
+   * @param scale the new scale
    * @return This tile
    */
-  public Tile setVScale(Scale scale) {
+  public Tile setVScale(AxisScale scale) {
     _axisScalable.setVScale(scale);
     return this;
   } 
@@ -334,7 +334,7 @@ public class Tile extends IPanel implements AxisScalable{
     _mosaic = mosaic;
     _irow = irow;
     _icol = icol;
-    _axisScalable = new AxisScalableTile(this,Scale.AUTO, Scale.AUTO);
+    _axisScalable = new AxisScalableTile(this,AxisScale.AUTO, AxisScale.AUTO);
     mosaic.add(this);
   }
   

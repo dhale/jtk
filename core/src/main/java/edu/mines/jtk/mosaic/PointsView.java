@@ -182,7 +182,7 @@ public class PointsView extends TiledView implements AxisScalable{
     Check.argument(x1.length==x2.length,"x1.length equals x2.length");
     if (x3!=null)
       Check.argument(x1.length==x3.length,"x1.length equals x3.length");
-    _axisScalable = new AxisScalable1D(this, Scale.AUTO, Scale.AUTO);
+    _axisScalable = new AxisScalable1D(this, AxisScale.AUTO, AxisScale.AUTO);
     _ns = 1;
     _nx.clear();
     _x1.clear();
@@ -437,10 +437,10 @@ public class PointsView extends TiledView implements AxisScalable{
 
   /**
    * Sets the horizontal axis scaling.
-   * @param axis scaling enum value
+   * @param scaleType axis scaling enum value
    */
   @Override
-  public PointsView setHScale(Scale scaleType) {
+  public PointsView setHScale(AxisScale scaleType) {
     _axisScalable.setHScale(scaleType);
     updateBestProjectors();
     return this;
@@ -448,10 +448,10 @@ public class PointsView extends TiledView implements AxisScalable{
 
   /**
    * Sets the vertical axis scaling.
-   * @param axis scaling enum value
+   * @param scaleType axis scaling enum value
    */
   @Override
-  public PointsView setVScale(Scale scaleType) {
+  public PointsView setVScale(AxisScale scaleType) {
     _axisScalable.setVScale(scaleType);
     updateBestProjectors();
     return this;
@@ -462,7 +462,7 @@ public class PointsView extends TiledView implements AxisScalable{
    * @return the horizontal scaling
    */
   @Override
-  public Scale getHScale() {
+  public AxisScale getHScale() {
     return _axisScalable.getHScale();
   }
 
@@ -471,7 +471,7 @@ public class PointsView extends TiledView implements AxisScalable{
    * @return the vertical scaling
    */
   @Override
-  public Scale getVScale() {
+  public AxisScale getVScale() {
     return _axisScalable.getVScale();
   }
   
@@ -634,23 +634,23 @@ public class PointsView extends TiledView implements AxisScalable{
         x2max = max(x2max,x2i);
       }
 
-      Scale hscale = getHScale();
-      Scale vscale = getVScale();
+      AxisScale hscale = getHScale();
+      AxisScale vscale = getVScale();
 
-      if (hscale == Scale.LOG) {
+      if (hscale == AxisScale.LOG) {
         int ind = getFirstPositiveInd(x1);
         if (ind > -1)
           x1min = max(x1min, x1[ind]);
         else
-          setHScale(Scale.LINEAR);
+          setHScale(AxisScale.LINEAR);
       }
 
-      if (vscale == Scale.LOG) {
+      if (vscale == AxisScale.LOG) {
         int ind = getSmallestPositiveInd(x2);
         if (ind > -1)
           x2min = max(x2min, x2[ind]);
         else
-          setVScale(Scale.LINEAR);
+          setVScale(AxisScale.LINEAR);
       }
     }
     
@@ -681,8 +681,8 @@ public class PointsView extends TiledView implements AxisScalable{
     // Best projectors.
     Projector bhp = null;
     Projector bvp = null;
-    Scale hscale = getHScale();
-    Scale vscale = getVScale();
+    AxisScale hscale = getHScale();
+    AxisScale vscale = getVScale();
     if (_orientation==Orientation.X1RIGHT_X2UP) {
       bhp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1,hscale):null;
       bvp = (x2min<x2max)?new Projector(x2max,x2min,u0,u1,vscale):null;
@@ -738,8 +738,8 @@ public class PointsView extends TiledView implements AxisScalable{
     double hLeft = Math.min(hp.v0(), hp.v1());
     double vBot = Math.min(vp.v0(), vp.v1());
     for (int i = 0; i < n; ++i) {
-      x[i] = ts.x((xv[i] <= 0 && hp.getScale() == Scale.LOG) ? hLeft : xv[i]);
-      y[i] = ts.y((yv[i] <= 0 && vp.getScale() == Scale.LOG) ? vBot : yv[i]);
+      x[i] = ts.x((xv[i] <= 0 && hp.getScale() == AxisScale.LOG) ? hLeft : xv[i]);
+      y[i] = ts.y((yv[i] <= 0 && vp.getScale() == AxisScale.LOG) ? vBot : yv[i]);
     }
   }
 

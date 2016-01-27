@@ -14,19 +14,40 @@ limitations under the License.
 ****************************************************************************/
 package edu.mines.jtk.mosaic;
 
+/**
+ * An implementation of the AxisScalable interface for use
+ * with TiledView classes displaying a 1D function.
+ *  *** currently implemented for PointsView only ***
+ * <p>
+ * This implementation stores a reference to its parent
+ * AxisScalable object and keeps track of its axis scale
+ * state information. Setting an axis scale will change the
+ * local state values as well as changing the scale value of
+ * the associated Projector. 
+ * @author Eric Addison
+ * @version 2016.1.25
+ */
 public class AxisScalable1D implements AxisScalable {
 
-  private AxisScalable _as;
-  private Scale _hscale, _vscale;
-  
-  public AxisScalable1D(AxisScalable as, Scale hscale, Scale vscale) {
+  /**
+   * Constructs and AxisScalable1D object with a parent AxisScalable
+   * as, horizontal scale hscale, and vertical scale vscale.
+   * @param as the parent AxisScalable
+   * @param hscale the horizontal scaling
+   * @param vscale the vertical scaling 
+   */
+  public AxisScalable1D(AxisScalable as, AxisScale hscale, AxisScale vscale) {
     _as = as;
     _hscale = hscale;
     _vscale = vscale;
   }
   
-  @Override
-  public AxisScalable setHScale(Scale s) {
+  /**
+   * Sets the horizontal axis scaling.
+   * @param s the new scale
+   * @return the parent AxisScalable object _as
+   */
+  public AxisScalable setHScale(AxisScale s) {
     if(s != _hscale){
       Projector hp = ((TiledView)_as).getHorizontalProjector();
       Tile tile = ((TiledView)_as).getTile();
@@ -39,8 +60,12 @@ public class AxisScalable1D implements AxisScalable {
     return _as;
   }
 
-  @Override
-  public AxisScalable setVScale(Scale s) {
+  /**
+   * Sets the vertical axis scaling.
+   * @param s the new scale
+   * @return the parent AxisScalable object _as
+   */
+  public AxisScalable setVScale(AxisScale s) {
   if(s != _vscale){
     Projector vp = ((TiledView)_as).getVerticalProjector();
     Tile tile = ((TiledView)_as).getTile();
@@ -53,14 +78,28 @@ public class AxisScalable1D implements AxisScalable {
     return _as;
   }
 
-  @Override
-  public Scale getHScale() {
+  /**
+   * Gets the current horizontal axis scaling.
+   * @return the horizontal scale
+   */
+  public AxisScale getHScale() {
     return _hscale;
   }
 
-  @Override
-  public Scale getVScale() {
+  /**
+   * Gets the current vertical axis scaling.
+   * @return the vertical scale
+   */
+  public AxisScale getVScale() {
     return _vscale;
   }
+  
+  ///////////////////////////////////////////////////////////////////////////
+  // private
+  
+  private AxisScalable _as;
+  private AxisScale _hscale, _vscale;
+  
+
 
 }

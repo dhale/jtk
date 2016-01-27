@@ -20,6 +20,12 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
+/**
+ * TODO: PUT IN JAVADOC HERE
+ * @author Dave Hale, Colorado School of Mines
+ * @author Eric Addison
+ * @version 2016.1.25
+ */
 public class LogAxisTics extends AxisTics {
 
   /**

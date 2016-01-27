@@ -44,8 +44,8 @@ public class TranscalerTest extends TestCase {
     
     public void testCombineWithLinearA () {
       Transcaler tr = new Transcaler(0.0, 0.0, 1.0, 1.0, 0, 0, 100, 100);
-      Projector xp = new Projector(0.0, 10.0, Scale.LINEAR);
-      Projector yp = new Projector(0.0, 50.0, Scale.LINEAR);
+      Projector xp = new Projector(0.0, 10.0, AxisScale.LINEAR);
+      Projector yp = new Projector(0.0, 50.0, AxisScale.LINEAR);
       
       Transcaler tr_c = tr.combineWith(xp, yp);
       assertVeryClose(5.0, tr_c.x(tr_c.x(5.0)));
@@ -56,8 +56,8 @@ public class TranscalerTest extends TestCase {
     
     public void testCombineWithLinearB () {
       Transcaler tr = new Transcaler(0.0, 0.0, 1.0, 1.0, 0, 0, 100, 100);
-      Projector xp = new Projector(0.0, 10.0, Scale.LINEAR);
-      Projector yp = new Projector(50.0, 0.0, Scale.LINEAR);
+      Projector xp = new Projector(0.0, 10.0, AxisScale.LINEAR);
+      Projector yp = new Projector(50.0, 0.0, AxisScale.LINEAR);
       
       Transcaler tr_c = tr.combineWith(xp, yp);
       assertVeryClose(5.0, tr_c.x(tr_c.x(5.0)));
@@ -72,8 +72,8 @@ public class TranscalerTest extends TestCase {
     // combined with the logarithm
     public void testCombineWithLogA () {
       Transcaler tr = new Transcaler(0.0, 0.0, 1.0, 1.0, 0, 0, 100, 100);
-      Projector xp = new Projector(10.0, 1000.0, Scale.LOG);
-      Projector yp = new Projector(1.0, 1000.0, Scale.LOG);
+      Projector xp = new Projector(10.0, 1000.0, AxisScale.LOG);
+      Projector yp = new Projector(1.0, 1000.0, AxisScale.LOG);
       
       Transcaler tr_c = tr.combineWith(xp, yp);
       assertToleranceClose(Math.log10(15.0), tr_c.x(tr_c.x(15.0)), 0.02);
@@ -84,8 +84,8 @@ public class TranscalerTest extends TestCase {
     
     public void testCombineWithLogB () {
       Transcaler tr = new Transcaler(0.0, 0.0, 1.0, 1.0, 0, 0, 100, 100);
-      Projector xp = new Projector(1.0, 10.0, Scale.LOG);
-      Projector yp = new Projector(50.0, 1.0, Scale.LOG);
+      Projector xp = new Projector(1.0, 10.0, AxisScale.LOG);
+      Projector yp = new Projector(50.0, 1.0, AxisScale.LOG);
       
       Transcaler tr_c = tr.combineWith(xp, yp);
       assertToleranceClose(Math.log10(5.0), tr_c.x(tr_c.x(5.0)), 0.02);
