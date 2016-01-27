@@ -85,33 +85,6 @@ public class Transcaler {
   }
   
   /**
-   * Constructs a transcaler with specified coordinate mapping
-   * and specified Scales. This should only be used with the
-   * combineWith() method when receiving projectors that 
-   * may be LOG scale. It is not the intention to be able
-   * to create arbitrary LOG scaled Transcalers.
-   * @param x1u the user x-coordinate corresponding to x1d.
-   * @param y1u the user y-coordinate corresponding to y1d.
-   * @param x2u the user x-coordinate corresponding to x2d.
-   * @param y2u the user y-coordinate corresponding to y2d.
-   * @param x1d the device x-coordinate corresponding to x1u.
-   * @param y1d the device y-coordinate corresponding to y1u.
-   * @param x2d the device x-coordinate corresponding to x2u.
-   * @param y2d the device y-coordinate corresponding to y2u.
-   * @param horizontal the horizontal projector Scale
-   * @param vertical the vertical projector Scale
-   */
-  private Transcaler(
-    double x1u, double y1u, double x2u, double y2u,
-    int    x1d, int    y1d, int    x2d, int    y2d,
-    AxisScale hscale, AxisScale vscale)
-  {
-  _xpScale = hscale;
-  _ypScale = vscale;
-    setMapping(x1u,y1u,x2u,y2u,x1d,y1d,x2d,y2d);
-  }
-
-  /**
    * Sets the coordinate mapping for this transcaler.
    * @param x1u the user x-coordinate corresponding to x1d.
    * @param y1u the user y-coordinate corresponding to y1d.
@@ -330,5 +303,32 @@ public class Transcaler {
       _ydshift = 0.5*(_y1u+_y2u);
       _ydscale = 0.0;
     }
+  }
+  
+  /**
+   * Constructs a transcaler with specified coordinate mapping
+   * and specified Scales. This should only be used with the
+   * combineWith() method when receiving projectors that 
+   * may be LOG scale. It is not the intention to be able
+   * to create arbitrary LOG scaled Transcalers.
+   * @param x1u the user x-coordinate corresponding to x1d.
+   * @param y1u the user y-coordinate corresponding to y1d.
+   * @param x2u the user x-coordinate corresponding to x2d.
+   * @param y2u the user y-coordinate corresponding to y2d.
+   * @param x1d the device x-coordinate corresponding to x1u.
+   * @param y1d the device y-coordinate corresponding to y1u.
+   * @param x2d the device x-coordinate corresponding to x2u.
+   * @param y2d the device y-coordinate corresponding to y2u.
+   * @param horizontal the horizontal projector Scale
+   * @param vertical the vertical projector Scale
+   */
+  private Transcaler(
+    double x1u, double y1u, double x2u, double y2u,
+    int    x1d, int    y1d, int    x2d, int    y2d,
+    AxisScale hscale, AxisScale vscale)
+  {
+  _xpScale = hscale;
+  _ypScale = vscale;
+    setMapping(x1u,y1u,x2u,y2u,x1d,y1d,x2d,y2d);
   }
 }

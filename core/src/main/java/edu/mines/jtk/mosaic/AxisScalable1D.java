@@ -17,6 +17,7 @@ package edu.mines.jtk.mosaic;
 /**
  * An implementation of the AxisScalable interface for use
  * with TiledView classes displaying a 1D function.
+ * <p>
  *  *** currently implemented for PointsView only ***
  * <p>
  * This implementation stores a reference to its parent
