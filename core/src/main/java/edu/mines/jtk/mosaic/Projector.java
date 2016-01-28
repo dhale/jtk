@@ -85,6 +85,7 @@ public class Projector {
    *  v0 != v1 is required.
    * @param v1 the v coordinate that corresponds to u coordinate 1;
    *  v0 != v1 is required.
+   *  @param scale the AxisScale type of this projector
    */
   public Projector(double v0, double v1, AxisScale scale) {
     this(v0,v1,0.0,1.0,scale);
@@ -119,7 +120,7 @@ public class Projector {
    *  0.0 &lt;= u0 &lt; u1 is required.
    * @param u1 the u coordinate closest to normalized coordinate 1;
    *  u0 &lt; u1 &lt;= 1.0 is required.
-   *  @param s the scale type
+   *  @param s the AxisScale type of this projector
    */
   public Projector(double v0, double v1, double u0, double u1, AxisScale s) {
     Check.argument(0.0<=u0,"0.0 <= u0");
