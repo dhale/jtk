@@ -632,8 +632,7 @@ public class TileAxis extends IPanel {
     else if (p.getScale() == AxisScale.LOG) {
       double v0a = min(v0, v1);
       double v1a = max(v0, v1);
-      ntic = (int)(floor(ArrayMath.log10(v1a)) - ceil(ArrayMath.log10(v0a))) + 1; 
-      _axisTics = new LogAxisTics(v0a, v1a, ntic);
+      _axisTics = new LogAxisTics(v0a, v1a);
     }
 
     // If either the tic label max width or height has changed,

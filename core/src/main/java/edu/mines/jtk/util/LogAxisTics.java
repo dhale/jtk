@@ -21,9 +21,17 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 /**
- * TODO: PUT IN JAVADOC HERE
- * @author Dave Hale, Colorado School of Mines
+ * LogAxisTics is a subclass of AxisTics that computes the information
+ * needed to draw logarithmically scaled tic marks. A LogAxisTics object
+ * is constructed by providing the value range end points x1 and x2. 
+ * <p>
+ * Powers of ten in the value range are drawn as the labeled major tics, 
+ * and all eight intermediate values between two successive decades are 
+ * drawn as minor tics. Currently it does not intelligently decide the 
+ * number of major tics to draw, it will only draw tics as previously 
+ * described. 
  * @author Eric Addison
+ * @author Dave Hale, Colorado School of Mines
  * @version 2016.1.25
  */
 public class LogAxisTics extends AxisTics {
@@ -32,17 +40,16 @@ public class LogAxisTics extends AxisTics {
    * Constructs axis tics for a specified maximum number of major tics.
    * @param x1 the value at one end of the axis.
    * @param x2 the value at the other end of the axis.
-   * @param ntic the maximum number of major tics.
    */
-  public LogAxisTics(double x1, double x2, int ntic) {
-    super(x1,x2,ntic);
+  public LogAxisTics(double x1, double x2) {
+    super(x1,x2,0);
     double xmin = min(x1,x2);
     double xmax = max(x1,x2);
     _expMin = log10(xmin);
     _expMax = log10(xmax);
     _dtic = 1;
     _ftic = pow(10,ceil(_expMin));
-    _ntic = ntic;
+    _ntic = (int)(floor(ArrayMath.log10(xmax)) - ceil(ArrayMath.log10(xmin))) + 1; 
     computeMultiple();
     computeMinorTics();
   }
