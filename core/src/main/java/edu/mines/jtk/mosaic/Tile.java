@@ -265,7 +265,7 @@ public class Tile extends IPanel implements AxisScalable{
    * @return the Scale; null, if none.
    */
   public AxisScale getHScale() {
-    return _axisScalable.getHScale();
+	  return _hp.getScale();
   }
 
   /**
@@ -273,7 +273,7 @@ public class Tile extends IPanel implements AxisScalable{
    * @return the Scale; null, if none.
    */
   public AxisScale getVScale() {
-    return _axisScalable.getVScale();
+	  return _vp.getScale();
   }
 
   /**
@@ -282,7 +282,10 @@ public class Tile extends IPanel implements AxisScalable{
    * @return This tile
    */
   public Tile setHScale(AxisScale scale) {
-    _axisScalable.setHScale(scale);
+    _hp.setScale(scale);
+    updateBestProjectors();
+    if(_mosaic != null)
+    	_mosaic.alignProjectors(this);
     return this;
   }
 
@@ -292,7 +295,10 @@ public class Tile extends IPanel implements AxisScalable{
    * @return This tile
    */
   public Tile setVScale(AxisScale scale) {
-    _axisScalable.setVScale(scale);
+    _vp.setScale(scale);
+    updateBestProjectors();
+    if(_mosaic != null)
+    	_mosaic.alignProjectors(this);
     return this;
   } 
   
@@ -334,7 +340,6 @@ public class Tile extends IPanel implements AxisScalable{
     _mosaic = mosaic;
     _irow = irow;
     _icol = icol;
-    _axisScalable = new AxisScalableTile(this,AxisScale.AUTO, AxisScale.AUTO);
     mosaic.add(this);
   }
   
@@ -433,7 +438,6 @@ public class Tile extends IPanel implements AxisScalable{
   private Projector _svp; // specified best vertical projector; or null
   private Transcaler _ts = new Transcaler();
   private DRectangle _vr = new DRectangle(0.0,0.0,1.0,1.0);
-  private AxisScalable _axisScalable;
 
   private void updateBestProjectors() {
     Projector bhp = null;

@@ -21,7 +21,6 @@ import java.awt.geom.Rectangle2D;
 import static java.lang.Math.*;
 import javax.swing.*;
 
-import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.AxisTics;
 import edu.mines.jtk.util.LogAxisTics;
 import edu.mines.jtk.util.MathPlus;
@@ -272,7 +271,7 @@ public class TileAxis extends IPanel {
     boolean isTop = isTop();
     boolean isLeft = isLeft();
     boolean isVerticalRotated = isVerticalRotated();
-    boolean isLogScale = (p.getScale() == AxisScale.LOG);
+    boolean isLogScale = (p.getScale() == AxisScale.LOG10);
 
     // Axis tic sampling.
     int nticMajor = _axisTics.getCountMajor();
@@ -629,7 +628,7 @@ public class TileAxis extends IPanel {
     // of world coordinates. These axis tics are painted by this axis.
     if(p.getScale() == AxisScale.LINEAR || p.getScale() == AxisScale.AUTO)
       _axisTics = new AxisTics(v0,v1,dtic);
-    else if (p.getScale() == AxisScale.LOG) {
+    else if (p.getScale() == AxisScale.LOG10) {
       double v0a = min(v0, v1);
       double v1a = max(v0, v1);
       _axisTics = new LogAxisTics(v0a, v1a);

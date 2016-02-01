@@ -4,6 +4,6 @@ package edu.mines.jtk.mosaic;
  */
 public enum AxisScale {
 	LINEAR,
-	LOG,
+	LOG10,
 	AUTO
 }

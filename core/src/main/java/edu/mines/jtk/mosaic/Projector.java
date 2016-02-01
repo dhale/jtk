@@ -17,7 +17,6 @@ package edu.mines.jtk.mosaic;
 import static edu.mines.jtk.util.MathPlus.max;
 import static edu.mines.jtk.util.MathPlus.min;
 import static edu.mines.jtk.util.MathPlus.signum;
-
 import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
@@ -152,7 +151,7 @@ public class Projector {
   public double u(double v) {
   if(_scaleType == AxisScale.LINEAR || _scaleType == AxisScale.AUTO)
       return _vshift+_vscale*v;
-  else if(_scaleType == AxisScale.LOG)
+  else if(_scaleType == AxisScale.LOG10)
     return _vshift+_vscale*ArrayMath.log10(v);
   return 0.0;
   }
@@ -165,7 +164,7 @@ public class Projector {
   public double v(double u) {
   if(_scaleType == AxisScale.LINEAR || _scaleType == AxisScale.AUTO)
     return _ushift+_uscale*u;
-  else if(_scaleType == AxisScale.LOG)
+  else if(_scaleType == AxisScale.LOG10)
     return ArrayMath.pow(10,_ushift+_uscale*u);
   return 0.0;
   }
@@ -336,6 +335,7 @@ public class Projector {
    * @param s new scale type
    */
   protected void setScale(AxisScale s) {
+	  System.out.println("setting PROJ Scale " + s);
     _scaleType = s;
     if(_v0 <= 0 || _v1 <= 0)
       _scaleType = AxisScale.LINEAR;
@@ -352,18 +352,21 @@ public class Projector {
   private AxisScale _scaleType;
 
   private void computeShiftsAndScales() {
-    if(_v0 <= 0.0 || _v1 <= 0.0)
+    if(_v0 <= 0.0 || _v1 <= 0.0){
       _scaleType = AxisScale.LINEAR;
+      System.out.println("  whoops!");  
+    }
     if (_scaleType == AxisScale.LINEAR || _scaleType == AxisScale.AUTO) {
       _uscale = (_v1-_v0)/(_u1-_u0);
       _ushift = _v0-_uscale*_u0;
       _vscale = (_u1-_u0)/(_v1-_v0);
       _vshift = _u0-_vscale*_v0;
-    } else if (_scaleType == AxisScale.LOG) {
+    } else if (_scaleType == AxisScale.LOG10) {
       _vscale = (_u1 - _u0) / (ArrayMath.log10(_v1) - ArrayMath.log10(_v0));
       _uscale = (ArrayMath.log10(_v1) - ArrayMath.log10(_v0)) / (_u1 - _u0);
       _ushift = ArrayMath.log10(_v0) - _uscale * _u0;
       _vshift = _u0 - _vscale * ArrayMath.log10(_v0);
     }
+    System.out.println("  Projector.compte... now has " + getScale());
   }
 }

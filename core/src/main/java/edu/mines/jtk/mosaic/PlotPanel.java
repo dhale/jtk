@@ -1252,54 +1252,6 @@ public class PlotPanel extends IPanel {
     } else if (_orientation == Orientation.X1DOWN_X2RIGHT) {
       pv.setOrientation(PointsView.Orientation.X1DOWN_X2RIGHT);
     }
-
-    AxisScale hscale = pv.getHScale();
-    AxisScale vscale = pv.getVScale();
-    int nRowViews = 0;
-    int nColViews = 0;
-    AxisScale otherHscale = AxisScale.AUTO;
-    AxisScale otherVscale = AxisScale.AUTO;
-
-    // find how many other views in this column
-    for (int jrow = 0; jrow < getMosaic().countRows(); ++jrow) {
-      int nviews = getTile(jrow, icol).countTiledViews();
-      if (nviews > 0) {
-        nColViews += nviews;
-        otherHscale = getTile(jrow, icol).getHScale();
-      }
-    }
-    
-    // find how many other views in this row
-    for (int jcol = 0; jcol < getMosaic().countColumns(); ++jcol) {
-      int nviews = getTile(irow, jcol).countTiledViews();
-      if (nviews > 0) {
-        nRowViews += nviews;
-        otherVscale = getTile(irow, jcol).getVScale();
-      }
-    }
-
-    // if there were no other views in this row
-    if (nRowViews == 0) {
-      pv.setVScale((vscale == AxisScale.AUTO) ? AxisScale.LINEAR : vscale);
-      getTile(irow, icol).setVScale(pv.getVScale());
-
-      // if there were other views in this row
-    } else {
-      pv.setVScale(otherVscale);
-      getTile(irow, icol).setVScale(otherVscale);
-    }
-
-    // if there were no other views in this column
-    if (nColViews == 0) {
-      pv.setHScale((hscale == AxisScale.AUTO) ? AxisScale.LINEAR : hscale);
-      getTile(irow, icol).setHScale(pv.getHScale());
-
-    // if there were other views in this column
-    } else {
-      pv.setHScale(otherHscale);
-      getTile(irow, icol).setHScale(otherHscale);
-    }
-
     addTiledView(irow, icol, pv);
     return pv;
   }

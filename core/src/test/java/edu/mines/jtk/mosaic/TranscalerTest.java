@@ -72,8 +72,8 @@ public class TranscalerTest extends TestCase {
     // combined with the logarithm
     public void testCombineWithLogA () {
       Transcaler tr = new Transcaler(0.0, 0.0, 1.0, 1.0, 0, 0, 100, 100);
-      Projector xp = new Projector(10.0, 1000.0, AxisScale.LOG);
-      Projector yp = new Projector(1.0, 1000.0, AxisScale.LOG);
+      Projector xp = new Projector(10.0, 1000.0, AxisScale.LOG10);
+      Projector yp = new Projector(1.0, 1000.0, AxisScale.LOG10);
       
       Transcaler tr_c = tr.combineWith(xp, yp);
       assertToleranceClose(Math.log10(15.0), tr_c.x(tr_c.x(15.0)), 0.02);
@@ -84,8 +84,8 @@ public class TranscalerTest extends TestCase {
     
     public void testCombineWithLogB () {
       Transcaler tr = new Transcaler(0.0, 0.0, 1.0, 1.0, 0, 0, 100, 100);
-      Projector xp = new Projector(1.0, 10.0, AxisScale.LOG);
-      Projector yp = new Projector(50.0, 1.0, AxisScale.LOG);
+      Projector xp = new Projector(1.0, 10.0, AxisScale.LOG10);
+      Projector yp = new Projector(50.0, 1.0, AxisScale.LOG10);
       
       Transcaler tr_c = tr.combineWith(xp, yp);
       assertToleranceClose(Math.log10(5.0), tr_c.x(tr_c.x(5.0)), 0.02);

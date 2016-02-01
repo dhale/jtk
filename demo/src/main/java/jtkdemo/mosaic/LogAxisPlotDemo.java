@@ -43,8 +43,8 @@ public class LogAxisPlotDemo {
 
     float[] x1 = new float[n];
     float[] x2 = new float[n];
-    x1 = ArrayMath.rampfloat(0.0f,X / n,n);
-    x2 = ArrayMath.rampfloat(0.0f,X / n,n);
+    x1 = ArrayMath.rampfloat(0.04f,X / n,n);
+    x2 = ArrayMath.rampfloat(0.04f,X / n,n);
 
     float[] f1 = new float[n];
     float[] f2 = new float[n];
@@ -65,14 +65,14 @@ public class LogAxisPlotDemo {
     // log-x plots
     PointsView pv3 = plot.addPoints(0,0,x1,f1);
     PointsView pv4 = plot.addPoints(0,0,x2,f2);
-    pv3.setHScale(AxisScale.LOG);
+    pv3.setHScale(AxisScale.LOG10);
     pv3.setLineColor(Color.BLUE);
     pv4.setLineColor(Color.RED);
 
     // log-y plots
     PointsView pv5 = plot.addPoints(1,1,x1,f1);
     PointsView pv6 = plot.addPoints(1,1,x2,f2);
-    pv5.setVScale(AxisScale.LOG);
+    pv5.setVScale(AxisScale.LOG10);
     pv5.setLineColor(Color.BLUE);
     pv6.setLineColor(Color.RED);
 
@@ -107,10 +107,10 @@ public class LogAxisPlotDemo {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (tile.getHScale() == AxisScale.LOG)
+        if (tile.getHScale() == AxisScale.LOG10)
           tile.setHScale(AxisScale.LINEAR);
         else
-          tile.setHScale(AxisScale.LOG);
+          tile.setHScale(AxisScale.LOG10);
       }
     });
     return b;
@@ -123,10 +123,10 @@ public class LogAxisPlotDemo {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (tile.getVScale() == AxisScale.LOG)
+        if (tile.getVScale() == AxisScale.LOG10)
           tile.setVScale(AxisScale.LINEAR);
         else
-          tile.setVScale(AxisScale.LOG);
+          tile.setVScale(AxisScale.LOG10);
         tile.repaint();
       }
     });

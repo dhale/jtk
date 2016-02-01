@@ -182,7 +182,6 @@ public class PointsView extends TiledView implements AxisScalable{
     Check.argument(x1.length==x2.length,"x1.length equals x2.length");
     if (x3!=null)
       Check.argument(x1.length==x3.length,"x1.length equals x3.length");
-    _axisScalable = new AxisScalable1D(this, AxisScale.AUTO, AxisScale.AUTO);
     _ns = 1;
     _nx.clear();
     _x1.clear();
@@ -440,9 +439,10 @@ public class PointsView extends TiledView implements AxisScalable{
    * @param scaleType axis scaling enum value
    */
   @Override
-  public PointsView setHScale(AxisScale scaleType) {
-    _axisScalable.setHScale(scaleType);
-    updateBestProjectors();
+  public PointsView setHScale(AxisScale scale) {
+    updateBestProjectors(scale, getVScale());
+	if(getTile() != null)
+	  getTile().setHScale(scale);
     return this;
   }
 
@@ -451,9 +451,10 @@ public class PointsView extends TiledView implements AxisScalable{
    * @param scaleType axis scaling enum value
    */
   @Override
-  public PointsView setVScale(AxisScale scaleType) {
-    _axisScalable.setVScale(scaleType);
-    updateBestProjectors();
+  public PointsView setVScale(AxisScale scale) {
+    updateBestProjectors(getHScale(), scale);
+	if(getTile() != null)
+		getTile().setVScale(scale);
     return this;
   }
 
@@ -463,7 +464,10 @@ public class PointsView extends TiledView implements AxisScalable{
    */
   @Override
   public AxisScale getHScale() {
-    return _axisScalable.getHScale();
+    if(getTile() != null)
+      return getTile().getHScale();
+    else
+      return AxisScale.AUTO;
   }
 
   /**
@@ -472,7 +476,10 @@ public class PointsView extends TiledView implements AxisScalable{
    */
   @Override
   public AxisScale getVScale() {
-    return _axisScalable.getVScale();
+    if(getTile() != null)
+        return getTile().getVScale();
+      else
+        return AxisScale.AUTO;
   }
   
   public void paint(Graphics2D g2d) {
@@ -610,12 +617,18 @@ public class PointsView extends TiledView implements AxisScalable{
   private float _markSize = -1.0f;
   private Color _markColor = null;
   private String _textFormat = "%1.4G";
-  private AxisScalable _axisScalable;
 
+  
+  
+  
   /**
    * Called when we might new realignment.
    */
   private void updateBestProjectors() {
+	  updateBestProjectors(getHScale(), getVScale());	  
+  }
+  
+  private void updateBestProjectors(AxisScale hscale, AxisScale vscale) {
     // Min and max (x1,x2) values.
     float x1min =  FLT_MAX;
     float x2min =  FLT_MAX;
@@ -634,23 +647,20 @@ public class PointsView extends TiledView implements AxisScalable{
         x2max = max(x2max,x2i);
       }
 
-      AxisScale hscale = getHScale();
-      AxisScale vscale = getVScale();
-
-      if (hscale == AxisScale.LOG) {
+      if (hscale == AxisScale.LOG10) {
         int ind = getFirstPositiveInd(x1);
         if (ind > -1)
           x1min = max(x1min, x1[ind]);
         else
-          setHScale(AxisScale.LINEAR);
+          hscale = AxisScale.LINEAR;
       }
 
-      if (vscale == AxisScale.LOG) {
+      if (vscale == AxisScale.LOG10) {
         int ind = getSmallestPositiveInd(x2);
         if (ind > -1)
           x2min = max(x2min, x2[ind]);
         else
-          setVScale(AxisScale.LINEAR);
+          vscale = AxisScale.LINEAR;
       }
     }
     
@@ -681,8 +691,7 @@ public class PointsView extends TiledView implements AxisScalable{
     // Best projectors.
     Projector bhp = null;
     Projector bvp = null;
-    AxisScale hscale = getHScale();
-    AxisScale vscale = getVScale();
+    System.out.println(x2min + ", " + x2max);
     if (_orientation==Orientation.X1RIGHT_X2UP) {
       bhp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1,hscale):null;
       bvp = (x2min<x2max)?new Projector(x2max,x2min,u0,u1,vscale):null;
@@ -738,8 +747,8 @@ public class PointsView extends TiledView implements AxisScalable{
     double hLeft = Math.min(hp.v0(), hp.v1());
     double vBot = Math.min(vp.v0(), vp.v1());
     for (int i = 0; i < n; ++i) {
-      x[i] = ts.x((xv[i] <= 0 && hp.getScale() == AxisScale.LOG) ? hLeft : xv[i]);
-      y[i] = ts.y((yv[i] <= 0 && vp.getScale() == AxisScale.LOG) ? vBot : yv[i]);
+      x[i] = ts.x((xv[i] <= 0 && hp.getScale() == AxisScale.LOG10) ? hLeft : xv[i]);
+      y[i] = ts.y((yv[i] <= 0 && vp.getScale() == AxisScale.LOG10) ? vBot : yv[i]);
     }
   }
 

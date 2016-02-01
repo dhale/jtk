@@ -150,10 +150,10 @@ public class Transcaler {
   public Transcaler combineWith(Projector xp, Projector yp) {
     AxisScale xsc = xp.getScale();
     AxisScale ysc = yp.getScale();
-    double x1v = (xsc == AxisScale.LOG) ? log10(xp.v(_x1u)) : xp.v(_x1u); 
-    double x2v = (xsc == AxisScale.LOG) ? log10(xp.v(_x2u)) : xp.v(_x2u);
-    double y1v = (ysc == AxisScale.LOG) ? log10(yp.v(_y1u)) : yp.v(_y1u); 
-    double y2v = (ysc == AxisScale.LOG) ? log10(yp.v(_y2u)) : yp.v(_y2u);
+    double x1v = (xsc == AxisScale.LOG10) ? log10(xp.v(_x1u)) : xp.v(_x1u); 
+    double x2v = (xsc == AxisScale.LOG10) ? log10(xp.v(_x2u)) : xp.v(_x2u);
+    double y1v = (ysc == AxisScale.LOG10) ? log10(yp.v(_y1u)) : yp.v(_y1u); 
+    double y2v = (ysc == AxisScale.LOG10) ? log10(yp.v(_y2u)) : yp.v(_y2u);
     return new Transcaler(x1v,y1v,x2v,y2v,_x1d,_y1d,_x2d,_y2d, xsc, ysc);
   }
 
@@ -163,7 +163,7 @@ public class Transcaler {
    * @return the device x-coordinate.
    */
   public int x(double xu) {
-  if(_xpScale == AxisScale.LOG)
+  if(_xpScale == AxisScale.LOG10)
     xu = log10(xu);
     
     double xd = _xushift+_xuscale*xu;
@@ -181,7 +181,7 @@ public class Transcaler {
    * @return the device y-coordinate.
    */
   public int y(double yu) {
-  if(_ypScale == AxisScale.LOG)
+  if(_ypScale == AxisScale.LOG10)
     yu = log10(yu);
   
     double yd = _yushift+_yuscale*yu;
