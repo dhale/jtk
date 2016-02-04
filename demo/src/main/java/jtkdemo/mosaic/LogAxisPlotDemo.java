@@ -43,8 +43,8 @@ public class LogAxisPlotDemo {
 
     float[] x1 = new float[n];
     float[] x2 = new float[n];
-    x1 = ArrayMath.rampfloat(0.04f,X / n,n);
-    x2 = ArrayMath.rampfloat(0.04f,X / n,n);
+    x1 = ArrayMath.rampfloat(0.0f,X / n,n);
+    x2 = ArrayMath.rampfloat(0.0f,X / n,n);
 
     float[] f1 = new float[n];
     float[] f2 = new float[n];
