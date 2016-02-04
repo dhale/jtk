@@ -291,10 +291,8 @@ public class Projector {
     assert 0.0<=_u0 && _u0<_u1 && _u1<=1.0:"_u0 and _u1 valid";
 
     // use LINEAR scale in case of conflict
-    if(p.isLinear()&&!isLinear()){
-      System.out.println("Projector: conflict found");
+    if(p.isLinear() && !isLinear())
       setScale(AxisScale.LINEAR);
-    }
     
     // Recompute shifts and scales.
     computeShiftsAndScales();

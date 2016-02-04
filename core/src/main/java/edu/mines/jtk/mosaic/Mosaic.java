@@ -600,6 +600,7 @@ public class Mosaic extends IPanel {
   // package
 
   void alignProjectors(Tile tile) {
+    
     // attempt to set all adjacent Tiles to the same scale as tile
     // if not, set them all to LINEAR
     boolean[] checkScales = setTileScales(tile);
