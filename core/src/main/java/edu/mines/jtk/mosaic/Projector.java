@@ -149,7 +149,7 @@ public class Projector {
    * @return normalized coordinate u.
    */
   public double u(double v) {
-  if(_scaleType == AxisScale.LINEAR || _scaleType == AxisScale.AUTO)
+  if(_scaleType == AxisScale.LINEAR)
       return _vshift+_vscale*v;
   else if(_scaleType == AxisScale.LOG10)
     return _vshift+_vscale*ArrayMath.log10(v);
@@ -162,9 +162,9 @@ public class Projector {
    * @return world coordinate v.
    */
   public double v(double u) {
-  if(_scaleType == AxisScale.LINEAR || _scaleType == AxisScale.AUTO)
+  if(_scaleType==AxisScale.LINEAR)
     return _ushift+_uscale*u;
-  else if(_scaleType == AxisScale.LOG10)
+  else if(_scaleType==AxisScale.LOG10)
     return ArrayMath.pow(10,_ushift+_uscale*u);
   return 0.0;
   }
@@ -209,6 +209,22 @@ public class Projector {
     return _scaleType;
   }  
 
+  /**
+   * Check whether projector is linear
+   * @return true if Projector is linear, else false
+   */
+  public boolean isLinear(){
+    return (_scaleType==AxisScale.LINEAR)?true:false;
+  }
+  
+  /**
+   * Check whether projector is logarithmic
+   * @return true if Projector is logarithmic, else false
+   */
+  public boolean isLog(){
+    return (_scaleType==AxisScale.LOG10)?true:false;
+  }  
+  
   /**
    * Merges the specified projector into this projector. 
    * @param p the projector.
@@ -274,6 +290,12 @@ public class Projector {
     assert niter<10:"niter<10";
     assert 0.0<=_u0 && _u0<_u1 && _u1<=1.0:"_u0 and _u1 valid";
 
+    // use LINEAR scale in case of conflict
+    if(p.isLinear()&&!isLinear()){
+      System.out.println("Projector: conflict found");
+      setScale(AxisScale.LINEAR);
+    }
+    
     // Recompute shifts and scales.
     computeShiftsAndScales();
   }
@@ -333,13 +355,14 @@ public class Projector {
   /**
    * Sets the scale type
    * @param s new scale type
+   * @return 
    */
-  protected void setScale(AxisScale s) {
-	  System.out.println("setting PROJ Scale " + s);
+  protected Projector setScale(AxisScale s) {
     _scaleType = s;
-    if(_v0 <= 0 || _v1 <= 0)
-      _scaleType = AxisScale.LINEAR;
+   // if(_v0 <= 0 || _v1 <= 0)
+   //   _scaleType = AxisScale.LINEAR;
     computeShiftsAndScales();
+    return this;
   } 
   
   ///////////////////////////////////////////////////////////////////////////
@@ -352,11 +375,7 @@ public class Projector {
   private AxisScale _scaleType;
 
   private void computeShiftsAndScales() {
-    if(_v0 <= 0.0 || _v1 <= 0.0){
-      _scaleType = AxisScale.LINEAR;
-      System.out.println("  whoops!");  
-    }
-    if (_scaleType == AxisScale.LINEAR || _scaleType == AxisScale.AUTO) {
+    if (_scaleType == AxisScale.LINEAR) {
       _uscale = (_v1-_v0)/(_u1-_u0);
       _ushift = _v0-_uscale*_u0;
       _vscale = (_u1-_u0)/(_v1-_v0);
@@ -367,6 +386,5 @@ public class Projector {
       _ushift = ArrayMath.log10(_v0) - _uscale * _u0;
       _vshift = _u0 - _vscale * ArrayMath.log10(_v0);
     }
-    System.out.println("  Projector.compte... now has " + getScale());
   }
 }

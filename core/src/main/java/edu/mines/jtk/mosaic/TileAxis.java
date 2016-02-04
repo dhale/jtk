@@ -626,7 +626,7 @@ public class TileAxis extends IPanel {
     // Compute new axis tics constructed with the best-fit tic interval 
     // computed above, but now for the currently visible range [v0,v1] 
     // of world coordinates. These axis tics are painted by this axis.
-    if(p.getScale() == AxisScale.LINEAR || p.getScale() == AxisScale.AUTO)
+    if(p.getScale() == AxisScale.LINEAR)
       _axisTics = new AxisTics(v0,v1,dtic);
     else if (p.getScale() == AxisScale.LOG10) {
       double v0a = min(v0, v1);

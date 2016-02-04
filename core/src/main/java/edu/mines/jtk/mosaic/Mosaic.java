@@ -600,22 +600,37 @@ public class Mosaic extends IPanel {
   // package
 
   void alignProjectors(Tile tile) {
+    // attempt to set all adjacent Tiles to the same scale as tile
+    // if not, set them all to LINEAR
+    boolean[] checkScales = setTileScales(tile);
+    AxisScale hscale = tile.getBestHorizontalProjector().getScale();
+    AxisScale vscale = tile.getBestVerticalProjector().getScale();
+    AxisScale hscale2 = checkScales[0]?hscale:AxisScale.LINEAR;
+    AxisScale vscale2 = checkScales[1]?vscale:AxisScale.LINEAR;
+    if(!(checkScales[0] && checkScales[1])){
+      tile.setScales(hscale2,vscale2,false);
+      setTileScales(tile);
+    }
+    
     int jrow = tile.getRowIndex();
     int jcol = tile.getColumnIndex();
     Projector bhp = tile.getBestHorizontalProjector();
+    
     if (bhp!=null) {
       bhp = new Projector(bhp);
       for (int irow=0; irow<_nrow; ++irow) {
-        if (irow!=jrow)
+        if (irow!=jrow){
           bhp.merge(_tiles[irow][jcol].getBestHorizontalProjector());
+        }
       }
     }
     Projector bvp = tile.getBestVerticalProjector();
     if (bvp!=null) {
       bvp = new Projector(bvp);
       for (int icol=0; icol<_ncol; ++icol) {
-        if (icol!=jcol)
+        if (icol!=jcol){
           bvp.merge(_tiles[jrow][icol].getBestVerticalProjector());
+        }
       }
     }
     if (bhp!=null && bvp!=null) {
@@ -640,7 +655,33 @@ public class Mosaic extends IPanel {
     repaintAxis(_axesLeft,jrow);
     repaintAxis(_axesRight,jrow);
   }
-
+ 
+  // set the Tiles in the same row and col of tile to have the same scale
+  // return a 2-element boolean array indicating whether the resulting 
+  // scale changes were successful. If not, that indicates one of the Tiles
+  // contained TiledViews that could not be set to the specified scale
+  private boolean[] setTileScales(Tile tile){
+    int jrow = tile.getRowIndex();
+    int jcol = tile.getColumnIndex();
+    AxisScale hscale = tile.getBestHorizontalProjector().getScale();
+    AxisScale vscale = tile.getBestVerticalProjector().getScale();
+    boolean[] compat = new boolean[]{true,true}; 
+    
+    for (int irow=0; irow<_nrow; ++irow){
+      Tile t = _tiles[irow][jcol];
+      t.setScales(hscale,t.getVScale(),false);
+      compat[0] = (t.getHScale()==hscale && compat[0])?true:false;
+    }
+    
+    for (int icol=0; icol<_ncol; ++icol){ 
+      Tile t = _tiles[jrow][icol];
+      t.setScales(t.getHScale(),vscale,false);
+      compat[1] = (t.getVScale()==vscale && compat[1])?true:false;
+    }
+    
+    return compat;
+  }
+  
   void setViewRect(Tile tile, DRectangle vr) {
     int wvsb = widthVScrollBars();
     int hhsb = heightHScrollBars();

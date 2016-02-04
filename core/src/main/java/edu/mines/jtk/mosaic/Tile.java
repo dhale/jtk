@@ -49,7 +49,7 @@ import edu.mines.jtk.util.Check;
  * @version 2004.12.27
  * @version 2005.12.23
  */
-public class Tile extends IPanel implements AxisScalable{
+public class Tile extends IPanel{
   private static final long serialVersionUID = 1L;
 
   /**
@@ -277,30 +277,58 @@ public class Tile extends IPanel implements AxisScalable{
   }
 
   /**
-   * Sets the Horizontal axis scaling.
-   * @param scale the new scale
-   * @return This tile
-   */
-  public Tile setHScale(AxisScale scale) {
-    _hp.setScale(scale);
-    updateBestProjectors();
-    if(_mosaic != null)
-    	_mosaic.alignProjectors(this);
+   * Sets the scale both best projectors.
+   * @param hscale the new horizontal scale
+   * @param vscale the new vertical scale
+   * @param align whether to align the mosaic
+   * @return this Tile
+   */  
+  public Tile setScales(AxisScale hscale, AxisScale vscale, boolean align){
+    if(hscale!=getHScale() || vscale!=getVScale())
+      alignProjectors(hscale,vscale,align);
     return this;
+  }  
+  
+  
+  /**
+   * Convenience method to set the scale of both best 
+   * projectors and align the mosaic.
+   * @param hscale the new horizontal scale
+   * @param vscale the new vertical scale
+   * @return this Tile
+   */  
+  public Tile setScales(AxisScale hscale, AxisScale vscale){
+    return setScales(hscale,vscale,true);
+  }
+  
+  /**
+   * Convenience method to set both scales the same and align mosaic
+   * @param scale the new scale
+   * @return this Tile
+   */  
+  public Tile setScales(AxisScale scale){
+    return setScales(scale,scale,true);
+  }  
+  
+  /**
+   * Convenience method to set the scale of the 
+   * best horizontal projector.
+   * @param scale the new scale 
+   * @return this Tile
+   */  
+  public Tile setHScale(AxisScale scale){
+    return setScales(scale,getVScale(),true);
   }
 
   /**
-   * Sets the Vertical axis scaling.
+   * Convenience method to set the scale of the 
+   * best vertical projector.
    * @param scale the new scale
-   * @return This tile
-   */
-  public Tile setVScale(AxisScale scale) {
-    _vp.setScale(scale);
-    updateBestProjectors();
-    if(_mosaic != null)
-    	_mosaic.alignProjectors(this);
-    return this;
-  } 
+   * @return this Tile
+   */  
+  public Tile setVScale(AxisScale scale){
+    return setScales(getHScale(),scale,true);
+  }  
   
   
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
@@ -392,8 +420,17 @@ public class Tile extends IPanel implements AxisScalable{
    * Called by this tile or by a tiled view when this tile needs alignment.
    */
   void alignProjectors() {
-    updateBestProjectors();
-    _mosaic.alignProjectors(this);
+    alignProjectors(_hp.getScale(),_vp.getScale(),true);
+  }
+  
+  void alignProjectors(AxisScale hscale, AxisScale vscale){
+    alignProjectors(hscale,vscale,true);
+  }
+  
+  void alignProjectors(AxisScale hscale, AxisScale vscale, boolean align) {
+    updateBestProjectors(hscale,vscale);
+    if(align)
+      _mosaic.alignProjectors(this);
   }
 
   /**
@@ -439,10 +476,21 @@ public class Tile extends IPanel implements AxisScalable{
   private Transcaler _ts = new Transcaler();
   private DRectangle _vr = new DRectangle(0.0,0.0,1.0,1.0);
 
-  private void updateBestProjectors() {
+  /**
+   * Called when we might new realignment.
+   */
+  
+  private void updateBestProjectors(AxisScale hscale, AxisScale vscale) {
+    boolean[] checkScales = setViewScales(hscale,vscale);
+    AxisScale hscale2 = checkScales[0]?hscale:AxisScale.LINEAR;
+    AxisScale vscale2 = checkScales[1]?vscale:AxisScale.LINEAR;
+    if(!(checkScales[0] && checkScales[1]))
+      setScales(hscale2,vscale2);
+
     Projector bhp = null;
     Projector bvp = null;
     int ntv = _tvs.size();
+    
     if (_shp==null) {
       int itv = ntv-1;
       for (; bhp==null && itv>=0; --itv) {
@@ -454,6 +502,7 @@ public class Tile extends IPanel implements AxisScalable{
         bhp.merge(tv.getBestHorizontalProjector());
       }
     }
+    
     if (_svp==null) {
       int itv = ntv-1;
       for (; bvp==null && itv>=0; --itv) {
@@ -468,10 +517,15 @@ public class Tile extends IPanel implements AxisScalable{
     
     _bhp = (_shp!=null)?_shp:bhp;
     _bvp = (_svp!=null)?_svp:bvp;
-
-    if(_bhp!=null)
-      _bhp.setScale(getHScale());
-    if(_bvp!=null)
-      _bvp.setScale(getVScale());
+  }
+  
+  private boolean[] setViewScales(AxisScale hscale, AxisScale vscale){
+    boolean[] compat = new boolean[]{true,true};
+    for(TiledView tv : _tvs){
+      tv.setScales(hscale,vscale,false);
+      compat[0] = (tv.getHScale()==hscale && compat[0])?true:false;
+      compat[1] = (tv.getVScale()==vscale && compat[1])?true:false; 
+    }
+    return compat;
   }
 }

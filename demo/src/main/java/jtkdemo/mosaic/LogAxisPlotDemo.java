@@ -18,6 +18,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -27,6 +28,7 @@ import edu.mines.jtk.mosaic.PlotPanel;
 import edu.mines.jtk.mosaic.PointsView;
 import edu.mines.jtk.mosaic.AxisScale;
 import edu.mines.jtk.mosaic.Tile;
+import edu.mines.jtk.mosaic.TiledView;
 import edu.mines.jtk.util.ArrayMath;
 import static edu.mines.jtk.util.MathPlus.*;
 /**
@@ -52,7 +54,19 @@ public class LogAxisPlotDemo {
       f1[i] = pow(1.5f * x1[i],1);
       f2[i] = 100 * (float) sin(0.1 * x2[i]);
     }
-
+/*
+    PlotPanel plot = new PlotPanel(1,2);
+    PointsView pv3 = plot.addPoints(0,0,x1,f1);
+    PointsView pv4 = plot.addPoints(0,0,x2,f2);
+    pv3.setScales(AxisScale.LOG10);
+    pv3.setLineColor(Color.BLUE);
+    pv4.setLineColor(Color.RED);
+    
+    PointsView pv1 = plot.addPoints(0,1,x1,f1);
+    PointsView pv2 = plot.addPoints(0,1,x2,f2);
+    pv1.setLineColor(Color.BLUE);
+    pv2.setLineColor(Color.RED);
+*/    
     // new plot
     PlotPanel plot = new PlotPanel(2,2);
 
@@ -66,7 +80,7 @@ public class LogAxisPlotDemo {
     PointsView pv3 = plot.addPoints(0,0,x1,f1);
     PointsView pv4 = plot.addPoints(0,0,x2,f2);
     pv3.setHScale(AxisScale.LOG10);
-    pv3.setLineColor(Color.BLUE);
+    pv3.setLineColor(Color.GREEN);
     pv4.setLineColor(Color.RED);
 
     // log-y plots
@@ -86,7 +100,7 @@ public class LogAxisPlotDemo {
     // make some buttons
     JPanel buttPanel = new JPanel();
     buttPanel.add(changeHAxisButton(plot.getTile(0,0)));
-    buttPanel.add(changeVAxisButton(plot.getTile(0,1)));
+    buttPanel.add(changeVAxisButton(plot.getTile(0,0)));
     buttPanel.add(changeHAxisButton(plot.getTile(0,1)));
     buttPanel.add(changeVAxisButton(plot.getTile(1,1)));
 
@@ -111,6 +125,7 @@ public class LogAxisPlotDemo {
           tile.setHScale(AxisScale.LINEAR);
         else
           tile.setHScale(AxisScale.LOG10);
+        tile.repaint();
       }
     });
     return b;
@@ -129,6 +144,7 @@ public class LogAxisPlotDemo {
           tile.setVScale(AxisScale.LOG10);
         tile.repaint();
       }
+      
     });
     return b;
   }

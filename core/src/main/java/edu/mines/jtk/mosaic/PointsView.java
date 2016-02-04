@@ -43,7 +43,7 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.12.28
  */
-public class PointsView extends TiledView implements AxisScalable{
+public class PointsView extends TiledView{
 
   /**
    * Orientation of axes x1 and x2. For example, the default orientation 
@@ -439,47 +439,10 @@ public class PointsView extends TiledView implements AxisScalable{
    * @param scaleType axis scaling enum value
    */
   @Override
-  public PointsView setHScale(AxisScale scale) {
-    updateBestProjectors(scale, getVScale());
-	if(getTile() != null)
-	  getTile().setHScale(scale);
+  public PointsView setScales(AxisScale hscale, AxisScale vscale, boolean align) {
+    if(hscale!=getHScale() || vscale!=getVScale())
+      updateBestProjectors(hscale, vscale, align);
     return this;
-  }
-
-  /**
-   * Sets the vertical axis scaling.
-   * @param scaleType axis scaling enum value
-   */
-  @Override
-  public PointsView setVScale(AxisScale scale) {
-    updateBestProjectors(getHScale(), scale);
-	if(getTile() != null)
-		getTile().setVScale(scale);
-    return this;
-  }
-
-  /**
-   * Gets the horizontal axis scaling.
-   * @return the horizontal scaling
-   */
-  @Override
-  public AxisScale getHScale() {
-    if(getTile() != null)
-      return getTile().getHScale();
-    else
-      return AxisScale.AUTO;
-  }
-
-  /**
-   * Gets the vertical axis scaling.
-   * @return the vertical scaling
-   */
-  @Override
-  public AxisScale getVScale() {
-    if(getTile() != null)
-        return getTile().getVScale();
-      else
-        return AxisScale.AUTO;
   }
   
   public void paint(Graphics2D g2d) {
@@ -624,11 +587,15 @@ public class PointsView extends TiledView implements AxisScalable{
   /**
    * Called when we might new realignment.
    */
-  private void updateBestProjectors() {
-	  updateBestProjectors(getHScale(), getVScale());	  
+  protected void updateBestProjectors() {
+	  updateBestProjectors(getHScale(), getVScale(),true);	  
   }
   
-  private void updateBestProjectors(AxisScale hscale, AxisScale vscale) {
+  protected void updateBestProjectors(AxisScale hscale, AxisScale vscale) {
+    updateBestProjectors(hscale,vscale,true);    
+  }
+  
+  protected void updateBestProjectors(AxisScale hscale, AxisScale vscale, boolean align) {
     // Min and max (x1,x2) values.
     float x1min =  FLT_MAX;
     float x2min =  FLT_MAX;
@@ -647,20 +614,18 @@ public class PointsView extends TiledView implements AxisScalable{
         x2max = max(x2max,x2i);
       }
 
-      if (hscale == AxisScale.LOG10) {
+      // Ignore negative values in the range of x1
+      // if current scale is LOG10
+      if (hscale==AxisScale.LOG10) {
         int ind = getFirstPositiveInd(x1);
-        if (ind > -1)
-          x1min = max(x1min, x1[ind]);
-        else
-          hscale = AxisScale.LINEAR;
+        if (ind>-1)
+          x1min = max(x1min,x1[ind]);
       }
 
-      if (vscale == AxisScale.LOG10) {
+      if (vscale==AxisScale.LOG10) {
         int ind = getSmallestPositiveInd(x2);
-        if (ind > -1)
-          x2min = max(x2min, x2[ind]);
-        else
-          vscale = AxisScale.LINEAR;
+        if (ind>-1)
+          x2min = max(x2min,x2[ind]);
       }
     }
     
@@ -691,7 +656,6 @@ public class PointsView extends TiledView implements AxisScalable{
     // Best projectors.
     Projector bhp = null;
     Projector bvp = null;
-    System.out.println(x2min + ", " + x2max);
     if (_orientation==Orientation.X1RIGHT_X2UP) {
       bhp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1,hscale):null;
       bvp = (x2min<x2max)?new Projector(x2max,x2min,u0,u1,vscale):null;
@@ -699,8 +663,7 @@ public class PointsView extends TiledView implements AxisScalable{
       bhp = (x2min<x2max)?new Projector(x2min,x2max,u0,u1,hscale):null;
       bvp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1,vscale):null;
     }
-
-    setBestProjectors(bhp,bvp);
+    setBestProjectors(bhp,bvp,align);
   }
 
   private int getFirstPositiveInd(float[] x) {
