@@ -4,5 +4,8 @@ package edu.mines.jtk.mosaic;
  */
 public enum AxisScale {
 	LINEAR,
-	LOG10
+	LOG10;
+	
+	public boolean isLinear() {return (this==LINEAR)?true:false;}
+	public boolean isLog() {return (this==LOG10)?true:false;}  // this could be extended to include LOG2
 }

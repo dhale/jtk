@@ -77,6 +77,81 @@ public class Tile extends IPanel{
   }
 
   /**
+   * Sets limits for the both horizontal and vertical axes.
+   * By default, limits are computed automatically by tiled graphical views.
+   * This method can be used to override those default limits.
+   * @param hmin the minimum value.
+   * @param vmin the minimum value.
+   * @param hmax the maximum value.
+   * @param vmax the maximum value.
+   */
+  public void setLimits(double hmin, double vmin, double hmax, double vmax){
+    setHLimits(hmin,hmax);
+    setVLimits(vmin,vmax);
+  }
+  
+  /**
+   * Sets limits for the horizontal axis.
+   * By default, limits are computed automatically by tiled graphical views.
+   * This method can be used to override those default limits.
+   * @param hmin the minimum value.
+   * @param hmax the maximum value.
+   */
+  public void setHLimits(double hmin, double hmax){
+    Check.argument(hmin<hmax,"hmin<hmax");
+    if(_bhp.isLog())
+      Check.argument(hmin>0,"hmin>0 for LOG scales");
+    _shp = new Projector(hmin,hmax);
+    alignProjectors();
+  }
+  
+  /**
+   * Sets limits for the vertical axis.
+   * By default, limits are computed automatically by tiled graphical views.
+   * This method can be used to override those default limits.
+   * @param vmin the minimum value.
+   * @param vmax the maximum value.
+   */
+  public void setVLimits(double vmin, double vmax){
+    Check.argument(vmin<vmax,"vmin<vmax");
+    if(_bvp.isLog())
+      Check.argument(vmin>0,"vmin>0 for LOG scales");
+    if(_bvp.v0()<_bvp.v1())
+      _svp = new Projector(vmin,vmax);
+    else
+      _svp = new Projector(vmax,vmin);
+    alignProjectors();
+  }
+  
+  /**
+   * Sets default limits for horizontal and vertical axes. This method may
+   * be used to restore default limits after they have been set explicitly.
+   */
+  public void setLimitsDefault(){
+    _svp=null;
+    _shp=null;
+    alignProjectors();
+  }
+  
+  /**
+   * Sets default limits for the horizontal axis. This method may be used 
+   * to restore default limits after they have been set explicitly.
+   */
+  public void setHLimitsDefault(){
+    _shp=null;
+    alignProjectors();
+  }
+  
+  /**
+   * Sets default limits for the vertical axis. This method may be used 
+   * to restore default limits after they have been set explicitly.
+   */
+  public void setVLimitsDefault(){
+    _svp=null;
+    alignProjectors();
+  }
+  
+  /**
    * Sets the best horizontal projector for this tile. If null, this
    * tile will compute its best horizontal projector by merging those
    * of its tiled views. If not null, the specified projector is best.
@@ -84,6 +159,7 @@ public class Tile extends IPanel{
    * it's mosaic during alignment with other tiles in the same column.
    * @param bhp the best horizontal projector.
    */
+  @Deprecated
   public void setBestHorizontalProjector(Projector bhp) {
     _shp = bhp;
     alignProjectors();
@@ -97,6 +173,7 @@ public class Tile extends IPanel{
    * it's mosaic during alignment with other tiles in the same row.
    * @param bvp the best vertical projector.
    */
+  @Deprecated
   public void setBestVerticalProjector(Projector bvp) {
     _svp = bvp;
     alignProjectors();
@@ -501,7 +578,8 @@ public class Tile extends IPanel{
         TiledView tv = _tvs.get(itv);
         bhp.merge(tv.getBestHorizontalProjector());
       }
-    }
+    } else
+      _shp.setScale(hscale2);
     
     if (_svp==null) {
       int itv = ntv-1;
@@ -513,7 +591,8 @@ public class Tile extends IPanel{
         TiledView tv = _tvs.get(itv);
         bvp.merge(tv.getBestVerticalProjector());
       }
-    }
+    } else
+      _svp.setScale(vscale2);
     
     _bhp = (_shp!=null)?_shp:bhp;
     _bvp = (_svp!=null)?_svp:bvp;

@@ -142,22 +142,22 @@ public class LogAxisTics extends AxisTics {
   }
 
   private void computeMinorTics() {
-    // the number of log-spaced tics that the first value is behind the first
-    // major tic
+    // the position out of 9 that the first tic should be before the first Major tic
+    // e.g. 7 out of 9
     double c = pow(10.0,(_expMin - ceil(_expMin) + 1));
     // the number of log-spaced tics that the last value is ahead of the
     // previous-to-first major tic
-    int c2 = 10 - (int) ceil(c);
+    int c2 = 9 - (int) floor(c);
     // the number of log-spaced tics that the last value is behind the
     // next-after-last major tic
     double d = pow(10.0,(_expMax - floor(_expMax)));
     // the number of log-spaced tics that the last value is ahead of the last
     // major tic
-    int d2 = (int) floor(d) - 1;
+    int d2 = (int) floor(d);
 
-    _nticMinor = 10 * (_ntic) + c2 + d2;
+    _nticMinor = 9 * (_ntic-1) + c2 + d2;
     _dticMinor = 1;
-    _fticMinor = pow(10,ceil(_expMin) - 1) * (int) (c);
+    _fticMinor = pow(10,ceil(_expMin) - 1) * (int) ceil(c);
     _ktic = c2 + 1;
   }
 

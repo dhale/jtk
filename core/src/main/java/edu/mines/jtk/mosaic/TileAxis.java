@@ -271,7 +271,7 @@ public class TileAxis extends IPanel {
     boolean isTop = isTop();
     boolean isLeft = isLeft();
     boolean isVerticalRotated = isVerticalRotated();
-    boolean isLogScale = (p.getScale() == AxisScale.LOG10);
+    boolean isLogScale = (p.getScale().isLog());
 
     // Axis tic sampling.
     int nticMajor = _axisTics.getCountMajor();
@@ -283,8 +283,8 @@ public class TileAxis extends IPanel {
     int mtic = _axisTics.getMultiple();
 
     // Minor tics. Skip major tics, which may not coincide, due to rounding.
-    int ktic = isLogScale ? ((LogAxisTics)_axisTics).getFirstMinorSkip()
-                          : (int)round((fticMajor-fticMinor)/dticMinor);
+    int ktic = isLogScale?((LogAxisTics)_axisTics).getFirstMinorSkip()-1
+                          :(int)round((fticMajor-fticMinor)/dticMinor);
     for (int itic=0; itic<nticMinor; ++itic) {
       if (itic==ktic) {
         ktic += mtic;
@@ -319,8 +319,8 @@ public class TileAxis extends IPanel {
     int wsmax = 0;
     double tiny = 1.0e-6*abs(dticMajor);
     for (int itic=0; itic<nticMajor; ++itic) {
-      double vtic = isLogScale ? fticMajor*Math.pow(10, itic) 
-              : fticMajor+itic*dticMajor;
+      double vtic = isLogScale?fticMajor*Math.pow(10, itic) 
+              :fticMajor+itic*dticMajor;
       double utic = p.u(vtic);
       if (abs(vtic)<tiny)
         vtic = 0.0;

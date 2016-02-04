@@ -18,7 +18,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -28,7 +27,6 @@ import edu.mines.jtk.mosaic.PlotPanel;
 import edu.mines.jtk.mosaic.PointsView;
 import edu.mines.jtk.mosaic.AxisScale;
 import edu.mines.jtk.mosaic.Tile;
-import edu.mines.jtk.mosaic.TiledView;
 import edu.mines.jtk.util.ArrayMath;
 import static edu.mines.jtk.util.MathPlus.*;
 /**
@@ -54,19 +52,7 @@ public class LogAxisPlotDemo {
       f1[i] = pow(1.5f * x1[i],1);
       f2[i] = 100 * (float) sin(0.1 * x2[i]);
     }
-/*
-    PlotPanel plot = new PlotPanel(1,2);
-    PointsView pv3 = plot.addPoints(0,0,x1,f1);
-    PointsView pv4 = plot.addPoints(0,0,x2,f2);
-    pv3.setScales(AxisScale.LOG10);
-    pv3.setLineColor(Color.BLUE);
-    pv4.setLineColor(Color.RED);
-    
-    PointsView pv1 = plot.addPoints(0,1,x1,f1);
-    PointsView pv2 = plot.addPoints(0,1,x2,f2);
-    pv1.setLineColor(Color.BLUE);
-    pv2.setLineColor(Color.RED);
-*/    
+
     // new plot
     PlotPanel plot = new PlotPanel(2,2);
 
@@ -101,8 +87,8 @@ public class LogAxisPlotDemo {
     JPanel buttPanel = new JPanel();
     buttPanel.add(changeHAxisButton(plot.getTile(0,0)));
     buttPanel.add(changeVAxisButton(plot.getTile(0,0)));
-    buttPanel.add(changeHAxisButton(plot.getTile(0,1)));
-    buttPanel.add(changeVAxisButton(plot.getTile(1,1)));
+    buttPanel.add(limitsTestButton(plot));
+    buttPanel.add(limitsDefaultButton(plot));
 
     // frame setup
     plot.setVisible(true);
@@ -131,6 +117,30 @@ public class LogAxisPlotDemo {
     return b;
   }
 
+  public static JButton limitsTestButton(final PlotPanel plot){
+    JButton b = new JButton("setLimits Test");
+    b.addActionListener(new ActionListener() {
+      
+      @Override
+      public void actionPerformed(ActionEvent arg0) {
+        plot.setLimits(10,20,100,1000);
+      }
+    });
+    return b;
+  }
+  
+  public static JButton limitsDefaultButton(final PlotPanel plot){
+    JButton b = new JButton("Default Limits");
+    b.addActionListener(new ActionListener() {
+      
+      @Override
+      public void actionPerformed(ActionEvent arg0) {
+        plot.setLimitsDefault();
+      }
+    });
+    return b; 
+  }
+  
   public static JButton changeVAxisButton(final Tile tile) {
     JButton b = new JButton("Tile " + tile.getRowIndex() + ", "
         + tile.getColumnIndex() + " V");

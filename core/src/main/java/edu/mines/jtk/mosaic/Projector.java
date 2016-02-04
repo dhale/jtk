@@ -356,9 +356,9 @@ public class Projector {
    * @return 
    */
   protected Projector setScale(AxisScale s) {
+    if(s.isLog() && !(_v0==0.0 && _v1==0.0))
+      Check.argument(_v0>0 && _v1>0,"LOG scale: v0<=0 or v1<=0");
     _scaleType = s;
-   // if(_v0 <= 0 || _v1 <= 0)
-   //   _scaleType = AxisScale.LINEAR;
     computeShiftsAndScales();
     return this;
   } 
