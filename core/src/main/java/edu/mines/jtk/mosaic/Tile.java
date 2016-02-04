@@ -49,7 +49,7 @@ import edu.mines.jtk.util.Check;
  * @version 2004.12.27
  * @version 2005.12.23
  */
-public class Tile extends IPanel{
+public class Tile extends IPanel {
   private static final long serialVersionUID = 1L;
 
   /**
@@ -85,7 +85,7 @@ public class Tile extends IPanel{
    * @param hmax the maximum value.
    * @param vmax the maximum value.
    */
-  public void setLimits(double hmin, double vmin, double hmax, double vmax){
+  public void setLimits(double hmin, double vmin, double hmax, double vmax) {
     setHLimits(hmin,hmax);
     setVLimits(vmin,vmax);
   }
@@ -97,7 +97,7 @@ public class Tile extends IPanel{
    * @param hmin the minimum value.
    * @param hmax the maximum value.
    */
-  public void setHLimits(double hmin, double hmax){
+  public void setHLimits(double hmin, double hmax) {
     Check.argument(hmin<hmax,"hmin<hmax");
     if(_bhp.isLog())
       Check.argument(hmin>0,"hmin>0 for LOG scales");
@@ -112,7 +112,7 @@ public class Tile extends IPanel{
    * @param vmin the minimum value.
    * @param vmax the maximum value.
    */
-  public void setVLimits(double vmin, double vmax){
+  public void setVLimits(double vmin, double vmax) {
     Check.argument(vmin<vmax,"vmin<vmax");
     if(_bvp.isLog())
       Check.argument(vmin>0,"vmin>0 for LOG scales");
@@ -127,7 +127,7 @@ public class Tile extends IPanel{
    * Sets default limits for horizontal and vertical axes. This method may
    * be used to restore default limits after they have been set explicitly.
    */
-  public void setLimitsDefault(){
+  public void setLimitsDefault() {
     _svp=null;
     _shp=null;
     alignProjectors();
@@ -137,7 +137,7 @@ public class Tile extends IPanel{
    * Sets default limits for the horizontal axis. This method may be used 
    * to restore default limits after they have been set explicitly.
    */
-  public void setHLimitsDefault(){
+  public void setHLimitsDefault() {
     _shp=null;
     alignProjectors();
   }
@@ -146,7 +146,7 @@ public class Tile extends IPanel{
    * Sets default limits for the vertical axis. This method may be used 
    * to restore default limits after they have been set explicitly.
    */
-  public void setVLimitsDefault(){
+  public void setVLimitsDefault() {
     _svp=null;
     alignProjectors();
   }
@@ -342,7 +342,7 @@ public class Tile extends IPanel{
    * @return the Scale; null, if none.
    */
   public AxisScale getHScale() {
-	  return _hp.getScale();
+    return _hp.getScale();
   }
 
   /**
@@ -350,7 +350,7 @@ public class Tile extends IPanel{
    * @return the Scale; null, if none.
    */
   public AxisScale getVScale() {
-	  return _vp.getScale();
+    return _vp.getScale();
   }
 
   /**
@@ -360,7 +360,7 @@ public class Tile extends IPanel{
    * @param align whether to align the mosaic
    * @return this Tile
    */  
-  public Tile setScales(AxisScale hscale, AxisScale vscale, boolean align){
+  public Tile setScales(AxisScale hscale, AxisScale vscale, boolean align) {
     if(hscale!=getHScale() || vscale!=getVScale())
       alignProjectors(hscale,vscale,align);
     return this;
@@ -374,7 +374,7 @@ public class Tile extends IPanel{
    * @param vscale the new vertical scale
    * @return this Tile
    */  
-  public Tile setScales(AxisScale hscale, AxisScale vscale){
+  public Tile setScales(AxisScale hscale, AxisScale vscale) {
     return setScales(hscale,vscale,true);
   }
   
@@ -383,7 +383,7 @@ public class Tile extends IPanel{
    * @param scale the new scale
    * @return this Tile
    */  
-  public Tile setScales(AxisScale scale){
+  public Tile setScales(AxisScale scale) {
     return setScales(scale,scale,true);
   }  
   
@@ -393,7 +393,7 @@ public class Tile extends IPanel{
    * @param scale the new scale 
    * @return this Tile
    */  
-  public Tile setHScale(AxisScale scale){
+  public Tile setHScale(AxisScale scale) {
     return setScales(scale,getVScale(),true);
   }
 
@@ -403,7 +403,7 @@ public class Tile extends IPanel{
    * @param scale the new scale
    * @return this Tile
    */  
-  public Tile setVScale(AxisScale scale){
+  public Tile setVScale(AxisScale scale) {
     return setScales(getHScale(),scale,true);
   }  
   
@@ -500,7 +500,7 @@ public class Tile extends IPanel{
     alignProjectors(_hp.getScale(),_vp.getScale(),true);
   }
   
-  void alignProjectors(AxisScale hscale, AxisScale vscale){
+  void alignProjectors(AxisScale hscale, AxisScale vscale) {
     alignProjectors(hscale,vscale,true);
   }
   
@@ -567,7 +567,6 @@ public class Tile extends IPanel{
     Projector bhp = null;
     Projector bvp = null;
     int ntv = _tvs.size();
-    
     if (_shp==null) {
       int itv = ntv-1;
       for (; bhp==null && itv>=0; --itv) {
@@ -598,7 +597,7 @@ public class Tile extends IPanel{
     _bvp = (_svp!=null)?_svp:bvp;
   }
   
-  private boolean[] setViewScales(AxisScale hscale, AxisScale vscale){
+  private boolean[] setViewScales(AxisScale hscale, AxisScale vscale) {
     boolean[] compat = new boolean[]{true,true};
     for(TiledView tv : _tvs){
       tv.setScales(hscale,vscale,false);

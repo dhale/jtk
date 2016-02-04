@@ -263,8 +263,8 @@ public class Mosaic extends IPanel {
    */
   public TileAxis getTileAxisRight(int irow) {
     return (_axesRight!=null)?_axesRight[irow]:null;
-  } 
-  
+  }
+
   /**
    * Sets the width minimum for the specified column. All tiles in the 
    * specified column will have width not less than the specified minimum. 
@@ -616,22 +616,19 @@ public class Mosaic extends IPanel {
     int jrow = tile.getRowIndex();
     int jcol = tile.getColumnIndex();
     Projector bhp = tile.getBestHorizontalProjector();
-    
     if (bhp!=null) {
       bhp = new Projector(bhp);
       for (int irow=0; irow<_nrow; ++irow) {
-        if (irow!=jrow){
+        if (irow!=jrow)
           bhp.merge(_tiles[irow][jcol].getBestHorizontalProjector());
-        }
       }
     }
     Projector bvp = tile.getBestVerticalProjector();
     if (bvp!=null) {
       bvp = new Projector(bvp);
       for (int icol=0; icol<_ncol; ++icol) {
-        if (icol!=jcol){
+        if (icol!=jcol)
           bvp.merge(_tiles[jrow][icol].getBestVerticalProjector());
-        }
       }
     }
     if (bhp!=null && bvp!=null) {
@@ -661,7 +658,7 @@ public class Mosaic extends IPanel {
   // return a 2-element boolean array indicating whether the resulting 
   // scale changes were successful. If not, that indicates one of the Tiles
   // contained TiledViews that could not be set to the specified scale
-  private boolean[] setTileScales(Tile tile){
+  private boolean[] setTileScales(Tile tile) {
     int jrow = tile.getRowIndex();
     int jcol = tile.getColumnIndex();
     AxisScale hscale = tile.getBestHorizontalProjector().getScale();

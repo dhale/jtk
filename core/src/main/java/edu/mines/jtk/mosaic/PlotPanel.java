@@ -1251,12 +1251,12 @@ public class PlotPanel extends IPanel {
   }
 
   private PointsView addPointsView(int irow, int icol, PointsView pv) {
-    if (_orientation == Orientation.X1RIGHT_X2UP) {
+    if (_orientation==Orientation.X1RIGHT_X2UP) {
       pv.setOrientation(PointsView.Orientation.X1RIGHT_X2UP);
-    } else if (_orientation == Orientation.X1DOWN_X2RIGHT) {
+    } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
       pv.setOrientation(PointsView.Orientation.X1DOWN_X2RIGHT);
     }
-    addTiledView(irow, icol, pv);
+    addTiledView(irow,icol,pv);
     return pv;
   }
 

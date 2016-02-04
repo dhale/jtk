@@ -49,7 +49,7 @@ public class LogAxisTics extends AxisTics {
     _expMax = log10(xmax);
     _dtic = 1;
     _ftic = pow(10,ceil(_expMin));
-    _ntic = (int)(floor(ArrayMath.log10(xmax)) - ceil(ArrayMath.log10(xmin))) + 1; 
+    _ntic = (int)(floor(ArrayMath.log10(xmax))-ceil(ArrayMath.log10(xmin)))+1; 
     computeMultiple();
     computeMinorTics();
   }
@@ -144,21 +144,21 @@ public class LogAxisTics extends AxisTics {
   private void computeMinorTics() {
     // the position out of 9 that the first tic should be before the first Major tic
     // e.g. 7 out of 9
-    double c = pow(10.0,(_expMin - ceil(_expMin) + 1));
+    double c = pow(10.0,(_expMin-ceil(_expMin)+1));
     // the number of log-spaced tics that the last value is ahead of the
     // previous-to-first major tic
-    int c2 = 9 - (int) floor(c);
+    int c2 = 9-(int)floor(c);
     // the number of log-spaced tics that the last value is behind the
     // next-after-last major tic
-    double d = pow(10.0,(_expMax - floor(_expMax)));
+    double d = pow(10.0,(_expMax-floor(_expMax)));
     // the number of log-spaced tics that the last value is ahead of the last
     // major tic
-    int d2 = (int) floor(d);
+    int d2 = (int)floor(d);
 
-    _nticMinor = 9 * (_ntic-1) + c2 + d2;
+    _nticMinor = 9*(_ntic-1)+c2+d2;
     _dticMinor = 1;
-    _fticMinor = pow(10,ceil(_expMin) - 1) * (int) ceil(c);
-    _ktic = c2 + 1;
+    _fticMinor = pow(10,ceil(_expMin)-1)*(int)ceil(c);
+    _ktic = c2+1;
   }
 
 }

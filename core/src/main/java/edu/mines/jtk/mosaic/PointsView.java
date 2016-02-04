@@ -43,7 +43,7 @@ import static edu.mines.jtk.util.ArrayMath.*;
  * @author Dave Hale, Colorado School of Mines
  * @version 2005.12.28
  */
-public class PointsView extends TiledView{
+public class PointsView extends TiledView {
 
   /**
    * Orientation of axes x1 and x2. For example, the default orientation 
@@ -441,7 +441,7 @@ public class PointsView extends TiledView{
   @Override
   public PointsView setScales(AxisScale hscale, AxisScale vscale, boolean align) {
     if(hscale!=getHScale() || vscale!=getVScale())
-      updateBestProjectors(hscale, vscale, align);
+      updateBestProjectors(hscale,vscale,align);
     return this;
   }
   
@@ -581,21 +581,14 @@ public class PointsView extends TiledView{
   private Color _markColor = null;
   private String _textFormat = "%1.4G";
 
-  
-  
-  
   /**
    * Called when we might new realignment.
    */
-  protected void updateBestProjectors() {
-	  updateBestProjectors(getHScale(), getVScale(),true);	  
+  private void updateBestProjectors() {
+	  updateBestProjectors(getHScale(),getVScale(),true);	  
   }
   
-  protected void updateBestProjectors(AxisScale hscale, AxisScale vscale) {
-    updateBestProjectors(hscale,vscale,true);    
-  }
-  
-  protected void updateBestProjectors(AxisScale hscale, AxisScale vscale, boolean align) {
+  private void updateBestProjectors(AxisScale hscale, AxisScale vscale, boolean align) {
     // Min and max (x1,x2) values.
     float x1min =  FLT_MAX;
     float x2min =  FLT_MAX;
@@ -639,7 +632,6 @@ public class PointsView extends TiledView{
       x2max += ulp(x2max);
     }
 
-    
     // Assume mark sizes and line widths less than 2% of plot dimensions.
     // The goal is to avoid clipping big marks and wide lines. The problem
     // is that mark sizes and line widths are specified in screen pixels
@@ -668,8 +660,8 @@ public class PointsView extends TiledView{
 
   private int getFirstPositiveInd(float[] x) {
     int ind = -1;
-    for (int i = 0; i < x.length; i++) {
-      if (x[i] > 0) {
+    for (int i=0; i<x.length; i++) {
+      if (x[i]>0) {
         ind = i;
         break;
       }
@@ -680,8 +672,8 @@ public class PointsView extends TiledView{
   private int getSmallestPositiveInd(float[] x) {
     int ind = -1;
     float smallest = Float.MAX_VALUE;
-    for (int i = 0; i < x.length; i++) {
-      if (x[i] > 0 && x[i] < smallest) {
+    for (int i=0; i<x.length; i++) {
+      if (x[i]>0 && x[i]<smallest) {
         ind = i;
         smallest = x[i];
       }
@@ -707,11 +699,11 @@ public class PointsView extends TiledView{
       xv = x2;
       yv = x1;
     }
-    double hLeft = Math.min(hp.v0(), hp.v1());
-    double vBot = Math.min(vp.v0(), vp.v1());
-    for (int i = 0; i < n; ++i) {
-      x[i] = ts.x((xv[i] <= 0 && hp.getScale() == AxisScale.LOG10) ? hLeft : xv[i]);
-      y[i] = ts.y((yv[i] <= 0 && vp.getScale() == AxisScale.LOG10) ? vBot : yv[i]);
+    double hLeft = Math.min(hp.v0(),hp.v1());
+    double vBot = Math.min(vp.v0(),vp.v1());
+    for (int i=0; i<n; ++i) {
+      x[i] = ts.x((xv[i]<=0 && hp.getScale()==AxisScale.LOG10)?hLeft:xv[i]);
+      y[i] = ts.y((yv[i]<=0 && vp.getScale()==AxisScale.LOG10)?vBot:yv[i]);
     }
   }
 

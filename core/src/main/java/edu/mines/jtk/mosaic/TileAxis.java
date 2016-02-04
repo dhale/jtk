@@ -291,8 +291,8 @@ public class TileAxis extends IPanel {
       } else {
         double vtic = 0.0;
         if(isLogScale){  // drawing log spaced minor tics ... always draws all 8 of them
-          vtic = (itic + fticMinor*MathPlus.pow(10.0,-floor(MathPlus.log10(fticMinor)))-1)%9+1;
-          vtic *= MathPlus.pow(10.0,(ktic-1)/mtic + floor(MathPlus.log10(fticMinor)));
+          vtic = (itic+fticMinor*MathPlus.pow(10.0,-floor(MathPlus.log10(fticMinor)))-1)%9+1;
+          vtic *= MathPlus.pow(10.0,(ktic-1)/mtic+floor(MathPlus.log10(fticMinor)));
         }
         else
           vtic = fticMinor+itic*dticMinor;
@@ -628,10 +628,10 @@ public class TileAxis extends IPanel {
     // of world coordinates. These axis tics are painted by this axis.
     if(p.getScale() == AxisScale.LINEAR)
       _axisTics = new AxisTics(v0,v1,dtic);
-    else if (p.getScale() == AxisScale.LOG10) {
-      double v0a = min(v0, v1);
-      double v1a = max(v0, v1);
-      _axisTics = new LogAxisTics(v0a, v1a);
+    else if (p.getScale()==AxisScale.LOG10) {
+      double v0a = min(v0,v1);
+      double v1a = max(v0,v1);
+      _axisTics = new LogAxisTics(v0a,v1a);
     }
 
     // If either the tic label max width or height has changed,

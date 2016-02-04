@@ -149,9 +149,9 @@ public class Projector {
    * @return normalized coordinate u.
    */
   public double u(double v) {
-  if(_scaleType == AxisScale.LINEAR)
+  if(_scaleType==AxisScale.LINEAR)
       return _vshift+_vscale*v;
-  else if(_scaleType == AxisScale.LOG10)
+  else if(_scaleType==AxisScale.LOG10)
     return _vshift+_vscale*ArrayMath.log10(v);
   return 0.0;
   }
@@ -213,16 +213,16 @@ public class Projector {
    * Check whether projector is linear
    * @return true if Projector is linear, else false
    */
-  public boolean isLinear(){
-    return (_scaleType==AxisScale.LINEAR)?true:false;
+  public boolean isLinear() {
+    return _scaleType.isLinear();
   }
   
   /**
    * Check whether projector is logarithmic
    * @return true if Projector is logarithmic, else false
    */
-  public boolean isLog(){
-    return (_scaleType==AxisScale.LOG10)?true:false;
+  public boolean isLog() {
+    return _scaleType.isLog();
   }  
   
   /**
@@ -230,7 +230,6 @@ public class Projector {
    * @param p the projector.
    */
   public void merge(Projector p) {
-    
     // Ignore null projectors.
     if (p==null)
       return;
@@ -373,16 +372,16 @@ public class Projector {
   private AxisScale _scaleType;
 
   private void computeShiftsAndScales() {
-    if (_scaleType == AxisScale.LINEAR) {
+    if (_scaleType==AxisScale.LINEAR) {
       _uscale = (_v1-_v0)/(_u1-_u0);
       _ushift = _v0-_uscale*_u0;
       _vscale = (_u1-_u0)/(_v1-_v0);
       _vshift = _u0-_vscale*_v0;
-    } else if (_scaleType == AxisScale.LOG10) {
-      _vscale = (_u1 - _u0) / (ArrayMath.log10(_v1) - ArrayMath.log10(_v0));
-      _uscale = (ArrayMath.log10(_v1) - ArrayMath.log10(_v0)) / (_u1 - _u0);
-      _ushift = ArrayMath.log10(_v0) - _uscale * _u0;
-      _vshift = _u0 - _vscale * ArrayMath.log10(_v0);
+    } else if (_scaleType==AxisScale.LOG10) {
+      _vscale = (_u1-_u0)/(ArrayMath.log10(_v1)-ArrayMath.log10(_v0));
+      _uscale = (ArrayMath.log10(_v1)-ArrayMath.log10(_v0))/(_u1-_u0);
+      _ushift = ArrayMath.log10(_v0)-_uscale*_u0;
+      _vshift = _u0-_vscale*ArrayMath.log10(_v0);
     }
   }
 }

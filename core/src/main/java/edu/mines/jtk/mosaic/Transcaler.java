@@ -83,7 +83,6 @@ public class Transcaler {
   {
     setMapping(x1u,y1u,x2u,y2u,x1d,y1d,x2d,y2d);
   }
-  
   /**
    * Sets the coordinate mapping for this transcaler.
    * @param x1u the user x-coordinate corresponding to x1d.
@@ -150,10 +149,10 @@ public class Transcaler {
   public Transcaler combineWith(Projector xp, Projector yp) {
     AxisScale xsc = xp.getScale();
     AxisScale ysc = yp.getScale();
-    double x1v = (xsc == AxisScale.LOG10) ? log10(xp.v(_x1u)) : xp.v(_x1u); 
-    double x2v = (xsc == AxisScale.LOG10) ? log10(xp.v(_x2u)) : xp.v(_x2u);
-    double y1v = (ysc == AxisScale.LOG10) ? log10(yp.v(_y1u)) : yp.v(_y1u); 
-    double y2v = (ysc == AxisScale.LOG10) ? log10(yp.v(_y2u)) : yp.v(_y2u);
+    double x1v = (xsc==AxisScale.LOG10)?log10(xp.v(_x1u)):xp.v(_x1u); 
+    double x2v = (xsc==AxisScale.LOG10)?log10(xp.v(_x2u)):xp.v(_x2u);
+    double y1v = (ysc==AxisScale.LOG10)?log10(yp.v(_y1u)):yp.v(_y1u); 
+    double y2v = (ysc==AxisScale.LOG10)?log10(yp.v(_y2u)):yp.v(_y2u);
     return new Transcaler(x1v,y1v,x2v,y2v,_x1d,_y1d,_x2d,_y2d, xsc, ysc);
   }
 
@@ -163,8 +162,8 @@ public class Transcaler {
    * @return the device x-coordinate.
    */
   public int x(double xu) {
-  if(_xpScale == AxisScale.LOG10)
-    xu = log10(xu);
+    if(_xpScale==AxisScale.LOG10)
+      xu = log10(xu);
     
     double xd = _xushift+_xuscale*xu;
     if (xd<DMIN) {
@@ -172,7 +171,7 @@ public class Transcaler {
     } else if (xd>DMAX) {
       xd = DMAX;
     }
-      return (int)(xd);
+    return (int)(xd);
   }
 
   /**
@@ -181,8 +180,8 @@ public class Transcaler {
    * @return the device y-coordinate.
    */
   public int y(double yu) {
-  if(_ypScale == AxisScale.LOG10)
-    yu = log10(yu);
+    if(_ypScale==AxisScale.LOG10)
+      yu = log10(yu);
   
     double yd = _yushift+_yuscale*yu;
     if (yd<DMIN) {
@@ -266,7 +265,6 @@ public class Transcaler {
   private static final double DMAX =  32767.0; // device max coordinate
   private static final double DMINW = DMIN-DMAX; // device min width
   private static final double DMAXW = DMAX-DMIN; // device max width
-  
   private double _x1u,_y1u,_x2u,_y2u;
   private int    _x1d,_y1d,_x2d,_y2d;
   private double _xushift,_xuscale,_yushift,_yuscale;

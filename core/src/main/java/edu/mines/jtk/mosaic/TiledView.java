@@ -84,7 +84,7 @@ public abstract class TiledView {
    * Gets the scale of the best horizontal projector.
    * @return the scale of the best horizontal projector.
    */  
-  public AxisScale getHScale(){
+  public AxisScale getHScale() {
     return (_bhp!=null)?_bhp.getScale():AxisScale.LINEAR;
   }
 
@@ -92,7 +92,7 @@ public abstract class TiledView {
    * Gets the scale of the best vertical projector.
    * @return the scale of the best horizontal projector.
    */  
-  public AxisScale getVScale(){
+  public AxisScale getVScale() {
     return (_bvp!=null)?_bvp.getScale():AxisScale.LINEAR;
   }
 
@@ -105,7 +105,7 @@ public abstract class TiledView {
    * @param align whether to align Tile Projectors after setting scale
    * @return this TiledView
    */  
-  public TiledView setScales(AxisScale hscale, AxisScale vscale, boolean align){
+  public TiledView setScales(AxisScale hscale, AxisScale vscale, boolean align) {
     return this;
   }
   
@@ -116,7 +116,7 @@ public abstract class TiledView {
    * @param vscale the new vertical scale
    * @return this TiledView
    */  
-  public TiledView setScales(AxisScale hscale, AxisScale vscale){
+  public TiledView setScales(AxisScale hscale, AxisScale vscale) {
     return  setScales(hscale,vscale,true);
   }
   
@@ -125,7 +125,7 @@ public abstract class TiledView {
    * @param scale the new scale
    * @return this TiledView
    */  
-  public TiledView setScales(AxisScale scale){
+  public TiledView setScales(AxisScale scale) {
     return setScales(scale,scale,true);
   }  
   
@@ -135,7 +135,7 @@ public abstract class TiledView {
    * @param scale the new scale 
    * @return this TiledView
    */  
-  public TiledView setHScale(AxisScale scale){
+  public TiledView setHScale(AxisScale scale) {
     return setScales(scale,_bvp.getScale(),true);
   }
 
@@ -145,7 +145,7 @@ public abstract class TiledView {
    * @param scale the new scale
    * @return this TiledView
    */  
-  public TiledView setVScale(AxisScale scale){
+  public TiledView setVScale(AxisScale scale) {
     return setScales(_bhp.getScale(),scale,true);
   }  
   
@@ -177,7 +177,7 @@ public abstract class TiledView {
       if (_tile!=null && align)
         _tile.alignProjectors(_bhp.getScale(),_bvp.getScale());
     }
-  }  
+  }
   
   /**
    * Gets the best horizontal projector for this tiled view.
