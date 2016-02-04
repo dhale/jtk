@@ -27,6 +27,7 @@ import edu.mines.jtk.awt.ColorMapped;
 import edu.mines.jtk.awt.ColorMapListener;
 import edu.mines.jtk.dsp.Sampling;
 import edu.mines.jtk.util.Check;
+import edu.mines.jtk.mosaic.AxisScale;
 
 /**
  * A plot panel is a panel that contains a mosaic of 2-D graphical views.

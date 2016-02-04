@@ -99,7 +99,7 @@ public class Tile extends IPanel {
    */
   public void setHLimits(double hmin, double hmax) {
     Check.argument(hmin<hmax,"hmin<hmax");
-    if(_bhp.isLog())
+    if(_bhp!=null &&_bhp.isLog())
       Check.argument(hmin>0,"hmin>0 for LOG scales");
     _shp = new Projector(hmin,hmax);
     alignProjectors();
@@ -114,7 +114,7 @@ public class Tile extends IPanel {
    */
   public void setVLimits(double vmin, double vmax) {
     Check.argument(vmin<vmax,"vmin<vmax");
-    if(_bvp.isLog())
+    if(_bvp!=null && _bvp.isLog())
       Check.argument(vmin>0,"vmin>0 for LOG scales");
     if(_bvp.v0()<_bvp.v1())
       _svp = new Projector(vmin,vmax);
@@ -342,7 +342,7 @@ public class Tile extends IPanel {
    * @return the Scale; null, if none.
    */
   public AxisScale getHScale() {
-    return _hp.getScale();
+    return (_bhp!=null)?_bhp.getScale():AxisScale.LINEAR;
   }
 
   /**
@@ -350,7 +350,7 @@ public class Tile extends IPanel {
    * @return the Scale; null, if none.
    */
   public AxisScale getVScale() {
-    return _vp.getScale();
+    return (_bvp!=null)?_bvp.getScale():AxisScale.LINEAR;
   }
 
   /**
@@ -562,7 +562,7 @@ public class Tile extends IPanel {
     AxisScale hscale2 = checkScales[0]?hscale:AxisScale.LINEAR;
     AxisScale vscale2 = checkScales[1]?vscale:AxisScale.LINEAR;
     if(!(checkScales[0] && checkScales[1]))
-      setScales(hscale2,vscale2);
+      setViewScales(hscale2,vscale2);
 
     Projector bhp = null;
     Projector bvp = null;

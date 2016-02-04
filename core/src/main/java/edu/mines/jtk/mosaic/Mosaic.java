@@ -600,12 +600,11 @@ public class Mosaic extends IPanel {
   // package
 
   void alignProjectors(Tile tile) {
-    
     // attempt to set all adjacent Tiles to the same scale as tile
     // if not, set them all to LINEAR
     boolean[] checkScales = setTileScales(tile);
-    AxisScale hscale = tile.getBestHorizontalProjector().getScale();
-    AxisScale vscale = tile.getBestVerticalProjector().getScale();
+    AxisScale hscale = tile.getHScale();
+    AxisScale vscale = tile.getVScale();
     AxisScale hscale2 = checkScales[0]?hscale:AxisScale.LINEAR;
     AxisScale vscale2 = checkScales[1]?vscale:AxisScale.LINEAR;
     if(!(checkScales[0] && checkScales[1])){
@@ -661,8 +660,8 @@ public class Mosaic extends IPanel {
   private boolean[] setTileScales(Tile tile) {
     int jrow = tile.getRowIndex();
     int jcol = tile.getColumnIndex();
-    AxisScale hscale = tile.getBestHorizontalProjector().getScale();
-    AxisScale vscale = tile.getBestVerticalProjector().getScale();
+    AxisScale hscale = tile.getHScale();
+    AxisScale vscale = tile.getVScale();
     boolean[] compat = new boolean[]{true,true}; 
     
     for (int irow=0; irow<_nrow; ++irow){
@@ -676,7 +675,6 @@ public class Mosaic extends IPanel {
       t.setScales(t.getHScale(),vscale,false);
       compat[1] = (t.getVScale()==vscale && compat[1])?true:false;
     }
-    
     return compat;
   }
   

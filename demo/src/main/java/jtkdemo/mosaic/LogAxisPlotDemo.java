@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import edu.mines.jtk.mosaic.GridView;
 import edu.mines.jtk.mosaic.PlotFrame;
 import edu.mines.jtk.mosaic.PlotPanel;
 import edu.mines.jtk.mosaic.PointsView;
@@ -65,14 +66,12 @@ public class LogAxisPlotDemo {
     // log-x plots
     PointsView pv3 = plot.addPoints(0,0,x1,f1);
     PointsView pv4 = plot.addPoints(0,0,x2,f2);
-    pv3.setHScale(AxisScale.LOG10);
     pv3.setLineColor(Color.GREEN);
     pv4.setLineColor(Color.RED);
 
     // log-y plots
     PointsView pv5 = plot.addPoints(1,1,x1,f1);
     PointsView pv6 = plot.addPoints(1,1,x2,f2);
-    pv5.setVScale(AxisScale.LOG10);
     pv5.setLineColor(Color.BLUE);
     pv6.setLineColor(Color.RED);
 
@@ -83,6 +82,8 @@ public class LogAxisPlotDemo {
     pv7.setLineColor(Color.BLUE);
     pv8.setLineColor(Color.RED);
 
+    pv7.setScales(AxisScale.LOG10);
+    
     // make some buttons
     JPanel buttPanel = new JPanel();
     buttPanel.add(changeHAxisButton(plot.getTile(0,0)));
