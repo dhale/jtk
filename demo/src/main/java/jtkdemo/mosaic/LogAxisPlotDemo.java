@@ -22,12 +22,11 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import edu.mines.jtk.mosaic.GridView;
 import edu.mines.jtk.mosaic.PlotFrame;
 import edu.mines.jtk.mosaic.PlotPanel;
 import edu.mines.jtk.mosaic.PointsView;
 import edu.mines.jtk.mosaic.AxisScale;
-import edu.mines.jtk.mosaic.Tile;
+import edu.mines.jtk.mosaic.TiledView;
 import edu.mines.jtk.util.ArrayMath;
 import static edu.mines.jtk.util.MathPlus.*;
 /**
@@ -53,41 +52,23 @@ public class LogAxisPlotDemo {
       f1[i] = pow(1.5f * x1[i],1);
       f2[i] = 100 * (float) sin(0.1 * x2[i]);
     }
-
-    // new plot
-    PlotPanel plot = new PlotPanel(2,2);
+ // new plot
+    PlotPanel plot = new PlotPanel(1,1);
 
     // plain old linear plots
-    PointsView pv1 = plot.addPoints(0,1,x1,f1);
-    PointsView pv2 = plot.addPoints(0,1,x2,f2);
+    PointsView pv1 = plot.addPoints(0,0,x1,f1);
     pv1.setLineColor(Color.BLUE);
-    pv2.setLineColor(Color.RED);
-
-    // log-x plots
-    PointsView pv3 = plot.addPoints(0,0,x1,f1);
-    PointsView pv4 = plot.addPoints(0,0,x2,f2);
-    pv3.setLineColor(Color.GREEN);
-    pv4.setLineColor(Color.RED);
-
-    // log-y plots
-    PointsView pv5 = plot.addPoints(1,1,x1,f1);
-    PointsView pv6 = plot.addPoints(1,1,x2,f2);
-    pv5.setLineColor(Color.BLUE);
-    pv6.setLineColor(Color.RED);
-
-    // need to update the PlotPanel
-    // log-log plots
-    PointsView pv7 = plot.addPoints(1,0,x1,f1);
-    PointsView pv8 = plot.addPoints(1,0,x2,f2);
-    pv7.setLineColor(Color.BLUE);
-    pv8.setLineColor(Color.RED);
-
-    pv7.setScales(AxisScale.LOG10);
+    pv1.setScales(AxisScale.LOG10);
     
+    PointsView pv2 = plot.addPoints(0,0,x2,f2);
+    pv2.setLineColor(Color.RED);
+    pv2.setScales(AxisScale.LOG10);
+
+     
     // make some buttons
     JPanel buttPanel = new JPanel();
-    buttPanel.add(changeHAxisButton(plot.getTile(0,0)));
-    buttPanel.add(changeVAxisButton(plot.getTile(0,0)));
+    buttPanel.add(changeHAxisButton(pv1,"Blue"));
+    buttPanel.add(changeHAxisButton(pv2,"Red"));
     buttPanel.add(limitsTestButton(plot));
     buttPanel.add(limitsDefaultButton(plot));
 
@@ -95,24 +76,27 @@ public class LogAxisPlotDemo {
     plot.setVisible(true);
     PlotFrame frame = new PlotFrame(plot);
     frame.add(buttPanel,BorderLayout.SOUTH);
-    frame.setSize(500,500);
+    frame.setSize(600,500);
     frame.setDefaultCloseOperation(PlotFrame.EXIT_ON_CLOSE);
     frame.setVisible(true);
 
+    
+    
+    
   }
 
-  public static JButton changeHAxisButton(final Tile tile) {
-    JButton b = new JButton("Tile " + tile.getRowIndex() + ", "
-        + tile.getColumnIndex() + " H");
+  public static JButton changeHAxisButton(final TiledView tv, final String label) {
+    final JButton b = new JButton(label + " " + tv.getHScale());
     b.addActionListener(new ActionListener() {
 
       @Override
       public void actionPerformed(ActionEvent e) {
-        if (tile.getHScale() == AxisScale.LOG10)
-          tile.setHScale(AxisScale.LINEAR);
+        if (tv.getHScale() == AxisScale.LOG10)
+          tv.setScales(AxisScale.LINEAR);
         else
-          tile.setHScale(AxisScale.LOG10);
-        tile.repaint();
+          tv.setScales(AxisScale.LOG10);
+        b.setText(label + " " + tv.getHScale());
+        System.out.println(tv + ": " + tv.getHScale());
       }
     });
     return b;
@@ -140,24 +124,6 @@ public class LogAxisPlotDemo {
       }
     });
     return b; 
-  }
-  
-  public static JButton changeVAxisButton(final Tile tile) {
-    JButton b = new JButton("Tile " + tile.getRowIndex() + ", "
-        + tile.getColumnIndex() + " V");
-    b.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if (tile.getVScale() == AxisScale.LOG10)
-          tile.setVScale(AxisScale.LINEAR);
-        else
-          tile.setVScale(AxisScale.LOG10);
-        tile.repaint();
-      }
-      
-    });
-    return b;
   }
 
   public static float f1(double x) {

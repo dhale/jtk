@@ -360,11 +360,11 @@ public class Tile extends IPanel {
    * @param align whether to align the mosaic
    * @return this Tile
    */  
-  public Tile setScales(AxisScale hscale, AxisScale vscale, boolean align) {
-    if(hscale!=getHScale() || vscale!=getVScale())
-      alignProjectors(hscale,vscale,align);
-    return this;
-  }  
+//  public Tile setScales(AxisScale hscale, AxisScale vscale, boolean align) {
+//    if(hscale!=getHScale() || vscale!=getVScale())
+//      alignProjectors(hscale,vscale,align);
+//    return this;
+//  }  
   
   
   /**
@@ -374,18 +374,18 @@ public class Tile extends IPanel {
    * @param vscale the new vertical scale
    * @return this Tile
    */  
-  public Tile setScales(AxisScale hscale, AxisScale vscale) {
-    return setScales(hscale,vscale,true);
-  }
+//  public Tile setScales(AxisScale hscale, AxisScale vscale) {
+//    return setScales(hscale,vscale,true);
+//  }
   
   /**
    * Convenience method to set both scales the same and align mosaic
    * @param scale the new scale
    * @return this Tile
    */  
-  public Tile setScales(AxisScale scale) {
-    return setScales(scale,scale,true);
-  }  
+//  public Tile setScales(AxisScale scale) {
+//    return setScales(scale,scale,true);
+//  }  
   
   /**
    * Convenience method to set the scale of the 
@@ -393,9 +393,9 @@ public class Tile extends IPanel {
    * @param scale the new scale 
    * @return this Tile
    */  
-  public Tile setHScale(AxisScale scale) {
-    return setScales(scale,getVScale(),true);
-  }
+//  public Tile setHScale(AxisScale scale) {
+//    return setScales(scale,getVScale(),true);
+//  }
 
   /**
    * Convenience method to set the scale of the 
@@ -403,9 +403,9 @@ public class Tile extends IPanel {
    * @param scale the new scale
    * @return this Tile
    */  
-  public Tile setVScale(AxisScale scale) {
-    return setScales(getHScale(),scale,true);
-  }  
+//  public Tile setVScale(AxisScale scale) {
+//    return setScales(getHScale(),scale,true);
+//  }  
   
   
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
@@ -558,12 +558,6 @@ public class Tile extends IPanel {
    */
   
   private void updateBestProjectors(AxisScale hscale, AxisScale vscale) {
-    boolean[] checkScales = setViewScales(hscale,vscale);
-    AxisScale hscale2 = checkScales[0]?hscale:AxisScale.LINEAR;
-    AxisScale vscale2 = checkScales[1]?vscale:AxisScale.LINEAR;
-    if(!(checkScales[0] && checkScales[1]))
-      setViewScales(hscale2,vscale2);
-
     Projector bhp = null;
     Projector bvp = null;
     int ntv = _tvs.size();
@@ -571,36 +565,43 @@ public class Tile extends IPanel {
       int itv = ntv-1;
       for (; bhp==null && itv>=0; --itv) {
         TiledView tv = _tvs.get(itv);
-        bhp = tv.getBestHorizontalProjector();
+        bhp = new Projector(tv.getBestHorizontalProjector());
       }
       for (; itv>=0; --itv) {
         TiledView tv = _tvs.get(itv);
         bhp.merge(tv.getBestHorizontalProjector());
       }
     } else
-      _shp.setScale(hscale2);
+      _shp.setScale(hscale);
     
     if (_svp==null) {
       int itv = ntv-1;
       for (; bvp==null && itv>=0; --itv) {
         TiledView tv = _tvs.get(itv);
-        bvp = tv.getBestVerticalProjector();
+        bvp = new Projector(tv.getBestVerticalProjector());
       }
       for (; itv>=0; --itv) {
         TiledView tv = _tvs.get(itv);
         bvp.merge(tv.getBestVerticalProjector());
       }
     } else
-      _svp.setScale(vscale2);
+      _svp.setScale(vscale);
     
     _bhp = (_shp!=null)?_shp:bhp;
     _bvp = (_svp!=null)?_svp:bvp;
+    
+    // reset scales to linear if disagreement
+    boolean[] checkScales = checkViewScales(hscale,vscale);
+    if(!checkScales[0])
+      _bhp.setScale(AxisScale.LINEAR);
+    if(!checkScales[1])
+      _bvp.setScale(AxisScale.LINEAR);
   }
   
-  private boolean[] setViewScales(AxisScale hscale, AxisScale vscale) {
+  // check to see if all view scales match the specified hscale and vscale
+  private boolean[] checkViewScales(AxisScale hscale, AxisScale vscale) {
     boolean[] compat = new boolean[]{true,true};
     for(TiledView tv : _tvs){
-      tv.setScales(hscale,vscale,false);
       compat[0] = (tv.getHScale()==hscale && compat[0])?true:false;
       compat[1] = (tv.getVScale()==vscale && compat[1])?true:false; 
     }

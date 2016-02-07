@@ -103,10 +103,10 @@ public abstract class TiledView {
    * @param hscale the new horizontal scale
    * @param vscale the new vertical scale
    * @param align whether to align Tile Projectors after setting scale
-   * @return this TiledView
+   * @return null, unless overriden by subclass to return this TiledView
    */  
   public TiledView setScales(AxisScale hscale, AxisScale vscale, boolean align) {
-    return this;
+    return null;
   }
   
   /**
@@ -174,6 +174,11 @@ public abstract class TiledView {
     if (!equal(_bhp,bhp) || !equal(_bvp,bvp)) {
       _bhp = (bhp!=null)?new Projector(bhp):null;
       _bvp = (bvp!=null)?new Projector(bvp):null;
+      // protect against setting unsupported TiledViews to non-linear scales
+      if(setScales(bhp.getScale(),bvp.getScale(),false)==null){
+        _bhp.setScale(AxisScale.LINEAR);
+        _bvp.setScale(AxisScale.LINEAR);
+      }
       if (_tile!=null && align)
         _tile.alignProjectors(_bhp.getScale(),_bvp.getScale());
     }

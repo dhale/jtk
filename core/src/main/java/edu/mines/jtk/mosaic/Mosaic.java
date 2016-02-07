@@ -600,21 +600,9 @@ public class Mosaic extends IPanel {
   // package
 
   void alignProjectors(Tile tile) {
-    // attempt to set all adjacent Tiles to the same scale as tile
-    // if not, set them all to LINEAR
-    boolean[] checkScales = setTileScales(tile);
-    AxisScale hscale = tile.getHScale();
-    AxisScale vscale = tile.getVScale();
-    AxisScale hscale2 = checkScales[0]?hscale:AxisScale.LINEAR;
-    AxisScale vscale2 = checkScales[1]?vscale:AxisScale.LINEAR;
-    if(!(checkScales[0] && checkScales[1])){
-      tile.setScales(hscale2,vscale2,false);
-      setTileScales(tile);
-    }
-    
     int jrow = tile.getRowIndex();
     int jcol = tile.getColumnIndex();
-    Projector bhp = tile.getBestHorizontalProjector();
+    Projector bhp = new Projector(tile.getBestHorizontalProjector());
     if (bhp!=null) {
       bhp = new Projector(bhp);
       for (int irow=0; irow<_nrow; ++irow) {
@@ -622,7 +610,7 @@ public class Mosaic extends IPanel {
           bhp.merge(_tiles[irow][jcol].getBestHorizontalProjector());
       }
     }
-    Projector bvp = tile.getBestVerticalProjector();
+    Projector bvp = new Projector(tile.getBestVerticalProjector());
     if (bvp!=null) {
       bvp = new Projector(bvp);
       for (int icol=0; icol<_ncol; ++icol) {
@@ -630,15 +618,21 @@ public class Mosaic extends IPanel {
           bvp.merge(_tiles[jrow][icol].getBestVerticalProjector());
       }
     }
+    
+    // check to see if scales in adjacent tiles are set up right
+    boolean[] checkScales = checkTileScales(tile);
+    if(!checkScales[0])
+      bhp.setScale(AxisScale.LINEAR);
+    if(!checkScales[1])
+      bvp.setScale(AxisScale.LINEAR);
+
     if (bhp!=null && bvp!=null) {
       tile.setProjectors(bhp,bvp);
     } else if (bhp!=null) {
       tile.setHorizontalProjector(bhp);
-    } else if (bvp!=null) {
-      tile.setVerticalProjector(bvp);
     }
-    bhp = tile.getHorizontalProjector();
-    bvp = tile.getVerticalProjector();
+    
+    
     for (int irow=0; irow<_nrow; ++irow) {
       if (irow!=jrow)
         _tiles[irow][jcol].setHorizontalProjector(bhp);
@@ -653,11 +647,9 @@ public class Mosaic extends IPanel {
     repaintAxis(_axesRight,jrow);
   }
  
-  // set the Tiles in the same row and col of tile to have the same scale
-  // return a 2-element boolean array indicating whether the resulting 
-  // scale changes were successful. If not, that indicates one of the Tiles
-  // contained TiledViews that could not be set to the specified scale
-  private boolean[] setTileScales(Tile tile) {
+  // check to see if the adjacent Tiles to tile have the appropriate
+  // matching axis scales
+  private boolean[] checkTileScales(Tile tile) {
     int jrow = tile.getRowIndex();
     int jcol = tile.getColumnIndex();
     AxisScale hscale = tile.getHScale();
@@ -666,13 +658,11 @@ public class Mosaic extends IPanel {
     
     for (int irow=0; irow<_nrow; ++irow){
       Tile t = _tiles[irow][jcol];
-      t.setScales(hscale,t.getVScale(),false);
       compat[0] = (t.getHScale()==hscale && compat[0])?true:false;
     }
     
     for (int icol=0; icol<_ncol; ++icol){ 
       Tile t = _tiles[jrow][icol];
-      t.setScales(t.getHScale(),vscale,false);
       compat[1] = (t.getVScale()==vscale && compat[1])?true:false;
     }
     return compat;
