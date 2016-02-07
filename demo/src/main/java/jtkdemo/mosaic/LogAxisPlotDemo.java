@@ -26,6 +26,7 @@ import edu.mines.jtk.mosaic.PlotFrame;
 import edu.mines.jtk.mosaic.PlotPanel;
 import edu.mines.jtk.mosaic.PointsView;
 import edu.mines.jtk.mosaic.AxisScale;
+import edu.mines.jtk.mosaic.GridView;
 import edu.mines.jtk.mosaic.TiledView;
 import edu.mines.jtk.util.ArrayMath;
 import static edu.mines.jtk.util.MathPlus.*;
@@ -35,6 +36,9 @@ import static edu.mines.jtk.util.MathPlus.*;
  * @version 2016.1.22
  */
 public class LogAxisPlotDemo {
+  
+  public static GridView gv = null;  
+  
   public static void main(String args[]) {
 
     System.out.println("LogAxisPlotDemo");
@@ -71,6 +75,7 @@ public class LogAxisPlotDemo {
     buttPanel.add(changeHAxisButton(pv2,"Red"));
     buttPanel.add(limitsTestButton(plot));
     buttPanel.add(limitsDefaultButton(plot));
+    buttPanel.add(gridButton(plot));
 
     // frame setup
     plot.setVisible(true);
@@ -125,6 +130,26 @@ public class LogAxisPlotDemo {
     });
     return b; 
   }
+  
+  public static JButton gridButton(final PlotPanel plot){
+      final JButton b = new JButton("Add Grid");
+      b.addActionListener(new ActionListener() {
+        
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+          if(gv==null){
+            gv = plot.addGrid(0,0);
+            b.setText("Remove Grid");
+          }
+          else{
+            plot.remove(gv);
+            gv=null;
+            b.setText("Add Grid");
+          }
+        }
+      });
+      return b; 
+    }
 
   public static float f1(double x) {
     return (float) (4 * x * Math.sin(10 / x)) + 10.0f;

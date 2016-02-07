@@ -506,7 +506,8 @@ public class Tile extends IPanel {
       int itv = ntv-1;
       for (; bhp==null && itv>=0; --itv) {
         TiledView tv = _tvs.get(itv);
-        bhp = new Projector(tv.getBestHorizontalProjector());
+        if(tv.getBestHorizontalProjector()!=null)
+          bhp = new Projector(tv.getBestHorizontalProjector());
       }
       for (; itv>=0; --itv) {
         TiledView tv = _tvs.get(itv);
@@ -519,7 +520,8 @@ public class Tile extends IPanel {
       int itv = ntv-1;
       for (; bvp==null && itv>=0; --itv) {
         TiledView tv = _tvs.get(itv);
-        bvp = new Projector(tv.getBestVerticalProjector());
+        if(tv.getBestVerticalProjector()!=null)
+          bvp = new Projector(tv.getBestVerticalProjector());
       }
       for (; itv>=0; --itv) {
         TiledView tv = _tvs.get(itv);

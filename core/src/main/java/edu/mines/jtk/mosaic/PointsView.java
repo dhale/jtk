@@ -585,7 +585,7 @@ public class PointsView extends TiledView {
    * Called when we might new realignment.
    */
   private void updateBestProjectors() {
-	  updateBestProjectors(getHScale(),getVScale());	  
+    updateBestProjectors(getHScale(),getVScale());    
   }
   
   private void updateBestProjectors(AxisScale hscale, AxisScale vscale) {
