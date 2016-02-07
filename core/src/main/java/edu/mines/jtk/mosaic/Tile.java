@@ -353,61 +353,6 @@ public class Tile extends IPanel {
     return (_bvp!=null)?_bvp.getScale():AxisScale.LINEAR;
   }
 
-  /**
-   * Sets the scale both best projectors.
-   * @param hscale the new horizontal scale
-   * @param vscale the new vertical scale
-   * @param align whether to align the mosaic
-   * @return this Tile
-   */  
-//  public Tile setScales(AxisScale hscale, AxisScale vscale, boolean align) {
-//    if(hscale!=getHScale() || vscale!=getVScale())
-//      alignProjectors(hscale,vscale,align);
-//    return this;
-//  }  
-  
-  
-  /**
-   * Convenience method to set the scale of both best 
-   * projectors and align the mosaic.
-   * @param hscale the new horizontal scale
-   * @param vscale the new vertical scale
-   * @return this Tile
-   */  
-//  public Tile setScales(AxisScale hscale, AxisScale vscale) {
-//    return setScales(hscale,vscale,true);
-//  }
-  
-  /**
-   * Convenience method to set both scales the same and align mosaic
-   * @param scale the new scale
-   * @return this Tile
-   */  
-//  public Tile setScales(AxisScale scale) {
-//    return setScales(scale,scale,true);
-//  }  
-  
-  /**
-   * Convenience method to set the scale of the 
-   * best horizontal projector.
-   * @param scale the new scale 
-   * @return this Tile
-   */  
-//  public Tile setHScale(AxisScale scale) {
-//    return setScales(scale,getVScale(),true);
-//  }
-
-  /**
-   * Convenience method to set the scale of the 
-   * best vertical projector.
-   * @param scale the new scale
-   * @return this Tile
-   */  
-//  public Tile setVScale(AxisScale scale) {
-//    return setScales(getHScale(),scale,true);
-//  }  
-  
-  
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
     g2d = createGraphics(g2d,x,y,w,h);
 
