@@ -442,17 +442,13 @@ public class Tile extends IPanel {
    * Called by this tile or by a tiled view when this tile needs alignment.
    */
   void alignProjectors() {
-    alignProjectors(_hp.getScale(),_vp.getScale(),true);
+    alignProjectors(_hp.getScale(),_vp.getScale());
   }
+  
   
   void alignProjectors(AxisScale hscale, AxisScale vscale) {
-    alignProjectors(hscale,vscale,true);
-  }
-  
-  void alignProjectors(AxisScale hscale, AxisScale vscale, boolean align) {
     updateBestProjectors(hscale,vscale);
-    if(align)
-      _mosaic.alignProjectors(this);
+    _mosaic.alignProjectors(this);
   }
 
   /**

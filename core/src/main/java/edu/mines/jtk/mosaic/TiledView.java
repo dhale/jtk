@@ -105,20 +105,10 @@ public abstract class TiledView {
    * @param align whether to align Tile Projectors after setting scale
    * @return null, unless overriden by subclass to return this TiledView
    */  
-  public TiledView setScales(AxisScale hscale, AxisScale vscale, boolean align) {
+  public TiledView setScales(AxisScale hscale, AxisScale vscale) {
     return null;
   }
   
-  /**
-   * Convenience method to set both axis scales separately and
-   * align tile projectors
-   * @param hscale the new horizontal scale
-   * @param vscale the new vertical scale
-   * @return this TiledView
-   */  
-  public TiledView setScales(AxisScale hscale, AxisScale vscale) {
-    return  setScales(hscale,vscale,true);
-  }
   
   /**
    * Convenience method to set both scales the same
@@ -126,7 +116,7 @@ public abstract class TiledView {
    * @return this TiledView
    */  
   public TiledView setScales(AxisScale scale) {
-    return setScales(scale,scale,true);
+    return setScales(scale,scale);
   }  
   
   /**
@@ -136,7 +126,7 @@ public abstract class TiledView {
    * @return this TiledView
    */  
   public TiledView setHScale(AxisScale scale) {
-    return setScales(scale,_bvp.getScale(),true);
+    return setScales(scale,_bvp.getScale());
   }
 
   /**
@@ -146,7 +136,7 @@ public abstract class TiledView {
    * @return this TiledView
    */  
   public TiledView setVScale(AxisScale scale) {
-    return setScales(_bhp.getScale(),scale,true);
+    return setScales(_bhp.getScale(),scale);
   }  
   
     
@@ -154,32 +144,21 @@ public abstract class TiledView {
   ///////////////////////////////////////////////////////////////////////////
   // protected
 
-  /**
-   * Sets the best projectors for this tiled view. Classes that extend
-   * this class call this method when their best projectors change.
-   * If this tiled view is in a tile, such a change may cause the tile 
-   * to realign this view.
-   */
-  protected void setBestProjectors(Projector bhp, Projector bvp) {
-    setBestProjectors(bhp,bvp,true);
-  }
   
   /**
    * Sets the best projectors for this tiled view. Classes that extend
    * this class call this method when their best projectors change.
-   * If this tiled view is in a tile, Tile will be realigned if parameter
-   * align is set to true.
    */
-  protected void setBestProjectors(Projector bhp, Projector bvp, boolean align) {
+  protected void setBestProjectors(Projector bhp, Projector bvp) {
     if (!equal(_bhp,bhp) || !equal(_bvp,bvp)) {
       _bhp = (bhp!=null)?new Projector(bhp):null;
       _bvp = (bvp!=null)?new Projector(bvp):null;
       // protect against setting unsupported TiledViews to non-linear scales
-      if(setScales(bhp.getScale(),bvp.getScale(),false)==null){
+      if(setScales(bhp.getScale(),bvp.getScale())==null){
         _bhp.setScale(AxisScale.LINEAR);
         _bvp.setScale(AxisScale.LINEAR);
       }
-      if (_tile!=null && align)
+      if (_tile!=null)
         _tile.alignProjectors(_bhp.getScale(),_bvp.getScale());
     }
   }

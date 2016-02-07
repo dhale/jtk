@@ -439,9 +439,9 @@ public class PointsView extends TiledView {
    * @param scaleType axis scaling enum value
    */
   @Override
-  public PointsView setScales(AxisScale hscale, AxisScale vscale, boolean align) {
+  public PointsView setScales(AxisScale hscale, AxisScale vscale) {
     if(hscale!=getHScale() || vscale!=getVScale())
-      updateBestProjectors(hscale,vscale,align);
+      updateBestProjectors(hscale,vscale);
     return this;
   }
   
@@ -585,10 +585,10 @@ public class PointsView extends TiledView {
    * Called when we might new realignment.
    */
   private void updateBestProjectors() {
-	  updateBestProjectors(getHScale(),getVScale(),true);	  
+	  updateBestProjectors(getHScale(),getVScale());	  
   }
   
-  private void updateBestProjectors(AxisScale hscale, AxisScale vscale, boolean align) {
+  private void updateBestProjectors(AxisScale hscale, AxisScale vscale) {
     // Min and max (x1,x2) values.
     float x1min =  FLT_MAX;
     float x2min =  FLT_MAX;
@@ -655,7 +655,7 @@ public class PointsView extends TiledView {
       bhp = (x2min<x2max)?new Projector(x2min,x2max,u0,u1,hscale):null;
       bvp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1,vscale):null;
     }
-    setBestProjectors(bhp,bvp,align);
+    setBestProjectors(bhp,bvp);
   }
 
   private int getFirstPositiveInd(float[] x) {
