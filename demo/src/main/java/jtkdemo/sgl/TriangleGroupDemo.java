@@ -30,12 +30,12 @@ public class TriangleGroupDemo {
   public static void main(String[] args) {
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {
-          go(args);
+          go();
         }
       });
   }
 
-  public static void go(String[] args) {
+  public static void go() {
     float[] xyz = makeSineWave();
     xyz = addBulge(xyz);
     xyz = addTear(xyz);
