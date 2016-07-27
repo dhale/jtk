@@ -406,7 +406,7 @@ public class RecursiveExponentialFilter {
     float ss = zs?1.0f-a:1.0f;
     float gg = zs?aa-a:aa;
     float c = (1.0f-aa-ss)/ss;
-    float d = 1.0f/(1.0f-aa+gg*(1.0f+c*pow(aa,n1-1)));
+    float d = 1.0f/(1.0f-aa+gg*(1.0f+c*pow(aa,n2-1)));
     float e = (1.0f-a)*(1.0f-a)*FLT_EPSILON/4.0f;
 
     // copy scaled input to output
