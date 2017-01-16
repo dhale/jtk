@@ -170,6 +170,14 @@ public class StateSet implements State {
   }
 
   /**
+   * Gets the light state in this set, if present.
+   * @return the light state; null, if none.
+   */
+  public LightSource getLightState() {
+    return (LightSource)find(LightSource.class);
+  }
+
+  /**
    * Applies all states in this set.
    */
   public void apply() {
