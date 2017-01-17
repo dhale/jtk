@@ -250,12 +250,20 @@ public class OrbitView extends View {
     _esd = esd;
   }
 
-  public void setLightSource(LightSource lightSource) {
-    _lightSource = lightSource;
+  /**
+   * Sets the scene lighting.
+   * @param sceneLighting the scene lighting.
+   */
+  public void setSceneLighting(SceneLighting sceneLighting) {
+    _sceneLighting = sceneLighting;
   }
 
-  public LightSource getLightSource() {
-    return _lightSource;
+  /**
+   * Gets the scene lighting.
+   * @return the scene lighting.
+   */
+  public SceneLighting getSceneLighting() {
+    return _sceneLighting;
   }
 
   ///////////////////////////////////////////////////////////////////////////
@@ -416,7 +424,7 @@ public class OrbitView extends View {
     glLoadIdentity();
 
     // Light.
-    _lightSource.draw();
+    _sceneLighting.draw();
 
     // View (world-to-view) transform.
     Matrix44 worldToView = this.getWorldToView();
@@ -448,7 +456,7 @@ public class OrbitView extends View {
   private double _azimuth;
   private double _elevation;
   private double _esd;
-  private LightSource _lightSource = new LightSource();
+  private SceneLighting _sceneLighting = new SceneLighting();
   private Projection _projection = Projection.PERSPECTIVE;
   private BoundingSphere _worldSphere = null;
   private Matrix44 _worldToUnitSphere;
