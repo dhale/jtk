@@ -14,23 +14,37 @@ limitations under the License.
 ****************************************************************************/
 package edu.mines.jtk.sgl;
 
+import java.util.Arrays;
+
 import static edu.mines.jtk.ogl.Gl.*;
 
 /**
- * OpenGL light source.
+ * Lighting for {@link edu.mines.jtk.sgl.OrbitView}.
  * <p>
- * There are three lights available within the JTK. Each light can be
- * positioned independently and have color properties assigned.
- *
- * The default scene lighting matches the default lighting used
- * by the JTK: a single <em>directional</em> light positioned at
- * <code>(-0.1,-0.1, 0.0)</code> with no ambient light, and both specular and
- * diffuse light colors are set to white.
+ * There are three light sources available within the JTK, and
+ * each light can be individually positioned in the canvas and have color
+ * properties assigned. Furthermore, each light can be defined to be one of
+ * two types:
+ * <ol>
+ *   <li>
+ *     Directional light (default): the light source placed at an infinite
+ *     distance and all light rays are parallel.
+ *   </li>
+ *   <li>
+ *     Positional light: the light source is positioned in the frustum and
+ *     light rays extend spherically in all directions.
+ *   </li>
+ * </ol>
+ * The default scene lighting matches the previously-hardwired lighting
+ * setup used by the JTK, that is a single <em>directional</em> light
+ * positioned at <code>(-0.1,-0.1, 0.0)</code> with black ambient light, and
+ * white specular and diffuse lights. This light is considered to be
+ * the "primary light".
  * </p>
  * @author Chris Engelsma
  * @version 2017.01.17
  */
-public class SceneLighting {
+public class OrbitViewLighting {
 
   /**
    * A light source type.
@@ -49,16 +63,16 @@ public class SceneLighting {
   }
 
   /**
-   * Constructs new scene lighting.
+   * Constructs an OrbitView Lighting
    */
-  public SceneLighting() {
+  public OrbitViewLighting() {
     for (int i=0; i<3; ++i) {
-      _positions[i] = _posDefault;
-      _ambients[i]  = _ambientDefault;
-      _diffuses[i]  = _diffuseDefault;
-      _speculars[i] = _specularDefault;
+      _positions[i]  = _posDefault;
+      _ambients[i]   = _ambientDefault;
+      _diffuses[i]   = _diffuseDefault;
+      _speculars[i]  = _specularDefault;
       _lightTypes[i] = LightSourceType.DIRECTIONAL;
-      _lightSet[i] = false;
+      _lightSet[i]   = false;
     }
     setLight(0,true);
   }
@@ -72,6 +86,13 @@ public class SceneLighting {
   }
 
   /**
+   * Toggles the primary light source.
+   */
+  public void toggleLight() {
+    toggleLight(0);
+  }
+
+  /**
    * Sets the state of a light source.
    * @param i a light source [0-2]
    * @param isOn true, if light is on; false, otherwise.
@@ -80,6 +101,22 @@ public class SceneLighting {
     _lightSet[i] = isOn;
   }
 
+  /**
+   * Determines if the primary light source is on.
+   * @return true, if light source is on; false, otherwise.
+   */
+  public boolean isLightOn() {
+    return isLightOn(0);
+  }
+
+  /**
+   * Determines if a light source is on.
+   * @param i a light source [0-2]
+   * @return true, if light is on; false, otherwise.
+   */
+  public boolean isLightOn(int i) {
+    return _lightSet[i];
+  }
   /**
    * Sets the ambient color of the primary light source.
    * @param rgba array[4] of color components.
@@ -186,7 +223,7 @@ public class SceneLighting {
    * Sets the ambient and diffuse colors of the primary light source.
    * @param rgba array[4] of color components.
    */
-  public void setAmbientDiffuse(float[] rgba) {
+  public void setAmbientAndDiffuse(float[] rgba) {
     setAmbientAndDiffuse(0,rgba);
   }
 
@@ -208,6 +245,14 @@ public class SceneLighting {
    */
   public void setPosition(float lx, float ly, float lz) {
     setPosition(0,lx,ly,lz);
+  }
+
+  /**
+   * Sets the position of the primary light source.
+   * @param pos array[3] of (x,y,z) coordinates.
+   */
+  public void setPosition(float[] pos) {
+    setPosition(0,pos);
   }
 
   /**
@@ -304,6 +349,34 @@ public class SceneLighting {
       }
     }
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    OrbitViewLighting that = (OrbitViewLighting) o;
+
+    if (!Arrays.equals(_lightSet, that._lightSet)) return false;
+    // Probably incorrect - comparing Object[] arrays with Arrays.equals
+    if (!Arrays.equals(_lightTypes, that._lightTypes)) return false;
+    if (!Arrays.deepEquals(_ambients, that._ambients)) return false;
+    if (!Arrays.deepEquals(_speculars, that._speculars)) return false;
+    if (!Arrays.deepEquals(_diffuses, that._diffuses)) return false;
+    return Arrays.deepEquals(_positions, that._positions);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = Arrays.hashCode(_lightSet);
+    result = 31 * result + Arrays.hashCode(_lightTypes);
+    result = 31 * result + Arrays.deepHashCode(_ambients);
+    result = 31 * result + Arrays.deepHashCode(_speculars);
+    result = 31 * result + Arrays.deepHashCode(_diffuses);
+    result = 31 * result + Arrays.deepHashCode(_positions);
+    return result;
+  }
+
 
   ////////////////////////////////////////////////////////////////////////////
   // private

@@ -3,14 +3,14 @@ package jtkdemo.sgl;
 import edu.mines.jtk.sgl.*;
 import java.awt.*;
 
-import static edu.mines.jtk.sgl.SceneLighting.*;
+import static edu.mines.jtk.sgl.OrbitViewLighting.*;
 
 /**
- * Demos {@link SceneLighting}.
+ * Demos {@link OrbitViewLighting}.
  * @author Chris Engelsma
  * @version 2017.01.17
  */
-public class SceneLightingDemo {
+public class OrbitViewLightingDemo {
 
   public static void main(String[] args) {
     demo0();
@@ -24,10 +24,10 @@ public class SceneLightingDemo {
     World world = new World();
     world.addChild(sphere);
     SimpleFrame sf = new SimpleFrame(world);
-    SceneLighting sl = new SceneLighting();
-    sl.setPosition(0,1.0f,1.0f,0.0f);
-    sl.setLightSourceType(LightSourceType.DIRECTIONAL);
-    sf.getOrbitView().setSceneLighting(sl);
+    OrbitViewLighting ovl = new OrbitViewLighting();
+    ovl.setPosition(0,1.0f,1.0f,0.0f);
+    ovl.setLightSourceType(LightSourceType.DIRECTIONAL);
+    sf.getOrbitView().setOrbitViewLighting(ovl);
   }
 
   private static void demo1() {
@@ -37,24 +37,24 @@ public class SceneLightingDemo {
     World world = new World();
     world.addChild(sphere);
     SimpleFrame sf = new SimpleFrame(world);
-    SceneLighting sl = new SceneLighting();
+    OrbitViewLighting ovl = new OrbitViewLighting();
 
-    sl.setPosition(0,-2.0f, 2.0f,0.0f);
-    sl.setPosition(1, 2.0f, 2.0f,0.0f);
-    sl.setPosition(2, 0.0f,-2.0f,0.0f);
+    ovl.setPosition(0,-2.0f, 2.0f,0.0f);
+    ovl.setPosition(1, 2.0f, 2.0f,0.0f);
+    ovl.setPosition(2, 0.0f,-2.0f,0.0f);
 
-    sl.setLightSourceType(0, LightSourceType.POSITIONAL);
-    sl.setLightSourceType(1, LightSourceType.POSITIONAL);
-    sl.setLightSourceType(2, LightSourceType.POSITIONAL);
+    ovl.setLightSourceType(0, LightSourceType.POSITIONAL);
+    ovl.setLightSourceType(1, LightSourceType.POSITIONAL);
+    ovl.setLightSourceType(2, LightSourceType.POSITIONAL);
 
-    sl.setDiffuse(0,RED);
-    sl.setDiffuse(1,GREEN);
-    sl.setDiffuse(2,BLUE);
+    ovl.setDiffuse(0,RED);
+    ovl.setDiffuse(1,GREEN);
+    ovl.setDiffuse(2,BLUE);
 
-    sl.toggleLight(1);
-    sl.toggleLight(2);
+    ovl.toggleLight(1);
+    ovl.toggleLight(2);
 
-    sf.getOrbitView().setSceneLighting(sl);
+    sf.getOrbitView().setOrbitViewLighting(ovl);
   }
 
   public static class Sphere extends Node {
