@@ -15,9 +15,26 @@ public class OrbitViewLightingDemo {
   public static void main(String[] args) {
     demo0();
     demo1();
+    demo2();
   }
 
+  /**
+   * Demos the default behavior.
+   */
   private static void demo0() {
+    Sphere sphere = new Sphere();
+    StateSet states = StateSet.forTwoSidedShinySurface(Color.WHITE);
+    sphere.setStates(states);
+    World world = new World();
+    world.addChild(sphere);
+    SimpleFrame sf = new SimpleFrame(world);
+    sf.setTitle("OrbitViewLighting Demo: Default lighting");
+  }
+
+  /**
+   * Demos re-positioning the light source to the top-right corner.
+   */
+  private static void demo1() {
     Sphere sphere = new Sphere();
     StateSet states = StateSet.forTwoSidedShinySurface(Color.WHITE);
     sphere.setStates(states);
@@ -28,9 +45,13 @@ public class OrbitViewLightingDemo {
     ovl.setPosition(0,1.0f,1.0f,0.0f);
     ovl.setLightSourceType(LightSourceType.DIRECTIONAL);
     sf.getOrbitView().setOrbitViewLighting(ovl);
+    sf.setTitle("OrbitViewLighting Demo: Re-positioned primary light");
   }
 
-  private static void demo1() {
+  /**
+   * Demos activating all three lights and assigning colors.
+   */
+  private static void demo2() {
     Sphere sphere = new Sphere();
     StateSet states = StateSet.forTwoSidedShinySurface(Color.WHITE);
     sphere.setStates(states);
@@ -55,6 +76,8 @@ public class OrbitViewLightingDemo {
     ovl.toggleLight(2);
 
     sf.getOrbitView().setOrbitViewLighting(ovl);
+
+    sf.setTitle("OrbitViewLighting Demo: Three Lights");
   }
 
   public static class Sphere extends Node {
