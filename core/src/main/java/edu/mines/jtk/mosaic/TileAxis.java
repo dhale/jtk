@@ -225,6 +225,23 @@ public class TileAxis extends IPanel {
     return _axisTics;
   }
 
+  /**
+   * Check whether axis is set to display log scale
+   * @return boolean
+   */
+  public boolean isLogScale() {
+    return _logScale;
+  }
+  
+  /**
+   * Set whether axis displays log scale
+   * @return this TileAxis
+   */
+  public TileAxis setLogScale(boolean logScale) {
+    _logScale = logScale;
+    return this;
+  }
+  
   public void paintToRect(Graphics2D g2d, int x, int y, int w, int h) {
 
     // If no axis tics, paint nothing.
@@ -271,21 +288,48 @@ public class TileAxis extends IPanel {
     boolean isVerticalRotated = isVerticalRotated();
 
     // Axis tic sampling.
-    int nticMajor = _axisTics.getCountMajor();
-    double dticMajor = _axisTics.getDeltaMajor();
-    double fticMajor = _axisTics.getFirstMajor();
-    int nticMinor = _axisTics.getCountMinor();
-    double dticMinor = _axisTics.getDeltaMinor();
-    double fticMinor = _axisTics.getFirstMinor();
-    int mtic = _axisTics.getMultiple();
+    int nticMajor = 0, nticMinor = 0, mtic = 0, ktic= 0;
+    double dticMajor = 0, fticMajor = 0, dticMinor = 0, fticMinor = 0;
+
+    if(!isLogScale()){
+        nticMajor = _axisTics.getCountMajor();
+        dticMajor = _axisTics.getDeltaMajor();
+        fticMajor = _axisTics.getFirstMajor();
+        nticMinor = _axisTics.getCountMinor();
+        dticMinor = _axisTics.getDeltaMinor();
+        fticMinor = _axisTics.getFirstMinor();
+        mtic = _axisTics.getMultiple();
+        ktic = (int)round((fticMajor-fticMinor)/dticMinor);
+        
+    } else {	// setup for log scale tics -- should this be part of AxisTics? 
+        double expMin = Math.min(p.v0(),p.v1());
+        double expMax = Math.max(p.v0(),p.v1());//p.v1();
+        double c = Math.pow(10, (expMin - ceil(expMin) + 1));
+        int c2 = 10 - (int)ceil(c);
+        double d = Math.pow(10, (expMax-floor(expMax)));
+        int d2 = (int)floor(d) - 1;
+        
+        nticMajor = (int)(floor(expMax) - ceil(expMin) + 1);
+        dticMajor = 1;
+        fticMajor = ceil(expMin);
+        nticMinor = 10*(nticMajor-1) + c2 + d2;
+        fticMinor = ceil(c); 
+        mtic = 9;
+        ktic = c2;
+    }
 
     // Minor tics. Skip major tics, which may not coincide, due to rounding.
-    int ktic = (int)round((fticMajor-fticMinor)/dticMinor);
     for (int itic=0; itic<nticMinor; ++itic) {
       if (itic==ktic) {
         ktic += mtic;
       } else {
-        double vtic = fticMinor+itic*dticMinor;
+          double vtic = 0;
+          if(isLogScale()){
+            int vticMajor = (((int)fticMinor + itic - 1)/9+(int)fticMajor) - 1;
+            int jtic = ((int)fticMinor + itic-1)%9+1;
+            vtic = vticMajor + Math.log10(jtic);
+          } else 
+            vtic = fticMinor+itic*dticMinor;
         double utic = p.u(vtic);
         if (isHorizontal) {
           x = t.x(utic);
@@ -697,6 +741,7 @@ public class TileAxis extends IPanel {
   private int _ticLabelHeight;
   private AxisTics _axisTics;
   private boolean _revalidatePending;
+  private boolean _logScale;
 
   /**
    * Called by this axis when it needs to be revalidated because a 
@@ -730,6 +775,8 @@ public class TileAxis extends IPanel {
 
   // Formats tic value, removing any trailing zeros after a decimal point.
   private String formatTic(double v) {
+	if(_logScale)
+	  v = Math.pow(10,v);
     String s = String.format(_format,v);
     s = StringUtil.removeTrailingZeros(s);
     return s;
