@@ -20,7 +20,6 @@ import static edu.mines.jtk.ogl.Gl.*;
 
 /**
  * Lighting for {@link edu.mines.jtk.sgl.OrbitView}.
- * <p>
  * There are three light sources available within the JTK, and
  * each light can be individually positioned in the canvas and have color
  * properties assigned. Furthermore, each light can be defined to be one of
@@ -40,7 +39,6 @@ import static edu.mines.jtk.ogl.Gl.*;
  * positioned at <code>(-0.1,-0.1, 0.0)</code> with black ambient light, and
  * white specular and diffuse lights. This light is considered to be
  * the "primary light".
- * </p>
  * @author Chris Engelsma
  * @version 2017.01.17
  */
