@@ -250,6 +250,21 @@ public class OrbitView extends View {
     _esd = esd;
   }
 
+  /**
+   * Sets the scene lighting.
+   * @param orbitViewLighting the scene lighting.
+   */
+  public void setOrbitViewLighting(OrbitViewLighting orbitViewLighting) {
+    _orbitViewLighting = orbitViewLighting;
+  }
+
+  /**
+   * Gets the scene lighting.
+   * @return the scene lighting.
+   */
+  public OrbitViewLighting getOrbitViewLighting() {
+    return _orbitViewLighting;
+  }
 
   ///////////////////////////////////////////////////////////////////////////
   // protected
@@ -409,10 +424,7 @@ public class OrbitView extends View {
     glLoadIdentity();
 
     // Light.
-    // TODO: make lighting customizable.
-    float[] lightPosition = {-0.1f,-0.1f,1.0f,0.0f};
-    glLightfv(GL_LIGHT0,GL_POSITION,lightPosition,0);
-    glEnable(GL_LIGHT0);
+    _orbitViewLighting.draw();
 
     // View (world-to-view) transform.
     Matrix44 worldToView = this.getWorldToView();
@@ -444,6 +456,7 @@ public class OrbitView extends View {
   private double _azimuth;
   private double _elevation;
   private double _esd;
+  private OrbitViewLighting _orbitViewLighting = new OrbitViewLighting();
   private Projection _projection = Projection.PERSPECTIVE;
   private BoundingSphere _worldSphere = null;
   private Matrix44 _worldToUnitSphere;
