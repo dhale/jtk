@@ -239,7 +239,7 @@ public abstract class Handle extends Group {
    * @param tc the transform context.
    * @return the transform matrix for this handle.
    */
-  protected Matrix44 computeTransform(TransformContext tc) {
+  private Matrix44 computeTransform(TransformContext tc) {
     View view = tc.getView();
     Tuple3 as = view.getAxesScale();
     Matrix44 localToPixel = tc.getLocalToPixel().times(_transform);
