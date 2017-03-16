@@ -17,6 +17,7 @@ package edu.mines.jtk.mosaic;
 import static edu.mines.jtk.util.MathPlus.max;
 import static edu.mines.jtk.util.MathPlus.min;
 import static edu.mines.jtk.util.MathPlus.signum;
+import edu.mines.jtk.util.ArrayMath;
 import edu.mines.jtk.util.Check;
 
 /**
@@ -73,8 +74,37 @@ public class Projector {
    *  v0 != v1 is required.
    */
   public Projector(double v0, double v1) {
-    this(v0,v1,0.0,1.0);
+    this(v0,v1,0.0,1.0,AxisScale.LINEAR);
   }
+  
+  /**
+   * Constructs a projector with specified v values and Scale,
+   * u0=0, and u1=1. The projector will have zero margins.
+   * @param v0 the v coordinate that corresponds to u coordinate 0;
+   *  v0 != v1 is required.
+   * @param v1 the v coordinate that corresponds to u coordinate 1;
+   *  v0 != v1 is required.
+   *  @param scale the AxisScale type of this projector
+   */
+  public Projector(double v0, double v1, AxisScale scale) {
+    this(v0,v1,0.0,1.0,scale);
+  }
+  
+  /**
+   * Constructs a projector with specified v and u values. The
+   * parameters u0 and u1 determine the margins of the projector.
+   * @param v0 the v coordinate that corresponds to u coordinate 0;
+   *  v0 != v1 is required.
+   * @param v1 the v coordinate that corresponds to u coordinate 1;
+   *  v0 != v1 is required.
+   *  @param u0 the u coordinate closest to normalized coordinate 0;
+   *  0.0 &lt;= u0 &lt; u1 is required.
+   * @param u1 the u coordinate closest to normalized coordinate 1;
+   *  u0 &lt; u1 &lt;= 1.0 is required.
+   */
+  public Projector(double v0, double v1, double u0, double u1) {
+    this(v0,v1,u0,u1,AxisScale.LINEAR);
+  }  
 
   /**
    * Constructs a projector with specified v and u values. The
@@ -89,16 +119,19 @@ public class Projector {
    *  0.0 &lt;= u0 &lt; u1 is required.
    * @param u1 the u coordinate closest to normalized coordinate 1;
    *  u0 &lt; u1 &lt;= 1.0 is required.
+   *  @param s the AxisScale type of this projector
    */
-  public Projector(double v0, double v1, double u0, double u1) {
+  public Projector(double v0, double v1, double u0, double u1, AxisScale s) {
     Check.argument(0.0<=u0,"0.0 <= u0");
     Check.argument(u0<u1,"u0 < u1");
     Check.argument(u1<=1.0,"u1 <= 1.0");
     Check.argument(v0!=v1,"v0 != v1");
+    setScale(s);
     _u0 = u0;
     _u1 = u1;
     _v0 = v0;
     _v1 = v1;
+    _scaleType = s;
     computeShiftsAndScales();
   }
 
@@ -107,7 +140,7 @@ public class Projector {
    * @param p the projector.
    */
   public Projector(Projector p) {
-    this(p._v0,p._v1,p._u0,p._u1);
+    this(p._v0,p._v1,p._u0,p._u1,p._scaleType);
   }
 
   /**
@@ -116,7 +149,11 @@ public class Projector {
    * @return normalized coordinate u.
    */
   public double u(double v) {
-    return _vshift+_vscale*v;
+  if(_scaleType==AxisScale.LINEAR)
+      return _vshift+_vscale*v;
+  else if(_scaleType==AxisScale.LOG10)
+    return _vshift+_vscale*ArrayMath.log10(v);
+  return 0.0;
   }
 
   /**
@@ -125,7 +162,11 @@ public class Projector {
    * @return world coordinate v.
    */
   public double v(double u) {
+  if(_scaleType==AxisScale.LINEAR)
     return _ushift+_uscale*u;
+  else if(_scaleType==AxisScale.LOG10)
+    return ArrayMath.pow(10,_ushift+_uscale*u);
+  return 0.0;
   }
 
   /**
@@ -161,11 +202,34 @@ public class Projector {
   }
 
   /**
+   * Returns the scale type
+   * @return the value of _scaleType
+   */
+  public AxisScale getScale() {
+    return _scaleType;
+  }  
+
+  /**
+   * Check whether projector is linear
+   * @return true if Projector is linear, else false
+   */
+  public boolean isLinear() {
+    return _scaleType.isLinear();
+  }
+  
+  /**
+   * Check whether projector is logarithmic
+   * @return true if Projector is logarithmic, else false
+   */
+  public boolean isLog() {
+    return _scaleType.isLog();
+  }  
+  
+  /**
    * Merges the specified projector into this projector. 
    * @param p the projector.
    */
   public void merge(Projector p) {
-
     // Ignore null projectors.
     if (p==null)
       return;
@@ -225,6 +289,10 @@ public class Projector {
     assert niter<10:"niter<10";
     assert 0.0<=_u0 && _u0<_u1 && _u1<=1.0:"_u0 and _u1 valid";
 
+    // use LINEAR scale in case of conflict
+    if(p.isLinear() && !isLinear())
+      setScale(AxisScale.LINEAR);
+    
     // Recompute shifts and scales.
     computeShiftsAndScales();
   }
@@ -257,7 +325,8 @@ public class Projector {
     return this._u0==that._u0 && 
            this._u1==that._u1 &&
            this._v0==that._v0 &&
-           this._v1==that._v1;
+           this._v1==that._v1 &&
+           this._scaleType == that._scaleType;
   }
 
   @Override
@@ -274,9 +343,24 @@ public class Projector {
 
   @Override
   public String toString() {
-    return "Projector("+_v0+", "+_v1+", "+_u0+", "+_u1+")";
+    return "Projector("+_v0+", "+_v1+", "+_u0+", "+_u1+", " + _scaleType +")";
   }
 
+  /////////////////////////////////////////////////////////////////////////
+  // protected
+  
+  /**
+   * Sets the scale type
+   * @param s new scale type
+   * @return 
+   */
+  protected Projector setScale(AxisScale s) {
+    if(s.isLog() && !(_v0==0.0 && _v1==0.0))
+      Check.argument(_v0>0 && _v1>0,"LOG scale: v0<=0 or v1<=0");
+    _scaleType = s;
+    computeShiftsAndScales();
+    return this;
+  } 
   
   ///////////////////////////////////////////////////////////////////////////
   // private
@@ -285,11 +369,19 @@ public class Projector {
   private double _v0,_v1;
   private double _ushift,_uscale;
   private double _vshift,_vscale;
+  private AxisScale _scaleType;
 
   private void computeShiftsAndScales() {
-    _uscale = (_v1-_v0)/(_u1-_u0);
-    _ushift = _v0-_uscale*_u0;
-    _vscale = (_u1-_u0)/(_v1-_v0);
-    _vshift = _u0-_vscale*_v0;
+    if (_scaleType==AxisScale.LINEAR) {
+      _uscale = (_v1-_v0)/(_u1-_u0);
+      _ushift = _v0-_uscale*_u0;
+      _vscale = (_u1-_u0)/(_v1-_v0);
+      _vshift = _u0-_vscale*_v0;
+    } else if (_scaleType==AxisScale.LOG10) {
+      _vscale = (_u1-_u0)/(ArrayMath.log10(_v1)-ArrayMath.log10(_v0));
+      _uscale = (ArrayMath.log10(_v1)-ArrayMath.log10(_v0))/(_u1-_u0);
+      _ushift = ArrayMath.log10(_v0)-_uscale*_u0;
+      _vshift = _u0-_vscale*ArrayMath.log10(_v0);
+    }
   }
 }

@@ -158,4 +158,144 @@ public class ProjectorTest extends TestCase {
     if (!success)
       fail("Expected: <"+expected+"> but was:<"+actual+">");
   }
+  
+  public static void assertVeryClose (double expected, double actual) {
+      boolean success = true;
+      success &= Math.abs(expected-actual) <= eps;
+      if (!success)
+        fail("Expected: <"+expected+"> but was:<"+actual+">");
+    }
+  
+  
+  // The same set of tests as above, except this time for a LOG scale projector
+  // with the addition of a functional test of log projection
+  
+  public void testProjectionLog () {
+    Projector p = new Projector(0.1, 100, 0.0, 1.0, AxisScale.LOG10);
+    assertVeryClose(0.1, p.v(p.u(0.1)));
+    assertVeryClose(2, p.v(p.u(2)));
+    assertVeryClose(56.7785, p.v(p.u(56.7785)));
+    assertVeryClose(0.0, p.u(p.v(0.0)));
+    assertVeryClose(0.25, p.u(p.v(0.25)));
+    assertVeryClose(0.6173, p.u(p.v(0.6173)));
+  }
+  
+
+  public void testAutoLinear() {
+    Projector p = new Projector(0.0, 100, 0.0, 1.0, AxisScale.LOG10);
+    assert(p.getScale() == AxisScale.LINEAR);
+  }
+  
+  public void testMergeALog () {
+    Projector pa = new Projector(0, 1, AxisScale.LOG10);
+    Projector pb = new Projector(0, 1, AxisScale.LOG10);
+    pa.merge(pb);
+    Projector expected = new Projector(0,1, AxisScale.LOG10);
+    assertVeryClose(expected,pa);
+  }
+  public void testMergeBLog () {
+    Projector pa = new Projector(0, 1, AxisScale.LOG10);
+    Projector pb = new Projector(1, 0, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(0,1, AxisScale.LOG10);
+    assertVeryClose(expected,pa);
+  }
+  public void testMergeCLog () {
+    Projector pa = new Projector(1, 0, AxisScale.LOG10);
+    Projector pb = new Projector(0, 1, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(1,0, AxisScale.LOG10);
+    assertVeryClose(expected,pa);
+  }
+  public void testMergeDLog () {
+    Projector pa = new Projector(1, 0, AxisScale.LOG10);
+    Projector pb = new Projector(1, 0, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(1,0, AxisScale.LOG10);
+    assertVeryClose(expected,pa);
+  }
+  public void testMergeELog () {
+    Projector pa = new Projector(10,  0, AxisScale.LOG10);
+    Projector pb = new Projector( 1, 11, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(11,0, AxisScale.LOG10);
+    assertVeryClose(expected, pa);
+  }
+  public void testMergeFLog () {
+    Projector pa = new Projector(10,  5, AxisScale.LOG10);
+    Projector pb = new Projector( 1, 11, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(11,1, AxisScale.LOG10);
+    assertVeryClose(expected, pa);
+  }
+  public void testMergeGLog () {
+    Projector pa = new Projector( 1, 11, AxisScale.LOG10);
+    Projector pb = new Projector(10,  0, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(0,11, AxisScale.LOG10);
+    assertVeryClose(expected, pa);
+  }
+  public void testMergeHLog () {
+    Projector pa = new Projector( 1.5, 1.4, AxisScale.LOG10);
+    Projector pb = new Projector( 1, 2, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(2,1, AxisScale.LOG10);
+    assertVeryClose(expected, pa);
+  }
+
+  public void testMerge1Log () {
+    Projector pa = new Projector(10, 20, 0.1, 0.8, AxisScale.LOG10);
+    Projector pb = new Projector(10, 20, 0.0, 1.0, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(10, 20, 0.1, 0.8, AxisScale.LOG10);
+    assertVeryClose(expected,pa);
+  }
+  public void testMerge1rLog () {
+    Projector pa = new Projector(10, 20, 0.0, 1.0, AxisScale.LOG10);
+    Projector pb = new Projector(10, 20, 0.1, 0.8, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(10, 20, 0.1, 0.8, AxisScale.LOG10);
+    assertVeryClose(expected,pa);
+  }
+  public void testMerge2Log () {
+    Projector pa = new Projector(10, 20, 0.1, 0.8, AxisScale.LOG10);
+    Projector pb = new Projector(20, 10, 0.0, 1.0, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(10, 20, 0.1, 0.8, AxisScale.LOG10);
+    assertVeryClose(expected,pa);
+  }
+  public void testMerge2rLog () {
+    Projector pa = new Projector(20, 10, 0.0, 1.0, AxisScale.LOG10);
+    Projector pb = new Projector(10, 20, 0.1, 0.8, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(20, 10, 0.2, 0.9, AxisScale.LOG10);
+    assertVeryClose(expected,pa);
+  }
+  public void testMerge3Log () {
+    Projector pa = new Projector(10, 20, 0.0, 1.0, AxisScale.LOG10);
+    Projector pb = new Projector(20, 10, 0.1, 0.8, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(10, 20, 0.2, 0.9, AxisScale.LOG10);
+    assertVeryClose(expected,pa);
+  }
+  public void testMerge3rLog () {
+    Projector pa = new Projector(20, 10, 0.1, 0.8, AxisScale.LOG10);
+    Projector pb = new Projector(10, 20, 0.0, 1.0, AxisScale.LOG10);
+    pa.merge(pb);
+
+    Projector expected = new Projector(20, 10, 0.1, 0.8, AxisScale.LOG10);
+    assertVeryClose(expected,pa);
+  }
 }

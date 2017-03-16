@@ -389,7 +389,9 @@ public class PlotPanel extends IPanel {
    */
   public void setHLimits(int icol, double hmin, double hmax) {
     Check.argument(hmin<hmax,"hmin<hmax");
-    setBestHorizontalProjector(icol,new Projector(hmin,hmax));
+    int nrow = getMosaic().countRows();
+    for (int irow=0; irow<nrow; ++irow)
+      getTile(irow,icol).setHLimits(hmin,hmax);
   }
 
   /**
@@ -402,11 +404,9 @@ public class PlotPanel extends IPanel {
    */
   public void setVLimits(int irow, double vmin, double vmax) {
     Check.argument(vmin<vmax,"vmin<vmax");
-    if (_orientation==Orientation.X1RIGHT_X2UP) {
-      setBestVerticalProjector(irow,new Projector(vmax,vmin));
-    } else {
-      setBestVerticalProjector(irow,new Projector(vmin,vmax));
-    }
+    int ncol = getMosaic().countColumns();
+    for (int icol=0; icol<ncol; ++icol)
+      getTile(irow,icol).setVLimits(vmin,vmax);
   }
 
   /**
@@ -441,7 +441,9 @@ public class PlotPanel extends IPanel {
    * @param icol the column index.
    */
   public void setHLimitsDefault(int icol) {
-    setBestHorizontalProjector(icol,null);
+    int nrow = getMosaic().countRows();
+    for (int irow=0; irow<nrow; ++irow)
+      getTile(irow,icol).setHLimitsDefault();
   }
 
   /**
@@ -451,7 +453,9 @@ public class PlotPanel extends IPanel {
    * @param irow the row index.
    */
   public void setVLimitsDefault(int irow) {
-    setBestVerticalProjector(irow,null);
+    int ncol = getMosaic().countColumns();
+    for (int icol=0; icol<ncol; ++icol)
+      getTile(irow,icol).setVLimitsDefault();
   }
 
   /**
@@ -1269,18 +1273,6 @@ public class PlotPanel extends IPanel {
   private SequenceView addSequenceView(int irow, int icol, SequenceView sv) {
     addTiledView(irow,icol,sv);
     return sv;
-  }
-
-  private void setBestHorizontalProjector(int icol, Projector p) {
-    int nrow = getMosaic().countRows();
-    for (int irow=0; irow<nrow; ++irow)
-      getTile(irow,icol).setBestHorizontalProjector(p);
-  }
-
-  private void setBestVerticalProjector(int irow, Projector p) {
-    int ncol = getMosaic().countColumns();
-    for (int icol=0; icol<ncol; ++icol)
-      getTile(irow,icol).setBestVerticalProjector(p);
   }
 
   /**

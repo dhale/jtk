@@ -434,6 +434,17 @@ public class PointsView extends TiledView {
     repaint();
   }
 
+  /**
+   * Sets the horizontal axis scaling.
+   * @param scaleType axis scaling enum value
+   */
+  @Override
+  public PointsView setScales(AxisScale hscale, AxisScale vscale) {
+    if(hscale!=getHScale() || vscale!=getVScale())
+      updateBestProjectors(hscale,vscale);
+    return this;
+  }
+  
   public void paint(Graphics2D g2d) {
     g2d.setRenderingHint(
       RenderingHints.KEY_ANTIALIASING,
@@ -574,7 +585,10 @@ public class PointsView extends TiledView {
    * Called when we might new realignment.
    */
   private void updateBestProjectors() {
-
+    updateBestProjectors(getHScale(),getVScale());    
+  }
+  
+  private void updateBestProjectors(AxisScale hscale, AxisScale vscale) {
     // Min and max (x1,x2) values.
     float x1min =  FLT_MAX;
     float x2min =  FLT_MAX;
@@ -592,8 +606,22 @@ public class PointsView extends TiledView {
         x1max = max(x1max,x1i);
         x2max = max(x2max,x2i);
       }
-    }
 
+      // Ignore negative values in the range of x1
+      // if current scale is LOG10
+      if (hscale==AxisScale.LOG10) {
+        int ind = getFirstPositiveInd(x1);
+        if (ind>-1)
+          x1min = max(x1min,x1[ind]);
+      }
+
+      if (vscale==AxisScale.LOG10) {
+        int ind = getSmallestPositiveInd(x2);
+        if (ind>-1)
+          x2min = max(x2min,x2[ind]);
+      }
+    }
+    
     // Ensure x1min<x1max and x2min<x2max.
     if (x1min==x1max) {
       x1min -= ulp(x1min);
@@ -621,15 +649,38 @@ public class PointsView extends TiledView {
     Projector bhp = null;
     Projector bvp = null;
     if (_orientation==Orientation.X1RIGHT_X2UP) {
-      bhp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1):null;
-      bvp = (x2min<x2max)?new Projector(x2max,x2min,u0,u1):null;
+      bhp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1,hscale):null;
+      bvp = (x2min<x2max)?new Projector(x2max,x2min,u0,u1,vscale):null;
     } else if (_orientation==Orientation.X1DOWN_X2RIGHT) {
-      bhp = (x2min<x2max)?new Projector(x2min,x2max,u0,u1):null;
-      bvp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1):null;
+      bhp = (x2min<x2max)?new Projector(x2min,x2max,u0,u1,hscale):null;
+      bvp = (x1min<x1max)?new Projector(x1min,x1max,u0,u1,vscale):null;
     }
     setBestProjectors(bhp,bvp);
   }
 
+  private int getFirstPositiveInd(float[] x) {
+    int ind = -1;
+    for (int i=0; i<x.length; i++) {
+      if (x[i]>0) {
+        ind = i;
+        break;
+      }
+    }
+    return ind;
+  }
+
+  private int getSmallestPositiveInd(float[] x) {
+    int ind = -1;
+    float smallest = Float.MAX_VALUE;
+    for (int i=0; i<x.length; i++) {
+      if (x[i]>0 && x[i]<smallest) {
+        ind = i;
+        smallest = x[i];
+      }
+    }
+    return ind;
+  }
+  
   private boolean equalColors(Color ca, Color cb) {
     return (ca==null)?cb==null:ca.equals(cb);
   }
@@ -648,9 +699,11 @@ public class PointsView extends TiledView {
       xv = x2;
       yv = x1;
     }
+    double hLeft = Math.min(hp.v0(),hp.v1());
+    double vBot = Math.min(vp.v0(),vp.v1());
     for (int i=0; i<n; ++i) {
-      x[i] = ts.x(xv[i]);
-      y[i] = ts.y(yv[i]);
+      x[i] = ts.x((xv[i]<=0 && hp.getScale()==AxisScale.LOG10)?hLeft:xv[i]);
+      y[i] = ts.y((yv[i]<=0 && vp.getScale()==AxisScale.LOG10)?vBot:yv[i]);
     }
   }
 
