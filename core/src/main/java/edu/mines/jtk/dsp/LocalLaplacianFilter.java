@@ -68,6 +68,7 @@ public class LocalLaplacianFilter {
 
   /**
    * Computes y = y+G'DGx for 2D arrays x and y.
+   * @param d a tensor.
    * @param x input array. Must be distinct from the array y.
    * @param y input/output array. Must be distinct from the array x.
    */
@@ -103,6 +104,7 @@ public class LocalLaplacianFilter {
 
   /**
    * Computes y = y+G'DGx for 3D arrays x and y.
+   * @param d a 3x3 tensor.
    * @param x input array. Must be distinct from the array y.
    * @param y input/output array. Must be distinct from the array x.
    */

@@ -131,6 +131,8 @@ public class Transcaler {
    * Sets the device-coordinate width and height. Maps the current user
    * coordinates (x1u,y1u) to device coordinates (0,0) and user coordinates
    * (x2u,y2u) to device coordinates (width-1,height-1).
+   * @param width device-coordinate width.
+   * @param height device-coordinate height.
    */
   public void setMapping(int width, int height) {
     Check.argument(width>0,"width>0");
@@ -317,8 +319,8 @@ public class Transcaler {
    * @param y1d the device y-coordinate corresponding to y1u.
    * @param x2d the device x-coordinate corresponding to x2u.
    * @param y2d the device y-coordinate corresponding to y2u.
-   * @param horizontal the horizontal projector Scale
-   * @param vertical the vertical projector Scale
+   * @param hscale the horizontal projector Scale
+   * @param vscale the vertical projector Scale
    */
   private Transcaler(
     double x1u, double y1u, double x2u, double y2u,

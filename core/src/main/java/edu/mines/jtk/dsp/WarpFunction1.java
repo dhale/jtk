@@ -39,6 +39,7 @@ public abstract class WarpFunction1 {
    * Returns a warping for a constant shift.
    * @param u shift.
    * @param n number of samples.
+   * @return a constant-shift 1d warping function.
    */
   public static WarpFunction1 constant(double u, int n) {
     return new ConstantWarp1(u,n);
@@ -48,6 +49,7 @@ public abstract class WarpFunction1 {
    * Returns a derivative-of-Gaussian warping.
    * @param u maximum shift.
    * @param n number of samples.
+   * @return a derivative-of-Gaussian 1d warping function.
    */
   public static WarpFunction1 gaussian(double u, int n) {
     return new GaussianWarp1(u,n);
@@ -57,6 +59,7 @@ public abstract class WarpFunction1 {
    * Returns a sinusoidal warping.
    * @param u maximum shift.
    * @param n number of samples.
+   * @return a sinusoidal 1d warping function.
    */
   public static WarpFunction1 sinusoid(double u, int n) {
     return new SinusoidWarp1(u,n);
@@ -67,6 +70,7 @@ public abstract class WarpFunction1 {
    * @param c constant shift.
    * @param u maximum sinusoidal shift.
    * @param n number of samples.
+   * @return a constant-plus-sinusoidal 1d warping function.
    */
   public static WarpFunction1 constantPlusSinusoid(double c, double u, int n) {
     return new SinusoidWarp1(c,u,n);

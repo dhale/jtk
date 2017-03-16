@@ -43,6 +43,7 @@ public abstract class WarpFunction3 {
    * @param n1 number of samples in 1st dimension.
    * @param n2 number of samples in 2nd dimension.
    * @param n3 number of samples in 3rd dimension.
+   * @return a constant-shift 3d warp function.
    */
   public static WarpFunction3 constant(
     double u1, double u2, double u3, 
@@ -59,6 +60,7 @@ public abstract class WarpFunction3 {
    * @param n1 number of samples in 1st dimension.
    * @param n2 number of samples in 2nd dimension.
    * @param n3 number of samples in 3rd dimension.
+   * @return a derivative-of-Gaussian 3d warping function.
    */
   public static WarpFunction3 gaussian(
     double u1, double u2, double u3, 
@@ -75,6 +77,7 @@ public abstract class WarpFunction3 {
    * @param n1 number of samples in 1st dimension.
    * @param n2 number of samples in 2nd dimension.
    * @param n3 number of samples in 3rd dimension.
+   * @return a sinusoidal 3d warping function.
    */
   public static WarpFunction3 sinusoid(
     double u1, double u2, double u3, 
@@ -94,6 +97,7 @@ public abstract class WarpFunction3 {
    * @param n1 number of samples in 1st dimension.
    * @param n2 number of samples in 2nd dimension.
    * @param n3 number of samples in 3rd dimension.
+   * @return a constant-plus-sinusoidal 3d warping function.
    */
   public static WarpFunction3 constantPlusSinusoid(
     double c1, double c2, double c3,

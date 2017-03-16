@@ -120,6 +120,7 @@ public interface ArrayOutput extends DataOutput {
   /**
    * Writes short elements from a specified array.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeShorts(short[][][] v) throws IOException;
 
@@ -128,6 +129,7 @@ public interface ArrayOutput extends DataOutput {
    * @param v the array.
    * @param k the index of the first element to write.
    * @param n the number of elements to write.
+   * @throws IOException if unable to write.
    */
   public void writeInts(int[] v, int k, int n) throws IOException;
 
@@ -135,18 +137,21 @@ public interface ArrayOutput extends DataOutput {
    * Writes int elements from a specified array.
    * The array length equals the number of elements to write.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeInts(int[] v) throws IOException;
 
   /**
    * Writes int elements from a specified array.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeInts(int[][] v) throws IOException;
 
   /**
    * Writes int elements from a specified array.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeInts(int[][][] v) throws IOException;
 
@@ -155,6 +160,7 @@ public interface ArrayOutput extends DataOutput {
    * @param v the array.
    * @param k the index of the first element to write.
    * @param n the number of elements to write.
+   * @throws IOException if unable to write.
    */
   public void writeLongs(long[] v, int k, int n) throws IOException;
 
@@ -162,18 +168,21 @@ public interface ArrayOutput extends DataOutput {
    * Writes long elements from a specified array.
    * The array length equals the number of elements to write.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeLongs(long[] v) throws IOException;
 
   /**
    * Writes long elements from a specified array.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeLongs(long[][] v) throws IOException;
 
   /**
    * Writes long elements from a specified array.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeLongs(long[][][] v) throws IOException;
 
@@ -182,6 +191,7 @@ public interface ArrayOutput extends DataOutput {
    * @param v the array.
    * @param k the index of the first element to write.
    * @param n the number of elements to write.
+   * @throws IOException if unable to write.
    */
   public void writeFloats(float[] v, int k, int n) throws IOException;
 
@@ -189,18 +199,21 @@ public interface ArrayOutput extends DataOutput {
    * Writes float elements from a specified array.
    * The array length equals the number of elements to write.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeFloats(float[] v) throws IOException;
 
   /**
    * Writes float elements from a specified array.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeFloats(float[][] v) throws IOException;
 
   /**
    * Writes float elements from a specified array.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeFloats(float[][][] v) throws IOException;
 
@@ -209,6 +222,7 @@ public interface ArrayOutput extends DataOutput {
    * @param v the array.
    * @param k the index of the first element to write.
    * @param n the number of elements to write.
+   * @throws IOException if unable to write.
    */
   public void writeDoubles(double[] v, int k, int n) throws IOException;
 
@@ -216,18 +230,21 @@ public interface ArrayOutput extends DataOutput {
    * Writes double elements from a specified array.
    * The array length equals the number of elements to write.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeDoubles(double[] v) throws IOException;
 
   /**
    * Writes double elements from a specified array.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeDoubles(double[][] v) throws IOException;
 
   /**
    * Writes double elements from a specified array.
    * @param v the array.
+   * @throws IOException if unable to write.
    */
   public void writeDoubles(double[][][] v) throws IOException;
 }

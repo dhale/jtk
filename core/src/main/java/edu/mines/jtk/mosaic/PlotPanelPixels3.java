@@ -155,6 +155,7 @@ public class PlotPanelPixels3 extends PlotPanel {
 
   /**
    * Gets the pixels view for the 1-2 slice.
+   * @return the pixels view.
    */
   public PixelsView getPixelsView12() {
     return _p12;
@@ -162,6 +163,7 @@ public class PlotPanelPixels3 extends PlotPanel {
 
   /**
    * Gets the pixels view for the 1-3 slice.
+   * @return the pixels view.
    */
   public PixelsView getPixelsView13() {
     return _p13;
@@ -169,6 +171,7 @@ public class PlotPanelPixels3 extends PlotPanel {
 
   /**
    * Gets the pixels view for the 2-3 slice.
+   * @return the pixels view.
    */
   public PixelsView getPixelsView23() {
     return _p23;

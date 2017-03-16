@@ -670,6 +670,7 @@ public class PlotPanel extends IPanel {
    * plot segments.
    * @param s1 the sampling of the variable x1; must be uniform.
    * @param x2 array of array of x2 values.
+   * @return a bars view.
    */
   public BarsView addBars(Sampling s1, float[][] x2) {
     return addBars(0,0,s1,x2);
@@ -883,6 +884,7 @@ public class PlotPanel extends IPanel {
    * The lengths of the specified arrays x1 and x2 must be equal.
    * @param x1 array of arrays of x1 coordinates.
    * @param x2 array of arrays of x2 coordinates.
+   * @return a points view.
    */
   public PointsView addPoints(float[][] x1, float[][] x2) {
     return addPoints(0,0,x1,x2);
@@ -950,6 +952,7 @@ public class PlotPanel extends IPanel {
    * @param icol the tile column index.
    * @param x1 array of arrays of x1 coordinates.
    * @param x2 array of arrays of x2 coordinates.
+   * @return the points view.
    */
   public PointsView addPoints(int irow, int icol, float[][] x1, float[][] x2) {
     PointsView pv = new PointsView(x1,x2);
@@ -961,6 +964,7 @@ public class PlotPanel extends IPanel {
    * Function f(x1,x2) assumed to have uniform sampling.
    * @param f array[n2][n1] of sampled function values f(x1,x2), where
    * n1 = f[0].length and n2 = f.length.
+   * @return the contours view.
    */
   public ContoursView addContours(float[][] f) {
     return addContours(0,0,f);
@@ -984,7 +988,8 @@ public class PlotPanel extends IPanel {
    * @param irow the tile row index.
    * @param icol the tile column index.
    * @param f array[n2][n1] of sampline function values f(x1,x2), where
-   * n1 = f[0].length and n2 = f.length.
+   *          n1 = f[0].length and n2 = f.length.
+   * @return a contours view.
    */
   public ContoursView addContours(int irow, int icol, float[][] f) {
     ContoursView cv = new ContoursView(f);
@@ -997,8 +1002,8 @@ public class PlotPanel extends IPanel {
    * @param icol the tile column index.
    * @param s1 the sampling of the variable x1; must be uniform.
    * @param s2 the sampling of the variable x2; must be uniform.
-   * @param f array[n2][n1] of sampled function values f(x1,x2), 
-   *  where n1 = f[0].length and n2 = f.length.
+   * @param f array[n2][n1] of sampled function values f(x1,x2),
+   *          where n1 = f[0].length and n2 = f.length.
    * @return the contours view.
    */
   public ContoursView addContours(
@@ -1058,7 +1063,7 @@ public class PlotPanel extends IPanel {
    * is already in this panel, it is first removed, before adding it again.
    * @param tv the tiled view.
    * @return true, if this panel did not already contain the specified
-   *  tiled view; false, otherwise.
+   * tiled view; false, otherwise.
    */
   public boolean addTiledView(TiledView tv) {
     return addTiledView(0,0,tv);

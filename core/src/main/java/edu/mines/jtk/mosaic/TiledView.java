@@ -102,7 +102,6 @@ public abstract class TiledView {
    * to implement non-linear scaling.
    * @param hscale the new horizontal scale
    * @param vscale the new vertical scale
-   * @param align whether to align Tile Projectors after setting scale
    * @return null, unless overriden by subclass to return this TiledView
    */  
   public TiledView setScales(AxisScale hscale, AxisScale vscale) {
@@ -148,6 +147,8 @@ public abstract class TiledView {
   /**
    * Sets the best projectors for this tiled view. Classes that extend
    * this class call this method when their best projectors change.
+   * @param bhp a horizontal projector.
+   * @param bvp a vertical projector.
    */
   protected void setBestProjectors(Projector bhp, Projector bvp) {
     if (!equal(_bhp,bhp) || !equal(_bvp,bvp)) {

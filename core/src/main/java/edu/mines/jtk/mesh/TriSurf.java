@@ -492,6 +492,8 @@ public class TriSurf {
 
     /**
      * Gets the face nabor opposite the specified node.
+     * @param node a node.
+     * @return the face nabor opposite the node.
      */
     public final Face faceNabor(Node node) {
       if (node==nodeA()) return _faceA;
@@ -503,6 +505,8 @@ public class TriSurf {
 
     /**
      * Gets the node in the specified face nabor that is opposite this face.
+     * @param faceNabor a face nabor.
+     * @return the node in the specified face nabor.
      */
     public final Node nodeNabor(Face faceNabor) {
       if (faceNabor._faceA==this) return faceNabor.nodeA();

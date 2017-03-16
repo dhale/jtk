@@ -126,6 +126,7 @@ public class LocalDiffusionKernel {
    * For example, if npass = 2, then the output is computed in two
    * passes: (1) y += G'DGx, (2) y += G'DGy.
    * The default is one pass.
+   * @param npass the number of passes.
    */
   public void setNumberOfPasses(int npass) {
     _npass = npass;

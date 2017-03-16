@@ -173,6 +173,7 @@ public class DMatrix {
    * @param i1 the index of last row.
    * @param j0 the index of first column.
    * @param j1 the index of last column.
+   * @return the submatrix.
    */
   public DMatrix get(int i0, int i1, int j0, int j1) {
     checkI(i0,i1);
@@ -188,6 +189,7 @@ public class DMatrix {
    * Gets a new matrix from the specified rows and columns of this matrix.
    * @param r the array of row indices; null, for all rows.
    * @param c the array of column indices; null, for all columns.
+   * @return the matrix.
    */
   public DMatrix get(int[] r, int[] c) {
     if (r==null && c==null) {
@@ -217,6 +219,7 @@ public class DMatrix {
    * Gets a matrix from specified one row and columns of this matrix.
    * @param i the row index.
    * @param c the array of column indices; null, for all columns.
+   * @return the matrix.
    */
   public DMatrix get(int i, int[] c) {
     return get(i,i,c);
@@ -226,6 +229,7 @@ public class DMatrix {
    * Gets a matrix from specified rows and one column of this matrix.
    * @param r the array of row indices; null, for all rows.
    * @param j the column index.
+   * @return the matrix.
    */
   public DMatrix get(int[] r, int j) {
     return get(r,j,j);
@@ -236,6 +240,7 @@ public class DMatrix {
    * @param i0 the index of the first row.
    * @param i1 the index of the last row.
    * @param c the array of column indices; null, for all columns.
+   * @return the matrix.
    */
   public DMatrix get(int i0, int i1, int[] c) {
     checkI(i0,i1);
@@ -259,6 +264,7 @@ public class DMatrix {
    * @param r the array of row indices; null, for all rows.
    * @param j0 the index of the first column.
    * @param j1 the index of the last column.
+   * @return the matrix.
    */
   public DMatrix get(int[] r, int j0, int j1) {
     checkJ(j0,j1);

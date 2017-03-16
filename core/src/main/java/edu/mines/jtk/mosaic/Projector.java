@@ -309,6 +309,7 @@ public class Projector {
    * are proportional to the sizes of margins [0,u0) or (u1,1] in the
    * specified projector should be scaled by this ratio before being used
    * with this projector.
+   * @param p a projector.
    * @return the scale factor.
    */
   public double getScaleRatio(Projector p) {
@@ -352,7 +353,7 @@ public class Projector {
   /**
    * Sets the scale type
    * @param s new scale type
-   * @return 
+   * @return the scale type.
    */
   protected Projector setScale(AxisScale s) {
     if(s.isLog() && !(_v0==0.0 && _v1==0.0))

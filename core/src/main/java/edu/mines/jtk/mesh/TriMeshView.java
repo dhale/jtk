@@ -40,6 +40,7 @@ public class TriMeshView extends TiledView {
   
   /**
    * Constructs a new view of the specified tri mesh.
+   * @param mesh a tri mesh.
    */
   public TriMeshView(TriMesh mesh) {
     setMesh(mesh);
@@ -241,6 +242,7 @@ public class TriMeshView extends TiledView {
   /**
    * Sets the map from triangle edges to weights.
    * If set, this map overrides the tri line color.
+   * @param triEdgeWeights a map from triangle edges to weights.
    */
   public void setTriEdgeWeights(Map<TriMesh.Edge,Float> triEdgeWeights) {
     _triEdgeWeights = triEdgeWeights;

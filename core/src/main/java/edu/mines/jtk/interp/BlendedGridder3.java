@@ -161,12 +161,14 @@ public class BlendedGridder3 implements Gridder3 {
 
   /**
    * Experimental use only.
+   * @param tmx time marker x.
    */
   public void setTimeMarkerX(boolean tmx) {
     _tmx = tmx;
   }
   /**
    * Experimental use only.
+   * @return time marker s.
    */
   public double getTimeMarkerS() {
     return _tms;
