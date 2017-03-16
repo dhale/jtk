@@ -418,6 +418,7 @@ public class SimplePlot extends PlotFrame {
    * Adds a contours view of the specified sample function f(x1,x2).
    * @param f array[n2][n1] of sampled function values f(x1,x2), where
    *  n2 = f[0].length and n2 = f.length.
+   * @return the contours view.
    */
   public ContoursView addContours(float[][] f) {
     return _panel.addContours(f);

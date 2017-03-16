@@ -148,7 +148,8 @@ public class IPanel extends JPanel {
    * ratio as this panel.
    * @param dpi the image resolution, in dots per inch.
    * @param win the image width, in inches.
-   * @param fileName the name of the file to contain the PNG image.  
+   * @param fileName the name of the file to contain the PNG image.
+   * @throws IOException when unable to save to file.
    */
   public void paintToPng(double dpi, double win, String fileName) 
     throws IOException 
@@ -226,6 +227,7 @@ public class IPanel extends JPanel {
    * @param y the y-coordinate of the graphics rectangle.
    * @param w the width of the graphics rectangle.
    * @param h the height of the graphics rectangle.
+   * @return the graphics2D.
    */
   protected Graphics2D createGraphics(
     Graphics2D g2d, int x, int y, int w, int h) 

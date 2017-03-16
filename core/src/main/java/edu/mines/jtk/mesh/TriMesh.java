@@ -273,6 +273,8 @@ public class TriMesh implements Serializable {
 
     /**
      * Gets the tri nabor opposite the specified node.
+     * @param node a node.
+     * @return the tri nabor opposite the node.
      */
     public final Tri triNabor(Node node) {
       if (node==_n0) return _t0;
@@ -284,6 +286,8 @@ public class TriMesh implements Serializable {
 
     /**
      * Gets the node in the specified tri nabor that is opposite this tri.
+     * @param triNabor a tri nabor.
+     * @return the node in the specified tri nabor opposite this tri.
      */
     public final Node nodeNabor(Tri triNabor) {
       if (triNabor._t0==this) return triNabor._n0;
@@ -1027,6 +1031,7 @@ public class TriMesh implements Serializable {
 
     /**
      * Appends the specified node and step to this list.
+     * @param step a step.
      * @param node the node to append.
      */
     public final void add(Node node, int step) {
@@ -2089,6 +2094,7 @@ public class TriMesh implements Serializable {
 
   /**
    * Determines whether the specified node is an inner node.
+   * @param node a node.
    * @return true, if inner; false, otherwise.
    */
   public boolean isInner(Node node) {
@@ -2106,6 +2112,7 @@ public class TriMesh implements Serializable {
 
   /**
    * Determines whether the specified node is an outer node.
+   * @param node a node.
    * @return true, if outer; false, otherwise.
    */
   public boolean isOuter(Node node) {
@@ -2114,6 +2121,7 @@ public class TriMesh implements Serializable {
 
   /**
    * Determines whether the specified tri is an inner tri.
+   * @param tri a tri.
    * @return true, if inner; false, otherwise.
    */
   public boolean isInner(Tri tri) {
@@ -2126,6 +2134,7 @@ public class TriMesh implements Serializable {
 
   /**
    * Determines whether the specified tri is an outer tri.
+   * @param tri a tri.
    * @return true, if outer; false, otherwise.
    */
   public boolean isOuter(Tri tri) {
@@ -2134,6 +2143,7 @@ public class TriMesh implements Serializable {
 
   /**
    * Determines whether the specified edge is an inner edge.
+   * @param edge an edge.
    * @return true, if inner; false, otherwise.
    */
   public boolean isInner(Edge edge) {
@@ -2146,6 +2156,7 @@ public class TriMesh implements Serializable {
 
   /**
    * Determines whether the specified edge is an outer edge.
+   * @param edge an edge.
    * @return true, if outer; false, otherwise.
    */
   public boolean isOuter(Edge edge) {
@@ -3137,6 +3148,9 @@ public class TriMesh implements Serializable {
    * This method appears to be 2-3 times slower than findNodeNearest,
    * but it is a lot of code, so we make it private for now.
    * (Currently unused.)
+   * @param x x-coordinate.
+   * @param y y-coordinate.
+   * @return the node nearest the coordinates.
    */
   public synchronized Node findNodeNearestSlow(float x, float y) {
 

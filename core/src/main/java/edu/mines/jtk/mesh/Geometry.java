@@ -767,21 +767,21 @@ public final class Geometry {
    * the method {@link #leftOfPlane} would return a positive number.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
-   * @param xa x coordinate of point a.
-   * @param ya y coordinate of point a.
-   * @param za z coordinate of point a.
-   * @param xb x coordinate of point b.
-   * @param yb y coordinate of point b.
-   * @param zb z coordinate of point b.
-   * @param xc x coordinate of point c.
-   * @param yc y coordinate of point c.
-   * @param zc z coordinate of point c.
-   * @param xd x coordinate of point d.
-   * @param yd y coordinate of point d.
-   * @param zd z coordinate of point d.
-   * @param xe x coordinate of point e.
-   * @param ye y coordinate of point e.
-   * @param ze z coordinate of point e.
+   * @param xa x-coordinate of point a.
+   * @param ya y-coordinate of point a.
+   * @param za z-coordinate of point a.
+   * @param xb x-coordinate of point b.
+   * @param yb y-coordinate of point b.
+   * @param zb z-coordinate of point b.
+   * @param xc x-coordinate of point c.
+   * @param yc y-coordinate of point c.
+   * @param zc z-coordinate of point c.
+   * @param xd x-coordinate of point d.
+   * @param yd y-coordinate of point d.
+   * @param zd z-coordinate of point d.
+   * @param xe x-coordinate of point e.
+   * @param ye y-coordinate of point e.
+   * @param ze z-coordinate of point e.
    * @return positive, if inside the sphere;
    *         negative, if outside the sphere;
    *         zero, otherwise.
@@ -892,6 +892,27 @@ public final class Geometry {
    * If all four weights (and radii) equal zero, then the ortho-sphere 
    * is the circumsphere. In this case, the method {@link #inSphere} 
    * is more efficient.
+   * @param xa x-coordinate of point a.
+   * @param ya y-coordinate of point a.
+   * @param za z-coordinate of point a.
+   * @param wa w-coordinate of point a.
+   * @param xb x-coordinate of point b.
+   * @param yb y-coordinate of point b.
+   * @param zb z-coordinate of point b.
+   * @param wb w-coordinate of point b.
+   * @param xc x-coordinate of point c.
+   * @param yc y-coordinate of point c.
+   * @param zc z-coordinate of point c.
+   * @param wc w-coordinate of point c.
+   * @param xd x-coordinate of point d.
+   * @param yd y-coordinate of point d.
+   * @param zd z-coordinate of point d.
+   * @param wd w-coordinate of point d.
+   * @param xe x-coordinate of point e.
+   * @param ye y-coordinate of point e.
+   * @param ze z-coordinate of point e.
+   * @param we w-coordinate of point e.
+   * @return a positive number if inside ortho-sphere; negative, otherwise.
    */
   public static double inOrthoSphere(
     double xa, double ya, double za, double wa,
@@ -1005,6 +1026,12 @@ public final class Geometry {
    * ortho-sphere defined by the weighted points a, b, c, and d.
    * The latter are assumed to be in CCW order, such that the method 
    * {@link #leftOfPlane} would return a positive number.
+   * @param pa {x,y,z,w} coordinates of point a.
+   * @param pb {x,y,z,w} coordinates of point b.
+   * @param pc {x,y,z,w} coordinates of point c.
+   * @param pd {x,y,z,w} coordinates of point d.
+   * @param pe {x,y,z,w} coordinates of point d.
+   * @return a positive number if within ortho-sphere; negative, otherwise.
    */
   public static double inOrthoSphere(
     double[] pa, double[] pb, double[] pc, double[] pd, double[] pe) 
@@ -1022,6 +1049,12 @@ public final class Geometry {
    * ortho-sphere defined by the weighted points a, b, c, and d.
    * The latter are assumed to be in CCW order, such that the method 
    * {@link #leftOfPlane} would return a positive number.
+   * @param pa {x,y,z,w} coordinates of point a.
+   * @param pb {x,y,z,w} coordinates of point b.
+   * @param pc {x,y,z,w} coordinates of point c.
+   * @param pd {x,y,z,w} coordinates of point d.
+   * @param pe {x,y,z,w} coordinates of point d.
+   * @return a positive number if within ortho-sphere; negative, otherwise.
    */
   public static double inOrthoSphere(
     float[] pa, float[] pb, float[] pc, float[] pd, float[] pe) 
@@ -1041,6 +1074,27 @@ public final class Geometry {
    * {@link #leftOfPlane} would return a positive number.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param xa x-coordinate of point a.
+   * @param ya y-coordinate of point a.
+   * @param za z-coordinate of point a.
+   * @param wa w-coordinate of point a.
+   * @param xb x-coordinate of point b.
+   * @param yb y-coordinate of point b.
+   * @param zb z-coordinate of point b.
+   * @param wb w-coordinate of point b.
+   * @param xc x-coordinate of point c.
+   * @param yc y-coordinate of point c.
+   * @param zc z-coordinate of point c.
+   * @param wc w-coordinate of point c.
+   * @param xd x-coordinate of point d.
+   * @param yd y-coordinate of point d.
+   * @param zd z-coordinate of point d.
+   * @param wd w-coordinate of point d.
+   * @param xe x-coordinate of point e.
+   * @param ye y-coordinate of point e.
+   * @param ze z-coordinate of point e.
+   * @param we w-coordinate of point e.
+   * @return a positive number if within ortho-sphere; negative, otherwise.
    */
   public static double inOrthoSphereFast(
     double xa, double ya, double za, double wa,
@@ -1094,6 +1148,12 @@ public final class Geometry {
    * {@link #leftOfPlane} would return a positive number.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param pa {x,y,z,w} coordinates of point a.
+   * @param pb {x,y,z,w} coordinates of point b.
+   * @param pc {x,y,z,w} coordinates of point c.
+   * @param pd {x,y,z,w} coordinates of point d.
+   * @param pe {x,y,z,w} coordinates of point e.
+   * @return positive, if inside the ortho-sphere; negative, otherwise.
    */
   public static double inOrthoSphereFast(
     double[] pa, double[] pb, double[] pc, double[] pd, double[] pe) 
@@ -1113,6 +1173,12 @@ public final class Geometry {
    * {@link #leftOfPlane} would return a positive number.
    * <p>
    * <em>Note: this fast method may return an incorrect result.</em>
+   * @param pa {x,y,z,w} coordinates of point a.
+   * @param pb {x,y,z,w} coordinates of point b.
+   * @param pc {x,y,z,w} coordinates of point c.
+   * @param pd {x,y,z,w} coordinates of point d.
+   * @param pe {x,y,z,w} coordinates of point e.
+   * @return positive, if inside the ortho-sphere; negative, otherwise.
    */
   public static double inOrthoSphereFast(
     float[] pa, float[] pb, float[] pc, float[] pd, float[] pe) 
@@ -1129,6 +1195,12 @@ public final class Geometry {
    * Computes the center of the circle defined by the points a, b, and c.
    * The latter are assumed to be in CCW order, such that the method 
    * {@link #leftOfLine} would return a positive number.
+   * @param xa x-coordinate of point a.
+   * @param ya y-coordinate of point a.
+   * @param xb x-coordinate of point b.
+   * @param yb y-coordinate of point b.
+   * @param xc x-coordinate of point c.
+   * @param yc y-coordinate of point c.
    * @param po array containing (x,y) coordinates of center.
    */
   public static void centerCircle(
@@ -1152,6 +1224,9 @@ public final class Geometry {
    * Computes the center of the circle defined by the points a, b, and c.
    * The latter are assumed to be in CCW order, such that the method 
    * {@link #leftOfLine} would return a positive number.
+   * @param pa {x,y} coordinates of point a.
+   * @param pb {x,y} coordinates of point b.
+   * @param pc {x,y} coordinates of point c.
    * @param po array containing (x,y) coordinates of center.
    */
   public static void centerCircle(
@@ -1167,6 +1242,12 @@ public final class Geometry {
    * Computes the center of the circle defined by the points a, b, and c.
    * The latter are assumed to be in CCW order, such that the method 
    * {@link #leftOfLine} would return a positive number.
+   * @param xa x-coordinate of point a.
+   * @param ya y-coordinate of point a.
+   * @param xb x-coordinate of point b.
+   * @param yb y-coordinate of point b.
+   * @param xc x-coordinate of point c.
+   * @param yc y-coordinate of point c.
    * @param po array containing (x,y) coordinates of center.
    */
   public static void centerCircle(
@@ -1190,6 +1271,9 @@ public final class Geometry {
    * Computes the center of the circle defined by the points a, b, and c.
    * The latter are assumed to be in CCW order, such that the method 
    * {@link #leftOfLine} would return a positive number.
+   * @param pa {x,y} coordinates of point a.
+   * @param pb {x,y} coordinates of point b.
+   * @param pc {x,y} coordinates of point c.
    * @param po array containing (x,y) coordinates of center.
    */
   public static void centerCircle(
@@ -1205,6 +1289,18 @@ public final class Geometry {
    * Computes the center of the sphere defined by the points a, b, c, and d.
    * The latter are assumed to be in CCW order, such that the method 
    * {@link #leftOfPlane} would return a positive number.
+   * @param xa x-coordinate of point a.
+   * @param ya y-coordinate of point a.
+   * @param za z-coordinate of point a.
+   * @param xb x-coordinate of point b.
+   * @param yb y-coordinate of point b.
+   * @param zb z-coordinate of point b.
+   * @param xc x-coordinate of point c.
+   * @param yc y-coordinate of point c.
+   * @param zc z-coordinate of point c.
+   * @param xd x-coordinate of point d.
+   * @param yd y-coordinate of point d.
+   * @param zd z-coordinate of point d.
    * @param po array containing (x,y,z) coordinates of center.
    */
   public static void centerSphere(
@@ -1242,6 +1338,10 @@ public final class Geometry {
    * Computes the center of the sphere defined by the points a, b, c, and d.
    * The latter are assumed to be in CCW order, such that the method 
    * {@link #leftOfPlane} would return a positive number.
+   * @param pa {x,y,z} coordinates of point a.
+   * @param pb {x,y,z} coordinates of point b.
+   * @param pc {x,y,z} coordinates of point c.
+   * @param pd {x,y,z} coordinates of point d.
    * @param po array containing (x,y,z) coordinates of center.
    */
   public static void centerSphere(
@@ -1258,6 +1358,18 @@ public final class Geometry {
    * Computes the center of the sphere defined by the points a, b, c, and d.
    * The latter are assumed to be in CCW order, such that the method 
    * {@link #leftOfPlane} would return a positive number.
+   * @param xa x-coordinate of point a.
+   * @param ya y-coordinate of point a.
+   * @param za z-coordinate of point a.
+   * @param xb x-coordinate of point b.
+   * @param yb y-coordinate of point b.
+   * @param zb z-coordinate of point b.
+   * @param xc x-coordinate of point c.
+   * @param yc y-coordinate of point c.
+   * @param zc z-coordinate of point c.
+   * @param xd x-coordinate of point d.
+   * @param yd y-coordinate of point d.
+   * @param zd z-coordinate of point d.
    * @param po array containing (x,y,z) coordinates of center.
    */
   public static void centerSphere(
@@ -1295,6 +1407,10 @@ public final class Geometry {
    * Computes the center of the sphere defined by the points a, b, c, and d.
    * The latter are assumed to be in CCW order, such that the method 
    * {@link #leftOfPlane} would return a positive number.
+   * @param pa {x,y,z} coordinates of point a.
+   * @param pb {x,y,z} coordinates of point b.
+   * @param pc {x,y,z} coordinates of point c.
+   * @param pd {x,y,z} coordinates of point d.
    * @param po array containing (x,y,z) coordinates of center.
    */
   public static void centerSphere(
@@ -1310,6 +1426,15 @@ public final class Geometry {
   /**
    * Computes the center of the circle defined by the 3-D points a, b, and c.
    * Because the points have 3-D coordinates, they may specified in any order.
+   * @param xa x-coordinate of point a.
+   * @param ya y-coordinate of point a.
+   * @param za z-coordinate of point a.
+   * @param xb x-coordinate of point b.
+   * @param yb y-coordinate of point b.
+   * @param zb z-coordinate of point b.
+   * @param xc x-coordinate of point c.
+   * @param yc y-coordinate of point c.
+   * @param zc z-coordinate of point c.
    * @param po array containing (x,y,z) coordinates of center.
    */
   public static void centerCircle3D(

@@ -309,6 +309,8 @@ public class RecursiveParallelFilter {
 
   /**
    * For experimental use only.
+   * @param x array of x-coordinates.
+   * @param y array of y-coordinates.
    */
   public void applyFrf(float[] x, float[] y) {
     scale(_c*_g,x,y);
@@ -320,6 +322,8 @@ public class RecursiveParallelFilter {
 
   /**
    * For experimental use only.
+   * @param x array of x-coordinates.
+   * @param y array of y-coordinates.
    */
   public void applyFrr(float[] x, float[] y) {
     scale(_c*_g,x,y);

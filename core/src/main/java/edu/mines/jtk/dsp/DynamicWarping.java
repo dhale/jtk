@@ -897,6 +897,7 @@ public class DynamicWarping {
    * Returns shifts found by backtracking in reverse.
    * @param d array of accumulated errors.
    * @param e array of alignment errors.
+   * @return an array of shifts.
    */
   public float[] backtrackReverse(float[][] d, float[][] e) {
     float[] u = new float[d.length];
@@ -908,6 +909,7 @@ public class DynamicWarping {
    * Returns shifts found by backtracking in reverse in 1st dimension.
    * @param d array of accumulated errors.
    * @param e array of alignment errors.
+   * @return an array of shifts.
    */
   public float[][] backtrackReverse1(float[][][] d, float[][][] e) {
     float[][] u = new float[d.length][d[0].length];
@@ -919,6 +921,7 @@ public class DynamicWarping {
    * Returns shifts found by backtracking in reverse in 2nd dimension.
    * @param d array of accumulated errors.
    * @param e array of alignment errors.
+   * @return an array of shifts.
    */
   public float[][] backtrackReverse2(float[][][] d, float[][][] e) {
     float[][] u = new float[d.length][d[0].length];

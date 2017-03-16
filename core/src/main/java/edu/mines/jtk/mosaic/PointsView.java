@@ -436,7 +436,8 @@ public class PointsView extends TiledView {
 
   /**
    * Sets the horizontal axis scaling.
-   * @param scaleType axis scaling enum value
+   * @param hscale horizontal axis scaling.
+   * @param vscale vertical axis scaling.
    */
   @Override
   public PointsView setScales(AxisScale hscale, AxisScale vscale) {

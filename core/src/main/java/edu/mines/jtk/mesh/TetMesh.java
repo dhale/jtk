@@ -347,6 +347,8 @@ public class TetMesh implements Serializable {
     /**
      * Returns the tet nabor opposite the specified node.
      * The specified node cannot be null, and must be referenced by this tet.
+     * @param node a node.
+     * @return a tet nabor opposite the node.
      */
     public final Tet tetNabor(Node node) {
       if (node==_n0) return _t0;
@@ -361,6 +363,8 @@ public class TetMesh implements Serializable {
      * Returns the node in the specified tet nabor that is opposite this tet.
      * The specified tet nabor cannot be null, and must be referenced by 
      * this tet.
+     * @param tetNabor a tet nabor.
+     * @return the node in the specified tet nabor.
      */
     public final Node nodeNabor(Tet tetNabor) {
       if (tetNabor._t0==this) return tetNabor._n0;
@@ -375,6 +379,8 @@ public class TetMesh implements Serializable {
      * Returns the node opposite this tet in the tet nabor that is opposite 
      * the specified node. The specified node cannot be null. If the tet 
      * nabor opposite the specified node is null, then null is returned.
+     * @param node a node.
+     * @return the node opposite this tet.
      */
     public final Node nodeNabor(Node node) {
       Tet tetNabor = tetNabor(node);
@@ -1684,6 +1690,7 @@ public class TetMesh implements Serializable {
     /**
      * Appends the specified node and step to this list.
      * @param node the node to append.
+     * @param step a step.
      */
     public final void add(Node node, int step) {
       if (_n==_a.length) {
@@ -3088,6 +3095,7 @@ public class TetMesh implements Serializable {
 
   /**
    * Determines whether the specified node is an inner node.
+   * @param node a node.
    * @return true, if inner; false, otherwise.
    */
   public boolean isInner(Node node) {
@@ -3105,6 +3113,7 @@ public class TetMesh implements Serializable {
 
   /**
    * Determines whether the specified node is an outer node.
+   * @param node a node.
    * @return true, if outer; false, otherwise.
    */
   public boolean isOuter(Node node) {
@@ -3113,6 +3122,7 @@ public class TetMesh implements Serializable {
 
   /**
    * Determines whether the specified tet is an inner tet.
+   * @param tet a tet.
    * @return true, if inner; false, otherwise.
    */
   public boolean isInner(Tet tet) {
@@ -3125,6 +3135,7 @@ public class TetMesh implements Serializable {
 
   /**
    * Determines whether the specified tet is an outer tet.
+   * @param tet a tet.
    * @return true, if outer; false, otherwise.
    */
   public boolean isOuter(Tet tet) {
@@ -3133,6 +3144,7 @@ public class TetMesh implements Serializable {
 
   /**
    * Determines whether the specified edge is an inner edge.
+   * @param edge an edge.
    * @return true, if inner; false, otherwise.
    */
   public boolean isInner(Edge edge) {
@@ -3154,6 +3166,7 @@ public class TetMesh implements Serializable {
 
   /**
    * Determines whether the specified edge is an outer edge.
+   * @param edge an edge.
    * @return true, if outer; false, otherwise.
    */
   public boolean isOuter(Edge edge) {
@@ -3162,6 +3175,7 @@ public class TetMesh implements Serializable {
 
   /**
    * Determines whether the specified face is an inner face.
+   * @param face a face.
    * @return true, if inner; false, otherwise.
    */
   public boolean isInner(Face face) {
@@ -3174,6 +3188,7 @@ public class TetMesh implements Serializable {
 
   /**
    * Determines whether the specified face is an outer face.
+   * @param face a face.
    * @return true, if outer; false, otherwise.
    */
   public boolean isOuter(Face face) {
@@ -4979,6 +4994,10 @@ public class TetMesh implements Serializable {
    * This method appears to be 2-3 times slower than findNodeNearest,
    * but it is a lot of code, so we make it private for now.
    * (Currently unused.)
+   * @param x x-coordinate.
+   * @param y y-coordinate.
+   * @param z z-coordinate.
+   * @return the node nearest to the point {x,y,z}.
    */
   public Node findNodeNearestSlow(float x, float y, float z) {
 

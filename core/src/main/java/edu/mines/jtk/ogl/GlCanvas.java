@@ -48,6 +48,7 @@ public class GlCanvas extends GLCanvas implements GLEventListener {
 
   /**
    * Constructs a canvas with specified capabilities.
+   * @param capabilities the OpenGL capabilities.
    */
   public GlCanvas(GLCapabilities capabilities) {
     super(capabilities);

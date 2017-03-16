@@ -451,6 +451,7 @@ public class Sampling {
    * returned index may be less than zero or greater than or equal to the 
    * number of samples.
    * @param x the value.
+   * @return the index of the sample nearest the value.
    */
   public int indexOfNearestExtended(double x) {
     Check.state(isUniform(),"sampling is uniform");
@@ -476,6 +477,7 @@ public class Sampling {
    * Specifically, the returned index may be less than zero or greater 
    * than or equal to the number of samples.
    * @param x the value.
+   * @return the index of the floor of the value.
    */
   public int indexOfFloorExtended(double x) {
     Check.state(isUniform(),"sampling is uniform");
@@ -492,6 +494,7 @@ public class Sampling {
    * the bounds of this sampling, which must be uniform.
    * @param x the value.
    * @param i the index.
+   * @return the difference between a value and the sampled value.
    */
   public double normalizedDifferenceExtended(double x, int i) {
     Check.state(isUniform(),"sampling is uniform");

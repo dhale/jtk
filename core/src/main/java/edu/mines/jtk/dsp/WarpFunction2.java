@@ -41,6 +41,7 @@ public abstract class WarpFunction2 {
    * @param u2 shift in 2nd dimension.
    * @param n1 number of samples in 1st dimension.
    * @param n2 number of samples in 2nd dimension.
+   * @return a constant-shift 2d warping function.
    */
   public static WarpFunction2 constant(double u1, double u2, int n1, int n2) {
     return new ConstantWarp2(u1,u2,n1,n2);
@@ -52,6 +53,7 @@ public abstract class WarpFunction2 {
    * @param u2 maximum shift in 2nd dimension.
    * @param n1 number of samples in 1st dimension.
    * @param n2 number of samples in 2nd dimension.
+   * @return a derivative-of-Gaussian 2d warping function.
    */
   public static WarpFunction2 gaussian(double u1, double u2, int n1, int n2) {
     return new GaussianWarp2(u1,u2,n1,n2);
@@ -63,6 +65,7 @@ public abstract class WarpFunction2 {
    * @param u2 maximum shift in 2nd dimension.
    * @param n1 number of samples in 1st dimension.
    * @param n2 number of samples in 2nd dimension.
+   * @return a sinusoidal 2d warping function.
    */
   public static WarpFunction2 sinusoid(double u1, double u2, int n1, int n2) {
     return new SinusoidWarp2(u1,u2,n1,n2);
@@ -76,6 +79,7 @@ public abstract class WarpFunction2 {
    * @param u2 maximum sinusoidal shift in 2nd dimension.
    * @param n1 number of samples in 1st dimension.
    * @param n2 number of samples in 2nd dimension.
+   * @return a constant-plus-sinusoidal 2d warping function.
    */
   public static WarpFunction2 constantPlusSinusoid(
     double c1, double c2, double u1, double u2, int n1, int n2) 
