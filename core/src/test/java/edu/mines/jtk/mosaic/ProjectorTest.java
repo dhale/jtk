@@ -182,8 +182,8 @@ public class ProjectorTest extends TestCase {
   
 
   public void testAutoLinear() {
-    Projector p = new Projector(0.0, 100, 0.0, 1.0, AxisScale.LOG10);
-    assert(p.getScale() == AxisScale.LINEAR);
+    Projector p = new Projector(0.0, 100, 0.0, 1.0);
+    assertTrue(p.getScale() == AxisScale.LINEAR);
   }
   
   public void testMergeALog () {
