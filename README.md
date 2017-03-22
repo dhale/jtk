@@ -1,14 +1,14 @@
-#The Mines Java Toolkit
+# The Mines Java Toolkit
 
 The Mines Java Toolkit (Mines JTK) is a set of Java packages and native (non-Java) software libraries for science and engineering. Applications currently include digital signal processing, linear algebra, optimization, meshing, interpolation, and 2D and 3D graphics.
 
 The Mines JTK is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
-###Using the Mines JTK 
+### Using the Mines JTK 
 
 To use the Mines JTK, simply include its JAR (Java archive) among any other external dependencies for your project. For example, ```edu-mines-jtk-1.0.0.jar``` can be found by [searching Maven Central](https://search.maven.org). Most build tools can be easily configured to automatically download dependencies from this repository, which also holds JAR files containing documentation (javadoc) and source code for the Mines JTK.
 
-###Getting the source code
+### Getting the source code
 
 If you want to build the Mines JTK yourself, you should first [download its source code from GitHub](https://github.com/dhale/jtk). If you clone this source code repository using git, then you will be able to easily update your copy as others make changes. Alternatively, you may use the Downloads link provided by GitHub to obtain a current snapshot of the code.
 
@@ -36,11 +36,11 @@ The directory jtk/ includes the following subdirectories:
 | [misc/](misc/)     | miscellaneous tools for development and maintenance        |
 
 
-###Installing the Java Development Kit (JDK)
+### Installing the Java Development Kit (JDK)
 
 Before building the Mines JTK, you must first [install Java SE JDK 7 (or later)](http://www.oracle.com/technetwork/java/javase/downloads) On Windows, we like to put tools such as the JDK in a folder named ```C:\pro\```. This folder name is shorter than "C:\Program Files" and contains no spaces, which makes it easy to specify in scripts and environment variables.
 
-###Building the Mines JTK
+### Building the Mines JTK
 
 The Mines JTK can be built most easily using the included Gradle wrapper. Gradle is a tool for automatic software builds. You can download and install Gradle on your system, but you need not do so if you only want to build the Mines JTK. First cd into the directory jtk/, which contains files build.gradle, gradlew (for Mac OS and Linux) and gradlew.bat (for Windows). Then type the command ```gradlew``` (or ```sh gradlew```) to build the Mines JTK. Look for the file ```core/build/libs/edu-mines-jtk-x.x.x.jar```, for some version number ```x.x.x```. You can use this JAR file like any other. However, depending on which packages you use, you may need other JAR files, called "dependencies." For example, the Mines JTK depends on JOGL for 3D graphics via OpenGL.
 
@@ -48,7 +48,7 @@ Gradle will automatically be downloaded the first time that you use the gradlew 
 
 The layout of directories and files for the Mines JTK was designed to conform to that expected by common build tools such as [Gradle](http://gradle.org/gradle-download/) (and Maven). You may also use an integrated development environment (IDE), such as [Eclipse](https://www.eclipse.org/downloads/) or [IntelliJ IDEA](https://www.jetbrains.com/idea/) to build the Mines JTK. However, we strongly recommend that you first build the JTK from the command line, as described above.
 
-###Testing the Mines JTK
+### Testing the Mines JTK
 
 The full name of the default Gradle task performed by the command ```gradlew``` is ```:core:jar```. We can perform other tasks, such as
 
@@ -66,7 +66,7 @@ to make a ZIP archive containing JAR files for the Mines JTK and all dependencie
 
 ```gradlew tasks```
 
-###Running demonstration programs
+### Running demonstration programs
 
 The Mines Java Toolkit is a set of classes intended for use in other programs. The demo subproject provides examples, Java classes with a method ```main```, and Jython scripts. We can learn a lot about classes in the Mines JTK by running the demos and studying their source code. Try this:
 
@@ -80,7 +80,7 @@ The former command runs a Java class with a method main, and the latter runs a J
 
 Currently, the best way to learn about what demos are available is to browse the directories ```demo/src/main/[java, jython]/jtkdemo/```.
 
-###3D graphics in the Mines JTK
+### 3D graphics in the Mines JTK
 
 Our packages for 3D graphics are built on JOGL, a Java binding for the OpenGL API. As a first demo that 3D graphics is working, type the command
 
@@ -88,7 +88,7 @@ Our packages for 3D graphics are built on JOGL, a Java binding for the OpenGL AP
 
 You should see a white square, painted via OpenGL. This demo program also prints the OpenGL vendor and version number. That number should not be less than 1.2.
 
-###Development using the Mines JTK
+### Development using the Mines JTK
 
 When developing your own software, you should not use package names that begin with "edu.mines.jtk", unless you are making modifications or additions to the Mines JTK that you wish to contribute back to us. (See the file [license.txt](license.txt].) The prefix edu.mines.jtk makes our class names unique.
 
