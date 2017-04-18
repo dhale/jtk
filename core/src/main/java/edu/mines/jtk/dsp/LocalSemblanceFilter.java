@@ -395,10 +395,10 @@ public class LocalSemblanceFilter {
     private float _scale;
     private static final double _small = 0.001;
     private static final int _niter = 1000;
-    private static final LocalDiffusionKernel _ldk = 
+    private final LocalDiffusionKernel _ldk = 
       //new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D22);
       new LocalDiffusionKernel(LocalDiffusionKernel.Stencil.D71);
-    private static final LocalSmoothingFilter _lsf = 
+    private final LocalSmoothingFilter _lsf = 
       new LocalSmoothingFilter(_small,_niter,_ldk);
     private static final double _kmax = 0.35;
   }
