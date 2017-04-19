@@ -618,12 +618,12 @@ public class Mosaic extends IPanel {
           bvp.merge(_tiles[jrow][icol].getBestVerticalProjector());
       }
     }
-    
+
     // check to see if scales in adjacent tiles are set up right
     boolean[] checkScales = checkTileScales(tile);
-    if(!checkScales[0])
+    if(!checkScales[0] && bhp!=null)
       bhp.setScale(AxisScale.LINEAR);
-    if(!checkScales[1])
+    if(!checkScales[1] && bvp!=null)
       bvp.setScale(AxisScale.LINEAR);
 
     if (bhp!=null && bvp!=null) {
@@ -633,16 +633,16 @@ public class Mosaic extends IPanel {
     } else if (bvp!=null) {
       tile.setVerticalProjector(bvp);
     }
-    
-    
+
     for (int irow=0; irow<_nrow; ++irow) {
-      if (irow!=jrow)
+      if (irow!=jrow && bhp!=null)
         _tiles[irow][jcol].setHorizontalProjector(bhp);
     }
     for (int icol=0; icol<_ncol; ++icol) {
-      if (icol!=jcol)
+      if (icol!=jcol && bvp!=null)
         _tiles[jrow][icol].setVerticalProjector(bvp);
     }
+
     repaintAxis(_axesTop,jcol);
     repaintAxis(_axesBottom,jcol);
     repaintAxis(_axesLeft,jrow);
@@ -651,23 +651,25 @@ public class Mosaic extends IPanel {
  
   // check to see if the adjacent Tiles to tile have the appropriate
   // matching axis scales
-  private boolean[] checkTileScales(Tile tile) {
-    int jrow = tile.getRowIndex();
-    int jcol = tile.getColumnIndex();
-    AxisScale hscale = tile.getHScale();
-    AxisScale vscale = tile.getVScale();
-    boolean[] compat = new boolean[]{true,true}; 
-    
+  private boolean[] checkTileScales(final Tile tile) {
+    final int jrow = tile.getRowIndex();
+    final int jcol = tile.getColumnIndex();
+    final AxisScale hscale = tile.getHScale();
+    final AxisScale vscale = tile.getVScale();
+
+    boolean hcompat = true;
     for (int irow=0; irow<_nrow; ++irow){
-      Tile t = _tiles[irow][jcol];
-      compat[0] = (t.getHScale()==hscale && compat[0])?true:false;
+      final Tile t = _tiles[irow][jcol];
+      hcompat &= t.getHScale()==hscale;
     }
     
+    boolean vcompat = true;
     for (int icol=0; icol<_ncol; ++icol){ 
-      Tile t = _tiles[jrow][icol];
-      compat[1] = (t.getVScale()==vscale && compat[1])?true:false;
+      final Tile t = _tiles[jrow][icol];
+      vcompat &= t.getVScale()==vscale;
     }
-    return compat;
+
+    return new boolean[] { hcompat, vcompat };
   }
   
   void setViewRect(Tile tile, DRectangle vr) {
