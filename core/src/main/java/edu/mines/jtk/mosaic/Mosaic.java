@@ -630,6 +630,8 @@ public class Mosaic extends IPanel {
       tile.setProjectors(bhp,bvp);
     } else if (bhp!=null) {
       tile.setHorizontalProjector(bhp);
+    } else if (bvp!=null) {
+      tile.setVerticalProjector(bvp);
     }
     
     
