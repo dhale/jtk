@@ -1,3 +1,5 @@
+# Note: This repository is deprecated and has moved here: https://github.com/MinesJTK/jtk
+
 # The Mines Java Toolkit
 
 The Mines Java Toolkit (Mines JTK) is a set of Java packages and native (non-Java) software libraries for science and engineering. Applications currently include digital signal processing, linear algebra, optimization, meshing, interpolation, and 2D and 3D graphics.
